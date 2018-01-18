@@ -14,13 +14,9 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -33,7 +29,6 @@ import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
 
 /**
  * A base class for DSpace Rest HAL Resource. The HAL Resource wraps the REST
@@ -44,16 +39,10 @@ import org.springframework.hateoas.ResourceSupport;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class DSpaceResource<T extends RestModel> extends ResourceSupport {
-	@JsonUnwrapped
-	private final T data;
-
-	@JsonProperty(value = "_embedded")
-	@JsonInclude(Include.NON_EMPTY)
-	private Map<String, Object> embedded = new HashMap<String, Object>();
+public abstract class DSpaceResource<T extends RestModel> extends HALResource<T> {
 
 	public DSpaceResource(T data, Utils utils, String... rels) {
-		this.data = data;
+		super(data);
 
 		if (data != null) {
 			try {
@@ -108,16 +97,13 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 							Link linkToSubResource = utils.linkToSubResource(data, name);	
 							// no method is specified to retrieve the linked object(s) so check if it is already here
 							if (StringUtils.isBlank(linkAnnotation.method())) {
-
 								Object linkedObject = readMethod.invoke(data);
 								Object wrapObject = linkedObject;
 								if (linkedObject instanceof RestModel) {
 									RestModel linkedRM = (RestModel) linkedObject; 
 									wrapObject = utils.getResourceRepository(linkedRM.getCategory(), linkedRM.getType())
 											.wrapResource(linkedRM);
-									if(linkAnnotation.linkClass() != null && linkAnnotation.linkClass().isAssignableFrom(linkedRM.getClass())) {
-										linkToSubResource = utils.linkToSingleResource(linkedRM, name);
-									}
+
 								}
 								else {
 									if (linkedObject instanceof List) {
@@ -139,16 +125,8 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 										}
 									}
 								}
-								if (linkedObject != null) {
-									embedded.put(name, wrapObject);
-									this.add(linkToSubResource);
-								} else if(!linkAnnotation.optional()) {
-									embedded.put(name, null);
-									this.add(linkToSubResource);
-								}
 
-								Method writeMethod = pd.getWriteMethod();
-								writeMethod.invoke(data, new Object[] { null });
+								embedded.put(name, wrapObject);
 							}
 							else {
 								// call the link repository
@@ -177,8 +155,6 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 							}
 						}
 						else if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {
-							Link linkToSubResource = utils.linkToSubResource(data, name);
-							this.add(linkToSubResource);
 							RestModel linkedObject = (RestModel) readMethod.invoke(data);
 							if (linkedObject != null) {
 								embedded.put(name,
@@ -187,9 +163,6 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 							} else {
 								embedded.put(name, null);
 							}
-
-							Method writeMethod = pd.getWriteMethod();
-							writeMethod.invoke(data, new Object[] { null });
 						}
 					}
 				}
@@ -197,20 +170,13 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 					| InvocationTargetException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
-			this.add(utils.linkToSingleResource(data, Link.REL_SELF));
 		}
 	}
 
+	//Trick to make Java Understand that our content extends RestModel
+	@JsonUnwrapped
 	@Override
-	public void add(Link link) {
-		System.out.println("Chiamato "+link.getRel());
-		super.add(link);
-	}
-	public Map<String, Object> getEmbedded() {
-		return embedded;
-	}
-
-	public T getData() {
-		return data;
+	public T getContent() {
+		return super.getContent();
 	}
 }

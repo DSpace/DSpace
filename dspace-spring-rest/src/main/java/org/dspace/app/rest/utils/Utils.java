@@ -61,7 +61,7 @@ public class Utils {
 	}
 
 	public Link linkToSingleResource(DSpaceResource r, String rel) {
-		RestModel data = r.getData();
+		RestModel data = r.getContent();
 		return linkToSingleResource(data, rel);
 	}
 

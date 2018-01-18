@@ -46,6 +46,8 @@ public class DSpaceKernelInit {
             } catch (Exception e) {
                 // Ignore exceptions here
             }
+        } else if (DSpaceKernelManager.getDefaultKernel() != null){
+            return (DSpaceKernelImpl) DSpaceKernelManager.getDefaultKernel();
         }
 
         synchronized (staticLock) {

@@ -45,19 +45,7 @@ public class SearchUtils {
     public static DiscoveryConfiguration getDiscoveryConfiguration(DSpaceObject dso) {
         DiscoveryConfigurationService configurationService = getConfigurationService();
 
-        DiscoveryConfiguration result = null;
-        if (dso == null) {
-            result = configurationService.getMap().get("site");
-        }else{
-            result = configurationService.getMap().get(dso.getHandle());
-        }
-
-        if (result == null) {
-            //No specific configuration, get the default one
-            result = configurationService.getMap().get("default");
-        }
-
-        return result;
+        return configurationService.getDiscoveryConfiguration(dso);
     }
 
     public static DiscoveryConfigurationService getConfigurationService() {

@@ -11,6 +11,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -148,4 +149,6 @@ public interface SearchService {
      * @return query with any special characters escaped
      */
     String escapeQueryChars(String query);
+
+    FacetYearRange getFacetYearRange(Context context, DSpaceObject scope, DiscoverySearchFilterFacet facet, List<String> filterQueries) throws SearchServiceException;
 }

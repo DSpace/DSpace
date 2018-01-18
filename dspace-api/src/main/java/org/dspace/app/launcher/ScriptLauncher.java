@@ -90,13 +90,17 @@ public class ScriptLauncher
         System.exit(status);
     }
 
+    protected static int runOneCommand(Document commandConfigs, String[] args) {
+        return runOneCommand(commandConfigs, args, kernelImpl);
+    }
+
     /**
      * Recognize and execute a single command.
      *
      * @param doc Document
      * @param args the command line arguments given
      */
-    static int runOneCommand(Document commandConfigs, String[] args)
+    public static int runOneCommand(Document commandConfigs, String[] args, DSpaceKernelImpl kernelImpl)
     {
         String request = args[0];
         Element root = commandConfigs.getRootElement();
@@ -256,10 +260,15 @@ public class ScriptLauncher
      */
     protected static Document getConfig()
     {
+        return getConfig(kernelImpl);
+    }
+
+    public static Document getConfig(DSpaceKernelImpl kernelImpl)
+    {
         // Load the launcher configuration file
         String config = kernelImpl.getConfigurationService().getProperty("dspace.dir") +
-                        System.getProperty("file.separator") + "config" +
-                        System.getProperty("file.separator") + "launcher.xml";
+                System.getProperty("file.separator") + "config" +
+                System.getProperty("file.separator") + "launcher.xml";
         SAXBuilder saxBuilder = new SAXBuilder();
         Document doc = null;
         try

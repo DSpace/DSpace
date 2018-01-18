@@ -19,6 +19,7 @@ import org.dspace.app.rest.converter.AuthorityEntryRestConverter;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.hateoas.AuthorityEntryResource;
+import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.Choice;
@@ -53,7 +54,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 	private AuthorityUtils authorityUtils;
 	
 	@Override
-	public ResourceSupport wrapResource(AuthorityEntryRest model, String... rels) {
+	public HALResource wrapResource(AuthorityEntryRest model, String... rels) {
 		return new AuthorityEntryResource(model);
 	}
 

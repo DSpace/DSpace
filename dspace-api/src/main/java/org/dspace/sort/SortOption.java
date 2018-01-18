@@ -35,10 +35,10 @@ public class SortOption
     
     /** the name of the sort */
     private String name;
-    
+
     /** the metadata field to sort on */
     private String metadata;
-    
+
     /** the type of data we are sorting by */
     private String type;
     

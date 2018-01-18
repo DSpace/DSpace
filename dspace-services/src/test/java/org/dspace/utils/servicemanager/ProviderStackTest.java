@@ -7,17 +7,18 @@
  */
 package org.dspace.utils.servicemanager;
 
-import static org.junit.Assert.*;
+import org.dspace.kernel.ServiceManager;
+import org.dspace.kernel.mixins.OrderedService;
+import org.junit.Test;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.kernel.ServiceManager;
-import org.dspace.kernel.mixins.OrderedService;
-import org.junit.Test;
-import org.springframework.context.ConfigurableApplicationContext;
+import static org.junit.Assert.*;
+
 
 /**
  * Tests the usage of the provider stack

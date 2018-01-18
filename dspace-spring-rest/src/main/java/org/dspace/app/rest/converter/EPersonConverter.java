@@ -60,4 +60,9 @@ public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.
 		return new EPersonRest();
 	}
 
+	@Override
+	protected Class<EPerson> getModelClass() {
+		return EPerson.class;
+	}
+
 }

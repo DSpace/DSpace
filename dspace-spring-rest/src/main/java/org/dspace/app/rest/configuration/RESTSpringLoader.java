@@ -14,9 +14,6 @@ import org.dspace.kernel.config.SpringLoader;
 import org.dspace.services.ConfigurationService;
 
 /**
- * Utility class that will load the Spring XML configuration files related to the REST webapp
- *
- * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class RESTSpringLoader implements SpringLoader {

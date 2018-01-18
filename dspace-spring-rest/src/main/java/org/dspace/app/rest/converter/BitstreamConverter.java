@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -67,5 +68,10 @@ public class BitstreamConverter
 	@Override
 	protected BitstreamRest newInstance() {
 		return new BitstreamRest();
+	}
+
+	@Override
+	protected Class<Bitstream> getModelClass() {
+		return Bitstream.class;
 	}
 }

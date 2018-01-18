@@ -54,6 +54,9 @@ public class AbstractDSpaceIntegrationTest
     {
         try
         {
+            //Stops System.exit(0) throws exception instead of exitting
+            System.setSecurityManager(new NoExitSecurityManager());
+
             //set a standard time zone for the tests
             TimeZone.setDefault(TimeZone.getTimeZone("Europe/Dublin"));
 
@@ -85,6 +88,8 @@ public class AbstractDSpaceIntegrationTest
      */
     @AfterClass
     public static void destroyKernel() throws SQLException {
+        System.setSecurityManager(null);
+
         //we clear the properties
         testProps.clear();
         testProps = null;
