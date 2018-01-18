@@ -10,7 +10,6 @@ package org.dspace.app.rest.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.content.Bitstream;
@@ -61,5 +60,10 @@ public class CommunityConverter
 	@Override
 	protected CommunityRest newInstance() {
 		return new CommunityRest();
+	}
+
+	@Override
+	protected Class<org.dspace.content.Community> getModelClass() {
+		return org.dspace.content.Community.class;
 	}
 }

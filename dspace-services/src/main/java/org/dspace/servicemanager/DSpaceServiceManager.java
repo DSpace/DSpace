@@ -7,22 +7,9 @@
  */
 package org.dspace.servicemanager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.kernel.Activator;
-import org.dspace.kernel.mixins.ConfigChangeListener;
-import org.dspace.kernel.mixins.InitializedService;
-import org.dspace.kernel.mixins.ServiceChangeListener;
-import org.dspace.kernel.mixins.ServiceManagerReadyAware;
-import org.dspace.kernel.mixins.ShutdownService;
+import org.dspace.kernel.mixins.*;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.spring.SpringServiceManager;
 import org.dspace.services.ConfigurationService;
@@ -31,6 +18,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * This is the core service manager which ties together the other

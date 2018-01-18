@@ -22,9 +22,10 @@ public interface RestModel extends Serializable {
 	public static final String CORE = "core";
 	public static final String EPERSON = "eperson";
 	public static final String DISCOVER = "discover";
+	public static final String ROOT = "root";
 	public static final String CONFIGURATION = "config";
 	public static final String INTEGRATION = "integration";
-	
+
 	@JsonIgnore
 	public String getCategory();
 	

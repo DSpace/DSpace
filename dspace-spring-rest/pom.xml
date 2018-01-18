@@ -251,7 +251,7 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
-        
+
         <!-- Apache Commons Collections 4.1 (used for MultiValuedMap to store metadata values for views) -->
         <!-- NOTE: Currently DSpace API / Services still used 3.2 and may need upgrading at some point -->
         <dependency>
