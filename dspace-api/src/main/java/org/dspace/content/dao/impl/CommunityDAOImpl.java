@@ -9,9 +9,9 @@ package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections.ListUtils;
 import org.dspace.content.Community;
 import org.dspace.content.MetadataField;
 import org.dspace.content.dao.CommunityDAO;
@@ -56,9 +56,9 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT ").append(Community.class.getSimpleName()).append(" FROM Community as ")
-                    .append(Community.class.getSimpleName()).append(" ");
+            .append(Community.class.getSimpleName()).append(" ");
         addMetadataLeftJoin(queryBuilder, Community.class.getSimpleName(), Arrays.asList(sortField));
-        addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), ListUtils.EMPTY_LIST);
+        addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), Collections.EMPTY_LIST);
 
         Query query = createQuery(context, queryBuilder.toString());
         if (offset != null) {
@@ -83,8 +83,8 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT community FROM Community as community ");
         addMetadataLeftJoin(queryBuilder, Community.class.getSimpleName().toLowerCase(), Arrays.asList(sortField));
-        addMetadataValueWhereQuery(queryBuilder, ListUtils.EMPTY_LIST, null, " community.parentCommunities IS EMPTY");
-        addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), ListUtils.EMPTY_LIST);
+        addMetadataValueWhereQuery(queryBuilder, Collections.EMPTY_LIST, null, " community.parentCommunities IS EMPTY");
+        addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), Collections.EMPTY_LIST);
 
         Query query = createQuery(context, queryBuilder.toString());
         query.setParameter(sortField.toString(), sortField.getID());

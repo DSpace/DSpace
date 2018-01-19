@@ -9,10 +9,10 @@ package org.dspace.core;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
@@ -63,7 +63,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
         for (MetadataField metadataField : metadataFields) {
             query.append(" left join ").append(tableIdentifier).append(".metadata ").append(metadataField.toString());
             query.append(" WITH ").append(metadataField.toString()).append(".metadataField.id").append(" = :")
-                 .append(metadataField.toString());
+                .append(metadataField.toString());
         }
     }
 
@@ -87,7 +87,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
                 if (StringUtils.isNotBlank(operator)) {
                     query.append(" (");
                     query.append("lower(STR(" + metadataField.toString()).append(".value)) ").append(operator)
-                         .append(" lower(:queryParam)");
+                        .append(" lower(:queryParam)");
                     query.append(")");
                     if (i < metadataFields.size() - 1) {
                         query.append(" OR ");
@@ -115,7 +115,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      */
     protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields,
                                         List<String> columnSortFields) {
-        addMetadataSortQuery(query, metadataSortFields, columnSortFields, ListUtils.EMPTY_LIST);
+        addMetadataSortQuery(query, metadataSortFields, columnSortFields, Collections.EMPTY_LIST);
     }
 
     /**

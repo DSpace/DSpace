@@ -27,7 +27,7 @@ import edu.harvard.hul.ois.mets.StructMap;
 import edu.harvard.hul.ois.mets.Type;
 import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.PCData;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
@@ -228,7 +228,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
         agentCreator.setOTHERTYPE("DSpace Software");
         Name creatorName = new Name();
         creatorName.getContent()
-                   .add(new PCData("DSpace " + Util.getSourceVersion()));
+            .add(new PCData("DSpace " + Util.getSourceVersion()));
         agentCreator.getContent().add(creatorName);
         metsHdr.getContent().add(agentCreator);
 
@@ -254,7 +254,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
         throws SQLException, IOException, AuthorizeException {
         String[] dmdTypes = configurationService.getArrayProperty("aip.disseminate.dmd");
         if (ArrayUtils.isEmpty(dmdTypes)) {
-            return new String[] {"MODS", "DIM"};
+            return new String[]{"MODS", "DIM"};
         } else {
             return dmdTypes;
         }
@@ -280,7 +280,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
         String[] techTypes = configurationService.getArrayProperty("aip.disseminate.techMD");
         if (ArrayUtils.isEmpty(techTypes)) {
             if (dso.getType() == Constants.BITSTREAM) {
-                return new String[] {"PREMIS"};
+                return new String[]{"PREMIS"};
             } else {
                 return new String[0];
             }
@@ -312,7 +312,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
         throws SQLException, IOException, AuthorizeException {
         String[] sourceTypes = configurationService.getArrayProperty("aip.disseminate.sourceMD");
         if (ArrayUtils.isEmpty(sourceTypes)) {
-            return new String[] {"AIP-TECHMD"};
+            return new String[]{"AIP-TECHMD"};
         } else {
             return sourceTypes;
         }

@@ -1150,15 +1150,14 @@
                 <version>1.10</version>
             </dependency>
             <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>3.2.2</version>
-                <!-- <version>3.1</version> xmlui - wing -->
-            </dependency>
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.2</version>
             </dependency>
             <dependency>
                 <groupId>commons-configuration</groupId>
