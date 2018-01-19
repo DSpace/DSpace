@@ -159,10 +159,6 @@
                      <groupId>org.apache.commons</groupId>
                      <artifactId>commons-lang3</artifactId>
                 </exclusion>
-                <exclusion>
-                     <groupId>org.codehaus.jackson</groupId>
-                     <artifactId>jackson-mapper-asl</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
 
