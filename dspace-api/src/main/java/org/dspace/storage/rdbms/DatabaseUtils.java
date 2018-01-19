@@ -1381,6 +1381,7 @@ public class DatabaseUtils
     /**
      * Get a reference to the configured DataSource (which can be used to
      * initialize the database using Flyway).
+     * The DataSource is configured via our ServiceManager (i.e. via Spring).
      * <P>
      * This is NOT public, as we discourage direct connections to the database
      * which bypass Hibernate. Only Flyway should be allowed a direct connection.
@@ -1388,7 +1389,6 @@ public class DatabaseUtils
      */
     protected static DataSource getDataSource()
     {
-        // DataSource is configured via our ServiceManager (i.e. via Spring).
         Object dataSource = DSpaceServicesFactory.getInstance()
                 .getServiceManager()
                 .getServiceByName("dataSource", Object.class);
