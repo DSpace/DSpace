@@ -13,6 +13,7 @@ import static org.dspace.app.rest.security.WebSecurityConfiguration.EPERSON_GRAN
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,7 +38,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 /**
- * This class is reponsible for authenticating a user via REST
+ * This class is responsible for authenticating a user via REST
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
@@ -78,11 +79,11 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         Context newContext = null;
         Authentication output = null;
 
-        if(authentication != null && authentication.getCredentials() != null) {
+        if(authentication != null) {
             try {
                 newContext = new Context();
                 String name = authentication.getName();
-                String password = authentication.getCredentials().toString();
+                String password = Objects.toString(authentication.getCredentials(), null);
 
                 int implicitStatus = authenticationService.authenticateImplicit(newContext, null, null, null, request);
 
@@ -104,8 +105,6 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                         throw new BadCredentialsException("Login failed");
                     }
                 }
-            } catch (Exception e) {
-                log.error("Error while authenticating in the rest api", e);
             } finally {
                 if (newContext != null && newContext.isValid()) {
                     try {
@@ -156,7 +155,8 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         return authorities;
     }
 
+    @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(DSpaceAuthentication.class);
+        return DSpaceAuthentication.class.isAssignableFrom(authentication);
     }
 }

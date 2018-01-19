@@ -31,7 +31,7 @@ public class DSpaceAuthentication implements Authentication {
     private boolean authenticated = true;
 
 
-    public DSpaceAuthentication (EPerson ePerson, List<GrantedAuthority> authorities) {
+    public DSpaceAuthentication(EPerson ePerson, List<GrantedAuthority> authorities) {
         this.previousLoginDate = ePerson.getPreviousActive();
         this.username = ePerson.getEmail();
         this.authorities = authorities;
