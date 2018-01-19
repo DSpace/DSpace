@@ -10,11 +10,14 @@ package org.dspace.core;
 import java.io.Serializable;
 
 /**
- * Interface that has to be implemented by all entities that can be reloaded by the Context
- * (see {@link org.dspace.core.Context#reloadEntity(ReloadableEntity)} ])}
+ * Implemented by all entities that can be reloaded by the {@link Context}.
+ * @param <T> type of this entity's primary key.
+ * @see org.dspace.core.Context#reloadEntity(ReloadableEntity)
  */
 public interface ReloadableEntity<T extends Serializable> {
-
+    /**
+     * The unique identifier of this entity instance.
+     * @return the value of the primary key for this instance.
+     */
     T getID();
-
 }
