@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -59,7 +59,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         // Ensure the element and qualifier are unique within a given schema.
         if (hasElement(context, -1, metadataSchema, element, qualifier)) {
             throw new NonUniqueMetadataException("Please make " + element + "."
-                                                     + qualifier + " unique within schema #" + metadataSchema.getID());
+                + qualifier + " unique within schema #" + metadataSchema.getID());
         }
 
         // Create a table row and update it with the values
@@ -72,7 +72,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         metadataFieldDAO.save(context, metadataField);
 
         log.info(LogManager.getHeader(context, "create_metadata_field",
-                                      "metadata_field_id=" + metadataField.getID()));
+            "metadata_field_id=" + metadataField.getID()));
         return metadataField;
     }
 
@@ -121,7 +121,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
 
         // Ensure the element and qualifier are unique within a given schema.
         if (hasElement(context, metadataField.getID(), metadataField.getMetadataSchema(), metadataField.getElement(),
-                       metadataField.getQualifier())) {
+            metadataField.getQualifier())) {
             throw new NonUniqueMetadataException(
                 "Please make " + metadataField.getMetadataSchema().getName() + "." + metadataField.getElement() + "."
                     + metadataField.getQualifier());
@@ -130,9 +130,9 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         metadataFieldDAO.save(context, metadataField);
 
         log.info(LogManager.getHeader(context, "update_metadatafieldregistry",
-                                      "metadata_field_id=" + metadataField.getID() + "element=" + metadataField
-                                          .getElement()
-                                          + "qualifier=" + metadataField.getQualifier()));
+            "metadata_field_id=" + metadataField.getID() + "element=" + metadataField
+                .getElement()
+                + "qualifier=" + metadataField.getQualifier()));
     }
 
     @Override
@@ -160,7 +160,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         }
 
         log.info(LogManager.getHeader(context, "delete_metadata_field",
-                                      "metadata_field_id=" + metadataField.getID()));
+            "metadata_field_id=" + metadataField.getID()));
     }
 
     /**

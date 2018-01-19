@@ -17,8 +17,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
+import org.apache.commons.collections4.CollectionUtils;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import mockit.NonStrictExpectations;
 import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -27,13 +31,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import mockit.NonStrictExpectations;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
