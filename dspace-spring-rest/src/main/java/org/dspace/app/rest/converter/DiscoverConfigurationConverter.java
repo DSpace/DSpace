@@ -67,6 +67,7 @@ public class DiscoverConfigurationConverter {
             filter.setType(discoverySearchFilter.getType());
             filter.setOpenByDefault(discoverySearchFilter.isOpenByDefault());
             filter.addDefaultOperatorsToList();
+            filter.setPageSize(discoverySearchFilter.getPageSize());
             searchConfigurationRest.addFilter(filter);
         }
     }

@@ -108,6 +108,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         private String type;
         private boolean isOpenByDefault = false;
         private List<Operator> operators = new LinkedList<>();
+        private int pageSize;
 
         public static final String OPERATOR_EQUALS = "equals";
         public static final String OPERATOR_NOTEQUALS = "notequals";
@@ -121,6 +122,14 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         }
         public void setHasFacets(boolean hasFacets) {
             this.hasFacets = hasFacets;
+        }
+
+        public int getPageSize() {
+            return pageSize;
+        }
+
+        public void setPageSize(int pageSize) {
+            this.pageSize = pageSize;
         }
 
         public String getType() {

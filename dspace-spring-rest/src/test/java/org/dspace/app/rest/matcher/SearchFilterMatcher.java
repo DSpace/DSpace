@@ -23,7 +23,8 @@ public class SearchFilterMatcher {
                 hasJsonPath("$.filter", is("title")),
                 hasJsonPath("$.hasFacets", is(false)),
                 hasJsonPath("$.type", is("text")),
-                hasJsonPath("$.openByDefault", is(false)),checkOperators()
+                hasJsonPath("$.openByDefault", is(true)),
+                checkOperators()
 
         );
     }
@@ -33,7 +34,8 @@ public class SearchFilterMatcher {
                 hasJsonPath("$.filter", is("author")),
                 hasJsonPath("$.hasFacets", is(true)),
                 hasJsonPath("$.type", is("text")),
-                hasJsonPath("$.openByDefault", is(true)),checkOperators()
+                hasJsonPath("$.openByDefault", is(true)),
+                checkOperators()
 
         );
     }
@@ -43,7 +45,8 @@ public class SearchFilterMatcher {
                 hasJsonPath("$.filter", is("subject")),
                 hasJsonPath("$.hasFacets", is(true)),
                 hasJsonPath("$.type", is("hierarchical")),
-                hasJsonPath("$.openByDefault", is(false)),checkOperators()
+                hasJsonPath("$.openByDefault", is(false)),
+                checkOperators()
 
         );
     }
@@ -53,7 +56,8 @@ public class SearchFilterMatcher {
                 hasJsonPath("$.filter", is("dateIssued")),
                 hasJsonPath("$.hasFacets", is(true)),
                 hasJsonPath("$.type", is("date")),
-                hasJsonPath("$.openByDefault", is(false)),checkOperators()
+                hasJsonPath("$.openByDefault", is(false)),
+                checkOperators()
 
         );
     }
@@ -63,21 +67,23 @@ public class SearchFilterMatcher {
                 hasJsonPath("$.filter", is("has_content_in_original_bundle")),
                 hasJsonPath("$.hasFacets", is(true)),
                 hasJsonPath("$.type", is("standard")),
-                hasJsonPath("$.openByDefault", is(false)),checkOperators()
+                hasJsonPath("$.openByDefault", is(false)),
+                checkOperators()
 
         );
     }
 
     public static Matcher<? super Object> checkOperators() {
         return allOf(
-            hasJsonPath("$.operators", containsInAnyOrder(
-                hasJsonPath("$.operator", is("equals")),
-                hasJsonPath("$.operator", is("notequals")),
-                hasJsonPath("$.operator", is("authority")),
-                hasJsonPath("$.operator", is("notauthority")),
-                hasJsonPath("$.operator", is("contains")),
-                hasJsonPath("$.operator", is("notcontains"))
-            ))
+                hasJsonPath("$.operators",  containsInAnyOrder(
+                        hasJsonPath("$.operator", is("equals")),
+                        hasJsonPath("$.operator", is("notequals")),
+                        hasJsonPath("$.operator", is("authority")),
+                        hasJsonPath("$.operator", is("notauthority")),
+                        hasJsonPath("$.operator", is("contains")),
+                        hasJsonPath("$.operator", is("notcontains")),
+                        hasJsonPath("$.operator", is("query"))
+                        ))
         );
     }
 }
