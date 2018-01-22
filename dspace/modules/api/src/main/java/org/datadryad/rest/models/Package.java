@@ -165,6 +165,7 @@ public class Package {
             jGen.writeStringField("@type", "Dataset");
             jGen.writeStringField("@id", DOIIdentifierProvider.getFullDOIURL(dataPackage.getDryadDOI()));
             jGen.writeStringField("url", DOIIdentifierProvider.getFullDOIURL(dataPackage.getDryadDOI()));
+            jGen.writeStringField("identifier", dataPackage.getDryadDOI());
             jGen.writeStringField("name", dataPackage.getTitle());
             jGen.writeObjectField("author", dataPackage.getAuthorList());
             jGen.writeStringField("datePublished", dataPackage.getPublicationDate());
@@ -176,7 +177,12 @@ public class Package {
             if (dataPackage.getKeywords().size() > 0) {
                 jGen.writeObjectField("keywords", dataPackage.getKeywords());
             }
-            jGen.writeStringField("citation", dataPackage.getPublicationDOI());
+
+            // write citation for article:
+            jGen.writeObjectFieldStart("citation");
+            jGen.writeStringField("@type", "Article");
+            jGen.writeStringField("identifier", dataPackage.getPublicationDOI());
+            jGen.writeEndObject();
 
             // write Dryad Digital Repository Organization object:
             jGen.writeObjectFieldStart("publisher");
