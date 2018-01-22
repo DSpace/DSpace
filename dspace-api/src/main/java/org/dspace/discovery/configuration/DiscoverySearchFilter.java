@@ -22,6 +22,8 @@ public class DiscoverySearchFilter {
     public static final String FILTER_TYPE_DEFAULT = "default";
     protected boolean isOpenByDefault = false;
 
+    protected int pageSize;
+
     public String getIndexFieldName() {
         return indexFieldName;
     }
@@ -70,4 +72,11 @@ public class DiscoverySearchFilter {
         this.isOpenByDefault = isOpenByDefault;
     }
 
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
 }
