@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.service.ApplicationService;
+import org.dspace.app.webui.util.IAtomicDisplayStrategy;
 import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
 import org.dspace.browse.BrowseDSpaceObject;
 import org.dspace.browse.BrowseItem;
@@ -29,9 +30,11 @@ import org.dspace.core.Utils;
 import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.utils.DSpace;
 
-public class CrisRefDisplayStrategy implements IDisplayMetadataValueStrategy
+public class CrisRefDisplayStrategy implements IDisplayMetadataValueStrategy, IAtomicDisplayStrategy
 {
 
+    private String myName;
+    
 	/**
 	 * log4j category
 	 */
@@ -49,8 +52,11 @@ public class CrisRefDisplayStrategy implements IDisplayMetadataValueStrategy
     {
         ACrisObject crisObject = (ACrisObject) ((BrowseDSpaceObject) item)
                 .getBrowsableDSpaceObject();
-		String metadata = internalDisplay(hrq, metadataArray, crisObject);
-		return metadata;
+        if(metadataArray != null && metadataArray.length > 0) {
+            String metadata = internalDisplay(hrq, metadataArray[0].value, crisObject);            
+            return metadata;
+        }
+        return "N/D";
 	}
     @Override
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
@@ -65,7 +71,9 @@ public class CrisRefDisplayStrategy implements IDisplayMetadataValueStrategy
             {
                 ACrisObject entityByCrisId = applicationService
                         .getEntityByCrisId(authority);
-                return internalDisplay(hrq, metadataArray, entityByCrisId);
+                if(metadataArray != null && metadataArray.length > 0) {
+                    return internalDisplay(hrq, metadataArray[0].value, entityByCrisId);
+                }
             } else {
                 return metadataArray[0].value;
             }
@@ -100,15 +108,18 @@ public class CrisRefDisplayStrategy implements IDisplayMetadataValueStrategy
     {
 
 		ACrisObject crisObject = (ACrisObject) item;
-		String metadata = internalDisplay(hrq, metadataArray, crisObject);
-		return metadata;
+		if(metadataArray != null && metadataArray.length > 0) {
+		    String metadata = internalDisplay(hrq, metadataArray[0].value, crisObject);
+		    return metadata;
+        }
+        return "N/D";
 	}
 	
     private String internalDisplay(HttpServletRequest hrq,
-            Metadatum[] metadataArray, ACrisObject crisObject)
+            String value, ACrisObject crisObject)
     {
         String metadata = "N/A";
-        if (metadataArray != null && metadataArray.length > 0)
+        if (StringUtils.isNotBlank(value))
         {
 			try 
 			{
@@ -191,7 +202,7 @@ public class CrisRefDisplayStrategy implements IDisplayMetadataValueStrategy
                     }
                 }
                 metadata = startLink;
-                metadata += Utils.addEntities(metadataArray[0].value);
+                metadata += Utils.addEntities(value);
                 metadata += "&nbsp;";
                 metadata += icon;
                 metadata += endLink;
@@ -202,6 +213,30 @@ public class CrisRefDisplayStrategy implements IDisplayMetadataValueStrategy
             }
         }
         return metadata;
+    }
+    @Override
+    public String getDisplayForValue(HttpServletRequest hrq, String field,
+            String value, String authority, String language, int confidence, int itemid, boolean viewFull, String browseType,
+            boolean disableCrossLinks, boolean emph)
+    {
+        if (StringUtils.isNotBlank(authority))
+        {
+            ACrisObject entityByCrisId = applicationService
+                    .getEntityByCrisId(authority);
+            return internalDisplay(hrq, value, entityByCrisId);
+        } else {
+            return value;
+        }
+    }
+    @Override
+    public String getPluginInstanceName()
+    {
+        return myName;
+    }
+    @Override
+    public void setPluginInstanceName(String name)
+    {
+        this.myName = name;
     }
 
 }

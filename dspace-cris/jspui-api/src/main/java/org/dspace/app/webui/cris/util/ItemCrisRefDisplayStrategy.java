@@ -15,17 +15,15 @@ import java.util.MissingResourceException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dspace.app.cris.integration.CRISAuthority;
 import org.dspace.app.cris.model.ACrisObject;
-import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.webui.util.ASimpleDisplayStrategy;
+import org.dspace.app.webui.util.IAtomicDisplayStrategy;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.dspace.content.Metadatum;
@@ -37,7 +35,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 import org.dspace.utils.DSpace;
 
-public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
+public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy implements IAtomicDisplayStrategy
 {
 	
     /**
@@ -92,23 +90,32 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
         StringBuffer sb = new StringBuffer();
         for (int j = 0; j < loopLimit; j++)
         {
-            buildBrowseLink(hrq, viewFull, browseType, metadataArray, minConfidence,
-                    disableCrossLinks, sb, j);
-            if (StringUtils.isNotBlank(metadataArray[j].authority) && metadataArray[j].confidence >= minConfidence) {
-            	buildAuthority(hrq, metadataArray, publicPath, sb, j);
-            }
-            if (j < (loopLimit - 1))
+            if (metadataArray != null && metadataArray.length > 0)
             {
-                if (colIdx != -1) // we are showing metadata in a table row
-                                  // (browse or item list)
+                buildBrowseLink(hrq, viewFull, browseType, metadataArray[j].value, metadataArray[j].authority, metadataArray[j].language, metadataArray[j].confidence,
+                        minConfidence, disableCrossLinks, sb);
+                if (StringUtils.isNotBlank(metadataArray[j].authority)
+                        && metadataArray[j].confidence >= minConfidence)
                 {
-                    sb.append("; ");
+                    buildAuthority(hrq, metadataArray[j].value, metadataArray[j].authority, publicPath, sb);
                 }
-                else
+                if (j < (loopLimit - 1))
                 {
-                    // we are in the item tag
-                    sb.append("<br />");
+                    if (colIdx != -1) // we are showing metadata in a table row
+                                      // (browse or item list)
+                    {
+                        sb.append("; ");
+                    }
+                    else
+                    {
+                        // we are in the item tag
+                        sb.append("<br />");
+                    }
                 }
+            }
+            else
+            {
+                break;
             }
         }
         if (truncated)
@@ -135,26 +142,25 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
     }
 
     protected void buildBrowseLink(HttpServletRequest hrq, boolean viewFull,
-            String browseType, Metadatum[] metadataArray, int minConfidence,
-            boolean disableCrossLinks, StringBuffer sb, int j)
+            String browseType, String metadataValue, String metadataAuthority, String metadataLanguage, int metadataConfidence, int minConfidence,
+            boolean disableCrossLinks, StringBuffer sb)
     {
         String startLink = "";
         String endLink = "";
+        String tmpValue = "";
         if (!StringUtils.isEmpty(browseType) && !disableCrossLinks)
         {
-            String argument;
-            String value;
-            String authority = metadataArray[j].authority;
-			if (authority != null &&
-                    metadataArray[j].confidence >= minConfidence && !(authority.startsWith(AuthorityValueGenerator.GENERATE)))
+            String argument;            
+			if (metadataAuthority != null &&
+			        metadataConfidence >= minConfidence && !(metadataAuthority.startsWith(AuthorityValueGenerator.GENERATE)))
             {
                 argument = "authority";
-                value = authority;
+                tmpValue = metadataAuthority;
             }
             else
             {
                 argument = "value";
-                value = metadataArray[j].value;
+                tmpValue = metadataValue;
             }
             if (viewFull)
             {
@@ -164,19 +170,19 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
             {
                 startLink = "<a href=\"" + hrq.getContextPath()
                         + "/browse?type=" + browseType + "&amp;" + argument
-                        + "=" + URLEncoder.encode(value, "UTF-8");
+                        + "=" + URLEncoder.encode(tmpValue, "UTF-8");
             }
             catch (UnsupportedEncodingException e)
             {
                 throw new RuntimeException(e.getMessage(), e);
             }
 
-            if (metadataArray[j].language != null)
+            if (StringUtils.isNotBlank(metadataLanguage))
             {
                 try
                 {
                     startLink = startLink + "&amp;" + argument + "_lang="
-                            + URLEncoder.encode(metadataArray[j].language, "UTF-8");
+                            + URLEncoder.encode(metadataLanguage, "UTF-8");
                 }
                 catch (UnsupportedEncodingException e)
                 {
@@ -195,17 +201,17 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
             endLink = "</a>";
         }
         sb.append(startLink);
-        sb.append(Utils.addEntities(metadataArray[j].value));
+        sb.append(Utils.addEntities(metadataValue));
         sb.append(endLink);
     }
 
     protected void buildAuthority(HttpServletRequest hrq,
-            Metadatum[] metadataArray, String publicPath, StringBuffer sb, int j)
+            String metadataValue, String metadataAuthority, String publicPath, StringBuffer sb)
     {
         String startLink = "";
         String endLink = "";
 
-        String authority = metadataArray[j].authority;
+        String authority = metadataAuthority;
 		if (StringUtils.isNotBlank(authority)) {
 			if (authority.startsWith(AuthorityValueGenerator.GENERATE)) {
 				String[] split = StringUtils.split(authority, AuthorityValueGenerator.SPLIT);
@@ -274,6 +280,47 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
 			}
 		}
 		
+    }
 
+    @Override
+    public String getDisplayForValue(HttpServletRequest hrq, String field,
+            String value, String authority, String language, int confidence,
+            int itemid, boolean viewFull, String browseType,
+            boolean disableCrossLinks, boolean emph)
+    {
+
+        String publicPath = null;
+        int minConfidence = -1;
+        if (StringUtils.isNotBlank(value)) {
+            ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+            String[] tokenized = Utils.tokenize(field);
+            ChoiceAuthority ca = cam.getChoiceAuthority(tokenized[0], tokenized[1], tokenized[2]);
+            minConfidence = MetadataAuthorityManager.getManager().getMinConfidence(tokenized[0], tokenized[1], tokenized[2]);
+            if (ca != null && ca instanceof CRISAuthority) {
+                CRISAuthority crisAuthority = (CRISAuthority) ca;
+                publicPath = crisAuthority.getPublicPath();
+                if (publicPath == null) {
+                    publicPath = ConfigurationManager.getProperty("ItemCrisRefDisplayStrategy.publicpath."+field);
+                    if (publicPath == null) {
+                        publicPath = tokenized[2];
+                    }
+                }
+            }
+        }
+        
+        if (StringUtils.isBlank(publicPath)) {
+            return "";
+        }
+        
+        StringBuffer sb = new StringBuffer();
+        buildBrowseLink(hrq, viewFull, browseType, value, authority, language, confidence,
+                minConfidence, disableCrossLinks, sb);
+        if (StringUtils.isNotBlank(authority)
+                && confidence >= minConfidence)
+        {
+            buildAuthority(hrq, value, authority, publicPath, sb);
+        }
+        
+        return sb.toString();
     }
 }

@@ -15,12 +15,21 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Utils;
 
-public class LinkDisplayStrategy extends AUniformDisplayStrategy
+public class LinkDisplayStrategy extends AUniformDisplayStrategy implements IAtomicDisplayStrategy
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(LinkDisplayStrategy.class);
 
     protected String getDisplayForValue(HttpServletRequest hrq, String value, int itemid)
+    {
+        return getDisplayForValue(hrq, null, value, null, null, -1, itemid, false, null, false, false);
+    }
+
+    @Override
+    public String getDisplayForValue(HttpServletRequest hrq, String field,
+            String value, String authority, String language, int confidence,
+            int itemid, boolean viewFull, String browseType,
+            boolean disableCrossLinks, boolean emph)
     {
         StringBuffer sb = new StringBuffer();
         String startLink = "<a href=\"" + value + "\">";

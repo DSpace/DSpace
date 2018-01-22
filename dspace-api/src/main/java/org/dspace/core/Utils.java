@@ -20,16 +20,17 @@ import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.coverity.security.Escape;
@@ -368,4 +369,51 @@ public final class Utils {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
 		return new String(encoded, encoding);
 	}
+	
+	   /**
+     * Utility method to extract schema, element, qualifier from the metadata field key 
+     * Keep in mind that this method try to auto discover the common separator used in DSpace ("_" or ".") 
+     * 
+     * Return an array of token with size 3 which contains:
+     * schema = tokens[0];
+     * element = tokens[1];
+     * qualifier = tokens[2]; //it can be empty string
+     * 
+     * @param metadata (the field in the form dc.title or dc_title)
+     * @return array of tokens 
+     */
+    public static String[] tokenize(String metadata) {
+        String separator = metadata.contains("_") ? "_" : ".";
+        StringTokenizer dcf = new StringTokenizer(metadata, separator);
+
+        String[] tokens = { "", "", "" };
+        int i = 0;
+        while (dcf.hasMoreTokens()) {
+            tokens[i] = dcf.nextToken().trim();
+            i++;
+        }
+        // Tokens contains:
+        // schema = tokens[0];
+        // element = tokens[1];
+        // qualifier = tokens[2];
+        return tokens;
+
+    }
+    
+    /**
+     * Make the metadata field key using the separator.
+     * 
+     * @param schema
+     * @param element
+     * @param qualifier
+     * @param separator (DSpace common separator are "_" or ".")
+     * @return metadata field key
+     */
+    public static String standardize(String schema, String element, String qualifier, String separator) {
+        if (StringUtils.isBlank(qualifier)) {
+            return schema + separator + element;
+        } else {
+            return schema + separator + element + separator + qualifier;
+        }
+    }
 }

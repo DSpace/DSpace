@@ -23,4 +23,37 @@
 		</property>	
 	</bean>
 
+	<bean class="org.dspace.app.webui.cris.util.MultiformRegexConfigurator"
+		name="org.dspace.app.webui.cris.util.MultiformRegexConfigurator">
+		<property name="defaultDecorator" value="link"/>
+		<property name="regex2Decorator4Value">
+			<list>
+				<bean
+					class="org.dspace.app.webui.cris.util.MultiformRegexConfigurator.RegexMultiform">
+					<property name="regex"><value>^10.\d{4,9}\/[-._;()/:a-zA-Z0-9]+$</value></property>
+					<property name="decorator"><value>doi</value></property>
+				</bean>
+				<bean
+					class="org.dspace.app.webui.cris.util.MultiformRegexConfigurator.RegexMultiform">
+					<property name="regex"><value>^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,6}$</value></property>
+					<property name="decorator"><value>mailto</value></property>
+				</bean>				
+			</list>
+		</property>
+		<property name="regex2Decorator4Authority">
+			<list>
+				<bean
+					class="org.dspace.app.webui.cris.util.MultiformRegexConfigurator.RegexMultiform">
+					<property name="regex"><value>^[a-zA-Z]+[0-9]+$</value></property>
+					<property name="decorator"><value>crisref</value></property>
+				</bean>
+				<bean
+					class="org.dspace.app.webui.cris.util.MultiformRegexConfigurator.RegexMultiform">
+					<property name="regex"><value>^[0-9]+\/[0-9]+$</value></property>
+					<property name="decorator"><value>itemref</value></property>
+				</bean>				
+			</list>
+		</property>		
+	</bean>
+	
 </beans>

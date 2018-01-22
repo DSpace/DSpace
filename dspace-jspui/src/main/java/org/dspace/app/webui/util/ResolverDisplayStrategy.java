@@ -28,7 +28,7 @@ public class ResolverDisplayStrategy extends AUniformDisplayStrategy
     
     private static final String HANDLE_DEFAULT_BASEURL = "http://hdl.handle.net/";
 
-    private static final String DOI_DEFAULT_BASEURL = "http://dx.doi.org/";
+    private static final String DOI_DEFAULT_BASEURL = "https://doi.org/";
     
     private void init()
     {

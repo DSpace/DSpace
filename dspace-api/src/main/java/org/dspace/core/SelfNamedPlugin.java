@@ -78,7 +78,7 @@ public abstract class SelfNamedPlugin
      *
      * @param name -- name used to select this class.
      */
-    protected void setPluginInstanceName(String name)
+    public void setPluginInstanceName(String name)
     {
         myName = name;
     }

@@ -19,7 +19,7 @@ import org.dspace.content.Metadatum;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 
-public class ItemRefDisplayStrategy extends ASimpleDisplayStrategy
+public class ItemRefDisplayStrategy extends ASimpleDisplayStrategy implements IAtomicDisplayStrategy
 {
 	/** log4j category */
     private static Logger log = Logger.getLogger(ItemRefDisplayStrategy.class);
@@ -46,7 +46,7 @@ public class ItemRefDisplayStrategy extends ASimpleDisplayStrategy
         StringBuffer sb = new StringBuffer();
         for (int j = 0; j < loopLimit; j++)
         {
-            sb.append(getDisplayForValue(hrq, field, metadataArray[j].value, metadataArray[j].authority, itemid));
+            sb.append(getDisplayForValue(hrq, field, metadataArray[j].value, metadataArray[j].authority, null, -1, itemid, viewFull, browseType, disableCrossLinks, emph));
             if (j < (loopLimit - 1))
             {
                 if (colIdx != -1) // we are showing metadata in a table row
@@ -89,7 +89,9 @@ public class ItemRefDisplayStrategy extends ASimpleDisplayStrategy
         return metadata;
     }
     
-    private String getDisplayForValue(HttpServletRequest hrq, String field, String value, String authority, int itemid)
+    @Override
+    public String getDisplayForValue(HttpServletRequest hrq, String field, String value, String authority, String language, int confidence, int itemid, boolean viewFull, String browseType,
+            boolean disableCrossLinks, boolean emph)
     {
     	if (StringUtils.isEmpty(authority)) return value;
         StringBuffer sb = new StringBuffer();

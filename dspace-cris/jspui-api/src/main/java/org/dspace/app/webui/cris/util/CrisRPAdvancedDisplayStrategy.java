@@ -17,10 +17,8 @@ import javax.servlet.jsp.JspException;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.cris.integration.CRISAuthority;
-import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authority.AuthorityValueGenerator;
-import org.dspace.browse.BrowseItem;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Metadatum;
@@ -30,7 +28,6 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
-import org.dspace.discovery.IGlobalSearchResult;
 
 /**
  * @author Luigi Andrea Pascarelli 
@@ -93,7 +90,7 @@ public class CrisRPAdvancedDisplayStrategy extends ItemCrisRefDisplayStrategy {
             buildBrowseLink(hrq, viewFull, browseType, metadataArray, minConfidence,
                     otherMetadata,disableCrossLinks, sb, j);
             if (StringUtils.isNotBlank(metadataArray[j].authority) && metadataArray[j].confidence >= minConfidence) {
-            	buildAuthority(hrq, metadataArray, publicPath, sb, j);
+            	buildAuthority(hrq, metadataArray[j].value, metadataArray[j].authority, publicPath, sb);
             }
             if (j < (loopLimit - 1))
             {
