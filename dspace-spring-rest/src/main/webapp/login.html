@@ -44,6 +44,11 @@
             margin-bottom: 15px;
             padding: 7px 9px;
         }
+        fieldset {
+            margin: 8px;
+            padding: 8px;
+            border: thin solid gray;
+        }
     </style>
     <script src="browser/vendor/js/jquery-1.10.2.min.js"></script>
     <script src="browser/vendor/js/bootstrap.js"></script>
@@ -53,9 +58,16 @@
 <div class="container">
     <form class="form-signin">
         <h2 class="form-signin-heading">HAL Browser</h2>
-        <input type="text" class="input-block-level" placeholder="Username" id="username">
-        <input type="password" class="input-block-level" placeholder="Password" id="password">
-        <button type="button" class="btn btn-large btn-primary" id="login">Sign in</button>
+        <fieldset>
+            <label>Password Authentication</label>
+            <input type="text" class="input-block-level" placeholder="Username" id="username">
+            <input type="password" class="input-block-level" placeholder="Password" id="password">
+            <button type="button" class="btn btn-large btn-primary" id="login">Sign in</button>
+        </fieldset>
+        <fieldset>
+            <label>SSO/Shibboleth Authentication</label>
+            <button type="button" class="btn btn-large btn-primary" id="login-sso">SSO Sign in</button>
+        </fieldset>
     </form>
 </div>
 
@@ -99,6 +111,35 @@
                 },
                 error : function() {
                     toastr.error('The credentials you entered are invalid. Please try again.', 'Login Failed');
+                }
+            });
+        });
+
+        $("#login-sso").click(function() {
+            $.ajax({
+                //This depends on this file to be called login.html
+                url : window.location.href.replace("login.html", "") + 'api/authn/login',
+                type : 'POST',
+                async : false,
+                data : 'password=&user=',
+                headers : {
+                    "Content-Type" : 'application/x-www-form-urlencoded',
+                    "Accept:" : '*/*'
+                },
+                success : function(result, status, xhr) {
+                    document.cookie = "MyHalBrowserToken=" + xhr.getResponseHeader('Authorization').split(" ")[1];
+                    toastr.success('You are now logged in. Please wait while we redirect you...', 'Login Successful');
+                    setTimeout(function() {
+                        window.location.href = window.location.pathname.replace("login.html", "");
+                    }, 2000);
+                },
+                error : function() {
+                    $.ajax({
+                        url: window.location.href.replace("login.html", "") + 'api/config/keys/authentication-shibboleth.lazysession.loginurl',
+                        success : function(result, status, xhr){
+                            document.location=result.value+'?target='+document.location;
+                        }
+                    });
                 }
             });
         });
