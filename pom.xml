@@ -1386,22 +1386,22 @@
             <dependency>
                 <groupId>com.google.apis</groupId>
                 <artifactId>google-api-services-analytics</artifactId>
-                <version>v3-rev123-1.21.0</version>
+                <version>v3-rev145-1.23.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.api-client</groupId>
                 <artifactId>google-api-client</artifactId>
-                <version>1.21.0</version>
+                <version>1.23.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client</artifactId>
-                <version>1.21.0</version>
+                <version>1.23.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client-jackson2</artifactId>
-                <version>1.21.0</version>
+                <version>1.23.0</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>jackson-core</artifactId>
@@ -1416,7 +1416,7 @@
             <dependency>
                 <groupId>com.google.oauth-client</groupId>
                 <artifactId>google-oauth-client</artifactId>
-                <version>1.21.0</version>
+                <version>1.23.0</version>
             </dependency>
             <!-- Findbugs annotations -->
             <dependency>
