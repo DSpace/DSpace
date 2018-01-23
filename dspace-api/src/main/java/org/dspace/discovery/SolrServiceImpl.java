@@ -1993,17 +1993,20 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         StringBuilder filterQuery = new StringBuilder();
         if (StringUtils.isNotBlank(field) && StringUtils.isNotBlank(value)) {
             filterQuery.append(field);
-            if ("equals".equals(operator)) {
-                //Query the keyword indexed field !
+
+
+            if(operator.endsWith("equals")){
                 filterQuery.append("_keyword");
-            } else if ("authority".equals(operator)) {
-                //Query the authority indexed field !
+            } else if (operator.endsWith("authority")){
                 filterQuery.append("_authority");
-            } else if ("notequals".equals(operator)
-                || "notcontains".equals(operator)
-                || "notauthority".equals(operator)) {
+            }
+
+            if(operator.startsWith("not")){
                 filterQuery.insert(0, "-");
             }
+
+
+
             filterQuery.append(":");
             if ("equals".equals(operator) || "notequals".equals(operator)) {
                 //DO NOT ESCAPE RANGE QUERIES !
