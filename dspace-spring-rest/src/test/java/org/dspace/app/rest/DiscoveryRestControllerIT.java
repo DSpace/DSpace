@@ -2494,7 +2494,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //An anonymous user browses this endpoint to find the the objects in the system
         //With the given search filter
         getClient().perform(get("/api/discover/search/objects")
-                .param("f.title", "-test,query"))
+                .param("f.title", "-Test,query"))
                 //** THEN **
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
@@ -2505,7 +2505,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         PageMatcher.pageEntry(0,20)
                 )))
                 //The search results have to contain the items that match the searchFilter
-                .andExpect(jsonPath("$._embedded.objects", Matchers.allOf(
+                .andExpect(jsonPath("$._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.matchOnItemName("item","items", "Test 2"),
                         SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
                 )))
