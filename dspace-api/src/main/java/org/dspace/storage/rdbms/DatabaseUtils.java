@@ -1389,13 +1389,13 @@ public class DatabaseUtils
      */
     protected static DataSource getDataSource()
     {
-        Object dataSource = DSpaceServicesFactory.getInstance()
+        DataSource dataSource = DSpaceServicesFactory.getInstance()
                 .getServiceManager()
-                .getServiceByName("dataSource", Object.class);
+                .getServiceByName("dataSource", DataSource.class);
         if (null == dataSource) {
             log.error("The service manager could not find the DataSource.");
         }
-        return (DataSource)dataSource;
+        return dataSource;
     }
 
     /**
