@@ -45,11 +45,10 @@ public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepCo
 
 	@Override
 	public SubmissionStepConfig toModel(SubmissionSectionRest obj) {
-		init();
 		SubmissionStepConfig step;
 		
 		try {
-			step = submissionConfigReader.getStepConfig(obj.getId());
+			step = getSubmissionConfigReader().getStepConfig(obj.getId());
 		} catch (SubmissionConfigReaderException e) {
 			throw new RuntimeException(e);
 		}
@@ -64,5 +63,10 @@ public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepCo
 				log.error(e.getMessage(), e);
 			}
 		}		
+	}
+
+	public SubmissionConfigReader getSubmissionConfigReader() {
+		init();
+		return submissionConfigReader;
 	}
 }
