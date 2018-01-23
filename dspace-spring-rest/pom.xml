@@ -169,6 +169,25 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>${spring-boot.version}</version>
+                        <exclusions>
+                                <!-- Temporary exclusions until DS-3135 is fixed. 
+                                Once we are using log4j v2, we should update Spring Boot to utilize 
+                                it per these instructions: 
+                                https://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html#howto-configure-log4j-for-logging 
+                                -->
+                                <exclusion>
+                                        <groupId>org.slf4j</groupId>
+                                        <artifactId>log4j-over-slf4j</artifactId>
+                                </exclusion>
+                                <exclusion>
+                                        <groupId>org.slf4j</groupId>
+                                        <artifactId>jul-to-slf4j</artifactId>
+                                </exclusion>
+                               <exclusion>
+                                        <groupId> ch.qos.logback</groupId>
+                                        <artifactId>logback-classic</artifactId>
+                                </exclusion>
+                        </exclusions>
 		</dependency>
 		<dependency>
             <groupId>org.springframework.boot</groupId>
