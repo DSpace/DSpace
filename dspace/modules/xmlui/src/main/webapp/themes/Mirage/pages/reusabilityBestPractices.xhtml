@@ -132,32 +132,10 @@
                 <p>
                     Just as with file naming, it is important to generate a clear file structure that will be interpretable by others. For instance, it may be sensible to segregate the data, code, and results of the data package as in the examples below (by file type or analysis as presented in your publication). However you choose to structure the data files, it will be helpful to your fellow researchers to explain all relevant details in a <a href="#description">README</a> file.
                 </p>
-                <pre>
-                Example A (Organized by file type)
-                ├── Code
-                │   ├── Step.1
-                │   └── Step.2
-                ├── Data
-                │   ├── Processed
-                │   └── Raw
-                ├── Results
-                │   ├── Figure.1
-                │   ├── Figure.2
-                │   └── Models
-                └── readme.txt
 
+                <img src="/themes/Mirage/images/fileStructureA.png" alt="Example organized by file type" />
+                <img src="/themes/Mirage/images/fileStructureB.png" alt="Example organized by analysis" />
 
-                    Example B (Organized by analysis)
-                ├── Figure.1
-                │   ├── Code
-                │   ├── Data
-                │   └── Results
-                ├── Figure.2
-                │   ├── Code
-                │   ├── Data
-                │   └── Results
-                └── readme.txt
-                </pre>
                 <h2 id="allfiles">Provide all files necessary to recreate the analyses in your publication</h2>
                 <ul class="text-list" style="margin-bottom: 10px;">
                     <li><strong>Unprocessed and processed data.</strong> Providing both unprocessed and processed data can be valuable for re-analysis assuming the data are of a reasonable size. Unprocessed raw digital data straight out of the recording instrument or database ensures that no details are lost, and any issues in the processing pipeline can be discovered and rectified. Processed data are cleaned, formatted, organized and ready for reuse by others. If possible, data should be provided in non-proprietary formats (<a href="/pages/filetypes">see preferred formats</a>).</li>
