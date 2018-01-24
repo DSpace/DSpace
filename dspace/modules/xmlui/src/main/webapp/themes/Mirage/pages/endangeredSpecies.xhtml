@@ -82,6 +82,23 @@
             <p>
                 Resources such as the Encyclopedia of Life (EOL) and the IUCN Red List of Threatened Species may be used to determine the current threat level of individual species. Please consider masking location information if your data meets the following combined criteria:
             </p>
+            <ul class="text-list" style="margin-bottom: 10px;">
+                <li>The species is flagged by a resource such as the ICUN Red List as "vulnerable", "endangered", or "critically endangered".</li>
+                <li>There is specific mention by the IUCN of threats from poaching/illegal hunting or other malicious human activity.</li>
+                <li>Your data includes exact geo-coordinates for this species.</li>
+                <li>The species is not located on a protected wildlife preserve.</li>
+            </ul>
+            <h2>Tips for "masking" sensitive endangered species data for Dryad</h2>
+            <p>
+                “Masking” involves deliberate modification or conversion of geographic coordinates for a particular species. Depending on the level of risk for a species, data may be generalized using decimal degrees. This method preserves the integrity of the overall geographic distribution but protects the confidentiality of the data observee.
+            </p>
+            <h2>Tips for documenting the method and level of generalization</h2>
+            <p>
+                Documentation of how you altered or masked your geographic data should be provided so that it is clear to readers what your data represent. Please consider including a separate README file that explains how your data have been modified.
+            </p>
+            <p>
+                For further assistance please consult the Global Biodiversity Information Facility’s (GBIF). "Guide to Best Practices for Generalising Primary Species-Occurrence Data", which provides some guidance in determining whether sensitive occurrence data should be restricted.
+            </p>
 
     </div>  
     <div>Last revised: 2018-01-23</div>
