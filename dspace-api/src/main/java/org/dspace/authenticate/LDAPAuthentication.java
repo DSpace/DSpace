@@ -700,8 +700,9 @@ public class LDAPAuthentication
     }
 
     /*
-     * Returns URL to which to redirect to obtain credentials (either password
-     * prompt or e.g. HTTPS port for client cert.); null means no redirect.
+     * Returns the URL of an external login page which is not applicable for this authn method.
+     * 
+     * Note: Prior to DSpace 7, this method return the page of login servlet.
      *
      * @param context
      *  DSpace context, will be modified (ePerson set) upon success.

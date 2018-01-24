@@ -200,10 +200,15 @@ public interface AuthenticationMethod {
         throws SQLException;
 
     /**
-     * Get login page to which to redirect.
+     * Get an external login page to which to redirect.
+     *
      * Returns URL (as string) to which to redirect to obtain
      * credentials (either password prompt or e.g. HTTPS port for client
      * cert.); null means no redirect.
+     *
+     * Note: Starting with DSpace 7, session logins will be managed through the REST
+     * API.  Therefore, only authn providers with external login pages (such as Shibboleth)
+     * should return a login page.
      *
      * @param context
      *  DSpace context, will be modified (ePerson set) upon success.
