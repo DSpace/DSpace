@@ -719,8 +719,7 @@ public class LDAPAuthentication
                             HttpServletRequest request,
                             HttpServletResponse response)
     {
-        return response.encodeRedirectURL(request.getContextPath() +
-                                          "/ldap-login");
+        return null;
     }
 
     /**

@@ -272,8 +272,7 @@ public class PasswordAuthentication
                             HttpServletRequest request,
                             HttpServletResponse response)
     {
-        return response.encodeRedirectURL(request.getContextPath() +
-                                          "/password-login");
+        return null;
     }
 
     /**
