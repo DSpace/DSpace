@@ -27,7 +27,6 @@ import java.text.ParsePosition;
  * the new solr stats.
  *
  * @see StatisticsImporter
- * @see StatisticsImporterElasticSearch
  *
  * @author Stuart Lewis
  */
@@ -86,7 +85,7 @@ public class ClassicDSpaceLogConverter {
         // Line counter
         int counter = 0;
         int lines = 0;
-        
+
         // Figure out input, output
         BufferedReader input;
         Writer output;
