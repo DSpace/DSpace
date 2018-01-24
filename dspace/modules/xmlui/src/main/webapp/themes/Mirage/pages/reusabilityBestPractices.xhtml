@@ -90,7 +90,44 @@
             <h2>Name files and directories in a consistent and descriptive manner</h2>
             <p>Name files and directories in a consistent and descriptive manner All filenames should be organized in a consistent manner and clearly describe the content they contain. Ideally, the names will be concise, informative, and unique. Stanford Libraries provides some excellent advice in their best practices for file naming.
             </p>
-
+            <p>
+                Vague and ambiguous filenames should be avoided. Examples of poor filenames that should be avoided:
+            </p>
+            <ul class="text-list" style="margin-bottom: 10px;">
+                <li>data.txt</li>
+                <li>Latest tables for upload.xls</li>
+                <li>Dryad Data (#1).csv</li>
+            </ul>
+            <p>
+                It is also important to avoid including special characters and spaces (e.g., “ “, “,!@#$%^&”) in filenames because they can be problematic for computers to interpret. It is best to remove all blank spaces and use one of the common special letter case patterns that is easily readable by both machines and people:
+            </p>
+            <ul class="text-list" style="margin-bottom: 10px;">
+                <li>Kebab-case: "The-quick-brown-fox-jumps-over-the-lazy-dog"</li>
+                <li>CamelCase: "TheQuickBrownFoxJumpsOverTheLazyDog"</li>
+                <li>Snake_case: "The_quick_brown_fox_jumps_over_the_lazy_dog"</li>
+            </ul>
+            <p>
+                We encourage authors to include the following types of information when naming files:
+            </p>
+            <ul class="text-list" style="margin-bottom: 10px;">
+                <li>Author name</li>
+                <li>Project name</li>
+                <li>Type of data</li>
+                <li>Type of analysis</li>
+                <li>Date</li>
+                <li>File extension for application-specific files (e.g., .csv, .txt, .R, .xls, .fasta, .nii)
+            </ul>
+            <p>
+                Here are some examples of descriptive file names that do not include special characters or spaces:
+                <ul class="text-list" style="margin-bottom: 10px;">
+                    <li>1900-2000_sasquatch_migration_coordinates.csv</li>
+                    <li>Smith-fMRI-neural-response-to-cupcakes-vs-vegetables.nii.gz</li>
+                    <li>2015-SimulationOfTropicalFrogEvolution.R
+                </ul>
+                <h2>Organize files in a logical schema</h2>
+                <p>
+                    Just as with file naming, it is important to generate a clear file structure that will be interpretable by others. For instance, it may be sensible to segregate the data, code, and results of the data package as in the examples below (by file type or analysis as presented in your publication). However you choose to structure the data files, it will be helpful to your fellow researchers to explain all relevant details in a README file.
+                </p>
         </div>
     </div>
 </body>
