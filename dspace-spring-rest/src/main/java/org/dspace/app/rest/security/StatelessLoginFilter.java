@@ -16,21 +16,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.auth.AUTH;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationMethod;
-import org.dspace.authenticate.ShibAuthentication;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
-import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.dspace.core.Context;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Component;
 
 /**
  * This class will filter login requests to try and authenticate them
@@ -70,16 +67,14 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                     )
             );
         } catch(BadCredentialsException e) {
-            DSpace dspace = new DSpace();
-            ConfigurationService configurationService = dspace.getConfigurationService();
-            String[] authMethods = configurationService.getArrayProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", new String[0]);
-            for(String method: authMethods) {
-                if (method.equals("org.dspace.authenticate.ShibAuthentication")) {
-                    String shibLoginUrl = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl", "");
-                    if (!shibLoginUrl.isEmpty()) {
-                        res.addHeader("Location", String.format("https://%s%s?target=%s", req.getHeader("Host"), shibLoginUrl, req.getHeader("Referer")));
-                    }
-                    break;
+            AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+            Iterator<AuthenticationMethod> authenticationMethodIterator = authenticationService.authenticationMethodIterator();
+            while (authenticationMethodIterator.hasNext()) {
+                AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
+                Context context = ContextUtil.obtainContext(req);
+                String loginPageURL = authenticationMethod.loginPageURL(context, req, res);
+                if (StringUtils.isNotBlank(loginPageURL)) {
+                    res.addHeader("Location", loginPageURL);
                 }
             }
             throw e;
