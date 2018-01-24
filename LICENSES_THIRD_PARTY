@@ -1,19 +1,19 @@
 
-DSpace uses third-party libraries which may be distributed under different 
+DSpace uses third-party libraries which may be distributed under different
 licenses. We have listed all of these third party libraries and their licenses
 below. This file can be regenerated at any time by simply running:
-    
+
     mvn clean verify -Dthird.party.licenses=true
 
-You must agree to the terms of these licenses, in addition to the DSpace 
+You must agree to the terms of these licenses, in addition to the DSpace
 source code license, in order to use this software.
 
 ---------------------------------------------------
 Third party Java libraries listed by License type.
 
 PLEASE NOTE: Some dependencies may be listed under multiple licenses if they
-are dual-licensed. This is especially true of anything listed as 
-"GNU General Public Library" below, as DSpace actually does NOT allow for any 
+are dual-licensed. This is especially true of anything listed as
+"GNU General Public Library" below, as DSpace actually does NOT allow for any
 dependencies that are solely released under GPL terms. For more info see:
 https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
 ---------------------------------------------------
@@ -200,7 +200,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Woodstox (org.codehaus.woodstox:wstx-asl:3.2.0 - http://woodstox.codehaus.org)
         * Woodstox (org.codehaus.woodstox:wstx-asl:3.2.7 - http://woodstox.codehaus.org)
         * databene ContiPerf (org.databene:contiperf:2.3.4 - http://databene.org/contiperf)
-        * elasticsearch (org.elasticsearch:elasticsearch:1.4.0 - http://nexus.sonatype.org/oss-repository-hosting.html/elasticsearch)
         * flyway-core (org.flywaydb:flyway-core:4.0.3 - https://flywaydb.org/flyway-core)
         * Ogg and Vorbis for Java, Core (org.gagravarr:vorbis-java-core:0.1 - https://github.com/Gagravarr/VorbisJava)
         * Apache Tika plugin for Ogg, Vorbis and FLAC (org.gagravarr:vorbis-java-tika:0.1 - https://github.com/Gagravarr/VorbisJava)
