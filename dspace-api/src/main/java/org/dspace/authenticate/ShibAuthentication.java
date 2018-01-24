@@ -516,7 +516,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			else 
 				returnURL = "http://";
 
-			returnURL += request.getHeader("Referer");
+			returnURL += "?target=" + request.getHeader("Referer");
 
 			try {
 				shibURL += "?target="+URLEncoder.encode(returnURL, "UTF-8");
