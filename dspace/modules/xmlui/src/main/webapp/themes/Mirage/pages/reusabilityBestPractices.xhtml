@@ -68,7 +68,144 @@
             <p>
                 We want to help you effectively communicate to the scientific community about your research to enhance both its visibility and the potential for collaboration. To this end, we provide the following recommendations to help make your Dryad data packages as interpretable and reusable as possible:
             </p>
+            <ul class="text-list" style="list-style: none; margin-bottom: 10px;">
+                <li>Make sure your data are shareable</li>
+                <li>Make sure your data are accessible</li>
+                <li>Name files and directories in a consistent and descriptive manner</li>
+                <li>Organize files in a logical schema</li>
+                <li>Provide all files necessary to recreate the analyses in your publication</li>
+                <li>Provide a description of all details relevant to the data package</li>
+                <li>Examples of good reusability practices</li>
+                <li>Further resources</li>
+            </ul>
+            <h2>Make sure your data are shareable</h2>
+            <ul class="text-list" style="margin-bottom: 10px;">
+                <li>All files submitted to Dryad must abide by the terms of Creative Commons Zero (CC0 1.0). Under these terms, the author releases the data to the public domain. Please review all files and ensure they conform to these terms (i.e., are not covered by any copyright claims). We cannot archive software or code files that contain licenses which are incompatible with CC0 (e.g., GNU GPL, MIT, CC BY), but we can provide a link to the files if they are in a dedicated software repository such as Github, Bitbucket, or CRAN.</li>
+                <li>Human subjects data must be properly anonymized and prepared under applicable legal and ethical guidelines (see recommendations for human subjects data)</li>
+                <li>For information on rare and endangered species, it may be necessary to mask certain details (e.g., locations) to prevent any further threat to these natural resources. Please review our recommendations for sharing rare and endangered species data responsibly (see INSERT LINK HERE: recommendations for endangered species data). Make sure your data are accessible</li>
+                <li>Data should be in non-proprietary open formats if possible (see preferred formats). Open format files ensure that your data will be accessible by the broadest number of people into the future.</li>
+                <li>Review all of your files carefully for errors. Common errors include missing data, misnamed files, mislabeled variables, incorrectly formatted values, and corrupted file archives. It may be helpful to run data validation tools before sharing. For example, if you are working with tabular datasets, a service like goodTables can identify missing data and data type formatting problems.</li>
+                <li>Multiple files, or directories of files, can be bundled together into compressed file archives (e.g., .zip, .tar.gz). We recommend that large files do not exceed 10GB each. If you have a large directory of files, and there is a logical way to split it into subdirectories and compress those, we encourage you to do so. See our recommendations for large file transfers.</li>
+            </ul>
+            <h2>Name files and directories in a consistent and descriptive manner</h2>
+            <p>Name files and directories in a consistent and descriptive manner All filenames should be organized in a consistent manner and clearly describe the content they contain. Ideally, the names will be concise, informative, and unique. Stanford Libraries provides some excellent advice in their best practices for file naming.
+            </p>
+            <p>
+                Vague and ambiguous filenames should be avoided. Examples of poor filenames that should be avoided:
+            </p>
+            <ul class="text-list" style="margin-bottom: 10px;">
+                <li>data.txt</li>
+                <li>Latest tables for upload.xls</li>
+                <li>Dryad Data (#1).csv</li>
+            </ul>
+            <p>
+                It is also important to avoid including special characters and spaces (e.g., “ “, “,!@#$%^&”) in filenames because they can be problematic for computers to interpret. It is best to remove all blank spaces and use one of the common special letter case patterns that is easily readable by both machines and people:
+            </p>
+            <ul class="text-list" style="margin-bottom: 10px;">
+                <li>Kebab-case: "The-quick-brown-fox-jumps-over-the-lazy-dog"</li>
+                <li>CamelCase: "TheQuickBrownFoxJumpsOverTheLazyDog"</li>
+                <li>Snake_case: "The_quick_brown_fox_jumps_over_the_lazy_dog"</li>
+            </ul>
+            <p>
+                We encourage authors to include the following types of information when naming files:
+            </p>
+            <ul class="text-list" style="margin-bottom: 10px;">
+                <li>Author name</li>
+                <li>Project name</li>
+                <li>Type of data</li>
+                <li>Type of analysis</li>
+                <li>Date</li>
+                <li>File extension for application-specific files (e.g., .csv, .txt, .R, .xls, .fasta, .nii)
+            </ul>
+            <p>
+                Here are some examples of descriptive file names that do not include special characters or spaces:
+                <ul class="text-list" style="margin-bottom: 10px;">
+                    <li>1900-2000_sasquatch_migration_coordinates.csv</li>
+                    <li>Smith-fMRI-neural-response-to-cupcakes-vs-vegetables.nii.gz</li>
+                    <li>2015-SimulationOfTropicalFrogEvolution.R
+                </ul>
+                <h2>Organize files in a logical schema</h2>
+                <p>
+                    Just as with file naming, it is important to generate a clear file structure that will be interpretable by others. For instance, it may be sensible to segregate the data, code, and results of the data package as in the examples below (by file type or analysis as presented in your publication). However you choose to structure the data files, it will be helpful to your fellow researchers to explain all relevant details in a README file.
+                </p>
+                <p>
+                Example A (Organized by file type)
+                ├── Code
+                │   ├── Step.1
+                │   └── Step.2
+                ├── Data
+                │   ├── Processed
+                │   └── Raw
+                ├── Results
+                │   ├── Figure.1
+                │   ├── Figure.2
+                │   └── Models
+                └── readme.txt
 
+
+                    Example B (Organized by analysis)
+                ├── Figure.1
+                │   ├── Code
+                │   ├── Data
+                │   └── Results
+                ├── Figure.2
+                │   ├── Code
+                │   ├── Data
+                │   └── Results
+                └── readme.txt
+                </p>
+                <h2>Provide all files necessary to recreate the analyses in your publication</h2>
+                <ul class="text-list" style="margin-bottom: 10px;">
+                    <li><strong>Unprocessed and processed data.</strong> Providing both unprocessed and processed data can be valuable for re-analysis assuming the data are of a reasonable size. Unprocessed raw digital data straight out of the recording instrument or database ensures that no details are lost, and any issues in the processing pipeline can be discovered and rectified. Processed data are cleaned, formatted, organized and ready for reuse by others. If possible, data should be provided in non-proprietary formats (see preferred formats).</li>
+                    <li><strong>Code.</strong> Programming scripts communicate to others all of the steps in processing and analysis. Including them ensures that the results are reproducible by others. Informative comments throughout your code will help future users understand your code's logic.</li>
+                    <li><strong>External data.</strong> Links to associated data stored in other repositories (e.g., NCBI, TreeBASE) can be included using the “External file identifier” option.</li>
+                </ul>
+                <h2>Provide a description of all details relevant to the data package</h2>
+                <p>
+                    Provide a clear and concise description of all relevant details about data collection, processing, and analysis in a README document. A README helps ensure that your data are correctly interpreted and reanalyzed by others. We recommend that a README be a plain text file, however, if text formatting is important, PDF is also acceptable. If you have included a README in a compressed archive of files, please also consider uploading it externally in the README section so that users are aware of the contents of the archive before downloading potentially huge files.
+                </p>
+                <p>There are two ways to include a README with your Dryad data submission:
+                </p>
+                <ul class="text-list" style="margin-bottom: 10px;">
+                    <li> Provide a separate README for each individual data file (view an example).</li>
+                    <li> Submit one README for the data package as a whole (view an example).
+                </ul>
+                <p>Details you may want to include:
+                </p>
+                <ul class="text-list" style="margin-bottom: 10px;">
+                    <li> Project name</li>
+                    <li> Citation(s) of your published research derived from these data.</li>
+                    <li> Contact information for author(s) regarding data analyses</li>
+                    <li> Description of all data processing steps and analyses. Make sure to include any details that are not included in the publication that may affect the interpretation of results.</li>
+                    <li> Description of any de-identification procedures for sensitive human subjects or endangered species data, and a list of variables that were removed from the original dataset.</li>
+                    <li> The operating system platform and software (include version) used for analyses and file compression. Please provide a URL for each software package. If proprietary software was used, please provide information for open source software alternatives if known.</li>
+                    <li> List of files, or directories of files, included in data package.</li>
+                    <li>Description for each file or group of files:
+                        <ul class="text-list">
+                            <li> type(s) of data included (e.g, categorical, time-series, geospatial, human subjects, etc.)</li>
+                            <li> relationship to the tables, figures, or sections within the accompanying publication</li>
+                            <li> key of definitions of variable names, column headings and row labels, data codes (including missing data), and measurement units</li>
+                        </ul>
+                    </li>
+                    <li> Description of associated datasets stored elsewhere and the associated URLs, if applicable[a][b][c][d].
+                </ul>
+                <h2>Examples of good reusability practices</h2>
+                <ul class="text-list" style="margin-bottom: 10px;">
+                    <li> Gallo T, Fidino M, Lehrer E, Magle S (2017) Data from: Mammal diversity and metacommunity dynamics in urban green spaces: implications for urban wildlife conservation. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.9mf02</li>
+                    <li> Rajon E, Desouhant E, Chevalier M, Débias F, Menu F (2014) Data from: The evolution of bet hedging in response to local ecological conditions. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.g7jq6</li>
+                    <li> Drake JM, Kaul RB, Alexander LW, O'Regan SM, Kramer AM, Pulliam JT, Ferrari MJ, Park AW (2015) Data from: Ebola cases and health system demand in Liberia. Dryad Digital Repository. http://dx.doi.org/10.5061/dryad.17m5q</li>
+                    <li> Wall CB, Mason RAB, Ellis WR, Cunning R, Gates RD (2017) Data from: Elevated pCO2 affects tissue biomass composition, but not calcification, in a reef coral under two light regimes. Dryad Digital Repository. https://doi.org/10.5061/dryad.5vg70.3</li>
+                    <li> Kriebel R, Khabbazian M, Sytsma KJ (2017) Data from: A continuous morphological approach to study the evolution of pollen in a phylogenetic context: an example with the order Myrtales. Dryad Digital Repository. https://doi.org/10.5061/dryad.j17pm.2</li>
+                </ul>
+                <h2>Further resources</h2>
+                <ul class="text-list" style="margin-bottom: 10px;">
+                    <li> Why Dryad uses Creative Commons Zero</li>
+                    <li> DataONE Primer on Data Management Best Practices (pdf)</li>
+                    <li> Introduction to Open Science: Why data versioning and data care practices are key for science and social science</li>
+                    <li> Making data Findable, Accessible, Interoperable, and Reusable (FAIR).</li>
+                    <li> goodTables - free online service for tabular data validation</li>
+                    <li> Data organization in spreadsheets</li>
+                </ul>
         </div>
     </div>
 </body>
