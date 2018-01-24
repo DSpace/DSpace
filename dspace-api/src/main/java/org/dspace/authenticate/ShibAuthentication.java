@@ -516,10 +516,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			else 
 				returnURL = "http://";
 
-			returnURL += host;
-			if (!(port == 443 || port == 80))
-				returnURL += ":" + port;
-			returnURL += "/" + contextPath + "/shibboleth-login";
+			returnURL += request.getHeader("Referer");
 
 			try {
 				shibURL += "?target="+URLEncoder.encode(returnURL, "UTF-8");
