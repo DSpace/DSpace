@@ -18,6 +18,8 @@ import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.eperson.EPerson;
 import org.hibernate.Criteria;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
+
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
@@ -94,9 +96,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("discoverable", discoverable);
         if(lastModified != null)
         {
-            //TODO RAF WRITE
-//            query.setTimestamp("last_modified", lastModified);
-	}
+            query.setParameter("last_modified", lastModified, TemporalType.TIMESTAMP);
+	    }
         return iterate(query);
     }
 
@@ -277,8 +278,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             throws SQLException
     {
         Query query = createQuery(context, "SELECT i FROM item i WHERE last_modified > :last_modified");
-        //TODO RAF WRITE
-//        query.setTimestamp("last_modified", since);
+        query.setParameter("last_modified", since, TemporalType.TIMESTAMP);
         return iterate(query);
     }
 
