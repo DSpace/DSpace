@@ -64,13 +64,6 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
     public List<MetadataSchema> findAll(Context context, Class clazz) throws SQLException {
         // Get all the metadataschema rows
 
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, MetadataSchema.class);
-//        criteria.addOrder(Order.asc("id"));
-//        criteria.setCacheable(true);
-//
-//        return list(criteria);
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, MetadataSchema.class);
         Root<MetadataSchema> metadataSchemaRoot = criteriaQuery.from(MetadataSchema.class);

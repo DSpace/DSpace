@@ -110,13 +110,6 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     @Override
     public List<MetadataField> findAll(Context context, Class<MetadataField> clazz) throws SQLException {
 
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, MetadataField.class);
-//        criteria.createAlias("metadataSchema", "s").addOrder(Order.asc("s.name")).addOrder(Order.asc("element")).addOrder(Order.asc("qualifier"));
-//        criteria.setFetchMode("metadataSchema", FetchMode.JOIN);
-//        criteria.setCacheable(true);
-//        return list(criteria);
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, MetadataField.class);
         Root<MetadataField> metadataFieldRoot = criteriaQuery.from(MetadataField.class);
@@ -129,7 +122,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         orderList.add(criteriaBuilder.asc(metadataFieldRoot.get(MetadataField_.qualifier)));
         criteriaQuery.orderBy(orderList);
 
-        return list(context, criteriaQuery, true, MetadataField.class, -1, -1);
+        return list(context, criteriaQuery, true, MetadataField.class, -1, -1, false);
     }
 
     @Override
