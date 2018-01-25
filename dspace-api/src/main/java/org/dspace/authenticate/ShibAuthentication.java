@@ -529,25 +529,6 @@ public class ShibAuthentication implements AuthenticationMethod
 	}
 
 	/**
-	 * Get title of login page to which to redirect. Returns a <i>message
-	 * key</i> that gets translated into the title or label for "login page" (or
-	 * null, if not implemented) This title may be used to identify the link to
-	 * the login page in a selection menu, when there are multiple ways to
-	 * login.
-	 * 
-	 * @param context
-	 *            DSpace context, will be modified (ePerson set) upon success.
-	 * 
-	 * @return title text.
-	 */
-	@Override
-    public String loginPageTitle(Context context)
-	{
-		return "org.dspace.authenticate.ShibAuthentication.title";
-	}
-
-
-	/**
 	 * Identify an existing EPerson based upon the shibboleth attributes provided on
 	 * the request object. There are three cases where this can occurr, each as
 	 * a fallback for the previous method.
