@@ -7,16 +7,15 @@
  */
 package org.dspace.servicemanager.servlet;
 
-import java.io.File;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.servicemanager.config.DSpaceConfigurationService;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
-import org.dspace.servicemanager.config.DSpaceConfigurationService;
+import java.io.File;
 
 
 /**
@@ -36,7 +35,9 @@ import org.dspace.servicemanager.config.DSpaceConfigurationService;
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  * @author Mark Diggory (mdiggory @ gmail.com)
+ * @deprecated The DSpace Kernel initialisation is now done by org.dspace.app.rest.Application
  */
+@Deprecated
 public final class DSpaceKernelServletContextListener implements ServletContextListener {
 
     private transient DSpaceKernelImpl kernelImpl;

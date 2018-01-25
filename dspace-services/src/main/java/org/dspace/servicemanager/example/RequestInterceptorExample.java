@@ -9,7 +9,6 @@ package org.dspace.servicemanager.example;
 
 import org.dspace.services.RequestService;
 import org.dspace.services.model.RequestInterceptor;
-import org.dspace.services.model.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,14 +35,14 @@ public final class RequestInterceptorExample implements RequestInterceptor {
 	}
 	
         @Override
-	public void onEnd(String requestId, Session session, boolean succeeded,
+	public void onEnd(String requestId, boolean succeeded,
 			Exception failure) {
-		log.info("Intercepting End of Request: id=" + requestId + ", session=" + session.getId() + ", succeeded=" + succeeded);
+		log.info("Intercepting End of Request: id=" + requestId + ", succeeded=" + succeeded);
 	}
 
         @Override
-	public void onStart(String requestId, Session session) {
-		log.info("Intercepting Start of Request: id=" + requestId + ", session=" + session.getId());
+	public void onStart(String requestId) {
+		log.info("Intercepting Start of Request: id=" + requestId);
 	}
 
         @Override

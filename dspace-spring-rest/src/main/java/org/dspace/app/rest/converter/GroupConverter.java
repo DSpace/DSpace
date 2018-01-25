@@ -51,4 +51,9 @@ public class GroupConverter extends DSpaceObjectConverter<Group, org.dspace.app.
 		return new GroupRest();
 	}
 
+	@Override
+	protected Class<Group> getModelClass() {
+		return Group.class;
+	}
+
 }

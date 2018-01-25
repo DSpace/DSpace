@@ -7,6 +7,8 @@
  */
 package org.dspace.kernel;
 
+import org.springframework.context.ConfigurableApplicationContext;
+
 import java.util.List;
 import java.util.Map;
 

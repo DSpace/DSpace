@@ -14,26 +14,20 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
-import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 /**
@@ -45,16 +39,10 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> extends ResourceSupport {
-	@JsonUnwrapped
-	private final T data;
-
-	@JsonProperty(value = "_embedded")
-	@JsonInclude(Include.NON_EMPTY)
-	private Map<String, Object> embedded = new HashMap<String, Object>();
+public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> extends HALResource<T> {
 
 	public DSpaceResource(T data, Utils utils, String... rels) {
-		this.data = data;
+		super(data);
 
 		if (data != null) {
 			try {
@@ -75,7 +63,6 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 							continue;
 						}
 						try {
-							//RestModel linkClass = linkAnnotation.linkClass().newInstance();
 							Method[] methods = linkRepository.getClass().getMethods();
 							boolean found = false;
 							for (Method m : methods) { 
@@ -110,13 +97,13 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 							Link linkToSubResource = utils.linkToSubResource(data, name);	
 							// no method is specified to retrieve the linked object(s) so check if it is already here
 							if (StringUtils.isBlank(linkAnnotation.method())) {
-								this.add(linkToSubResource);
 								Object linkedObject = readMethod.invoke(data);
 								Object wrapObject = linkedObject;
 								if (linkedObject instanceof DirectlyAddressableRestModel) {
 									DirectlyAddressableRestModel linkedRM = (DirectlyAddressableRestModel) linkedObject; 
 									wrapObject = utils.getResourceRepository(linkedRM.getCategory(), linkedRM.getType())
 											.wrapResource(linkedRM);
+
 								}
 								else {
 									if (linkedObject instanceof List) {
@@ -138,18 +125,12 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 										}
 									}
 								}
-								if (linkedObject != null) {
-									embedded.put(name, wrapObject);
-								} else {
-									embedded.put(name, null);
-								}
-								Method writeMethod = pd.getWriteMethod();
-								writeMethod.invoke(data, new Object[] { null });
+
+								embedded.put(name, wrapObject);
 							}
 							else {
 								// call the link repository
 								try {
-									//RestModel linkClass = linkAnnotation.linkClass().newInstance();
 									String apiCategory = data.getCategory();
 									String model = data.getType();
 									LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkAnnotation.name());
@@ -164,7 +145,7 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 												}
 												else {
 													DirectlyAddressableRestModel object = (DirectlyAddressableRestModel)m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
-													ResourceSupport ep = linkRepository.wrapResource(object, linkToSubResource.getHref());
+													HALResource ep = linkRepository.wrapResource(object, linkToSubResource.getHref());
 													embedded.put(name, ep);
 												}
 
@@ -181,8 +162,6 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 							}
 						}
 						else if (DirectlyAddressableRestModel.class.isAssignableFrom(readMethod.getReturnType())) {
-							Link linkToSubResource = utils.linkToSubResource(data, name);
-							this.add(linkToSubResource);
 							DirectlyAddressableRestModel linkedObject = (DirectlyAddressableRestModel) readMethod.invoke(data);
 							if (linkedObject != null) {
 								embedded.put(name,
@@ -191,9 +170,6 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 							} else {
 								embedded.put(name, null);
 							}
-
-							Method writeMethod = pd.getWriteMethod();
-							writeMethod.invoke(data, new Object[] { null });
 						}
 					}
 				}
@@ -201,20 +177,13 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 					| InvocationTargetException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
-			this.add(utils.linkToSingleResource(data, Link.REL_SELF));
 		}
 	}
 
+	//Trick to make Java Understand that our content extends RestModel
+	@JsonUnwrapped
 	@Override
-	public void add(Link link) {
-		System.out.println("Chiamato "+link.getRel());
-		super.add(link);
-	}
-	public Map<String, Object> getEmbedded() {
-		return embedded;
-	}
-
-	public T getData() {
-		return data;
+	public T getContent() {
+		return super.getContent();
 	}
 }

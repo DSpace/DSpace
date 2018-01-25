@@ -7,7 +7,10 @@
  */
 package org.dspace.discovery;
 
+import org.apache.commons.collections4.ListUtils;
 import org.dspace.content.DSpaceObject;
+import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
 import java.util.*;
 
@@ -95,7 +98,16 @@ public class DiscoverResult {
     }
 
     public List<FacetResult> getFacetResult(String facet){
-        return facetResults.get(facet) == null ? new ArrayList<FacetResult>() : facetResults.get(facet);
+        return ListUtils.emptyIfNull(facetResults.get(facet));
+    }
+
+    public List<FacetResult> getFacetResult(DiscoverySearchFilterFacet field) {
+        List<DiscoverResult.FacetResult> facetValues = getFacetResult(field.getIndexFieldName());
+        //Check if we are dealing with a date, sometimes the facet values arrive as dates !
+        if(facetValues.size() == 0 && field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)){
+            facetValues = getFacetResult(field.getIndexFieldName() + ".year");
+        }
+        return ListUtils.emptyIfNull(facetValues);
     }
 
     public DSpaceObjectHighlightResult getHighlightedResults(DSpaceObject dso)
@@ -114,13 +126,15 @@ public class DiscoverResult {
         private String authorityKey;
         private String sortValue;
         private long count;
+        private String fieldType;
 
-        public FacetResult(String asFilterQuery, String displayedValue, String authorityKey, String sortValue, long count) {
+        public FacetResult(String asFilterQuery, String displayedValue, String authorityKey, String sortValue, long count, String fieldType) {
             this.asFilterQuery = asFilterQuery;
             this.displayedValue = displayedValue;
             this.authorityKey = authorityKey;
             this.sortValue = sortValue;
             this.count = count;
+            this.fieldType = fieldType;
         }
 
         public String getAsFilterQuery() {
@@ -148,6 +162,10 @@ public class DiscoverResult {
         public String getFilterType()
         {
             return authorityKey != null?"authority":"equals";
+        }
+
+        public String getFieldType() {
+            return fieldType;
         }
     }
 
@@ -178,6 +196,10 @@ public class DiscoverResult {
         public List<String> getHighlightResults(String metadataKey)
         {
             return highlightResults.get(metadataKey);
+        }
+
+        public Map<String, List<String>> getHighlightResults() {
+            return highlightResults;
         }
     }
 

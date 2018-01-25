@@ -7,24 +7,42 @@
  */
 package org.dspace.app.rest.builder;
 
-import org.dspace.content.*;
+import org.dspace.content.Collection;
+import org.dspace.content.DCDate;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
 /**
  * Builder to construct Item objects
+ *
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
-public class ItemBuilder extends AbstractBuilder<Item> {
+public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     private WorkspaceItem workspaceItem;
+    private Item item;
     private Group readerGroup = null;
 
-    public ItemBuilder createItem(final Context context, final Collection col1) {
+    protected ItemBuilder(Context context) {
+        super(context);
+    }
+
+    public static ItemBuilder createItem(final Context context, final Collection col) {
+        ItemBuilder builder = new ItemBuilder(context);
+        return builder.create(context, col);
+    }
+
+    private ItemBuilder create(final Context context, final Collection col) {
         this.context = context;
 
         try {
-            workspaceItem = workspaceItemService.create(context, col1, false);
+            workspaceItem = workspaceItemService.create(context, col, false);
+            item = workspaceItem.getItem();
         } catch (Exception e) {
             return handleException(e);
         }
@@ -33,28 +51,28 @@ public class ItemBuilder extends AbstractBuilder<Item> {
     }
 
     public ItemBuilder withTitle(final String title) {
-        return setMetadataSingleValue(workspaceItem.getItem(), MetadataSchema.DC_SCHEMA, "title", null, title);
+        return setMetadataSingleValue(item, MetadataSchema.DC_SCHEMA, "title", null, title);
     }
 
     public ItemBuilder withIssueDate(final String issueDate) {
-        return addMetadataValue(workspaceItem.getItem(), MetadataSchema.DC_SCHEMA, "date", "issued", new DCDate(issueDate).toString());
+        return addMetadataValue(item, MetadataSchema.DC_SCHEMA, "date", "issued", new DCDate(issueDate).toString());
     }
 
     public ItemBuilder withAuthor(final String authorName) {
-        return addMetadataValue(workspaceItem.getItem(), MetadataSchema.DC_SCHEMA, "contributor", "author", authorName);
+        return addMetadataValue(item, MetadataSchema.DC_SCHEMA, "contributor", "author", authorName);
     }
 
     public ItemBuilder withSubject(final String subject) {
-        return addMetadataValue(workspaceItem.getItem(), MetadataSchema.DC_SCHEMA, "subject", null, subject);
+        return addMetadataValue(item, MetadataSchema.DC_SCHEMA, "subject", null, subject);
     }
 
     public ItemBuilder makePrivate() {
-        workspaceItem.getItem().setDiscoverable(false);
+        item.setDiscoverable(false);
         return this;
     }
 
     public ItemBuilder withEmbargoPeriod(String embargoPeriod) {
-        return setEmbargo(embargoPeriod, workspaceItem.getItem());
+        return setEmbargo(embargoPeriod, item);
     }
 
     public ItemBuilder withReaderGroup(Group group) {
@@ -65,7 +83,7 @@ public class ItemBuilder extends AbstractBuilder<Item> {
     @Override
     public Item build() {
         try {
-            Item item = installItemService.installItem(context, workspaceItem);
+            installItemService.installItem(context, workspaceItem);
             itemService.update(context, item);
 
             //Check if we need to make this item private. This has to be done after item install.
@@ -82,8 +100,12 @@ public class ItemBuilder extends AbstractBuilder<Item> {
         }
     }
 
+    protected void cleanup() throws Exception {
+        delete(item);
+    }
+
     @Override
-    protected DSpaceObjectService<Item> getDsoService() {
+    protected DSpaceObjectService<Item> getService() {
         return itemService;
     }
 

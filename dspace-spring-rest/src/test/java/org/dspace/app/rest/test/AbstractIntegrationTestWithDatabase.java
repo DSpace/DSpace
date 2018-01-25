@@ -10,17 +10,20 @@ package org.dspace.app.rest.test;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.launcher.ScriptLauncher;
+import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.storage.rdbms.DatabaseUtils;
+import org.jdom.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -41,6 +44,11 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * EPerson mock object to use in the tests.
      */
     protected EPerson eperson;
+
+    /**
+     * The password of our test eperson
+     */
+    protected String password = "mySuperS3cretP4ssW0rd";
 
     /**
      * The test Parent Community
@@ -106,6 +114,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 eperson.setEmail("test@email.com");
                 eperson.setCanLogIn(true);
                 eperson.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+                ePersonService.setPassword(eperson, password);
                 // actually save the eperson to unit testing DB
                 ePersonService.update(context, eperson);
             }
@@ -137,20 +146,16 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * but no execution order is guaranteed
      */
     @After
-    public void destroy()
-    {
+    public void destroy() throws Exception {
         // Cleanup our global context object
         try {
+            AbstractBuilder.cleanupObjects();
             if(context == null || !context.isValid()){
                 context = new Context();
             }
-            parentCommunity = context.reloadEntity(parentCommunity);
             eperson = context.reloadEntity(eperson);
 
             context.turnOffAuthorisationSystem();
-            if(parentCommunity != null) {
-                ContentServiceFactory.getInstance().getCommunityService().delete(context, parentCommunity);
-            }
             if(eperson != null) {
                 EPersonServiceFactory.getInstance().getEPersonService().delete(context, eperson);
             }
@@ -175,6 +180,35 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         // Cleanup Context object by setting it to null
         if(context !=null) {
             context = null;
+        }
+    }
+
+    public void runDSpaceScript(String... args) throws Exception {
+        int status = 0;
+        try {
+            // Load up the ScriptLauncher's configuration
+            Document commandConfigs = ScriptLauncher.getConfig(kernelImpl);
+
+            // Check that there is at least one argument (if not display command options)
+            if (args.length < 1)
+            {
+                log.error("You must provide at least one command argument");
+            }
+
+            // Look up command in the configuration, and execute.
+            ScriptLauncher.runOneCommand(commandConfigs, args, kernelImpl);
+
+
+        } catch(ExitException e){
+            status = e.getStatus();
+        }
+
+        if(status != 0){
+            log.error("Failed to run script " + Arrays.toString(args));
+        }
+
+        if(!context.isValid()){
+            setUp();
         }
     }
 }

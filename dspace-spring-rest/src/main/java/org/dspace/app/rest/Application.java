@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import java.io.File;
+import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -15,6 +16,7 @@ import javax.servlet.Filter;
 
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
+import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.util.DSpaceContextListener;
 import org.dspace.kernel.DSpaceKernel;
@@ -39,6 +41,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -137,7 +140,7 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
+    public WebMvcConfigurer webMvcConfigurer() {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
@@ -145,6 +148,11 @@ public class Application extends SpringBootServletInitializer {
                 if (corsAllowedOrigins != null) {
                     registry.addMapping("/api/**").allowedMethods(CorsConfiguration.ALL).allowedOrigins(corsAllowedOrigins);
                 }
+            }
+
+            @Override
+            public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+                argumentResolvers.add(new SearchFilterResolver());
             }
         };
     }
@@ -195,7 +203,7 @@ public class Application extends SpringBootServletInitializer {
                         // nothing
                     }
                     String message = "Failure during ServletContext initialisation: " + e.getMessage();
-                    log.error(message + ":" + e.getMessage(), e);
+                    log.error(message, e);
                     throw new RuntimeException(message, e);
                 }
             }

@@ -7,6 +7,9 @@
  */
 package org.dspace.discovery;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
+
 import java.util.*;
 
 /**
@@ -282,5 +285,59 @@ public class DiscoverQuery {
 
     public void setSpellCheck(boolean spellCheck) {
         this.spellCheck = spellCheck;
+    }
+
+    public void addYearRangeFacet(DiscoverySearchFilterFacet facet, FacetYearRange facetYearRange) {
+        if(facetYearRange.isValid()) {
+
+            int newestYear = facetYearRange.getNewestYear();
+            int oldestYear = facetYearRange.getOldestYear();
+            String dateFacet = facetYearRange.getDateFacet();
+            int gap = facetYearRange.getYearGap();
+
+            // We need to determine our top year so we can start our count from a clean year
+            // Example: 2001 and a gap from 10 we need the following result: 2010 - 2000 ; 2000 - 1990 hence the top year
+            int topYear = getTopYear(newestYear, gap);
+
+            if (gap == 1) {
+                //We need a list of our years
+                //We have a date range add faceting for our field
+                //The faceting will automatically be limited to the 10 years in our span due to our filterquery
+                this.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), 10, facet.getSortOrderSidebar()));
+            } else {
+                List<String> facetQueries = buildFacetQueriesWithGap(newestYear, oldestYear, dateFacet, gap, topYear);
+                for (String facetQuery : CollectionUtils.emptyIfNull(facetQueries)) {
+                    this.addFacetQuery(facetQuery);
+                }
+            }
+        }
+    }
+
+    private List<String> buildFacetQueriesWithGap(int newestYear, int oldestYear, String dateFacet, int gap, int topYear) {
+        List<String> facetQueries = new LinkedList<>();
+        //Create facet queries but limit them to 11 (11 == when we need to show a "show more" url)
+        for (int year = topYear; year > oldestYear && (facetQueries.size() < 11); year -= gap) {
+            //Add a filter to remove the last year only if we aren't the last year
+            int bottomYear = year - gap;
+            //Make sure we don't go below our last year found
+            if (bottomYear < oldestYear) {
+                bottomYear = oldestYear;
+            }
+
+            //Also make sure we don't go above our newest year
+            int currentTop = year;
+            if ((year == topYear)) {
+                currentTop = newestYear;
+            } else {
+                //We need to do -1 on this one to get a better result
+                currentTop--;
+            }
+            facetQueries.add(dateFacet + ":[" + bottomYear + " TO " + currentTop + "]");
+        }
+        return facetQueries;
+    }
+
+    private int getTopYear(int newestYear, int gap) {
+        return (int) (Math.ceil((float) (newestYear) / gap) * gap);
     }
 }

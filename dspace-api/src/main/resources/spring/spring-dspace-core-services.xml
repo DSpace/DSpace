@@ -22,6 +22,8 @@
           autowire="byType"
           scope="singleton"/>
 
+    <bean id="org.dspace.services.ConfigurationService" class="org.dspace.servicemanager.config.DSpaceConfigurationService" scope="singleton"/>
+
    <!-- provider for exposing default Handle services implementaion. -->
     <!--bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.HandleIdentifierProvider"
           scope="singleton">

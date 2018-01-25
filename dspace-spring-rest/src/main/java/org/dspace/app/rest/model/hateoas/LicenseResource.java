@@ -21,13 +21,13 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
  *
  */
 @RelNameDSpaceResource(LicenseRest.NAME)
-public class LicenseResource extends ResourceSupport {
+public class LicenseResource extends HALResource {
 
 	@JsonUnwrapped
-	private final LicenseRest data;
+	private LicenseRest data;
 
 	public LicenseResource(LicenseRest entry) {
-		this.data = entry;
+		super(entry);
 	}
 
 	public LicenseRest getData() {

@@ -19,7 +19,6 @@ import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.RequestService;
-import org.dspace.services.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +33,6 @@ public class SampleServlet extends HttpServlet {
 
     private static Logger log = LoggerFactory.getLogger(SampleServlet.class);
 
-    private transient SessionService sessionService;
     private transient RequestService requestService;
 
     @Override
@@ -49,10 +47,6 @@ public class SampleServlet extends HttpServlet {
                 throw new IllegalStateException("DSpace Kernel is not running, cannot startup the DirectServlet");
             }
             ServiceManager serviceManager = kernel.getServiceManager();
-            sessionService = serviceManager.getServiceByName(SessionService.class.getName(), SessionService.class);
-            if (sessionService == null) {
-                throw new IllegalStateException("Could not get the DSpace SessionService");
-            }
             requestService = serviceManager.getServiceByName(RequestService.class.getName(), RequestService.class);
             if (requestService == null) {
                 throw new IllegalStateException("Could not get the DSpace RequestService");
@@ -77,7 +71,7 @@ public class SampleServlet extends HttpServlet {
         PrintWriter writer = res.getWriter();
         writer.print(XML_HEADER);
         writer.print(XHTML_HEADER);
-        writer.print("DSpaceTest:session=" + sessionService.getCurrentSessionId() + ":request=" + requestService.getCurrentRequestId());
+        writer.print("DSpaceTest: request=" + requestService.getCurrentRequestId());
         writer.print(XHTML_FOOTER);
         res.setStatus(HttpServletResponse.SC_OK);
 

@@ -21,9 +21,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
@@ -490,7 +492,7 @@ public class DatabaseUtils
                 // First, add location for custom SQL migrations, if any (based on DB Type)
                 // e.g. [dspace.dir]/etc/[dbtype]/
                 // (We skip this for H2 as it's only used for unit testing)
-                if (!dbType.equals(DBMS_H2))
+                if(!dbType.equals(DBMS_H2))
                 {
                     scriptLocations.add("filesystem:" + config.getProperty("dspace.dir") +
                                         "/etc/" + dbType);
@@ -610,7 +612,7 @@ public class DatabaseUtils
 
             // If a target version was specified, tell Flyway to ONLY migrate to that version
             // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.
-            if (!StringUtils.isBlank(targetVersion))
+            if(!StringUtils.isBlank(targetVersion))
             {
                 flyway.setTargetAsString(targetVersion);
             }
@@ -619,7 +621,7 @@ public class DatabaseUtils
             // If not, then this is the first time Flyway has run, and we need to initialize
             // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
             // See: http://flywaydb.org/documentation/faq.html#case-sensitive
-            if (!tableExists(connection, flyway.getTable(), true))
+            if(!tableExists(connection, flyway.getTable(), true))
             {
                 // Try to determine our DSpace database version, so we know what to tell Flyway to do
                 String dbVersion = determineDBVersion(connection);
