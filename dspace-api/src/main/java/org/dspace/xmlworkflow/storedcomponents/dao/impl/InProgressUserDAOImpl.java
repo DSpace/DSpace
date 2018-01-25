@@ -96,16 +96,6 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
 
     @Override
     public int countInProgressUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, InProgressUser.class);
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("workflowItem", workflowItem),
-//                        Restrictions.eq("finished", false)
-//                )
-//        );
-//
-//        return count(criteria);
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -121,15 +111,6 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
 
     @Override
     public int countFinishedUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, InProgressUser.class);
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("workflowItem", workflowItem),
-//                        Restrictions.eq("finished", true)
-//                )
-//        );
-//        return count(criteria);
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);

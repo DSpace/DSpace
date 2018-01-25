@@ -111,8 +111,6 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     @Override
     public List<Community> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException {
 
-        //TODO RAF CHECK
-
         /*TableRowIterator tri = DatabaseManager.query(context,
                 "SELECT \n" +
                         "  * \n" +
@@ -132,24 +130,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                         "  resourcepolicy.resource_type_id = 4 AND eperson.eperson_id = ?", context.getCurrentUser()
                         .getID());
         */
-//        Criteria criteria = createCriteria(context, Community.class);
-//        criteria.createAlias("resourcePolicies", "resourcePolicy");
-//
-//        Disjunction actionQuery = Restrictions.or();
-//        for (Integer action : actions)
-//        {
-//            actionQuery.add(Restrictions.eq("resourcePolicy.actionId", action));
-//        }
-//        criteria.add(Restrictions.and(
-//                Restrictions.eq("resourcePolicy.resourceTypeId", Constants.COMMUNITY),
-//                Restrictions.eq("resourcePolicy.eperson", ePerson),
-//                actionQuery
-//        ));
-//        criteria.setCacheable(true);
-//
-//        return list(criteria);
-//
-//
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Community.class);
         Root<Community> communityRoot = criteriaQuery.from(Community.class);

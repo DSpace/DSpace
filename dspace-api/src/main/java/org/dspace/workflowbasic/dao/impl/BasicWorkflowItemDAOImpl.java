@@ -61,12 +61,7 @@ public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflow
     @Override
     public List<BasicWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException
     {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, BasicWorkflowItem.class);
-//        criteria.createAlias("item", "i");
-//        criteria.add(Restrictions.eq("i.submitter", ep));
-//        criteria.addOrder(Order.asc("workflowitemId"));
-//        return list(criteria);
+
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BasicWorkflowItem.class);

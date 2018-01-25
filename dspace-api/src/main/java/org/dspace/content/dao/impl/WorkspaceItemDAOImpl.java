@@ -22,9 +22,12 @@ import org.dspace.identifier.DOI;
 import org.dspace.workflow.WorkflowItem;
 import org.hibernate.Criteria;
 import javax.persistence.Query;
+
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.BasicTransformerAdapter;
+import org.springframework.jdbc.object.SqlQuery;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -94,10 +97,6 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     @Override
     public List<WorkspaceItem> findAll(Context context) throws SQLException
     {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, WorkspaceItem.class);
-//        criteria.addOrder(Order.asc("item"));
-//        return list(criteria);
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
@@ -124,11 +123,7 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
 
     @Override
     public List<WorkspaceItem> findWithSupervisedGroup(Context context) throws SQLException {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, WorkspaceItem.class);
-//        criteria.add(Restrictions.isNotEmpty("supervisorGroups"));
-//        criteria.addOrder(Order.asc("workspaceItemId"));
-//        return list(criteria);
+
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
@@ -149,13 +144,6 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     @Override
     public List<WorkspaceItem> findBySupervisedGroupMember(Context context, EPerson ePerson) throws SQLException {
 
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, WorkspaceItem.class);
-//        criteria.createAlias("supervisorGroups", "supervisorGroup");
-//        criteria.createAlias("supervisorGroup.epeople", "person");
-//        criteria.add(Restrictions.eq("person.id", ePerson.getID()));
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);

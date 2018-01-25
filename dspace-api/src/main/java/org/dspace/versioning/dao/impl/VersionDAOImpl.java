@@ -74,12 +74,6 @@ public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements Ver
     public List<Version> findVersionsWithItems(Context context, VersionHistory versionHistory)
             throws SQLException
     {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, Version.class);
-//        criteria.add(Restrictions.eq("versionHistory", versionHistory));
-//        criteria.add(Restrictions.and(Restrictions.isNotNull("item")));
-//        criteria.addOrder(Order.desc("versionNumber"));
-//        return list(criteria);
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Version.class);

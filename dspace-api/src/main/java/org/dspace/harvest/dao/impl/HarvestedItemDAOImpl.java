@@ -56,17 +56,6 @@ public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> im
     @Override
     public HarvestedItem findByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException {
 
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, HarvestedItem.class);
-//        criteria.createAlias("item", "i");
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("oaiId", itemOaiID),
-//                        Restrictions.eq("i.owningCollection", collection)
-//                )
-//        );
-//        return singleResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedItem.class);
         Root<HarvestedItem> harvestedItemRoot = criteriaQuery.from(HarvestedItem.class);

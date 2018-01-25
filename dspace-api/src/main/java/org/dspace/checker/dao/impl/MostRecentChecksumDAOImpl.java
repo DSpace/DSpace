@@ -62,18 +62,6 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 //                    + "and most_recent_checksum.last_process_start_date < ? "
 //                    + "order by most_recent_checksum.bitstream_id
 
-//        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("toBeProcessed", false),
-//                        Restrictions.le("processStartDate", startDate),
-//                        Restrictions.gt("processStartDate", endDate)
-//                )
-//        );
-//        criteria.addOrder(Order.asc("bitstream.id"));
-//        return list(criteria);
-
-        //TODO RAF CHECK
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
@@ -115,18 +103,6 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 //                    + "and most_recent_checksum.last_process_start_date >= ? "
 //                    + "and most_recent_checksum.last_process_start_date < ? "
 //                    + "order by bitstream_id";
-//        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("checksumResult.resultCode", resultCode),
-//                        Restrictions.le("processStartDate", startDate),
-//                        Restrictions.gt("processStartDate", endDate)
-//                )
-//        );
-//        criteria.addOrder(Order.asc("bitstream.id"));
-//        return list(criteria);
-//
-        //TODO RAF CHECK
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
@@ -159,12 +135,7 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         //        + "order by date_trunc('milliseconds', last_process_end_date), "
         //        + "bitstream_id " + "ASC LIMIT 1";
 
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-//        criteria.add(Restrictions.eq("toBeProcessed", true));
-//        criteria.addOrder(Order.asc("processEndDate")).addOrder(Order.asc("bitstream.id"));
-//        criteria.setMaxResults(1);
-//        return singleResult(criteria);
+
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
@@ -187,16 +158,6 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 //                + "order by date_trunc('milliseconds', last_process_end_date), "
 //                + "bitstream_id " + "ASC LIMIT 1";
 
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("toBeProcessed", true),
-//                        Restrictions.lt("processStartDate", lessThanDate)
-//                ));
-//        criteria.addOrder(Order.asc("processEndDate")).addOrder(Order.asc("bitstream.id"));
-//        criteria.setMaxResults(1);
-//        return singleResult(criteria);
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);

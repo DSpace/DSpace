@@ -49,14 +49,6 @@ public class VersionHistoryDAOImpl extends AbstractHibernateDAO<VersionHistory> 
 
     @Override
     public VersionHistory findByItem(Context context, Item item) throws SQLException {
-
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, VersionHistory.class);
-//        criteria.createAlias("versions", "v");
-//        criteria.add(Restrictions.eq("v.item", item));
-//        criteria.addOrder(Order.desc("v.versionNumber"));
-//        return singleResult(criteria);
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, VersionHistory.class);
         Root<VersionHistory> versionHistoryRoot = criteriaQuery.from(VersionHistory.class);

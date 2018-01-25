@@ -124,17 +124,6 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
     @Override
     public List<BitstreamFormat> findNonInternal(Context context) throws SQLException {
 
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, BitstreamFormat.class);
-//        criteria.add(Restrictions.and(
-//                Restrictions.eq("internal", false),
-//                Restrictions.not(Restrictions.like("shortDescription", "Unknown"))
-//        ));
-//        criteria.addOrder(Order.desc("supportLevel")).addOrder(Order.asc("shortDescription"));
-//
-//        return list(criteria);
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
@@ -170,12 +159,6 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
 
     @Override
     public List<BitstreamFormat> findAll(Context context, Class clazz) throws SQLException {
-
-        //TODO RAF CHECK
-
-//        Criteria criteria = createCriteria(context, BitstreamFormat.class);
-//        criteria.addOrder(Order.asc("id"));
-//        return list(criteria);
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
