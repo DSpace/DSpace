@@ -7,13 +7,14 @@
  */
 package org.dspace.discovery.configuration;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -21,7 +22,7 @@ import java.util.List;
 public class DiscoveryConfiguration implements InitializingBean{
 
     /** The configuration for the sidebar facets **/
-    private List<DiscoverySearchFilterFacet> sidebarFacets = new ArrayList<DiscoverySearchFilterFacet>();
+    private List<DiscoverySearchFilterFacet> sidebarFacets = new ArrayList<>();
 
     private TagCloudFacetConfiguration tagCloudFacetConfiguration = new TagCloudFacetConfiguration();
     
@@ -32,7 +33,7 @@ public class DiscoveryConfiguration implements InitializingBean{
     private DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration;
 
     /** The search filters which can be selected on the search page**/
-    private List<DiscoverySearchFilter> searchFilters = new ArrayList<DiscoverySearchFilter>();
+    private List<DiscoverySearchFilter> searchFilters = new ArrayList<>();
 
     private DiscoverySortConfiguration searchSortConfiguration;
 
@@ -91,6 +92,15 @@ public class DiscoveryConfiguration implements InitializingBean{
 
     public List<DiscoverySearchFilter> getSearchFilters() {
         return searchFilters;
+    }
+
+    public DiscoverySearchFilter getSearchFilter(String name) {
+        for (DiscoverySearchFilter filter : CollectionUtils.emptyIfNull(searchFilters)) {
+            if(StringUtils.equals(name, filter.getIndexFieldName())) {
+                return filter;
+            }
+        }
+        return null;
     }
 
     @Required
@@ -180,5 +190,14 @@ public class DiscoveryConfiguration implements InitializingBean{
 
             throw new DiscoveryConfigurationException(error.toString());
         }
-    }   
+    }
+
+    public DiscoverySearchFilterFacet getSidebarFacet(final String facetName) {
+        for (DiscoverySearchFilterFacet sidebarFacet : sidebarFacets) {
+            if(StringUtils.equals(sidebarFacet.getIndexFieldName(), facetName)) {
+                return sidebarFacet;
+            }
+        }
+        return null;
+    }
 }

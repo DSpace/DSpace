@@ -270,6 +270,45 @@ public class ContextTest extends AbstractUnitTest
         cleanupContext(instance);
         cleanupContext(newInstance);
     }
+
+    /**
+     * Test of close method, of class Context.
+     */
+    @Test
+    public void testClose() throws SQLException, AuthorizeException
+    {
+        new NonStrictExpectations(authorizeService.getClass())
+        {{
+            // Allow Admin permissions - needed to create a new EPerson
+            authorizeService.isAdmin((Context) any); result = true;
+        }};
+
+        String createdEmail = "susie@email.com";
+
+        // To test close() we need a new Context object in a try-with-resources block
+        try(Context instance = new Context()) {
+
+            // Create a new EPerson (DO NOT COMMIT IT)
+            EPerson newUser = ePersonService.create(instance);
+            newUser.setFirstName(context, "Susan");
+            newUser.setLastName(context, "Doe");
+            newUser.setEmail(createdEmail);
+            newUser.setCanLogIn(true);
+            newUser.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+
+        }
+
+        // Open a new context, let's make sure that EPerson isn't there
+        Context newInstance = new Context();
+        EPerson found = ePersonService.findByEmail(newInstance, createdEmail);
+        assertThat("testClose 0", found, nullValue());
+
+        // Cleanup our contexts
+        cleanupContext(newInstance);
+
+        //Calling close on a finished context should not result in errors
+        newInstance.close();
+    }
     
     /**
      * Test of abort method, of class Context.
@@ -422,13 +461,35 @@ public class ContextTest extends AbstractUnitTest
     public void testFinalize() throws Throwable {
         // We need a new Context object
         Context instance = new Context();
-        
+
         instance.finalize();
-        
+
         // Finalize is like abort()...should invalidate our context
         assertThat("testSetSpecialGroup 0", instance.isValid(), equalTo(false));
 
         // Cleanup our context
         cleanupContext(instance);
     }
+
+    /**
+     * Test of updateDatabase method, of class Context.
+     */
+    @Test
+    public void testUpdateDatabase() throws Throwable {
+        // We create a new Context object and force the databaseUpdated flag to false
+        Context instance = new Context() {
+            @Override
+            protected void init() {
+                super.init();
+                databaseUpdated.set(false);
+            }
+        };
+
+        // Finalize is like abort()...should invalidate our context
+        assertThat("updateDatabase 0", Context.updateDatabase(), equalTo(true));
+
+        // Cleanup our context
+        cleanupContext(instance);
+    }
+
 }

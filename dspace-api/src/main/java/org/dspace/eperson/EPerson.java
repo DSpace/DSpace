@@ -65,6 +65,9 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     @Column(name="salt", length = 32)
     private String salt;
 
+    @Column(name="session_salt", length = 32)
+    private String sessionSalt;
+
     @Column(name="digest_algorithm", length = 16)
     private String digestAlgorithm;
 
@@ -88,6 +91,9 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
 
     @Transient
     protected transient EPersonService ePersonService;
+
+    @Transient
+    private Date previousActive;
 
     /**
      * Protected constructor, create object using:
@@ -370,6 +376,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public void setLastActive(Date when)
     {
+        this.previousActive = lastActive;
         this.lastActive = when;
     }
 
@@ -433,4 +440,20 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
         }
         return ePersonService;
     }
+
+    public String getSessionSalt() {
+        return sessionSalt;
+    }
+
+    public void setSessionSalt(String sessionSalt) {
+        this.sessionSalt = sessionSalt;
+    }
+
+    public Date getPreviousActive() {
+        if (previousActive == null) {
+            return new Date(0);
+        }
+        return previousActive;
+    }
+
 }

@@ -14,9 +14,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.junit.Test;
 
-
 /**
  * Integration test for the {@link RootRestResourceController}
+ *
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public class RootRestResourceControllerIT extends AbstractControllerIntegrationTest {
 
@@ -48,6 +50,7 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.submissionsections.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.submissionuploads.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.workspaceitems.href", startsWith(REST_SERVER_URL)))                
+                .andExpect(jsonPath("$._links.authn.href", startsWith(REST_SERVER_URL)))
                 ;
     }
 

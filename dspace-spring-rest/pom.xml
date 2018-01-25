@@ -169,6 +169,25 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>${spring-boot.version}</version>
+                        <exclusions>
+                                <!-- Temporary exclusions until DS-3135 is fixed. 
+                                Once we are using log4j v2, we should update Spring Boot to utilize 
+                                it per these instructions: 
+                                https://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html#howto-configure-log4j-for-logging 
+                                -->
+                                <exclusion>
+                                        <groupId>org.slf4j</groupId>
+                                        <artifactId>log4j-over-slf4j</artifactId>
+                                </exclusion>
+                                <exclusion>
+                                        <groupId>org.slf4j</groupId>
+                                        <artifactId>jul-to-slf4j</artifactId>
+                                </exclusion>
+                               <exclusion>
+                                        <groupId> ch.qos.logback</groupId>
+                                        <artifactId>logback-classic</artifactId>
+                                </exclusion>
+                        </exclusions>
 		</dependency>
 		<dependency>
             <groupId>org.springframework.boot</groupId>
@@ -181,18 +200,24 @@
 			<artifactId>spring-boot-starter-data-rest</artifactId>
 			<version>${spring-boot.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<version>${spring-boot.version}</version>
-			<scope>test</scope>
-		</dependency>
-        <!-- <dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
             <scope>test</scope>
             <version>${json-path.version}</version>
-        </dependency> -->
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path-assert</artifactId>
+            <version>${json-path.version}</version>
+            <scope>test</scope>
+        </dependency>
 		
 		<!-- The HAL Browser -->
  		<dependency>
@@ -206,10 +231,11 @@
 		</dependency>
 
          <!-- Add in Spring Security for AuthN and AuthZ -->
-        <!-- <dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency> -->
+            <version>${spring-boot.version}</version>
+        </dependency>
 
         <!-- Add in log4j support by excluding default logging, and using starter-log4j -->
         <!-- See: http://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html#howto-configure-log4j-for-logging -->
@@ -244,7 +270,7 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
-        
+
         <!-- Apache Commons Collections 4.1 (used for MultiValuedMap to store metadata values for views) -->
         <!-- NOTE: Currently DSpace API / Services still used 3.2 and may need upgrading at some point -->
         <dependency>
@@ -255,6 +281,11 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>4.23</version>
         </dependency>
 
         <!-- TEST DEPENDENCIES -->
@@ -286,11 +317,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path-assert</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

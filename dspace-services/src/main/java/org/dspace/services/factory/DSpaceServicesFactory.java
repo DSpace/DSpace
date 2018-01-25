@@ -26,8 +26,6 @@ public abstract class DSpaceServicesFactory
 
     public abstract RequestService getRequestService();
 
-    public abstract SessionService getSessionService();
-
     public abstract ServiceManager getServiceManager();
 
     public static DSpaceServicesFactory getInstance()

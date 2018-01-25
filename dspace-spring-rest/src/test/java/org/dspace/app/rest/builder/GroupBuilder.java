@@ -14,22 +14,29 @@ import org.dspace.eperson.Group;
 
 /**
  * Builder to construct Group objects
+ *
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
-public class GroupBuilder extends AbstractBuilder<Group> {
+public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
 
     private Group group;
 
-    @Override
-    protected DSpaceObjectService<Group> getDsoService() {
-        return groupService;
+    protected GroupBuilder(Context context) {
+        super(context);
+
     }
 
-    @Override
-    public Group build() {
-        return group;
+    protected void cleanup() throws Exception {
+        delete(group);
     }
 
-    public GroupBuilder createGroup(final Context context) {
+    public static GroupBuilder createGroup(final Context context) {
+        GroupBuilder builder = new GroupBuilder(context);
+        return builder.create(context);
+    }
+
+    private GroupBuilder create(final Context context) {
         this.context = context;
         try {
             group = groupService.create(context);
@@ -37,6 +44,16 @@ public class GroupBuilder extends AbstractBuilder<Group> {
             return handleException(e);
         }
         return this;
+    }
+
+    @Override
+    protected DSpaceObjectService<Group> getService() {
+        return groupService;
+    }
+
+    @Override
+    public Group build() {
+        return group;
     }
 
     public GroupBuilder withName(String groupName) {
@@ -65,4 +82,5 @@ public class GroupBuilder extends AbstractBuilder<Group> {
         }
         return this;
     }
+
 }

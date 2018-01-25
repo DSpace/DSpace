@@ -7,6 +7,8 @@
  */
 package org.dspace.services;
 
+import java.util.UUID;
+
 import org.dspace.services.model.Request;
 import org.dspace.services.model.RequestInterceptor;
 
@@ -20,6 +22,11 @@ import javax.servlet.ServletResponse;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface RequestService {
+
+    /**
+     * Request attribute name for the current authenticated user
+     */
+    static final String AUTHENTICATED_EPERSON = "authenticated_eperson";
 
     /**
      * Initiates a request in the system.
@@ -93,5 +100,20 @@ public interface RequestService {
      * @throws IllegalArgumentException if this priority is invalid or the input is null
      */
     public void registerRequestInterceptor(RequestInterceptor interceptor);
+
+    /**
+     * Access the current user id for the current session.
+     * (also available from the current session)
+     *
+     * @return the id of the user associated with the current thread OR null if there is no user
+     */
+    public String getCurrentUserId();
+
+    /**
+     * Set the ID of the current authenticated user
+     *
+     * @return the id of the user associated with the current thread OR null if there is no user
+     */
+    public void setCurrentUserId(UUID epersonId);
 
 }

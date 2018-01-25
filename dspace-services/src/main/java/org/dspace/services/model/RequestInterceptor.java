@@ -37,10 +37,9 @@ public interface RequestInterceptor extends OrderedService {
      * then throw a {@link RequestInterruptionException}.
      * 
      * @param requestId the unique id of the request
-     * @param session the session associated with this request
      * @throws RequestInterruptionException if this interceptor wants to stop the request
      */
-    public void onStart(String requestId, Session session);
+    public void onStart(String requestId);
 
     /**
      * Take actions after the request is handled for an operation.
@@ -57,11 +56,10 @@ public interface RequestInterceptor extends OrderedService {
      * cue to rollback or commit, for example.
      * 
      * @param requestId the unique id of the request
-     * @param session the session associated with this request
      * @param succeeded true if the request operations were successful, false if there was a failure
      * @param failure this is the exception associated with the failure, it is null if there is no associated exception
      */
-    public void onEnd(String requestId, Session session, boolean succeeded, Exception failure);
+    public void onEnd(String requestId, boolean succeeded, Exception failure);
 
     /**
      * Indicate that request processing should be halted.  This should 

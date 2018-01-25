@@ -32,12 +32,14 @@ import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
 import org.dspace.app.rest.model.DirectlyAddressableRestModel;
+import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.step.UploadStatusResponse;
+import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
@@ -101,6 +103,9 @@ public class RestResourceController implements InitializingBean {
 	@Autowired
 	private ObjectMapper mapper;
 	 
+	@Autowired
+	HalLinkService linkService;
+
 	@Override
 	public void afterPropertiesSet() {
 		List<Link> links = new ArrayList<Link>();
@@ -151,6 +156,7 @@ public class RestResourceController implements InitializingBean {
 			throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
 		}
 		DSpaceResource result = repository.wrapResource(modelObject);
+		linkService.addLinks(result);
 		return result;
 	}
 
@@ -314,6 +320,7 @@ public class RestResourceController implements InitializingBean {
 		Class<DirectlyAddressableRestModel> domainClass = repository.getDomainClass();
 		
 		LinkRest linkRest = utils.getLinkRest(rel, domainClass);
+		PagedResources<? extends HALResource> result;
 
 		if (linkRest != null) {
 			LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkRest.name());
@@ -330,18 +337,19 @@ public class RestResourceController implements InitializingBean {
 								.invoke(linkRepository, request, uuid, page, projection);
 						Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
 								.slash(rel).withSelfRel();
-						PagedResources<? extends ResourceSupport> result = assembler
-								.toResource(pageResult.map(linkRepository::wrapResource), link);
-						return result;
+						Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
+						halResources.forEach(linkService::addLinks);
+
+						return assembler.toResource(halResources, link);
 					}
 					else {
 						RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
 								projection);
 						Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(rel)
 								.withSelfRel();
-						ResourceSupport result = linkRepository.wrapResource(object);
-						result.add(link);						
-						return result;
+						HALResource tmpresult = linkRepository.wrapResource(object);
+						tmpresult.add(link);						
+						return tmpresult;
 					}					
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new RuntimeException(e.getMessage(), e);
@@ -349,18 +357,20 @@ public class RestResourceController implements InitializingBean {
 			}
 		}
 		DirectlyAddressableRestModel modelObject = repository.findOne(uuid);
-		DSpaceResource result = repository.wrapResource(modelObject, rel);
-		if (result.getLink(rel) == null) {
+		DSpaceResource resource = repository.wrapResource(modelObject, rel);
+		linkService.addLinks(resource);
+
+		if (resource.getLink(rel) == null) {
 			// TODO create a custom exception
 			throw new ResourceNotFoundException(rel + " undefined for " + model);
-		} else if (result.getEmbedded().get(rel) instanceof EmbeddedPage) {
+		} else if (resource.getEmbeddedResources().get(rel) instanceof EmbeddedPage) {
 			// this is a very inefficient scenario. We have an embedded list
 			// already fully retrieved that we need to limit with pagination
 			// parameter. BTW change the default sorting is not implemented at
 			// the current stage and could be overcompex to implement
 			// if we really want to implement pagination we should implement a
 			// link repository so to fall in the previous block code
-			EmbeddedPage ep = (EmbeddedPage) result.getEmbedded().get(rel);
+			EmbeddedPage ep = (EmbeddedPage) resource.getEmbeddedResources().get(rel);
 			List<? extends DirectlyAddressableRestModel> fullList = ep.getFullList();
 			if (fullList == null || fullList.size() == 0)
 				return null;
@@ -369,10 +379,10 @@ public class RestResourceController implements InitializingBean {
 			DSpaceRestRepository<DirectlyAddressableRestModel, ?> resourceRepository = utils
 					.getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
 			PageImpl<DirectlyAddressableRestModel> pageResult = new PageImpl(fullList.subList(start, end), page, fullList.size());
-			return assembler.toResource(pageResult.map(resourceRepository::wrapResource));
+			result = assembler.toResource(pageResult.map(resourceRepository::wrapResource));
+			return result;
 		} else {
-			ResourceSupport resu = (ResourceSupport) result.getEmbedded().get(rel);
-			return resu;
+			return (ResourceSupport) resource.getEmbeddedResources().get(rel);
 		}
 	}
 
@@ -388,6 +398,7 @@ public class RestResourceController implements InitializingBean {
 		Page<DSpaceResource<T>> resources;
 		try {
 			resources = repository.findAll(page).map(repository::wrapResource);
+			resources.forEach(linkService::addLinks);
 		} catch (PaginationException pe) {
 			resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
 		} catch (RepositoryMethodNotImplementedException mne) {
@@ -459,6 +470,7 @@ public class RestResourceController implements InitializingBean {
 		ResourceSupport result = null;
 		if (returnPage) {
 			Page<DSpaceResource<T>> resources = ((Page<T>) searchResult).map(repository::wrapResource);
+			resources.forEach(linkService::addLinks);
 			result = assembler.toResource(resources, link);
 		} else {
 			result = repository.wrapResource((T) searchResult);

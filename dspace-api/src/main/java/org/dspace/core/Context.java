@@ -27,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Class representing the context of a particular DSpace operation. This stores
@@ -45,9 +46,10 @@ import java.util.*;
  * 
  * @version $Revision$
  */
-public class Context
+public class Context implements AutoCloseable
 {
     private static final Logger log = Logger.getLogger(Context.class);
+    protected static final AtomicBoolean databaseUpdated = new AtomicBoolean(false);
 
     /** Current user - null means anonymous access */
     private EPerson currentUser;
@@ -95,21 +97,6 @@ public class Context
         BATCH_EDIT
     }
 
-    static
-    {
-        // Before initializing a Context object, we need to ensure the database
-        // is up-to-date. This ensures any outstanding Flyway migrations are run
-        // PRIOR to Hibernate initializing (occurs when DBConnection is loaded in init() below).
-        try
-        {
-            DatabaseUtils.updateDatabase();
-        }
-        catch(SQLException sqle)
-        {
-            log.fatal("Cannot initialize database via Flyway!", sqle);
-        }
-    }
-
     protected Context(EventService eventService, DBConnection dbConnection)  {
         this.mode = Mode.READ_WRITE;
         this.eventService = eventService;
@@ -146,8 +133,10 @@ public class Context
      * @throws SQLException
      *                if there was an error obtaining a database connection
      */
-    private void init()
+    protected void init()
     {
+        updateDatabase();
+
         if(eventService == null)
         {
             eventService = EventServiceFactory.getInstance().getEventService();
@@ -171,9 +160,27 @@ public class Context
 
         specialGroups = new ArrayList<>();
 
-        authStateChangeHistory = new Stack<Boolean>();
-        authStateClassCallHistory = new Stack<String>();
+        authStateChangeHistory = new Stack<>();
+        authStateClassCallHistory = new Stack<>();
         setMode(this.mode);
+    }
+
+    public static boolean updateDatabase() {
+        //If the database has not been updated yet, update it and remember that.
+        if (databaseUpdated.compareAndSet(false, true)) {
+
+            // Before initializing a Context object, we need to ensure the database
+            // is up-to-date. This ensures any outstanding Flyway migrations are run
+            // PRIOR to Hibernate initializing (occurs when DBConnection is loaded in calling init() method).
+            try {
+                DatabaseUtils.updateDatabase();
+            } catch (SQLException sqle) {
+                log.fatal("Cannot initialize database via Flyway!", sqle);
+                databaseUpdated.set(false);
+            }
+        }
+
+        return databaseUpdated.get();
     }
 
     /**
@@ -566,6 +573,13 @@ public class Context
                 log.error("Exception aborting context", ex);
             }
             events = null;
+        }
+    }
+
+    @Override
+    public void close() {
+        if(isValid()) {
+            abort();
         }
     }
 

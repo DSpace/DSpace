@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * The Collection REST Resource
  * 
@@ -25,5 +28,20 @@ public class SiteRest extends DSpaceObjectRest {
 	@Override
 	public String getType() {
 		return NAME;
+	}
+
+	@Override
+	public boolean equals(Object object){
+		return (object instanceof SiteRest &&
+				new EqualsBuilder().append(this.getCategory(), ((SiteRest) object).getCategory())
+						.append(this.getType(), ((SiteRest) object).getType())
+						.isEquals());
+	}
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(17, 37)
+				.append(this.getCategory())
+				.append(this.getType())
+				.toHashCode();
 	}
 }

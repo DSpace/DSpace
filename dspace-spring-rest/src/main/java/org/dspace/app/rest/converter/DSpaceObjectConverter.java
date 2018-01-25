@@ -13,7 +13,6 @@ import java.util.List;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
-import org.springframework.core.convert.converter.Converter;
 
 /**
  * 
@@ -29,6 +28,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends org.dspace.app.rest.model.DSpaceObjectRest>
 		extends DSpaceConverter<M, R> {
+
 	@Override
 	public R fromModel(M obj) {
 		R resource = newInstance();
@@ -54,5 +54,12 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
 		return null;
 	}
 
+	public boolean supportsModel(DSpaceObject object) {
+		return object != null && object.getClass().equals(getModelClass());
+	}
+
 	protected abstract R newInstance();
+
+	protected abstract Class<M> getModelClass();
+
 }

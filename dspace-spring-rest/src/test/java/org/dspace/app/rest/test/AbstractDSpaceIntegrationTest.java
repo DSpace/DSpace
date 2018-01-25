@@ -7,7 +7,12 @@
  */
 package org.dspace.app.rest.test;
 
-import static org.junit.Assert.fail;
+import org.apache.log4j.Logger;
+import org.dspace.app.rest.builder.AbstractBuilder;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 import java.io.IOException;
 import java.net.URL;
@@ -15,12 +20,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
-import org.dspace.app.rest.builder.AbstractBuilder;
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import static org.junit.Assert.fail;
 
 /**
  * Abstract Test class copied from DSpace API
@@ -54,6 +54,9 @@ public class AbstractDSpaceIntegrationTest
     {
         try
         {
+            //Stops System.exit(0) throws exception instead of exitting
+            System.setSecurityManager(new NoExitSecurityManager());
+
             //set a standard time zone for the tests
             TimeZone.setDefault(TimeZone.getTimeZone("Europe/Dublin"));
 
@@ -85,6 +88,8 @@ public class AbstractDSpaceIntegrationTest
      */
     @AfterClass
     public static void destroyKernel() throws SQLException {
+        System.setSecurityManager(null);
+
         //we clear the properties
         testProps.clear();
         testProps = null;
