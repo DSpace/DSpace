@@ -42,10 +42,7 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
     @Override
     public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedDesc(Context context, int status, int type, int limit) throws SQLException {
 //      Old query: "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested desc limit 1";
-        //TODO RAF CHECK
-//        Criteria criteria = getByStatusAndMinimalTypeCriteria(context, status, type, limit);
-//        criteria.addOrder(Order.desc("lastHarvested"));
-//        return singleResult(criteria);
+
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
@@ -62,10 +59,7 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
     @Override
     public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedAsc(Context context, int status, int type, int limit) throws SQLException {
 //        Old query: "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested asc limit 1";
-        //TODO RAF CHECK
-//        Criteria criteria = getByStatusAndMinimalTypeCriteria(context, status, type, limit);
-//        criteria.addOrder(Order.asc("lastHarvested"));
-//        return singleResult(criteria);
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
@@ -112,33 +106,7 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
 //      Old query: "SELECT * FROM harvested_collection WHERE
 // (last_harvested < ? or last_harvested is null) and harvest_type > ? and (harvest_status = ? or harvest_status = ? or (harvest_status=? and harvest_start_time < ?)) ORDER BY last_harvested",
 //                new java.sql.Timestamp(startTime.getTime()), 0, HarvestedCollection.STATUS_READY, HarvestedCollection.STATUS_OAI_ERROR, HarvestedCollection.STATUS_BUSY, new java.sql.Timestamp(expirationTime.getTime()));
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, HarvestedCollection.class);
-//        LogicalExpression lastHarvestedRestriction = Restrictions.or(
-//                Restrictions.lt("lastHarvested", startTime),
-//                Restrictions.isNull("lastHarvested")
-//        );
-//        Disjunction statusRestriction = Restrictions.or();
-//        for (int status : statuses) {
-//            statusRestriction.add(Restrictions.eq("harvestStatus", status));
-//        }
-//        statusRestriction.add(
-//                Restrictions.and(
-//                        Restrictions.eq("harvestStatus", expirationStatus),
-//                        Restrictions.gt("harvestStartTime", expirationTime)
-//                )
-//        );
-//
-//        criteria.add(
-//                Restrictions.and(
-//                        lastHarvestedRestriction,
-//                        Restrictions.gt("harvestType", minimalType),
-//                        statusRestriction
-//
-//                )
-//        );
-//        criteria.addOrder(Order.asc("lastHarvested"));
-//        return list(criteria);
+
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
@@ -182,9 +150,6 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
 
     @Override
     public int count(Context context) throws SQLException {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, HarvestedCollection.class);
-//        return count(criteria);
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);

@@ -59,24 +59,6 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
     public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude) throws SQLException {
         //SELECT * FROM Doi WHERE resource_type_id = ? AND resource_id = ? AND resource_id = ? AND ((status != ? AND status != ?) OR status IS NULL)
 
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, DOI.class);
-//        Disjunction statusQuery = Restrictions.or();
-//        Conjunction statusConjunctionAnd = Restrictions.and();
-//        for (Integer status : statusToExclude) {
-//            statusConjunctionAnd.add(Restrictions.not(Restrictions.eq("status", status)));
-//        }
-//        statusQuery.add(statusConjunctionAnd);
-//        statusQuery.add(Restrictions.isNull("status"));
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("dSpaceObject", dso),
-//                        statusQuery
-//
-//                )
-//        );
-//        return singleResult(criteria);
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
@@ -126,22 +108,6 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
             throws SQLException
     {
         // SELECT * FROM Doi WHERE doi LIKE ? AND resource_type_id = ? AND resource_id IS NOT NULL AND status != ? AND status != ?
-
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, DOI.class);
-//        Conjunction conjunctionAnd = Restrictions.and();
-//        Disjunction statusQuery = Restrictions.or();
-//        for (Integer status : excludedStatuses) {
-//            statusQuery.add(Restrictions.ne("status", status));
-//        }
-//        conjunctionAnd.add(Restrictions.like("doi", doi));
-//        conjunctionAnd.add(statusQuery);
-//        if (dsoNotNull)
-//        {
-//            conjunctionAnd.add(Restrictions.isNotNull("dSpaceObject"));
-//        }
-//        criteria.add(conjunctionAnd);
-//        return list(criteria);
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);

@@ -48,16 +48,6 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     @Override
     public List<MetadataValue> findByField(Context context, MetadataField metadataField) throws SQLException
     {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, MetadataValue.class);
-//        criteria.add(
-//                Restrictions.eq("metadataField.id", metadataField.getID())
-//        );
-//        criteria.setFetchMode("metadataField", FetchMode.JOIN);
-//
-//        return list(criteria);
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, MetadataValue.class);
         Root<MetadataValue> metadataValueRoot = criteriaQuery.from(MetadataValue.class);
@@ -66,7 +56,7 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
         criteriaQuery.where(criteriaBuilder.equal(join.get(MetadataField_.id), metadataField.getID()));
 
 
-        return null;
+        return list(context, criteriaQuery,true, MetadataValue.class, -1, -1);
     }
 
     @Override

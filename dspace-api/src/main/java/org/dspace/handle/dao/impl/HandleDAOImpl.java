@@ -79,7 +79,7 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         query.setParameter("handle", handle);
 
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
-        return uniqueResult(query);
+        return singleResult(query);
     }
 
     @Override
@@ -98,11 +98,7 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
 
     @Override
     public long countHandlesByPrefix(Context context, String prefix) throws SQLException {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, Handle.class);
-//        criteria.add(Restrictions.like("handle", prefix + "%"));
-//        return countLong(criteria);
-//
+
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);

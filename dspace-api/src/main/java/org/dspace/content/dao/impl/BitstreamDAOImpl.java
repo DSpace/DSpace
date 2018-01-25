@@ -132,10 +132,7 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, Bitstream.class);
-//        criteria.add(Restrictions.eq("storeNumber", storeNumber));
-//        return countLong(criteria);
+
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);

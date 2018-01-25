@@ -128,7 +128,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     @Override
     public List<Collection> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException {
-        //TODO RAF CHECK
         //        TableRowIterator tri = DatabaseManager.query(context,
 //                "SELECT * FROM collection, resourcepolicy, eperson " +
 //                        "WHERE resourcepolicy.resource_id = collection.collection_id AND " +
@@ -136,24 +135,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 //                        "resourcepolicy.resource_type_id = 3 AND "+
 //                        "( resourcepolicy.action_id = 3 OR resourcepolicy.action_id = 11 ) AND "+
 //                        "eperson.eperson_id = ?", context.getCurrentUser().getID());
-
-//        Criteria criteria = createCriteria(context, Collection.class);
-//        criteria.createAlias("resourcePolicies", "resourcePolicy");
-//
-//        Disjunction actionQuery = Restrictions.or();
-//        for (Integer action : actions)
-//        {
-//            actionQuery.add(Restrictions.eq("resourcePolicy.actionId", action));
-//        }
-//        criteria.add(Restrictions.and(
-//                Restrictions.eq("resourcePolicy.resourceTypeId", Constants.COLLECTION),
-//                Restrictions.eq("resourcePolicy.eperson", ePerson),
-//                actionQuery
-//        ));
-//        criteria.setCacheable(true);
-//
-//        return list(criteria);
-
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);

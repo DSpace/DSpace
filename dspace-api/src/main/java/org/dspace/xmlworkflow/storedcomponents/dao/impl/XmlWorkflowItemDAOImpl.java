@@ -86,13 +86,7 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
 
     @Override
     public int countAllInCollection(Context context, Collection collection) throws SQLException {
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, XmlWorkflowItem.class);
-//        if(collection != null)
-//        {
-//            criteria.add(Restrictions.eq("collection", collection));
-//        }
-//        return count(criteria);
+
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -107,14 +101,6 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
     @Override
     public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException {
 
-        //TODO RAF CHECK
-//        Criteria criteria = createCriteria(context, XmlWorkflowItem.class);
-//        criteria.createAlias("item", "i");
-//        criteria.add(Restrictions.eq("i.submitter", ep));
-//
-//        return list(criteria);
-//
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, XmlWorkflowItem.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
