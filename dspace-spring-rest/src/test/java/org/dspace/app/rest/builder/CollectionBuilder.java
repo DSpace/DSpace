@@ -39,11 +39,10 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     public static CollectionBuilder createCollection(final Context context, final Community parent) {
         CollectionBuilder builder = new CollectionBuilder(context);
-        return builder.create(context, parent);
+        return builder.create(parent);
     }
 
-    private CollectionBuilder create(final Context context, final Community parent) {
-        this.context = context;
+    private CollectionBuilder create(final Community parent) {
         try {
             this.collection = collectionService.create(context, parent);
         } catch (Exception e) {
