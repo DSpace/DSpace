@@ -9,7 +9,12 @@ var CollReport = function() {
     Report.call(this);
     //If sortable.js is included, uncomment the following
     //this.hasSorttable = function(){return true;}
-    
+
+    //Indicate if Password Authentication is supported
+    //this.makeAuthLink = function(){return true;};
+    //Indicate if Shibboleth Authentication is supported
+    //this.makeShibLink = function(){return true;};
+
     this.COLL_LIMIT = 20;
     this.TOOBIG = 10000;
     this.loadId = 0;
