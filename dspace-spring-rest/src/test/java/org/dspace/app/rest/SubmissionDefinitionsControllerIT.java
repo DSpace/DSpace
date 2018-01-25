@@ -67,11 +67,11 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
         
     	context.turnOffAuthorisationSystem();
     	
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Community")
                 .build();
         
-        Collection col1 = new CollectionBuilder().createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         
         getClient().perform(get("/api/config/submissiondefinitions/search/findByCollection")
                 .param("uuid", col1.getID().toString()))
