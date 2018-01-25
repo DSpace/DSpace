@@ -30,7 +30,10 @@
     </bean>
 
     <!-- Inject the SolrLoggerUsageEventListener into the EventService  -->
-    <!-- Comment out to enable service in DSpace 7 
+    <!-- 
+    Temporarily commented out to get REST API working on master. 
+    This should be uncommented again once DS-3815 is resolved.
+
     <bean class="org.dspace.statistics.SolrLoggerUsageEventListener">
         <property name="eventService" >
             <ref bean="dspace.eventService"/>
