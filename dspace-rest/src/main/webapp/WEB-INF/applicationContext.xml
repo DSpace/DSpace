@@ -31,7 +31,7 @@
 
     <!-- Inject the SolrLoggerUsageEventListener into the EventService  -->
     <!-- 
-    Temporarily commented out to get REST API working on master. 
+    Temporarily commented out SolrLoggerUsageEventListener to get REST API working on master. 
     This should be uncommented again once DS-3815 is resolved.
 
     <bean class="org.dspace.statistics.SolrLoggerUsageEventListener">
