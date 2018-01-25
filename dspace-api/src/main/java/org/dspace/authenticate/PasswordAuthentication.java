@@ -275,18 +275,4 @@ public class PasswordAuthentication
         return null;
     }
 
-    /**
-     * Returns message key for title of the "login" page, to use
-     * in a menu showing the choice of multiple login methods.
-     *
-     * @param context
-     *  DSpace context, will be modified (EPerson set) upon success.
-     *
-     * @return Message key to look up in i18n message catalog.
-     */
-    @Override
-    public String loginPageTitle(Context context)
-    {
-        return "org.dspace.eperson.PasswordAuthentication.title";
-    }
 }

@@ -94,26 +94,6 @@ public class AuthenticationRestController implements InitializingBean {
         return getLoginResponse(request, "Authentication failed for user " + user + ": The credentials you provided are not valid.");
     }
 
-    //TODO This should be moved under API, but then we also need to update org.dspace.authenticate.ShibAuthentication
-    //This is also not gonna work until it is moved
-    @RequestMapping(value = "/shibboleth-login", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity shibbolethLogin(HttpServletRequest request) {
-        //If you can get here, you should be authenticated, the actual login is handled by spring security.
-        //If not, no valid Shibboleth session is present or Shibboleth config is missing.
-
-        /* Make sure to apply
-           - AuthType shibboleth
-           - ShibRequireSession On
-           - ShibUseHeaders On
-           - require valid-user
-           to this endpoint. The Shibboleth daemon will then take care of redirecting you to the login page if
-           necessary.
-         */
-
-        //TODO we should redirect the user to a correct page in the UI. These could be provided as optional parameters.
-        return getLoginResponse(request, "Shibboleth authentication failed: No valid Shibboleth session could be found.");
-    }
-
     @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity logout() {
         //This is handled by org.dspace.app.rest.security.CustomLogoutHandler

@@ -723,22 +723,6 @@ public class LDAPAuthentication
         return null;
     }
 
-    /**
-     * Returns message key for title of the "login" page, to use
-     * in a menu showing the choice of multiple login methods.
-     *
-     * @param context
-     *  DSpace context, will be modified (ePerson set) upon success.
-     *
-     * @return Message key to look up in i18n message catalog.
-     */
-    @Override
-    public String loginPageTitle(Context context)
-    {
-        return "org.dspace.eperson.LDAPAuthentication.title";
-    }
-
-
     /*
      * Add authenticated users to the group defined in dspace.cfg by
      * the authentication-ldap.login.groupmap.* key.

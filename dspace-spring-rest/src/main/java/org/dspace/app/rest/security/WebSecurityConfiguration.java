@@ -87,8 +87,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 //Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
                 .addFilterBefore(new StatelessLoginFilter("/api/authn/login", authenticationManager(), restAuthenticationService), LogoutFilter.class)
-                //TODO see comment at org.dspace.app.rest.AuthenticationRestController.shibbolethLogin()
-                .addFilterBefore(new StatelessLoginFilter("/shibboleth-login", authenticationManager(), restAuthenticationService), LogoutFilter.class)
 
                 // Add a custom Token based authentication filter based on the token previously given to the client before each URL
                 .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager(), restAuthenticationService,
