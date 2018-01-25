@@ -41,11 +41,6 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
 
     @Override
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-//        Criteria criteria = createCriteria(context, PoolTask.class);
-//        criteria.add(Restrictions.eq("ePerson", ePerson));
-//
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);
@@ -57,11 +52,6 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
 
     @Override
     public List<PoolTask> findByGroup(Context context, Group group) throws SQLException {
-//        Criteria criteria = createCriteria(context, PoolTask.class);
-//        criteria.add(Restrictions.eq("group", group));
-//
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);
@@ -72,11 +62,6 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
 
     @Override
     public List<PoolTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-//        Criteria criteria = createCriteria(context, PoolTask.class);
-//        criteria.add(Restrictions.eq("workflowItem", workflowItem));
-//
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);
@@ -87,16 +72,6 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
 
     @Override
     public PoolTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson) throws SQLException {
-//        Criteria criteria = createCriteria(context, PoolTask.class);
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("workflowItem", workflowItem),
-//                        Restrictions.eq("ePerson", ePerson)
-//                )
-//        );
-//
-//        return uniqueResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);
@@ -110,16 +85,6 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
 
     @Override
     public PoolTask findByWorkflowItemAndGroup(Context context, Group group, XmlWorkflowItem workflowItem) throws SQLException {
-//        Criteria criteria = createCriteria(context, PoolTask.class);
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("workflowItem", workflowItem),
-//                        Restrictions.eq("group", group)
-//                )
-//        );
-//
-//        return uniqueResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);

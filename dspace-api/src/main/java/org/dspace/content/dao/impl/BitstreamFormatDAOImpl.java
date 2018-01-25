@@ -60,15 +60,6 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
     {
         // NOTE: Avoid internal formats since e.g. "License" also has
         // a MIMEtype of text/plain.
-//        Criteria criteria = createCriteria(context, BitstreamFormat.class);
-//        criteria.add(Restrictions.and(
-//                Restrictions.eq("internal", includeInternal),
-//                Restrictions.like("mimetype", mimeType)
-//        ));
-//
-//        return singleResult(criteria);
-//
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
@@ -96,13 +87,6 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
     public BitstreamFormat findByShortDescription(Context context,
             String desc) throws SQLException
     {
-//        Criteria criteria = createCriteria(context, BitstreamFormat.class);
-//        criteria.add(Restrictions.and(
-//                Restrictions.eq("shortDescription", desc)
-//        ));
-//
-//        return uniqueResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
@@ -151,9 +135,6 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
         Query query = createQuery(context, "from BitstreamFormat bf where :extension in elements(bf.fileExtensions)");
         query.setParameter("extension", extension);
 
-//        Criteria criteria = createCriteria(context, BitstreamFormat.class, "bitstreamFormat");
-//        criteria.createAlias("bitstreamFormat.fileExtensions", "extension");
-//        criteria.add(Restrictions.eq("extension",extension ));
         return list(query);
     }
 

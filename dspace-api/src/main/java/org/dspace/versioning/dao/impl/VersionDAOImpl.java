@@ -47,10 +47,6 @@ public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements Ver
 
     @Override
     public Version findByItem(Context context, Item item) throws SQLException {
-//        Criteria criteria = createCriteria(context, Version.class);
-//        criteria.add(Restrictions.eq("item", item));
-//        return singleResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Version.class);
         Root<Version> versionRoot = criteriaQuery.from(Version.class);

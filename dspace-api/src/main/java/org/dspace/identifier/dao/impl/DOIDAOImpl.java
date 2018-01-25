@@ -43,10 +43,6 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
 
     @Override
     public DOI findByDoi(Context context, String doi) throws SQLException {
-//        Criteria criteria = createCriteria(context, DOI.class);
-//        criteria.add(Restrictions.eq("doi", doi));
-//        return uniqueResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
@@ -83,14 +79,6 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
 
     @Override
     public List<DOI> findByStatus(Context context, List<Integer> statuses) throws SQLException {
-//        Criteria criteria = createCriteria(context, DOI.class);
-//        Disjunction statusQuery = Restrictions.or();
-//        for (Integer status : statuses) {
-//            statusQuery.add(Restrictions.eq("status", status));
-//        }
-//        criteria.add(statusQuery);
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
@@ -136,14 +124,6 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
 
     @Override
     public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {
-//        Criteria criteria = createCriteria(context, DOI.class);
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("dSpaceObject", dso)
-//                )
-//        );
-//        return singleResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);

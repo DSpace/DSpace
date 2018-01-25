@@ -44,12 +44,6 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
 
     @Override
     public List<Group2GroupCache> findByParent(Context context, Group group) throws SQLException {
-//        Criteria criteria = createCriteria(context, Group2GroupCache.class);
-//        criteria.add(Restrictions.eq("parent.id", group.getID()));
-//        criteria.setCacheable(true);
-//
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Group2GroupCache.class);
         Root<Group2GroupCache> group2GroupCacheRoot = criteriaQuery.from(Group2GroupCache.class);
@@ -60,20 +54,6 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
 
     @Override
     public List<Group2GroupCache> findByChildren(Context context, Iterable<Group> groups) throws SQLException {
-//        Criteria criteria = createCriteria(context, Group2GroupCache.class);
-//
-//        Disjunction orDisjunction = Restrictions.or();
-//        for(Group group : groups)
-//        {
-//            orDisjunction.add(Restrictions.eq("child.id", group.getID()));
-//        }
-//
-//        criteria.add(orDisjunction);
-//        criteria.setCacheable(true);
-//
-//        return list(criteria);
-//
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Group2GroupCache.class);
         Root<Group2GroupCache> group2GroupCacheRoot = criteriaQuery.from(Group2GroupCache.class);
@@ -101,12 +81,6 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
 
     @Override
     public Group2GroupCache find(Context context, Group parent, Group child) throws SQLException {
-//        Criteria criteria = createCriteria(context, Group2GroupCache.class);
-//        criteria.add(Restrictions.eq("parent.id", parent.getID()));
-//        criteria.add(Restrictions.eq("child.id", child.getID()));
-//        criteria.setCacheable(true);
-//        return uniqueResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Group2GroupCache.class);
         Root<Group2GroupCache> group2GroupCacheRoot = criteriaQuery.from(Group2GroupCache.class);

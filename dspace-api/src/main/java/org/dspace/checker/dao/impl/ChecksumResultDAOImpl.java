@@ -39,10 +39,6 @@ public class ChecksumResultDAOImpl extends AbstractHibernateDAO<ChecksumResult> 
 
     @Override
     public ChecksumResult findByCode(Context context, ChecksumResultCode code) throws SQLException {
-//        Criteria criteria = createCriteria(context, ChecksumResult.class);
-//        criteria.add(Restrictions.eq("resultCode", code));
-//        return uniqueResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ChecksumResult.class);
         Root<ChecksumResult> checksumResultRoot = criteriaQuery.from(ChecksumResult.class);

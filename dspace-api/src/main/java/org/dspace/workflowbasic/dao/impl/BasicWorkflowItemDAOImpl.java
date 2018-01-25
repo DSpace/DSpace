@@ -45,11 +45,6 @@ public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflow
 
     @Override
     public BasicWorkflowItem findByItem(Context context, Item i) throws SQLException {
-//        Criteria criteria = createCriteria(context, BasicWorkflowItem.class);
-//        criteria.add(Restrictions.eq("item", i));
-        // Look for the unique WorkflowItem entry where 'item_id' references this item
-//        return uniqueResult(criteria);
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BasicWorkflowItem.class);
         Root<BasicWorkflowItem> basicWorkflowItemRoot = criteriaQuery.from(BasicWorkflowItem.class);
@@ -76,10 +71,6 @@ public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflow
     @Override
     public List<BasicWorkflowItem> findByCollection(Context context, Collection c) throws SQLException
     {
-//        Criteria criteria = createCriteria(context, BasicWorkflowItem.class);
-//        criteria.add(Restrictions.eq("collection", c));
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BasicWorkflowItem.class);
         Root<BasicWorkflowItem> basicWorkflowItemRoot = criteriaQuery.from(BasicWorkflowItem.class);
@@ -99,10 +90,6 @@ public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflow
 
     @Override
     public List<BasicWorkflowItem> findByOwner(Context context, EPerson ePerson) throws SQLException {
-//        Criteria criteria = createCriteria(context, BasicWorkflowItem.class);
-//        criteria.add(Restrictions.eq("owner", ePerson));
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BasicWorkflowItem.class);
         Root<BasicWorkflowItem> basicWorkflowItemRoot = criteriaQuery.from(BasicWorkflowItem.class);

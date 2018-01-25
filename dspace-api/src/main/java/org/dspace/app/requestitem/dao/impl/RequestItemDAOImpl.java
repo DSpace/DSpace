@@ -37,10 +37,6 @@ public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implem
 
     @Override
     public RequestItem findByToken(Context context, String token) throws SQLException {
-//        Criteria criteria = createCriteria(context, RequestItem.class);
-//        criteria.add(Restrictions.eq("token", token));
-//        return uniqueResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RequestItem.class);
         Root<RequestItem> requestItemRoot = criteriaQuery.from(RequestItem.class);
