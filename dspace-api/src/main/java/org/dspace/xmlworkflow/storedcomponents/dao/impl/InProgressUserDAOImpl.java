@@ -40,17 +40,7 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
 
     @Override
     public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson) throws SQLException {
-//        Criteria criteria = createCriteria(context, InProgressUser.class);
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.eq("workflowItem", workflowItem),
-//                        Restrictions.eq("ePerson", ePerson)
-//                )
-//        );
-//        return uniqueResult(criteria);
-//
-//
-//
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, InProgressUser.class);
         Root<InProgressUser> inProgressUserRoot = criteriaQuery.from(InProgressUser.class);
@@ -65,12 +55,6 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
 
     @Override
     public List<InProgressUser> findByEperson(Context context, EPerson ePerson) throws SQLException {
-//        Criteria criteria = createCriteria(context, InProgressUser.class);
-//        criteria.add(Restrictions.eq("ePerson", ePerson));
-//
-//        return list(criteria);
-//
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, InProgressUser.class);
         Root<InProgressUser> inProgressUserRoot = criteriaQuery.from(InProgressUser.class);
@@ -81,11 +65,7 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
 
     @Override
     public List<InProgressUser> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-//        Criteria criteria = createCriteria(context, InProgressUser.class);
-//        criteria.add(Restrictions.eq("workflowItem", workflowItem));
-//
-//        return list(criteria);
-//
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, InProgressUser.class);
         Root<InProgressUser> inProgressUserRoot = criteriaQuery.from(InProgressUser.class);

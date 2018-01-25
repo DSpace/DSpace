@@ -64,10 +64,6 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     @Override
     public List<WorkspaceItem> findByCollection(Context context, Collection c) throws SQLException
     {
-//        Criteria criteria = createCriteria(context, WorkspaceItem.class);
-//        criteria.add(Restrictions.eq("collection", c));
-//        return list(criteria);
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
@@ -80,12 +76,6 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     @Override
     public WorkspaceItem findByItem(Context context, Item i) throws SQLException
     {
-//        Criteria criteria = createCriteria(context, WorkspaceItem.class);
-//        criteria.add(Restrictions.eq("item", i));
-//         Look for the unique workspaceitem entry where 'item_id' references this item
-//        return uniqueResult(criteria);
-//
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);

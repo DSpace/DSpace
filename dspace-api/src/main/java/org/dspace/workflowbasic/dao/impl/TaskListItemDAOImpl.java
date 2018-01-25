@@ -48,10 +48,6 @@ public class TaskListItemDAOImpl extends AbstractHibernateDAO<TaskListItem> impl
 
     @Override
     public List<TaskListItem> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-//        Criteria criteria = createCriteria(context, TaskListItem.class);
-//        criteria.add(Restrictions.eq("ePerson", ePerson));
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, TaskListItem.class);
         Root<TaskListItem> taskListItemRoot = criteriaQuery.from(TaskListItem.class);

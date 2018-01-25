@@ -37,8 +37,6 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException {
-//        Criteria criteria = createCriteria(context, Bitstream.class);
-//        criteria.add(Restrictions.eq("deleted", true));
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Bitstream.class);
         Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
@@ -50,13 +48,6 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public List<Bitstream> findDuplicateInternalIdentifier(Context context, Bitstream bitstream) throws SQLException {
-//        Criteria criteria = createCriteria(context, Bitstream.class);
-//        criteria.add(Restrictions.and(
-//                Restrictions.eq("internalId", bitstream.getInternalId()),
-//                Restrictions.not(Restrictions.eq("id", bitstream.getID()))
-//        ));
-//
-//        return list(criteria);
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Bitstream.class);
         Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
