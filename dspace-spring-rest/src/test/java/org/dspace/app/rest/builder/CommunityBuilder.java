@@ -35,20 +35,19 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
 
     public static CommunityBuilder createCommunity(final Context context) {
         CommunityBuilder builder = new CommunityBuilder(context);
-        return builder.create(context);
+        return builder.create();
     }
 
-    private CommunityBuilder create(final Context context) {
+    private CommunityBuilder create() {
         return createSubCommunity(context, null);
     }
 
     public static CommunityBuilder createSubCommunity(final Context context, final Community parent) {
         CommunityBuilder builder = new CommunityBuilder(context);
-        return builder.createSub(context, parent);
+        return builder.createSub(parent);
     }
 
-    private CommunityBuilder createSub(final Context context, final Community parent) {
-        this.context = context;
+    private CommunityBuilder createSub(final Community parent) {
         try {
             community = communityService.create(parent, context);
         } catch (Exception e) {
