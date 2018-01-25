@@ -43,11 +43,8 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @return
      * @throws SQLException
      */
-    public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException {
-//        Criteria criteria = createCriteria(context, clazz);
-//        criteria.add(Restrictions.eq("legacyId", legacyId));
-//        return uniqueResult(criteria);
-//
+    public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException
+    {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, clazz);
         Root<T> root = criteriaQuery.from(clazz);

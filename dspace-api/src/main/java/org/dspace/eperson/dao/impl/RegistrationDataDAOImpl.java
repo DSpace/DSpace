@@ -38,10 +38,6 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
 
     @Override
     public RegistrationData findByEmail(Context context, String email) throws SQLException {
-//        Criteria criteria = createCriteria(context, RegistrationData.class);
-//        criteria.add(Restrictions.eq("email", email));
-//        return uniqueResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RegistrationData.class);
         Root<RegistrationData> registrationDataRoot = criteriaQuery.from(RegistrationData.class);
@@ -52,10 +48,6 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
 
     @Override
     public RegistrationData findByToken(Context context, String token) throws SQLException {
-//        Criteria criteria = createCriteria(context, RegistrationData.class);
-//        criteria.add(Restrictions.eq("token", token));
-//        return uniqueResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RegistrationData.class);
         Root<RegistrationData> registrationDataRoot = criteriaQuery.from(RegistrationData.class);

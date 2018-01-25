@@ -84,10 +84,7 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
 
     @Override
     public List<Handle> findByPrefix(Context context, String prefix) throws SQLException {
-//        Criteria criteria = createCriteria(context, Handle.class);
-//        criteria.add(Restrictions.like("handle", prefix + "%"));
-//        return list(criteria);
-//
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Handle.class);
         Root<Handle> handleRoot = criteriaQuery.from(Handle.class);

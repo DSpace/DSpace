@@ -74,10 +74,6 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
 
     @Override
     public List<HarvestedCollection> findByStatus(Context context, int status) throws SQLException {
-//        Criteria criteria = createCriteria(context, HarvestedCollection.class);
-//        criteria.add(Restrictions.eq("harvestStatus", status));
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
@@ -88,10 +84,6 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
 
     @Override
     public HarvestedCollection findByCollection(Context context, Collection collection) throws SQLException {
-//        Criteria criteria = createCriteria(context, HarvestedCollection.class);
-//        criteria.add(Restrictions.eq("collection", collection));
-//        return singleResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
@@ -159,20 +151,6 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
     }
 
     protected CriteriaQuery getByStatusAndMinimalTypeCriteria(Context context, int status, int type, int limit) throws SQLException {
-//        Criteria criteria = createCriteria(context, HarvestedCollection.class);
-//        criteria.add(
-//                Restrictions.and(
-//                        Restrictions.gt("harvestType", type),
-//                        Restrictions.eq("harvestStatus", status)
-//                )
-//        );
-//        if(limit != -1)
-//        {
-//            criteria.setMaxResults(1);
-//        }
-//        return criteria;
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);

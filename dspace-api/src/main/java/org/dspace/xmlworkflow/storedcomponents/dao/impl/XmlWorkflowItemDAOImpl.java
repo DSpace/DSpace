@@ -44,25 +44,6 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
 
     @Override
     public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer limit, Collection collection) throws SQLException {
-//        Criteria criteria = createCriteria(context, XmlWorkflowItem.class);
-//        if(collection != null)
-//        {
-//            criteria.add(Restrictions.eq("collection", collection));
-//        }
-//
-//        if(offset != null)
-//        {
-//            criteria.setFirstResult(offset);
-//        }
-//        if(limit != null)
-//        {
-//            criteria.setMaxResults(limit);
-//        }
-//
-//        return list(criteria);
-
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, XmlWorkflowItem.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
@@ -112,11 +93,6 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
 
     @Override
     public List<XmlWorkflowItem> findByCollection(Context context, Collection collection) throws SQLException {
-//        Criteria criteria = createCriteria(context, XmlWorkflowItem.class);
-//        criteria.add(Restrictions.eq("collection", collection));
-//
-//        return list(criteria);
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, XmlWorkflowItem.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
@@ -127,11 +103,6 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
 
     @Override
     public XmlWorkflowItem findByItem(Context context, Item item) throws SQLException {
-//        Criteria criteria = createCriteria(context, XmlWorkflowItem.class);
-//        criteria.add(Restrictions.eq("item", item));
-//
-//        return uniqueResult(criteria);
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, XmlWorkflowItem.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);

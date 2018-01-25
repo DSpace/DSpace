@@ -39,11 +39,6 @@ public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> 
 
     @Override
     public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException {
-//        Criteria criteria = createCriteria(context, CollectionRole.class);
-//        criteria.add(Restrictions.eq("collection", collection));
-//
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CollectionRole.class);
         Root<CollectionRole> collectionRoleRoot = criteriaQuery.from(CollectionRole.class);
@@ -54,16 +49,6 @@ public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> 
 
     @Override
     public CollectionRole findByCollectionAndRole(Context context, Collection collection, String role) throws SQLException {
-//        Criteria criteria = createCriteria(context, CollectionRole.class);
-//        criteria.add(Restrictions.and(
-//                        Restrictions.eq("collection", collection),
-//                        Restrictions.eq("roleId", role)
-//                )
-//        );
-//
-//        return uniqueResult(criteria);
-//
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CollectionRole.class);
         Root<CollectionRole> collectionRoleRoot = criteriaQuery.from(CollectionRole.class);

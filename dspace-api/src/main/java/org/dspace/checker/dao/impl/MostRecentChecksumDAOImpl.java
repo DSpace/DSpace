@@ -80,10 +80,6 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 
     @Override
     public MostRecentChecksum findByBitstream(Context context, Bitstream bitstream) throws SQLException {
-//        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-//        criteria.add(Restrictions.eq("bitstream", bitstream));
-//        return singleResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);

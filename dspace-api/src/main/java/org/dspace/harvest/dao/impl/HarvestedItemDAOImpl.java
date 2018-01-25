@@ -41,10 +41,6 @@ public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> im
 
     @Override
     public HarvestedItem findByItem(Context context, Item item) throws SQLException {
-//        Criteria criteria = createCriteria(context, HarvestedItem.class);
-//        criteria.add(Restrictions.eq("item", item));
-//        return singleResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedItem.class);
         Root<HarvestedItem> harvestedItemRoot = criteriaQuery.from(HarvestedItem.class);

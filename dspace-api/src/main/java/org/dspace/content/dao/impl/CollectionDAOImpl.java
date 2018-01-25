@@ -84,10 +84,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     @Override
     public Collection findByTemplateItem(Context context, Item item) throws SQLException {
-//        Criteria criteria = createCriteria(context, Collection.class);
-//        criteria.add(Restrictions.eq("template_item", item));
-//        return uniqueResult(criteria);
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
         Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
@@ -99,19 +95,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     @Override
     public Collection findByGroup(Context context, Group group) throws SQLException {
-//        Criteria criteria = createCriteria(context, Collection.class);
-//        criteria.add(
-//                Restrictions.or(
-//                        Restrictions.eq("workflowStep1", group),
-//                        Restrictions.eq("workflowStep2", group),
-//                        Restrictions.eq("workflowStep3", group),
-//                        Restrictions.eq("submitters", group),
-//                        Restrictions.eq("admins", group)
-//                )
-//        );
-//        return singleResult(criteria);
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
         Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);

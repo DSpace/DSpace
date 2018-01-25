@@ -40,15 +40,6 @@ public class WorkflowItemRoleDAOImpl extends AbstractHibernateDAO<WorkflowItemRo
 
     @Override
     public List<WorkflowItemRole> findByWorkflowItemAndRole(Context context, XmlWorkflowItem workflowItem, String role) throws SQLException {
-//        Criteria criteria = createCriteria(context, WorkflowItemRole.class);
-//        criteria.add(Restrictions.and(
-//                        Restrictions.eq("workflowItem", workflowItem),
-//                        Restrictions.eq("role", role)
-//                )
-//        );
-//
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkflowItemRole.class);
         Root<WorkflowItemRole> workflowItemRoleRoot = criteriaQuery.from(WorkflowItemRole.class);
@@ -62,11 +53,6 @@ public class WorkflowItemRoleDAOImpl extends AbstractHibernateDAO<WorkflowItemRo
 
     @Override
     public List<WorkflowItemRole> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-//        Criteria criteria = createCriteria(context, WorkflowItemRole.class);
-//        criteria.add(Restrictions.eq("workflowItem", workflowItem));
-//
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkflowItemRole.class);
         Root<WorkflowItemRole> workflowItemRoleRoot = criteriaQuery.from(WorkflowItemRole.class);
@@ -77,11 +63,6 @@ public class WorkflowItemRoleDAOImpl extends AbstractHibernateDAO<WorkflowItemRo
 
     @Override
     public List<WorkflowItemRole> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-//        Criteria criteria = createCriteria(context, WorkflowItemRole.class);
-//        criteria.add(Restrictions.eq("ePerson", ePerson));
-//
-//        return list(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkflowItemRole.class);
         Root<WorkflowItemRole> workflowItemRoleRoot = criteriaQuery.from(WorkflowItemRole.class);

@@ -80,10 +80,6 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
 
     @Override
     public Community findByAdminGroup(Context context, Group group) throws SQLException {
-//        Criteria criteria = createCriteria(context, Community.class);
-//        criteria.add(Restrictions.eq("admins", group));
-//        return singleResult(criteria);
-//
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Community.class);
         Root<Community> communityRoot = criteriaQuery.from(Community.class);
