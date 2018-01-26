@@ -473,7 +473,9 @@ public class RestResourceController implements InitializingBean {
 			resources.forEach(linkService::addLinks);
 			result = assembler.toResource(resources, link);
 		} else {
-			result = repository.wrapResource((T) searchResult);
+			DSpaceResource<T> dsResource = repository.wrapResource((T) searchResult);
+			linkService.addLinks(dsResource);
+			result = dsResource;
 		}
 		return result;
 	}
