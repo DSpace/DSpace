@@ -432,16 +432,17 @@ public class EditItemServlet extends DSpaceServlet
 
 			if (!exit) {
 				CCLookup ccLookup = new CCLookup();
-				ccLookup.issue(licenseclass, map, configurationService.getProperty("cc.license.locale"));
+				String licenceLocale = configurationService.getProperty("cc.license.locale");
+				ccLookup.issue(licenseclass, map, licenceLocale);
 				if (ccLookup.isSuccess()) {
 					creativeCommonsService.removeLicense(context, uriField, nameField, item);
 
-					uriField.addItemValue(context, item, ccLookup.getLicenseUrl());
+					uriField.addItemValue(context, item, ccLookup.getLicenseUrl(), null);
 					if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
 						creativeCommonsService.setLicenseRDF(context, item, ccLookup.getRdf());
 					}
 					if (configurationService.getBooleanProperty("cc.submit.setname")) {
-						nameField.addItemValue(context, item, ccLookup.getLicenseName());
+						nameField.addItemValue(context, item, ccLookup.getLicenseName(), licenceLocale);
 					}
 
 					itemService.update(context, item);
