@@ -154,7 +154,8 @@
          <hint>
            Wybierz język dla istotnej częsci tej pozycji. Jeżeli języka nie ma
            na liście, wybierz "Inny". Jeżeli dla tej pozycji nie można ustalić
-           języka (np. jest to zestaw danych lub obraz), proszę wybrać "N/A".</hint>
+           języka (np. jest to zestaw danych lub obraz), proszę wybrać
+           "nieokreślony".</hint>
          <required></required>
        </field>
      </page>
@@ -362,47 +363,47 @@
      -->
    <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
      <pair>
-       <displayed-value>N/A</displayed-value>
+       <displayed-value>nieokreślony</displayed-value>
        <stored-value></stored-value>
      </pair>
      <pair>
-       <displayed-value>English (United States)</displayed-value>
-       <stored-value>en_US</stored-value>
+       <displayed-value>Polski</displayed-value>
+       <stored-value>pl</stored-value>
       </pair>
      <pair>
-       <displayed-value>English</displayed-value>
+       <displayed-value>Angielski</displayed-value>
        <stored-value>en</stored-value>
      </pair>
      <pair>
-       <displayed-value>Spanish</displayed-value>
+       <displayed-value>Hiszpański</displayed-value>
        <stored-value>es</stored-value>
      </pair>
      <pair>
-       <displayed-value>German</displayed-value>
+       <displayed-value>Niemiecki</displayed-value>
        <stored-value>de</stored-value>
      </pair>
      <pair>
-       <displayed-value>French</displayed-value>
+       <displayed-value>Francuski</displayed-value>
        <stored-value>fr</stored-value>
      </pair>
      <pair>
-       <displayed-value>Italian</displayed-value>
+       <displayed-value>Włoski</displayed-value>
        <stored-value>it</stored-value>
      </pair>
      <pair>
-       <displayed-value>Japanese</displayed-value>
+       <displayed-value>Japoński</displayed-value>
        <stored-value>ja</stored-value>
      </pair>
      <pair>
-       <displayed-value>Chinese</displayed-value>
+       <displayed-value>Chiński</displayed-value>
        <stored-value>zh</stored-value>
      </pair>
      <pair>
-       <displayed-value>Turkish</displayed-value>
+       <displayed-value>Turecki</displayed-value>
        <stored-value>tr</stored-value>
      </pair>
      <pair>
-       <displayed-value>(Other)</displayed-value>
+       <displayed-value>(Inny)</displayed-value>
        <stored-value>other</stored-value>
      </pair>
    </value-pairs>
