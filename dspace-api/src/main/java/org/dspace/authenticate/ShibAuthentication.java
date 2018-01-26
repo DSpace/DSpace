@@ -510,7 +510,18 @@ public class ShibAuthentication implements AuthenticationMethod
 			int port = request.getServerPort();
 			String contextPath = request.getContextPath();
 
-			String returnURL = request.getHeader("Referer");;
+			String returnURL = request.getHeader("Referer");
+			if (returnURL == null) {
+				if (request.isSecure() || forceHTTPS) {
+					returnURL = "https://";
+				} else {
+					returnURL = "http://";
+				}
+				returnURL += host;
+				if (!(port == 443 || port == 80)) {
+					returnURL += ":" + port;
+				}
+			}
 
 			try {
 				shibURL += "?target="+URLEncoder.encode(returnURL, "UTF-8");
