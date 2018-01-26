@@ -12,13 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.checker.BitstreamInfoDAO;
@@ -192,18 +191,6 @@ public class BitstreamStorageManager
             log.warn("S3 BucketName is not configured, setting default: " + s3BucketName);
         }
 
-        try {
-            if (! s3Service.doesBucketExist(s3BucketName)) {
-                s3Service.createBucket(s3BucketName);
-                log.info("Creating new S3 Bucket: " + s3BucketName);
-            }
-        }
-        catch (Exception e)
-            {
-                log.error(e);
-                throw new IOException(e);
-            }
-
         // region
         if (awsRegionName != null && awsRegionName.length() > 0) {
             try {
@@ -214,6 +201,18 @@ public class BitstreamStorageManager
             } catch (IllegalArgumentException e) {
                 log.warn("Invalid aws_region: " + awsRegionName);
             }
+        }
+
+        try {
+            if (! s3Service.doesBucketExist(s3BucketName)) {
+                s3Service.createBucket(s3BucketName);
+                log.info("Creating new S3 Bucket: " + s3BucketName);
+            }
+        }
+        catch (Exception e)
+        {
+            log.error(e);
+            throw new IOException(e);
         }
 
         log.info("AWS S3 Assetstore ready to go! bucket:" + s3BucketName);
@@ -571,8 +570,11 @@ public class BitstreamStorageManager
             String key = getFullS3Key(sInternalId + "");
             log.debug("retrieving item " + key + " from Amazon S3 bucket " + s3BucketName);
             try {
-                S3Object object = s3Service.getObject(new GetObjectRequest(s3BucketName, key));
-                resultInputStream = (object != null) ? object.getObjectContent() : null;
+                //get tomorrow's date:
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+                URL url = s3Service.generatePresignedUrl(s3BucketName, key, calendar.getTime());
+                resultInputStream = url.openStream();
             } catch (Exception e) {
                 log.error("Unable to get S3 item " + key + " from bucket " + s3BucketName, e);
                 throw new IOException(e);
