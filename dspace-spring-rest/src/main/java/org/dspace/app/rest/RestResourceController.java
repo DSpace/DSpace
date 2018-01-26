@@ -14,9 +14,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,15 +31,14 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
-import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.link.HalLinkService;
+import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
-import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.model.step.UploadStatusResponse;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
@@ -212,6 +209,7 @@ public class RestResourceController implements InitializingBean {
 			throw new HttpRequestMethodNotSupportedException(RequestMethod.POST.toString());
 		}
 		DSpaceResource result = repository.wrapResource(modelObject);
+		linkService.addLinks(result);
 		//TODO manage HTTPHeader
 		return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);		
 	}	
@@ -232,24 +230,21 @@ public class RestResourceController implements InitializingBean {
 		return uploadInternal(request, apiCategory, model, id, extraField, uploadfile);
 	}
     
-	private <ID extends Serializable, U extends UploadStatusResponse> ResponseEntity<ResourceSupport> uploadInternal(HttpServletRequest request, String apiCategory, String model, ID id,
+	private <ID extends Serializable> ResponseEntity<ResourceSupport> uploadInternal(HttpServletRequest request, String apiCategory, String model, ID id,
 			String extraField, MultipartFile uploadfile) {
 		checkModelPluralForm(apiCategory, model);
 		DSpaceRestRepository<DirectlyAddressableRestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
 		
-		U result = null;
+		DirectlyAddressableRestModel modelObject = null;
 		try {
-			result = repository.upload(request, apiCategory, model, id, extraField, uploadfile);
-			if(result.isStatus()) {
-				return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, new Resource(result));
-			}
-			else {
-				return ControllerUtils.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, null, new Resource(result));
-			}				
+			modelObject = repository.upload(request, apiCategory, model, id, extraField, uploadfile);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
+			return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+		DSpaceResource result = repository.wrapResource(modelObject);
+		linkService.addLinks(result);
+		return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
 	}	
 	
 	@RequestMapping(method = RequestMethod.PATCH, value = "/{id:\\d+}")
@@ -284,6 +279,7 @@ public class RestResourceController implements InitializingBean {
 			return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		DSpaceResource result = repository.wrapResource(modelObject);
+		linkService.addLinks(result);
 		//TODO manage HTTPHeader
 		return ControllerUtils.toResponseEntity(HttpStatus.OK, null, result);		
 		
@@ -307,7 +303,9 @@ public class RestResourceController implements InitializingBean {
 				List result = new ArrayList();
 				result.add(object);
 				PageImpl<DirectlyAddressableRestModel> pageResult = new PageImpl(result, page, 1);
-				return assembler.toResource(pageResult.map(linkRepository::wrapResource),link);
+				Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
+				halResources.forEach(linkService::addLinks);
+				return assembler.toResource(halResources, link);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
