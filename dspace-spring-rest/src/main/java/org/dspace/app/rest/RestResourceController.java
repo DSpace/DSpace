@@ -14,7 +14,9 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -380,10 +382,19 @@ public class RestResourceController implements InitializingBean {
 					.getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
 			PageImpl<DirectlyAddressableRestModel> pageResult = new PageImpl(fullList.subList(start, end), page, fullList.size());
 			result = assembler.toResource(pageResult.map(resourceRepository::wrapResource));
+            for (Resource subObj : result) {
+                if(subObj.getContent() instanceof HALResource) {
+                	linkService.addLinks((HALResource) subObj.getContent());
+                }
+            }
 			return result;
+			
+
+			
 		} else {
 			return (ResourceSupport) resource.getEmbeddedResources().get(rel);
 		}
+		
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
