@@ -468,6 +468,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                   <a href="/pages/journalLookup">Look up your journal</a>
                                 </li>
                                 <li>
+                                  <a href="/pages/reusabilityBestPractices" target="_blank">Open data best practices</a>
+                                </li>
+                                <li>
                                   <a href="/pages/faq">FAQs</a>
                                 </li>
                                 <li>
@@ -475,9 +478,6 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                                 <li>
                                   <a href="/pages/institutionalSponsors">Institutional sponsors</a>
-                                </li>
-                                <li>
-                                  <a href="/pages/dryadlab" target="_blank">Educational outreach with DryadLab</a>
                                 </li>
                                 <li>
                                     <a href="/pages/policies">Terms of service</a>

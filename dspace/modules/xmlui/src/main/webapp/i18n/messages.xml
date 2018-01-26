@@ -2946,16 +2946,15 @@
 	</message>
     <message key="xmlui.submit.dataset.describe.help">
         <div>
-            Please select and upload a data file from your computer, and describe the data file in as much detail as possible. Providing a detailed description will make it easier for others to find your data in Dryad. (While a data file may not have the same authors and keywords as the publication, for convenience, some of this information has been copied over. Please update as needed).<br />
-            <br />Only one file may be uploaded and described on this page. Once this data file has been saved, you may add additional files to the data package. If you have a large number of related files, they may be submitted in an archive format such as .tar or .zip.<br />
-            <br />Note that there will be additional fees if the total content submitted to Dryad for a given publication is more than 20GB. Submitters will be asked to pay $50 for each additional 10GB, or part thereof.<br />
-
-            <br />Please remember that Dryad does <strong>not</strong> accept data submissions that contain personally identifiable human subject information or non-CC0 compatible licenses. 
-            <a href="/pages/faq#depositing-acceptable-data" target="_blank">View general guidance</a> about what types of data Dryad accepts and <a href="/pages/readme" target="_blank">README file guidance</a>.
-            If you have human subjects data, please review our <a href="/pages/humanSubjectsData" target="_blank">guidelines for de-identification of human subjects data.</a><br />
-
-            <br />Fields marked with an asterisk (*) are required. For more information on expected contents for a field, mouse over the ? icon. If you have trouble submitting files, 
-            please contact us at <a href="mailto:help@datadryad.org">help@datadryad.org</a>.
+            Please select and upload a data file from your computer, and describe the data file in as much detail as possible. Providing a detailed description will make it easier for others to find your data in Dryad. (While a data file may not have the same authors and keywords as the publication, for convenience, some of this information has been copied over. Please update as needed).
+            <br /><br />
+            Only one file may be uploaded and described on this page. Once this data file has been saved, you may add additional files to the data package. If you have a large number of related files, they may be submitted in an archive format such as .tar or .zip.
+            <br /><br />
+            Note that there will be additional fees if the total content submitted to Dryad for a given publication is more than 20GB. Submitters will be asked to pay $50 for each additional 10GB, or part thereof.
+            <br /><br />
+            Please remember that Dryad does <strong>not</strong> accept data submissions that contain personally identifiable <a href="/pages/humanSubjectsData" target="_blank">human subject information</a> or <a href="/pages/faq#info-cc0" target="_blank">non-CC0 compatible</a> licenses. <a href="/pages/faq#depositing-acceptable-data" target="_blank">View general guidance</a> about what types of data Dryad accepts and <a href="/pages/reusabilityBestPractices" target="_blank">best practices for reusability</a>.
+            <br /><br />
+            Fields marked with an asterisk (*) are required. For more information on expected contents for a field, mouse over the ? icon. If you have trouble submitting files, please contact us at <a href="mailto:help@datadryad.org">help@datadryad.org</a>.
         </div>
 	</message>
 	<message key="xmlui.submit.dataset.form.pub.head">Publication</message>

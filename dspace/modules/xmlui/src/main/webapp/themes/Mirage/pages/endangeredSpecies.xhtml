@@ -1,0 +1,132 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<!-- We have to comment out the DTD to run, but use it to validate when editing -->
+<!--
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> -->
+<html>
+<head>
+    <title>Endangered species data</title>
+    <style type="text/css">
+    div#ds-body {
+        margin: 0px 0px 0px 0px;
+        padding-right: 10px;
+        top: 165px;
+    }
+
+    #hsd-identifiers {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    #hsd-identifiers td,
+    #hsd-identifiers th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    #hsd-identifiers th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        background-color: #EEEEEE;
+        color: white;
+    }
+
+    h2 {
+        margin-top: 30px;
+    }
+
+    .listbox {
+        background: #dde6c5;
+        border: 1px solid #d4dcbd;
+        -moz-border-radius: 15px;
+        border-radius: 15px;
+        margin: 18px 24px 24px 24px;
+        padding: 6px 40px 20x 40px;
+    }
+
+    .innerlistbox {
+        background: #f8ffe6;
+        margin: 18px;
+        padding: 12px;
+    }
+
+    p.light {
+        background-color: #f8ffe6;
+    }
+
+    p.dark {
+        background-color: #dde6c5;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="ds-body">
+        <h1 class="ds-div-head">Endangered species data</h1>
+        <div class="ds-static-div primary">
+            <p>Congress passed the <a href="https://www.epa.gov/laws-regulations/summary-endangered-species-act" target="_blank">Endangered Species Act (ESA)</a> in 1973. Its purpose is to monitor and develop programs to conserve and recover endangered species and their habitats. The ESA also provides the public with lists of protected plant and animal species nationally and worldwide. All species of plants and animals, except pest insects, are eligible for listing as endangered or threatened under the ESA. Researchers are encouraged to refer to the ESA and similar organizations for information on current conservation efforts and programs relevant to the species they are studying.
+            </p>
+            <p>
+                Researchers can assess the level of risk to a particular species using the following suggested criteria:
+            </p>
+            <ul class="text-list" style="margin-bottom: 11px;">
+                <li>What are current conservation efforts for this species?</li>
+                <li>Will this information aid or harm conservation efforts?</li>
+                <li>Is the information already in the public domain?</li>
+                <li>Is the species located on a protected wildlife preserve or sanctuary?</li>
+            </ul>
+            <h2>Tips for preparing data for Dryad</h2>
+            <p>
+                <strong>Note:</strong> While every submission is evaluated by our curation team and we provide guidance for researchers to follow, the researchers themselves are responsible for ensuring that data do not contain information which may cause harm to threatened species (see <a href="http://datadryad.org/pages/policies">Dryad’s Terms of Service</a>).
+            </p>
+            <p>
+                Resources such as the <a href="http://eol.org/" target="_blank">Encyclopedia of Life (EOL)</a> and the <a href="http://www.iucnredlist.org/" target="_blank">IUCN Red List of Threatened Species</a> may be used to determine the current threat level of individual species. Please consider masking location information if your data meets the following combined criteria:
+            </p>
+            <ul class="text-list" style="margin-bottom: 10px;">
+                <li>The species is flagged by a resource such as the IUCN Red List as "vulnerable", "endangered", or "critically endangered".</li>
+                <li>There is specific mention by the IUCN of threats from poaching/illegal hunting or other malicious human activity.</li>
+                <li>Your data includes exact geo-coordinates for this species.</li>
+                <li>The species is not located on a protected wildlife preserve.</li>
+            </ul>
+            <h2>Tips for "masking" sensitive endangered species data for Dryad</h2>
+            <p>
+                “Masking” involves deliberate modification or conversion of geographic coordinates for a particular species. Depending on the level of risk for a species, data may be generalized using decimal degrees. This method preserves the integrity of the overall geographic distribution but protects the confidentiality of the data observee.
+            </p>
+            <h2>Tips for documenting the method and level of generalization</h2>
+            <p>
+                Documentation of how you altered or masked your geographic data should be provided so that it is clear to readers what your data represent. Please consider including a separate <a href="/pages/reusabilityBestPractices#description">README</a> file that explains how your data have been modified.
+            </p>
+            <p>
+                For further assistance please consult the Global Biodiversity Information Facility’s (GBIF). "<a href="https://www.gbif.org/document/80512/guide-to-best-practices-for-generalising-sensitive-species-occurrence-data" target="_blank">Guide to Best Practices for Generalising Primary Species-Occurrence Data</a>", which provides some guidance in determining whether sensitive occurrence data should be restricted.
+            </p>
+            <h2>References</h2>
+            <p>
+            Chapman, AD, Grafton O (2008) Guide to best practices for generalising: sensitive species occurrence data, version 1.0. Copenhagen: Global Biodiversity Information Facility, 27 pp. ISBN: 87-92020-06-2. Available online at <a href="http://www.gbif.org/resource/80512" target="_blank">http://www.gbif.org/resource/80512</a>.
+            </p>
+            <p>
+            Clarke, KC (2016) A multiscale masking method for point geographic data. International Journal Of Geographical Information Science 30(2): 300-315. <a href="https://doi.org/10.1080/13658816.2015.1085540" target="_blank">https://doi.org/10.1080/13658816.2015.1085540</a> 
+            </p>
+            <p>
+            Lindenmayer D, Scheele B (2017) Do not publish. Science 356(6340): 800-801. <a href="https://doi.org/10.1126/science.aan1362" target="_blank">https://doi.org/10.1126/science.aan1362</a>
+            </p>
+            <p>
+            Lowe, AJ Smyth, AK Atkins, K Avery, R, Belbin, L, Brown, N,  Budden, AE Sparrow, B ( 2017) Publish openly but responsibly. Science 357(6347): 141. <a href="https://doi.org/10.1126/science.aao0054" target="_blank">https://doi.org/10.1126/science.aao0054</a>
+            </p>
+            <p>
+            U. S. Fish and Wildlife Service Endangered Species Program (2013) ESA Basics 40: Years of Conserving Endangered Species. Arlington, VA: U. S. Fish and Wildlife Service. Available online at <a href="https://www.fws.gov/endangered/esa-library/pdf/ESA_basics.pdf" target="_blank">https://www.fws.gov/endangered/esa-library/pdf/ESA_basics.pdf</a>
+            </p>
+        <p>Go to <a href="/pages/faq">Frequently Asked Questions</a></p>
+    </div>  
+        <div class="page-license">
+      <p>
+        All text on this page is available under a 
+        <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC-BY 3.0 license.
+          <img src="/themes/Dryad/images/cc-by.png" alt="CC-BY 3.0 icon"/>
+          <span class="accessibly-hidden">(opens in a new window)</span>
+        </a>             
+      </p>
+
+    </div>  
+    <div>Last revised: 2018-01-24</div>
+  </div>
+ </body>
+</html>
