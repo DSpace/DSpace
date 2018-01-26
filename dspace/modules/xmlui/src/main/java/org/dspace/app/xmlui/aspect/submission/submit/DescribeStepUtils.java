@@ -378,9 +378,9 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
             select.addOption("none", "Publish immediately");
         }
 
+        select.addOption("untilArticleAppears", "Embargo until article appears");
         select.addOption("oneyear", "1 year embargo");
         select.addOption("custom", "Custom length embargo (approved by journal editor)");
-        select.addOption("untilArticleAppears", "Embargo until article appears");
 
 
         // Setup the field's pre-selected values
