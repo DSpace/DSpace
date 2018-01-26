@@ -61,7 +61,7 @@
                             </configuration>
                         </execution>
                         <!-- Make sure that we do not have conflicting dependencies-->
-                        <!-- <execution>
+                        <execution>
                             <id>enforce-versions</id>
                             <goals>
                                 <goal>enforce</goal>
@@ -71,7 +71,7 @@
                                     <DependencyConvergence />
                                 </rules>
                             </configuration>
-                        </execution> -->
+                        </execution>
                     </executions>
                 </plugin>
                 <!-- Used to compile all Java classes -->
