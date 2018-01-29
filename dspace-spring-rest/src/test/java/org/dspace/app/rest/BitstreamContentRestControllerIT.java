@@ -7,17 +7,28 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -30,11 +41,14 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.disseminate.CitationDocumentServiceImpl;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
 import org.dspace.solr.MockSolrServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration test to test the /api/core/bitstreams/[id]/content endpoint
@@ -46,12 +60,19 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
 
     private MockSolrServer mockSolrServer;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private CitationDocumentServiceImpl citationDocumentService;
+
     @Before
     public void setup() throws Exception {
         super.setUp();
         mockSolrServer = new MockSolrServer("statistics");
         mockSolrServer.getSolrServer().deleteByQuery("*:*");
         mockSolrServer.getSolrServer().commit();
+        configurationService.setProperty("citation-page.enable_globally", false);
     }
 
     @After
@@ -300,5 +321,95 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
         QueryResponse queryResponse = mockSolrServer.getSolrServer().query(query);
         assertEquals(expectedNumberOfStatsRecords, queryResponse.getResults().getNumFound());
     }
+
+    @Test
+    public void retrieveCitationCoverpageOfBitstream() throws Exception {
+        configurationService.setProperty("citation-page.enable_globally", true);
+        citationDocumentService.afterPropertiesSet();
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. A public item with a bitstream
+        File originalPdf = new File(testProps.getProperty("test.bitstream"));
+
+
+        try(InputStream is = new FileInputStream(originalPdf)) {
+
+            Item publicItem1 = ItemBuilder.createItem(context, col1)
+                    .withTitle("Public item citation cover page test 1")
+                    .withIssueDate("2017-10-17")
+                    .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                    .build();
+
+            Bitstream bitstream = BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Test bitstream")
+                    .withDescription("This is a bitstream to test the citation cover page.")
+                    .withMimeType("application/pdf")
+                    .build();
+
+            //** WHEN **
+            //We download the bitstream
+            byte[] content = getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+
+                    //** THEN **
+                    .andExpect(status().isOk())
+
+                    //The Content Length must match the full length
+                    .andExpect(header().string("Content-Length", not(nullValue())))
+                    //The server should indicate we support Range requests
+                    .andExpect(header().string("Accept-Ranges", "bytes"))
+                    //The ETag has to be based on the checksum
+                    .andExpect(header().string("ETag", bitstream.getChecksum()))
+                    //We expect the content type to match the bitstream mime type
+                    .andExpect(content().contentType("application/pdf"))
+                    //THe bytes of the content must match the original content
+                    .andReturn().getResponse().getContentAsByteArray();
+
+            // The citation cover page contains the item title. We will now verify that the pdf text contains this title.
+            String pdfText = extractPDFText(content);
+            System.out.println(pdfText);
+            assertTrue(StringUtils.contains(pdfText,"Public item citation cover page test 1"));
+
+            // The dspace-api/src/test/data/dspaceFolder/assetstore/ConstitutionofIreland.pdf file contains 64 pages, manually counted + 1 citation cover page
+            assertEquals(65,getNumberOfPdfPages(content));
+
+            //A If-None-Match HEAD request on the ETag must tell is the bitstream is not modified
+            getClient().perform(head("/api/core/bitstreams/" + bitstream.getID() + "/content")
+                    .header("If-None-Match", bitstream.getChecksum()))
+                    .andExpect(status().isNotModified());
+
+            //The download and head request should also be logged as a statistics record
+            checkNumberOfStatsRecords(bitstream, 2);
+        }
+    }
+
+    private String extractPDFText(byte[] content) throws IOException {
+        PDFTextStripper pts = new PDFTextStripper();
+        pts.setSortByPosition(true);
+
+        try (ByteArrayInputStream source = new ByteArrayInputStream(content);
+            Writer writer = new StringWriter();
+            PDDocument pdfDoc = PDDocument.load(source)){
+
+            pts.writeText(pdfDoc, writer);
+            return writer.toString();
+        }
+    }
+
+    private int getNumberOfPdfPages(byte[] content) throws IOException {
+        try (ByteArrayInputStream source = new ByteArrayInputStream(content);
+             PDDocument pdfDoc = PDDocument.load(source)){
+            return pdfDoc.getNumberOfPages();
+        }
+    }
+
 
 }

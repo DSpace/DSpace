@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
 import org.apache.catalina.connector.ClientAbortException;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -28,6 +29,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.disseminate.service.CitationDocumentService;
 import org.dspace.services.EventService;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,9 @@ public class BitstreamContentRestController {
 	@Autowired
     private AuthorizeService authorizeService;
 
+	@Autowired
+	private CitationDocumentService citationDocumentService;
+
 	@RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
 	public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
 											 HttpServletRequest request) throws IOException, SQLException, AuthorizeException {
@@ -77,23 +82,18 @@ public class BitstreamContentRestController {
         Long lastModified = bitstreamService.getLastModified(bit);
         BitstreamFormat format = bit.getFormat(context);
         String mimetype = format.getMIMEType();
+        String name = getBitstreamName(bit, format);
+
+        Pair<InputStream, Long> bitstreamTuple = getBitstreamInputStreamAndSize(context, bit);
 
 		// Pipe the bits
-		try(InputStream is = bitstreamService.retrieve(context, bit)) {
-
-            String name = bit.getName();
-            if (name == null) {
-                // give a default name to the file based on the UUID and the primary extension of the format
-                name = bit.getID().toString();
-                if (format != null && format.getExtensions() != null && format.getExtensions().size() > 0) {
-                    name += "." + format.getExtensions().get(0);
-                }
-            }
+		try (InputStream is = bitstreamTuple.getLeft())
+		{
             MultipartFileSender sender = MultipartFileSender
 					.fromInputStream(is)
 					.withBufferSize(BUFFER_SIZE)
 					.withFileName(name)
-					.withLength(bit.getSize())
+					.withLength(bitstreamTuple.getRight())
 					.withChecksum(bit.getChecksum())
 					.withMimetype(mimetype)
 					.withLastModified(lastModified)
@@ -123,6 +123,40 @@ public class BitstreamContentRestController {
 		} catch(ClientAbortException ex) {
 			log.debug("Client aborted the request before the download was completed. Client is probably switching to a Range request.", ex);
 		}
+	}
+
+	private Pair<InputStream, Long> getBitstreamInputStreamAndSize(Context context, Bitstream bit) throws SQLException, IOException, AuthorizeException {
+
+		if (citationDocumentService.isCitationEnabledForBitstream(bit, context)) {
+			return generateBitstreamWithCitation(context, bit);
+		} else {
+			return Pair.of(bitstreamService.retrieve(context, bit),bit.getSize());
+		}
+	}
+
+	private Pair<InputStream, Long> generateBitstreamWithCitation(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException {
+		//Create the cited document
+		Pair<InputStream, Long> citationDocument = citationDocumentService.makeCitedDocument(context, bitstream);
+		if (citationDocument.getLeft() == null) {
+			log.error("CitedDocument was null");
+		} else {
+			if (log.isDebugEnabled()) {
+				log.debug("CitedDocument was ok, has size " + citationDocument.getRight());
+			}
+		}
+		return citationDocument;
+	}
+
+	private String getBitstreamName(Bitstream bit, BitstreamFormat format) {
+		String name = bit.getName();
+		if (name == null) {
+			// give a default name to the file based on the UUID and the primary extension of the format
+			name = bit.getID().toString();
+			if (format != null && format.getExtensions() != null && format.getExtensions().size() > 0) {
+				name += "." + format.getExtensions().get(0);
+			}
+		}
+		return name;
 	}
 
     private Bitstream getBitstream(Context context, @PathVariable UUID uuid, HttpServletResponse response) throws SQLException, IOException, AuthorizeException {
