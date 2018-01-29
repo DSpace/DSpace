@@ -7,8 +7,6 @@
  */
 package org.dspace.services.caching;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Statistics;
 import org.dspace.kernel.ServiceManager;
@@ -236,36 +233,11 @@ public final class CachingServiceImpl
     /* (non-Javadoc)
      * @see org.dspace.kernel.mixins.InitializedService#init()
      */
+    @Override
     public void init() {
         log.info("init()");
         // get settings
         reloadConfig();
-
-        // don't display the EhCache update notice in logs - it's meant for developers, not users
-        System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");
-
-        // make sure we have a cache manager
-        if (cacheManager == null) {
-            // not injected so we need to create one
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            InputStream is = cl.getResourceAsStream(DEFAULT_CONFIG);
-            try {
-                if (is == null) {
-                    throw new IllegalStateException(
-                        "Could not init the cache manager, no config file found as a resource in the classloader: " +
-                            DEFAULT_CONFIG);
-                }
-                cacheManager = new CacheManager(is);
-            } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        log.debug("Error closing config stream", e);
-                    }
-                }
-            }
-        }
 
         // get all caches out of the cachemanager and load them into the cache list
         List<Ehcache> ehcaches = getAllEhCaches(false);
