@@ -153,7 +153,7 @@ public class CitationPage extends AbstractCurationTask {
                         //Create the cited document
                         Pair<InputStream, Long> citedDocument = citationDocument.makeCitedDocument(Curator.curationContext(), bitstream);
                         //Add the cited document to the approiate bundle
-                        this.addCitedPageToItem(citedDocument.getKey(), bundle, pBundle,
+                        this.addCitedPageToItem(citedDocument.getLeft(), bundle, pBundle,
                                 dBundle, displayMap, item, bitstream);
                     } catch (Exception e) {
                         //Could be many things, but nothing that should be
@@ -188,7 +188,7 @@ public class CitationPage extends AbstractCurationTask {
      * A helper function for {@link CitationPage#performItem(Item)}. This function takes in the
      * cited document as a File and adds it to DSpace properly.
      *
-     * @param citedDoc The temporary File that is the cited document.
+     * @param citedDoc The inputstream that is the cited document.
      * @param bundle The bundle the cited file is from.
      * @param pBundle The preservation bundle. The original document should be
      * put in here if it is not already.
