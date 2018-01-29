@@ -8,6 +8,7 @@
 package org.dspace.disseminate;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -118,6 +119,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         //Populate VALID_TYPES
         VALID_TYPES.addAll(PDF_MIMES);
 
+        // Global enabled?
+        citationEnabledGlobally = configurationService.getBooleanProperty("citation-page.enable_globally", false);
 
         //Load enabled collections
         String[] citationEnabledCollections = configurationService.getArrayProperty("citation-page.enabled_collections");
@@ -206,10 +209,6 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected Boolean citationEnabledGlobally = null;
 
     protected boolean isCitationEnabledGlobally() {
-        if(citationEnabledGlobally == null) {
-            citationEnabledGlobally = configurationService.getBooleanProperty("citation-page.enable_globally", false);
-        }
-
         return citationEnabledGlobally;
     }
 
@@ -273,7 +272,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     }
 
     @Override
-    public File makeCitedDocument(Context context, Bitstream bitstream)
+    public Pair<InputStream, Long> makeCitedDocument(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException {
         PDDocument document = new PDDocument();
         PDDocument sourceDocument = new PDDocument();
@@ -284,8 +283,14 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             generateCoverPage(context, document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
 
-            document.save(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
-            return new File(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
+            //We already have the full PDF in memory, so keep it their
+            try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                document.save(out);
+
+                byte[] data = out.toByteArray();
+                return Pair.of((InputStream) new ByteArrayInputStream(data), new Long(data.length));
+            }
+
         } finally {
             sourceDocument.close();
             document.close();

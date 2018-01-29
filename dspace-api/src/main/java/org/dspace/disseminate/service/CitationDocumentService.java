@@ -7,6 +7,7 @@
  */
 package org.dspace.disseminate.service;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
@@ -15,8 +16,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 
 /**
@@ -81,7 +82,7 @@ public interface CitationDocumentService {
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      */
-    public File makeCitedDocument(Context context, Bitstream bitstream)
+    public Pair<InputStream, Long> makeCitedDocument(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException;
 
     /**
