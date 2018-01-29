@@ -36,15 +36,11 @@ dspace.hostname = localhost
 # DSpace base host URL.  Include port number etc.
 dspace.baseUrl = http://localhost:8080
 
-# The user interface you will be using for DSpace. Common usage is either xmlui or jspui
-dspace.ui = xmlui
-
 # Full link your end users will use to access DSpace. In most cases, this will be the baseurl followed by
 # the context path to the UI you are using.
 #
 # Alternatively, you can use a url redirect or deploy the web application under the servlet container root.
-# In this case, make sure to remove the /${dspace.ui} from the dspace.url property.
-#dspace.url = ${dspace.baseUrl}/${dspace.ui}
+#dspace.url = ${dspace.baseUrl}
 
 # Name of the site
 dspace.name = DSpace at My University
