@@ -283,7 +283,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             generateCoverPage(context, document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
 
-            //We already have the full PDF in memory, so keep it their
+            //We already have the full PDF in memory, so keep it there
             try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 document.save(out);
 
