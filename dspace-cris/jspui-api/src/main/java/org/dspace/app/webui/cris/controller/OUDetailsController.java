@@ -104,9 +104,9 @@ public class OUDetailsController
             model.put("isLoggedIn", new Boolean(false));
         }
         
-        
+        boolean isAdmin = CrisAuthorizeManager.isAdmin(context,ou);
         if ((ou.getStatus() == null || ou.getStatus().booleanValue() == false)
-                && !AuthorizeManager.isAdmin(context))
+                && !isAdmin)
         {
             
             if (currUser != null
@@ -116,19 +116,19 @@ public class OUDetailsController
                 // Log the error
                 log.info(LogManager
                         .getHeader(context, "authorize_error",
-                                "Only system administrator can access to disabled researcher page"));
+                                "Only administrator can access to disabled researcher page"));
 
                 JSPManager
                         .showAuthorizeError(
                                 request,
                                 response,
                                 new AuthorizeException(
-                                        "Only system administrator can access to disabled researcher page"));
+                                        "Only administrator can access to disabled researcher page"));
             }
             return null;
         }
 
-        if (AuthorizeManager.isAdmin(context))
+        if (isAdmin)
         {
             model.put("ou_page_menu", new Boolean(true));
         }

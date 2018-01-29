@@ -144,7 +144,7 @@ public class ResearcherPageDetailsController
             model.put("isLoggedIn", new Boolean(false));
         }
         
-        boolean isAdmin = AuthorizeManager.isAdmin(context);
+        boolean isAdmin = CrisAuthorizeManager.isAdmin(context,researcher);
       
         
         if (isAdmin
@@ -177,14 +177,14 @@ public class ResearcherPageDetailsController
                 // Log the error
                 log.info(LogManager
                         .getHeader(context, "authorize_error",
-                                "Only system administrator can access to disabled researcher page"));
+                                "Only administrator can access to disabled researcher page"));
 
                 JSPManager
                         .showAuthorizeError(
                                 request,
                                 response,
                                 new AuthorizeException(
-                                        "Only system administrator can access to disabled researcher page"));
+                                        "Only administrator can access to disabled researcher page"));
             }
             return null;
         }

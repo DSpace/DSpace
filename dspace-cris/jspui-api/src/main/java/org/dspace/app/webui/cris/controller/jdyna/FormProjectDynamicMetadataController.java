@@ -38,6 +38,7 @@ import org.dspace.app.cris.model.jdyna.TabProject;
 import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.app.webui.cris.util.CrisAuthorizeManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -68,10 +69,8 @@ public class FormProjectDynamicMetadataController
 
         // check admin authorization
         boolean isAdmin = false;
-        Context context = UIUtil.obtainContext(request);
-        if (AuthorizeManager.isAdmin(context))
-        {
-            isAdmin = true;
+        if(map.containsKey("isAdmin")) {
+            isAdmin = (Boolean)map.get("isAdmin");
         }
 
         // collection of edit tabs (all edit tabs created on system associate to
@@ -160,20 +159,19 @@ public class FormProjectDynamicMetadataController
         String paramId = request.getParameter("id");
 
         Integer id = null;
-        Boolean isAdmin = false;
         if (paramId != null)
         {
             id = Integer.parseInt(paramId);
         }
         Project grant = getApplicationService().get(Project.class, id);
         Context context = UIUtil.obtainContext(request);
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException("Only system admin can edit");
-        }
-        else
+        Boolean isAdmin = false;
+        if (CrisAuthorizeManager.isAdmin(context, grant))
         {
             isAdmin = true;
+        }
+        else {
+            throw new AuthorizeException("Only system admin can edit");
         }
 
         Integer areaId;

@@ -7,6 +7,18 @@
  */
 package org.dspace.app.webui.cris.controller.jdyna;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dspace.app.cris.model.ResearchObject;
+import org.dspace.app.webui.cris.util.CrisAuthorizeManager;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.core.Context;
+
 import it.cilea.osd.jdyna.model.ANestedObjectWithTypeSupport;
 import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
 import it.cilea.osd.jdyna.model.ANestedProperty;
@@ -18,22 +30,6 @@ import it.cilea.osd.jdyna.web.IPropertyHolder;
 import it.cilea.osd.jdyna.web.Tab;
 import it.cilea.osd.jdyna.web.Utils;
 import it.cilea.osd.jdyna.web.controller.FormAnagraficaController;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.dspace.app.cris.model.OrganizationUnit;
-import org.dspace.app.cris.model.ResearchObject;
-import org.dspace.app.cris.model.ResearcherPage;
-import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 
 /**
  * This is the base abstract SpringMVC controller for the RPs authority list
@@ -76,8 +72,9 @@ public abstract class AFormDynamicObjectController<P extends Property<TP>, TP ex
                     ResearchObject.class, id);
         Context context = UIUtil.obtainContext(request);
         
-        if (AuthorizeManager.isAdmin(context))
+        if (CrisAuthorizeManager.isAdmin(context, entity))
         {
+            reference.put("isAdmin", new Boolean(true));
             reference.put("do_page_menu", new Boolean(true));
             reference.put("entity", entity);         
         }

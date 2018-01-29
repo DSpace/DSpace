@@ -7,11 +7,6 @@
  */
 package org.dspace.app.webui.cris.controller.jdyna;
 
-import it.cilea.osd.jdyna.dto.AnagraficaObjectAreaDTO;
-import it.cilea.osd.jdyna.model.AnagraficaObject;
-import it.cilea.osd.jdyna.model.IContainable;
-import it.cilea.osd.jdyna.util.AnagraficaUtils;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,7 +31,7 @@ import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
 import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
 import org.dspace.app.cris.service.ApplicationService;
-import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.app.webui.cris.util.CrisAuthorizeManager;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -47,6 +42,11 @@ import org.dspace.eperson.EPerson;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.web.servlet.ModelAndView;
+
+import it.cilea.osd.jdyna.dto.AnagraficaObjectAreaDTO;
+import it.cilea.osd.jdyna.model.AnagraficaObject;
+import it.cilea.osd.jdyna.model.IContainable;
+import it.cilea.osd.jdyna.util.AnagraficaUtils;
 
 public class FormRPDynamicMetadataController
         extends
@@ -70,9 +70,8 @@ public class FormRPDynamicMetadataController
         // check admin authorization
         boolean isAdmin = false;
         Context context = UIUtil.obtainContext(request);
-        if (AuthorizeManager.isAdmin(context))
-        {
-            isAdmin = true;
+        if(map.containsKey("isAdmin")) {
+            isAdmin = (Boolean)map.get("isAdmin");
         }
 
         // collection of edit tabs (all edit tabs created on system associate to
@@ -194,7 +193,7 @@ public class FormRPDynamicMetadataController
         String paramId = request.getParameter("id");
 
         Integer id = null;
-        Boolean isAdmin = false;
+
         if (paramId != null)
         {
             id = Integer.parseInt(paramId);
@@ -202,18 +201,23 @@ public class FormRPDynamicMetadataController
         ResearcherPage researcher = getApplicationService().get(
                 ResearcherPage.class, id);
         Context context = UIUtil.obtainContext(request);
+        
+        Boolean isAdmin = false;
+        if (CrisAuthorizeManager.isAdmin(context, researcher))
+        {
+            isAdmin = true;
+        }
+        
+        
         EPerson currentUser = context.getCurrentUser();
         if ((currentUser==null || (researcher.getEpersonID()!=null && currentUser.getID()!=researcher.getEpersonID()))
-               && !AuthorizeManager.isAdmin(context))
+               && !isAdmin)
         {
             throw new AuthorizeException(
                     "Only system admin can edit not personal researcher page");
         }
 
-        if (AuthorizeManager.isAdmin(context))
-        {
-            isAdmin = true;
-        }
+
 
         Integer areaId;
         if (paramTabId == null)
