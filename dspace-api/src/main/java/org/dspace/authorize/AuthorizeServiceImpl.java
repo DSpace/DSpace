@@ -530,21 +530,21 @@ public class AuthorizeServiceImpl implements AuthorizeService
     public void addPolicy(Context context, DSpaceObject o, int actionID,
                                  EPerson e, String type) throws SQLException, AuthorizeException
     {
-        createResourcePolicy(context, o, null, e, actionID, type, null, null, null, null);
+        createResourcePolicy(context, o, null, e, actionID, type);
     }
 
     @Override
     public void addPolicy(Context c, DSpaceObject o, int actionID,
                                  Group g) throws SQLException, AuthorizeException
     {
-        createResourcePolicy(c, o, g, null, actionID, null, null, null, null, null);
+        createResourcePolicy(c, o, g, null, actionID, null);
     }
 
     @Override
     public void addPolicy(Context c, DSpaceObject o, int actionID,
                                  Group g, String type) throws SQLException, AuthorizeException
     {
-        createResourcePolicy(c, o, g, null, actionID, type, null, null, null, null);
+        createResourcePolicy(c, o, g, null, actionID, type);
     }
 
     @Override
@@ -777,6 +777,11 @@ public class AuthorizeServiceImpl implements AuthorizeService
     }
 
     @Override
+    public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson, int type, String rpType) throws SQLException, AuthorizeException {
+    	return createResourcePolicy(context, dso, group, eperson, type, rpType, null, null, null, null);
+    }
+    
+    @Override
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson, int type, String rpType, String rpName, String rpDescription, Date startDate, Date endDate) throws SQLException, AuthorizeException {
         if (group == null && eperson == null)
         {
@@ -823,7 +828,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
         if (policy == null)
         {
-            policy = createResourcePolicy(context, dso, group, ePerson, action, ResourcePolicy.TYPE_CUSTOM, null, null, null, null);
+            policy = createResourcePolicy(context, dso, group, ePerson, action, ResourcePolicy.TYPE_CUSTOM);
         }
         policy.setGroup(group);
         policy.setEPerson(ePerson);
