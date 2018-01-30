@@ -15,7 +15,7 @@ import org.dspace.services.ConfigurationService;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class UploadConfiguration<T extends SubmissionFormField>{
+public class UploadConfiguration {
 	
 	private ConfigurationService configurationService;
 	
