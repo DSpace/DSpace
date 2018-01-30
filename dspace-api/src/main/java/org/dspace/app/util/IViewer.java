@@ -16,7 +16,9 @@ public interface IViewer {
 	public final String METADATA_STRING_PROVIDER = BITSTREAM_SCHEMA + "." + VIEWER_ELEMENT + "."+ PROVIDER_QUALIFIER;
 	
 	public final String MASTER_ELEMENT = "master";
+	public final String HIDENOTPRIMARY_QUALIFIER = "hidenotprimary";
 	public final String[] METADATA_MASTER = new String[]{BITSTREAM_SCHEMA, MASTER_ELEMENT, null};
 	public final String METADATA_STRING_MASTER = BITSTREAM_SCHEMA + "." + MASTER_ELEMENT;
 	public final String STOP_DOWNLOAD = "nodownload";
+	public final String METADATA_STRING_HIDENOTPRIMARY = BITSTREAM_SCHEMA + "." + VIEWER_ELEMENT + "." + HIDENOTPRIMARY_QUALIFIER;
 }

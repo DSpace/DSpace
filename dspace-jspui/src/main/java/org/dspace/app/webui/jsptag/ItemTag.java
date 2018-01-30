@@ -21,6 +21,7 @@ import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.IViewer;
 import org.dspace.app.util.MetadataExposure;
@@ -591,7 +592,20 @@ public class ItemTag extends TagSupport
 					}
             		for (int i = 0; i < bundles.length; i++)
             		{
-            			Bitstream[] bitstreams = bundles[i].getBitstreams();
+            			int primaryBitID = bundles[i].getPrimaryBitstreamID();
+            			Bitstream primaryBit = null;
+            			if (primaryBitID != -1) {
+            				primaryBit = Bitstream.find(context, primaryBitID);
+            			}
+            			
+            			Bitstream[] bitstreams;
+            			if (primaryBit != null && hideNotPrimaryBitstreams(context, request, pageContext, handle, primaryBit)) {
+            				bitstreams = new Bitstream[] {primaryBit};
+            			}
+            			else {
+            				bitstreams = bundles[i].getBitstreams();	
+            			}
+            			
 
             			for (int k = 0; k < bitstreams.length; k++)
             			{
@@ -787,6 +801,18 @@ public class ItemTag extends TagSupport
     public static class ViewOption {
     	String label;
     	String link;
+    }
+    
+    public static boolean hideNotPrimaryBitstreams(Context context, HttpServletRequest request, PageContext pageContext,
+			String handle, Bitstream bit) throws UnsupportedEncodingException {
+    	
+    	List<String> hideNotPrimary = bit.getMetadataValue(IViewer.METADATA_STRING_HIDENOTPRIMARY);
+    	for (String h : hideNotPrimary) {
+    		if (BooleanUtils.toBoolean(h)) {
+    			return true;
+    		}
+    	}
+    	return false;
     }
     
 	public static List<ViewOption> getViewOptions(Context context, HttpServletRequest request, PageContext pageContext,

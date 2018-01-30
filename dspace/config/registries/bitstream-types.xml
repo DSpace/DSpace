@@ -26,6 +26,14 @@
 
     <dc-type>
         <schema>bitstream</schema>
+        <element>viewer</element>
+        <qualifier>hidenotprimary</qualifier>
+        <scope_note>Metadata field used to enable the show only primary
+	bitstream behaviour when the bitstream is selected</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>bitstream</schema>
         <element>master</element>
         <scope_note>Metadata field used to link an alternative (mostly
 					for access) copy to the master one</scope_note>
