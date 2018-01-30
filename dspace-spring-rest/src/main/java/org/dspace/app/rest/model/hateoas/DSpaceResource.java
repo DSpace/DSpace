@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
-import org.dspace.app.rest.model.DirectlyAddressableRestModel;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -39,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> extends HALResource<T> {
+public abstract class DSpaceResource<T extends RestAddressableModel> extends HALResource<T> {
 
 	public DSpaceResource(T data, Utils utils, String... rels) {
 		super(data);
@@ -68,7 +68,7 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 							for (Method m : methods) { 
 								if (StringUtils.equals(m.getName(), linkAnnotation.method())) {
 										// TODO add support for single linked object other than for collections
-										Page<? extends Serializable> pageResult = (Page<? extends DirectlyAddressableRestModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
+										Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
 										EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
 										embedded.put(name, ep);
 										found = true;
@@ -99,25 +99,25 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 							if (StringUtils.isBlank(linkAnnotation.method())) {
 								Object linkedObject = readMethod.invoke(data);
 								Object wrapObject = linkedObject;
-								if (linkedObject instanceof DirectlyAddressableRestModel) {
-									DirectlyAddressableRestModel linkedRM = (DirectlyAddressableRestModel) linkedObject; 
+								if (linkedObject instanceof RestAddressableModel) {
+									RestAddressableModel linkedRM = (RestAddressableModel) linkedObject; 
 									wrapObject = utils.getResourceRepository(linkedRM.getCategory(), linkedRM.getType())
 											.wrapResource(linkedRM);
 
 								}
 								else {
 									if (linkedObject instanceof List) {
-										List<DirectlyAddressableRestModel> linkedRMList = (List<DirectlyAddressableRestModel>) linkedObject; 
+										List<RestAddressableModel> linkedRMList = (List<RestAddressableModel>) linkedObject; 
 										if (linkedRMList.size() > 0) {
 											
-											DSpaceRestRepository<DirectlyAddressableRestModel, ?> resourceRepository = utils.getResourceRepository(linkedRMList.get(0).getCategory(), linkedRMList.get(0).getType());
+											DSpaceRestRepository<RestAddressableModel, ?> resourceRepository = utils.getResourceRepository(linkedRMList.get(0).getCategory(), linkedRMList.get(0).getType());
 											// TODO should we force pagination also of embedded resource? 
 											// This will force a pagination with size 10 for embedded collections as well
 //											int pageSize = 1;
 //											PageImpl<RestModel> page = new PageImpl(
 //													linkedRMList.subList(0,
 //															linkedRMList.size() > pageSize ? pageSize : linkedRMList.size()), new PageRequest(0, pageSize), linkedRMList.size()); 
-											PageImpl<DirectlyAddressableRestModel> page = new PageImpl(linkedRMList);
+											PageImpl<RestAddressableModel> page = new PageImpl(linkedRMList);
 											wrapObject = new EmbeddedPage(linkToSubResource.getHref(), page.map(resourceRepository::wrapResource), linkedRMList);
 										}
 										else {
@@ -139,12 +139,12 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 									for (Method m : methods) { 
 										if (StringUtils.equals(m.getName(), linkAnnotation.method())) {
 												if ( Page.class.isAssignableFrom( m.getReturnType()) ){
-													Page<? extends Serializable> pageResult = (Page<? extends DirectlyAddressableRestModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);														
+													Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);														
 													EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
 													embedded.put(name, ep);
 												}
 												else {
-													DirectlyAddressableRestModel object = (DirectlyAddressableRestModel)m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
+													RestAddressableModel object = (RestAddressableModel)m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
 													HALResource ep = linkRepository.wrapResource(object, linkToSubResource.getHref());
 													embedded.put(name, ep);
 												}
@@ -161,8 +161,8 @@ public abstract class DSpaceResource<T extends DirectlyAddressableRestModel> ext
 								}
 							}
 						}
-						else if (DirectlyAddressableRestModel.class.isAssignableFrom(readMethod.getReturnType())) {
-							DirectlyAddressableRestModel linkedObject = (DirectlyAddressableRestModel) readMethod.invoke(data);
+						else if (RestAddressableModel.class.isAssignableFrom(readMethod.getReturnType())) {
+							RestAddressableModel linkedObject = (RestAddressableModel) readMethod.invoke(data);
 							if (linkedObject != null) {
 								embedded.put(name,
 										utils.getResourceRepository(linkedObject.getCategory(), linkedObject.getType())

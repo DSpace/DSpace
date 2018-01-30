@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class CommunityRest extends DSpaceObjectRest {
 	public static final String NAME = "community";
-	public static final String CATEGORY = DirectlyAddressableRestModel.CORE;
+	public static final String CATEGORY = RestAddressableModel.CORE;
 
 	@JsonIgnore
 	private BitstreamRest logo;

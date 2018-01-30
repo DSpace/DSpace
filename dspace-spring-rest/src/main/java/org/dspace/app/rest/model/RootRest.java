@@ -14,7 +14,7 @@ import org.dspace.app.rest.RootRestResourceController;
 /**
  * The purpose of this class is to show the representation of information on the home/root page of the REST API
  */
-public class RootRest implements RestModel {
+public class RootRest implements RestAddressableModel {
     public static final String NAME = "root";
     public static final String CATEGORY = RestModel.ROOT;
     private String dspaceURL;

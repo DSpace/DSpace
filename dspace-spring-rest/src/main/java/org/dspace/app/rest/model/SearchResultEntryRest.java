@@ -17,7 +17,7 @@ import org.dspace.app.rest.DiscoveryRestController;
 /**
  * This class' purpose is to create a container for the information in the SearchResultEntryResource
  */
-public class SearchResultEntryRest implements RestModel {
+public class SearchResultEntryRest implements RestAddressableModel {
 
     public static final String NAME = "discover";
     public static final String CATEGORY = RestModel.DISCOVER;

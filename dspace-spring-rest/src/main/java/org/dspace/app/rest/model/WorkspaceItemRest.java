@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
  */
 public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 	public static final String NAME = "workspaceitem";
-	public static final String CATEGORY = DirectlyAddressableRestModel.SUBMISSION;
+	public static final String CATEGORY = RestAddressableModel.SUBMISSION;
 
 	private Date lastModified = new Date();
 

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  */
 public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 	public static final String NAME = "submissiondefinition";
-	public static final String CATEGORY = DirectlyAddressableRestModel.CONFIGURATION;
+	public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
 	private String name;
 	

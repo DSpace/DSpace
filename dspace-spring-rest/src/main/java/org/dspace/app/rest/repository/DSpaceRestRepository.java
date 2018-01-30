@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
-import org.dspace.app.rest.model.DirectlyAddressableRestModel;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.step.UploadStatusResponse;
@@ -40,7 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class DSpaceRestRepository<T extends DirectlyAddressableRestModel, ID extends Serializable>
+public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID extends Serializable>
 extends AbstractDSpaceRestRepository
 		implements PagingAndSortingRepository<T, ID> {
 
