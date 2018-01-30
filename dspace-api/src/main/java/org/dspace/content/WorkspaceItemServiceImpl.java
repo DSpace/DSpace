@@ -266,7 +266,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 		source.setCollection(toCollection);
 		
 		List<MetadataValue> remove = new ArrayList<>();
-		List<String> diff = Util.diff(fromCollection, toCollection);
+		List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
 		for(String toRemove : diff) {
 			for(MetadataValue value : source.getItem().getMetadata()) {
 				if(value.getMetadataField().toString('.').equals(toRemove)) {
