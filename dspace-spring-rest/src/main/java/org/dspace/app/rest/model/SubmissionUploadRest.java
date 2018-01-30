@@ -25,8 +25,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SubmissionUploadRest extends BaseObjectRest<String> {
 	
 	public static final String NAME = "submissionupload";
-	public static final String NAME_LINK_ON_PANEL = DirectlyAddressableRestModel.CONFIGURATION;
-	public static final String CATEGORY = DirectlyAddressableRestModel.CONFIGURATION;
+	public static final String NAME_LINK_ON_PANEL = RestAddressableModel.CONFIGURATION;
+	public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
 	private String name;
 	

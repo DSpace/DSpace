@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public interface DirectlyAddressableRestModel extends RestModel {
+public interface RestAddressableModel extends RestModel {
 	
 	@JsonIgnore
 	public String getCategory();

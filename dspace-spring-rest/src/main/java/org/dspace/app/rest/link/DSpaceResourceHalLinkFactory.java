@@ -15,7 +15,7 @@ import java.util.LinkedList;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.app.rest.model.DirectlyAddressableRestModel;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
@@ -38,7 +38,7 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
     private Utils utils;
 
     protected void addLinks(DSpaceResource halResource, Pageable page, LinkedList<Link> list) throws Exception {
-    	DirectlyAddressableRestModel data = halResource.getContent();
+    	RestAddressableModel data = halResource.getContent();
 
         try {
             for (PropertyDescriptor pd : Introspector.getBeanInfo(data.getClass()).getPropertyDescriptors()) {
@@ -57,8 +57,8 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
                         if (StringUtils.isBlank(linkAnnotation.method())) {
                             Object linkedObject = readMethod.invoke(data);
 
-                            if(linkedObject instanceof DirectlyAddressableRestModel && linkAnnotation.linkClass().isAssignableFrom(linkedObject.getClass())) {
-                                linkToSubResource = utils.linkToSingleResource((DirectlyAddressableRestModel) linkedObject, name);
+                            if(linkedObject instanceof RestAddressableModel && linkAnnotation.linkClass().isAssignableFrom(linkedObject.getClass())) {
+                                linkToSubResource = utils.linkToSingleResource((RestAddressableModel) linkedObject, name);
                             }
 
                             if (linkedObject != null || !linkAnnotation.optional()) {

@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 })
 public class CollectionRest extends DSpaceObjectRest {
 	public static final String NAME = "collection";
-	public static final String CATEGORY = DirectlyAddressableRestModel.CORE;
+	public static final String CATEGORY = RestAddressableModel.CORE;
 	public static final String LICENSE = "license";
 	public static final String DEFAULT_ACCESS_CONDITIONS = "defaultAccessConditions";
 	@JsonIgnore

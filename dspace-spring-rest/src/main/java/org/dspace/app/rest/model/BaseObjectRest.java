@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  * @param <T>
  *            the class of the resource identifier
  */
-public abstract class BaseObjectRest<T extends Serializable> implements Identifiable<T>, DirectlyAddressableRestModel {
+public abstract class BaseObjectRest<T extends Serializable> implements Identifiable<T>, RestAddressableModel {
 
 	protected T id;
 	

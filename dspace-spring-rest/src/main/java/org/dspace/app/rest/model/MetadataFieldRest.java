@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class MetadataFieldRest extends BaseObjectRest<Integer> {
 	public static final String NAME = "metadatafield";
-	public static final String CATEGORY = DirectlyAddressableRestModel.CORE;
+	public static final String CATEGORY = RestAddressableModel.CORE;
 	
 	@JsonIgnore
 	private MetadataSchemaRest schema;
