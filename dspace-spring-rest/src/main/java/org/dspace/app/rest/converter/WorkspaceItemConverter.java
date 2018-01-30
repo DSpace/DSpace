@@ -105,7 +105,7 @@ public class WorkspaceItemConverter
 					Object stepInstance = stepClass.newInstance();
 
 					if (stepInstance instanceof AbstractProcessingStep) {
-						// load the JSPStep interface for this step
+						// load the interface for this step
 						AbstractRestProcessingStep stepProcessing = (AbstractRestProcessingStep) stepClass
 								.newInstance();
 						for(ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
@@ -115,7 +115,7 @@ public class WorkspaceItemConverter
 					} else {
 						throw new Exception("The submission step class specified by '"
 								+ stepConfig.getProcessingClassName()
-								+ "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
+								+ "' does not extend the class org.dspace.app.rest.submit.AbstractRestProcessingStep!"
 								+ " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
 					}
 

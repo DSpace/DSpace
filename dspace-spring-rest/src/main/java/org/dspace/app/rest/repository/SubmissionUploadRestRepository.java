@@ -109,7 +109,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 		return new SubmissionUploadResource(sd, utils, rels);
 	}
 
-	private SubmissionUploadRest convert(Context context, UploadConfiguration<SubmissionFormFieldRest> config) throws Exception {
+	private SubmissionUploadRest convert(Context context, UploadConfiguration config) throws Exception {
 		SubmissionUploadRest result = new SubmissionUploadRest();
 		for (AccessConditionOption option : config.getOptions()) {
 			AccessConditionOptionRest optionRest = new AccessConditionOptionRest();
