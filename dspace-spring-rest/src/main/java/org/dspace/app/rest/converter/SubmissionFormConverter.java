@@ -77,7 +77,9 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 		inputField.setRepeatable(dcinput.isRepeatable());
 		if(dcinput.getLanguage()) {
 			int idx = 1;
+			//list contains: at even position the code, at odd position the label 
 			for(String code : dcinput.getValueLanguageList()) {
+				//check and retrieve "even/odd" couple to build the dto with "code/display" values
 				if(idx%2==0) {
 					String display = dcinput.getValueLanguageList().get(idx-2);
 					LanguageFormField lang = new LanguageFormField(code, display);
