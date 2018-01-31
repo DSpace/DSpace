@@ -22,6 +22,7 @@ import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
@@ -68,7 +69,7 @@ public class SubmissionDefinitionConverter extends DSpaceConverter<SubmissionCon
 			List<Collection> collections = panelConverter.getSubmissionConfigReader().getCollectionsBySubmissionConfig(context, obj.getSubmissionName());
 			List<CollectionRest> collectionsRest = collections.stream().map((collection) -> collectionConverter.convert(collection)).collect( Collectors.toList());
 			sd.setCollections(collectionsRest);
-		} catch (SQLException e) {
+		} catch (SQLException | IllegalStateException | SubmissionConfigReaderException e) {
 			log.error(e.getMessage(), e);
 		}		
 		sd.setPanels(panels);

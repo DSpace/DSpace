@@ -55,18 +55,10 @@ public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepCo
 		return step;
 	}
 	
-	public void init() {
+	public SubmissionConfigReader getSubmissionConfigReader() throws SubmissionConfigReaderException {
 		if(submissionConfigReader==null) {
-			try {
-				submissionConfigReader = new SubmissionConfigReader();
-			} catch (SubmissionConfigReaderException e) {
-				log.error(e.getMessage(), e);
-			}
-		}		
-	}
-
-	public SubmissionConfigReader getSubmissionConfigReader() {
-		init();
+			submissionConfigReader = new SubmissionConfigReader();
+		}	
 		return submissionConfigReader;
 	}
 }
