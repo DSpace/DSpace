@@ -30,7 +30,7 @@
          <label>Title</label>
          <input-type>onebox</input-type>
          <hint>Enter the name of the file.</hint>
-         <required>You must enter a main title for this item.</required>
+         <required>You must enter a main title for this file.</required>
        </field>
 
        <field>
