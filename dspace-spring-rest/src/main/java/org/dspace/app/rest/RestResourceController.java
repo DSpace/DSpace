@@ -88,6 +88,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SuppressWarnings("rawtypes")
 public class RestResourceController implements InitializingBean {
 	
+	/**
+	 * Regular expression in the request mapping to accept UUID as identifier 
+	 */
+	private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
+
+	/**
+	 * Regular expression in the request mapping to accept a string as identifier but not the other kind of identifier (digits or uuid)
+	 */
+	private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG = "/{id:^(?!^\\d+$)(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$+}";
+
+	/**
+	 * Regular expression in the request mapping to accept number as identifier
+	 */
+	private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT = "/{id:\\d+}";
+
 	private static final Logger log = Logger.getLogger(RestResourceController.class);
 	
 	@Autowired
@@ -136,7 +151,7 @@ public class RestResourceController implements InitializingBean {
 	 * @param projection
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/{id:\\d+}")
+	@RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
 	@SuppressWarnings("unchecked")
 	public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
 			@PathVariable Integer id, @RequestParam(required = false) String projection) {
@@ -167,7 +182,7 @@ public class RestResourceController implements InitializingBean {
 	 * @param projection
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/{id:^(?!^\\d+$)(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$+}")
+	@RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
 	@SuppressWarnings("unchecked")
 	public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
 			@PathVariable String id, @RequestParam(required = false) String projection) {
@@ -188,7 +203,7 @@ public class RestResourceController implements InitializingBean {
 	 * @param projection
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}")
+	@RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
 	@SuppressWarnings("unchecked")
 	public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
 			@PathVariable UUID uuid, @RequestParam(required = false) String projection) {
@@ -236,7 +251,7 @@ public class RestResourceController implements InitializingBean {
 	 * @param projection
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/{id:\\d+}/{rel}")
+	@RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/{rel}")
 	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable Integer id, @PathVariable String rel, Pageable page,
 			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
@@ -259,7 +274,7 @@ public class RestResourceController implements InitializingBean {
 	 * @param projection
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/{id:^(?!^\\d+$)(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$}/{rel}")
+	@RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG + "/{rel}")
 	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable String id, @PathVariable String rel, Pageable page,
 			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
@@ -281,7 +296,7 @@ public class RestResourceController implements InitializingBean {
 	 * @param projection
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/{rel}")
+	@RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/{rel}")
 	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable UUID uuid, @PathVariable String rel, Pageable page,
 			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
@@ -293,7 +308,7 @@ public class RestResourceController implements InitializingBean {
 	 * 
 	 * Note that the regular expression in the request mapping accept a string as identifier but not the other kind of identifier;
 	 * 
-	 * http://<dspace.url>/dspace-spring-rest/api/{apiCategory}/{model}/{id}/{rel}
+	 * http://<dspace.url>/dspace-spring-rest/api/{apiCategory}/{model}/{id}/{rel}/{relid}
 	 * 
 	 * Example:
 	 * <pre>
@@ -321,7 +336,7 @@ public class RestResourceController implements InitializingBean {
 	 * @param projection
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/{id:^(?!^\\d+$)(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$}/{rel}/{relid:[\\w+\\-]+}")
+	@RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG + "/{rel}/{relid:[\\w+\\-]+}")
 	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable String id, @PathVariable String rel, @PathVariable String relid,
 			Pageable page, PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
@@ -396,7 +411,7 @@ public class RestResourceController implements InitializingBean {
 	 * @return
 	 * @throws HttpRequestMethodNotSupportedException
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/{id:\\d+}" , headers = "content-type=multipart/form-data")
+	@RequestMapping(method = RequestMethod.POST, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT , headers = "content-type=multipart/form-data")
 	public <ID extends Serializable> ResponseEntity<ResourceSupport> upload(HttpServletRequest request,
 			@PathVariable String apiCategory, @PathVariable String model, @PathVariable Integer id,
 			@RequestParam(required=false, value="extraField") String extraField,
@@ -418,7 +433,7 @@ public class RestResourceController implements InitializingBean {
 	 * @return
 	 * @throws HttpRequestMethodNotSupportedException
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}", headers = "content-type=multipart/form-data")	
+	@RequestMapping(method = RequestMethod.POST, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID, headers = "content-type=multipart/form-data")	
 	public <ID extends Serializable> ResponseEntity<ResourceSupport> upload(HttpServletRequest request,
 			@PathVariable String apiCategory, @PathVariable String model, @PathVariable UUID id,
 			@RequestParam(required=false, value="extraField") String extraField,
@@ -469,7 +484,7 @@ public class RestResourceController implements InitializingBean {
 	 * @return
 	 * @throws HttpRequestMethodNotSupportedException
 	 */
-	@RequestMapping(method = RequestMethod.PATCH, value = "/{id:\\d+}")
+	@RequestMapping(method = RequestMethod.PATCH, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
 	public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable Integer id, @RequestBody(required = true) JsonNode jsonNode) throws HttpRequestMethodNotSupportedException {
 		return patchInternal(request, apiCategory, model, id, jsonNode);
@@ -488,7 +503,7 @@ public class RestResourceController implements InitializingBean {
 	 * @return
 	 * @throws HttpRequestMethodNotSupportedException
 	 */
-	@RequestMapping(method = RequestMethod.PATCH, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}")
+	@RequestMapping(method = RequestMethod.PATCH, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
 	public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable UUID id, @RequestBody(required = true) JsonNode jsonNode) throws HttpRequestMethodNotSupportedException {
 		return patchInternal(request, apiCategory, model, id, jsonNode);
@@ -787,13 +802,13 @@ public class RestResourceController implements InitializingBean {
 		headers.setLocation(new UriTemplate(selfLink).expand());
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{id:\\d+}")
+	@RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
 	public ResponseEntity<ResourceSupport> delete(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable Integer id) throws HttpRequestMethodNotSupportedException {		
 		return deleteInternal(apiCategory, model, id);
 	}
 	
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}")
+	@RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
 	public ResponseEntity<ResourceSupport> delete(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable UUID id) throws HttpRequestMethodNotSupportedException {		
 		return deleteInternal(apiCategory, model, id);
