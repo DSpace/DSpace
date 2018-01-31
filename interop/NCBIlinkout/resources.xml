@@ -4,7 +4,7 @@
     <Link>
         <LinkId>dryad.pubmed.2011-10-31</LinkId>
         <ProviderId>7893</ProviderId>
-        <IconUrl>http://www.nescent.org/wg/dryad/images/7/7f/DryadLogo-Button.png</IconUrl>
+        <IconUrl>http://wiki.datadryad.org/images/7/7f/DryadLogo-Button.png</IconUrl>
         <ObjectSelector>
             <Database>PubMed</Database>
             <ObjectList>
