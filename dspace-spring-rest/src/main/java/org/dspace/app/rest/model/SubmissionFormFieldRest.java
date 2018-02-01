@@ -8,7 +8,11 @@
 
 package org.dspace.app.rest.model;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.dspace.submit.model.LanguageFormField;
+import org.dspace.submit.model.SelectableMetadata;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -22,16 +26,19 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  */
 @JsonInclude(value = Include.NON_NULL)
 public class SubmissionFormFieldRest {
+	
+	private SubmissionFormInputTypeRest input;
+	private ScopeEnum scope;
+	private SubmissionVisibilityRest visibility;
 	private String label;
 	private boolean mandatory;
 	private boolean repeatable;
 	private String mandatoryMessage;
 	private String hints;
-	private SubmissionFormInputTypeRest input;
-	private ScopeEnum scope;
-	private SubmissionVisibilityRest visibility;
-	private List<SelectableMetadata> selectableMetadata;
 
+	private List<SelectableMetadata> selectableMetadata;
+	private List<LanguageFormField> languageCodes;
+	
 	public List<SelectableMetadata> getSelectableMetadata() {
 		return selectableMetadata;
 	}
@@ -80,6 +87,17 @@ public class SubmissionFormFieldRest {
 		this.hints = hints;
 	}
 
+	public List<LanguageFormField> getLanguageCodes() {
+		if(languageCodes==null) {
+			languageCodes = new ArrayList<LanguageFormField>();
+		}
+		return languageCodes;
+	}
+
+	public void setLanguageCodes(List<LanguageFormField> languageCodes) {
+		this.languageCodes = languageCodes;
+	}
+	
 	public SubmissionFormInputTypeRest getInput() {
 		return input;
 	}

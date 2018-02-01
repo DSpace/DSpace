@@ -7,6 +7,7 @@
  */
 package org.dspace.content.dao.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.dao.MetadataFieldDAO;
@@ -78,7 +79,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     {
         Query query;
 
-        if(qualifier != null) {
+        if(StringUtils.isNotBlank(qualifier)) {
             query = createQuery(context, "SELECT mf " +
                     "FROM MetadataField mf " +
                     "JOIN FETCH mf.metadataSchema ms " +
@@ -95,7 +96,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         query.setParameter("name", metadataSchema);
         query.setParameter("element", element);
 
-        if(qualifier != null) {
+        if(StringUtils.isNotBlank(qualifier)) {
             query.setParameter("qualifier", qualifier);
         }
 

@@ -7,11 +7,13 @@
  */
 package org.dspace.content.service;
 
+import java.sql.SQLException;
+
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
-
-import java.sql.SQLException;
 
 /**
  * Service interface class for the InProgressSubmission.
@@ -40,4 +42,6 @@ public interface InProgressSubmissionService<T extends InProgressSubmission> {
      * @throws AuthorizeException if authorization error
      */
     public void update(Context context, T inProgressSubmission) throws SQLException, AuthorizeException;
+    
+	public void move(Context context, T inProgressSubmission, Collection fromCollection, Collection toCollection) throws DCInputsReaderException;
 }

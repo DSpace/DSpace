@@ -21,7 +21,7 @@ import org.dspace.app.rest.RestResourceController;
 public class BitstreamFormatRest extends BaseObjectRest<Integer> {
 	public static final String NAME = "bitstreamformat";
 	
-	public static final String CATEGORY = RestModel.CORE;
+	public static final String CATEGORY = RestAddressableModel.CORE;
 	
 	private String shortDescription;
 

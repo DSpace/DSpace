@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
  */
 public class ItemRest extends DSpaceObjectRest {
 	public static final String NAME = "item";
-	public static final String CATEGORY = RestModel.CORE;
+	public static final String CATEGORY = RestAddressableModel.CORE;
 	private boolean inArchive = false;
 	private boolean discoverable = false;
 	private boolean withdrawn = false;

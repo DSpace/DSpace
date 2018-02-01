@@ -40,6 +40,7 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -145,7 +146,7 @@ public class Application extends SpringBootServletInitializer {
             public void addCorsMappings(CorsRegistry registry) {
                 String[] corsAllowedOrigins = configuration.getCorsAllowedOrigins();
                 if (corsAllowedOrigins != null) {
-                    registry.addMapping("/api/**").allowedOrigins(corsAllowedOrigins);
+                    registry.addMapping("/api/**").allowedMethods(CorsConfiguration.ALL).allowedOrigins(corsAllowedOrigins);
                 }
             }
 

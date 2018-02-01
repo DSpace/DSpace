@@ -7,6 +7,15 @@
  */
 package org.dspace.content;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -24,9 +33,6 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Service implementation class for the DSpaceObject.
@@ -154,7 +160,13 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         String element = tokens[1];
         String qualifier = tokens[2];
 
-        List<MetadataValue> values;
+        List<MetadataValue> values = getMetadata(dso, schema, element, qualifier);
+
+        return values;
+    }
+
+	private List<MetadataValue> getMetadata(T dso, String schema, String element, String qualifier) {
+		List<MetadataValue> values;
         if (Item.ANY.equals(qualifier))
         {
             values = getMetadata(dso, schema, element, Item.ANY, Item.ANY);
@@ -167,9 +179,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         {
             values = getMetadata(dso, schema, element, qualifier, Item.ANY);
         }
-
-        return values;
-    }
+		return values;
+	}
 
     @Override
     public String getMetadata(T dso, String value) {
@@ -432,7 +443,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             return false;
         }
 
-        if (qualifier == null)
+        if (StringUtils.isBlank(qualifier))
         {
             // Value must be unqualified
             if (metadataField.getQualifier() != null)
@@ -613,5 +624,99 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             default:
                 return new String[]{null, null, null};
         }
+    }
+    
+    @Override
+    public void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException {
+
+    	List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+		
+		clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
+
+		int idx = 0;
+		boolean last = true;
+		for(MetadataValue rr : list) {
+			if(idx==index) {
+				addMetadata(context, dso, schema, element, qualifier,
+					lang, value, authority, confidence);
+				last = false;
+			}
+			addMetadata(context, dso, schema, element, qualifier,
+					rr.getLanguage(), rr.getValue(), rr.getAuthority(), rr.getConfidence());
+			idx++;
+		}
+		if(last) {
+			addMetadata(context, dso, schema, element, qualifier,
+					lang, value, authority, confidence);
+		}
+    }
+    
+	@Override
+	public void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
+			throws SQLException, IllegalArgumentException {
+
+		if(from==to) {
+			throw new IllegalArgumentException("The \"from\" location MUST be different from \"to\" location"); 
+		}
+		
+		List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+		
+		if(from>=list.size()) {
+			throw new IllegalArgumentException("The \"from\" location MUST exist for the operation to be successful. Idx:" + from);
+		}
+
+		clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
+
+		int idx = 0;
+		MetadataValue moved = null;
+		for (MetadataValue md : list) {
+			if (idx == from) {
+				moved = md;
+				break;
+			}
+			idx++;
+		}
+
+		idx = 0;
+		boolean last = true;
+		for (MetadataValue rr : list) {
+			if (idx == to && to<from) {
+				addMetadata(context, dso, schema, element, qualifier, moved.getLanguage(), moved.getValue(), moved.getAuthority(), moved.getConfidence());
+				last = false;
+			}
+			if (idx != from) {
+				addMetadata(context, dso, schema, element, qualifier, rr.getLanguage(), rr.getValue(),
+						rr.getAuthority(), rr.getConfidence());
+			}
+			if (idx == to && to>from) {
+				addMetadata(context, dso, schema, element, qualifier, moved.getLanguage(), moved.getValue(), moved.getAuthority(), moved.getConfidence());
+				last = false;
+			}
+			idx++;
+		}
+		if (last) {
+			addMetadata(context, dso, schema, element, qualifier, moved.getLanguage(), moved.getValue(), moved.getAuthority(), moved.getConfidence());
+		}
+	}
+	
+    @Override
+    public void replaceMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException {
+
+    	List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+		
+		clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
+
+		int idx = 0;
+		for(MetadataValue rr : list) {
+			if(idx==index) {
+				addMetadata(context, dso, schema, element, qualifier,
+					lang, value, authority, confidence);
+			}
+			else {
+				addMetadata(context, dso, schema, element, qualifier,
+					rr.getLanguage(), rr.getValue(), rr.getAuthority(), rr.getConfidence());
+			}
+			idx++;
+		}
     }
 }

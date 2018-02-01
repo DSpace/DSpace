@@ -15,20 +15,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.Link;
+
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 /**
  * A base class for DSpace Rest HAL Resource. The HAL Resource wraps the REST
@@ -39,7 +39,7 @@ import org.springframework.hateoas.Link;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class DSpaceResource<T extends RestModel> extends HALResource<T> {
+public abstract class DSpaceResource<T extends RestAddressableModel> extends HALResource<T> {
 
 	public DSpaceResource(T data, Utils utils, String... rels) {
 		super(data);
@@ -68,7 +68,7 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource<T>
 							for (Method m : methods) { 
 								if (StringUtils.equals(m.getName(), linkAnnotation.method())) {
 										// TODO add support for single linked object other than for collections
-										Page<? extends Serializable> pageResult = (Page<? extends RestModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
+										Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
 										EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
 										embedded.put(name, ep);
 										found = true;
@@ -99,25 +99,25 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource<T>
 							if (StringUtils.isBlank(linkAnnotation.method())) {
 								Object linkedObject = readMethod.invoke(data);
 								Object wrapObject = linkedObject;
-								if (linkedObject instanceof RestModel) {
-									RestModel linkedRM = (RestModel) linkedObject; 
+								if (linkedObject instanceof RestAddressableModel) {
+									RestAddressableModel linkedRM = (RestAddressableModel) linkedObject; 
 									wrapObject = utils.getResourceRepository(linkedRM.getCategory(), linkedRM.getType())
 											.wrapResource(linkedRM);
 
 								}
 								else {
 									if (linkedObject instanceof List) {
-										List<RestModel> linkedRMList = (List<RestModel>) linkedObject; 
+										List<RestAddressableModel> linkedRMList = (List<RestAddressableModel>) linkedObject; 
 										if (linkedRMList.size() > 0) {
 											
-											DSpaceRestRepository<RestModel, ?> resourceRepository = utils.getResourceRepository(linkedRMList.get(0).getCategory(), linkedRMList.get(0).getType());
+											DSpaceRestRepository<RestAddressableModel, ?> resourceRepository = utils.getResourceRepository(linkedRMList.get(0).getCategory(), linkedRMList.get(0).getType());
 											// TODO should we force pagination also of embedded resource? 
 											// This will force a pagination with size 10 for embedded collections as well
 //											int pageSize = 1;
 //											PageImpl<RestModel> page = new PageImpl(
 //													linkedRMList.subList(0,
 //															linkedRMList.size() > pageSize ? pageSize : linkedRMList.size()), new PageRequest(0, pageSize), linkedRMList.size()); 
-											PageImpl<RestModel> page = new PageImpl(linkedRMList);
+											PageImpl<RestAddressableModel> page = new PageImpl(linkedRMList);
 											wrapObject = new EmbeddedPage(linkToSubResource.getHref(), page.map(resourceRepository::wrapResource), linkedRMList);
 										}
 										else {
@@ -138,10 +138,17 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource<T>
 									boolean found = false;
 									for (Method m : methods) { 
 										if (StringUtils.equals(m.getName(), linkAnnotation.method())) {
-												// TODO add support for single linked object other than for collections
-												Page<? extends Serializable> pageResult = (Page<? extends RestModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
-												EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
-												embedded.put(name, ep);
+												if ( Page.class.isAssignableFrom( m.getReturnType()) ){
+													Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);														
+													EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
+													embedded.put(name, ep);
+												}
+												else {
+													RestAddressableModel object = (RestAddressableModel)m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
+													HALResource ep = linkRepository.wrapResource(object, linkToSubResource.getHref());
+													embedded.put(name, ep);
+												}
+
 												found = true;
 										}
 									}
@@ -154,8 +161,8 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource<T>
 								}
 							}
 						}
-						else if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {
-							RestModel linkedObject = (RestModel) readMethod.invoke(data);
+						else if (RestAddressableModel.class.isAssignableFrom(readMethod.getReturnType())) {
+							RestAddressableModel linkedObject = (RestAddressableModel) readMethod.invoke(data);
 							if (linkedObject != null) {
 								embedded.put(name,
 										utils.getResourceRepository(linkedObject.getCategory(), linkedObject.getType())

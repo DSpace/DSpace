@@ -778,6 +778,11 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
     @Override
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson, int type, String rpType) throws SQLException, AuthorizeException {
+    	return createResourcePolicy(context, dso, group, eperson, type, rpType, null, null, null, null);
+    }
+    
+    @Override
+    public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson, int type, String rpType, String rpName, String rpDescription, Date startDate, Date endDate) throws SQLException, AuthorizeException {
         if (group == null && eperson == null)
         {
             throw new IllegalArgumentException("We need at least an eperson or a group in order to create a resource policy.");
@@ -789,6 +794,10 @@ public class AuthorizeServiceImpl implements AuthorizeService
         myPolicy.setGroup(group);
         myPolicy.setEPerson(eperson);
         myPolicy.setRpType(rpType);
+        myPolicy.setRpName(rpName);
+        myPolicy.setRpDescription(rpDescription);
+        myPolicy.setEndDate(endDate);
+        myPolicy.setStartDate(startDate);
         resourcePolicyService.update(context, myPolicy);
 
         return myPolicy;

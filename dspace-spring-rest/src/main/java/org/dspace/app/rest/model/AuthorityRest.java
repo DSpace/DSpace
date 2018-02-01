@@ -22,7 +22,7 @@ import org.dspace.app.rest.RestResourceController;
 public class AuthorityRest extends BaseObjectRest<String> {
 
 	public static final String NAME = "authority";
-	public static final String CATEGORY = RestModel.INTEGRATION;
+	public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 	public static final String ENTRIES = "entries";
 	public static final String ENTRY = "entryValues";
 	

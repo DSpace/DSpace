@@ -233,7 +233,7 @@ public class LicenseUtilsTest extends AbstractUnitTest
         Item item = installItemService.installItem(context, workspaceItemService.create(context, collection, false));
         String defaultLicense = licenseService.getDefaultSubmissionLicense();
 
-        LicenseUtils.grantLicense(context, item, defaultLicense);
+        LicenseUtils.grantLicense(context, item, defaultLicense, null);
 
         StringWriter writer = new StringWriter();
         IOUtils.copy(bitstreamService.retrieve(context, itemService.getBundles(item, "LICENSE").get(0).getBitstreams().get(0)), writer);

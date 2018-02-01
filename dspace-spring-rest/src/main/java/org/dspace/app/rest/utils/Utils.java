@@ -11,16 +11,15 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
-import org.dspace.app.rest.model.MetadataFieldRest;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -61,20 +60,20 @@ public class Utils {
 	}
 
 	public Link linkToSingleResource(DSpaceResource r, String rel) {
-		RestModel data = r.getContent();
+		RestAddressableModel data = r.getContent();
 		return linkToSingleResource(data, rel);
 	}
 
-	public Link linkToSingleResource(RestModel data, String rel) {
+	public Link linkToSingleResource(RestAddressableModel data, String rel) {
 		return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data)
 				.withRel(rel);
 	}
 
-	public Link linkToSubResource(RestModel data, String rel) {
+	public Link linkToSubResource(RestAddressableModel data, String rel) {
 		return linkToSubResource(data, rel, rel);
 	}
 
-	public Link linkToSubResource(RestModel data, String rel, String path) {
+	public Link linkToSubResource(RestAddressableModel data, String rel, String path) {
 		return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data).slash(path)
 				.withRel(rel);
 	}
@@ -100,6 +99,9 @@ public class Utils {
 		}
 		if (modelPlural.equals("authorities")) {
 			return AuthorityRest.NAME;
+		}
+		if (modelPlural.equals("resourcePolicies")) {
+			return ResourcePolicyRest.NAME;
 		}
 		return modelPlural.replaceAll("s$", "");
 	}
@@ -132,7 +134,7 @@ public class Utils {
 	 * @return the LinkRest annotation corresponding to the specified rel in the
 	 *         domainClass. Null if not found
 	 */
-	public LinkRest getLinkRest(String rel, Class<RestModel> domainClass) {
+	public LinkRest getLinkRest(String rel, Class<RestAddressableModel> domainClass) {
 		LinkRest linkRest = null;
 		LinksRest linksAnnotation = domainClass.getDeclaredAnnotation(LinksRest.class);
 		if (linksAnnotation != null) {
@@ -157,6 +159,6 @@ public class Utils {
 	 * @return
 	 */
 	public String getMetadataKey(String schema, String element, String qualifier) {
-		return schema + "." + element + (StringUtils.isNotBlank(qualifier) ? "." + qualifier : "");
+		return org.dspace.core.Utils.standardize(schema, element, qualifier, ".");
 	}
 }

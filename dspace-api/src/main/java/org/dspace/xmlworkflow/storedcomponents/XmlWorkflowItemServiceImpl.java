@@ -7,6 +7,11 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -15,17 +20,13 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Service implementation for the XmlWorkflowItem object.
@@ -183,4 +184,11 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
         // FIXME - auth?
         xmlWorkflowItemDAO.delete(context, workflowItem);
     }
+    
+
+	@Override
+	public void move(Context context, XmlWorkflowItem inProgressSubmission, Collection fromCollection,
+			Collection toCollection) {
+		// TODO not implemented yet
+	}
 }

@@ -22,15 +22,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class GroupRest extends DSpaceObjectRest {
 	public static final String NAME = "group";
 	
-	public static final String CATEGORY = RestModel.EPERSON;
+	public static final String CATEGORY = RestAddressableModel.EPERSON;
 
 	private String name;
 
 	private boolean permanent;
 
-	// FIXME this should be annotated with @JsonIgnore but right now only simple
-	// rest resource can be embedded not list, see
-	// https://jira.duraspace.org/browse/DS-3483
+	@JsonIgnore
 	private List<GroupRest> groups;
 
 	@Override
@@ -58,7 +56,8 @@ public class GroupRest extends DSpaceObjectRest {
 	public void setPermanent(boolean permanent) {
 		this.permanent = permanent;
 	}
-
+	
+	@LinkRest(linkClass = GroupRest.class)
 	public List<GroupRest> getGroups() {
 		return groups;
 	}

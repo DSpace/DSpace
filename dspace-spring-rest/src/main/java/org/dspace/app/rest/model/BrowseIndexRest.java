@@ -29,7 +29,7 @@ public class BrowseIndexRest extends BaseObjectRest<String> {
 
 	public static final String NAME = "browse";
 
-	public static final String CATEGORY = RestModel.DISCOVER;
+	public static final String CATEGORY = RestAddressableModel.DISCOVER;
 	
 	public static final String ITEMS = "items";
 	public static final String ENTRIES = "entries";

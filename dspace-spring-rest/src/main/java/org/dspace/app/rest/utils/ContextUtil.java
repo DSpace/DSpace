@@ -61,7 +61,7 @@ public class ContextUtil
         if (context == null)
         {
             try {
-                context = ContextUtil.intializeContext();
+                context = ContextUtil.initializeContext();
             } catch (SQLException e) {
                 log.error("Unable to initialize context", e);
                 return null;
@@ -79,7 +79,7 @@ public class ContextUtil
      * @return a DSpace Context Object
      * @throws SQLException 
      */
-    private static Context intializeContext() throws SQLException
+    private static Context initializeContext() throws SQLException
     {
         // Create a new Context
         Context context = new Context();

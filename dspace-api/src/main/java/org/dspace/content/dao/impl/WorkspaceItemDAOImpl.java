@@ -71,6 +71,16 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
         criteria.addOrder(Order.asc("item"));
         return list(criteria);
     }
+    
+    @Override
+    public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException
+    {
+        Criteria criteria = createCriteria(context, WorkspaceItem.class);
+        criteria.addOrder(Order.asc("item"));
+        criteria.setFirstResult(offset);
+        criteria.setMaxResults(limit);
+        return list(criteria);
+    }
 
     @Override
     public List<WorkspaceItem> findWithSupervisedGroup(Context context) throws SQLException {

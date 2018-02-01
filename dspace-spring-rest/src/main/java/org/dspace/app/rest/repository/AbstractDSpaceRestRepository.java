@@ -33,4 +33,8 @@ public abstract class AbstractDSpaceRestRepository {
 		Request currentRequest = requestService.getCurrentRequest();
 		return ContextUtil.obtainContext(currentRequest.getServletRequest());
 	}
+
+	public RequestService getRequestService() {
+		return requestService;
+	}
 }

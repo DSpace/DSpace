@@ -7,11 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.List;
-
 import org.dspace.app.rest.RestResourceController;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The MetadataSchema REST Resource
@@ -21,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class MetadataSchemaRest extends BaseObjectRest<Integer> {
 	public static final String NAME = "metadataschema";
-	public static final String CATEGORY = RestModel.CORE;
+	public static final String CATEGORY = RestAddressableModel.CORE;
 	
 	private String prefix;
 
