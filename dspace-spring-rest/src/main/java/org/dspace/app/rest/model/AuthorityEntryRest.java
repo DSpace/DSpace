@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class AuthorityEntryRest implements RestModel {
+public class AuthorityEntryRest implements RestAddressableModel {
 	public static final String NAME = "authorityEntry";
 	private String id;
 	private String display;

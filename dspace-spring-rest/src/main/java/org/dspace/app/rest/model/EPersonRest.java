@@ -20,7 +20,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class EPersonRest extends DSpaceObjectRest {
 	public static final String NAME = "eperson";
-	public static final String CATEGORY = RestModel.EPERSON;
+	public static final String CATEGORY = RestAddressableModel.EPERSON;
 	private String netid;
 
 	private Date lastActive;

@@ -32,6 +32,7 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 //Check that all required root links are present and that they are absolute
+                .andExpect(jsonPath("$._links.authorities.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.bitstreamformats.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.bitstreams.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.browses.href", startsWith(REST_SERVER_URL)))
@@ -42,7 +43,13 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.items.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.metadatafields.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.metadataschemas.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.resourcePolicies.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.sites.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.submissiondefinitions.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.submissionforms.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.submissionsections.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.submissionuploads.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.workspaceitems.href", startsWith(REST_SERVER_URL)))                
                 .andExpect(jsonPath("$._links.authn.href", startsWith(REST_SERVER_URL)))
                 ;
     }

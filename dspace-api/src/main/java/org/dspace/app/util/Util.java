@@ -14,14 +14,17 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
 
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -543,4 +546,25 @@ public class Util {
 		}
         return toReturn;
     }
+
+	public static List<String> differenceInSubmissionFields(Collection fromCollection, Collection toCollection) throws DCInputsReaderException {
+		DCInputsReader reader = new DCInputsReader();
+		List<DCInputSet> from = reader.getInputsByCollectionHandle(fromCollection.getHandle());
+		List<DCInputSet> to = reader.getInputsByCollectionHandle(toCollection.getHandle());
+		
+		Set<String> fromFieldName = new HashSet<>();
+		Set<String> toFieldName = new HashSet<>();
+		for(DCInputSet ff : from) {
+			for (DCInput fdc : ff.getFields()) {
+				fromFieldName.add(fdc.getFieldName());
+			}
+		}
+		for(DCInputSet tt : to) {
+			for (DCInput tdc : tt.getFields()) {
+				toFieldName.add(tdc.getFieldName());
+			}
+		}		
+		
+		return ListUtils.removeAll(fromFieldName, toFieldName);
+	}
 }

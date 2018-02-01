@@ -15,6 +15,7 @@ import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.model.SubmissionFormRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
+import org.dspace.app.rest.model.SubmissionUploadRest;
 import org.dspace.app.rest.model.hateoas.SubmissionSectionResource;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.springframework.data.domain.Pageable;
@@ -32,15 +33,21 @@ public class SubmissionSectionHalLinkFactory extends HalLinkFactory<SubmissionSe
     protected void addLinks(final SubmissionSectionResource halResource, final Pageable pageable, final LinkedList<Link> list) throws Exception{
         SubmissionSectionRest sd = halResource.getContent();
 
-        if(SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(sd.getSectionType())) {
-
+		if(SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(sd.getSectionType())) {
             UriComponentsBuilder uriComponentsBuilder = linkTo(getMethodOn(SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME)
                     .findRel(null, SubmissionFormRest.CATEGORY, English.plural(SubmissionFormRest.NAME), sd.getId(), "", null, null, null))
                     .toUriComponentsBuilder();
             String uribuilder = uriComponentsBuilder.build().toString();
-
-            list.add(buildLink(uribuilder.substring(0, uribuilder.lastIndexOf("/")), SubmissionFormRest.NAME_LINK_ON_PANEL));
-        }
+			list.add(buildLink(SubmissionFormRest.NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
+		}
+		if(SubmissionStepConfig.UPLOAD_STEP_NAME.equals(sd.getSectionType())) {
+			UriComponentsBuilder uriComponentsBuilder = linkTo(getMethodOn(RestResourceController.class, SubmissionUploadRest.CATEGORY, SubmissionUploadRest.NAME)
+					.findRel(null, SubmissionUploadRest.CATEGORY, English.plural(SubmissionUploadRest.NAME), sd.getId(), "", null, null, null))
+					.toUriComponentsBuilder();
+			String uribuilder = uriComponentsBuilder.build().toString();
+			list.add(buildLink(SubmissionFormRest.NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
+		}
+		
     }
 
     protected Class<RestResourceController> getControllerClass() {

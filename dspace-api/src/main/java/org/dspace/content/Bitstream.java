@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.dspace.content.factory.ContentServiceFactory;
@@ -436,5 +437,17 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
          hash += 73 * hash + getID().hashCode();
          return hash;
      }
+
+	/**
+	 * Add date for bitstream granted (used into the use case for license grant the {@link LicenseUtils#grantLicense(Context, Item, String, String)}
+	 * 
+	 * @param context
+     *            the dspace context
+	 * @param acceptanceDate the granted date
+	 * @throws SQLException
+	 */
+	public void setAcceptanceDate(Context context, DCDate acceptanceDate) throws SQLException {
+		getBitstreamService().setMetadataSingleValue(context, this, "dcterms", "accessRights", null, null, acceptanceDate.toString());
+	}
 
 }

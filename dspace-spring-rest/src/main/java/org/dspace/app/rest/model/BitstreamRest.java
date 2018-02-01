@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 public class BitstreamRest extends DSpaceObjectRest {
 	public static final String PLURAL_NAME = "bitstreams";
 	public static final String NAME = "bitstream";
-	public static final String CATEGORY = RestModel.CORE;
+	public static final String CATEGORY = RestAddressableModel.CORE;
 	private String bundleName;
 
 	// avoid to serialize this object inline as we want a full resource embedded

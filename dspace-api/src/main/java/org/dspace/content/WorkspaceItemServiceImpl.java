@@ -7,7 +7,17 @@
  */
 package org.dspace.content;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
+import org.dspace.app.util.DCInput;
+import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -18,15 +28,11 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Service implementation for the WorkspaceItem object.
@@ -171,6 +177,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     public List<WorkspaceItem> findAll(Context context) throws SQLException {
         return workspaceItemDAO.findAll(context);
     }
+    
+    @Override
+    public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException {
+    	return workspaceItemDAO.findAll(context, limit, offset);
+    }
 
     @Override
     public void update(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
@@ -249,4 +260,23 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         workspaceItemDAO.delete(context, workspaceItem);
 
     }
+
+	@Override
+	public void move(Context context, WorkspaceItem source, Collection fromCollection, Collection toCollection) throws DCInputsReaderException {
+		source.setCollection(toCollection);
+		
+		List<MetadataValue> remove = new ArrayList<>();
+		List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
+		for(String toRemove : diff) {
+			for(MetadataValue value : source.getItem().getMetadata()) {
+				if(value.getMetadataField().toString('.').equals(toRemove)) {
+					remove.add(value);
+				}
+			}
+		}
+		
+		source.getItem().removeMetadata(remove);
+		
+	}
+
 }

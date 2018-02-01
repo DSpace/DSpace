@@ -7,6 +7,11 @@
  */
 package org.dspace.workflowbasic;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -15,15 +20,11 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflowbasic.dao.BasicWorkflowItemDAO;
 import org.dspace.workflowbasic.service.BasicWorkflowItemService;
 import org.dspace.workflowbasic.service.TaskListItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Service implementation for the BasicWorkflowItem object.
@@ -161,4 +162,11 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     public int countTotal(Context context) throws SQLException {
         return workflowItemDAO.countRows(context);
     }
+    
+	@Override
+	public void move(Context context, BasicWorkflowItem inProgressSubmission, Collection fromCollection,
+			Collection toCollection) {
+		// TODO not implemented yet
+		
+	}
 }

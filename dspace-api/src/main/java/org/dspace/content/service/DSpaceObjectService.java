@@ -7,17 +7,17 @@
  */
 package org.dspace.content.service;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataValue;
-import org.dspace.core.Context;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
+import org.dspace.core.Context;
 
 /**
  * Service interface class for the DSpaceObject.
@@ -400,4 +400,9 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      */
     public int getSupportsTypeConstant();
 
+    void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException;
+    
+    void replaceMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException;
+    
+    void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to) throws SQLException;
 }

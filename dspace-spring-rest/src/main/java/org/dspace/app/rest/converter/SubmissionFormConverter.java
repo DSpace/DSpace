@@ -14,16 +14,16 @@ import java.util.List;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.ScopeEnum;
-import org.dspace.app.rest.model.SelectableMetadata;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.app.rest.model.SubmissionFormInputTypeRest;
 import org.dspace.app.rest.model.SubmissionFormRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
 import org.dspace.app.rest.utils.AuthorityUtils;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
+import org.dspace.submit.model.LanguageFormField;
+import org.dspace.submit.model.SelectableMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,9 +40,6 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 	private static final String INPUT_TYPE_NAME = "name";
 	private static final String INPUT_TYPE_LOOKUP = "lookup";
 	private static final String INPUT_TYPE_LOOKUP_NAME = "lookup-name";
-
-	@Autowired
-	private Utils utils;
 
 	@Autowired
 	private AuthorityUtils authorityUtils;
@@ -78,7 +75,19 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 				VisibilityEnum.fromString(dcinput.isReadOnly("submission") ? "read-only" : null),
 				VisibilityEnum.fromString(dcinput.isReadOnly("workflow") ? "read-only" : null)));
 		inputField.setRepeatable(dcinput.isRepeatable());
-
+		if(dcinput.getLanguage()) {
+			int idx = 1;
+			//list contains: at even position the code, at odd position the label 
+			for(String code : dcinput.getValueLanguageList()) {
+				//check and retrieve "even/odd" couple to build the dto with "code/display" values
+				if(idx%2==0) {
+					String display = dcinput.getValueLanguageList().get(idx-2);
+					LanguageFormField lang = new LanguageFormField(code, display);
+					inputField.getLanguageCodes().add(lang);
+				}
+				idx++;
+			}
+		}
 		SubmissionFormInputTypeRest inputRest = new SubmissionFormInputTypeRest();
 
 		inputRest.setRegex(dcinput.getRegex());
@@ -91,14 +100,14 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 			if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
 				inputRest.setType(
 						getPresentation(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), inputType));
-				selMd.setAuthority(authorityUtils.getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
-						dcinput.getQualifier()));
+				selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+						dcinput.getQualifier(), dcinput.getPairsType(), dcinput.getVocabulary()));
 				selMd.setClosed(
 						authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
 			} else {
 				inputRest.setType(inputType);
 			}
-			selMd.setMetadata(utils.getMetadataKey(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+			selMd.setMetadata(org.dspace.core.Utils.standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
 			selectableMetadata.add(selMd);
 
 		} else {
@@ -107,10 +116,10 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 			for (int idx = 0; idx < pairs.size(); idx += 2) {
 				SelectableMetadata selMd = new SelectableMetadata();
 				selMd.setLabel((String) pairs.get(idx));
-				selMd.setMetadata(utils.getMetadataKey(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1)));
+				selMd.setMetadata(org.dspace.core.Utils.standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
 				if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
-					selMd.setAuthority(authorityUtils.getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
-							pairs.get(idx + 1)));
+					selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+							pairs.get(idx + 1), dcinput.getPairsType(), dcinput.getVocabulary()));
 					selMd.setClosed(
 							authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
 				}
@@ -138,6 +147,17 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 			}
 		}
 		return inputType;
+	}
+	
+	private String getAuthorityName(String schema, String element, String qualifier, String valuePairsName, String vocabularyName) {
+		if(StringUtils.isNotBlank(valuePairsName)) {
+			return valuePairsName;
+		}
+		else if (StringUtils.isNotBlank(vocabularyName)) {
+			return vocabularyName;
+		}
+		return authorityUtils.getAuthorityName(schema, element,
+				qualifier);
 	}
 
 	@Override

@@ -12,7 +12,9 @@ import java.util.List;
 import org.dspace.app.rest.RestResourceController;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * The Submission Definition REST Resource
@@ -20,11 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-
-
 public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 	public static final String NAME = "submissiondefinition";
-	public static final String CATEGORY = RestModel.CONFIGURATION;
+	public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
 	private String name;
 	
@@ -33,6 +33,8 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 	
 	private List<SubmissionSectionRest> panels;
 
+	private List<CollectionRest> collections;
+	
 	@Override
 	public String getId() {
 		return name;
@@ -77,5 +79,15 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 	@Override
 	public String getCategory() {
 		return CATEGORY;
+	}
+
+	@LinkRest(linkClass = CollectionRest.class)	
+	@JsonIgnore
+	public List<CollectionRest> getCollections() {
+		return collections;
+	}
+
+	public void setCollections(List<CollectionRest> collections) {
+		this.collections = collections;
 	}
 }

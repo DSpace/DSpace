@@ -7,10 +7,14 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.commons.lang.NotImplementedException;
+import javax.servlet.ServletException;
+
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +27,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepConfig, SubmissionSectionRest> {
 
+	private static final Logger log = Logger.getLogger(SubmissionSectionConverter.class);
+	
+	private SubmissionConfigReader submissionConfigReader;
+	
 	@Override
 	public SubmissionSectionRest fromModel(SubmissionStepConfig step) {
 		SubmissionSectionRest sp = new SubmissionSectionRest();
@@ -37,6 +45,20 @@ public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepCo
 
 	@Override
 	public SubmissionStepConfig toModel(SubmissionSectionRest obj) {
-		throw new NotImplementedException();
+		SubmissionStepConfig step;
+		
+		try {
+			step = getSubmissionConfigReader().getStepConfig(obj.getId());
+		} catch (SubmissionConfigReaderException e) {
+			throw new RuntimeException(e);
+		}
+		return step;
+	}
+	
+	public SubmissionConfigReader getSubmissionConfigReader() throws SubmissionConfigReaderException {
+		if(submissionConfigReader==null) {
+			submissionConfigReader = new SubmissionConfigReader();
+		}	
+		return submissionConfigReader;
 	}
 }

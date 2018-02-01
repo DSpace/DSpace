@@ -37,15 +37,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This is a specialized controller to provide access to the bitstream binary content
+ * This is a specialized controller to provide access to the bitstream binary
+ * content
  *
+ * The mapping for requested endpoint try to resolve a valid UUID, for example
+ * <pre>
+ * {@code
+ * https://<dspace.url>/dspace-spring-rest/api/core/bitstreams/26453b4d-e513-44e8-8d5b-395f62972eff/content
+ * }
+ * </pre>
+ * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  *
  */
 @RestController
-@RequestMapping("/api/"+BitstreamRest.CATEGORY +"/"+ BitstreamRest.PLURAL_NAME + "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/content")
+@RequestMapping("/api/" + BitstreamRest.CATEGORY + "/" + BitstreamRest.PLURAL_NAME
+		+ "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/content")
 public class BitstreamContentRestController {
 
 	private static final Logger log = Logger.getLogger(BitstreamContentRestController.class);
