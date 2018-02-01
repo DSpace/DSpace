@@ -19,7 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.*;
 
-import com.amazonaws.services.s3.transfer.TransferManager;
 import org.apache.log4j.Logger;
 import org.dspace.checker.BitstreamInfoDAO;
 import org.dspace.core.ConfigurationManager;
@@ -379,8 +378,7 @@ public class BitstreamStorageManager
                 objectMetadata.addUserMetadata(MD5_TAG, md5);
 
                 PutObjectRequest putObjectRequest = new PutObjectRequest(s3BucketName, key, scratchFile).withMetadata(objectMetadata);
-                TransferManager transferManager = new TransferManager();
-                transferManager.upload(putObjectRequest);
+                PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
 
                 bitstream.setColumn("checksum", md5);
                 bitstream.setColumn("checksum_algorithm", CSA);
