@@ -104,12 +104,7 @@ public abstract class AbstractVersionProvider {
 
 
     protected Bitstream createBitstream(Context context, Bitstream nativeBitstream) throws AuthorizeException, SQLException, IOException {
-        Bitstream newBitstream = bitstreamStorageService.clone(context, nativeBitstream);
-	    List<MetadataValue> bitstreamMeta = bitstreamService.getMetadata(nativeBitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-	    for (MetadataValue value : bitstreamMeta) {
-		    bitstreamService.addMetadata(context, newBitstream, value.getMetadataField(), value.getLanguage(), value.getValue(), value.getAuthority(), value.getConfidence());
-	    }
-	    return newBitstream;
+	    return bitstreamStorageService.clone(context, nativeBitstream);
     }
 
     public void setIgnoredMetadataFields(Set<String> ignoredMetadataFields) {
