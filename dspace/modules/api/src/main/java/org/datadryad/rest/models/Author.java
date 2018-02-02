@@ -60,6 +60,20 @@ public class Author {
         return;
     }
 
+    // compare last names and first initial of given name
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj.getClass().equals(this.getClass())) {
+            Author author = (Author) obj;
+            if (author.getNormalizedFamilyName().equalsIgnoreCase(this.getNormalizedFamilyName())) {
+                return author.getFirstInitial().equalsIgnoreCase(this.getFirstInitial());
+            }
+        }
+        return false;
+    }
+
     public void setFullName(String authorString) {
         if ("".equals(familyName) || "".equals(givenNames)) {
             String suffix = "";
@@ -173,6 +187,11 @@ public class Author {
     @JsonIgnore
     public String getNormalizedGivenNames() {
         return Normalizer.normalize(getUnicodeGivenNames(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+    }
+
+    @JsonIgnore
+    public String getFirstInitial() {
+        return getNormalizedFamilyName().substring(0,1);
     }
 
     @JsonIgnore

@@ -605,17 +605,19 @@ public class JournalUtils {
         DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
         result.append("item " + item.getID() + " has " + itemAuthors.length + " authors while manuscript has " + manuscript.getAuthorList().size() + " authors\n");
         for (int j = 0; j < itemAuthors.length; j++) {
-            for (Author a : manuscript.getAuthorList()) {
-                double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value).toLowerCase(), a.getNormalizedFullName().toLowerCase());
-                result.append("author " + itemAuthors[j].value + " matched " + a.getUnicodeFullName() + " with a score of " + score + "\n");
-                if (score > 0.6) {
+            Author itemAuthor = new Author(itemAuthors[j].value);
+            for (Author msAuthor : manuscript.getAuthorList()) {
+                double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value).toLowerCase(), msAuthor.getNormalizedFullName().toLowerCase());
+                result.append("item author " + itemAuthors[j].value + " matched ms author " + msAuthor.getUnicodeFullName() + " with a score of " + score + "\n");
+                if (itemAuthor.equals(msAuthor)) {
+                    result.append("  matched\n");
                     numMatched++;
                     break;
                 }
             }
         }
 
-        result.append(numMatched + " authors matched");
+        result.append(numMatched).append(" authors matched");
         return numMatched;
     }
 
