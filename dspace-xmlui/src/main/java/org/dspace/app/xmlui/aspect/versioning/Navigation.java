@@ -33,6 +33,8 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.xml.sax.SAXException;
@@ -127,6 +129,15 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
                     if(dso != null)
                     {
                         validity.add(context, dso);
+                        if(dso instanceof Item){
+                            VersionHistory versionHistory = versionHistoryService.findByItem(context, (Item) dso);
+                            if(versionHistory!=null){
+                                Version latestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
+                                if(latestVersion!=null){
+                                    validity.add(latestVersion.toString());
+                                }
+                            }
+                        }
                     }
 
 		            this.validity = validity.complete();
