@@ -8,8 +8,6 @@
 package org.dspace.content;
 
 import org.apache.log4j.Logger;
-import org.databene.contiperf.PerfTest;
-import org.databene.contiperf.Required;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -36,11 +34,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * This is an integration test to ensure collections and communities interact properly.
  *
- * The code below is attached as an example. Performance checks by ContiPerf
- * can be applied at method level or at class level. This shows the syntax
- * for class-level checks.
- * @PerfTest(invocations = 1000, threads = 20)
- * @Required(max = 1200, average = 250)
+ * The code below is attached as an example.
  *
  * @author pvillega
  * @author tdonohue
@@ -91,8 +85,6 @@ public class ITCommunityCollection extends AbstractIntegrationTest
      * Tests the creation of a community collection tree
      */
     @Test
-    @PerfTest(invocations = 25, threads = 1)
-    @Required(percentile95 = 1200, average = 700, throughput = 1)
     public void testCreateTree() throws SQLException, AuthorizeException, IOException {
         //we create the structure
         context.turnOffAuthorisationSystem();
@@ -118,8 +110,6 @@ public class ITCommunityCollection extends AbstractIntegrationTest
      * Tests the creation of items in a community/collection tree
      */
     @Test
-    @PerfTest(invocations = 25, threads = 1)
-    @Required(percentile95 = 1200, average = 700, throughput = 1)
     public void testCreateItems() throws SQLException, AuthorizeException, IOException {
         //we create the structure
         context.turnOffAuthorisationSystem();
@@ -147,8 +137,6 @@ public class ITCommunityCollection extends AbstractIntegrationTest
       * NOTE: Counts are currently expensive (take a while)
       */
     @Test
-    @PerfTest(invocations = 10, threads = 1)
-    @Required(percentile95 = 2000, average= 1800)
     public void testCountItems() throws SQLException, AuthorizeException, IOException {
         int items_per_collection = 2;
 
