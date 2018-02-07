@@ -199,7 +199,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Woodstox (org.codehaus.woodstox:woodstox-core-asl:4.1.4 - http://woodstox.codehaus.org)
         * Woodstox (org.codehaus.woodstox:wstx-asl:3.2.0 - http://woodstox.codehaus.org)
         * Woodstox (org.codehaus.woodstox:wstx-asl:3.2.7 - http://woodstox.codehaus.org)
-        * databene ContiPerf (org.databene:contiperf:2.3.4 - http://databene.org/contiperf)
         * flyway-core (org.flywaydb:flyway-core:4.0.3 - https://flywaydb.org/flyway-core)
         * Ogg and Vorbis for Java, Core (org.gagravarr:vorbis-java-core:0.1 - https://github.com/Gagravarr/VorbisJava)
         * Apache Tika plugin for Ogg, Vorbis and FLAC (org.gagravarr:vorbis-java-tika:0.1 - https://github.com/Gagravarr/VorbisJava)

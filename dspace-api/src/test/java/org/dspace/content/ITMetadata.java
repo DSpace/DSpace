@@ -8,8 +8,6 @@
 package org.dspace.content;
 
 import org.apache.log4j.Logger;
-import org.databene.contiperf.PerfTest;
-import org.databene.contiperf.Required;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -75,8 +73,6 @@ public class ITMetadata  extends AbstractIntegrationTest
      * Tests the creation of a new metadata schema with some values
      */
     @Test
-    @PerfTest(invocations = 50, threads = 1)
-    @Required(percentile95 = 500, average= 200)
     public void testCreateSchema() throws SQLException, AuthorizeException, NonUniqueMetadataException, IOException
     {
         String schemaName = "integration";
