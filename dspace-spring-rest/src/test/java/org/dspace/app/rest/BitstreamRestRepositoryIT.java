@@ -88,15 +88,15 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                     .build();
         }
 
-        getClient().perform(get("/api/core/bitstreams/"))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/bitstreams/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.bitstreams", Matchers.containsInAnyOrder(
                         BitstreamMatcher.matchBitstreamEntry(bitstream),
                         BitstreamMatcher.matchBitstreamEntry(bitstream1)
-                )))
-
-        ;
+                )));
     }
 
     @Test
@@ -145,7 +145,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                     .build();
         }
 
-        getClient().perform(get("/api/core/bitstreams/")
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/bitstreams/")
                 .param("size","1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -160,7 +162,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         ;
 
-        getClient().perform(get("/api/core/bitstreams/")
+        getClient(token).perform(get("/api/core/bitstreams/")
                 .param("size","1")
                 .param("page", "1"))
                 .andExpect(status().isOk())
@@ -172,9 +174,10 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                         Matchers.contains(
                                 BitstreamMatcher.matchBitstreamEntry(bitstream)
                         )
-                )))
+                )));
 
-        ;
+        getClient().perform(get("/api/core/bitstreams/"))
+                .andExpect(status().isForbidden());
     }
 
     //TODO Re-enable test after https://jira.duraspace.org/browse/DS-3774 is fixed
@@ -375,7 +378,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
-        getClient().perform(get("/api/core/bitstreams/"+ UUID.randomUUID()))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/bitstreams/"+ UUID.randomUUID()))
                 .andExpect(status().isNotFound())
         ;
 

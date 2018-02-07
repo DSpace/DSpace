@@ -53,6 +53,7 @@ public class DSpacePermissionEvaluator implements PermissionEvaluator {
             DSpaceObjectRest dSpaceObject = (DSpaceObjectRest) targetDomainObject;
             DSpaceObjectService<DSpaceObject> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(Constants.getTypeID(dSpaceObject.getType().toUpperCase()));
             int action = Constants.getActionID((permission.toString()));
+
             return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObjectService.find(context, UUID.fromString(dSpaceObject.getUuid())), action, false);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -70,7 +71,10 @@ public class DSpacePermissionEvaluator implements PermissionEvaluator {
             UUID dsoId = UUID.fromString(targetId.toString());
             DSpaceObjectService<DSpaceObject> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(Constants.getTypeID(targetType.toString()));
             DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
-
+            //If the dso is null then we give permission so we can throw another status code instead
+            if (dSpaceObject == null) {
+                return true;
+            }
 
             int action = Constants.getActionID((String) permission);
             return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject, action, false);

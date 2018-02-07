@@ -7,28 +7,22 @@
  */
 package org.dspace.app.rest;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.matcher.CollectionMatcher;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.eperson.EPerson;
-import org.hamcrest.Matchers;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.util.UUID;
-
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.UUID;
+
+import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.matcher.CollectionMatcher;
+import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.hamcrest.Matchers;
+import org.junit.Test;
 
 public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTest{
 

@@ -58,7 +58,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 			throw new RuntimeException(e.getMessage(), e);
 		}
 		if (community == null) {
-			return null;
+			throw new ResourceNotFoundException();
 		}
 		return converter.fromModel(community);
 	}

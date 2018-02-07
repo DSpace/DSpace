@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -58,7 +59,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 		if (item == null) {
-			return null;
+			throw new ResourceNotFoundException();
 		}
 		return converter.fromModel(item);
 	}

@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -64,7 +65,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 			throw new RuntimeException(e.getMessage(), e);
 		}
 		if (collection == null) {
-			return null;
+			throw new ResourceNotFoundException();
 		}
 		return converter.fromModel(collection);
 	}
