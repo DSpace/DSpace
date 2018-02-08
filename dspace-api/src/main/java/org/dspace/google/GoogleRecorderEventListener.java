@@ -9,6 +9,7 @@
 package org.dspace.google;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -23,6 +24,7 @@ import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,6 +77,33 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
     }
 
     private void bitstreamDownload(UsageEvent ue) throws IOException {
+        Runnable task = new GoogleRunnable(GoogleURL, analyticsKey, ue, httpclient);
+        Thread worker = new Thread(task);
+
+        worker.setName("GoogleAnalyticsWorker");
+        worker.start();
+    }
+
+}
+
+class GoogleRunnable implements Runnable {
+
+    private String GoogleURL;
+    private String analyticsKey;
+    private UsageEvent ue;
+    private static Logger log = Logger.getLogger(GoogleRecorderEventListener.class);
+    private CloseableHttpClient httpclient;
+
+
+    GoogleRunnable(String GoogleURL, String analyticsKey, UsageEvent ue, CloseableHttpClient httpclient){
+        this.GoogleURL = GoogleURL;
+        this.analyticsKey = analyticsKey;
+        this.ue = ue;
+        this.httpclient = httpclient;
+    }
+
+    @Override
+    public void run() {
         HttpPost httpPost = new HttpPost(GoogleURL);
 
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
@@ -85,14 +114,22 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
         nvps.add(new BasicNameValuePair("dp", ue.getRequest().getRequestURI()));
         nvps.add(new BasicNameValuePair("ec", "bitstream"));
         nvps.add(new BasicNameValuePair("ea", "download"));
-        httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+        try {
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            log.debug("UnsupportedEncodingException: "+e.getMessage());
+        }
 
         try (CloseableHttpResponse response2 = httpclient.execute(httpPost)) {
             // I can't find a list of what are acceptable responses, so I log the response but take no action.
             log.debug("Google Analytics response is " + response2.getStatusLine());
+        } catch (ClientProtocolException e) {
+            log.debug(e.getMessage());
+        } catch (IOException e) {
+            log.debug(e.getMessage());
         }
 
         log.debug("Posted to Google Analytics - " + ue.getRequest().getRequestURI());
     }
-
 }
