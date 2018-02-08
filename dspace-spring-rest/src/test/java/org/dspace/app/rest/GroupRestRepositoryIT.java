@@ -7,19 +7,21 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.UUID;
+
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-
-import java.util.UUID;
-
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * @author Jonas Van Goolen - (jonas@atmire.com)
@@ -67,9 +69,11 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withName(testGroupName)
                 .build();
 
+        String token = getAuthToken(admin.getEmail(), password);
+
         String generatedGroupId = group.getID().toString();
         String groupIdCall = "/api/eperson/groups/" + generatedGroupId;
-        getClient().perform(get(groupIdCall))
+        getClient(token).perform(get(groupIdCall))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -77,7 +81,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                         GroupMatcher.matchGroupEntry(group.getID(), group.getName())
                 )))
         ;
-        getClient().perform(get("/api/eperson/groups"))
+        getClient(token).perform(get("/api/eperson/groups"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -98,7 +102,11 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withName("Group2")
                 .build();
 
-        getClient().perform(get("/api/eperson/groups/" + group2.getID()))
+
+        //Admin can access
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/eperson/groups/" + group2.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", Matchers.is(
@@ -110,6 +118,28 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                         )
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/eperson/groups/" + group2.getID())));
+
+
+        //THIS SHOULD WORK
+//        //People in group should be able to access token
+//        token = getAuthToken(eperson.getEmail(), password);
+//
+//        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+//
+//        groupService.addMember(context, group2, eperson);
+//
+//        getClient(token).perform(get("/api/eperson/groups/" + group2.getID()))
+//                .andExpect(status().isOk())
+//                .andExpect(content().contentType(contentType))
+//                .andExpect(jsonPath("$", Matchers.is(
+//                        GroupMatcher.matchGroupEntry(group2.getID(), group2.getName())
+//                )))
+//                .andExpect(jsonPath("$", Matchers.not(
+//                        Matchers.is(
+//                                GroupMatcher.matchGroupEntry(group.getID(), group.getName())
+//                        )
+//                )))
+//                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/eperson/groups/" + group2.getID())));
     }
 
     @Test
