@@ -7,26 +7,6 @@
  */
 package org.dspace.documentation.bitstream;
 
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.model.RestModel;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
-import org.junit.Test;
-
-import java.io.InputStream;
-
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.relaxedLinks;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -35,11 +15,27 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedR
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
+
+import org.apache.commons.codec.CharEncoding;
+import org.apache.commons.io.IOUtils;
+import org.dspace.app.rest.builder.BitstreamBuilder;
+import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.test.AbstractDocumentationTest;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.junit.Test;
+
 
 /**
  * Documentation test for the {@link org.dspace.app.rest.repository.BitstreamRestRepository}
  */
-public class BitstreamControllerDocumentation extends AbstractControllerIntegrationTest {
+public class BitstreamControllerDocumentation extends AbstractDocumentationTest {
 
     protected String getRestCategory() {
         return RestModel.CORE;
@@ -52,17 +48,17 @@ public class BitstreamControllerDocumentation extends AbstractControllerIntegrat
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -73,7 +69,7 @@ public class BitstreamControllerDocumentation extends AbstractControllerIntegrat
         //Add a bitstream to an item
         Bitstream bitstream = null;
         try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream = new BitstreamBuilder().
+            bitstream = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream")
                     .build();
@@ -112,17 +108,17 @@ public class BitstreamControllerDocumentation extends AbstractControllerIntegrat
 
 //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -133,7 +129,7 @@ public class BitstreamControllerDocumentation extends AbstractControllerIntegrat
         //Add a bitstream to an item
         Bitstream bitstream = null;
         try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream = new BitstreamBuilder().
+            bitstream = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream")
                     .build();
@@ -141,14 +137,14 @@ public class BitstreamControllerDocumentation extends AbstractControllerIntegrat
 
         Bitstream bitstream1 = null;
         try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream = new BitstreamBuilder().
+            bitstream = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream")
                     .build();
         }
         Bitstream bitstream2 = null;
         try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream = new BitstreamBuilder().
+            bitstream = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream")
                     .build();

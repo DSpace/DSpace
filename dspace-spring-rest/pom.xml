@@ -253,7 +253,7 @@
         <dependency>
             <groupId>org.springframework.restdocs</groupId>
             <artifactId>spring-restdocs-mockmvc</artifactId>
-            <version>1.2.2.RELEASE</version>
+            <version>1.2.3.RELEASE</version>
             <scope>test</scope>
         </dependency>
 

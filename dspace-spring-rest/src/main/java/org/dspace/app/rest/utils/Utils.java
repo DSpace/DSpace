@@ -12,16 +12,15 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.model.hateoas.DSpaceCurieProvider;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
-import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.RestAddressableModel;
+import org.dspace.app.rest.model.hateoas.DSpaceCurieProvider;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
@@ -174,7 +173,7 @@ public class Utils {
      * @param <T>
      * @return
      */
-	public <T extends RestModel> String getNamespacedRel(T data, String name) {
+	public <T extends RestAddressableModel> String getNamespacedRel(T data, String name) {
 		return curieProvider.getNamespacedRelFor(data, name);
 	}
 

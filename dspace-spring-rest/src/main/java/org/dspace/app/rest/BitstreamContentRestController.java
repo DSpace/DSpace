@@ -94,10 +94,11 @@ public class BitstreamContentRestController {
             if (name == null) {
                 // give a default name to the file based on the UUID and the primary extension of the format
                 name = bit.getID().toString();
-                if (format != null && format.getExtensions() != null && format.getExtensions().size() > 0) {
+                if (format.getExtensions() != null && format.getExtensions().size() > 0) {
                     name += "." + format.getExtensions().get(0);
                 }
             }
+
             MultipartFileSender sender = MultipartFileSender
 					.fromInputStream(is)
 					.withBufferSize(BUFFER_SIZE)

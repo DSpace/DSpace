@@ -7,23 +7,6 @@
  */
 package org.dspace.documentation.bitstreamformat;
 
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.model.RestModel;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.io.InputStream;
-
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.relaxedLinks;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -32,11 +15,16 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedR
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.test.AbstractDocumentationTest;
+import org.junit.Ignore;
+import org.junit.Test;
+
 
 /**
  * Documentation test for the {@link org.dspace.app.rest.repository.BitstreamFormatRestRepository}
  */
-public class BitstreamFormatControllerDocumentation extends AbstractControllerIntegrationTest {
+public class BitstreamFormatControllerDocumentation extends AbstractDocumentationTest {
 
     protected String getRestCategory() {
         return RestModel.CORE;

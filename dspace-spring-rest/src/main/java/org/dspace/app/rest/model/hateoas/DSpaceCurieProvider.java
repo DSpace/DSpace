@@ -14,7 +14,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.RestAddressableModel;
+import org.dspace.app.rest.security.StatelessAuthenticationFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.IanaRels;
 import org.springframework.hateoas.Link;
@@ -29,6 +32,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DSpaceCurieProvider extends DefaultCurieProvider {
+
+    private static final Logger log = LoggerFactory.getLogger(DSpaceCurieProvider.class);
 
     private static final String SEPERATOR = ":";
 
@@ -49,7 +54,6 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
     }
 
     public String getNamespacedRelFor(String rel) {
-        //TODO CLeanup
         String category = extractPrefix(rel);
         String coreRel = extractRel(rel);
 
@@ -66,7 +70,6 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
     }
 
     private String extractPrefix(String rel) {
-        //TODO Cleanup
         if(StringUtils.containsNone(rel, SEPERATOR)){
             return DEFAULT_CURIE;
         }
@@ -94,13 +97,18 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
         return buildRel(category, rel);
     }
 
-    public String getNamespacedRelFor(RestModel data, String rel) {
+    public String getNamespacedRelFor(RestAddressableModel data, String rel) {
         return getNamespacedRelFor(data.getCategory(), rel);
     }
 
     public String getCurieForCategory(final String category) {
-        //TODO create mapping
-        return curiemapping.get(category);
+        String curie = curiemapping.get(category);
+        if(StringUtils.isBlank(curie)) {
+            log.warn("We don't have a curie mapping for category " + category);
+            return category;
+        } else {
+            return curie;
+        }
     }
 
     private String buildRel(String prefix, String rel) {

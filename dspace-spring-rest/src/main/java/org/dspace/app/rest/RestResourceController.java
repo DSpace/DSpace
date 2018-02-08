@@ -651,7 +651,7 @@ public class RestResourceController implements InitializingBean {
 		linkService.addLinks(resource);
 
         String namespacedRel = utils.getNamespacedRel(modelObject, rel);
-		if (resource.getLink(rel) == null) {
+		if (resource.getLink(namespacedRel) == null) {
 			// TODO create a custom exception
 			throw new ResourceNotFoundException(rel + " undefined for " + model);
 		} else if (resource.getEmbeddedResources().get(namespacedRel) instanceof EmbeddedPage) {

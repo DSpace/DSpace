@@ -21,11 +21,9 @@ import javax.servlet.Filter;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Application;
-import org.dspace.app.rest.model.hateoas.DSpaceCurieProvider;
 import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,11 +32,11 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.cli.CliDocumentation;
 import org.springframework.restdocs.http.HttpDocumentation;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentationConfigurer;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -85,9 +83,6 @@ public abstract class AbstractControllerIntegrationTest extends AbstractIntegrat
     private List<Filter> requestFilters;
 
     @Autowired
-    private DSpaceCurieProvider curieProvider;
-
-    @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
 
         this.mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream().filter(
@@ -96,18 +91,6 @@ public abstract class AbstractControllerIntegrationTest extends AbstractIntegrat
         Assert.assertNotNull("the JSON message converter must not be null",
                 this.mappingJackson2HttpMessageConverter);
     }
-
-    @Rule
-    public JUnitRestDocumentation getRestDocumentation() {
-        if(restDocumentation == null) {
-            String curie = curieProvider.getCurieForCategory(getRestCategory());
-            restDocumentation = new JUnitRestDocumentation(DOCUMENTATION_SNIPPETS_DIR + curie);
-        }
-
-        return restDocumentation;
-    }
-
-    protected abstract String getRestCategory();
 
     public MockMvc getClient() throws SQLException {
         return getClient(null);

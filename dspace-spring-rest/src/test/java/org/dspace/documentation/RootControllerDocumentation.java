@@ -17,14 +17,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.RootRestResourceController;
 import org.dspace.app.rest.model.RestModel;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.AbstractDocumentationTest;
 import org.junit.Test;
 
 
 /**
  * Documentation test for the {@link RootRestResourceController}
  */
-public class RootControllerDocumentation extends AbstractControllerIntegrationTest {
+public class RootControllerDocumentation extends AbstractDocumentationTest {
 
     protected String getRestCategory() {
         return RestModel.CORE;

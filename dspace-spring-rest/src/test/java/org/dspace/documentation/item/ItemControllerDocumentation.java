@@ -7,16 +7,6 @@
  */
 package org.dspace.documentation.item;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.model.RestModel;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.junit.Test;
-
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.relaxedLinks;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -25,11 +15,21 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedR
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.test.AbstractDocumentationTest;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.junit.Test;
+
 
 /**
  * Documentation test for the {@link org.dspace.app.rest.repository.ItemRestRepository}
  */
-public class ItemControllerDocumentation extends AbstractControllerIntegrationTest {
+public class ItemControllerDocumentation extends AbstractDocumentationTest {
 
     protected String getRestCategory() {
         return RestModel.CORE;
@@ -42,31 +42,31 @@ public class ItemControllerDocumentation extends AbstractControllerIntegrationTe
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
@@ -111,31 +111,31 @@ public class ItemControllerDocumentation extends AbstractControllerIntegrationTe
 
 //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
