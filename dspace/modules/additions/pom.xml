@@ -100,7 +100,7 @@
       <dependency>
         <groupId>ar.edu.unlp.sedici</groupId>
         <artifactId>sedici2003-api</artifactId>
-        <version>1.8.2</version>
+        <version>5.8</version>
       </dependency>
 
    </dependencies>
