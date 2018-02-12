@@ -7,21 +7,21 @@
  */
 package org.dspace.rest.common;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import javax.servlet.ServletContext;
+import javax.ws.rs.WebApplicationException;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.apache.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-
-import javax.servlet.ServletContext;
-import javax.ws.rs.WebApplicationException;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,105 +47,90 @@ public class Collection extends DSpaceObject {
 
     //Collection-Metadata
     private String license;
-    private String copyrightText, introductoryText, shortDescription, sidebarText;
+    private String copyrightText;
+    private String introductoryText;
+    private String shortDescription;
+    private String sidebarText;
 
     //Calculated
     private Integer numberItems;
 
-    public Collection(){}
+    public Collection() {
+    }
 
-    public Collection(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset)
-        throws SQLException, WebApplicationException
-    {
+    public Collection(org.dspace.content.Collection collection, ServletContext servletContext, String expand,
+                      Context context, Integer limit, Integer offset)
+        throws SQLException, WebApplicationException {
         super(collection, servletContext);
         setup(collection, servletContext, expand, context, limit, offset);
     }
 
-    private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset)
-        throws SQLException
-    {
+    private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand,
+                       Context context, Integer limit, Integer offset)
+        throws SQLException {
         List<String> expandFields = new ArrayList<String>();
-        if (expand != null)
-        {
+        if (expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
 
         this.setCopyrightText(collectionService.getMetadata(collection, org.dspace.content.Collection.COPYRIGHT_TEXT));
-        this.setIntroductoryText(collectionService.getMetadata(collection, org.dspace.content.Collection.INTRODUCTORY_TEXT));
-        this.setShortDescription(collectionService.getMetadata(collection, org.dspace.content.Collection.SHORT_DESCRIPTION));
+        this.setIntroductoryText(
+            collectionService.getMetadata(collection, org.dspace.content.Collection.INTRODUCTORY_TEXT));
+        this.setShortDescription(
+            collectionService.getMetadata(collection, org.dspace.content.Collection.SHORT_DESCRIPTION));
         this.setSidebarText(collectionService.getMetadata(collection, org.dspace.content.Collection.SIDEBAR_TEXT));
 
-        if (expandFields.contains("parentCommunityList") || expandFields.contains("all"))
-        {
+        if (expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
             List<org.dspace.content.Community> parentCommunities = communityService.getAllParents(context, collection);
-            for (org.dspace.content.Community parentCommunity : parentCommunities)
-            {
+            for (org.dspace.content.Community parentCommunity : parentCommunities) {
                 this.addParentCommunityList(new Community(parentCommunity, servletContext, null, context));
             }
-        }
-        else
-        {
+        } else {
             this.addExpand("parentCommunityList");
         }
 
-        if (expandFields.contains("parentCommunity") | expandFields.contains("all"))
-        {
+        if (expandFields.contains("parentCommunity") | expandFields.contains("all")) {
             org.dspace.content.Community parentCommunity =
                 (org.dspace.content.Community) collectionService
                     .getParentObject(context, collection);
             this.setParentCommunity(new Community(
                 parentCommunity, servletContext, null, context));
-        }
-        else
-        {
+        } else {
             this.addExpand("parentCommunity");
         }
 
         //TODO: Item paging. limit, offset/page
-        if (expandFields.contains("items") || expandFields.contains("all"))
-        {
+        if (expandFields.contains("items") || expandFields.contains("all")) {
             Iterator<org.dspace.content.Item> childItems =
                 itemService.findByCollection(context, collection, limit, offset);
 
             items = new ArrayList<Item>();
-            while (childItems.hasNext())
-            {
+            while (childItems.hasNext()) {
                 org.dspace.content.Item item = childItems.next();
 
-                if (itemService.isItemListedForUser(context, item))
-                {
+                if (itemService.isItemListedForUser(context, item)) {
                     items.add(new Item(item, servletContext, null, context));
                 }
             }
-        }
-        else
-        {
+        } else {
             this.addExpand("items");
         }
 
-        if (expandFields.contains("license") || expandFields.contains("all"))
-        {
+        if (expandFields.contains("license") || expandFields.contains("all")) {
             setLicense(collectionService.getLicense(collection));
-        }
-        else
-        {
+        } else {
             this.addExpand("license");
         }
 
-        if (expandFields.contains("logo") || expandFields.contains("all"))
-        {
-            if (collection.getLogo() != null)
-            {
+        if (expandFields.contains("logo") || expandFields.contains("all")) {
+            if (collection.getLogo() != null) {
                 this.logo = new Bitstream(collection.getLogo(), servletContext, null, context);
             }
-        }
-        else
-        {
+        } else {
             this.addExpand("logo");
         }
 
-        if (!expandFields.contains("all"))
-        {
+        if (!expandFields.contains("all")) {
             this.addExpand("all");
         }
 

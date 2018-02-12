@@ -13,13 +13,14 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
 @XmlType
-public class CheckSum{
+public class CheckSum {
     String checkSumAlgorithm;
     String value;
 
-    public CheckSum(){}
+    public CheckSum() {
+    }
 
-    @XmlAttribute(name="checkSumAlgorithm")
+    @XmlAttribute(name = "checkSumAlgorithm")
     public String getCheckSumAlgorith() {
         return checkSumAlgorithm;
     }

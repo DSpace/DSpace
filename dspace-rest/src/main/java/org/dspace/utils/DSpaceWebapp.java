@@ -16,17 +16,13 @@ import org.dspace.app.util.AbstractDSpaceWebapp;
  * @author Bram Luyten (bram at atmire dot com)
  */
 public class DSpaceWebapp
-        extends AbstractDSpaceWebapp
-{
-    public DSpaceWebapp()
-    {
+    extends AbstractDSpaceWebapp {
+    public DSpaceWebapp() {
         super("REST");
     }
 
     @Override
-    public boolean isUI()
-    {
+    public boolean isUI() {
         return false;
     }
 }
- 
