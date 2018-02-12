@@ -180,7 +180,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.17</version>
+                    <version>3.0.0</version>
                     <executions>
                         <execution>
                             <id>verify-style</id>
@@ -201,7 +201,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>8.5</version>
+                            <version>8.8</version>
                         </dependency>
                     </dependencies>
                 </plugin>
