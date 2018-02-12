@@ -7,28 +7,29 @@
  */
 package org.dspace.app.rest.matcher;
 
-import org.hamcrest.Matcher;
-
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+
+import org.hamcrest.Matcher;
 
 public class PageMatcher {
 
 
     public static Matcher<? super Object> pageEntry(int number, int size) {
         return allOf(
-                hasJsonPath("$.number", is(number)),
-                hasJsonPath("$.size", is(size))
+            hasJsonPath("$.number", is(number)),
+            hasJsonPath("$.size", is(size))
         );
     }
 
-    public static Matcher<? super Object> pageEntryWithTotalPagesAndElements(int number, int size, int totalPages, int totalElements) {
+    public static Matcher<? super Object> pageEntryWithTotalPagesAndElements(int number, int size, int totalPages,
+                                                                             int totalElements) {
         return allOf(
-                hasJsonPath("$.number", is(number)),
-                hasJsonPath("$.size", is(size)),
-                hasJsonPath("$.totalPages", is(totalPages)),
-                hasJsonPath("$.totalElements", is(totalElements))
+            hasJsonPath("$.number", is(number)),
+            hasJsonPath("$.size", is(size)),
+            hasJsonPath("$.totalPages", is(totalPages)),
+            hasJsonPath("$.totalElements", is(totalElements))
         );
     }
 

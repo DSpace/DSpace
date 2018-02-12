@@ -18,6 +18,16 @@ import org.dspace.core.Constants;
  */
 public class URLUtils {
 
+    /**
+     * Default constructor
+     */
+    private URLUtils() { }
+
+    /**
+     * Decode a given URL
+     * @param url URL
+     * @return decoded URL
+     */
     public static String decode(String url) {
         try {
             return URLDecoder.decode(url, Constants.DEFAULT_ENCODING);
@@ -26,6 +36,11 @@ public class URLUtils {
         }
     }
 
+    /**
+     * Encode a given URL
+     * @param url URL
+     * @return encoded URL
+     */
     public static String encode(String url) {
         try {
             return URLEncoder.encode(url, Constants.DEFAULT_ENCODING);

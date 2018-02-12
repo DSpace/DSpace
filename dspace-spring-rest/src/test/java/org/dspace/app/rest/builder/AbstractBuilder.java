@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -14,7 +17,17 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.*;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.SiteService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -28,13 +41,6 @@ import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Date;
 
 /**
  * Abstract builder class that holds references to all available services
@@ -69,10 +75,12 @@ public abstract class AbstractBuilder<T, S> {
     protected Context context;
 
     private static List<AbstractBuilder> builders = new LinkedList<>();
-    /** log4j category */
+    /**
+     * log4j category
+     */
     private static final Logger log = Logger.getLogger(AbstractDSpaceObjectBuilder.class);
 
-    protected AbstractBuilder(Context context){
+    protected AbstractBuilder(Context context) {
         this.context = context;
         builders.add(this);
     }
@@ -90,7 +98,9 @@ public abstract class AbstractBuilder<T, S> {
         bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
         authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
-        indexingService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
+        indexingService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                               .getServiceByName(IndexingService.class.getName(),
+                                                                 IndexingService.class);
         registrationDataService = EPersonServiceFactory.getInstance().getRegistrationDataService();
         versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
         metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
@@ -137,7 +147,7 @@ public abstract class AbstractBuilder<T, S> {
         }
 
         // Bitstreams still leave a trace when deleted, so we need to fully "expunge" them
-        try(Context c = new Context()) {
+        try (Context c = new Context()) {
             List<Bitstream> bitstreams = bitstreamService.findAll(c);
             for (Bitstream bitstream : CollectionUtils.emptyIfNull(bitstreams)) {
 
@@ -161,6 +171,7 @@ public abstract class AbstractBuilder<T, S> {
 
     /**
      * Method to completely delete a bitstream from the database and asset store.
+     *
      * @param bit The deleted bitstream to remove completely
      */
     static void expungeBitstream(Context c, Bitstream bit) throws Exception {

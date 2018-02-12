@@ -18,16 +18,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * This factory provides a means to add links to the SearchFacetValueResource. This method and class will be called from the
+ * This factory provides a means to add links to the SearchFacetValueResource. This method and class will be called
+ * from the
  * HalLinkService addLinks method if the given resource is eligible.
  */
 @Component
 public class SearchFacetValueHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchFacetValueResource> {
 
     @Override
-    protected void addLinks(SearchFacetValueResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
+    protected void addLinks(SearchFacetValueResource halResource, Pageable pageable, LinkedList<Link> list)
+        throws Exception {
 
-        if(halResource.getSearchData() != null && halResource.getFacetData() != null && halResource.getValueData() != null){
+        if (halResource.getSearchData() != null && halResource.getFacetData() != null && halResource
+            .getValueData() != null) {
 
             UriComponentsBuilder builder = buildSearchBaseLink(halResource.getSearchData());
 

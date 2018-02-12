@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +43,7 @@ import org.springframework.stereotype.Component;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @Component
-public class EPersonRestAuthenticationProvider implements AuthenticationProvider{
+public class EPersonRestAuthenticationProvider implements AuthenticationProvider {
 
     private static final Logger log = LoggerFactory.getLogger(EPersonRestAuthenticationProvider.class);
 
@@ -63,7 +62,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         Context context = ContextUtil.obtainContext(request);
-        if(context != null && context.getCurrentUser() != null) {
+        if (context != null && context.getCurrentUser() != null) {
             return authenticateRefreshTokenRequest(context);
         } else {
             return authenticateNewLogin(authentication);
@@ -79,7 +78,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         Context newContext = null;
         Authentication output = null;
 
-        if(authentication != null) {
+        if (authentication != null) {
             try {
                 newContext = new Context();
                 String name = authentication.getName();
@@ -91,17 +90,18 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                     log.info(LogManager.getHeader(newContext, "login", "type=implicit"));
                     output = createAuthentication(password, newContext);
                 } else {
-                    int authenticateResult = authenticationService.authenticate(newContext, name, password, null, request);
+                    int authenticateResult = authenticationService
+                        .authenticate(newContext, name, password, null, request);
                     if (AuthenticationMethod.SUCCESS == authenticateResult) {
 
                         log.info(LogManager
-                                .getHeader(newContext, "login", "type=explicit"));
+                                     .getHeader(newContext, "login", "type=explicit"));
 
                         output = createAuthentication(password, newContext);
                     } else {
                         log.info(LogManager.getHeader(newContext, "failed_login", "email="
-                                + name + ", result="
-                                + authenticateResult));
+                            + name + ", result="
+                            + authenticateResult));
                         throw new BadCredentialsException("Login failed");
                     }
                 }
@@ -122,14 +122,15 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
     private Authentication createAuthentication(final String password, final Context context) {
         EPerson ePerson = context.getCurrentUser();
 
-        if(ePerson != null && StringUtils.isNotBlank(ePerson.getEmail())) {
+        if (ePerson != null && StringUtils.isNotBlank(ePerson.getEmail())) {
             //Pass the eperson ID to the request service
             requestService.setCurrentUserId(ePerson.getID());
 
             return new DSpaceAuthentication(ePerson, getGrantedAuthorities(context, ePerson));
 
         } else {
-            log.info(LogManager.getHeader(context, "failed_login", "No eperson with an non-blank e-mail address found"));
+            log.info(
+                LogManager.getHeader(context, "failed_login", "No eperson with an non-blank e-mail address found"));
             throw new BadCredentialsException("Login failed");
         }
     }
@@ -137,7 +138,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
     public List<GrantedAuthority> getGrantedAuthorities(Context context, EPerson eperson) {
         List<GrantedAuthority> authorities = new LinkedList<>();
 
-        if(eperson != null) {
+        if (eperson != null) {
             boolean isAdmin = false;
             try {
                 isAdmin = authorizeService.isAdmin(context, eperson);

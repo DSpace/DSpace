@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,7 +24,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -60,7 +58,8 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     @Override
-    public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, DSpaceAuthentication authentication) throws IOException {
+    public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
+                                             DSpaceAuthentication authentication) throws IOException {
         try {
             Context context = ContextUtil.obtainContext(request);
             context.setCurrentUser(ePersonService.findByEmail(context, authentication.getName()));
@@ -68,7 +67,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             List<Group> groups = authenticationService.getSpecialGroups(context, request);
 
             String token = jwtTokenHandler.createTokenForEPerson(context, request,
-                    authentication.getPreviousLoginDate(), groups);
+                                                                 authentication.getPreviousLoginDate(), groups);
 
             addTokenToResponse(response, token);
             context.commit();

@@ -7,49 +7,41 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import java.util.List;
-
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Submission "move" operation for ordering the Bitstream
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class BitstreamMovePatchOperation extends MovePatchOperation<String>{
+public class BitstreamMovePatchOperation extends MovePatchOperation<String> {
 
-	@Autowired
-	ItemService itemService;
-	
-	@Autowired
-	BundleService bundleService;
-	
+    @Autowired
+    ItemService itemService;
 
-	@Override
-	protected Class<String[]> getArrayClassForEvaluation() {
-		return String[].class;
-	}
+    @Autowired
+    BundleService bundleService;
 
-	@Override
-	protected Class<String> getClassForEvaluation() {
-		return String.class;
-	}
 
-	@Override
-	void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
-			throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    protected Class<String[]> getArrayClassForEvaluation() {
+        return String[].class;
+    }
+
+    @Override
+    protected Class<String> getClassForEvaluation() {
+        return String.class;
+    }
+
+    @Override
+    void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
+        throws Exception {
+        // TODO Auto-generated method stub
+
+    }
 }

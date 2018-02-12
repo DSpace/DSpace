@@ -21,27 +21,27 @@ public class SearchSupportRestTest {
     SearchSupportRest searchSupportRest;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         searchSupportRest = new SearchSupportRest();
     }
 
     @Test
-    public void testConstructorDoesNotReturnNull() throws Exception{
+    public void testConstructorDoesNotReturnNull() throws Exception {
         assertNotNull(searchSupportRest);
     }
 
     @Test
-    public void testGetTypeReturnsCorrectValue() throws Exception{
+    public void testGetTypeReturnsCorrectValue() throws Exception {
         assertEquals(SearchSupportRest.NAME, searchSupportRest.getType());
     }
 
     @Test
-    public void testGetCategoryReturnsCorrectValue() throws Exception{
+    public void testGetCategoryReturnsCorrectValue() throws Exception {
         assertEquals(SearchSupportRest.CATEGORY, searchSupportRest.getCategory());
     }
 
     @Test
-    public void testGetControllerReturnsCorrectValue() throws Exception{
+    public void testGetControllerReturnsCorrectValue() throws Exception {
         assertEquals(DiscoveryRestController.class, searchSupportRest.getController());
     }
 }

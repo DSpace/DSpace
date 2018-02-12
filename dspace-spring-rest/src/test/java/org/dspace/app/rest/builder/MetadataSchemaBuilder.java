@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.sql.SQLException;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
@@ -14,12 +16,11 @@ import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
-import java.sql.SQLException;
 
 public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, MetadataSchemaService> {
 
     /* Log4j logger*/
-    private static final Logger log =  Logger.getLogger(MetadataSchemaBuilder.class);
+    private static final Logger log = Logger.getLogger(MetadataSchemaBuilder.class);
 
     private MetadataSchema metadataSchema;
 
@@ -39,7 +40,7 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
 
     @Override
     public MetadataSchema build() {
-        try{
+        try {
 
             metadataSchemaService.update(context, metadataSchema);
             context.dispatchEvents();
@@ -50,7 +51,8 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
         } catch (SQLException e) {
             log.error(e);
         } catch (AuthorizeException e) {
-            log.error(e);;
+            log.error(e);
+            ;
         } catch (NonUniqueMetadataException e) {
             e.printStackTrace();
         }
@@ -58,7 +60,7 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
     }
 
     public void delete(MetadataSchema dso) throws Exception {
-        try(Context c = new Context()) {
+        try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             MetadataSchema attachedDso = c.reloadEntity(dso);
             if (attachedDso != null) {
@@ -71,11 +73,14 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
     }
 
 
-    public static MetadataSchemaBuilder createMetadataSchema(Context context, String name, String namespace) throws SQLException, AuthorizeException {
+    public static MetadataSchemaBuilder createMetadataSchema(Context context, String name, String namespace)
+        throws SQLException, AuthorizeException {
         MetadataSchemaBuilder metadataSchemaBuilder = new MetadataSchemaBuilder(context);
         return metadataSchemaBuilder.create(context, name, namespace);
     }
-    private MetadataSchemaBuilder create(Context context, String name, String namespace) throws SQLException, AuthorizeException {
+
+    private MetadataSchemaBuilder create(Context context, String name, String namespace)
+        throws SQLException, AuthorizeException {
         this.context = context;
 
         try {

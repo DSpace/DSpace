@@ -19,7 +19,7 @@ import org.dspace.app.rest.model.SearchFacetEntryRest;
  */
 public class FacetConfigurationResource extends HALResource<FacetConfigurationRest> {
 
-    public FacetConfigurationResource(FacetConfigurationRest facetConfigurationRest){
+    public FacetConfigurationResource(FacetConfigurationRest facetConfigurationRest) {
         super(facetConfigurationRest);
         addEmbeds(facetConfigurationRest);
     }

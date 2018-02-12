@@ -27,12 +27,12 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverFilterQuery;
+import org.dspace.discovery.DiscoverHitHighlightingField;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.FacetYearRange;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.discovery.DiscoverHitHighlightingField;
 import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
@@ -70,9 +70,10 @@ public class DiscoverQueryBuilder implements InitializingBean {
                                     DiscoveryConfiguration discoveryConfiguration,
                                     String query, List<SearchFilter> searchFilters,
                                     String dsoType, Pageable page)
-            throws InvalidRequestException {
+        throws InvalidRequestException {
 
-        DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters, dsoType);
+        DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
+                                                           dsoType);
 
         //When all search criteria are set, configure facet results
         addFaceting(context, scope, queryArgs, discoveryConfiguration);
@@ -85,24 +86,27 @@ public class DiscoverQueryBuilder implements InitializingBean {
         return queryArgs;
     }
 
-    private void addDiscoveryHitHighlightFields(DiscoveryConfiguration discoveryConfiguration, DiscoverQuery queryArgs) {
-        if(discoveryConfiguration.getHitHighlightingConfiguration() != null)
-        {
-            List<DiscoveryHitHighlightFieldConfiguration> metadataFields = discoveryConfiguration.getHitHighlightingConfiguration().getMetadataFields();
-            for (DiscoveryHitHighlightFieldConfiguration fieldConfiguration : metadataFields)
-            {
-                queryArgs.addHitHighlightingField(new DiscoverHitHighlightingField(fieldConfiguration.getField(), fieldConfiguration.getMaxSize(), fieldConfiguration.getSnippets()));
+    private void addDiscoveryHitHighlightFields(DiscoveryConfiguration discoveryConfiguration,
+                                                DiscoverQuery queryArgs) {
+        if (discoveryConfiguration.getHitHighlightingConfiguration() != null) {
+            List<DiscoveryHitHighlightFieldConfiguration> metadataFields = discoveryConfiguration
+                .getHitHighlightingConfiguration().getMetadataFields();
+            for (DiscoveryHitHighlightFieldConfiguration fieldConfiguration : metadataFields) {
+                queryArgs.addHitHighlightingField(
+                    new DiscoverHitHighlightingField(fieldConfiguration.getField(), fieldConfiguration.getMaxSize(),
+                                                     fieldConfiguration.getSnippets()));
             }
         }
     }
 
     public DiscoverQuery buildFacetQuery(Context context, DSpaceObject scope,
-                                    DiscoveryConfiguration discoveryConfiguration,
-                                    String query, List<SearchFilter> searchFilters,
-                                    String dsoType, Pageable page, String facetName)
-            throws InvalidRequestException {
+                                         DiscoveryConfiguration discoveryConfiguration,
+                                         String query, List<SearchFilter> searchFilters,
+                                         String dsoType, Pageable page, String facetName)
+        throws InvalidRequestException {
 
-        DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters, dsoType);
+        DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
+                                                           dsoType);
 
         //When all search criteria are set, configure facet results
         addFacetingForFacets(context, scope, queryArgs, discoveryConfiguration, facetName, page);
@@ -122,7 +126,8 @@ public class DiscoverQueryBuilder implements InitializingBean {
         }
     }
 
-    private DiscoverQuery addFacetingForFacets(Context context, DSpaceObject scope, DiscoverQuery queryArgs, DiscoveryConfiguration discoveryConfiguration,
+    private DiscoverQuery addFacetingForFacets(Context context, DSpaceObject scope, DiscoverQuery queryArgs,
+                                               DiscoveryConfiguration discoveryConfiguration,
                                                String facetName, Pageable page) throws InvalidSearchFacetException {
 
         DiscoverySearchFilterFacet facet = discoveryConfiguration.getSidebarFacet(facetName);
@@ -139,28 +144,35 @@ public class DiscoverQueryBuilder implements InitializingBean {
         return queryArgs;
     }
 
-    private void fillFacetIntoQueryArgs(Context context, DSpaceObject scope, DiscoverQuery queryArgs, DiscoverySearchFilterFacet facet, final int pageSize) {
+    private void fillFacetIntoQueryArgs(Context context, DSpaceObject scope, DiscoverQuery queryArgs,
+                                        DiscoverySearchFilterFacet facet, final int pageSize) {
         if (facet.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             try {
-                FacetYearRange facetYearRange = searchService.getFacetYearRange(context, scope, facet, queryArgs.getFilterQueries());
+                FacetYearRange facetYearRange = searchService
+                    .getFacetYearRange(context, scope, facet, queryArgs.getFilterQueries());
 
                 queryArgs.addYearRangeFacet(facet, facetYearRange);
 
             } catch (Exception e) {
-                log.error(LogManager.getHeader(context, "Error in Discovery while setting up date facet range", "date facet: " + facet), e);
+                log.error(LogManager.getHeader(context, "Error in Discovery while setting up date facet range",
+                                               "date facet: " + facet), e);
             }
 
         } else {
 
-            //Add one to our facet limit to make sure that if we have more then the shown facets that we show our "show more" url
+            //Add one to our facet limit to make sure that if we have more then the shown facets that we show our
+            // "show more" url
             int facetLimit = pageSize + 1;
             //This should take care of the sorting for us
-            queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit, facet.getSortOrderSidebar()));
+            queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit,
+                                                           facet.getSortOrderSidebar()));
         }
     }
 
-    private DiscoverQuery buildCommonDiscoverQuery(Context context, DiscoveryConfiguration discoveryConfiguration, String query,
-                                                   List<SearchFilter> searchFilters, String dsoType) throws InvalidSearchFilterException, InvalidDSpaceObjectTypeException {
+    private DiscoverQuery buildCommonDiscoverQuery(Context context, DiscoveryConfiguration discoveryConfiguration,
+                                                   String query,
+                                                   List<SearchFilter> searchFilters, String dsoType)
+        throws InvalidSearchFilterException, InvalidDSpaceObjectTypeException {
         DiscoverQuery queryArgs = buildBaseQueryForConfiguration(discoveryConfiguration);
 
         //Add search filters
@@ -181,11 +193,14 @@ public class DiscoverQueryBuilder implements InitializingBean {
     private DiscoverQuery buildBaseQueryForConfiguration(DiscoveryConfiguration discoveryConfiguration) {
         DiscoverQuery queryArgs = new DiscoverQuery();
         queryArgs.addFilterQueries(discoveryConfiguration.getDefaultFilterQueries()
-                .toArray(new String[discoveryConfiguration.getDefaultFilterQueries().size()]));
+                                                         .toArray(
+                                                             new String[discoveryConfiguration.getDefaultFilterQueries()
+                                                                                              .size()]));
         return queryArgs;
     }
 
-    private void configureSorting(Pageable page, DiscoverQuery queryArgs, DiscoverySortConfiguration searchSortConfiguration) throws InvalidSortingException {
+    private void configureSorting(Pageable page, DiscoverQuery queryArgs,
+                                  DiscoverySortConfiguration searchSortConfiguration) throws InvalidSortingException {
         String sortBy = null;
         String sortOrder = null;
 
@@ -208,10 +223,12 @@ public class DiscoverQueryBuilder implements InitializingBean {
         }
 
         //Update Discovery query
-        DiscoverySortFieldConfiguration sortFieldConfiguration = searchSortConfiguration.getSortFieldConfiguration(sortBy);
+        DiscoverySortFieldConfiguration sortFieldConfiguration = searchSortConfiguration
+            .getSortFieldConfiguration(sortBy);
 
         if (sortFieldConfiguration != null) {
-            String sortField = searchService.toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
+            String sortField = searchService
+                .toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
 
             if ("asc".equalsIgnoreCase(sortOrder)) {
                 queryArgs.setSortField(sortField, DiscoverQuery.SORT_ORDER.asc);
@@ -229,7 +246,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
     private String getDefaultSortDirection(DiscoverySortConfiguration searchSortConfiguration, String sortOrder) {
         if (searchSortConfiguration != null) {
             sortOrder = searchSortConfiguration.getDefaultSortOrder()
-                    .toString();
+                                               .toString();
         }
         return sortOrder;
     }
@@ -262,18 +279,21 @@ public class DiscoverQueryBuilder implements InitializingBean {
         return index;
     }
 
-    private String[] convertFilters(Context context, DiscoveryConfiguration discoveryConfiguration, List<SearchFilter> searchFilters) throws InvalidSearchFilterException {
+    private String[] convertFilters(Context context, DiscoveryConfiguration discoveryConfiguration,
+                                    List<SearchFilter> searchFilters) throws InvalidSearchFilterException {
         ArrayList<String> filterQueries = new ArrayList<>(CollectionUtils.size(searchFilters));
 
         try {
             for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
                 DiscoverySearchFilter filter = discoveryConfiguration.getSearchFilter(searchFilter.getName());
-                if(filter == null) {
+                if (filter == null) {
                     throw new InvalidSearchFilterException(searchFilter.getName() + " is not a valid search filter");
                 }
 
                 DiscoverFilterQuery filterQuery = searchService.toFilterQuery(context,
-                        filter.getIndexFieldName(), searchFilter.getOperator(), searchFilter.getValue());
+                                                                              filter.getIndexFieldName(),
+                                                                              searchFilter.getOperator(),
+                                                                              searchFilter.getValue());
 
                 if (filterQuery != null) {
                     filterQueries.add(filterQuery.getFilterQuery());
@@ -286,11 +306,13 @@ public class DiscoverQueryBuilder implements InitializingBean {
         return filterQueries.toArray(new String[filterQueries.size()]);
     }
 
-    private DiscoverQuery addFaceting(Context context, DSpaceObject scope, DiscoverQuery queryArgs, DiscoveryConfiguration discoveryConfiguration) {
+    private DiscoverQuery addFaceting(Context context, DSpaceObject scope, DiscoverQuery queryArgs,
+                                      DiscoveryConfiguration discoveryConfiguration) {
 
         List<DiscoverySearchFilterFacet> facets = discoveryConfiguration.getSidebarFacets();
 
-        log.debug("facets for configuration " + discoveryConfiguration.getId() + ": " + (facets != null ? facets.size() : null));
+        log.debug("facets for configuration " + discoveryConfiguration.getId() + ": " + (facets != null ? facets
+            .size() : null));
 
         if (facets != null) {
             queryArgs.setFacetMinCount(1);

@@ -26,54 +26,53 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the repository responsible to manage EPerson Rest object
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
 @Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME)
 public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUID> {
-	EPersonService es = EPersonServiceFactory.getInstance().getEPersonService();
-	
-	@Autowired
-	EPersonConverter converter;
-	
-	@Override
-	public EPersonRest findOne(Context context, UUID id) {
-		EPerson eperson = null;
-		try {
-			eperson = es.find(context, id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (eperson == null) {
-			return null;
-		}
-		return converter.fromModel(eperson);
-	}
+    EPersonService es = EPersonServiceFactory.getInstance().getEPersonService();
 
-	@Override
-	public Page<EPersonRest> findAll(Context context, Pageable pageable) {
-		List<EPerson> epersons = null;
-		int total = 0;
-		try {
-			total = es.countTotal(context);
-			epersons = es.findAll(context, EPerson.ID, pageable.getPageSize(), pageable.getOffset());
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(converter);
-		return page;
-	}
-	
-	@Override
-	public Class<EPersonRest> getDomainClass() {
-		return EPersonRest.class;
-	}
-	
-	@Override
-	public EPersonResource wrapResource(EPersonRest eperson, String... rels) {
-		return new EPersonResource(eperson, utils, rels);
-	}
+    @Autowired
+    EPersonConverter converter;
+
+    @Override
+    public EPersonRest findOne(Context context, UUID id) {
+        EPerson eperson = null;
+        try {
+            eperson = es.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (eperson == null) {
+            return null;
+        }
+        return converter.fromModel(eperson);
+    }
+
+    @Override
+    public Page<EPersonRest> findAll(Context context, Pageable pageable) {
+        List<EPerson> epersons = null;
+        int total = 0;
+        try {
+            total = es.countTotal(context);
+            epersons = es.findAll(context, EPerson.ID, pageable.getPageSize(), pageable.getOffset());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(converter);
+        return page;
+    }
+
+    @Override
+    public Class<EPersonRest> getDomainClass() {
+        return EPersonRest.class;
+    }
+
+    @Override
+    public EPersonResource wrapResource(EPersonRest eperson, String... rels) {
+        return new EPersonResource(eperson, utils, rels);
+    }
 
 }

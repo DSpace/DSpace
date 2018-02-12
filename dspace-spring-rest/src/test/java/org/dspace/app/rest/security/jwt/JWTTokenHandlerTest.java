@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -72,7 +71,7 @@ public class JWTTokenHandlerTest {
         when(ePerson.getSessionSalt()).thenReturn("01234567890123456789012345678901");
         when(ePerson.getLastActive()).thenReturn(new Date());
         when(context.getCurrentUser()).thenReturn(ePerson);
-        when(ePersonClaimProvider.getKey()).thenReturn( "eid");
+        when(ePersonClaimProvider.getKey()).thenReturn("eid");
         when(ePersonClaimProvider.getValue(any(), Mockito.any(HttpServletRequest.class))).thenReturn("epersonID");
         jwtClaimProviders.add(ePersonClaimProvider);
     }
@@ -84,7 +83,8 @@ public class JWTTokenHandlerTest {
     @Test
     public void testJWTNoEncryption() throws Exception {
         Date previous = new Date(System.currentTimeMillis() - 10000000000L);
-        String token = jwtTokenHandler.createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+        String token = jwtTokenHandler
+            .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
         SignedJWT signedJWT = SignedJWT.parse(token);
         String personId = (String) signedJWT.getJWTClaimsSet().getClaim(EPersonClaimProvider.EPERSON_ID);
         assertEquals("epersonID", personId);
@@ -96,7 +96,8 @@ public class JWTTokenHandlerTest {
         Date previous = new Date(System.currentTimeMillis() - 10000000000L);
         StringKeyGenerator keyGenerator = KeyGenerators.string();
         when(jwtTokenHandler.getEncryptionKey()).thenReturn(keyGenerator.generateKey().getBytes());
-        String token = jwtTokenHandler.createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+        String token = jwtTokenHandler
+            .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
         SignedJWT signedJWT = SignedJWT.parse(token);
     }
 
@@ -106,7 +107,8 @@ public class JWTTokenHandlerTest {
         when(jwtTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Date previous = new Date(new Date().getTime() - 10000000000L);
-        String token = jwtTokenHandler.createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+        String token = jwtTokenHandler
+            .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
         EPerson parsed = jwtTokenHandler.parseEPersonFromToken(token, httpServletRequest, context);
         assertEquals(null, parsed);
 
@@ -118,8 +120,10 @@ public class JWTTokenHandlerTest {
         when(jwtTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Date previous = new Date(new Date().getTime() - 10000000000L);
-        String token = jwtTokenHandler.createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder().claim("eid", "epersonID").expirationTime(new Date(System.currentTimeMillis() + 99999999)).build();
+        String token = jwtTokenHandler
+            .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder().claim("eid", "epersonID").expirationTime(
+            new Date(System.currentTimeMillis() + 99999999)).build();
         String tamperedPayload = new String(Base64.getUrlEncoder().encode(jwtClaimsSet.toString().getBytes()));
         String[] splitToken = token.split("\\.");
         String tamperedToken = splitToken[0] + "." + tamperedPayload + "." + splitToken[2];

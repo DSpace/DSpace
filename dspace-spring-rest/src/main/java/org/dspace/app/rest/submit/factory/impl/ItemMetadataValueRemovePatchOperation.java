@@ -16,48 +16,47 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Submission "remove" PATCH operation.
- * 
+ *
  * Path used to remove a <b>specific metadata value</b> using index:
  * "/sections/<:name-of-the-form>/<:metadata>/<:idx-zero-based>"
- * 
+ *
  * Example: <code>
  * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "remove", "path": "
  * /sections/traditionalpageone/dc.title/1"}]'
  * </code>
- * 
+ *
  * Path used to remove <b>all the metadata values</b> for a specific metadata key:
  * "/sections/<:name-of-the-form>/<:metadata>"
- * 
+ *
  * Example: <code>
  * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "remove", "path": "
  * /sections/traditionalpageone/dc.title"}]'
- * </code> 
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * </code>
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class ItemMetadataValueRemovePatchOperation extends MetadataValueRemovePatchOperation<Item> {
 
-	@Autowired
-	ItemService itemService;
+    @Autowired
+    ItemService itemService;
 
-	@Override
-	void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
-			throws Exception {
-		String[] split = getAbsolutePath(path).split("/");
-		if (split.length == 1) {
-			deleteValue(context, source.getItem(), split[0], -1);
-		} else {
-			Integer toDelete = Integer.parseInt(split[1]);
-			deleteValue(context, source.getItem(), split[0], toDelete);
-		}
-	}
+    @Override
+    void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
+        throws Exception {
+        String[] split = getAbsolutePath(path).split("/");
+        if (split.length == 1) {
+            deleteValue(context, source.getItem(), split[0], -1);
+        } else {
+            Integer toDelete = Integer.parseInt(split[1]);
+            deleteValue(context, source.getItem(), split[0], toDelete);
+        }
+    }
 
-	@Override
-	protected ItemService getDSpaceObjectService() {
-		return itemService;
-	}
+    @Override
+    protected ItemService getDSpaceObjectService() {
+        return itemService;
+    }
 
 }

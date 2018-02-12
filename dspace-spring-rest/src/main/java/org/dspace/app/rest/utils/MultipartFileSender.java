@@ -17,7 +17,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,11 +27,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to send an input stream with Range header and ETag support.
- * Based on https://github.com/davinkevin/Podcast-Server/blob/v1.0.0/src/main/java/lan/dk/podcastserver/service/MultiPartFileSenderService.java
+ * Based on https://github.com/davinkevin/Podcast-Server/blob/v1.0.0/src/main/java/lan/dk/podcastserver/service
+ * /MultiPartFileSenderService.java
  *
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
- *
  */
 public class MultipartFileSender {
 
@@ -40,7 +39,8 @@ public class MultipartFileSender {
 
     private static final String METHOD_HEAD = "HEAD";
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
-    private static final String CONTENT_TYPE_MULTITYPE_WITH_BOUNDARY = "multipart/byteranges; boundary=" + MULTIPART_BOUNDARY;
+    private static final String CONTENT_TYPE_MULTITYPE_WITH_BOUNDARY = "multipart/byteranges; boundary=" +
+        MULTIPART_BOUNDARY;
     private static final String CONTENT_DISPOSITION_INLINE = "inline";
     private static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment";
     private static final String IF_NONE_MATCH = "If-None-Match";
@@ -129,7 +129,7 @@ public class MultipartFileSender {
     }
 
     public MultipartFileSender withBufferSize(int bufferSize) {
-        if(bufferSize > 0) {
+        if (bufferSize > 0) {
             this.bufferSize = bufferSize;
         }
         return this;
@@ -167,7 +167,9 @@ public class MultipartFileSender {
                 contentType = APPLICATION_OCTET_STREAM;
             } else if (!contentType.startsWith(IMAGE)) {
                 String accept = request.getHeader(ACCEPT);
-                disposition = accept != null && accepts(accept, contentType) ? CONTENT_DISPOSITION_INLINE : CONTENT_DISPOSITION_ATTACHMENT;
+                disposition = accept != null && accepts(accept,
+                                                        contentType) ? CONTENT_DISPOSITION_INLINE :
+                    CONTENT_DISPOSITION_ATTACHMENT;
             }
 
             response.setHeader(CONTENT_DISPOSITION, String.format(CONTENT_DISPOSITION_FORMAT, disposition, fileName));
@@ -301,7 +303,7 @@ public class MultipartFileSender {
         Range full = getFullRange();
         List<Range> ranges = getRanges(full);
 
-        if(hasNoRanges(full, ranges)) {
+        if (hasNoRanges(full, ranges)) {
             return true;
         } else {
             return false;
@@ -327,7 +329,8 @@ public class MultipartFileSender {
             // Range header should match format "bytes=n-n,n-n,n-n...". If not, then return 416.
             if (!range.matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
                 log.error("Range header should match format \"bytes=n-n,n-n,n-n...\". If not, then return 416.");
-                response.setHeader(CONTENT_RANGE, String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
+                response.setHeader(CONTENT_RANGE,
+                                   String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
                 response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
                 return null;
             }
@@ -371,7 +374,8 @@ public class MultipartFileSender {
                     // Check if Range is syntactically valid. If not, then return 416.
                     if (start > end) {
                         log.warn("Check if Range is syntactically valid. If not, then return 416.");
-                        response.setHeader(CONTENT_RANGE, String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
+                        response.setHeader(CONTENT_RANGE,
+                                           String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
                         response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
                         return null;
                     }
@@ -415,7 +419,8 @@ public class MultipartFileSender {
 
             Range prevRange = null;
             for (Range r : ranges) {
-                Range newRange = isNull(prevRange) ? r : new Range(r.start - prevRange.end - 1, r.end - prevRange.end - 1, r.total);
+                Range newRange = isNull(prevRange) ? r : new Range(r.start - prevRange.end - 1,
+                                                                   r.end - prevRange.end - 1, r.total);
                 builder.add(newRange);
                 prevRange = r;
             }
@@ -428,7 +433,8 @@ public class MultipartFileSender {
             return (substring.length() > 0) ? Long.parseLong(substring) : -1;
         }
 
-        private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length, int bufferSize) throws IOException {
+        private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length,
+                                 int bufferSize) throws IOException {
             byte[] buffer = new byte[bufferSize];
             int read;
 
@@ -461,8 +467,8 @@ public class MultipartFileSender {
         Arrays.sort(acceptValues);
 
         return Arrays.binarySearch(acceptValues, toAccept) > -1
-                || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
-                || Arrays.binarySearch(acceptValues, "*/*") > -1;
+            || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
+            || Arrays.binarySearch(acceptValues, "*/*") > -1;
     }
 
     private static boolean matches(String matchHeader, String toMatch) {

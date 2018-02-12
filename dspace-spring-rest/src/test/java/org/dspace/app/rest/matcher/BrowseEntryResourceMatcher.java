@@ -24,16 +24,17 @@ import org.hamcrest.Matcher;
 public class BrowseEntryResourceMatcher {
     public static Matcher<? super Object> matchBrowseEntry(String value, int expectedCount) {
         return allOf(
-                //Check core metadata (the JSON Path expression evaluates to a collection so we have to use contains)
-                hasJsonPath("$.value", is(value)),
-                hasJsonPath("$.count", is(expectedCount)),
-                //Check links
-                matchItemLinks()
+            //Check core metadata (the JSON Path expression evaluates to a collection so we have to use contains)
+            hasJsonPath("$.value", is(value)),
+            hasJsonPath("$.count", is(expectedCount)),
+            //Check links
+            matchItemLinks()
         );
     }
+
     public static Matcher<? super Object> matchItemLinks() {
         return allOf(
-                hasJsonPath("$._links.items.href", startsWith(REST_SERVER_URL))
+            hasJsonPath("$._links.items.href", startsWith(REST_SERVER_URL))
         );
     }
 }

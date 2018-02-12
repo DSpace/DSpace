@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -60,8 +59,8 @@ public class EPersonClaimProviderTest {
         Mockito.doCallRealMethod().when(context).getCurrentUser();
         when(ePerson.getID()).thenReturn(UUID.fromString("c3bae216-a481-496b-a524-7df5aabdb609"));
         jwtClaimsSet = new JWTClaimsSet.Builder()
-                .claim(EPersonClaimProvider.EPERSON_ID, "c3bae216-a481-496b-a524-7df5aabdb609")
-                .build();
+            .claim(EPersonClaimProvider.EPERSON_ID, "c3bae216-a481-496b-a524-7df5aabdb609")
+            .build();
         when(ePersonService.find(any(), any(UUID.class))).thenReturn(ePerson);
     }
 
@@ -79,7 +78,7 @@ public class EPersonClaimProviderTest {
     @Test
     public void testGetEPerson() throws Exception {
         EPerson parsed = ePersonClaimProvider.getEPerson(context, jwtClaimsSet);
-        assertEquals(parsed.getID(), UUID.fromString("c3bae216-a481-496b-a524-7df5aabdb609" ));
+        assertEquals(parsed.getID(), UUID.fromString("c3bae216-a481-496b-a524-7df5aabdb609"));
     }
 
 }

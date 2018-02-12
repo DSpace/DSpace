@@ -25,12 +25,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class SearchResultsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchResultsResource> {
 
-    protected void addLinks(SearchResultsResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
+    protected void addLinks(SearchResultsResource halResource, Pageable pageable, LinkedList<Link> list)
+        throws Exception {
         SearchResultsRest data = halResource.getContent();
 
-        if(data != null && pageable != null){
-            PageImpl<SearchResultEntryResource> page = new PageImpl<SearchResultEntryResource>(halResource.getEntryResources(),
-                    pageable, data.getTotalNumberOfResults());
+        if (data != null && pageable != null) {
+            PageImpl<SearchResultEntryResource> page = new PageImpl<SearchResultEntryResource>(
+                halResource.getEntryResources(),
+                pageable, data.getTotalNumberOfResults());
 
             halResource.setPageHeader(new EmbeddedPageHeader(buildSearchBaseLink(data), page));
         }

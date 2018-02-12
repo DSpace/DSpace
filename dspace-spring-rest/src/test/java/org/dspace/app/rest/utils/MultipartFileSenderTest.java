@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -110,18 +109,19 @@ public class MultipartFileSenderTest {
 
     /**
      * Test if Range header is supported and gives back the right range
+     *
      * @throws Exception
      */
     @Test
     public void testRangeHeader() throws Exception {
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .with(responseWrapper)
-                .withFileName(fileName)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .with(responseWrapper)
+            .withFileName(fileName)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length);
 
         when(request.getHeader(eq("If-Range"))).thenReturn("not_file_to_serve.txt");
         when(request.getHeader(eq("Range"))).thenReturn("bytes=1-3");
@@ -135,18 +135,19 @@ public class MultipartFileSenderTest {
 
     /**
      * Test if we can just request the full file without ranges
+     *
      * @throws Exception
      */
     @Test
     public void testFullFileReturn() throws Exception {
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .with(responseWrapper)
-                .withFileName(fileName)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .with(responseWrapper)
+            .withFileName(fileName)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length);
 
         multipartFileSender.serveResource();
 
@@ -158,18 +159,19 @@ public class MultipartFileSenderTest {
 
     /**
      * Test for support of Open ranges
+     *
      * @throws Exception
      */
     @Test
     public void testOpenRange() throws Exception {
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .with(responseWrapper)
-                .withFileName(fileName)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .with(responseWrapper)
+            .withFileName(fileName)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length);
 
         when(request.getHeader(eq("Range"))).thenReturn("bytes=5-");
 
@@ -182,18 +184,19 @@ public class MultipartFileSenderTest {
 
     /**
      * Test support for multiple ranges
+     *
      * @throws Exception
      */
     @Test
     public void testMultipleRanges() throws Exception {
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .with(responseWrapper)
-                .withFileName(fileName)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .with(responseWrapper)
+            .withFileName(fileName)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length);
 
         when(request.getHeader(eq("Range"))).thenReturn("bytes=1-2,3-4,5-9");
 
@@ -202,37 +205,38 @@ public class MultipartFileSenderTest {
         String content = new String(responseWrapper.getContentAsByteArray(), CharEncoding.UTF_8);
 
         assertEquals("--MULTIPART_BYTERANGES" +
-                        "Content-Type: text/plain" +
-                        "Content-Range: bytes 1-2/10" +
-                        "12" +
-                        "--MULTIPART_BYTERANGES" +
-                        "Content-Type: text/plain" +
-                        "Content-Range: bytes 3-4/10" +
-                        "34" +
-                        "--MULTIPART_BYTERANGES" +
-                        "Content-Type: text/plain" +
-                        "Content-Range: bytes 5-9/10" +
-                        "56789" +
-                        "--MULTIPART_BYTERANGES--".replace("\n", "").replace("\r", "")
-                , content.replace("\n", "").replace("\r", "")
+                         "Content-Type: text/plain" +
+                         "Content-Range: bytes 1-2/10" +
+                         "12" +
+                         "--MULTIPART_BYTERANGES" +
+                         "Content-Type: text/plain" +
+                         "Content-Range: bytes 3-4/10" +
+                         "34" +
+                         "--MULTIPART_BYTERANGES" +
+                         "Content-Type: text/plain" +
+                         "Content-Range: bytes 5-9/10" +
+                         "56789" +
+                         "--MULTIPART_BYTERANGES--".replace("\n", "").replace("\r", "")
+            , content.replace("\n", "").replace("\r", "")
         );
 
     }
 
     /**
      * Test with a unvalid Range header, should return status 416
+     *
      * @throws Exception
      */
     @Test
     public void testInvalidRange() throws Exception {
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .with(responseWrapper)
-                .withFileName(fileName)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .with(responseWrapper)
+            .withFileName(fileName)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length);
 
         when(request.getHeader(eq("Range"))).thenReturn("bytes=invalid");
 
@@ -243,18 +247,19 @@ public class MultipartFileSenderTest {
 
     /**
      * Test if the ETAG is in the response header
+     *
      * @throws Exception
      */
     @Test
     public void testEtagInResponse() throws Exception {
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .with(responseWrapper)
-                .withFileName(fileName)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .with(responseWrapper)
+            .withFileName(fileName)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length);
 
 
         when(request.getHeader(eq("Range"))).thenReturn("bytes=1-3");
@@ -270,13 +275,13 @@ public class MultipartFileSenderTest {
     @Test
     public void testHeadRequest() throws Exception {
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .with(responseWrapper)
-                .withFileName(fileName)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .with(responseWrapper)
+            .withFileName(fileName)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length);
 
 
         when(request.getMethod()).thenReturn("HEAD");
@@ -300,13 +305,13 @@ public class MultipartFileSenderTest {
     @Test
     public void testIfNoneMatchFail() throws Exception {
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .with(responseWrapper)
-                .withFileName(fileName)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .with(responseWrapper)
+            .withFileName(fileName)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length);
 
         when(request.getHeader(eq("If-None-Match"))).thenReturn(checksum);
 
@@ -317,21 +322,23 @@ public class MultipartFileSenderTest {
 
     /**
      * Happy path of If-None-Match header
+     *
      * @throws Exception
      */
     @Test
     public void testIfNoneMatchPass() throws Exception {
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .with(responseWrapper)
-                .withFileName(fileName)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .with(responseWrapper)
+            .withFileName(fileName)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length);
 
 
-        when(request.getHeader(eq("If-None-Match"))).thenReturn("pretendthisisarandomchecksumnotequaltotherequestedbitstream");
+        when(request.getHeader(eq("If-None-Match")))
+            .thenReturn("pretendthisisarandomchecksumnotequaltotherequestedbitstream");
 
         multipartFileSender.isValid();
         multipartFileSender.serveResource();
@@ -341,17 +348,18 @@ public class MultipartFileSenderTest {
 
     /**
      * If the bitstream has no filename this should throw an internal server error
+     *
      * @throws Exception
      */
     @Test
     public void testNoFileName() throws Exception {
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .with(responseWrapper)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .with(responseWrapper)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length);
 
 
         multipartFileSender.isValid();
@@ -362,20 +370,21 @@ public class MultipartFileSenderTest {
 
     /**
      * Test if the Modified Since precondition works, should return 304 if it hasn't been modified
+     *
      * @throws Exception
      */
     @Test
     public void testIfModifiedSinceNotModifiedSince() throws Exception {
         Long time = new Date().getTime();
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .withFileName(fileName)
-                .with(responseWrapper)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length)
-                .withLastModified(time);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .withFileName(fileName)
+            .with(responseWrapper)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length)
+            .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(time + 100000);
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(-1L);
@@ -389,20 +398,21 @@ public class MultipartFileSenderTest {
 
     /**
      * Happy path for modified since
+     *
      * @throws Exception
      */
     @Test
     public void testIfModifiedSinceModifiedSince() throws Exception {
         Long time = new Date().getTime();
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .withFileName(fileName)
-                .with(responseWrapper)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length)
-                .withLastModified(time);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .withFileName(fileName)
+            .with(responseWrapper)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length)
+            .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(time - 100000);
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(-1L);
@@ -416,20 +426,21 @@ public class MultipartFileSenderTest {
 
     /**
      * If the If-Match doesn't match the ETAG then return 416 Status code
+     *
      * @throws Exception
      */
     @Test
     public void testIfMatchNoMatch() throws Exception {
         Long time = new Date().getTime();
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .withFileName(fileName)
-                .with(responseWrapper)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length)
-                .withLastModified(time);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .withFileName(fileName)
+            .with(responseWrapper)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length)
+            .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(-1L);
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(-1L);
@@ -442,20 +453,21 @@ public class MultipartFileSenderTest {
 
     /**
      * If matches then just return resource
+     *
      * @throws Exception
      */
     @Test
     public void testIfMatchMatch() throws Exception {
         Long time = new Date().getTime();
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .withFileName(fileName)
-                .with(responseWrapper)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length)
-                .withLastModified(time);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .withFileName(fileName)
+            .with(responseWrapper)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length)
+            .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(-1L);
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(-1L);
@@ -468,20 +480,21 @@ public class MultipartFileSenderTest {
 
     /**
      * If not modified since given date then return resource
+     *
      * @throws Exception
      */
     @Test
     public void testIfUnmodifiedSinceNotModifiedSince() throws Exception {
         Long time = new Date().getTime();
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .withFileName(fileName)
-                .with(responseWrapper)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length)
-                .withLastModified(time);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .withFileName(fileName)
+            .with(responseWrapper)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length)
+            .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(time + 100000);
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(-1L);
@@ -494,20 +507,21 @@ public class MultipartFileSenderTest {
 
     /**
      * If modified since given date then return 412
+     *
      * @throws Exception
      */
     @Test
     public void testIfUnmodifiedSinceModifiedSince() throws Exception {
         Long time = new Date().getTime();
         MultipartFileSender multipartFileSender = MultipartFileSender
-                .fromInputStream(is)
-                .with(requestWrapper)
-                .withFileName(fileName)
-                .with(responseWrapper)
-                .withChecksum(checksum)
-                .withMimetype(mimeType)
-                .withLength(length)
-                .withLastModified(time);
+            .fromInputStream(is)
+            .with(requestWrapper)
+            .withFileName(fileName)
+            .with(responseWrapper)
+            .withChecksum(checksum)
+            .withMimetype(mimeType)
+            .withLength(length)
+            .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(time - 100000);
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(-1L);
@@ -517,12 +531,6 @@ public class MultipartFileSenderTest {
         assertEquals(HttpServletResponse.SC_PRECONDITION_FAILED, responseWrapper.getStatusCode());
 
     }
-
-
-
-
-
-
 
 
 }

@@ -15,12 +15,12 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation allows to specify the direct linked REST entities
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target( {ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface LinksRest {
-	LinkRest[] links();
+    LinkRest[] links();
 }

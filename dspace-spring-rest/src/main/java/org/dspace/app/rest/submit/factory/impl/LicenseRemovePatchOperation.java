@@ -16,35 +16,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Submission License "remove" patch operation.
- * 
- * To remove a previous granted license:
- * 
- * Example: <code>
- * curl -X PATCH http://${dspace.url}/dspace-spring-rest/api/submission/workspaceitems/31599 -H "Content-Type: application/json" -d '[{ "op": "remove", "path": "/sections/license/granted"}]'
- * </code>
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * To remove a previous granted license:
+ *
+ * Example: <code>
+ * curl -X PATCH http://${dspace.url}/dspace-spring-rest/api/submission/workspaceitems/31599 -H "Content-Type:
+ * application/json" -d '[{ "op": "remove", "path": "/sections/license/granted"}]'
+ * </code>
+ *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class LicenseRemovePatchOperation extends RemovePatchOperation<String> {
 
-	@Autowired
-	ItemService itemService;
+    @Autowired
+    ItemService itemService;
 
-	@Override
-	void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
-			throws Exception {
-		Item item = source.getItem();
-		itemService.removeDSpaceLicense(context, item);
-	}
+    @Override
+    void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
+        throws Exception {
+        Item item = source.getItem();
+        itemService.removeDSpaceLicense(context, item);
+    }
 
-	@Override
-	protected Class<String[]> getArrayClassForEvaluation() {
-		return String[].class;
-	}
+    @Override
+    protected Class<String[]> getArrayClassForEvaluation() {
+        return String[].class;
+    }
 
-	@Override
-	protected Class<String> getClassForEvaluation() {
-		return String.class;
-	}
+    @Override
+    protected Class<String> getClassForEvaluation() {
+        return String.class;
+    }
 }

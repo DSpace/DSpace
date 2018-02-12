@@ -16,50 +16,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Submission "move" PATCH operation.
- * 
+ *
  * It is possible to rearrange the metadata values using the move operation. For
  * instance to put the 3rd author as 1st author you need to run:
- * 
+ *
  * <code>
  * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "move", "from": "
  * /sections/traditionalpageone/dc.contributor.author/2", "path": "
  * /sections/traditionalpageone/dc.contributor.author/0"}]'
  * </code>
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class ItemMetadataValueMovePatchOperation extends MetadataValueMovePatchOperation<Item> {
 
-	@Autowired
-	ItemService itemService;
+    @Autowired
+    ItemService itemService;
 
-	@Override
-	void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
-			throws Exception {
-		String[] splitTo = getAbsolutePath(path).split("/");
-		
-		String evalFrom = getAbsolutePath(from);
-		String[] splitFrom = evalFrom.split("/");
-		String metadata = splitFrom[0];
+    @Override
+    void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
+        throws Exception {
+        String[] splitTo = getAbsolutePath(path).split("/");
 
-		if (splitTo.length > 1) {
-			String stringTo = splitTo[1];
-			if(splitFrom.length > 1) {
-				String stringFrom = splitFrom[1];
-				
-				int intTo = Integer.parseInt(stringTo);
-				int intFrom = Integer.parseInt(stringFrom);
-				moveValue(context, source.getItem(), metadata, intFrom, intTo);
-			}
-		}
-		
-	}
+        String evalFrom = getAbsolutePath(from);
+        String[] splitFrom = evalFrom.split("/");
+        String metadata = splitFrom[0];
 
-	@Override
-	protected ItemService getDSpaceObjectService() {
-		return itemService;
-	}
+        if (splitTo.length > 1) {
+            String stringTo = splitTo[1];
+            if (splitFrom.length > 1) {
+                String stringFrom = splitFrom[1];
+
+                int intTo = Integer.parseInt(stringTo);
+                int intFrom = Integer.parseInt(stringFrom);
+                moveValue(context, source.getItem(), metadata, intFrom, intTo);
+            }
+        }
+
+    }
+
+    @Override
+    protected ItemService getDSpaceObjectService() {
+        return itemService;
+    }
 
 }

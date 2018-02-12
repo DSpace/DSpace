@@ -13,30 +13,31 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Factory to get an instance of PatchOperation
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class PatchOperationFactory {
-	
-	private PatchConfigurationService patchConfigurationService;
 
-	public PatchOperation instanceOf(String instance, String operation) {
-		PatchOperation result = getPatchConfigurationService().getMap().get(operation).get(instance);
-		if(result==null) {
-			throw new RuntimeException("Operation "+operation+" not yet implemented for " + instance);
-		}
-		return result;
-	}
+    private PatchConfigurationService patchConfigurationService;
 
-	public PatchConfigurationService getPatchConfigurationService() {
-		if(patchConfigurationService==null) {
-			patchConfigurationService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("patchConfigurationService", PatchConfigurationService.class);
-		}
-		return patchConfigurationService;
-	}
+    public PatchOperation instanceOf(String instance, String operation) {
+        PatchOperation result = getPatchConfigurationService().getMap().get(operation).get(instance);
+        if (result == null) {
+            throw new RuntimeException("Operation " + operation + " not yet implemented for " + instance);
+        }
+        return result;
+    }
 
-	public void setPatchConfigurationService(PatchConfigurationService patchOperationService) {
-		this.patchConfigurationService = patchOperationService;
-	}
+    public PatchConfigurationService getPatchConfigurationService() {
+        if (patchConfigurationService == null) {
+            patchConfigurationService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                                             .getServiceByName("patchConfigurationService",
+                                                                               PatchConfigurationService.class);
+        }
+        return patchConfigurationService;
+    }
+
+    public void setPatchConfigurationService(PatchConfigurationService patchOperationService) {
+        this.patchConfigurationService = patchOperationService;
+    }
 }

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
@@ -48,39 +47,39 @@ import org.springframework.web.bind.annotation.RestController;
  * https://<dspace.url>/dspace-spring-rest/api/core/bitstreams/26453b4d-e513-44e8-8d5b-395f62972eff/content
  * }
  * </pre>
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
- *
  */
 @RestController
 @RequestMapping("/api/" + BitstreamRest.CATEGORY + "/" + BitstreamRest.PLURAL_NAME
-		+ "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/content")
+    + "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/content")
 public class BitstreamContentRestController {
 
-	private static final Logger log = Logger.getLogger(BitstreamContentRestController.class);
+    private static final Logger log = Logger.getLogger(BitstreamContentRestController.class);
 
-	//Most file systems are configured to use block sizes of 4096 or 8192 and our buffer should be a multiple of that.
-	private static final int BUFFER_SIZE = 4096 * 10;
+    //Most file systems are configured to use block sizes of 4096 or 8192 and our buffer should be a multiple of that.
+    private static final int BUFFER_SIZE = 4096 * 10;
 
-	@Autowired
-	private BitstreamService bitstreamService;
+    @Autowired
+    private BitstreamService bitstreamService;
 
-	@Autowired
-	private EventService eventService;
+    @Autowired
+    private EventService eventService;
 
-	@Autowired
+    @Autowired
     private AuthorizeService authorizeService;
 
-	@Autowired
-	private CitationDocumentService citationDocumentService;
+    @Autowired
+    private CitationDocumentService citationDocumentService;
 
-	@RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
-	public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
-											 HttpServletRequest request) throws IOException, SQLException, AuthorizeException {
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
+    public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
+                         HttpServletRequest request) throws IOException, SQLException, AuthorizeException {
 
-		Context context = ContextUtil.obtainContext(request);
+
+        Context context = ContextUtil.obtainContext(request);
 
         Bitstream bit = getBitstream(context, uuid, response);
         if (bit == null) {
@@ -95,93 +94,96 @@ public class BitstreamContentRestController {
 
         Pair<InputStream, Long> bitstreamTuple = getBitstreamInputStreamAndSize(context, bit);
 
-		// Pipe the bits
-		try (InputStream is = bitstreamTuple.getLeft())
-		{
+        // Pipe the bits
+        try (InputStream is = bitstreamTuple.getLeft()) {
             MultipartFileSender sender = MultipartFileSender
-					.fromInputStream(is)
-					.withBufferSize(BUFFER_SIZE)
-					.withFileName(name)
-					.withLength(bitstreamTuple.getRight())
-					.withChecksum(bit.getChecksum())
-					.withMimetype(mimetype)
-					.withLastModified(lastModified)
-					.with(request)
-					.with(response);
+                    .fromInputStream(is)
+                    .withBufferSize(BUFFER_SIZE)
+                    .withFileName(name)
+                    .withLength(bitstreamTuple.getRight())
+                    .withChecksum(bit.getChecksum())
+                    .withMimetype(mimetype)
+                    .withLastModified(lastModified)
+                    .with(request)
+                    .with(response);
 
-			if (sender.isNoRangeRequest() && isNotAnErrorResponse(response)) {
-				//We only log a download request when serving a request without Range header. This is because
-				//a browser always sends a regular request first to check for Range support.
-				eventService.fireEvent(
-						new UsageEvent(
-								UsageEvent.Action.VIEW,
-								request,
-								context,
-								bit));
-			}
+            if (sender.isNoRangeRequest() && isNotAnErrorResponse(response)) {
+                //We only log a download request when serving a request without Range header. This is because
+                //a browser always sends a regular request first to check for Range support.
+                eventService.fireEvent(
+                        new UsageEvent(
+                                UsageEvent.Action.VIEW,
+                                request,
+                                context,
+                                bit));
+            }
 
-			//We have all the data we need, close the connection to the database so that it doesn't stay open during
-			//download/streaming
-			context.complete();
+            //We have all the data we need, close the connection to the database so that it doesn't stay open during
+            //download/streaming
+            context.complete();
 
-			//Send the data
-			if (sender.isValid()) {
-				sender.serveResource();
-			}
+            //Send the data
+            if (sender.isValid()) {
+                sender.serveResource();
+            }
 
-		} catch(ClientAbortException ex) {
-			log.debug("Client aborted the request before the download was completed. Client is probably switching to a Range request.", ex);
-		}
-	}
+        } catch (ClientAbortException ex) {
+            log.debug("Client aborted the request before the download was completed. " +
+                          "Client is probably switching to a Range request.", ex);
+        }
+    }
 
-	private Pair<InputStream, Long> getBitstreamInputStreamAndSize(Context context, Bitstream bit) throws SQLException, IOException, AuthorizeException {
+    private Pair<InputStream, Long> getBitstreamInputStreamAndSize(Context context, Bitstream bit)
+        throws SQLException, IOException, AuthorizeException {
 
-		if (citationDocumentService.isCitationEnabledForBitstream(bit, context)) {
-			return generateBitstreamWithCitation(context, bit);
-		} else {
-			return Pair.of(bitstreamService.retrieve(context, bit),bit.getSize());
-		}
-	}
+        if (citationDocumentService.isCitationEnabledForBitstream(bit, context)) {
+            return generateBitstreamWithCitation(context, bit);
+        } else {
+            return Pair.of(bitstreamService.retrieve(context, bit),bit.getSize());
+        }
+    }
 
-	private Pair<InputStream, Long> generateBitstreamWithCitation(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException {
-		//Create the cited document
-		Pair<InputStream, Long> citationDocument = citationDocumentService.makeCitedDocument(context, bitstream);
-		if (citationDocument.getLeft() == null) {
-			log.error("CitedDocument was null");
-		} else {
-			if (log.isDebugEnabled()) {
-				log.debug("CitedDocument was ok, has size " + citationDocument.getRight());
-			}
-		}
-		return citationDocument;
-	}
+    private Pair<InputStream, Long> generateBitstreamWithCitation(Context context, Bitstream bitstream)
+        throws SQLException, IOException, AuthorizeException {
+        //Create the cited document
+        Pair<InputStream, Long> citationDocument = citationDocumentService.makeCitedDocument(context, bitstream);
+        if (citationDocument.getLeft() == null) {
+            log.error("CitedDocument was null");
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("CitedDocument was ok, has size " + citationDocument.getRight());
+            }
+        }
+        return citationDocument;
+    }
 
-	private String getBitstreamName(Bitstream bit, BitstreamFormat format) {
-		String name = bit.getName();
-		if (name == null) {
-			// give a default name to the file based on the UUID and the primary extension of the format
-			name = bit.getID().toString();
-			if (format != null && format.getExtensions() != null && format.getExtensions().size() > 0) {
-				name += "." + format.getExtensions().get(0);
-			}
-		}
-		return name;
-	}
+    private String getBitstreamName(Bitstream bit, BitstreamFormat format) {
+        String name = bit.getName();
+        if (name == null) {
+            // give a default name to the file based on the UUID and the primary extension of the format
+            name = bit.getID().toString();
+            if (format != null && format.getExtensions() != null && format.getExtensions().size() > 0) {
+                name += "." + format.getExtensions().get(0);
+            }
+        }
+        return name;
+    }
 
-    private Bitstream getBitstream(Context context, @PathVariable UUID uuid, HttpServletResponse response) throws SQLException, IOException, AuthorizeException {
+    private Bitstream getBitstream(Context context, @PathVariable UUID uuid, HttpServletResponse response)
+        throws SQLException, IOException, AuthorizeException {
         Bitstream bit = bitstreamService.find(context, uuid);
         if (bit == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
-			authorizeService.authorizeAction(context, bit, Constants.READ);
+            authorizeService.authorizeAction(context, bit, Constants.READ);
         }
 
         return bit;
     }
 
-	private boolean isNotAnErrorResponse(HttpServletResponse response) {
-		Response.Status.Family responseCode = Response.Status.Family.familyOf(response.getStatus());
-		return responseCode.equals(Response.Status.Family.SUCCESSFUL)
-				|| responseCode.equals(Response.Status.Family.REDIRECTION);
-	}
+    private boolean isNotAnErrorResponse(HttpServletResponse response) {
+        Response.Status.Family responseCode = Response.Status.Family.familyOf(response.getStatus());
+        return responseCode.equals(Response.Status.Family.SUCCESSFUL)
+            || responseCode.equals(Response.Status.Family.REDIRECTION);
+    }
 }

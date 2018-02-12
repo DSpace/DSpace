@@ -7,73 +7,71 @@
  */
 package org.dspace.app.rest.model;
 
-import org.dspace.app.rest.RestResourceController;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * The MetadataField REST Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class MetadataFieldRest extends BaseObjectRest<Integer> {
-	public static final String NAME = "metadatafield";
-	public static final String CATEGORY = RestAddressableModel.CORE;
-	
-	@JsonIgnore
-	private MetadataSchemaRest schema;
-	
-	private String element;
+    public static final String NAME = "metadatafield";
+    public static final String CATEGORY = RestAddressableModel.CORE;
 
-	private String qualifier;
+    @JsonIgnore
+    private MetadataSchemaRest schema;
 
-	private String scopeNote;
+    private String element;
 
-	public MetadataSchemaRest getSchema() {
-		return schema;
-	}
-	
-	public void setSchema(MetadataSchemaRest schema) {
-		this.schema = schema;
-	}
-	
-	public String getElement() {
-		return element;
-	}
+    private String qualifier;
 
-	public void setElement(String element) {
-		this.element = element;
-	}
+    private String scopeNote;
 
-	public String getQualifier() {
-		return qualifier;
-	}
+    public MetadataSchemaRest getSchema() {
+        return schema;
+    }
 
-	public void setQualifier(String qualifier) {
-		this.qualifier = qualifier;
-	}
+    public void setSchema(MetadataSchemaRest schema) {
+        this.schema = schema;
+    }
 
-	public String getScopeNote() {
-		return scopeNote;
-	}
+    public String getElement() {
+        return element;
+    }
 
-	public void setScopeNote(String scopeNote) {
-		this.scopeNote = scopeNote;
-	}
+    public void setElement(String element) {
+        this.element = element;
+    }
 
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    public String getQualifier() {
+        return qualifier;
+    }
 
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
+    public void setQualifier(String qualifier) {
+        this.qualifier = qualifier;
+    }
 
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
+    public String getScopeNote() {
+        return scopeNote;
+    }
+
+    public void setScopeNote(String scopeNote) {
+        this.scopeNote = scopeNote;
+    }
+
+    @Override
+    public String getType() {
+        return NAME;
+    }
+
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
+
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
 }

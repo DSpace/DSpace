@@ -45,7 +45,7 @@ public class SearchResultEntryRest implements RestAddressableModel {
     }
 
     public void addHitHighlights(String key, List<String> value) {
-        if(hitHighlights == null) {
+        if (hitHighlights == null) {
             hitHighlights = new HashMap<>();
         }
         hitHighlights.put(key, value);

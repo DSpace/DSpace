@@ -7,19 +7,19 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.sql.SQLException;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 
-import java.sql.SQLException;
-
 public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
 
     private EPerson ePerson;
 
-    protected EPersonBuilder(Context context){
+    protected EPersonBuilder(Context context) {
         super(context);
     }
 
@@ -45,10 +45,11 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return ePerson;
     }
 
-    public static EPersonBuilder createEPerson(Context context){
+    public static EPersonBuilder createEPerson(Context context) {
         EPersonBuilder ePersonBuilder = new EPersonBuilder(context);
         return ePersonBuilder.create();
     }
+
     private EPersonBuilder create() {
         try {
             ePerson = ePersonService.create(context);

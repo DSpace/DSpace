@@ -13,17 +13,18 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * This is the exception to capture details about call to a methods not
  * exposed or not implemented by the repository
- * 	
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-@ResponseStatus(value = HttpStatus.METHOD_NOT_ALLOWED, reason = "This repository doesn't provide or implement the requested method")
+@ResponseStatus(value = HttpStatus.METHOD_NOT_ALLOWED, reason = "This repository doesn't provide or implement the " +
+    "requested method")
 public class RepositoryMethodNotImplementedException extends RuntimeException {
-	String model;
-	String method;
-	public RepositoryMethodNotImplementedException(String model, String method) {
-		this.model = model;
-		this.method = method;
-	}
+    String model;
+    String method;
+
+    public RepositoryMethodNotImplementedException(String model, String method) {
+        this.model = model;
+        this.method = method;
+    }
 
 }

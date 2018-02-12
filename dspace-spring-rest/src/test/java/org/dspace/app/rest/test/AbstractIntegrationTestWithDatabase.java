@@ -32,7 +32,9 @@ import org.junit.BeforeClass;
  * Abstract Test class that will initialize the in-memory database
  */
 public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrationTest {
-    /** log4j category */
+    /**
+     * log4j category
+     */
     private static final Logger log = Logger.getLogger(AbstractIntegrationTestWithDatabase.class);
 
     /**
@@ -66,23 +68,19 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * initializes the in-memory database for tests that need it.
      */
     @BeforeClass
-    public static void initDatabase()
-    {
+    public static void initDatabase() {
         // Clear our old flyway object. Because this DB is in-memory, its
         // data is lost when the last connection is closed. So, we need
         // to (re)start Flyway from scratch for each Unit Test class.
         DatabaseUtils.clearFlywayDBCache();
 
-        try
-        {
+        try {
             // Update/Initialize the database to latest version (via Flyway)
             DatabaseUtils.updateDatabase();
-        }
-        catch(SQLException se)
-        {
+        } catch (SQLException se) {
             log.error("Error initializing database", se);
             fail("Error initializing database: " + se.getMessage()
-                    + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
+                     + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
         }
     }
 
@@ -95,8 +93,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      */
     @Before
     public void setUp() throws Exception {
-        try
-        {
+        try {
             //Start a new context
             context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
@@ -104,8 +101,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             //Find our global test EPerson account. If it doesn't exist, create it.
             EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
             eperson = ePersonService.findByEmail(context, "test@email.com");
-            if(eperson == null)
-            {
+            if (eperson == null) {
                 // This EPerson creation should only happen once (i.e. for first test run)
                 log.info("Creating initial EPerson (email=test@email.com) for Unit Tests");
                 eperson = ePersonService.create(context);
@@ -125,15 +121,11 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             EPersonServiceFactory.getInstance().getGroupService().initDefaultGroupNames(context);
 
             context.restoreAuthSystemState();
-        }
-        catch (AuthorizeException ex)
-        {
+        } catch (AuthorizeException ex) {
             log.error("Error creating initial eperson or default groups", ex);
             fail("Error creating initial eperson or default groups in AbstractUnitTest init()");
-        }
-        catch (SQLException ex)
-        {
-            log.error(ex.getMessage(),ex);
+        } catch (SQLException ex) {
+            log.error(ex.getMessage(), ex);
             fail("SQL Error on AbstractUnitTest init()");
         }
     }
@@ -150,13 +142,13 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         // Cleanup our global context object
         try {
             AbstractBuilder.cleanupObjects();
-            if(context == null || !context.isValid()){
+            if (context == null || !context.isValid()) {
                 context = new Context();
             }
             eperson = context.reloadEntity(eperson);
 
             context.turnOffAuthorisationSystem();
-            if(eperson != null) {
+            if (eperson != null) {
                 EPersonServiceFactory.getInstance().getEPersonService().delete(context, eperson);
             }
 
@@ -168,17 +160,17 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     }
 
     /**
-     *  Utility method to cleanup a created Context object (to save memory).
-     *  This can also be used by individual tests to cleanup context objects they create.
+     * Utility method to cleanup a created Context object (to save memory).
+     * This can also be used by individual tests to cleanup context objects they create.
      */
     protected void cleanupContext() throws SQLException {
         // If context still valid, flush all database changes and close it
-        if(context != null && context.isValid()) {
+        if (context != null && context.isValid()) {
             context.complete();
         }
 
         // Cleanup Context object by setting it to null
-        if(context !=null) {
+        if (context != null) {
             context = null;
         }
     }
@@ -190,8 +182,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             Document commandConfigs = ScriptLauncher.getConfig(kernelImpl);
 
             // Check that there is at least one argument (if not display command options)
-            if (args.length < 1)
-            {
+            if (args.length < 1) {
                 log.error("You must provide at least one command argument");
             }
 
@@ -199,15 +190,15 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             ScriptLauncher.runOneCommand(commandConfigs, args, kernelImpl);
 
 
-        } catch(ExitException e){
+        } catch (ExitException e) {
             status = e.getStatus();
         }
 
-        if(status != 0){
+        if (status != 0) {
             log.error("Failed to run script " + Arrays.toString(args));
         }
 
-        if(!context.isValid()){
+        if (!context.isValid()) {
             setUp();
         }
     }

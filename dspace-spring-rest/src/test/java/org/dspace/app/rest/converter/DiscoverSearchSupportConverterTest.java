@@ -23,17 +23,17 @@ public class DiscoverSearchSupportConverterTest {
     DiscoverSearchSupportConverter discoverSearchSupportConverter;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         discoverSearchSupportConverter = new DiscoverSearchSupportConverter();
     }
 
     @Test
-    public void testReturnIsCorrectClass() throws Exception{
+    public void testReturnIsCorrectClass() throws Exception {
         assertEquals(discoverSearchSupportConverter.convert().getClass(), SearchSupportRest.class);
     }
 
     @Test
-    public void testReturnIsNotNull() throws Exception{
+    public void testReturnIsNotNull() throws Exception {
         assertNotNull(discoverSearchSupportConverter.convert());
     }
 }

@@ -13,25 +13,23 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 /**
- * 
- * Java Bean to expose the section upload during in progress submission. 
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * Java Bean to expose the section upload during in progress submission.
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class DataUpload implements SectionData {
-	
-	@JsonUnwrapped
-	private List<UploadBitstreamRest> files;
 
-	public List<UploadBitstreamRest> getFiles() {
-		if(files==null) {
-			files = new ArrayList<UploadBitstreamRest>();
-		}
-		return files;
-	}
+    @JsonUnwrapped
+    private List<UploadBitstreamRest> files;
 
-	public void setFiles(List<UploadBitstreamRest> files) {
-		this.files = files;
-	}
+    public List<UploadBitstreamRest> getFiles() {
+        if (files == null) {
+            files = new ArrayList<UploadBitstreamRest>();
+        }
+        return files;
+    }
+
+    public void setFiles(List<UploadBitstreamRest> files) {
+        this.files = files;
+    }
 }

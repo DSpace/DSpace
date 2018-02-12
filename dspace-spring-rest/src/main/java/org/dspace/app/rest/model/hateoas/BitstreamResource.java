@@ -14,14 +14,13 @@ import org.dspace.app.rest.utils.Utils;
 /**
  * Bitstream Rest HAL Resource. The HAL Resource wraps the REST Resource
  * adding support for the links and embedded resources
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @RelNameDSpaceResource(BitstreamRest.NAME)
 public class BitstreamResource extends DSpaceResource<BitstreamRest> {
-	public BitstreamResource(BitstreamRest bs, Utils utils, String... rels) {
-		super(bs, utils, rels);
-		add(utils.linkToSubResource(bs, "content"));
-	}
+    public BitstreamResource(BitstreamRest bs, Utils utils, String... rels) {
+        super(bs, utils, rels);
+        add(utils.linkToSubResource(bs, "content"));
+    }
 }

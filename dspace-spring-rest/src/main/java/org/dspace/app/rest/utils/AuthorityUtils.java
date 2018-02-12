@@ -19,68 +19,67 @@ import org.springframework.stereotype.Component;
 
 /**
  * Utility methods to expose the authority framework over REST
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
- * 
  */
 @Component
 public class AuthorityUtils {
 
-	public static final String PRESENTATION_TYPE_LOOKUP = "lookup";
+    public static final String PRESENTATION_TYPE_LOOKUP = "lookup";
 
-	public static final String PRESENTATION_TYPE_SUGGEST = "suggest";
+    public static final String PRESENTATION_TYPE_SUGGEST = "suggest";
 
-	public static final String RESERVED_KEYMAP_PARENT = "parent";
+    public static final String RESERVED_KEYMAP_PARENT = "parent";
 
-	@Autowired
-	private ChoiceAuthorityService cas;
-	
-	@Autowired
-	private AuthorityEntryRestConverter entryConverter;
-	
-	@Autowired
-	private AuthorityRestConverter authorityConverter;
-	
-	
-	public boolean isChoice(String schema, String element, String qualifier) {		
-		return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"));
-	}
+    @Autowired
+    private ChoiceAuthorityService cas;
 
-	public String getAuthorityName(String schema, String element, String qualifier) {
-		return cas.getChoiceAuthorityName(schema, element, qualifier);
-	}
+    @Autowired
+    private AuthorityEntryRestConverter entryConverter;
 
-	public boolean isClosed(String schema, String element, String qualifier) {
-		return cas.isClosed(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"));
-	}
+    @Autowired
+    private AuthorityRestConverter authorityConverter;
 
-	public String getPresentation(String schema, String element, String qualifier) {		
-		return cas.getPresentation(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"));
-	}
-	
-	/**
-	 * TODO the authorityName MUST be a part of Choice model
-	 * 
-	 * @param choice
-	 * @param authorityName
-	 * @return
-	 */
-	public AuthorityEntryRest convertEntry(Choice choice, String authorityName) {
-		AuthorityEntryRest entry = entryConverter.convert(choice);
-		entry.setAuthorityName(authorityName);		
-		return entry;
-	}
-	
-	/**
-	 * TODO the authorityName MUST be a part of ChoiceAuthority model
-	 * 
-	 * @param source
-	 * @param name
-	 * @return
-	 */
-	public AuthorityRest convertAuthority(ChoiceAuthority source, String authorityName) {
-		AuthorityRest result = authorityConverter.convert(source);
-		result.setName(authorityName);
-		return result;
-	}
+
+    public boolean isChoice(String schema, String element, String qualifier) {
+        return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"));
+    }
+
+    public String getAuthorityName(String schema, String element, String qualifier) {
+        return cas.getChoiceAuthorityName(schema, element, qualifier);
+    }
+
+    public boolean isClosed(String schema, String element, String qualifier) {
+        return cas.isClosed(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"));
+    }
+
+    public String getPresentation(String schema, String element, String qualifier) {
+        return cas.getPresentation(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"));
+    }
+
+    /**
+     * TODO the authorityName MUST be a part of Choice model
+     *
+     * @param choice
+     * @param authorityName
+     * @return
+     */
+    public AuthorityEntryRest convertEntry(Choice choice, String authorityName) {
+        AuthorityEntryRest entry = entryConverter.convert(choice);
+        entry.setAuthorityName(authorityName);
+        return entry;
+    }
+
+    /**
+     * TODO the authorityName MUST be a part of ChoiceAuthority model
+     *
+     * @param source
+     * @param name
+     * @return
+     */
+    public AuthorityRest convertAuthority(ChoiceAuthority source, String authorityName) {
+        AuthorityRest result = authorityConverter.convert(source);
+        result.setName(authorityName);
+        return result;
+    }
 }

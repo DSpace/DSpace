@@ -7,6 +7,14 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.dspace.app.rest.builder.BitstreamFormatBuilder;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -14,10 +22,6 @@ import org.dspace.content.BitstreamFormat;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * @author Jonas Van Goolen - (jonas@atmire.com)
@@ -28,11 +32,11 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     @Test
     public void findAllPaginationTest() throws Exception {
         getClient().perform(get("/api/core/bitstreamformats"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats")))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats")))
         ;
     }
 
@@ -40,15 +44,15 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     @Ignore
     public void unknownFormatRequiredByDefault() throws Exception {
         getClient().perform(get("/api/core/bitstreamformats"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(1)))
-                .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats")))
-                .andExpect(jsonPath("$._embedded.bitstreamformats", Matchers.is(
-                        BitstreamFormatMatcher.matchBitstreamFormatMimeType("Unknown")
-                )));
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats")))
+                   .andExpect(jsonPath("$._embedded.bitstreamformats", Matchers.is(
+                       BitstreamFormatMatcher.matchBitstreamFormatMimeType("Unknown")
+                   )));
     }
 
     @Test
@@ -56,16 +60,17 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     public void findAllMimeTypeCheck() throws Exception {
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
-                .withMimeType("application/octet-stream")
-                .withDescription("Description")
-                .build();
+                                                                .withMimeType("application/octet-stream")
+                                                                .withDescription("Description")
+                                                                .build();
         getClient().perform(get("/api/core/bitstreamformats"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.page.totalElements", is(2)))
-                .andExpect(jsonPath("$._embedded.bitstreamformats", Matchers.contains(
-                        BitstreamFormatMatcher.matchBitstreamFormat(bitstreamFormat.getMIMEType(), bitstreamFormat.getDescription())
-                )))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$._embedded.bitstreamformats", Matchers.contains(
+                       BitstreamFormatMatcher
+                           .matchBitstreamFormat(bitstreamFormat.getMIMEType(), bitstreamFormat.getDescription())
+                   )))
         ;
 
     }
@@ -75,18 +80,19 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     public void findOne() throws Exception {
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
-                .withMimeType("application/octet-stream")
-                .withDescription("Description")
-                .build();
+                                                                .withMimeType("application/octet-stream")
+                                                                .withDescription("Description")
+                                                                .build();
 
         getClient().perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.description", is(bitstreamFormat.getDescription())))
-                .andExpect(jsonPath("$.mimetype", is(bitstreamFormat.getMIMEType())))
-                .andExpect(jsonPath("$.type", is("bitstreamformat")))
-                .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats/"+bitstreamFormat.getID())))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.description", is(bitstreamFormat.getDescription())))
+                   .andExpect(jsonPath("$.mimetype", is(bitstreamFormat.getMIMEType())))
+                   .andExpect(jsonPath("$.type", is("bitstreamformat")))
+                   .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       endsWith("/api/core/bitstreamformats/" + bitstreamFormat.getID())))
         ;
     }
 }

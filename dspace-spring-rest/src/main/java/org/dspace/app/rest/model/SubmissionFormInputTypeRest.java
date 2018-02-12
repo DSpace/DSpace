@@ -14,37 +14,36 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 /**
  * The InputFormField REST Resource. It is not addressable directly, only used
  * as inline object in the InputForm resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @JsonInclude(value = Include.NON_NULL)
 public class SubmissionFormInputTypeRest {
-	private String type;
-	private String regex;
-	private AuthorityRest authority;
+    private String type;
+    private String regex;
+    private AuthorityRest authority;
 
-	public String getType() {
-		return type;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public String getRegex() {
-		return regex;
-	}
+    public String getRegex() {
+        return regex;
+    }
 
-	public void setRegex(String regex) {
-		this.regex = regex;
-	}
+    public void setRegex(String regex) {
+        this.regex = regex;
+    }
 
-	public AuthorityRest getAuthority() {
-		return authority;
-	}
+    public AuthorityRest getAuthority() {
+        return authority;
+    }
 
-	public void setAuthority(AuthorityRest authority) {
-		this.authority = authority;
-	}
+    public void setAuthority(AuthorityRest authority) {
+        this.authority = authority;
+    }
 }

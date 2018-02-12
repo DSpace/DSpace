@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -32,78 +31,77 @@ import org.springframework.stereotype.Component;
 /**
  * This is the converter from/to the Collection in the DSpace API data model and
  * the REST data model
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
 public class CollectionConverter
-		extends DSpaceObjectConverter<org.dspace.content.Collection, org.dspace.app.rest.model.CollectionRest> {
-	
-	private static final Logger log = Logger.getLogger(CollectionConverter.class);
-	
-	@Autowired
-	private BitstreamConverter bitstreamConverter;
-	@Autowired
-	private CollectionService collectionService;
-	@Autowired
-	private RequestService requestService;
-	@Autowired
-	private AuthorizeService authorizeService;
-	@Autowired
-	private ResourcePolicyConverter resourcePolicyConverter;
+    extends DSpaceObjectConverter<org.dspace.content.Collection, org.dspace.app.rest.model.CollectionRest> {
 
-	@Override
-	public org.dspace.content.Collection toModel(org.dspace.app.rest.model.CollectionRest obj) {
-		return (org.dspace.content.Collection) super.toModel(obj);
-	}
+    private static final Logger log = Logger.getLogger(CollectionConverter.class);
 
-	@Override
-	public CollectionRest fromModel(org.dspace.content.Collection obj) {
-		CollectionRest col = (CollectionRest) super.fromModel(obj);
-		Bitstream logo = obj.getLogo();
-		if (logo != null) {
-			col.setLogo(bitstreamConverter.convert(logo));
-		}
+    @Autowired
+    private BitstreamConverter bitstreamConverter;
+    @Autowired
+    private CollectionService collectionService;
+    @Autowired
+    private RequestService requestService;
+    @Autowired
+    private AuthorizeService authorizeService;
+    @Autowired
+    private ResourcePolicyConverter resourcePolicyConverter;
 
-		col.setDefaultAccessConditions(getDefaultBitstreamPoliciesForCollection(obj.getID()));
+    @Override
+    public org.dspace.content.Collection toModel(org.dspace.app.rest.model.CollectionRest obj) {
+        return (org.dspace.content.Collection) super.toModel(obj);
+    }
 
-		return col;
-	}
+    @Override
+    public CollectionRest fromModel(org.dspace.content.Collection obj) {
+        CollectionRest col = (CollectionRest) super.fromModel(obj);
+        Bitstream logo = obj.getLogo();
+        if (logo != null) {
+            col.setLogo(bitstreamConverter.convert(logo));
+        }
 
-	private List<ResourcePolicyRest> getDefaultBitstreamPoliciesForCollection(UUID uuid) {
+        col.setDefaultAccessConditions(getDefaultBitstreamPoliciesForCollection(obj.getID()));
 
-		HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-		Context context = null;
-		Collection collection = null;
-		List<ResourcePolicy> defaultCollectionPolicies = null;
-		try {
-			context = ContextUtil.obtainContext(request);
-			collection = collectionService.find(context, uuid);
-			defaultCollectionPolicies = authorizeService.getPoliciesActionFilter(context, collection,
-					Constants.DEFAULT_BITSTREAM_READ);
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-		}
+        return col;
+    }
 
-		List<ResourcePolicyRest> results = new ArrayList<ResourcePolicyRest>();
+    private List<ResourcePolicyRest> getDefaultBitstreamPoliciesForCollection(UUID uuid) {
 
-		for (ResourcePolicy pp : defaultCollectionPolicies) {
-			ResourcePolicyRest accessCondition = resourcePolicyConverter.convert(pp);
-			if (accessCondition != null) {
-				results.add(accessCondition);
-			}
-		}
-		return results;
-	}
+        HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
+        Context context = null;
+        Collection collection = null;
+        List<ResourcePolicy> defaultCollectionPolicies = null;
+        try {
+            context = ContextUtil.obtainContext(request);
+            collection = collectionService.find(context, uuid);
+            defaultCollectionPolicies = authorizeService.getPoliciesActionFilter(context, collection,
+                                                                                 Constants.DEFAULT_BITSTREAM_READ);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
 
-	@Override
-	protected CollectionRest newInstance() {
-		return new CollectionRest();
-	}
+        List<ResourcePolicyRest> results = new ArrayList<ResourcePolicyRest>();
 
-	@Override
-	protected Class<org.dspace.content.Collection> getModelClass() {
-		return org.dspace.content.Collection.class;
-	}
+        for (ResourcePolicy pp : defaultCollectionPolicies) {
+            ResourcePolicyRest accessCondition = resourcePolicyConverter.convert(pp);
+            if (accessCondition != null) {
+                results.add(accessCondition);
+            }
+        }
+        return results;
+    }
+
+    @Override
+    protected CollectionRest newInstance() {
+        return new CollectionRest();
+    }
+
+    @Override
+    protected Class<org.dspace.content.Collection> getModelClass() {
+        return org.dspace.content.Collection.class;
+    }
 }

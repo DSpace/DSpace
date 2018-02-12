@@ -37,13 +37,13 @@ public class DSpaceAuthentication implements Authentication {
         this.authorities = authorities;
     }
 
-    public DSpaceAuthentication (String username, String password, List<GrantedAuthority> authorities) {
+    public DSpaceAuthentication(String username, String password, List<GrantedAuthority> authorities) {
         this.username = username;
         this.password = password;
         this.authorities = authorities;
     }
 
-    public DSpaceAuthentication (String username, List<GrantedAuthority> authorities) {
+    public DSpaceAuthentication(String username, List<GrantedAuthority> authorities) {
         this(username, null, authorities);
     }
 
