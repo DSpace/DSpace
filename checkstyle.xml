@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE module PUBLIC
-        "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
-        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+        "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://checkstyle.sourceforge.net/dtds/configuration_1_3.dtd">
 <!--
 DSpace CodeStyle Requirements
 
   1. 4-space indents for Java, and 2-space indents for XML. NO TABS ALLOWED.
-     (Only exception is throws clause, which should be indented 8 spaces if on a new line)
   2. K&R style braces required. Braces required on all blocks.
   3. Do not use wildcard imports (e.g. import java.util.*). Duplicated or unused imports also not allowed.
-  4. Javadocs required for all public classes and methods. Keep it short and to the point
-  5. Maximum line length is 120 characters
+  4. Javadocs should exist for all public classes and methods. (Methods rule is unenforced at this time.) Keep it short and to the point
+  5. Maximum line length is 120 characters (except for long URLs, packages or imports)
   6. No trailing spaces allowed (except in comments)
   7. Tokens should be surrounded by whitespace (see http://checkstyle.sourceforge.net/config_whitespace.html#WhitespaceAround)
   8. Each source file must include our license header (validated separately by license-maven-plugin, see pom.xml)
@@ -49,7 +48,7 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
             <property name="ignorePattern" value="^package.*|^import.*|http://|https://"/>
         </module>
 
-        <!-- Check for and report back any TODO or FIXME comments as info messages -->
+        <!-- Highlight any TODO or FIXME comments in info messages -->
         <module name="TodoComment">
             <property name="severity" value="info"/>
             <property name="format" value="(TODO)|(FIXME)"/>
