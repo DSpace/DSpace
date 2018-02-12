@@ -18,7 +18,7 @@ public class SearchResultMatcher {
     public static Matcher<? super Object> match(String type, String typePlural) {
         return allOf(
                 hasJsonPath("$.type", is("discover")),
-                hasJsonPath("$._links.dspaceObject.href", containsString("/api/core/"+typePlural)),
+                hasJsonPath("$._links.c:dspaceObject.href", containsString("/api/core/"+typePlural)),
                 hasJsonPath("$._embedded", notNullValue()),
                 hasJsonPath("$._embedded.dspaceObject", is(
                     matchEmbeddedObject(type)
@@ -42,7 +42,7 @@ public class SearchResultMatcher {
     public static Matcher<? super Object> matchOnItemName(String type, String typePlural, String itemName) {
         return allOf(
                 hasJsonPath("$.type", is("discover")),
-                hasJsonPath("$._links.dspaceObject.href", containsString("/api/core/"+typePlural)),
+                hasJsonPath("$._links.c:dspaceObject.href", containsString("/api/core/"+typePlural)),
                 hasJsonPath("$._embedded", notNullValue()),
                 hasJsonPath("$._embedded.dspaceObject", is(
                         matchEmbeddedObjectOnItemName(type, itemName)
@@ -63,7 +63,7 @@ public class SearchResultMatcher {
                 hasJsonPath("$.type", is("discover")),
                 hasJsonPath("$.hitHighlights", is(
                         HitHighlightMatcher.entry(hitHighlightQuery, expectedFieldInHitHighlightning))),
-                hasJsonPath("$._links.dspaceObject.href", containsString("/api/core/"+typePlural)),
+                hasJsonPath("$._links.c:dspaceObject.href", containsString("/api/core/"+typePlural)),
                 hasJsonPath("$._embedded", notNullValue()),
                 hasJsonPath("$._embedded.dspaceObject", is(
                         matchEmbeddedObjectOnItemName(type, itemName)

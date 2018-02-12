@@ -52,7 +52,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.headers().cacheControl();
+        http.headers()
+                .frameOptions().sameOrigin()
+                .cacheControl();
         http
                 //Tell Spring to not create Sessions
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()

@@ -63,10 +63,10 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$.page.number", is(0)))
 
                 //The array of browse index should have a size 4
-                .andExpect(jsonPath("$._embedded.d:browses", hasSize(4)))
+                .andExpect(jsonPath("$._embedded.browse:browses", hasSize(4)))
 
                 //Check that all (and only) the default browse indexes are present
-                .andExpect(jsonPath("$._embedded.d:browses", containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.browse:browses", containsInAnyOrder(
                         BrowseIndexMatcher.dateIssuedBrowseIndex("asc"),
                         BrowseIndexMatcher.contributorBrowseIndex("asc"),
                         BrowseIndexMatcher.titleBrowseIndex("asc"),
@@ -184,7 +184,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 //Check the embedded resources and that they're sorted alphabetically
                 //Check that the subject matches as expected
                 //Verify that they're sorted alphabetically
-                .andExpect(jsonPath("$._embedded.d:browseEntries", contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1),
+                .andExpect(jsonPath("$._embedded.browseEntry:browseEntries", contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1),
                         BrowseEntryResourceMatcher.matchBrowseEntry( "ExtraEntry", 3),
                         BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2)
                         )));
@@ -204,7 +204,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 //Check the embedded resources and that they're sorted alphabetically
                 //Check that the subject matches as expected
                 //Verify that they're sorted alphabetically
-                .andExpect(jsonPath("$._embedded.d:browseEntries", contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2),
+                .andExpect(jsonPath("$._embedded.browseEntry:browseEntries", contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2),
                         BrowseEntryResourceMatcher.matchBrowseEntry( "ExtraEntry", 3),
                         BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1)
                         )));

@@ -40,7 +40,7 @@ public class CollectionMatcher {
 
     private static Matcher<? super Object> matchLinks(UUID uuid){
         return allOf(
-                hasJsonPath("$._links.logo.href", containsString("api/core/collections/" + uuid.toString() + "/logo")),
+                hasJsonPath("$._links.c:logo.href", containsString("api/core/collections/" + uuid.toString() + "/logo")),
                 hasJsonPath("$._links.self.href", containsString("api/core/collections/" + uuid.toString()))
         );
     }
@@ -48,10 +48,10 @@ public class CollectionMatcher {
     private static Matcher<? super Object> matchLogo(Bitstream logo) {
         return logo == null ?
                 allOf(
-                    hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty()))
+                    hasJsonPath("$._embedded.core:logo", Matchers.not(Matchers.empty()))
                 ) :
                 allOf(
-                    hasJsonPath("$._embedded.logo", BitstreamMatcher.matchBitstreamEntry(logo.getID(), logo.getSize()))
+                    hasJsonPath("$._embedded.core:logo", BitstreamMatcher.matchBitstreamEntry(logo.getID(), logo.getSize()))
                 );
     }
 

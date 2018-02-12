@@ -33,7 +33,7 @@ public class RootControllerDocumentation extends AbstractDocumentationTest {
     @Test
     public void listDefinedEndpoint() throws Exception {
         //When we call the root endpoint
-        getClient().perform(get("/api"))
+        getClient(this.getRestDocumentation()).perform(get("/api"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
 

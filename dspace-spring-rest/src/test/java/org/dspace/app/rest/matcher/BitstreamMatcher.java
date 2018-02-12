@@ -29,7 +29,7 @@ public class BitstreamMatcher {
                 )),
                 hasJsonPath("$.sizeBytes", is((int) bitstream.getSize())),
                 hasJsonPath("$.checkSum", matchChecksum()),
-                hasJsonPath("$._embedded.format", matchFormat()),
+                hasJsonPath("$._embedded.core:format", matchFormat()),
                 //Check links
                 matchBitstreamLinks(bitstream.getID())
         );
@@ -43,7 +43,7 @@ public class BitstreamMatcher {
                 //Make sure we have a checksum
                 hasJsonPath("$.checkSum", matchChecksum()),
                 //Make sure we have a valid format
-                hasJsonPath("$._embedded.format", matchFormat()),
+                hasJsonPath("$._embedded.core:format", matchFormat()),
                 //Check links
                 matchBitstreamLinks(uuid)
         );
@@ -51,9 +51,9 @@ public class BitstreamMatcher {
 
     private static Matcher<? super Object> matchBitstreamLinks(UUID uuid) {
         return allOf(
-                hasJsonPath("$._links.format.href", containsString("/api/core/bitstreams/" + uuid + "/format")),
+                hasJsonPath("$._links.c:format.href", containsString("/api/core/bitstreams/" + uuid + "/format")),
                 hasJsonPath("$._links.self.href", containsString("/api/core/bitstreams/"+uuid)),
-                hasJsonPath("$._links.content.href", containsString("/api/core/bitstreams/"+uuid+"/content"))
+                hasJsonPath("$._links.c:content.href", containsString("/api/core/bitstreams/"+uuid+"/content"))
         );
     }
 

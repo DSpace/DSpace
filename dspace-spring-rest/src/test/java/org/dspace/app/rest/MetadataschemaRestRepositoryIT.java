@@ -32,7 +32,7 @@ public class MetadataschemaRestRepositoryIT extends AbstractControllerIntegratio
         getClient().perform(get("/api/core/metadataschemas"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.metadataschemas", Matchers.hasItem(
+                .andExpect(jsonPath("$._embedded.metadataschema:metadataschemas", Matchers.hasItem(
                         MetadataschemaMatcher.matchEntry()
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/metadataschemas")))

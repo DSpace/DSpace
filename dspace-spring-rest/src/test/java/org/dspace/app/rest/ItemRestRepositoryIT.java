@@ -73,7 +73,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/core/items"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.c:items", Matchers.containsInAnyOrder(
                         ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "Public item 1", "2017-10-17"),
                         ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13"),
                         ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3, "Public item 3", "2016-02-13")
@@ -124,11 +124,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items")
                 .param("size", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.c:items", Matchers.containsInAnyOrder(
                         ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "Public item 1", "2017-10-17"),
                         ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13")
                 )))
-                .andExpect(jsonPath("$._embedded.items", Matchers.not(
+                .andExpect(jsonPath("$._embedded.c:items", Matchers.not(
                         Matchers.contains(
                                 ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3, "Public item 3", "2016-02-13")
                         )
@@ -140,10 +140,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .param("size", "2")
                 .param("page", "1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.items", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.c:items", Matchers.contains(
                         ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3, "Public item 3", "2016-02-13")
                 )))
-                .andExpect(jsonPath("$._embedded.items", Matchers.not(
+                .andExpect(jsonPath("$._embedded.c:items", Matchers.not(
                         Matchers.contains(
                                 ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "Public item 1", "2017-10-17"),
                                 ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13")

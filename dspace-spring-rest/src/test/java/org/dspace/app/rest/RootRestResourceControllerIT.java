@@ -37,7 +37,7 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 //Check that all required root links are present and that they are absolute
-                .andExpect(jsonPath("$._links.core:authorities.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.i:authorities.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.c:bitstreamformats.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.c:bitstreams.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.d:browses.href", startsWith(REST_SERVER_URL)))
@@ -48,14 +48,14 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.c:items.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.c:metadatafields.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.c:metadataschemas.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.core:resourcePolicies.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.az:resourcePolicies.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.c:sites.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.submissiondefinitions.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.submissionforms.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.submissionsections.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.submissionuploads.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.workspaceitems.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.authn.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.cf:submissiondefinitions.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.cf:submissionforms.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.cf:submissionsections.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.cf:submissionuploads.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.s:workspaceitems.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.c:authn.href", startsWith(REST_SERVER_URL)))
                 ;
     }
 

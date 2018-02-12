@@ -22,8 +22,8 @@ public class MetadataFieldMatcher {
                 hasJsonPath("$.element", Matchers.not(Matchers.empty())),
                 hasJsonPath("$.qualifier", Matchers.not(Matchers.empty())),
                 hasJsonPath("$.type", is("metadatafield")),
-                hasJsonPath("$._embedded.schema", Matchers.not(Matchers.empty())),
-                hasJsonPath("$._links.schema.href", Matchers.containsString("/api/core/metadatafields")),
+                hasJsonPath("$._embedded.core:schema", Matchers.not(Matchers.empty())),
+                hasJsonPath("$._links.c:schema.href", Matchers.containsString("/api/core/metadatafields")),
                 hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields"))
         );
     }
@@ -33,8 +33,8 @@ public class MetadataFieldMatcher {
                 hasJsonPath("$.element", is(metadataField.getElement())),
                 hasJsonPath("$.qualifier", is(metadataField.getQualifier())),
                 hasJsonPath("$.type", is("metadatafield")),
-                hasJsonPath("$._embedded.schema", Matchers.not(Matchers.empty())),
-                hasJsonPath("$._links.schema.href", Matchers.containsString("/api/core/metadatafields")),
+                hasJsonPath("$._embedded.core:schema", Matchers.not(Matchers.empty())),
+                hasJsonPath("$._links.c:schema.href", Matchers.containsString("/api/core/metadatafields")),
                 hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields"))
         );
     }

@@ -35,7 +35,7 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/core/sites"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.sites[0]", SiteMatcher.matchEntry(site)))
+                .andExpect(jsonPath("$._embedded.site:sites[0]", SiteMatcher.matchEntry(site)))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/sites")))
                 .andExpect(jsonPath("$.page.size", is(20)));
 

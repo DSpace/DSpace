@@ -70,7 +70,7 @@ public class BitstreamContentControllerDocumentation extends AbstractDocumentati
                     .build();
         }
 
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()+"/content"))
+        getClient(this.getRestDocumentation()).perform(get("/api/core/bitstreams/" + bitstream.getID()+"/content"))
                 .andExpect(status().isOk())
                 .andDo(
                         document("content"

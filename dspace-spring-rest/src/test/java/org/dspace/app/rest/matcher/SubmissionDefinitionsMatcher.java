@@ -31,7 +31,7 @@ public class SubmissionDefinitionsMatcher {
 		        hasJsonPath("$.id", is(id)),
 		        hasJsonPath("$.type", is("submissiondefinition")),
 		        hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "config/submissiondefinitions/" + id)),
-		        hasJsonPath("$._links.sections.href", is(REST_SERVER_URL + "config/submissiondefinitions/" + id + "/sections"))
+		        hasJsonPath("$._links.cf:sections.href", is(REST_SERVER_URL + "config/submissiondefinitions/" + id + "/sections"))
 		);
 	}
 }

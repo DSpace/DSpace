@@ -57,7 +57,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/core/collections"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.c:collections", Matchers.containsInAnyOrder(
                         CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()),
                         CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                 )));
@@ -88,10 +88,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .param("size", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.c:collections", Matchers.contains(
                         CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                 )))
-                .andExpect(jsonPath("$._embedded.collections", Matchers.not(
+                .andExpect(jsonPath("$._embedded.c:collections", Matchers.not(
                         Matchers.contains(
                                 CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                         )
@@ -102,10 +102,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.c:collections", Matchers.contains(
                         CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                 )))
-                .andExpect(jsonPath("$._embedded.collections", Matchers.not(
+                .andExpect(jsonPath("$._embedded.c:collections", Matchers.not(
                         Matchers.contains(
                                 CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                         )
@@ -181,9 +181,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/core/collections/" + col1.getID() + "/logo"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._links.format.href", Matchers.containsString("/api/core/bitstreams"))).andExpect(jsonPath("$._links.format.href", Matchers.containsString("/format")))
+                .andExpect(jsonPath("$._links.c:format.href", Matchers.containsString("/api/core/bitstreams"))).andExpect(jsonPath("$._links.c:format.href", Matchers.containsString("/format")))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/bitstreams")))
-                .andExpect(jsonPath("$._links.content.href", Matchers.containsString("/api/core/bitstreams"))).andExpect(jsonPath("$._links.content.href", Matchers.containsString("/content")))
+                .andExpect(jsonPath("$._links.c:content.href", Matchers.containsString("/api/core/bitstreams"))).andExpect(jsonPath("$._links.c:content.href", Matchers.containsString("/content")))
                 ;
 
     }

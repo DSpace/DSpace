@@ -22,8 +22,8 @@ public class CommunityMatcher {
     public static Matcher<? super Object> matchCommunityEntry(String name, UUID uuid, String handle) {
         return allOf(
                 matchProperties(name, uuid, handle),
-                hasJsonPath("$._embedded.collections", Matchers.not(Matchers.empty())),
-                hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
+                hasJsonPath("$._embedded.core:collections", Matchers.not(Matchers.empty())),
+                hasJsonPath("$._embedded.core:logo", Matchers.not(Matchers.empty())),
                 matchLinks(uuid)
         );
     }
@@ -42,8 +42,8 @@ public class CommunityMatcher {
 
     public static Matcher<? super Object> matchLinks(UUID uuid){
         return allOf(
-                hasJsonPath("$._links.collections.href", Matchers.containsString("/api/core/communities/" + uuid.toString() + "/collections")),
-                hasJsonPath("$._links.logo.href", Matchers.containsString("/api/core/communities/" + uuid.toString() + "/logo")),
+                hasJsonPath("$._links.c:collections.href", Matchers.containsString("/api/core/communities/" + uuid.toString() + "/collections")),
+                hasJsonPath("$._links.c:logo.href", Matchers.containsString("/api/core/communities/" + uuid.toString() + "/logo")),
                 hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/communities/" + uuid.toString()))
         );
     }
@@ -51,9 +51,9 @@ public class CommunityMatcher {
     public static Matcher<? super Object> matchCommunityWithCollectionEntry(String name, UUID uuid, String handle, Collection col) {
         return allOf(
                 matchProperties(name, uuid, handle),
-                hasJsonPath("$._embedded.collections._embedded[0]",
+                hasJsonPath("$._embedded.core:collections._embedded[0]",
                         CollectionMatcher.matchCollectionEntry(col.getName(), col.getID(), col.getHandle(), col.getLogo())),
-                hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
+                hasJsonPath("$._embedded.core:logo", Matchers.not(Matchers.empty())),
                 matchLinks(uuid)
         );
     }

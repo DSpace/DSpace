@@ -35,7 +35,7 @@ public class BitstreamFormatControllerDocumentation extends AbstractDocumentatio
         context.turnOffAuthorisationSystem();
 
         //When we call the root endpoint
-        getClient().perform(get("/api/core/bitstreamformats")
+        getClient(this.getRestDocumentation()).perform(get("/api/core/bitstreamformats")
                 .param("size", "2"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
@@ -64,7 +64,7 @@ public class BitstreamFormatControllerDocumentation extends AbstractDocumentatio
         context.turnOffAuthorisationSystem();
 
         //When we call the root endpoint
-        getClient().perform(get("/api/core/bitstreamformats/1"))
+        getClient(this.getRestDocumentation()).perform(get("/api/core/bitstreamformats/1"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
 

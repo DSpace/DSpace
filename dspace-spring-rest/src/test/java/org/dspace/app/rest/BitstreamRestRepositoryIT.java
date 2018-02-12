@@ -91,7 +91,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/bitstreams/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.bitstream:bitstreams", Matchers.containsInAnyOrder(
                         BitstreamMatcher.matchBitstreamEntry(bitstream),
                         BitstreamMatcher.matchBitstreamEntry(bitstream1)
                 )))
@@ -149,10 +149,10 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("size","1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.bitstream:bitstreams", Matchers.contains(
                         BitstreamMatcher.matchBitstreamEntry(bitstream))
                 ))
-                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
+                .andExpect(jsonPath("$._embedded.bitstream:bitstreams", Matchers.not(
                         Matchers.contains(
                                 BitstreamMatcher.matchBitstreamEntry(bitstream1))
                         )
@@ -165,10 +165,10 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.bitstream:bitstreams", Matchers.contains(
                         BitstreamMatcher.matchBitstreamEntry(bitstream1)
                 )))
-                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
+                .andExpect(jsonPath("$._embedded.bitstream:bitstreams", Matchers.not(
                         Matchers.contains(
                                 BitstreamMatcher.matchBitstreamEntry(bitstream)
                         )

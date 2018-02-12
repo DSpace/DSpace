@@ -75,7 +75,7 @@ public class BitstreamControllerDocumentation extends AbstractDocumentationTest 
                     .build();
         }
 
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+        getClient(this.getRestDocumentation()).perform(get("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isOk())
                 .andDo(
                         document("bitstream",
@@ -151,7 +151,7 @@ public class BitstreamControllerDocumentation extends AbstractDocumentationTest 
         }
 
         //When we call the root endpoint
-        getClient().perform(get("/api/core/bitstreams")
+        getClient(this.getRestDocumentation()).perform(get("/api/core/bitstreams")
                 .param("size", "2"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())

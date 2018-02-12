@@ -36,7 +36,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest{
         getClient().perform(get("/api/eperson/eperson"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.p:epersons", Matchers.containsInAnyOrder(
                         EPersonMatcher.matchEPersonEntry(ePerson),
                         EPersonMatcher.matchDefaultTestEPerson()
                 )))
@@ -58,10 +58,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest{
                 .param("size", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.p:epersons", Matchers.contains(
                         EPersonMatcher.matchDefaultTestEPerson()
                 )))
-                .andExpect(jsonPath("$._embedded.epersons", Matchers.not(
+                .andExpect(jsonPath("$._embedded.p:epersons", Matchers.not(
                         Matchers.contains(
                                 EPersonMatcher.matchEPersonEntry(ePerson)
                         )
@@ -75,7 +75,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest{
                 .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.p:epersons", Matchers.contains(
                         EPersonMatcher.matchEPersonEntry(ePerson)
                 )))
                 .andExpect(jsonPath("$.page.size", is(1)))

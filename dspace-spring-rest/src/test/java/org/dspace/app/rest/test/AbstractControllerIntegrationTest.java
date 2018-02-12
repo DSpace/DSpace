@@ -24,6 +24,7 @@ import org.dspace.app.rest.Application;
 import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,7 +67,7 @@ public abstract class AbstractControllerIntegrationTest extends AbstractIntegrat
     protected static final String AUTHORIZATION_HEADER = "Authorization";
     protected static final String AUTHORIZATION_TYPE = "Bearer";
 
-    public static final String REST_SERVER_URL = "http://localhost:8080/api/";
+    public static final String REST_SERVER_URL = "http://localhost/api/";
     public static final String DOCUMENTATION_SNIPPETS_DIR = "target/generated-snippets/";
 
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
@@ -93,22 +94,36 @@ public abstract class AbstractControllerIntegrationTest extends AbstractIntegrat
     }
 
     public MockMvc getClient() throws SQLException {
-        return getClient(null);
+        return getClient(null, null);
     }
 
-    public MockMvc getClient(String authToken) throws SQLException {
+    public MockMvc getClient(JUnitRestDocumentation restDocumentation) throws SQLException {
+        return getClient(null, restDocumentation);
+    }
+
+    public MockMvc getClient(String authToken, JUnitRestDocumentation restDocumentation) throws SQLException {
         if(context != null && context.isValid()) {
             context.commit();
         }
+        DefaultMockMvcBuilder mockMvcBuilder;
+        if(restDocumentation == null) {
+            mockMvcBuilder = webAppContextSetup(webApplicationContext)
+                    //Always log the response to debug
+                    .alwaysDo(MockMvcResultHandlers.log())
+                    //Add all filter implementations
+                    .addFilters(new ErrorPageFilter())
+                    .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]));
+        } else {
+            mockMvcBuilder = webAppContextSetup(webApplicationContext)
+                    //Configure Spring REST docs
+                    .apply(getDocumentationConfiguration(restDocumentation))
+                    //Always log the response to debug
+                    .alwaysDo(MockMvcResultHandlers.log())
+                    //Add all filter implementations
+                    .addFilters(new ErrorPageFilter())
+                    .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]));
 
-        DefaultMockMvcBuilder mockMvcBuilder = webAppContextSetup(webApplicationContext)
-                //Configure Spring REST docs
-                .apply(getDocumentationConfiguration())
-                //Always log the response to debug
-                .alwaysDo(MockMvcResultHandlers.log())
-                //Add all filter implementations
-                .addFilters(new ErrorPageFilter())
-                .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]));
+        }
 
         if(StringUtils.isNotBlank(authToken)) {
             mockMvcBuilder.defaultRequest(get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + " " + authToken));
@@ -129,7 +144,7 @@ public abstract class AbstractControllerIntegrationTest extends AbstractIntegrat
         return getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER);
     }
 
-    private MockMvcRestDocumentationConfigurer getDocumentationConfiguration() {
+    private MockMvcRestDocumentationConfigurer getDocumentationConfiguration(JUnitRestDocumentation restDocumentation) {
         return documentationConfiguration(restDocumentation).uris()
                 .withScheme("http")
                 .withHost("localhost")

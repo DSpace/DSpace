@@ -60,7 +60,7 @@ public class OwningCollectionControllerDocumentation extends AbstractDocumentati
                 .build();
 
         //When we call the root endpoint
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/owningCollection"))
+        getClient(this.getRestDocumentation()).perform(get("/api/core/items/" + publicItem1.getID() + "/owningCollection"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
 

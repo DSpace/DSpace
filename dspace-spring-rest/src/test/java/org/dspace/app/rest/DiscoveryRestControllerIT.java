@@ -59,7 +59,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The type has to be 'discover'
                 .andExpect(jsonPath("$.type", is("discover")))
                 //There needs to be a link to the facets endpoint
-                .andExpect(jsonPath("$._links.facets.href", containsString("api/discover/facets")))
+                .andExpect(jsonPath("$._links.c:facets.href", containsString("api/discover/facets")))
                 //There needs to be a link to the search endpoint
                 .andExpect(jsonPath("$._links.search.href", containsString("api/discover/search")))
                 //There needs to be a self link
@@ -708,7 +708,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The type has to be 'discover'
                 .andExpect(jsonPath("$.type", is("discover")))
                 //There needs to be a link to the objects that contains a string as specified below
-                .andExpect(jsonPath("$._links.objects.href", containsString("api/discover/search/objects")))
+                .andExpect(jsonPath("$._links.c:objects.href", containsString("api/discover/search/objects")))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("api/discover/search")))
                 //There needs to be a section where these filters as specified as they're the default filters given in the configuration

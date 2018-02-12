@@ -67,7 +67,7 @@ public class TemplateItemOfControllerDocumentation extends AbstractDocumentation
 
         Item templateItem = col1.getTemplateItem();
         //When we call the root endpoint
-        getClient().perform(get("/api/core/items/" + templateItem.getID() + "/templateItemOf"))
+        getClient(this.getRestDocumentation()).perform(get("/api/core/items/" + templateItem.getID() + "/templateItemOf"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
 
