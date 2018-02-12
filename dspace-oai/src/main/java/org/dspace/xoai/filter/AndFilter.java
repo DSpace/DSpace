@@ -22,7 +22,8 @@ public class AndFilter extends DSpaceFilter {
 
     @Override
     public SolrFilterResult buildSolrQuery() {
-        return new SolrFilterResult("("+left.buildSolrQuery().getQuery()+") AND ("+right.buildSolrQuery().getQuery()+")");
+        return new SolrFilterResult(
+            "(" + left.buildSolrQuery().getQuery() + ") AND (" + right.buildSolrQuery().getQuery() + ")");
     }
 
     @Override

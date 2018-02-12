@@ -7,6 +7,8 @@
  */
 package org.dspace.xoai.app;
 
+import static java.lang.Integer.MAX_VALUE;
+
 import com.lyncode.jtwig.mvc.JtwigViewResolver;
 import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
 import org.dspace.xoai.services.impl.xoai.DSpaceItemRepositoryResolver;
@@ -20,10 +22,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import static java.lang.Integer.MAX_VALUE;
-
-@Import({
-        BasicConfiguration.class
+@Import( {
+    BasicConfiguration.class
 })
 @Configuration
 @EnableWebMvc
@@ -53,6 +53,7 @@ public class DSpaceWebappConfiguration extends WebMvcConfigurerAdapter {
 
         return viewResolver;
     }
+
     @Bean
     public ItemRepositoryResolver xoaiItemRepositoryResolver() {
         return new DSpaceItemRepositoryResolver();
