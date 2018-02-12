@@ -45,7 +45,9 @@ public class ScopeResolver {
             } catch (IllegalArgumentException ex) {
                 log.warn("The given scope string " + StringUtils.trimToEmpty(scope) + " is not a UUID", ex);
             } catch (SQLException ex) {
-                log.warn("Unable to retrieve DSpace Object with ID " + StringUtils.trimToEmpty(scope) + " from the database", ex);
+                log.warn(
+                    "Unable to retrieve DSpace Object with ID " + StringUtils.trimToEmpty(scope) + " from the database",
+                    ex);
             }
         }
 

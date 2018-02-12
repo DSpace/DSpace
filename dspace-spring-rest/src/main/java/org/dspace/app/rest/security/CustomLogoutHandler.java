@@ -36,11 +36,13 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     /**
      * This method removes the session salt from an eperson, this way the token won't be verified anymore
+     *
      * @param httpServletRequest
      * @param httpServletResponse
      * @param authentication
      */
-    public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) {
+    public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+                       Authentication authentication) {
         try {
             Context context = ContextUtil.obtainContext(httpServletRequest);
             restAuthenticationService.invalidateAuthenticationData(httpServletRequest, context);

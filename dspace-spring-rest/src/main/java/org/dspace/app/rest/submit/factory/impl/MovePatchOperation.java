@@ -14,20 +14,20 @@ import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 
 /**
- * 
  * Class to manage HTTP PATCH method operation MOVE
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  * @param <T>
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public abstract class MovePatchOperation<T extends Object> extends PatchOperation<T> {
-	
-	@Override
-	public void perform(Context context, Request currentRequest, WorkspaceItem source, Operation operation) throws Exception {
-		move(context, currentRequest, source, operation.getPath(), ((MoveOperation)operation).getFrom());
-	}
 
-	abstract void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from) throws Exception;
-	
+    @Override
+    public void perform(Context context, Request currentRequest, WorkspaceItem source, Operation operation)
+        throws Exception {
+        move(context, currentRequest, source, operation.getPath(), ((MoveOperation) operation).getFrom());
+    }
+
+    abstract void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
+        throws Exception;
+
 }

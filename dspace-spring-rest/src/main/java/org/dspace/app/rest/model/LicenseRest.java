@@ -9,33 +9,32 @@ package org.dspace.app.rest.model;
 
 /**
  * The License text REST resource.
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class LicenseRest implements RestModel {
-	public static final String NAME = "license";
-	private boolean custom = false;
-	private String text; 
-	
-	public boolean isCustom() {
-		return custom;
-	}
+    public static final String NAME = "license";
+    private boolean custom = false;
+    private String text;
 
-	public void setCustom(boolean custom) {
-		this.custom = custom;
-	}
+    public boolean isCustom() {
+        return custom;
+    }
 
-	public String getText() {
-		return text;
-	}
+    public void setCustom(boolean custom) {
+        this.custom = custom;
+    }
 
-	public void setText(String text) {
-		this.text = text;
-	}
-	
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    @Override
+    public String getType() {
+        return NAME;
+    }
 }

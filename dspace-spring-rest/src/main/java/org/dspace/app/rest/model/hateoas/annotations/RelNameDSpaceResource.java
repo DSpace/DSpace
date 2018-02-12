@@ -15,12 +15,12 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation allows to set the name to use for REST collections
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target( {ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RelNameDSpaceResource {
-	String value();
+    String value();
 }

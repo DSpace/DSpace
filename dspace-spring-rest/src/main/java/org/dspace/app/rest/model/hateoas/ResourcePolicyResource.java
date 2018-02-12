@@ -14,13 +14,12 @@ import org.dspace.app.rest.utils.Utils;
 /**
  * Access Condition Rest HAL Resource. The HAL Resource wraps the REST Resource adding
  * support for the links and embedded resources
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @RelNameDSpaceResource(ResourcePolicyRest.NAME)
 public class ResourcePolicyResource extends DSpaceResource<ResourcePolicyRest> {
-	public ResourcePolicyResource(ResourcePolicyRest eperson, Utils utils, String... rels) {
-		super(eperson, utils, rels);
-	}
+    public ResourcePolicyResource(ResourcePolicyRest eperson, Utils utils, String... rels) {
+        super(eperson, utils, rels);
+    }
 }

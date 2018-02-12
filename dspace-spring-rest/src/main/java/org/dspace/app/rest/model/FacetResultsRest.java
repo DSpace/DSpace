@@ -20,12 +20,12 @@ public class FacetResultsRest extends DiscoveryResultsRest {
     @JsonUnwrapped
     private SearchFacetEntryRest facetEntry;
 
-    public void addToFacetResultList(SearchFacetValueRest facetResult){
+    public void addToFacetResultList(SearchFacetValueRest facetResult) {
         facetEntry.addValue(facetResult);
     }
 
     @JsonIgnore
-    public List<SearchFacetValueRest> getFacetResultList(){
+    public List<SearchFacetValueRest> getFacetResultList() {
         return facetEntry.getValues();
     }
 

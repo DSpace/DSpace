@@ -17,19 +17,18 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * server is incapable of processing the request. This might include attempts to
  * modify a resource in a way that would cause the resource to become invalid; A
  * response json object should be returned with more details about the exception
- * 
+ *
  * TODO (i.e. the idx of the patch operation that fail, detail about the
  * failure on execution such as wrong idx in an array path, unsupported patch
  * operation, etc.)
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY, reason = "Unprocessable request")
 public class PatchUnprocessableEntityException extends RuntimeException {
 
-	public PatchUnprocessableEntityException(String message) {
-		super(message);
-	}
-	
+    public PatchUnprocessableEntityException(String message) {
+        super(message);
+    }
+
 }

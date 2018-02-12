@@ -27,8 +27,9 @@ public class RootHalLinkFactory extends HalLinkFactory<RootResource, RootRestRes
     DiscoverableEndpointsService discoverableEndpointsService;
 
     protected void addLinks(RootResource halResource, Pageable page, LinkedList<Link> list) throws Exception {
-        for(Link endpointLink : discoverableEndpointsService.getDiscoverableEndpoints()){
-            list.add(buildLink(endpointLink.getRel(), halResource.getContent().getDspaceRest() + endpointLink.getHref()));
+        for (Link endpointLink : discoverableEndpointsService.getDiscoverableEndpoints()) {
+            list.add(
+                buildLink(endpointLink.getRel(), halResource.getContent().getDspaceRest() + endpointLink.getHref()));
         }
     }
 

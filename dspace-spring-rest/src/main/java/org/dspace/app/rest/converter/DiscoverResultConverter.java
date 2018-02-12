@@ -40,8 +40,10 @@ public class DiscoverResultConverter {
 
     private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
 
-    public SearchResultsRest convert(final Context context, final String query, final String dsoType, final String configurationName, final String scope,
-                                     final List<SearchFilter> searchFilters, final Pageable page, final DiscoverResult searchResult, final DiscoveryConfiguration configuration) {
+    public SearchResultsRest convert(final Context context, final String query, final String dsoType,
+                                     final String configurationName, final String scope,
+                                     final List<SearchFilter> searchFilters, final Pageable page,
+                                     final DiscoverResult searchResult, final DiscoveryConfiguration configuration) {
 
         SearchResultsRest resultsRest = new SearchResultsRest();
 
@@ -56,7 +58,8 @@ public class DiscoverResultConverter {
         return resultsRest;
     }
 
-    private void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest resultsRest, final DiscoveryConfiguration configuration) {
+    private void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest resultsRest,
+                                final DiscoveryConfiguration configuration) {
 
         List<DiscoverySearchFilterFacet> facets = configuration.getSidebarFacets();
         for (DiscoverySearchFilterFacet field : CollectionUtils.emptyIfNull(facets)) {
@@ -70,7 +73,7 @@ public class DiscoverResultConverter {
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
                 //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
                 //more results available.
-                if(valueCount < field.getFacetLimit()) {
+                if (valueCount < field.getFacetLimit()) {
                     SearchFacetValueRest valueRest = facetValueConverter.convert(value);
 
                     facetEntry.addValue(valueRest);
@@ -78,7 +81,7 @@ public class DiscoverResultConverter {
                     facetEntry.setHasMore(true);
                 }
 
-                if(StringUtils.isBlank(facetEntry.getFacetType())) {
+                if (StringUtils.isBlank(facetEntry.getFacetType())) {
                     facetEntry.setFacetType(value.getFieldType());
                 }
 
@@ -97,9 +100,11 @@ public class DiscoverResultConverter {
             resultEntry.setDspaceObject(convertDSpaceObject(dspaceObject));
 
             //Add hit highlighting for this DSO if present
-            DiscoverResult.DSpaceObjectHighlightResult highlightedResults = searchResult.getHighlightedResults(dspaceObject);
-            if(highlightedResults != null && MapUtils.isNotEmpty(highlightedResults.getHighlightResults())) {
-                for (Map.Entry<String, List<String>> metadataHighlight : highlightedResults.getHighlightResults().entrySet()) {
+            DiscoverResult.DSpaceObjectHighlightResult highlightedResults = searchResult
+                .getHighlightedResults(dspaceObject);
+            if (highlightedResults != null && MapUtils.isNotEmpty(highlightedResults.getHighlightResults())) {
+                for (Map.Entry<String, List<String>> metadataHighlight : highlightedResults.getHighlightResults()
+                                                                                           .entrySet()) {
                     resultEntry.addHitHighlights(metadataHighlight.getKey(), metadataHighlight.getValue());
                 }
             }
@@ -110,29 +115,33 @@ public class DiscoverResultConverter {
 
     private DSpaceObjectRest convertDSpaceObject(final DSpaceObject dspaceObject) {
         for (DSpaceObjectConverter converter : converters) {
-            if(converter.supportsModel(dspaceObject)) {
+            if (converter.supportsModel(dspaceObject)) {
                 return converter.fromModel(dspaceObject);
             }
         }
         return null;
     }
 
-    private void setRequestInformation(final Context context, final String query, final String dsoType, final String configurationName, final String scope,
-                                       final List<SearchFilter> searchFilters, final Pageable page, final SearchResultsRest resultsRest) {
+    private void setRequestInformation(final Context context, final String query, final String dsoType,
+                                       final String configurationName, final String scope,
+                                       final List<SearchFilter> searchFilters, final Pageable page,
+                                       final SearchResultsRest resultsRest) {
         resultsRest.setQuery(query);
         resultsRest.setConfigurationName(configurationName);
         resultsRest.setDsoType(dsoType);
 
         resultsRest.setScope(scope);
 
-        if(page != null && page.getSort() != null && page.getSort().iterator().hasNext()) {
+        if (page != null && page.getSort() != null && page.getSort().iterator().hasNext()) {
             Sort.Order order = page.getSort().iterator().next();
             resultsRest.setSort(order.getProperty(), order.getDirection().name());
         }
-        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter = new SearchFilterToAppliedFilterConverter();
+        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter =
+            new SearchFilterToAppliedFilterConverter();
         for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
 
-            resultsRest.addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
+            resultsRest
+                .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
         }
     }
 }

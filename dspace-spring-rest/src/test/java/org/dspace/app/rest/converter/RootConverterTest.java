@@ -33,18 +33,18 @@ public class RootConverterTest {
     private ConfigurationService configurationService;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         when(configurationService.getProperty("dspace.url")).thenReturn("dspaceurl");
         when(configurationService.getProperty("dspace.name")).thenReturn("dspacename");
     }
 
     @Test
-    public void testReturnCorrectClass() throws Exception{
+    public void testReturnCorrectClass() throws Exception {
         assertEquals(rootConverter.convert("").getClass(), RootRest.class);
     }
 
     @Test
-    public void testCorrectPropertiesSetFromConfigurationService() throws Exception{
+    public void testCorrectPropertiesSetFromConfigurationService() throws Exception {
         String restUrl = "rest";
         RootRest rootRest = rootConverter.convert(restUrl);
         assertEquals("dspaceurl", rootRest.getDspaceURL());
@@ -53,7 +53,7 @@ public class RootConverterTest {
     }
 
     @Test
-    public void testReturnNotNull() throws Exception{
+    public void testReturnNotNull() throws Exception {
         assertNotNull(rootConverter.convert(""));
     }
 }

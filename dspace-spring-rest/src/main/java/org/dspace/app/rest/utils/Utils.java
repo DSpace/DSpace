@@ -16,11 +16,10 @@ import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
-import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
@@ -35,130 +34,125 @@ import org.springframework.stereotype.Component;
 
 /**
  * Collection of utility methods
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
- * 
  */
 @Component
 public class Utils {
-	@Autowired
-	ApplicationContext applicationContext;
+    @Autowired
+    ApplicationContext applicationContext;
 
-	public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
-		int total = fullContents.size();
-		List<T> pageContent = null;
-		if (pageable.getOffset() > total) {
-			throw new PaginationException(total);
-		} else {
-			if (pageable.getOffset() + pageable.getPageSize() > total) {
-				pageContent = fullContents.subList(pageable.getOffset(), total);
-			} else {
-				pageContent = fullContents.subList(pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
-			}
-			return new PageImpl<T>(pageContent, pageable, total);
-		}
-	}
+    public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
+        int total = fullContents.size();
+        List<T> pageContent = null;
+        if (pageable.getOffset() > total) {
+            throw new PaginationException(total);
+        } else {
+            if (pageable.getOffset() + pageable.getPageSize() > total) {
+                pageContent = fullContents.subList(pageable.getOffset(), total);
+            } else {
+                pageContent = fullContents.subList(pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
+            }
+            return new PageImpl<T>(pageContent, pageable, total);
+        }
+    }
 
-	public Link linkToSingleResource(DSpaceResource r, String rel) {
-		RestAddressableModel data = r.getContent();
-		return linkToSingleResource(data, rel);
-	}
+    public Link linkToSingleResource(DSpaceResource r, String rel) {
+        RestAddressableModel data = r.getContent();
+        return linkToSingleResource(data, rel);
+    }
 
-	public Link linkToSingleResource(RestAddressableModel data, String rel) {
-		return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data)
-				.withRel(rel);
-	}
+    public Link linkToSingleResource(RestAddressableModel data, String rel) {
+        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data)
+                                                                                     .withRel(rel);
+    }
 
-	public Link linkToSubResource(RestAddressableModel data, String rel) {
-		return linkToSubResource(data, rel, rel);
-	}
+    public Link linkToSubResource(RestAddressableModel data, String rel) {
+        return linkToSubResource(data, rel, rel);
+    }
 
-	public Link linkToSubResource(RestAddressableModel data, String rel, String path) {
-		return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data).slash(path)
-				.withRel(rel);
-	}
+    public Link linkToSubResource(RestAddressableModel data, String rel, String path) {
+        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data).slash(path)
+                                                                                     .withRel(rel);
+    }
 
-	public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural) {
-		String model = makeSingular(modelPlural);
-		try {
-			return applicationContext.getBean(apiCategory + "." + model, DSpaceRestRepository.class);
-		} catch (NoSuchBeanDefinitionException e) {
-			throw new RepositoryNotFoundException(apiCategory, model);
-		}
-	}
+    public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural) {
+        String model = makeSingular(modelPlural);
+        try {
+            return applicationContext.getBean(apiCategory + "." + model, DSpaceRestRepository.class);
+        } catch (NoSuchBeanDefinitionException e) {
+            throw new RepositoryNotFoundException(apiCategory, model);
+        }
+    }
 
-	public String[] getRepositories() {
-		return applicationContext.getBeanNamesForType(DSpaceRestRepository.class);
-	}
+    public String[] getRepositories() {
+        return applicationContext.getBeanNamesForType(DSpaceRestRepository.class);
+    }
 
-	public static String makeSingular(String modelPlural) {
-		// The old dspace res package includes the evo inflection library which
-		// has a plural() function but no singular function
-		if (modelPlural.equals("communities")) {
-			return CommunityRest.NAME;
-		}
-		if (modelPlural.equals("authorities")) {
-			return AuthorityRest.NAME;
-		}
-		if (modelPlural.equals("resourcePolicies")) {
-			return ResourcePolicyRest.NAME;
-		}
-		return modelPlural.replaceAll("s$", "");
-	}
+    public static String makeSingular(String modelPlural) {
+        // The old dspace res package includes the evo inflection library which
+        // has a plural() function but no singular function
+        if (modelPlural.equals("communities")) {
+            return CommunityRest.NAME;
+        }
+        if (modelPlural.equals("authorities")) {
+            return AuthorityRest.NAME;
+        }
+        if (modelPlural.equals("resourcePolicies")) {
+            return ResourcePolicyRest.NAME;
+        }
+        return modelPlural.replaceAll("s$", "");
+    }
 
-	/**
-	 * Retrieve the LinkRestRepository associated with a specific link from the
-	 * apiCategory and model specified in the parameters.
-	 * 
-	 * @param apiCategory
-	 *            the apiCategory
-	 * @param modelPlural
-	 *            the model name in its plural form
-	 * @param rel
-	 *            the name of the relation
-	 * @return
-	 */
-	public LinkRestRepository getLinkResourceRepository(String apiCategory, String modelPlural, String rel) {
-		String model = makeSingular(modelPlural);
-		try {
-			return applicationContext.getBean(apiCategory + "." + model + "." + rel, LinkRestRepository.class);
-		} catch (NoSuchBeanDefinitionException e) {
-			throw new RepositoryNotFoundException(apiCategory, model);
-		}
-	}
+    /**
+     * Retrieve the LinkRestRepository associated with a specific link from the
+     * apiCategory and model specified in the parameters.
+     *
+     * @param apiCategory the apiCategory
+     * @param modelPlural the model name in its plural form
+     * @param rel         the name of the relation
+     * @return
+     */
+    public LinkRestRepository getLinkResourceRepository(String apiCategory, String modelPlural, String rel) {
+        String model = makeSingular(modelPlural);
+        try {
+            return applicationContext.getBean(apiCategory + "." + model + "." + rel, LinkRestRepository.class);
+        } catch (NoSuchBeanDefinitionException e) {
+            throw new RepositoryNotFoundException(apiCategory, model);
+        }
+    }
 
-	/**
-	 * 
-	 * @param rel
-	 * @param domainClass
-	 * @return the LinkRest annotation corresponding to the specified rel in the
-	 *         domainClass. Null if not found
-	 */
-	public LinkRest getLinkRest(String rel, Class<RestAddressableModel> domainClass) {
-		LinkRest linkRest = null;
-		LinksRest linksAnnotation = domainClass.getDeclaredAnnotation(LinksRest.class);
-		if (linksAnnotation != null) {
-			LinkRest[] links = linksAnnotation.links();
-			for (LinkRest l : links) {
-				if (StringUtils.equals(rel, l.name())) {
-					linkRest = l;
-					break;
-				}
-			}
-		}
-		return linkRest;
-	}
+    /**
+     * @param rel
+     * @param domainClass
+     * @return the LinkRest annotation corresponding to the specified rel in the
+     * domainClass. Null if not found
+     */
+    public LinkRest getLinkRest(String rel, Class<RestAddressableModel> domainClass) {
+        LinkRest linkRest = null;
+        LinksRest linksAnnotation = domainClass.getDeclaredAnnotation(LinksRest.class);
+        if (linksAnnotation != null) {
+            LinkRest[] links = linksAnnotation.links();
+            for (LinkRest l : links) {
+                if (StringUtils.equals(rel, l.name())) {
+                    linkRest = l;
+                    break;
+                }
+            }
+        }
+        return linkRest;
+    }
 
-	/**
-	 * Build the canonical representation of a metadata key in DSpace. ie
-	 * <schema>.<element>[.<qualifier>]
-	 *
-	 * @param schema
-	 * @param element
-	 * @param object
-	 * @return
-	 */
-	public String getMetadataKey(String schema, String element, String qualifier) {
-		return org.dspace.core.Utils.standardize(schema, element, qualifier, ".");
-	}
+    /**
+     * Build the canonical representation of a metadata key in DSpace. ie
+     * <schema>.<element>[.<qualifier>]
+     *
+     * @param schema
+     * @param element
+     * @param object
+     * @return
+     */
+    public String getMetadataKey(String schema, String element, String qualifier) {
+        return org.dspace.core.Utils.standardize(schema, element, qualifier, ".");
+    }
 }

@@ -9,7 +9,6 @@ package org.dspace.app.rest.security.jwt;
 
 import java.sql.SQLException;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -26,7 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @Component
-public class EPersonClaimProvider implements JWTClaimProvider{
+public class EPersonClaimProvider implements JWTClaimProvider {
 
     public static final String EPERSON_ID = "eid";
 

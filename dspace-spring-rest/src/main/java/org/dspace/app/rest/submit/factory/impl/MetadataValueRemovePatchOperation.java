@@ -20,39 +20,40 @@ import org.dspace.core.Utils;
 
 /**
  * Submission "remove" PATCH operation.
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public abstract class MetadataValueRemovePatchOperation<DSO extends DSpaceObject> extends RemovePatchOperation<MetadataValueRest> {
+public abstract class MetadataValueRemovePatchOperation<DSO extends DSpaceObject>
+    extends RemovePatchOperation<MetadataValueRest> {
 
-	@Override
-	protected Class<MetadataValueRest[]> getArrayClassForEvaluation() {
-		return MetadataValueRest[].class;
-	}
+    @Override
+    protected Class<MetadataValueRest[]> getArrayClassForEvaluation() {
+        return MetadataValueRest[].class;
+    }
 
-	@Override
-	protected Class<MetadataValueRest> getClassForEvaluation() {
-		return MetadataValueRest.class;
-	}
+    @Override
+    protected Class<MetadataValueRest> getClassForEvaluation() {
+        return MetadataValueRest.class;
+    }
 
-	protected void deleteValue(Context context, DSO source, String target, int index) throws SQLException {
-		String[] metadata = Utils.tokenize(target);
-		List<MetadataValue> mm = getDSpaceObjectService().getMetadata(source, metadata[0], metadata[1], metadata[2],
-				Item.ANY);
-		getDSpaceObjectService().clearMetadata(context, source, metadata[0], metadata[1], metadata[2], Item.ANY);
-		if (index != -1) {
-			int idx = 0;
-			for (MetadataValue m : mm) {
-				if (idx != index) {
-					getDSpaceObjectService().addMetadata(context, source, metadata[0], metadata[1], metadata[2],
-							m.getLanguage(), m.getValue(), m.getAuthority(), m.getConfidence());
-				}
-				idx++;
-			}
-		}
-	}
-	
-	protected abstract DSpaceObjectService<DSO> getDSpaceObjectService();
+    protected void deleteValue(Context context, DSO source, String target, int index) throws SQLException {
+        String[] metadata = Utils.tokenize(target);
+        List<MetadataValue> mm = getDSpaceObjectService().getMetadata(source, metadata[0], metadata[1], metadata[2],
+                                                                      Item.ANY);
+        getDSpaceObjectService().clearMetadata(context, source, metadata[0], metadata[1], metadata[2], Item.ANY);
+        if (index != -1) {
+            int idx = 0;
+            for (MetadataValue m : mm) {
+                if (idx != index) {
+                    getDSpaceObjectService().addMetadata(context, source, metadata[0], metadata[1], metadata[2],
+                                                         m.getLanguage(), m.getValue(), m.getAuthority(),
+                                                         m.getConfidence());
+                }
+                idx++;
+            }
+        }
+    }
+
+    protected abstract DSpaceObjectService<DSO> getDSpaceObjectService();
 
 }

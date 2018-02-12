@@ -12,10 +12,8 @@ import org.dspace.app.rest.RestResourceController;
 
 /**
  * Find out your authentication status.
- *
  */
-public class AuthenticationStatusRest extends BaseObjectRest<Integer>
-{
+public class AuthenticationStatusRest extends BaseObjectRest<Integer> {
     private boolean okay;
     private boolean authenticated;
 
@@ -52,7 +50,7 @@ public class AuthenticationStatusRest extends BaseObjectRest<Integer>
 
     public AuthenticationStatusRest(EPersonRest eperson) {
         setOkay(true);
-        if(eperson != null) {
+        if (eperson != null) {
             setAuthenticated(true);
             this.ePersonRest = eperson;
         }

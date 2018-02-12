@@ -18,7 +18,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 /**
- * This factory class provides a means to add links to the SearchResultsEntryResource. This method will be called from the
+ * This factory class provides a means to add links to the SearchResultsEntryResource. This method will be called
+ * from the
  * HalLinkService addLinks method if the HalResource given is eligible.
  */
 @Component
@@ -28,10 +29,11 @@ public class SearchResultEntryHalLinkFactory extends DiscoveryRestHalLinkFactory
     private Utils utils;
 
     @Override
-    protected void addLinks(SearchResultEntryResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
+    protected void addLinks(SearchResultEntryResource halResource, Pageable pageable, LinkedList<Link> list)
+        throws Exception {
         SearchResultEntryRest data = halResource.getContent();
 
-        if(data != null && data.getDspaceObject() != null) {
+        if (data != null && data.getDspaceObject() != null) {
             list.add(utils.linkToSingleResource(data.getDspaceObject(), SearchResultEntryResource.DSPACE_OBJECT_LINK));
         }
     }

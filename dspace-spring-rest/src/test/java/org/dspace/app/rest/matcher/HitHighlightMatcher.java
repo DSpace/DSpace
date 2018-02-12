@@ -7,16 +7,18 @@
  */
 package org.dspace.app.rest.matcher;
 
-import org.hamcrest.Matcher;
-
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+
+import org.hamcrest.Matcher;
 
 public class HitHighlightMatcher {
 
     public static Matcher<? super Object> entry(String value, String expectedField) {
         return allOf(
-                hasJsonPath("$.['"+expectedField+"']", contains(containsString("Public")))
+            hasJsonPath("$.['" + expectedField + "']", contains(containsString("Public")))
         );
     }
 

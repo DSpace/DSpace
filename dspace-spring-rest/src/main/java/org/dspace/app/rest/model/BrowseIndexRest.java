@@ -9,103 +9,102 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
-import org.dspace.app.rest.RestResourceController;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * The Browse Index REST Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-		@LinkRest(name = BrowseIndexRest.ITEMS, linkClass = ItemRest.class, method = "listBrowseItems"),
-		@LinkRest(name = BrowseIndexRest.ENTRIES, linkClass = BrowseEntryRest.class, method = "listBrowseEntries", optional=true)
+    @LinkRest(name = BrowseIndexRest.ITEMS, linkClass = ItemRest.class, method = "listBrowseItems"),
+    @LinkRest(name = BrowseIndexRest.ENTRIES, linkClass = BrowseEntryRest.class, method = "listBrowseEntries",
+        optional = true)
 })
 public class BrowseIndexRest extends BaseObjectRest<String> {
-	private static final long serialVersionUID = -4870333170249999559L;
+    private static final long serialVersionUID = -4870333170249999559L;
 
-	public static final String NAME = "browse";
+    public static final String NAME = "browse";
 
-	public static final String CATEGORY = RestAddressableModel.DISCOVER;
-	
-	public static final String ITEMS = "items";
-	public static final String ENTRIES = "entries";
+    public static final String CATEGORY = RestAddressableModel.DISCOVER;
 
-	boolean metadataBrowse;
+    public static final String ITEMS = "items";
+    public static final String ENTRIES = "entries";
 
-	@JsonProperty(value="metadata")
-	List<String> metadataList;
-	
-	List<SortOption> sortOptions;
+    boolean metadataBrowse;
 
-	String order;
+    @JsonProperty(value = "metadata")
+    List<String> metadataList;
 
-	@JsonIgnore
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
+    List<SortOption> sortOptions;
 
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    String order;
 
-	public boolean isMetadataBrowse() {
-		return metadataBrowse;
-	}
+    @JsonIgnore
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
 
-	public void setMetadataBrowse(boolean metadataBrowse) {
-		this.metadataBrowse = metadataBrowse;
-	}
+    @Override
+    public String getType() {
+        return NAME;
+    }
 
-	public List<String> getMetadataList() {
-		return metadataList;
-	}
+    public boolean isMetadataBrowse() {
+        return metadataBrowse;
+    }
 
-	public void setMetadataList(List<String> metadataList) {
-		this.metadataList = metadataList;
-	}
+    public void setMetadataBrowse(boolean metadataBrowse) {
+        this.metadataBrowse = metadataBrowse;
+    }
 
-	public String getOrder() {
-		return order;
-	}
+    public List<String> getMetadataList() {
+        return metadataList;
+    }
 
-	public void setOrder(String order) {
-		this.order = order;
-	}
-	
-	public List<SortOption> getSortOptions() {
-		return sortOptions;
-	}
-	
-	public void setSortOptions(List<SortOption> sortOptions) {
-		this.sortOptions = sortOptions;
-	}
+    public void setMetadataList(List<String> metadataList) {
+        this.metadataList = metadataList;
+    }
 
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
-	
-	static public class SortOption {
-		private String name;
-		private String metadata;
-		
-		public SortOption(String name, String metadata) {
-			this.name = name;
-			this.metadata = metadata;
-		}
-		
-		public String getName() {
-			return name;
-		}
-		
-		public String getMetadata() {
-			return metadata;
-		}
-	}
+    public String getOrder() {
+        return order;
+    }
+
+    public void setOrder(String order) {
+        this.order = order;
+    }
+
+    public List<SortOption> getSortOptions() {
+        return sortOptions;
+    }
+
+    public void setSortOptions(List<SortOption> sortOptions) {
+        this.sortOptions = sortOptions;
+    }
+
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
+
+    static public class SortOption {
+        private String name;
+        private String metadata;
+
+        public SortOption(String name, String metadata) {
+            this.name = name;
+            this.metadata = metadata;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getMetadata() {
+            return metadata;
+        }
+    }
 }

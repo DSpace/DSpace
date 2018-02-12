@@ -14,9 +14,10 @@ import org.dspace.app.rest.DiscoveryRestController;
 /**
  * This class' purpose is to give information about the api/discover endpoint
  */
-public class SearchSupportRest extends BaseObjectRest<String>{
+public class SearchSupportRest extends BaseObjectRest<String> {
     public static final String NAME = "discover";
     public static final String CATEGORY = RestModel.DISCOVER;
+
     public String getCategory() {
         return CATEGORY;
     }
@@ -30,19 +31,20 @@ public class SearchSupportRest extends BaseObjectRest<String>{
     }
 
     @Override
-    public boolean equals(Object object){
+    public boolean equals(Object object) {
         return (object instanceof SearchSupportRest &&
-                new EqualsBuilder().append(this.getCategory(), ((SearchSupportRest) object).getCategory())
-                        .append(this.getType(), ((SearchSupportRest) object).getType())
-                        .append(this.getController(), ((SearchSupportRest) object).getController())
-                        .isEquals());
+            new EqualsBuilder().append(this.getCategory(), ((SearchSupportRest) object).getCategory())
+                               .append(this.getType(), ((SearchSupportRest) object).getType())
+                               .append(this.getController(), ((SearchSupportRest) object).getController())
+                               .isEquals());
     }
+
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(this.getCategory())
-                .append(this.getType())
-                .append(this.getController())
-                .toHashCode();
+            .append(this.getCategory())
+            .append(this.getType())
+            .append(this.getController())
+            .toHashCode();
     }
 }

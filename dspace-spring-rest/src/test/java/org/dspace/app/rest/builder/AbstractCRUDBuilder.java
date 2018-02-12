@@ -16,7 +16,7 @@ import org.dspace.service.DSpaceCRUDService;
  */
 public abstract class AbstractCRUDBuilder<T extends ReloadableEntity> extends AbstractBuilder<T, DSpaceCRUDService> {
 
-    protected AbstractCRUDBuilder(Context context){
+    protected AbstractCRUDBuilder(Context context) {
         super(context);
     }
 
@@ -25,7 +25,7 @@ public abstract class AbstractCRUDBuilder<T extends ReloadableEntity> extends Ab
     public abstract T build();
 
     public void delete(T dso) throws Exception {
-        try(Context c = new Context()) {
+        try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             T attachedDso = c.reloadEntity(dso);
             if (attachedDso != null) {

@@ -8,7 +8,6 @@
 package org.dspace.app.rest.filter;
 
 import java.io.IOException;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -23,50 +22,42 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A Servlet Filter whose only role is to clean up open Context objects in
- * the request. (These Context objects may have been created by Controllers 
+ * the request. (These Context objects may have been created by Controllers
  * in order to populate Views).
- * 
+ *
  * @author Tim Donohue
  * @see ContextUtil
  */
-public class DSpaceRequestContextFilter implements Filter
-{
+public class DSpaceRequestContextFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(DSpaceRequestContextFilter.class);
-    
+
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException
-    {
+    public void init(FilterConfig filterConfig) throws ServletException {
         //noop
     }
-    
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException
-    {
+        throws IOException, ServletException {
         Context context = null;
-        try
-        {
+        try {
             // First, process any other servlet filters, along with the controller & view
             chain.doFilter(request, response);
 
             // *After* view was processed, check for an open Context object in the ServletRequest
             // (This Context object may have been opened by a @Controller via ContextUtil.obtainContext())
-            context = (Context) request.getAttribute(ContextUtil.DSPACE_CONTEXT); 
-        }
-        finally
-        {
+            context = (Context) request.getAttribute(ContextUtil.DSPACE_CONTEXT);
+        } finally {
             // Abort the context if it's still valid, thus closing any open
             // database connections
-            if ((context != null) && context.isValid())
-            {
+            if ((context != null) && context.isValid()) {
                 ContextUtil.abortContext(request);
             }
         }
     }
-    
+
     @Override
-    public void destroy()
-    {
-       //noop
+    public void destroy() {
+        //noop
     }
 }

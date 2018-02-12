@@ -46,7 +46,7 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
         return scope;
     }
 
-    public void setScope(String scope){
+    public void setScope(String scope) {
         this.scope = scope;
     }
 
@@ -54,34 +54,41 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
         return configurationName;
     }
 
-    public void setConfigurationName(String configurationName){
+    public void setConfigurationName(String configurationName) {
         this.configurationName = configurationName;
     }
 
-    public List<SearchFacetEntryRest> getSidebarFacets(){ return sidebarFacets;}
-    public void addSidebarFacet(SearchFacetEntryRest sidebarFacet){sidebarFacets.add(sidebarFacet);}
+    public List<SearchFacetEntryRest> getSidebarFacets() {
+        return sidebarFacets;
+    }
+
+    public void addSidebarFacet(SearchFacetEntryRest sidebarFacet) {
+        sidebarFacets.add(sidebarFacet);
+    }
 
     @Override
-    public boolean equals(Object object){
+    public boolean equals(Object object) {
         return (object instanceof FacetConfigurationRest &&
-                new EqualsBuilder().append(this.getCategory(), ((FacetConfigurationRest) object).getCategory())
-                        .append(this.getType(), ((FacetConfigurationRest) object).getType())
-                        .append(this.getController(), ((FacetConfigurationRest) object).getController())
-                        .append(this.getScope(), ((FacetConfigurationRest) object).getScope())
-                        .append(this.getConfigurationName(), ((FacetConfigurationRest) object).getConfigurationName())
-                        .append(this.getSidebarFacets(), ((FacetConfigurationRest) object).getSidebarFacets())
-                        .isEquals());
+            new EqualsBuilder().append(this.getCategory(), ((FacetConfigurationRest) object).getCategory())
+                               .append(this.getType(), ((FacetConfigurationRest) object).getType())
+                               .append(this.getController(), ((FacetConfigurationRest) object).getController())
+                               .append(this.getScope(), ((FacetConfigurationRest) object).getScope())
+                               .append(this.getConfigurationName(),
+                                       ((FacetConfigurationRest) object).getConfigurationName())
+                               .append(this.getSidebarFacets(), ((FacetConfigurationRest) object).getSidebarFacets())
+                               .isEquals());
     }
+
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(this.getCategory())
-                .append(this.getType())
-                .append(this.getController())
-                .append(this.getScope())
-                .append(this.getConfigurationName())
-                .append(this.getSidebarFacets())
-                .toHashCode();
+            .append(this.getCategory())
+            .append(this.getType())
+            .append(this.getController())
+            .append(this.getScope())
+            .append(this.getConfigurationName())
+            .append(this.getSidebarFacets())
+            .toHashCode();
     }
 
 }

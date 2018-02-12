@@ -25,12 +25,14 @@ import org.springframework.stereotype.Component;
 public class FacetResultsHalLinkFactory extends DiscoveryRestHalLinkFactory<FacetResultsResource> {
 
     @Override
-    protected void addLinks(FacetResultsResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
+    protected void addLinks(FacetResultsResource halResource, Pageable pageable, LinkedList<Link> list)
+        throws Exception {
         FacetResultsRest data = halResource.getContent();
 
-        if(data != null && pageable != null){
+        if (data != null && pageable != null) {
             PageImpl page = new PageImpl<>(data.getFacetResultList(), pageable,
-                    pageable.getOffset() + data.getFacetResultList().size() + (data.getFacetEntry().isHasMore() ? 1 : 0));
+                                           pageable.getOffset() + data.getFacetResultList().size() + (data
+                                               .getFacetEntry().isHasMore() ? 1 : 0));
 
             halResource.setPageHeader(new EmbeddedPageHeader(buildFacetBaseLink(data), page, false));
         }

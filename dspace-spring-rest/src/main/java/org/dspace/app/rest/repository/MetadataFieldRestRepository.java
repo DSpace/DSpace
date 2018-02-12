@@ -23,55 +23,54 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the repository responsible to manage MetadataField Rest object
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(MetadataFieldRest.CATEGORY + "." + MetadataFieldRest.NAME)
 public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFieldRest, Integer> {
 
-	@Autowired
-	MetadataFieldService metaFieldService;
+    @Autowired
+    MetadataFieldService metaFieldService;
 
-	@Autowired
-	MetadataFieldConverter converter;
+    @Autowired
+    MetadataFieldConverter converter;
 
-	public MetadataFieldRestRepository() {
-	}
+    public MetadataFieldRestRepository() {
+    }
 
-	@Override
-	public MetadataFieldRest findOne(Context context, Integer id) {
-		MetadataField metadataField = null;
-		try {
-			metadataField = metaFieldService.find(context, id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (metadataField == null) {
-			return null;
-		}
-		return converter.fromModel(metadataField);
-	}
+    @Override
+    public MetadataFieldRest findOne(Context context, Integer id) {
+        MetadataField metadataField = null;
+        try {
+            metadataField = metaFieldService.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (metadataField == null) {
+            return null;
+        }
+        return converter.fromModel(metadataField);
+    }
 
-	@Override
-	public Page<MetadataFieldRest> findAll(Context context, Pageable pageable) {
-		List<MetadataField> metadataField = null;
-		try {
-			metadataField = metaFieldService.findAll(context);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable).map(converter);
-		return page;
-	}
+    @Override
+    public Page<MetadataFieldRest> findAll(Context context, Pageable pageable) {
+        List<MetadataField> metadataField = null;
+        try {
+            metadataField = metaFieldService.findAll(context);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable).map(converter);
+        return page;
+    }
 
-	@Override
-	public Class<MetadataFieldRest> getDomainClass() {
-		return MetadataFieldRest.class;
-	}
+    @Override
+    public Class<MetadataFieldRest> getDomainClass() {
+        return MetadataFieldRest.class;
+    }
 
-	@Override
-	public MetadataFieldResource wrapResource(MetadataFieldRest bs, String... rels) {
-		return new MetadataFieldResource(bs, utils, rels);
-	}
+    @Override
+    public MetadataFieldResource wrapResource(MetadataFieldRest bs, String... rels) {
+        return new MetadataFieldResource(bs, utils, rels);
+    }
 }

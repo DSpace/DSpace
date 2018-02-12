@@ -9,42 +9,40 @@ package org.dspace.app.rest.model.patch;
 
 import javax.annotation.Nonnull;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * {@link LateObjectEvaluator} implementation that assumes values represented as JSON objects.
- * 
- * Based on {@link org.springframework.data.rest.webmvc.json.patch.JsonLateObjectEvaluator} 
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * Based on {@link org.springframework.data.rest.webmvc.json.patch.JsonLateObjectEvaluator}
+ *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class JsonValueEvaluator implements LateObjectEvaluator {
 
-	private final @Nonnull ObjectMapper mapper;
-	private final @Nonnull JsonNode valueNode;
+    private final @Nonnull ObjectMapper mapper;
+    private final @Nonnull JsonNode valueNode;
 
-	public JsonValueEvaluator(ObjectMapper mapper, JsonNode valueNode) {
-		this.mapper = mapper;
-		this.valueNode = valueNode;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator#evaluate(java.lang.Class)
-	 */
-	@Override
-	public <T> Object evaluate(Class<T> type) {
+    public JsonValueEvaluator(ObjectMapper mapper, JsonNode valueNode) {
+        this.mapper = mapper;
+        this.valueNode = valueNode;
+    }
 
-		try {
-			return mapper.readValue(valueNode.traverse(), type);
-		} catch (Exception e) {
-			throw new PatchException(String.format("Could not read %s into %s!", valueNode, type), e);
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator#evaluate(java.lang.Class)
+     */
+    @Override
+    public <T> Object evaluate(Class<T> type) {
+
+        try {
+            return mapper.readValue(valueNode.traverse(), type);
+        } catch (Exception e) {
+            throw new PatchException(String.format("Could not read %s into %s!", valueNode, type), e);
+        }
+    }
 
 }

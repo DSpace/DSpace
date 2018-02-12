@@ -7,12 +7,7 @@
  */
 package org.dspace.app.rest.test;
 
-import org.apache.log4j.Logger;
-import org.dspace.app.rest.builder.AbstractBuilder;
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,15 +15,21 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import static org.junit.Assert.fail;
+import org.apache.log4j.Logger;
+import org.dspace.app.rest.builder.AbstractBuilder;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
  * Abstract Test class copied from DSpace API
  */
-public class AbstractDSpaceIntegrationTest
-{
+public class AbstractDSpaceIntegrationTest {
 
-    /** log4j category */
+    /**
+     * log4j category
+     */
     private static final Logger log = Logger.getLogger(AbstractDSpaceIntegrationTest.class);
 
     /**
@@ -50,10 +51,8 @@ public class AbstractDSpaceIntegrationTest
      * and then starts the DSpace Kernel (which allows access to services).
      */
     @BeforeClass
-    public static void initKernel()
-    {
-        try
-        {
+    public static void initKernel() {
+        try {
             //Stops System.exit(0) throws exception instead of exitting
             System.setSecurityManager(new NoExitSecurityManager());
 
@@ -63,20 +62,17 @@ public class AbstractDSpaceIntegrationTest
             //load the properties of the tests
             testProps = new Properties();
             URL properties = AbstractDSpaceIntegrationTest.class.getClassLoader()
-                    .getResource("test-config.properties");
+                                                                .getResource("test-config.properties");
             testProps.load(properties.openStream());
 
             // Initialise the service manager kernel
             kernelImpl = DSpaceKernelInit.getKernel(null);
-            if (!kernelImpl.isRunning())
-            {
+            if (!kernelImpl.isRunning()) {
                 // NOTE: the "dspace.dir" system property MUST be specified via Maven
                 kernelImpl.start(getDspaceDir()); // init the kernel
             }
             AbstractBuilder.init();
-        }
-        catch (IOException ex)
-        {
+        } catch (IOException ex) {
             log.error("Error initializing tests", ex);
             fail("Error initializing tests: " + ex.getMessage());
         }
@@ -103,7 +99,7 @@ public class AbstractDSpaceIntegrationTest
         kernelImpl = null;
     }
 
-    public static String getDspaceDir(){
+    public static String getDspaceDir() {
         return System.getProperty("dspace.dir");
 
     }

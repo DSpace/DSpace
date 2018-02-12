@@ -14,17 +14,16 @@ import org.dspace.app.rest.utils.Utils;
 /**
  * Authority Rest HAL Resource. The HAL Resource wraps the REST Resource
  * adding support for the links and embedded resources
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @RelNameDSpaceResource(AuthorityRest.NAME)
 public class AuthorityResource extends DSpaceResource<AuthorityRest> {
-	public AuthorityResource(AuthorityRest sd, Utils utils, String... rels) {		
-		super(sd, utils, rels);
-		if(sd.hasIdentifier()) {
-			add(utils.linkToSubResource(sd, AuthorityRest.ENTRY));	
-		}		
-		add(utils.linkToSubResource(sd, AuthorityRest.ENTRIES));	
-	}
+    public AuthorityResource(AuthorityRest sd, Utils utils, String... rels) {
+        super(sd, utils, rels);
+        if (sd.hasIdentifier()) {
+            add(utils.linkToSubResource(sd, AuthorityRest.ENTRY));
+        }
+        add(utils.linkToSubResource(sd, AuthorityRest.ENTRIES));
+    }
 }

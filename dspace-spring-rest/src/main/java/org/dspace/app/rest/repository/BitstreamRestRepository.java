@@ -30,84 +30,83 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the repository responsible to manage Bitstream Rest object
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
 @Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME)
 public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest, UUID> {
 
-	@Autowired
-	BitstreamService bs;
+    @Autowired
+    BitstreamService bs;
 
-	@Autowired
-	BitstreamConverter converter;
-	
-	public BitstreamRestRepository() {
-		System.out.println("Repository initialized by Spring");
-	}
+    @Autowired
+    BitstreamConverter converter;
 
-	@Override
-	public BitstreamRest findOne(Context context, UUID id) {
-		Bitstream bit = null;
-		try {
-			bit = bs.find(context, id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (bit == null) {
-			return null;
-		}
-		return converter.fromModel(bit);
-	}
+    public BitstreamRestRepository() {
+        System.out.println("Repository initialized by Spring");
+    }
 
-	@Override
-	public Page<BitstreamRest> findAll(Context context, Pageable pageable) {
-		List<Bitstream> bit = new ArrayList<Bitstream>();
-		Iterator<Bitstream> it = null;
-		int total = 0;
-		try {
-			total = bs.countTotal(context);
-			it = bs.findAll(context, pageable.getPageSize(), pageable.getOffset());
-			while(it.hasNext()) {
-				bit.add(it.next());
-			}
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		Page<BitstreamRest> page = new PageImpl<Bitstream>(bit, pageable, total).map(converter);
-		return page;
-	}
-	
-	@Override
-	public Class<BitstreamRest> getDomainClass() {
-		return BitstreamRest.class;
-	}
-	
-	@Override	
-	public BitstreamResource wrapResource(BitstreamRest bs, String... rels) {
-		return new BitstreamResource(bs, utils, rels);
-	}
+    @Override
+    public BitstreamRest findOne(Context context, UUID id) {
+        Bitstream bit = null;
+        try {
+            bit = bs.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (bit == null) {
+            return null;
+        }
+        return converter.fromModel(bit);
+    }
 
-	public InputStream retrieve(UUID uuid) {
-		Context context = obtainContext();
-		Bitstream bit = null;
-		try {
-			bit = bs.find(context, uuid);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (bit == null) {
-			return null;
-		}
-		InputStream is;
-		try {
-			is = bs.retrieve(context, bit);
-		} catch (IOException | SQLException | AuthorizeException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		context.abort();
-		return is;
-	}
+    @Override
+    public Page<BitstreamRest> findAll(Context context, Pageable pageable) {
+        List<Bitstream> bit = new ArrayList<Bitstream>();
+        Iterator<Bitstream> it = null;
+        int total = 0;
+        try {
+            total = bs.countTotal(context);
+            it = bs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+            while (it.hasNext()) {
+                bit.add(it.next());
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<BitstreamRest> page = new PageImpl<Bitstream>(bit, pageable, total).map(converter);
+        return page;
+    }
+
+    @Override
+    public Class<BitstreamRest> getDomainClass() {
+        return BitstreamRest.class;
+    }
+
+    @Override
+    public BitstreamResource wrapResource(BitstreamRest bs, String... rels) {
+        return new BitstreamResource(bs, utils, rels);
+    }
+
+    public InputStream retrieve(UUID uuid) {
+        Context context = obtainContext();
+        Bitstream bit = null;
+        try {
+            bit = bs.find(context, uuid);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (bit == null) {
+            return null;
+        }
+        InputStream is;
+        try {
+            is = bs.retrieve(context, bit);
+        } catch (IOException | SQLException | AuthorizeException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        context.abort();
+        return is;
+    }
 }

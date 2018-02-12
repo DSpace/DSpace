@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,23 +22,23 @@ public class SearchConfigurationRestTest {
     SearchConfigurationRest searchConfigurationRest;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         searchConfigurationRest = new SearchConfigurationRest();
     }
 
 
     @Test
-    public void testFiltersNotNullAfterConstructor() throws Exception{
+    public void testFiltersNotNullAfterConstructor() throws Exception {
         assertNotNull(searchConfigurationRest.getFilters());
     }
 
     @Test
-    public void testSortOptionsNotNullAfterConstructor() throws Exception{
+    public void testSortOptionsNotNullAfterConstructor() throws Exception {
         assertNotNull(searchConfigurationRest.getSortOptions());
     }
 
     @Test
-    public void testAddFilterToEmptyListAndListContainsThatFilter() throws Exception{
+    public void testAddFilterToEmptyListAndListContainsThatFilter() throws Exception {
         SearchConfigurationRest.Filter filter = new SearchConfigurationRest.Filter();
         filter.setFilter("filter");
         searchConfigurationRest.addFilter(filter);
@@ -44,7 +46,7 @@ public class SearchConfigurationRestTest {
     }
 
     @Test
-    public void testAddSortOptionToEmptyListAndListContainsThatSortOption() throws Exception{
+    public void testAddSortOptionToEmptyListAndListContainsThatSortOption() throws Exception {
         SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
         sortOption.setActualName("sort option");
         searchConfigurationRest.addSortOption(sortOption);
@@ -52,7 +54,7 @@ public class SearchConfigurationRestTest {
     }
 
     @Test
-    public void testAddMultipleFiltersToListAndListIsConstructedProperly() throws Exception{
+    public void testAddMultipleFiltersToListAndListIsConstructedProperly() throws Exception {
         SearchConfigurationRest.Filter filter = new SearchConfigurationRest.Filter();
         filter.setFilter("filter");
         searchConfigurationRest.addFilter(filter);
@@ -62,13 +64,15 @@ public class SearchConfigurationRestTest {
 
         assertEquals(2, searchConfigurationRest.getFilters().size());
 
-        assertTrue(searchConfigurationRest.getFilters().get(0) == filter || searchConfigurationRest.getFilters().get(0) == filter2);
-        assertTrue(searchConfigurationRest.getFilters().get(1) == filter || searchConfigurationRest.getFilters().get(1) == filter2);
+        assertTrue(searchConfigurationRest.getFilters().get(0) == filter || searchConfigurationRest.getFilters()
+                                                                                                   .get(0) == filter2);
+        assertTrue(searchConfigurationRest.getFilters().get(1) == filter || searchConfigurationRest.getFilters()
+                                                                                                   .get(1) == filter2);
 
     }
 
     @Test
-    public void testAddMultipleSortOptionsToListAndListIsConstructedProperly() throws Exception{
+    public void testAddMultipleSortOptionsToListAndListIsConstructedProperly() throws Exception {
         SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
         sortOption.setActualName("sort option");
         searchConfigurationRest.addSortOption(sortOption);
@@ -78,27 +82,35 @@ public class SearchConfigurationRestTest {
 
         assertEquals(2, searchConfigurationRest.getSortOptions().size());
 
-        assertTrue(searchConfigurationRest.getSortOptions().get(0) == sortOption || searchConfigurationRest.getSortOptions().get(0) == sortOption2);
-        assertTrue(searchConfigurationRest.getSortOptions().get(1) == sortOption || searchConfigurationRest.getSortOptions().get(1) == sortOption2);
+        assertTrue(
+            searchConfigurationRest.getSortOptions().get(0) == sortOption || searchConfigurationRest.getSortOptions()
+                                                                                                    .get(
+                                                                                                        0) ==
+                sortOption2);
+        assertTrue(
+            searchConfigurationRest.getSortOptions().get(1) == sortOption || searchConfigurationRest.getSortOptions()
+                                                                                                    .get(
+                                                                                                        1) ==
+                sortOption2);
 
     }
 
 
     @Test
-    public void testOperatorConstructorWithProperValueReturnsCorrectValue() throws Exception{
+    public void testOperatorConstructorWithProperValueReturnsCorrectValue() throws Exception {
         SearchConfigurationRest.Filter.Operator operator = new SearchConfigurationRest.Filter.Operator("operator");
         assertEquals("operator", operator.getOperator());
     }
 
 
     @Test
-    public void testFilterGetOperatorsAfterConstructorReturnsEmptyList() throws Exception{
+    public void testFilterGetOperatorsAfterConstructorReturnsEmptyList() throws Exception {
         SearchConfigurationRest.Filter filter = new SearchConfigurationRest.Filter();
         assertTrue(filter.getOperators().isEmpty());
     }
 
     @Test
-    public void testFilterAddOperatorAddsProperlyAndIsIncludedInGetOperators() throws Exception{
+    public void testFilterAddOperatorAddsProperlyAndIsIncludedInGetOperators() throws Exception {
         SearchConfigurationRest.Filter filter = new SearchConfigurationRest.Filter();
         SearchConfigurationRest.Filter.Operator operator = new SearchConfigurationRest.Filter.Operator("operator");
         filter.addOperator(operator);
@@ -106,7 +118,7 @@ public class SearchConfigurationRestTest {
     }
 
     @Test
-    public void testFilterAddDefaultOperatorsToListPopulatesList() throws Exception{
+    public void testFilterAddDefaultOperatorsToListPopulatesList() throws Exception {
         SearchConfigurationRest.Filter filter = new SearchConfigurationRest.Filter();
         filter.addDefaultOperatorsToList();
         assertTrue(!filter.getOperators().isEmpty());

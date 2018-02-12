@@ -15,51 +15,48 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 
 /**
- * 
  * This is the base converter from/to objects in the DSpace API data model and
  * the REST data model
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
- * @param <M>
- *            the Class in the DSpace API data model
- * @param <R>
- *            the Class in the DSpace REST data model
+ * @param <M> the Class in the DSpace API data model
+ * @param <R> the Class in the DSpace REST data model
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends org.dspace.app.rest.model.DSpaceObjectRest>
-		extends DSpaceConverter<M, R> {
+public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends org.dspace.app.rest.model
+    .DSpaceObjectRest>
+    extends DSpaceConverter<M, R> {
 
-	@Override
-	public R fromModel(M obj) {
-		R resource = newInstance();
-		resource.setHandle(obj.getHandle());
-		if (obj.getID() != null) {
-			resource.setUuid(obj.getID().toString());
-		}
-		resource.setName(obj.getName());
-		List<MetadataEntryRest> metadata = new ArrayList<MetadataEntryRest>();
-		for (MetadataValue mv : obj.getMetadata()) {
-			MetadataEntryRest me = new MetadataEntryRest();
-			me.setKey(mv.getMetadataField().toString('.'));
-			me.setValue(mv.getValue());
-			me.setLanguage(mv.getLanguage());
-			metadata.add(me);
-		}
-		resource.setMetadata(metadata);
-		return resource;
-	}
+    @Override
+    public R fromModel(M obj) {
+        R resource = newInstance();
+        resource.setHandle(obj.getHandle());
+        if (obj.getID() != null) {
+            resource.setUuid(obj.getID().toString());
+        }
+        resource.setName(obj.getName());
+        List<MetadataEntryRest> metadata = new ArrayList<MetadataEntryRest>();
+        for (MetadataValue mv : obj.getMetadata()) {
+            MetadataEntryRest me = new MetadataEntryRest();
+            me.setKey(mv.getMetadataField().toString('.'));
+            me.setValue(mv.getValue());
+            me.setLanguage(mv.getLanguage());
+            metadata.add(me);
+        }
+        resource.setMetadata(metadata);
+        return resource;
+    }
 
-	@Override
-	public M toModel(R obj) {
-		return null;
-	}
+    @Override
+    public M toModel(R obj) {
+        return null;
+    }
 
-	public boolean supportsModel(DSpaceObject object) {
-		return object != null && object.getClass().equals(getModelClass());
-	}
+    public boolean supportsModel(DSpaceObject object) {
+        return object != null && object.getClass().equals(getModelClass());
+    }
 
-	protected abstract R newInstance();
+    protected abstract R newInstance();
 
-	protected abstract Class<M> getModelClass();
+    protected abstract Class<M> getModelClass();
 
 }

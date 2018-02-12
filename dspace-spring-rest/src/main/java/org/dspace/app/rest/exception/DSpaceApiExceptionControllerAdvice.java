@@ -7,22 +7,16 @@
  */
 package org.dspace.app.rest.exception;
 
-
 import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIBUTE;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.authorize.AuthorizeException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
@@ -31,26 +25,29 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
- *
  */
 @ControllerAdvice
-public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler{
+public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AuthorizeException.class)
-    protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
+    protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
         sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @ExceptionHandler(SQLException.class)
-    protected void handleSQLException(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
+    protected void handleSQLException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
         sendErrorResponse(request, response, ex,
-                "An internal database error occurred", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                          "An internal database error occurred", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(IOException.class)
-    protected void handleIOException(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
+    protected void handleIOException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
         sendErrorResponse(request, response, ex,
-                "An internal read or write operation failed (IO Exception)", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                          "An internal read or write operation failed (IO Exception)",
+                          HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
     private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,

@@ -15,84 +15,83 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * The Access Condition (ResourcePolicy) REST Resource
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class AccessConditionOptionRest {
 
-	private String name;
-	
-	@JsonInclude(Include.NON_NULL)
-	private UUID groupUUID;
-	
-	@JsonInclude(Include.NON_NULL)
-	private UUID selectGroupUUID;
-	
-	private Boolean hasStartDate;
-	
-	private Boolean hasEndDate;
-	
-	@JsonInclude(Include.NON_NULL)	
-	private Date maxStartDate;
-	
-	@JsonInclude(Include.NON_NULL)
-	private Date maxEndDate;
+    private String name;
 
-	public UUID getGroupUUID() {
-		return groupUUID;
-	}
+    @JsonInclude(Include.NON_NULL)
+    private UUID groupUUID;
 
-	public void setGroupUUID(UUID groupUuid) {
-		this.groupUUID = groupUuid;
-	}
+    @JsonInclude(Include.NON_NULL)
+    private UUID selectGroupUUID;
 
-	public UUID getSelectGroupUUID() {
-		return selectGroupUUID;
-	}
+    private Boolean hasStartDate;
 
-	public void setSelectGroupUUID(UUID selectGroupUuid) {
-		this.selectGroupUUID = selectGroupUuid;
-	}
+    private Boolean hasEndDate;
 
-	public Date getMaxEndDate() {
-		return maxEndDate;
-	}
+    @JsonInclude(Include.NON_NULL)
+    private Date maxStartDate;
 
-	public void setMaxEndDate(Date maxEndDate) {
-		this.maxEndDate = maxEndDate;
-	}
+    @JsonInclude(Include.NON_NULL)
+    private Date maxEndDate;
 
-	public Boolean getHasStartDate() {
-		return hasStartDate;
-	}
+    public UUID getGroupUUID() {
+        return groupUUID;
+    }
 
-	public void setHasStartDate(Boolean hasStartDate) {
-		this.hasStartDate = hasStartDate;
-	}
+    public void setGroupUUID(UUID groupUuid) {
+        this.groupUUID = groupUuid;
+    }
 
-	public Boolean getHasEndDate() {
-		return hasEndDate;
-	}
+    public UUID getSelectGroupUUID() {
+        return selectGroupUUID;
+    }
 
-	public void setHasEndDate(Boolean hasEndDate) {
-		this.hasEndDate = hasEndDate;
-	}
+    public void setSelectGroupUUID(UUID selectGroupUuid) {
+        this.selectGroupUUID = selectGroupUuid;
+    }
 
-	public Date getMaxStartDate() {
-		return maxStartDate;
-	}
+    public Date getMaxEndDate() {
+        return maxEndDate;
+    }
 
-	public void setMaxStartDate(Date maxStartDate) {
-		this.maxStartDate = maxStartDate;
-	}
+    public void setMaxEndDate(Date maxEndDate) {
+        this.maxEndDate = maxEndDate;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public Boolean getHasStartDate() {
+        return hasStartDate;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setHasStartDate(Boolean hasStartDate) {
+        this.hasStartDate = hasStartDate;
+    }
+
+    public Boolean getHasEndDate() {
+        return hasEndDate;
+    }
+
+    public void setHasEndDate(Boolean hasEndDate) {
+        this.hasEndDate = hasEndDate;
+    }
+
+    public Date getMaxStartDate() {
+        return maxStartDate;
+    }
+
+    public void setMaxStartDate(Date maxStartDate) {
+        this.maxStartDate = maxStartDate;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

@@ -17,7 +17,7 @@ import org.dspace.app.rest.parameter.SearchFilter;
 /**
  * This class provides a container for the information to be used in the DiscoveryResultsResource
  */
-public abstract class DiscoveryResultsRest extends BaseObjectRest<String>{
+public abstract class DiscoveryResultsRest extends BaseObjectRest<String> {
 
     @JsonIgnore
     public static final String NAME = "discover";
@@ -74,7 +74,7 @@ public abstract class DiscoveryResultsRest extends BaseObjectRest<String>{
     }
 
     public void addAppliedFilter(final SearchResultsRest.AppliedFilter filter) {
-        if(appliedFilters == null) {
+        if (appliedFilters == null) {
             appliedFilters = new LinkedList<>();
         }
 
@@ -104,11 +104,11 @@ public abstract class DiscoveryResultsRest extends BaseObjectRest<String>{
 
     private String configurationName;
 
-    public void setSearchFilters(final List<SearchFilter> searchFilters){
+    public void setSearchFilters(final List<SearchFilter> searchFilters) {
         this.searchFilters = searchFilters;
     }
 
-    public List<SearchFilter> getSearchFilters(){
+    public List<SearchFilter> getSearchFilters() {
         return searchFilters;
     }
 

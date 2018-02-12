@@ -7,13 +7,13 @@
  */
 package org.dspace.app.rest.link.search;
 
+import java.util.LinkedList;
+
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.model.hateoas.FacetsResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
-
-import java.util.LinkedList;
 
 @Component
 public class FacetsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<FacetsResource> {
@@ -22,7 +22,7 @@ public class FacetsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<Fa
         SearchResultsRest data = halResource.getContent();
 
 
-        if(data != null){
+        if (data != null) {
             list.add(buildLink(Link.REL_SELF, buildSearchFacetsBaseLink(data).build().toUriString()));
         }
     }

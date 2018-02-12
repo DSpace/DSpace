@@ -16,11 +16,10 @@ import org.dspace.app.rest.utils.Utils;
  * adding support for the links and embedded resources
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
- *
  */
 @RelNameDSpaceResource(SubmissionUploadRest.NAME)
 public class SubmissionUploadResource extends DSpaceResource<SubmissionUploadRest> {
-	public SubmissionUploadResource(SubmissionUploadRest sd, Utils utils, String... rels) {
-		super(sd, utils, rels);
-	}
+    public SubmissionUploadResource(SubmissionUploadRest sd, Utils utils, String... rels) {
+        super(sd, utils, rels);
+    }
 }

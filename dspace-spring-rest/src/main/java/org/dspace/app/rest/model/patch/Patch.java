@@ -17,30 +17,29 @@ import java.util.List;
  * This class (and {@link Operation} capture the definition of a patch, but are not coupled to any specific patch
  * representation.
  * </p>
- *	
- * Based on {@link org.springframework.data.rest.webmvc.json.patch.Patch}
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * Based on {@link org.springframework.data.rest.webmvc.json.patch.Patch}
+ *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class Patch {
 
-	private final List<Operation> operations;
+    private final List<Operation> operations;
 
-	public Patch(List<Operation> operations) {
-		this.operations = operations;
-	}
+    public Patch(List<Operation> operations) {
+        this.operations = operations;
+    }
 
-	/**
-	 * @return the number of operations that make up this patch.
-	 */
-	public int size() {
-		return operations.size();
-	}
+    /**
+     * @return the number of operations that make up this patch.
+     */
+    public int size() {
+        return operations.size();
+    }
 
-	public List<Operation> getOperations() {
-		return operations;
-	}
+    public List<Operation> getOperations() {
+        return operations;
+    }
 
-	
+
 }

@@ -11,46 +11,45 @@ import org.dspace.app.rest.RestResourceController;
 
 /**
  * The MetadataSchema REST Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class MetadataSchemaRest extends BaseObjectRest<Integer> {
-	public static final String NAME = "metadataschema";
-	public static final String CATEGORY = RestAddressableModel.CORE;
-	
-	private String prefix;
+    public static final String NAME = "metadataschema";
+    public static final String CATEGORY = RestAddressableModel.CORE;
 
-	private String namespace;
+    private String prefix;
 
-	public String getPrefix() {
-		return prefix;
-	}
-	
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
-	
-	public String getNamespace() {
-		return namespace;
-	}
-	
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
-	
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    private String namespace;
 
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
-	
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
+
+    @Override
+    public String getType() {
+        return NAME;
+    }
+
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
+
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
 }
