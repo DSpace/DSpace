@@ -12,15 +12,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Used to handle/determine status of REST API.
  * Mainly to know your authentication status
- *
  */
 @XmlRootElement(name = "collection")
-public class HierarchyCollection extends HierarchyObject
-{
-    public HierarchyCollection(){
+public class HierarchyCollection extends HierarchyObject {
+    public HierarchyCollection() {
     }
-    
-    public HierarchyCollection(String id, String name, String handle){
-    	super(id, name, handle);
+
+    public HierarchyCollection(String id, String name, String handle) {
+        super(id, name, handle);
     }
 }
