@@ -10,83 +10,79 @@ package org.purl.sword.base;
 
 /**
  * A representation of a quality value.
- * 
+ *
  * The quality value must be between 0 and 1, with no more than three digits
  * after the decimal place.
- * 
+ *
  * @author Stuart Lewis
  */
 public class QualityValue {
-    
-    /** The quality value. */
+
+    /**
+     * The quality value.
+     */
     private float quality;
-    
+
     /**
      * Create a quality value defaulting to 1
-     * 
+     *
      * @throws NumberFormatException thrown if the quality value is invalid according to the SWORD specification
      */
-    public QualityValue() throws NumberFormatException
-    {
+    public QualityValue() throws NumberFormatException {
         // As per the spec, default to value 1
         setQualityValue(1f);
     }
-    
+
     /**
      * Create a quality value
-     * 
+     *
      * @param q The quality value
      * @throws NumberFormatException thrown if the quality value is invalid according to the SWORD specification
      */
-    public QualityValue(float q) throws NumberFormatException
-    {
+    public QualityValue(float q) throws NumberFormatException {
         setQualityValue(q);
     }
-    
+
     /**
      * Set the quality value.
-     * 
+     *
      * @param q The quality value
      * @throws NumberFormatException thrown if the quality value is invalid according to the SWORD specification
      */
-    public final void setQualityValue(float q) throws NumberFormatException
-    {
+    public final void setQualityValue(float q) throws NumberFormatException {
         // Check the float is in range
-        if ((q < 0) || (q > 1))
-        {
+        if ((q < 0) || (q > 1)) {
             throw new NumberFormatException("Invalid value - must be between 0 and 1");
         }
-        
+
         // Check there are no more than three digits after the decimal point
         String qStr = "" + q;
         int pos = qStr.indexOf('.');
-        if (qStr.substring(pos + 1).length() > 3)
-        {
-            throw new NumberFormatException("Invalid value - no more than three digits after the decimal point: " + qStr);
+        if (qStr.substring(pos + 1).length() > 3) {
+            throw new NumberFormatException(
+                "Invalid value - no more than three digits after the decimal point: " + qStr);
         }
         quality = q;
     }
-    
+
     /**
      * Get the quality value
-     * 
+     *
      * @return the quality value
      */
-    public final float getQualityValue()
-    {
+    public final float getQualityValue() {
         return quality;
     }
-    
+
     /**
      * Get a String representation of this quality value
-     * 
+     *
      * @return The String representation of the quality value
      */
-    public String toString()
-    {
+    public String toString() {
         return Float.toString(quality);
     }
-    
+
     /**
      * A main method with rudimentary tests to check the class
      */
@@ -94,7 +90,7 @@ public class QualityValue {
     public static void main(String[] args)
     {
         // Test the class
-        
+
         // Fail - under 0
         try
         {
@@ -106,7 +102,7 @@ public class QualityValue {
             System.out.print("1) Pass: -0.01 failed as expected ");
             System.out.println(nfe);
         }
-        
+
         // Fail - over 1
         try
         {
@@ -118,7 +114,7 @@ public class QualityValue {
             System.out.print("2) Pass: 1.01 failed as expected ");
             System.out.println(nfe);
         }
-        
+
         // Fail - to many decimal points
         try
         {
@@ -130,7 +126,7 @@ public class QualityValue {
             System.out.print("3) Pass: 0.1234 failed as expected ");
             System.out.println(nfe);
         }
-        
+
         // Pass - no decimal places 0
         try
         {
@@ -141,7 +137,7 @@ public class QualityValue {
         {
             System.out.println("4) Fail: 0 failed unexpectedly");
         }
-        
+
         // Pass - no decimal places 1
         try
         {
@@ -164,7 +160,7 @@ public class QualityValue {
         {
             System.out.println("6) Fail: 0.123 failed unexpectedly");
         }
-        
+
         // Pass - No value given
         try
         {
