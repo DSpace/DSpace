@@ -12,7 +12,7 @@ import org.dspace.services.ConfigurationService;
 /**
  * This is the most core piece of the system:  instantiating one will
  * startup the dspace services framework.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface DSpaceKernel extends CommonLifecycle<DSpaceKernel> {
@@ -20,7 +20,7 @@ public interface DSpaceKernel extends CommonLifecycle<DSpaceKernel> {
     public static final String KERNEL_NAME = "Kernel";
     public static final String MBEAN_PREFIX = "org.dspace:name=";
     public static final String MBEAN_SUFFIX = ",type=DSpaceKernel";
-    public static final String MBEAN_NAME = MBEAN_PREFIX+KERNEL_NAME+MBEAN_SUFFIX;
+    public static final String MBEAN_NAME = MBEAN_PREFIX + KERNEL_NAME + MBEAN_SUFFIX;
 
     /**
      * @return the unique MBean name of this DSpace Kernel

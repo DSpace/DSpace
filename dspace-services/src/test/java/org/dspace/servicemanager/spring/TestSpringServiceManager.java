@@ -26,7 +26,7 @@ import org.junit.Test;
 
 /**
  * Testing the spring based service manager
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class TestSpringServiceManager {
@@ -42,7 +42,8 @@ public class TestSpringServiceManager {
         configurationService.loadConfig(SampleAnnotationBean.class.getName() + ".sampleValue", "beckyz");
         configurationService.loadConfig("fakeBean.fakeParam", "beckyz");
 
-        ssm = new SpringServiceManager(new MockServiceManagerSystem(ssm), configurationService, true, true, SPRING_TEST_CONFIG_FILE);
+        ssm = new SpringServiceManager(new MockServiceManagerSystem(ssm), configurationService, true, true,
+                                       SPRING_TEST_CONFIG_FILE);
     }
 
     @After
@@ -80,7 +81,8 @@ public class TestSpringServiceManager {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#getServiceByName(java.lang.String, java.lang.Class)}.
+     * Test method for
+     * {@link org.dspace.servicemanager.spring.SpringServiceManager#getServiceByName(java.lang.String, java.lang.Class)}.
      */
     @Test
     public void testGetServiceByName() {
@@ -92,7 +94,8 @@ public class TestSpringServiceManager {
         assertEquals("azeckoski", concrete.getName());
         concrete = null;
 
-        SampleAnnotationBean sab = ssm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
+        SampleAnnotationBean sab = ssm
+            .getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
         assertEquals(null, sab.getSampleValue());
         sab = null;
@@ -107,12 +110,14 @@ public class TestSpringServiceManager {
         assertEquals("azeckoski", concrete.getName());
         concrete = null;
 
-        SampleAnnotationBean sab = ssm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
+        SampleAnnotationBean sab = ssm
+            .getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
         assertEquals("beckyz", sab.getSampleValue());
         sab = null;
 
-        SpringAnnotationBean spr = ssm.getServiceByName(SpringAnnotationBean.class.getName(), SpringAnnotationBean.class);
+        SpringAnnotationBean spr = ssm
+            .getServiceByName(SpringAnnotationBean.class.getName(), SpringAnnotationBean.class);
         assertNotNull(spr);
         assertEquals("azeckoski", spr.getConcreteName());
         assertEquals("aaronz", spr.getExampleName());
@@ -140,7 +145,8 @@ public class TestSpringServiceManager {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#registerServiceClass(java.lang.String, java.lang.Class)}.
+     * Test method for
+     * {@link org.dspace.servicemanager.spring.SpringServiceManager#registerServiceClass(java.lang.String, java.lang.Class)}.
      */
     @Test
     public void testRegisterServiceClass() {
@@ -156,7 +162,7 @@ public class TestSpringServiceManager {
         l = null;
 
         try {
-            ssm.registerService("fakey", (Class<?>)null);
+            ssm.registerService("fakey", (Class<?>) null);
             fail("should have thrown exception");
         } catch (IllegalArgumentException e) {
             assertNotNull(e.getMessage());
@@ -164,7 +170,8 @@ public class TestSpringServiceManager {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#registerService(java.lang.String, java.lang.Object)}.
+     * Test method for
+     * {@link org.dspace.servicemanager.spring.SpringServiceManager#registerService(java.lang.String, java.lang.Object)}.
      */
     @Test
     public void testRegisterService() {
@@ -177,7 +184,7 @@ public class TestSpringServiceManager {
         assertEquals("AZ", service);
 
         try {
-            ssm.registerService("fakey", (Object)null);
+            ssm.registerService("fakey", (Object) null);
             fail("should have thrown exception");
         } catch (IllegalArgumentException e) {
             assertNotNull(e.getMessage());

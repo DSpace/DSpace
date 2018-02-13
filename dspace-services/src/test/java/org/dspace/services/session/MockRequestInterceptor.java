@@ -12,7 +12,7 @@ import org.dspace.services.model.RequestInterceptor;
 
 /**
  * This is a mock request interceptor for testing
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class MockRequestInterceptor implements RequestInterceptor {
@@ -21,7 +21,8 @@ public class MockRequestInterceptor implements RequestInterceptor {
     public int hits = 0;
 
     /* (non-Javadoc)
-     * @see org.dspace.services.model.RequestInterceptor#onEnd(java.lang.String, org.dspace.services.model.Session, boolean, java.lang.Exception)
+     * @see org.dspace.services.model.RequestInterceptor#onEnd(java.lang.String, org.dspace.services.model.Session,
+     * boolean, java.lang.Exception)
      */
     public void onEnd(String requestId, boolean succeeded, Exception failure) {
         if (succeeded) {
