@@ -434,7 +434,7 @@
                                                             select="concat($rfirstpart, $apos, 'https://doi.org/', $pkgDOI, $apos, $rsecondpart,
 														$thistitle, $rthirdpart)"/>
                                                 </xsl:attribute>
-                                                <img border="0px;" src="http://reddit.com/static/spreddit7.gif"
+                                                <img border="0px;" src="https://reddit.com/static/spreddit7.gif"
                                                      alt="Reddit"/>
                                                 <!-- xsl:text is a work around for formatting issues -->
                                                 <xsl:text> </xsl:text>
@@ -476,7 +476,7 @@
                                                             select="concat('http://www.mendeley.com/import/?url=http://datadryad.org/resource/',
                                                                        $pkgDOI)" />
                                                 </xsl:attribute>
-                                                <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png" alt="Mendeley"/>
+                                                <img border="0px;" src="https://www.mendeley.com/graphics/mendeley.png" alt="Mendeley"/>
                                             </xsl:element>
                                         </td>
                                     </tr>
@@ -809,7 +809,7 @@
                                                             select="concat($rfirstpart, $apos, 'https://doi.org/', $my_doi, $apos, $rsecondpart,
 												$thistitle, $rthirdpart)"/>
                                                 </xsl:attribute>
-                                                <img border="0px;" src="http://reddit.com/static/spreddit7.gif"
+                                                <img border="0px;" src="https://reddit.com/static/spreddit7.gif"
                                                      alt="Reddit"/>
                                                 <!-- xsl:text is a work around for formatting issues -->
                                                 <xsl:text> </xsl:text>
@@ -851,7 +851,7 @@
                                                             select="concat('http://www.mendeley.com/import/?url=http://datadryad.org/resource/',
                                                             $my_doi)" />
                                                 </xsl:attribute>
-                                                <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png" alt="Mendeley"/>
+                                                <img border="0px;" src="https://www.mendeley.com/graphics/mendeley.png" alt="Mendeley"/>
                                             </xsl:element>
                                         </td>
                                     </tr>

@@ -243,7 +243,7 @@
     <xsl:template name="reddit-item">
         <a href="http://reddit.com/submit"
             onclick="window.open('http://reddit.com/submit?url='+encodeURIComponent('https://doi.org/doi:10.5061/dryad.87ht85rs')+'&amp;title=Data+from%3A+Robustness+of+compound+Dirichlet+priors+for+Bayesian+inference+of+branch+lengths.+','reddit','toolbar=no,width=550,height=550'); return false">
-            <img alt="Reddit" src="http://reddit.com/static/spreddit7.gif" border="0px;"/>
+            <img alt="Reddit" src="https://reddit.com/static/spreddit7.gif" border="0px;"/>
         </a>
     </xsl:template>
 
@@ -264,7 +264,7 @@
     <xsl:template name="mendeley-item">
         <a
             href="http://www.mendeley.com/import/?url=http://datadryad.org/resource/doi:10.5061/dryad.87ht85rs">
-            <img alt="Mendeley" src="http://www.mendeley.com/graphics/mendeley.png" border="0px;"/>
+            <img alt="Mendeley" src="https://www.mendeley.com/graphics/mendeley.png" border="0px;"/>
         </a>
     </xsl:template>
 
