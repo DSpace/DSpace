@@ -8,13 +8,10 @@
     http://www.dspace.org/license/
 
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans 
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-           http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
     <!-- Place all DSpace core service bean definitions below here -->
 
@@ -23,22 +20,23 @@
          like ${dspace.dir} within our Spring bean XML configuration files. These
          property values are then dynamically loaded via our DSpaceConfigurationService. -->
     <!-- First, configure a property placeholder. This lets us use properties like ${..} within Spring bean configs -->
-    <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean id="propertyPlaceholderConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="properties" ref="dspaceConfigurationFactoryBean"/>
     </bean>
     <!-- Next, wire it up to use our DSpaceConfigurationFactoryBean. This bean will use our configured
          DSpace ConfigurationService for all property substitution in Spring XML files -->
     <bean id="dspaceConfigurationFactoryBean" class="org.dspace.servicemanager.config.DSpaceConfigurationFactoryBean">
-       <constructor-arg ref="org.dspace.services.ConfigurationService" />
+        <constructor-arg ref="org.dspace.services.ConfigurationService"/>
     </bean>
     <!-- end PROPERTY PLACEHOLDER SETUP-->
 
     <!-- CACHING service beans -->
-    <bean id="org.dspace.services.CachingService" class="org.dspace.services.caching.CachingServiceImpl" />
+    <bean id="org.dspace.services.CachingService" class="org.dspace.services.caching.CachingServiceImpl"/>
 
     <!-- This is the main cache manager -->
     <bean id="org.dspace.caching.ehcache.CacheManager"
-        class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+          class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
         <property name="configLocation">
             <bean class="org.dspace.servicemanager.spring.ResourceFinder" factory-method="getResourceFromPaths">
                 <constructor-arg>
@@ -54,17 +52,17 @@
     <!-- CACHING end beans -->
 
     <!-- REQUEST - request service (implemented as a single bean) -->
-    <bean id="org.dspace.services.RequestService" class="org.dspace.services.sessions.StatelessRequestServiceImpl" />
+    <bean id="org.dspace.services.RequestService" class="org.dspace.services.sessions.StatelessRequestServiceImpl"/>
     <!-- REQUEST end beans -->
-    
+
     <!-- EVENTS -->
-    <bean id="org.dspace.services.EventService" class="org.dspace.services.events.SystemEventService" />
+    <bean id="org.dspace.services.EventService" class="org.dspace.services.events.SystemEventService"/>
 
     <!-- EMAIL -->
     <bean id="org.dspace.services.email.EmailServiceImpl"
-        class="org.dspace.services.email.EmailServiceImpl">
+          class="org.dspace.services.email.EmailServiceImpl">
         <property name="cfg"
-                  ref="org.dspace.services.ConfigurationService" />
+                  ref="org.dspace.services.ConfigurationService"/>
     </bean>
 
     <!-- DSpaceServicesFactory (for easy access to above core services) -->

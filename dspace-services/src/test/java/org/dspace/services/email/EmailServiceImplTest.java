@@ -8,23 +8,23 @@
 
 package org.dspace.services.email;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
 import org.dspace.test.DSpaceAbstractKernelTest;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 /**
- *
  * @author mwood
  */
 public class EmailServiceImplTest
-        extends DSpaceAbstractKernelTest
-{
+    extends DSpaceAbstractKernelTest {
     private static final String USERNAME = "auser";
     private static final String PASSWORD = "apassword";
 
@@ -57,8 +57,7 @@ public class EmailServiceImplTest
      */
     @Test
     public void testGetSession()
-            throws MessagingException
-    {
+        throws MessagingException {
         System.out.println("getSession");
         Session session;
         EmailService instance = getService(EmailServiceImpl.class);
@@ -75,8 +74,7 @@ public class EmailServiceImplTest
      * Test of getPasswordAuthentication method, of class EmailServiceImpl.
      */
     @Test
-    public void testGetPasswordAuthentication()
-    {
+    public void testGetPasswordAuthentication() {
         System.out.println("getPasswordAuthentication");
         ConfigurationService cfg = getKernel().getConfigurationService();
 

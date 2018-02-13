@@ -7,28 +7,28 @@
  */
 package org.dspace.servicemanager;
 
-import org.dspace.servicemanager.config.DSpaceConfigurationService;
-
 import java.util.List;
+
+import org.dspace.servicemanager.config.DSpaceConfigurationService;
 
 /**
  * Interface for modular service manager systems.
  * Provides a generic initialization routine, in lieu of hardcoded
  * constructors.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface ExternalServiceManagerSystem extends ServiceManagerSystem {
     /**
      * Initialize the service manager's configuration.
      *
-     * @param parent parent ServiceManagerSystem
+     * @param parent               parent ServiceManagerSystem
      * @param configurationService current DSpace configuration service
-     * @param testMode whether in test mode
-     * @param developmentMode whether in development mode
-     * @param serviceManagers List of ServiceManagerSystems
+     * @param testMode             whether in test mode
+     * @param developmentMode      whether in development mode
+     * @param serviceManagers      List of ServiceManagerSystems
      */
     void init(ServiceManagerSystem parent, DSpaceConfigurationService configurationService,
-            boolean testMode, boolean developmentMode, List<ServiceManagerSystem> serviceManagers);
+              boolean testMode, boolean developmentMode, List<ServiceManagerSystem> serviceManagers);
 
 }

@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
@@ -110,11 +109,14 @@ public final class StatelessRequestServiceImpl implements RequestService, Initia
                 try {
                     requestInterceptor.onStart(req.getRequestId());
                 } catch (RequestInterruptionException e) {
-                    String message = "Request stopped from starting by exception from the interceptor ("+requestInterceptor+"): " + e.getMessage();
+                    String message = "Request stopped from starting by exception from the interceptor (" +
+                        requestInterceptor + "): " + e
+                        .getMessage();
                     log.warn(message);
                     throw new RequestInterruptionException(message, e);
                 } catch (Exception e) {
-                    log.warn("Request interceptor ("+requestInterceptor+") failed to execute on start ("+req.getRequestId()+"): " + e.getMessage());
+                    log.warn("Request interceptor (" + requestInterceptor + ") failed to execute on start (" + req
+                        .getRequestId() + "): " + e.getMessage());
                 }
             }
         }
@@ -150,9 +152,16 @@ public final class StatelessRequestServiceImpl implements RequestService, Initia
                     try {
                         requestInterceptor.onEnd(requestId, (failure == null), failure);
                     } catch (RequestInterruptionException e) {
-                        log.warn("Attempt to stop request from ending by an exception from the interceptor ("+requestInterceptor+"), cannot stop requests from ending though so request end continues, this may be an error: " + e.getMessage());
+                        log.warn(
+                            "Attempt to stop request from ending by an exception from the interceptor (" +
+                                requestInterceptor + "), cannot stop requests from ending though so request end " +
+                                "continues, this may be an error: " + e
+                                .getMessage());
                     } catch (Exception e) {
-                        log.warn("Request interceptor ("+requestInterceptor+") failed to execute on end ("+requestId+"): " + e.getMessage());
+                        log.warn(
+                            "Request interceptor (" + requestInterceptor + ") failed to execute on end (" + requestId
+                                + "): " + e
+                                .getMessage());
                     }
                 }
             }
@@ -166,9 +175,9 @@ public final class StatelessRequestServiceImpl implements RequestService, Initia
      * @return the current list of interceptors in the correct order
      */
     private List<RequestInterceptor> getInterceptors(boolean reverse) {
-        ArrayList<RequestInterceptor> l = new ArrayList<RequestInterceptor>( this.interceptorsMap.values() );
+        ArrayList<RequestInterceptor> l = new ArrayList<RequestInterceptor>(this.interceptorsMap.values());
         OrderedServiceComparator comparator = new OrderedServiceComparator();
-        Collections.sort(l, comparator );
+        Collections.sort(l, comparator);
         if (reverse) {
             Collections.reverse(l);
         }
@@ -189,24 +198,28 @@ public final class StatelessRequestServiceImpl implements RequestService, Initia
         this.interceptorsMap.put(key, interceptor);
     }
 
-    /** (non-Javadoc)
+    /**
+     * (non-Javadoc)
+     *
      * @see org.dspace.services.RequestService#getCurrentUserId()
      */
     public String getCurrentUserId() {
         Request currentRequest = getCurrentRequest();
-        if(currentRequest == null) {
+        if (currentRequest == null) {
             return null;
         } else {
             return Objects.toString(currentRequest.getAttribute(AUTHENTICATED_EPERSON));
         }
     }
 
-    /** (non-Javadoc)
+    /**
+     * (non-Javadoc)
+     *
      * @see org.dspace.services.RequestService#setCurrentUserId()
      */
     public void setCurrentUserId(UUID epersonId) {
         Request currentRequest = getCurrentRequest();
-        if(currentRequest != null) {
+        if (currentRequest != null) {
             getCurrentRequest().setAttribute(AUTHENTICATED_EPERSON, epersonId);
         }
     }
@@ -259,6 +272,7 @@ public final class StatelessRequestServiceImpl implements RequestService, Initia
 
             return null;
         }
+
         void remove(String requestId) {
             if (!StringUtils.isEmpty(requestId)) {
                 for (Map.Entry<Long, Request> reqEntry : requestMap.entrySet()) {

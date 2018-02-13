@@ -7,9 +7,22 @@
  */
 package org.dspace.servicemanager;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.kernel.Activator;
-import org.dspace.kernel.mixins.*;
+import org.dspace.kernel.mixins.ConfigChangeListener;
+import org.dspace.kernel.mixins.InitializedService;
+import org.dspace.kernel.mixins.ServiceChangeListener;
+import org.dspace.kernel.mixins.ServiceManagerReadyAware;
+import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.spring.SpringServiceManager;
 import org.dspace.services.ConfigurationService;
@@ -19,14 +32,11 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.util.*;
-import java.util.Map.Entry;
-
 /**
  * This is the core service manager which ties together the other
- * service managers and generally handles any edge cases in the various 
+ * service managers and generally handles any edge cases in the various
  * systems.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class DSpaceServiceManager implements ServiceManagerSystem {
@@ -36,23 +46,27 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     private final DSpaceConfigurationService configurationService;
 
     protected boolean running = false;
+
     /**
      * @return true if the service manager is running
      */
     public boolean isRunning() {
         return running;
     }
+
     /**
      * Checks to see if the service manager is running, if not throws an exception
+     *
      * @throws IllegalStateException if not running
      */
     private void checkRunning() {
-        if (! isRunning()) {
+        if (!isRunning()) {
             throw new IllegalStateException("Cannot perform operations on a service manager that is not running");
         }
     }
 
-    private List<ServiceManagerSystem> serviceManagers = Collections.synchronizedList(new ArrayList<ServiceManagerSystem>());
+    private List<ServiceManagerSystem> serviceManagers = Collections
+        .synchronizedList(new ArrayList<ServiceManagerSystem>());
     private SpringServiceManager primaryServiceManager = null;
     /**
      * This holds the stack of activators.  It is randomly ordered.
@@ -60,8 +74,10 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     private List<Activator> activators = Collections.synchronizedList(new ArrayList<Activator>());
 
     protected boolean developing = false;
+
     /**
      * Standard constructor.
+     *
      * @param configurationService current DSpace configuration service
      */
     public DSpaceServiceManager(DSpaceConfigurationService configurationService) {
@@ -74,8 +90,10 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
     protected boolean testing = false;
     protected String[] springXmlConfigFiles = null;
+
     /**
      * TESTING - This is for testing only.
+     *
      * @param configurationService current DSpace configuration service
      * @param springXmlConfigFiles one or more Spring XML configs
      */
@@ -91,15 +109,16 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
      */
     private void registerActivators() {
 
-        for (Activator activator : this.getServicesByType(Activator.class))
-        {
-             // succeeded creating the activator
+        for (Activator activator : this.getServicesByType(Activator.class)) {
+            // succeeded creating the activator
             try {
                 activator.start(this);
                 activators.add(activator);
                 log.info("Started and registered activator: " + activator.getClass().getName());
             } catch (Exception e1) {
-                log.error("ERROR: Failed to start activator ("+ activator.getClass().getName() +"): " + e1.getMessage(), e1);
+                log.error(
+                    "ERROR: Failed to start activator (" + activator.getClass().getName() + "): " + e1.getMessage(),
+                    e1);
             }
         }
     }
@@ -116,7 +135,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                     activator.stop(this);
                     log.info("Stopped and unregistered activator: " + activatorClassName);
                 } catch (Exception e1) {
-                    log.error("ERROR: Failed to stop activator ("+activatorClassName+"): " + e1.getMessage(), e1);
+                    log.error("ERROR: Failed to stop activator (" + activatorClassName + "): " + e1.getMessage(), e1);
                 }
             }
         }
@@ -141,12 +160,13 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
     /**
      * Checks to see if a listener should be notified
-     * @param implementedTypes the types implemented by the service changing
+     *
+     * @param implementedTypes      the types implemented by the service changing
      * @param serviceChangeListener the listener
      * @return true if it should be notified, false otherwise
      */
     private boolean checkNotifyServiceChange(List<Class<?>> implementedTypes,
-            ServiceChangeListener serviceChangeListener) {
+                                             ServiceChangeListener serviceChangeListener) {
         boolean notify = false;
         Class<?>[] notifyTypes = serviceChangeListener.notifyForTypes();
         if (notifyTypes == null || notifyTypes.length == 0) {
@@ -175,7 +195,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                 sms.shutdown();
             } catch (Exception e) {
                 // shutdown failures are not great but should NOT cause an interruption of processing
-                log.error("Failure shutting down service manager ("+sms+"): " + e.getMessage(), e);
+                log.error("Failure shutting down service manager (" + sms + "): " + e.getMessage(), e);
             }
         }
         this.running = false; // wait til the end
@@ -191,12 +211,13 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     public void startup() {
         if (!testing) {
             // try to load up extra config files for spring
-            String[] extraConfigs = configurationService.getPropertyAsType("service.manager.spring.configs", String[].class);
+            String[] extraConfigs = configurationService
+                .getPropertyAsType("service.manager.spring.configs", String[].class);
             if (extraConfigs != null) {
                 if (springXmlConfigFiles == null) {
                     springXmlConfigFiles = extraConfigs;
                 } else {
-                    springXmlConfigFiles = (String[])ArrayUtils.addAll(springXmlConfigFiles, extraConfigs);
+                    springXmlConfigFiles = (String[]) ArrayUtils.addAll(springXmlConfigFiles, extraConfigs);
                 }
             }
         }
@@ -204,7 +225,8 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             // have to put this at the top because otherwise initializing beans will die when they try to use the SMS
             this.running = true;
             // create the primary SMS and start it
-            SpringServiceManager springSMS = new SpringServiceManager(this, configurationService, testing, developing, springXmlConfigFiles);
+            SpringServiceManager springSMS = new SpringServiceManager(this, configurationService, testing, developing,
+                                                                      springXmlConfigFiles);
             try {
                 springSMS.startup();
             } catch (Exception e) {
@@ -220,7 +242,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
             // now we call the ready mixins
             notifyServiceManagerReady();
-            
+
         } catch (Exception e) {
             shutdown(); // execute the shutdown
             String message = "Failed to startup the DSpace Service Manager: " + e.getMessage();
@@ -287,8 +309,8 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             }
         }
         // need to check the service mixin manager if not found
-        if (service == null 
-                && name != null) {
+        if (service == null
+            && name != null) {
             for (ServiceManagerSystem sms : serviceManagers) {
                 if (service == null) {
                     service = sms.getServiceByName(name, type);
@@ -311,7 +333,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
         HashSet<T> set = new HashSet<T>();
         for (ServiceManagerSystem sms : serviceManagers) {
             try {
-                set.addAll( sms.getServicesByType(type) );
+                set.addAll(sms.getServicesByType(type));
             } catch (Exception e) {
                 // keep going
             }
@@ -327,7 +349,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
         List<String> names = new ArrayList<String>();
         for (ServiceManagerSystem sms : serviceManagers) {
             try {
-                names.addAll( sms.getServicesNames() );
+                names.addAll(sms.getServicesNames());
             } catch (Exception e) {
                 // keep going
             }
@@ -361,13 +383,15 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
         for (ServiceManagerSystem sms : serviceManagers) {
             try {
                 for (Entry<String, Object> entry : sms.getServices().entrySet()) {
-                    if (! services.containsKey(entry.getKey())) {
+                    if (!services.containsKey(entry.getKey())) {
                         services.put(entry.getKey(), entry.getValue());
                     }
                 }
             } catch (Exception e) {
                 // keep going if it fails for one
-                log.error("Failed to get list of services from service manager ("+sms.getClass()+"): " + e.getMessage(), e);
+                log.error(
+                    "Failed to get list of services from service manager (" + sms.getClass() + "): " + e.getMessage(),
+                    e);
             }
         }
         return services;
@@ -390,11 +414,12 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                 Map<String, String> changedSettings = new LinkedHashMap<String, String>();
                 for (String configName : changedNames) {
                     changedSettingNames.add(configName);
-                    changedSettings.put( configName, configurationService.getProperty(configName) );
+                    changedSettings.put(configName, configurationService.getProperty(configName));
                 }
                 // notify the services that implement the mixin
                 for (ServiceManagerSystem sms : serviceManagers) {
-                    List<ConfigChangeListener> configChangeListeners = sms.getServicesByType(ConfigChangeListener.class);
+                    List<ConfigChangeListener> configChangeListeners = sms
+                        .getServicesByType(ConfigChangeListener.class);
                     for (ConfigChangeListener configChangeListener : configChangeListeners) {
                         // notify this service
                         try {
@@ -418,7 +443,9 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                                 configChangeListener.configurationChanged(changedSettingNames, changedSettings);
                             }
                         } catch (Exception e) {
-                            log.error("Failure occurred while trying to notify service of config change: " + e.getMessage(), e);
+                            log.error(
+                                "Failure occurred while trying to notify service of config change: " + e.getMessage(),
+                                e);
                         }
                     }
                 }
@@ -437,18 +464,17 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
      * <P>
      * This method logs an error if it encounters configs which refer to a
      * service by name, but is an invalid setting for that service.
-     * 
+     *
      * @param serviceName the name of the service
-     * @param service the service object (which will be configured)
-     * @param config the running configuration service
+     * @param service     the service object (which will be configured)
+     * @param config      the running configuration service
      */
     public static void configureService(String serviceName, Object service, ConfigurationService config) {
 
         // Check if the configuration has any properties whose prefix
         // corresponds to this service's name
         List<String> configKeys = config.getPropertyKeys(serviceName);
-        if(configKeys!=null && !configKeys.isEmpty())
-        {
+        if (configKeys != null && !configKeys.isEmpty()) {
             BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(service);
             for (String key : configKeys) {
                 // Remove serviceName prefix from key. This is the name of the actual bean's parameter
@@ -459,10 +485,12 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                 try {
                     // Attempt to set this configuration on the given service's bean
                     beanWrapper.setPropertyValue(param, config.getProperty(key));
-                    log.info("Set param ("+param+") on service bean ("+serviceName+") to: " + config.getProperty(key));
+                    log.info("Set param (" + param + ") on service bean (" + serviceName + ") to: " + config
+                        .getProperty(key));
                 } catch (RuntimeException e) {
                     // If an error occurs, just log it
-                    log.error("Unable to set param ("+param+") on service bean ("+serviceName+") to: " + config.getProperty(key), e);
+                    log.error("Unable to set param (" + param + ") on service bean (" + serviceName + ") to: " + config
+                        .getProperty(key), e);
                 }
             }
         }
@@ -470,6 +498,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
     /**
      * Initializes a service if it asks to be initialized or does nothing.
+     *
      * @param service any bean
      * @throws IllegalStateException if the service init fails
      */
@@ -478,13 +507,15 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             try {
                 ((InitializedService) service).init();
             } catch (Exception e) {
-                throw new IllegalStateException("Failure attempting to initialize service (" + service + "): " + e.getMessage(), e);
+                throw new IllegalStateException(
+                    "Failure attempting to initialize service (" + service + "): " + e.getMessage(), e);
             }
         }
     }
 
     /**
      * Shuts down a service if it asks to be shutdown or does nothing.
+     *
      * @param service any bean
      */
     public static void shutdownService(Object service) {
