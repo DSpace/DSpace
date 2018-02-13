@@ -956,7 +956,7 @@
 	<!-- org.dspace.app.xmlui.Submission.submit.CCLicenseStep -->
 	<message key="xmlui.Submission.submit.CCLicenseStep.head">Creative Commons License</message>
 	<message key="xmlui.Submission.submit.CCLicenseStep.info1">If you wish, you may add a <a
-			href="http://creativecommons.org/">Creative Commons</a> License to your item. <strong>Creative
+			href="https://creativecommons.org/">Creative Commons</a> License to your item. <strong>Creative
 			Commons licenses govern what people who read your work may then do with it.</strong> If you
 		wish to select a Creative Commons license click the button below. You will be taken to the
 		Creative Commons website, where you will be presented with several licensing options. After
@@ -2613,9 +2613,9 @@
 	<message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
 	<message key="xmlui.dri2xhtml.structural.link_original_license">Original License</message>
 	<message key="xmlui.dri2xhtml.structural.footer.static.dryad-license">All text on this page is
-		available under a <a href="http://creativecommons.org/licenses/by/3.0">CC-BY 3.0</a> license.</message>
+		available under a <a href="https://creativecommons.org/licenses/by/3.0">CC-BY 3.0</a> license.</message>
 	<message key="xmlui.dri2xhtml.structural.footer.data.dryad-license"> Most text on this page is
-		available under a <a href="http://creativecommons.org/publicdomain/zero/1.0/">CC-0</a> license. See <!-- <<terms of service page>> --> for details.
+		available under a <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC-0</a> license. See <!-- <<terms of service page>> --> for details.
 	</message>
 
 
@@ -2891,9 +2891,9 @@
 	<message key="xmlui.submit.select.license.head"><span class="ds-form-label">Data Release Agreement*</span><br/><br/></message>
 	<message key="xmlui.submit.select.pub.form.license">&#160;By clicking this checkbox, I certify that I have read and agree to the Dryad  <a target="_blank" href="/pages/policies">Terms of Service</a>. I understand that by submitting data to Dryad,
 		I am agreeing to release it under the terms of the <div id="cc-label" style="display: inline;"><a
-			href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative Commons Zero
+			href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative Commons Zero
 			(CC0)</a> waiver and that I have the right to do so. All authors of the data have agreed to the terms of this waiver. <a href="/pages/faq#info-cc0" target="_blank">Why does Dryad require CC0?</a>
-			&#160;&#160;&#160;&#160;<a class="single-image-link" href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank"><img src="/themes/Dryad/images/cc-zero.png" alt="CC0 logo"></img></a></div></message>
+			&#160;&#160;&#160;&#160;<a class="single-image-link" href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank"><img src="/themes/Dryad/images/cc-zero.png" alt="CC0 logo"></img></a></div></message>
 	<message key="xmlui.submit.select.pub.form.license_error">You must accept the CC0 waiver to continue the submission.</message>
 
 	<message key="xmlui.submit.publication.journal.preview.head">Metadata preview of selected journal</message>
@@ -2985,7 +2985,7 @@
 	<message key="xmlui.Submission.general.submission.complete.datapackage">Continue to upload and describe data file</message>
 
 	<message key="xmlui.submit.dataset.license">By uploading data to Dryad, you agree to release it
-		under the terms of the <br/><a href="http://creativecommons.org/publicdomain/zero/1.0/"
+		under the terms of the <br/><a href="https://creativecommons.org/publicdomain/zero/1.0/"
 			target="_blank"> Creative Commons Zero waiver. <img src="/themes/Dryad/images/cc-zero.png"
 				alt="CC0"/>
 		</a></message>

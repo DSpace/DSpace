@@ -272,7 +272,7 @@
 				<rightsList>
 				<rights>
 					<xsl:attribute name="rightsURI">
-						<xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
+						<xsl:text>https://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
 					</xsl:attribute>
 				</rights>
 				</rightsList>
