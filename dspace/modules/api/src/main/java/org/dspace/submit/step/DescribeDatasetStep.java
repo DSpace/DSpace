@@ -252,7 +252,7 @@ public class DescribeDatasetStep extends DescribeStep {
             if(request.getParameter("dataset_id_present") == null){
                 if("file".equals(request.getParameter("datafile_type"))){
                 	item.clearMetadata(MetadataSchema.DC_SCHEMA, "rights", "uri", Item.ANY); // remove any existing
-                    item.addMetadata(MetadataSchema.DC_SCHEMA, "rights", "uri", null, "https://creativecommons.org/publicdomain/zero/1.0/");
+                    item.addMetadata(MetadataSchema.DC_SCHEMA, "rights", "uri", null, "http://creativecommons.org/publicdomain/zero/1.0/");
                     datasetFileSuccess = processUploadFile(context, request, subInfo, "dataset-file", false);
                 }
                 else

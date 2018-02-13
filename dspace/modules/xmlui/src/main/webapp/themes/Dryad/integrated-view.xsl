@@ -217,7 +217,7 @@
         </div>
 
         <xsl:choose>
-            <xsl:when test=".//dim:field[@element='rights'][.='https://creativecommons.org/publicdomain/zero/1.0/']">
+            <xsl:when test=".//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
               <!-- For items with the normal CC0 license, display cc-zero.png && opendata.png -->
                 <table class="license-line">
                 <tr>
@@ -226,7 +226,7 @@
                         <xsl:text> </xsl:text>
                     </td>
                     <td style="padding-left:0px">
-                        <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">
+                        <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">
                             <img src="/themes/Dryad/images/cc-zero.png"/>
                         </a>
                     </td>
