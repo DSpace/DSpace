@@ -8,19 +8,17 @@
 package org.purl.sword.atom;
 
 /**
- * An invalid media type has been detected during parsing. 
- * 
+ * An invalid media type has been detected during parsing.
+ *
  * @author Neil Taylor
  */
-public class InvalidMediaTypeException extends Exception
-{
+public class InvalidMediaTypeException extends Exception {
     /**
-     * Create a new instance and store the message. 
-     * 
-     * @param message The exception's message. 
+     * Create a new instance and store the message.
+     *
+     * @param message The exception's message.
      */
-    public InvalidMediaTypeException( String message )
-    {
+    public InvalidMediaTypeException(String message) {
         super(message);
     }
 }
