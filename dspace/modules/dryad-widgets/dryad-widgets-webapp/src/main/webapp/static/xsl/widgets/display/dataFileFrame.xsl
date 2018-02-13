@@ -249,7 +249,7 @@
 
     <xsl:template name="twitter-item">
         <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true"
-            src="http://platform.twitter.com/widgets/tweet_button.1406859257.html#_=1407626732783&amp;count=none&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Fdatadryad.org%2Fresource%2Fdoi%3A10.5061%2Fdryad.87ht85rs%2F1&amp;size=m&amp;text=USYB-2011-142.SupplData%20from%3A%20Robustness%20of%20compound%20Dirichlet%20priors%20for%20Bayesian%20inference%20of%20branch%20lengths.%20-%20Dryad&amp;url=https%3A%2F%2Fdoi.org%2Fdoi%3A10.5061%2Fdryad.87ht85rs&amp;via=datadryad"
+            src="https://platform.twitter.com/widgets/tweet_button.1406859257.html#_=1407626732783&amp;count=none&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Fdatadryad.org%2Fresource%2Fdoi%3A10.5061%2Fdryad.87ht85rs%2F1&amp;size=m&amp;text=USYB-2011-142.SupplData%20from%3A%20Robustness%20of%20compound%20Dirichlet%20priors%20for%20Bayesian%20inference%20of%20branch%20lengths.%20-%20Dryad&amp;url=https%3A%2F%2Fdoi.org%2Fdoi%3A10.5061%2Fdryad.87ht85rs&amp;via=datadryad"
             class="twitter-share-button twitter-tweet-button twitter-share-button twitter-count-none"
             title="Twitter Tweet Button" data-twttr-rendered="true"/>
     </xsl:template>
