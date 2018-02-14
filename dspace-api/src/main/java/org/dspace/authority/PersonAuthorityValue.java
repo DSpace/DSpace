@@ -7,18 +7,17 @@
  */
 package org.dspace.authority;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
+
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -184,7 +183,7 @@ public class PersonAuthorityValue extends AuthorityValue {
             boolean added = false;
             for (String email : getEmails()) {
                 if (!added && StringUtils.isNotBlank(email)) {
-                    map.put("email",email);
+                    map.put("email", email);
                     added = true;
                 }
             }
@@ -204,7 +203,8 @@ public class PersonAuthorityValue extends AuthorityValue {
     @Override
     public String generateString() {
         return AuthorityValueServiceImpl.GENERATE + getAuthorityType() + AuthorityValueServiceImpl.SPLIT + getName();
-        // the part after "AuthorityValueGenerator.GENERATE + getAuthorityType() + AuthorityValueGenerator.SPLIT" is the value of the "info" parameter in public AuthorityValue newInstance(String info)
+        // the part after "AuthorityValueGenerator.GENERATE + getAuthorityType() + AuthorityValueGenerator.SPLIT" is
+        // the value of the "info" parameter in public AuthorityValue newInstance(String info)
     }
 
     @Override
@@ -217,12 +217,12 @@ public class PersonAuthorityValue extends AuthorityValue {
     @Override
     public String toString() {
         return "PersonAuthorityValue{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", nameVariants=" + nameVariants +
-                ", institution='" + institution + '\'' +
-                ", emails=" + emails +
-                "} " + super.toString();
+            "firstName='" + firstName + '\'' +
+            ", lastName='" + lastName + '\'' +
+            ", nameVariants=" + nameVariants +
+            ", institution='" + institution + '\'' +
+            ", emails=" + emails +
+            "} " + super.toString();
     }
 
     @Override
@@ -233,7 +233,7 @@ public class PersonAuthorityValue extends AuthorityValue {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        if(!super.hasTheSameInformationAs(o)){
+        if (!super.hasTheSameInformationAs(o)) {
             return false;
         }
 

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -70,11 +69,11 @@ public class BioName {
     @Override
     public String toString() {
         return "BioName{" +
-                "givenNames='" + givenNames + '\'' +
-                ", familyName='" + familyName + '\'' +
-                ", creditName='" + creditName + '\'' +
-                ", otherNames=" + otherNames +
-                '}';
+            "givenNames='" + givenNames + '\'' +
+            ", familyName='" + familyName + '\'' +
+            ", creditName='" + creditName + '\'' +
+            ", otherNames=" + otherNames +
+            '}';
     }
 
     @Override

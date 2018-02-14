@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.authenticate.service.AuthenticationService;
@@ -49,27 +48,27 @@ import org.springframework.beans.factory.annotation.Autowired;
  * The "stack" is always traversed in order, with the methods
  * specified first (in the configuration) thus getting highest priority.
  *
- * @see AuthenticationMethod
- *
  * @author Larry Stone
  * @version $Revision$
+ * @see AuthenticationMethod
  */
-public class AuthenticationServiceImpl implements AuthenticationService
-{
+public class AuthenticationServiceImpl implements AuthenticationService {
 
-    /** SLF4J logging category */
+    /**
+     * SLF4J logging category
+     */
     private final Logger log = (Logger) LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 
     @Autowired(required = true)
     protected EPersonService ePersonService;
 
-    protected AuthenticationServiceImpl()
-    {
+    protected AuthenticationServiceImpl() {
 
     }
 
     public List<AuthenticationMethod> getAuthenticationMethodStack() {
-        return Arrays.asList((AuthenticationMethod[])CoreServiceFactory.getInstance().getPluginService().getPluginSequence(AuthenticationMethod.class));
+        return Arrays.asList((AuthenticationMethod[]) CoreServiceFactory.getInstance().getPluginService()
+                                                                        .getPluginSequence(AuthenticationMethod.class));
     }
 
     @Override
@@ -77,30 +76,27 @@ public class AuthenticationServiceImpl implements AuthenticationService
                             String username,
                             String password,
                             String realm,
-                            HttpServletRequest request)
-    {
+                            HttpServletRequest request) {
         return authenticateInternal(context, username, password, realm,
-                                     request, false);
+                                    request, false);
     }
 
     @Override
     public int authenticateImplicit(Context context,
-                            String username,
-                            String password,
-                            String realm,
-                            HttpServletRequest request)
-    {
+                                    String username,
+                                    String password,
+                                    String realm,
+                                    HttpServletRequest request) {
         return authenticateInternal(context, username, password, realm,
-                                     request, true);
+                                    request, true);
     }
 
     protected int authenticateInternal(Context context,
-                            String username,
-                            String password,
-                            String realm,
-                            HttpServletRequest request,
-                            boolean implicitOnly)
-    {
+                                       String username,
+                                       String password,
+                                       String realm,
+                                       HttpServletRequest request,
+                                       boolean implicitOnly) {
         // better is lowest, so start with the highest.
         int bestRet = AuthenticationMethod.BAD_ARGS;
 
@@ -127,7 +123,7 @@ public class AuthenticationServiceImpl implements AuthenticationService
 
     public void updateLastActiveDate(Context context) {
         EPerson me = context.getCurrentUser();
-        if(me != null) {
+        if (me != null) {
             me.setLastActive(new Date());
             try {
                 ePersonService.update(context, me);
@@ -143,12 +139,9 @@ public class AuthenticationServiceImpl implements AuthenticationService
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
                                    String username)
-        throws SQLException
-    {
-        for (AuthenticationMethod method : getAuthenticationMethodStack())
-        {
-            if (method.canSelfRegister(context, request, username))
-            {
+        throws SQLException {
+        for (AuthenticationMethod method : getAuthenticationMethodStack()) {
+            if (method.canSelfRegister(context, request, username)) {
                 return true;
             }
         }
@@ -159,12 +152,9 @@ public class AuthenticationServiceImpl implements AuthenticationService
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
                                     String username)
-        throws SQLException
-    {
-        for (AuthenticationMethod method : getAuthenticationMethodStack())
-        {
-            if (method.allowSetPassword(context, request, username))
-            {
+        throws SQLException {
+        for (AuthenticationMethod method : getAuthenticationMethodStack()) {
+            if (method.allowSetPassword(context, request, username)) {
                 return true;
             }
         }
@@ -173,29 +163,24 @@ public class AuthenticationServiceImpl implements AuthenticationService
 
     @Override
     public void initEPerson(Context context,
-                                   HttpServletRequest request,
-                                   EPerson eperson)
-        throws SQLException
-    {
-        for (AuthenticationMethod method : getAuthenticationMethodStack())
-        {
+                            HttpServletRequest request,
+                            EPerson eperson)
+        throws SQLException {
+        for (AuthenticationMethod method : getAuthenticationMethodStack()) {
             method.initEPerson(context, request, eperson);
         }
     }
 
     @Override
     public List<Group> getSpecialGroups(Context context,
-                                         HttpServletRequest request)
-        throws SQLException
-    {
+                                        HttpServletRequest request)
+        throws SQLException {
         List<Group> result = new ArrayList<>();
         int totalLen = 0;
 
-        for (AuthenticationMethod method : getAuthenticationMethodStack())
-        {
+        for (AuthenticationMethod method : getAuthenticationMethodStack()) {
             List<Group> gl = method.getSpecialGroups(context, request);
-            if (gl.size() > 0)
-            {
+            if (gl.size() > 0) {
                 result.addAll(gl);
                 totalLen += gl.size();
             }
@@ -205,8 +190,7 @@ public class AuthenticationServiceImpl implements AuthenticationService
     }
 
     @Override
-    public Iterator<AuthenticationMethod> authenticationMethodIterator()
-    {
+    public Iterator<AuthenticationMethod> authenticationMethodIterator() {
         return getAuthenticationMethodStack().iterator();
     }
 }

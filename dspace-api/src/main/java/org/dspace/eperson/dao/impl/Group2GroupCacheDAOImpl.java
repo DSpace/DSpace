@@ -7,8 +7,11 @@
  */
 package org.dspace.eperson.dao.impl;
 
-import org.dspace.core.Context;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Group2GroupCache;
 import org.dspace.eperson.dao.Group2GroupCacheDAO;
@@ -17,10 +20,6 @@ import org.hibernate.Query;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Hibernate implementation of the Database Access Object interface class for the Group2GroupCache object.
  * This class is responsible for all database calls for the Group2GroupCache object and is autowired by spring
@@ -28,10 +27,8 @@ import java.util.Set;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCache> implements Group2GroupCacheDAO
-{
-    protected Group2GroupCacheDAOImpl()
-    {
+public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCache> implements Group2GroupCacheDAO {
+    protected Group2GroupCacheDAOImpl() {
         super();
     }
 
@@ -49,8 +46,7 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
         Criteria criteria = createCriteria(context, Group2GroupCache.class);
 
         Disjunction orDisjunction = Restrictions.or();
-        for(Group group : groups)
-        {
+        for (Group group : groups) {
             orDisjunction.add(Restrictions.eq("child.id", group.getID()));
         }
 
@@ -63,7 +59,7 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
     @Override
     public Group2GroupCache findByParentAndChild(Context context, Group parent, Group child) throws SQLException {
         Query query = createQuery(context,
-                "FROM Group2GroupCache g WHERE g.parent = :parentGroup AND g.child = :childGroup");
+                                  "FROM Group2GroupCache g WHERE g.parent = :parentGroup AND g.child = :childGroup");
 
         query.setParameter("parentGroup", parent);
         query.setParameter("childGroup", child);

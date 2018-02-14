@@ -7,6 +7,9 @@
  */
 package org.dspace.content.dao.impl;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -18,9 +21,6 @@ import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 
-import java.sql.SQLException;
-import java.util.List;
-
 /**
  * Hibernate implementation of the Database Access Object interface class for the MetadataField object.
  * This class is responsible for all database calls for the MetadataField object and is autowired by spring
@@ -28,39 +28,37 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> implements MetadataFieldDAO
-{
-    protected MetadataFieldDAOImpl()
-    {
+public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> implements MetadataFieldDAO {
+    protected MetadataFieldDAOImpl() {
         super();
     }
 
     @Override
     public MetadataField find(Context context, int metadataFieldId, MetadataSchema metadataSchema, String element,
-                           String qualifier) throws SQLException{
+                              String qualifier) throws SQLException {
         Query query;
 
-        if(qualifier != null) {
+        if (qualifier != null) {
             query = createQuery(context, "SELECT mf " +
-                    "FROM MetadataField mf " +
-                    "JOIN FETCH mf.metadataSchema ms " +
-                    "WHERE mf.id != :id " +
-                    "AND ms.name = :name AND mf.element = :element " +
-                    "AND qualifier = :qualifier");
+                "FROM MetadataField mf " +
+                "JOIN FETCH mf.metadataSchema ms " +
+                "WHERE mf.id != :id " +
+                "AND ms.name = :name AND mf.element = :element " +
+                "AND qualifier = :qualifier");
         } else {
             query = createQuery(context, "SELECT mf " +
-                    "FROM MetadataField mf " +
-                    "JOIN FETCH mf.metadataSchema ms " +
-                    "WHERE mf.id != :id " +
-                    "AND ms.name = :name AND mf.element = :element " +
-                    "AND mf.qualifier IS NULL");
+                "FROM MetadataField mf " +
+                "JOIN FETCH mf.metadataSchema ms " +
+                "WHERE mf.id != :id " +
+                "AND ms.name = :name AND mf.element = :element " +
+                "AND mf.qualifier IS NULL");
         }
 
         query.setParameter("id", metadataFieldId);
         query.setParameter("name", metadataSchema.getName());
         query.setParameter("element", element);
 
-        if(qualifier != null) {
+        if (qualifier != null) {
             query.setParameter("qualifier", qualifier);
         }
 
@@ -69,34 +67,34 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     }
 
     @Override
-    public MetadataField findByElement(Context context, MetadataSchema metadataSchema, String element, String qualifier) throws SQLException
-    {
+    public MetadataField findByElement(Context context, MetadataSchema metadataSchema, String element, String qualifier)
+        throws SQLException {
         return findByElement(context, metadataSchema.getName(), element, qualifier);
     }
 
     @Override
-    public MetadataField findByElement(Context context, String metadataSchema, String element, String qualifier) throws SQLException
-    {
+    public MetadataField findByElement(Context context, String metadataSchema, String element, String qualifier)
+        throws SQLException {
         Query query;
 
-        if(StringUtils.isNotBlank(qualifier)) {
+        if (StringUtils.isNotBlank(qualifier)) {
             query = createQuery(context, "SELECT mf " +
-                    "FROM MetadataField mf " +
-                    "JOIN FETCH mf.metadataSchema ms " +
-                    "WHERE ms.name = :name AND mf.element = :element " +
-                    "AND qualifier = :qualifier");
+                "FROM MetadataField mf " +
+                "JOIN FETCH mf.metadataSchema ms " +
+                "WHERE ms.name = :name AND mf.element = :element " +
+                "AND qualifier = :qualifier");
         } else {
             query = createQuery(context, "SELECT mf " +
-                    "FROM MetadataField mf " +
-                    "JOIN FETCH mf.metadataSchema ms " +
-                    "WHERE ms.name = :name AND mf.element = :element " +
-                    "AND mf.qualifier IS NULL");
+                "FROM MetadataField mf " +
+                "JOIN FETCH mf.metadataSchema ms " +
+                "WHERE ms.name = :name AND mf.element = :element " +
+                "AND mf.qualifier IS NULL");
         }
 
         query.setParameter("name", metadataSchema);
         query.setParameter("element", element);
 
-        if(StringUtils.isNotBlank(qualifier)) {
+        if (StringUtils.isNotBlank(qualifier)) {
             query.setParameter("qualifier", qualifier);
         }
 
@@ -107,19 +105,20 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     @Override
     public List<MetadataField> findAll(Context context, Class<MetadataField> clazz) throws SQLException {
         Criteria criteria = createCriteria(context, MetadataField.class);
-        criteria.createAlias("metadataSchema", "s").addOrder(Order.asc("s.name")).addOrder(Order.asc("element")).addOrder(Order.asc("qualifier"));
+        criteria.createAlias("metadataSchema", "s").addOrder(Order.asc("s.name")).addOrder(Order.asc("element"))
+                .addOrder(Order.asc("qualifier"));
         criteria.setFetchMode("metadataSchema", FetchMode.JOIN);
         criteria.setCacheable(true);
         return list(criteria);
     }
 
     @Override
-    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema, String element) throws SQLException
-    {
+    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema,
+                                                                  String element) throws SQLException {
         Query query = createQuery(context, "SELECT mf " +
-                    "FROM MetadataField mf " +
-                    "JOIN FETCH mf.metadataSchema ms " +
-                    "WHERE ms.name = :name AND mf.element = :element ");
+            "FROM MetadataField mf " +
+            "JOIN FETCH mf.metadataSchema ms " +
+            "WHERE ms.name = :name AND mf.element = :element ");
 
 
         query.setParameter("name", metadataSchema);
@@ -129,15 +128,15 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         return list(query);
     }
 
-    
+
     @Override
     public List<MetadataField> findAllInSchema(Context context, MetadataSchema metadataSchema) throws SQLException {
 
         Query query = createQuery(context, "SELECT mf " +
-                "FROM MetadataField mf " +
-                "JOIN FETCH mf.metadataSchema ms " +
-                "WHERE ms.name = :name " +
-                "ORDER BY mf.element ASC, mf.qualifier ASC ");
+            "FROM MetadataField mf " +
+            "JOIN FETCH mf.metadataSchema ms " +
+            "WHERE ms.name = :name " +
+            "ORDER BY mf.element ASC, mf.qualifier ASC ");
 
         query.setParameter("name", metadataSchema.getName());
 

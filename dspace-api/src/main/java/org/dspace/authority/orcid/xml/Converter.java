@@ -11,12 +11,11 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 /**
- *
+ * @param <T> type
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
- * @param <T> type
  */
 public abstract class Converter<T> {
 

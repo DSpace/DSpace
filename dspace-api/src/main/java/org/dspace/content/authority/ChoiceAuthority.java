@@ -17,8 +17,7 @@ import org.dspace.content.Collection;
  * @see ChoiceAuthorityServiceImpl
  * @see MetadataAuthorityServiceImpl
  */
-public interface ChoiceAuthority
-{
+public interface ChoiceAuthority {
     /**
      * Get all values from the authority that match the preferred value.
      * Note that the offering was entered by the user and may contain
@@ -33,12 +32,12 @@ public interface ChoiceAuthority
      * defaultSelected index in the Choices instance to the choice, if any,
      * that matches the value.
      *
-     * @param field being matched for
-     * @param text user's value to match
+     * @param field      being matched for
+     * @param text       user's value to match
      * @param collection database ID of Collection for context (owner of Item)
-     * @param start choice at which to start, 0 is first.
-     * @param limit maximum number of choices to return, 0 for no limit.
-     * @param locale explicit localization key if available, or null
+     * @param start      choice at which to start, 0 is first.
+     * @param limit      maximum number of choices to return, 0 for no limit.
+     * @param locale     explicit localization key if available, or null
      * @return a Choices object (never null).
      */
     public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale);
@@ -52,10 +51,10 @@ public interface ChoiceAuthority
      * This call is typically used in non-interactive metadata ingest
      * where there is no interactive agent to choose from among options.
      *
-     * @param field being matched for
-     * @param text user's value to match
+     * @param field      being matched for
+     * @param text       user's value to match
      * @param collection database ID of Collection for context (owner of Item)
-     * @param locale explicit localization key if available, or null
+     * @param locale     explicit localization key if available, or null
      * @return a Choices object (never null) with 1 or 0 values.
      */
     public Choices getBestMatch(String field, String text, Collection collection, String locale);
@@ -68,31 +67,31 @@ public interface ChoiceAuthority
      * This may get called many times while populating a Web page so it should
      * be implemented as efficiently as possible.
      *
-     * @param field being matched for     
-     * @param key authority key known to this authority.
+     * @param field  being matched for
+     * @param key    authority key known to this authority.
      * @param locale explicit localization key if available, or null
      * @return descriptive label - should always return something, never null.
      */
     public String getLabel(String field, String key, String locale);
 
     default boolean isHierarchical() {
-		return false;
-	}
-	
+        return false;
+    }
+
     default boolean isScrollable() {
-		return false;
-	}
+        return false;
+    }
 
     default boolean hasIdentifier() {
-		return true;
-	}
-    
-	default public Choice getChoice(String fieldKey, String authKey, String locale) {
-		Choice result = new Choice();
-		result.authority = authKey;
-		result.label = getLabel(fieldKey, authKey, locale);
-		result.value = getLabel(fieldKey, authKey, locale);
-		return result;
-	}
-	
+        return true;
+    }
+
+    default public Choice getChoice(String fieldKey, String authKey, String locale) {
+        Choice result = new Choice();
+        result.authority = authKey;
+        result.label = getLabel(fieldKey, authKey, locale);
+        result.value = getLabel(fieldKey, authKey, locale);
+        return result;
+    }
+
 }

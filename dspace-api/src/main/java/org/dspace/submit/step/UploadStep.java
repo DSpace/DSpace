@@ -13,21 +13,22 @@ import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.dspace.submit.AbstractProcessingStep;
 
-public class UploadStep extends AbstractProcessingStep
-{
-    /** log4j logger */
+public class UploadStep extends AbstractProcessingStep {
+    /**
+     * log4j logger
+     */
     private static final Logger log = Logger.getLogger(UploadStep.class);
 
-	@Override
-	public void doProcessing(Context context, Request req, InProgressSubmission wsi) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void doProcessing(Context context, Request req, InProgressSubmission wsi) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void doPostProcessing(Context context, Request obj, InProgressSubmission wsi) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    @Override
+    public void doPostProcessing(Context context, Request obj, InProgressSubmission wsi) {
+        // TODO Auto-generated method stub
+
+    }
 
 }

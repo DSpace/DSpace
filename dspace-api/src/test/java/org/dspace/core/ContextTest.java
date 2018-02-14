@@ -7,6 +7,13 @@
  */
 package org.dspace.core;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
@@ -22,16 +29,14 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.junit.*;
-import static org.junit.Assert.* ;
-import static org.hamcrest.CoreMatchers.*;
+import org.junit.Test;
 
 /**
  * Perform some basic unit tests for Context Class
+ *
  * @author tdonohue
  */
-public class ContextTest extends AbstractUnitTest
-{
+public class ContextTest extends AbstractUnitTest {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
@@ -40,10 +45,9 @@ public class ContextTest extends AbstractUnitTest
      * Test of getDBConnection method, of class Context.
      */
     @Test
-    public void testGetDBConnection() throws SQLException
-    {
+    public void testGetDBConnection() throws SQLException {
         DBConnection connection = context.getDBConnection();
-        
+
         assertThat("testGetDBConnection 0", connection, notNullValue());
         assertThat("testGetDBConnection 1", connection.isSessionAlive(), equalTo(true));
     }
@@ -52,16 +56,15 @@ public class ContextTest extends AbstractUnitTest
      * Test of setCurrentUser method, of class Context.
      */
     @Test
-    public void testSetCurrentUser() throws SQLException, AuthorizeException
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    public void testSetCurrentUser() throws SQLException, AuthorizeException {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Allow Admin permissions - needed to create a new EPerson
-                authorizeService.isAdmin((Context) any); result = true;
+            authorizeService.isAdmin((Context) any);
+            result = true;
         }};
-        
+
         EPerson oldUser = context.getCurrentUser();
-        
+
         // Create a dummy EPerson to set as current user
         EPerson newUser = ePersonService.create(context);
         newUser.setFirstName(context, "Jane");
@@ -69,12 +72,12 @@ public class ContextTest extends AbstractUnitTest
         newUser.setEmail("jane@email.com");
         newUser.setCanLogIn(true);
         newUser.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        
+
         context.setCurrentUser(newUser);
-        
+
         assertThat("testSetCurrentUser 0", context.getCurrentUser(), notNullValue());
         assertThat("testSetCurrentUser 1", context.getCurrentUser(), equalTo(newUser));
-        
+
         // Restore the previous current user
         context.setCurrentUser(oldUser);
     }
@@ -83,8 +86,7 @@ public class ContextTest extends AbstractUnitTest
      * Test of getCurrentUser method, of class Context.
      */
     @Test
-    public void testGetCurrentUser() 
-    {
+    public void testGetCurrentUser() {
         //NOTE: 'eperson' is initialized by AbstractUnitTest & set as the "currentUser" there
         assertThat("testGetCurrentUser 0", context.getCurrentUser(), notNullValue());
         assertThat("testGetCurrentUser 1", context.getCurrentUser(), equalTo(eperson));
@@ -94,8 +96,7 @@ public class ContextTest extends AbstractUnitTest
      * Test of getCurrentLocale method, of class Context.
      */
     @Test
-    public void testGetCurrentLocale() 
-    {
+    public void testGetCurrentLocale() {
         //NOTE: CurrentLocale is not initialized in AbstractUnitTest. So it should be DEFAULTLOCALE
         assertThat("testGetCurrentLocale 0", context.getCurrentLocale(), notNullValue());
         assertThat("testGetCurrentLocale 1", context.getCurrentLocale(), equalTo(I18nUtil.DEFAULTLOCALE));
@@ -106,17 +107,17 @@ public class ContextTest extends AbstractUnitTest
      */
     @Test
     public void testSetCurrentLocale() {
-        
+
         //Get previous value
         Locale oldLocale = context.getCurrentLocale();
-        
+
         //Set a new, non-English value
         Locale newLocale = Locale.FRENCH;
         context.setCurrentLocale(newLocale);
-        
+
         assertThat("testSetCurrentLocale 0", context.getCurrentLocale(), notNullValue());
         assertThat("testSetCurrentLocale 1", context.getCurrentLocale(), equalTo(newLocale));
-        
+
         // Restore previous value
         context.setCurrentLocale(oldLocale);
     }
@@ -125,12 +126,11 @@ public class ContextTest extends AbstractUnitTest
      * Test of ignoreAuthorization method, of class Context.
      */
     @Test
-    public void testIgnoreAuthorization() 
-    {
+    public void testIgnoreAuthorization() {
         // Turn off authorization
         context.turnOffAuthorisationSystem();
         assertThat("testIgnoreAuthorization 0", context.ignoreAuthorization(), equalTo(true));
-        
+
         // Turn it back on
         context.restoreAuthSystemState();
         assertThat("testIgnoreAuthorization 1", context.ignoreAuthorization(), equalTo(false));
@@ -141,7 +141,7 @@ public class ContextTest extends AbstractUnitTest
      */
     /*@Test
     public void testTurnOffAuthorisationSystem() {
-        // Already tested in testIgnoreAuthorization() 
+        // Already tested in testIgnoreAuthorization()
     }*/
 
     /**
@@ -164,15 +164,14 @@ public class ContextTest extends AbstractUnitTest
      * Test of setExtraLogInfo method, of class Context.
      */
     @Test
-    public void testSetExtraLogInfo() 
-    {
+    public void testSetExtraLogInfo() {
         // Get the previous value
         String oldValue = context.getExtraLogInfo();
-       
+
         // Set a new value
         String newValue = "This is some extra log info";
         context.setExtraLogInfo(newValue);
-        
+
         assertThat("testSetExtraLogInfo 0", context.getExtraLogInfo(), notNullValue());
         assertThat("testSetExtraLogInfo 1", context.getExtraLogInfo(), equalTo(newValue));
     }
@@ -181,11 +180,10 @@ public class ContextTest extends AbstractUnitTest
      * Test of getExtraLogInfo method, of class Context.
      */
     @Test
-    public void testGetExtraLogInfo() 
-    {
+    public void testGetExtraLogInfo() {
         // Extra log info has a default value of "", and AbstractUnitTest doesn't change it
         String defaultValue = "";
-        
+
         assertThat("testGetExtraLogInfo 0", context.getExtraLogInfo(), notNullValue());
         assertThat("testGetExtraLogInfo 1", context.getExtraLogInfo(), equalTo(defaultValue));
     }
@@ -194,16 +192,15 @@ public class ContextTest extends AbstractUnitTest
      * Test of complete method, of class Context.
      */
     @Test
-    public void testComplete() throws SQLException 
-    {
+    public void testComplete() throws SQLException {
         // To test complete() we need a new Context object
         Context instance = new Context();
-        
+
         // By default, we should have a new DB connection, so let's make sure it is there
         assertThat("testComplete 0", instance.getDBConnection(), notNullValue());
         assertThat("testComplete 1", instance.getDBConnection().isSessionAlive(), equalTo(true));
         assertThat("testComplete 2", instance.isValid(), equalTo(true));
-        
+
         // Now, call complete(). This should set DB connection to null & invalidate context
         instance.complete();
         assertThat("testComplete 3", instance.getDBConnection(), nullValue());
@@ -213,17 +210,16 @@ public class ContextTest extends AbstractUnitTest
         cleanupContext(instance);
         // TODO: May also want to test that complete() is calling commit()?
     }
-    
+
     /**
      * Test of complete method, of class Context.
      */
     @Test
-    public void testComplete2() throws SQLException 
-    {
+    public void testComplete2() throws SQLException {
         // To test complete() we need a new Context object
         Context instance = new Context();
-        
-        // Call complete twice. The second call should NOT throw an error 
+
+        // Call complete twice. The second call should NOT throw an error
         // and effectively does nothing
         instance.complete();
         instance.complete();
@@ -236,17 +232,16 @@ public class ContextTest extends AbstractUnitTest
      * Test of abort method, of class Context.
      */
     @Test
-    public void testAbort() throws SQLException, AuthorizeException
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    public void testAbort() throws SQLException, AuthorizeException {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Allow Admin permissions - needed to create a new EPerson
-            authorizeService.isAdmin((Context) any); result = true;
+            authorizeService.isAdmin((Context) any);
+            result = true;
         }};
 
         // To test abort() we need a new Context object
         Context instance = new Context();
-        
+
         // Create a new EPerson (DO NOT COMMIT IT)
         String createdEmail = "susie@email.com";
         EPerson newUser = ePersonService.create(instance);
@@ -255,12 +250,12 @@ public class ContextTest extends AbstractUnitTest
         newUser.setEmail(createdEmail);
         newUser.setCanLogIn(true);
         newUser.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-        
+
         // Abort our context
         instance.abort();
         // Ensure the context is no longer valid
         assertThat("testAbort 0", instance.isValid(), equalTo(false));
-        
+
         // Open a new context, let's make sure that EPerson isn't there
         Context newInstance = new Context();
         EPerson found = ePersonService.findByEmail(newInstance, createdEmail);
@@ -275,18 +270,17 @@ public class ContextTest extends AbstractUnitTest
      * Test of close method, of class Context.
      */
     @Test
-    public void testClose() throws SQLException, AuthorizeException
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    public void testClose() throws SQLException, AuthorizeException {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Allow Admin permissions - needed to create a new EPerson
-            authorizeService.isAdmin((Context) any); result = true;
+            authorizeService.isAdmin((Context) any);
+            result = true;
         }};
 
         String createdEmail = "susie@email.com";
 
         // To test close() we need a new Context object in a try-with-resources block
-        try(Context instance = new Context()) {
+        try (Context instance = new Context()) {
 
             // Create a new EPerson (DO NOT COMMIT IT)
             EPerson newUser = ePersonService.create(instance);
@@ -309,17 +303,16 @@ public class ContextTest extends AbstractUnitTest
         //Calling close on a finished context should not result in errors
         newInstance.close();
     }
-    
+
     /**
      * Test of abort method, of class Context.
      */
     @Test
-    public void testAbort2() throws SQLException 
-    {
+    public void testAbort2() throws SQLException {
         // To test abort() we need a new Context object
         Context instance = new Context();
-        
-        // Call abort twice. The second call should NOT throw an error 
+
+        // Call abort twice. The second call should NOT throw an error
         // and effectively does nothing
         instance.abort();
         instance.abort();
@@ -340,11 +333,10 @@ public class ContextTest extends AbstractUnitTest
      * Test of isReadOnly method, of class Context.
      */
     @Test
-    public void testIsReadOnly() throws SQLException
-    {
+    public void testIsReadOnly() throws SQLException {
         // Our default context should NOT be read only
         assertThat("testIsReadOnly 0", context.isReadOnly(), equalTo(false));
-        
+
         // Create a new read-only context
         Context instance = new Context(Context.Mode.READ_ONLY);
         assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
@@ -360,8 +352,7 @@ public class ContextTest extends AbstractUnitTest
      * Test that commit cannot be called when the context is in read-only mode
      */
     @Test
-    public void testIsReadOnlyCommit() throws SQLException
-    {
+    public void testIsReadOnlyCommit() throws SQLException {
         // Create a new read-only context
         Context instance = new Context(Context.Mode.READ_ONLY);
         assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
@@ -392,17 +383,16 @@ public class ContextTest extends AbstractUnitTest
      * Test of setSpecialGroup method, of class Context.
      */
     @Test
-    public void testSetSpecialGroup() throws SQLException
-    {
+    public void testSetSpecialGroup() throws SQLException {
         // To test special groups we need a new Context object
         Context instance = new Context();
-        
+
         // Pass in random integers (need not be valid group IDs)
         UUID groupID1 = UUID.randomUUID();
         UUID groupID2 = UUID.randomUUID();
         instance.setSpecialGroup(groupID1);
         instance.setSpecialGroup(groupID2);
-        
+
         assertThat("testSetSpecialGroup 0", instance.inSpecialGroup(groupID1), equalTo(true));
         assertThat("testSetSpecialGroup 1", instance.inSpecialGroup(groupID2), equalTo(true));
         assertThat("testSetSpecialGroup 2", instance.inSpecialGroup(UUID.randomUUID()), equalTo(false));
@@ -423,27 +413,26 @@ public class ContextTest extends AbstractUnitTest
      * Test of getSpecialGroups method, of class Context.
      */
     @Test
-    public void testGetSpecialGroups() throws SQLException, AuthorizeException
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    public void testGetSpecialGroups() throws SQLException, AuthorizeException {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Allow Admin permissions - needed to create a new Group
-            authorizeService.isAdmin((Context) any); result = true;
+            authorizeService.isAdmin((Context) any);
+            result = true;
         }};
-        
+
         // To test special groups we need a new Context object
         Context instance = new Context();
-        
+
         // Create a new group & add it as a special group
         Group group = groupService.create(instance);
         UUID groupID = group.getID();
         instance.setSpecialGroup(groupID);
-        
+
         // Also add Administrator group as a special group
         Group adminGroup = groupService.findByName(instance, Group.ADMIN);
         UUID adminGroupID = adminGroup.getID();
         instance.setSpecialGroup(adminGroupID);
-        
+
         // Now get our special groups
         List<Group> specialGroups = instance.getSpecialGroups();
         assertThat("testGetSpecialGroup 0", specialGroups.size(), equalTo(2));

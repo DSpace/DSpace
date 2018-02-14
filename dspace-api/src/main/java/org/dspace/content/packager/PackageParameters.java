@@ -9,7 +9,6 @@ package org.dspace.content.packager;
 
 import java.util.Enumeration;
 import java.util.Properties;
-
 import javax.servlet.ServletRequest;
 
 /**
@@ -24,21 +23,18 @@ import javax.servlet.ServletRequest;
  * @version $Revision$
  */
 
-public class PackageParameters extends Properties
-{
+public class PackageParameters extends Properties {
     // Use non-printing FS (file separator) as arg-sep token, like Perl $;
     protected static final String SEPARATOR = "\034";
 
     // Regular expression to match the separator token:
     protected static final String SEPARATOR_REGEX = "\\034";
 
-    public PackageParameters()
-    {
+    public PackageParameters() {
         super();
     }
 
-    public PackageParameters(Properties defaults)
-    {
+    public PackageParameters(Properties defaults) {
         super(defaults);
     }
 
@@ -49,30 +45,21 @@ public class PackageParameters extends Properties
      * @param request - the request from which to take the values
      * @return new parameters object.
      */
-    public static PackageParameters create(ServletRequest request)
-    {
+    public static PackageParameters create(ServletRequest request) {
         PackageParameters result = new PackageParameters();
 
         Enumeration pe = request.getParameterNames();
-        while (pe.hasMoreElements())
-        {
-            String name = (String)pe.nextElement();
+        while (pe.hasMoreElements()) {
+            String name = (String) pe.nextElement();
             String v[] = request.getParameterValues(name);
-            if (v.length == 0)
-            {
+            if (v.length == 0) {
                 result.setProperty(name, "");
-            }
-            else if (v.length == 1)
-            {
+            } else if (v.length == 1) {
                 result.setProperty(name, v[0]);
-            }
-            else
-            {
+            } else {
                 StringBuffer sb = new StringBuffer();
-                for (int i = 0; i < v.length; ++i)
-                {
-                    if (i > 0)
-                    {
+                for (int i = 0; i < v.length; ++i) {
+                    if (i > 0) {
                         sb.append(SEPARATOR);
                     }
                     sb.append(v[i]);
@@ -88,20 +75,16 @@ public class PackageParameters extends Properties
      * Adds a value to a property; if property already has value(s),
      * this is tacked onto the end, otherwise it acts like setProperty().
      *
-     * @param key - the key to be placed into this property list.
+     * @param key   - the key to be placed into this property list.
      * @param value - the new value to add, corresponding to this key.
      * @return the previous value of the specified key in this property list, or
-     *    null if it did not have one.
+     * null if it did not have one.
      */
-    public Object addProperty(String key, String value)
-    {
+    public Object addProperty(String key, String value) {
         String oldVal = getProperty(key);
-        if (oldVal == null)
-        {
+        if (oldVal == null) {
             setProperty(key, value);
-        }
-        else
-        {
+        } else {
             setProperty(key, oldVal + SEPARATOR + value);
         }
         return oldVal;
@@ -113,39 +96,32 @@ public class PackageParameters extends Properties
      * @param key - the key to look for in this property list.
      * @return all values in an array, or null if this property is unset.
      */
-    public String[] getProperties(String key)
-    {
+    public String[] getProperties(String key) {
         String val = getProperty(key);
-        if (val == null)
-        {
+        if (val == null) {
             return null;
-        }
-        else
-        {
+        } else {
             return val.split(SEPARATOR_REGEX);
         }
     }
 
     /**
      * Returns boolean form of property with selectable default
-     * @param key the key to look for in this property list.
+     *
+     * @param key           the key to look for in this property list.
      * @param defaultAnswer default to return if there is no such property
      * @return the boolean derived from the value of property, or default
-     *   if it was not specified.
+     * if it was not specified.
      */
-    public boolean getBooleanProperty(String key, boolean defaultAnswer)
-    {
+    public boolean getBooleanProperty(String key, boolean defaultAnswer) {
         String stringValue = getProperty(key);
 
-        if (stringValue == null)
-        {
+        if (stringValue == null) {
             return defaultAnswer;
-        }
-        else
-        {
+        } else {
             return stringValue.equalsIgnoreCase("true") ||
-                    stringValue.equalsIgnoreCase("on") ||
-                    stringValue.equalsIgnoreCase("yes");
+                stringValue.equalsIgnoreCase("on") ||
+                stringValue.equalsIgnoreCase("yes");
         }
     }
 
@@ -159,8 +135,7 @@ public class PackageParameters extends Properties
      *
      * @return boolean result
      */
-    public boolean workflowEnabled()
-    {
+    public boolean workflowEnabled() {
         return getBooleanProperty("useWorkflow", true);
     }
 
@@ -169,8 +144,7 @@ public class PackageParameters extends Properties
      *
      * @param value boolean value (true = workflow enabled, false = workflow disabled)
      */
-    public void setWorkflowEnabled(boolean value)
-    {
+    public void setWorkflowEnabled(boolean value) {
         addProperty("useWorkflow", String.valueOf(value));
     }
 
@@ -186,18 +160,17 @@ public class PackageParameters extends Properties
      * object which already exists.  Use 'keep-existing' or 'replace' mode to
      * either skip-over (keep) or replace existing objects.
      * <p>
-     * Defaults to 'false' if previously unset. NOTE: 'replace' mode and 
+     * Defaults to 'false' if previously unset. NOTE: 'replace' mode and
      * 'keep-existing' mode are special types of "restores".  So, when either
      * replaceModeEnabled() or keepExistingModeEnabled() is true, this method
      * should also return true.
      *
      * @return boolean result
      */
-    public boolean restoreModeEnabled()
-    {
+    public boolean restoreModeEnabled() {
         return (getBooleanProperty("restoreMode", false) ||
-           replaceModeEnabled() ||
-           keepExistingModeEnabled());
+            replaceModeEnabled() ||
+            keepExistingModeEnabled());
     }
 
     /***
@@ -212,8 +185,7 @@ public class PackageParameters extends Properties
      *
      * @param value boolean value (true = restore enabled, false = restore disabled)
      */
-    public void setRestoreModeEnabled(boolean value)
-    {
+    public void setRestoreModeEnabled(boolean value) {
         addProperty("restoreMode", String.valueOf(value));
     }
 
@@ -229,8 +201,7 @@ public class PackageParameters extends Properties
      *
      * @return boolean result
      */
-    public boolean replaceModeEnabled()
-    {
+    public boolean replaceModeEnabled() {
         return getBooleanProperty("replaceMode", false);
     }
 
@@ -243,8 +214,7 @@ public class PackageParameters extends Properties
      *
      * @param value boolean value (true = replace enabled, false = replace disabled)
      */
-    public void setReplaceModeEnabled(boolean value)
-    {
+    public void setReplaceModeEnabled(boolean value) {
         addProperty("replaceMode", String.valueOf(value));
     }
 
@@ -260,8 +230,7 @@ public class PackageParameters extends Properties
      *
      * @return boolean result
      */
-    public boolean keepExistingModeEnabled()
-    {
+    public boolean keepExistingModeEnabled() {
         return getBooleanProperty("keepExistingMode", false);
     }
 
@@ -274,8 +243,7 @@ public class PackageParameters extends Properties
      *
      * @param value boolean value (true = replace enabled, false = replace disabled)
      */
-    public void setKeepExistingModeEnabled(boolean value)
-    {
+    public void setKeepExistingModeEnabled(boolean value) {
         addProperty("keepExistingMode", String.valueOf(value));
     }
 
@@ -287,8 +255,7 @@ public class PackageParameters extends Properties
      *
      * @return boolean result
      */
-    public boolean useCollectionTemplate()
-    {
+    public boolean useCollectionTemplate() {
         return getBooleanProperty("useCollectionTemplate", false);
     }
 
@@ -300,8 +267,7 @@ public class PackageParameters extends Properties
      *
      * @param value boolean value (true = template enabled, false = template disabled)
      */
-    public void setUseCollectionTemplate(boolean value)
-    {
+    public void setUseCollectionTemplate(boolean value) {
         addProperty("useCollectionTemplate", String.valueOf(value));
     }
 
@@ -318,8 +284,7 @@ public class PackageParameters extends Properties
      *
      * @return boolean result
      */
-    public boolean recursiveModeEnabled()
-    {
+    public boolean recursiveModeEnabled() {
         return getBooleanProperty("recursiveMode", false);
     }
 
@@ -332,8 +297,7 @@ public class PackageParameters extends Properties
      *
      * @param value boolean value (true = recursion enabled, false = recursion disabled)
      */
-    public void setRecursiveModeEnabled(boolean value)
-    {
+    public void setRecursiveModeEnabled(boolean value) {
         addProperty("recursiveMode", String.valueOf(value));
     }
 

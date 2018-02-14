@@ -7,29 +7,39 @@
  */
 package org.dspace.content;
 
-import org.apache.log4j.Logger;
-import org.dspace.AbstractIntegrationTest;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+import org.apache.log4j.Logger;
+import org.dspace.AbstractIntegrationTest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.WorkspaceItemService;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This is an integration test to validate the metadata classes
+ *
  * @author pvillega
  */
-public class ITMetadata  extends AbstractIntegrationTest
-{
-    /** log4j category */
+public class ITMetadata extends AbstractIntegrationTest {
+    /**
+     * log4j category
+     */
     private static final Logger log = Logger.getLogger(ITMetadata.class);
 
 
@@ -37,7 +47,8 @@ public class ITMetadata  extends AbstractIntegrationTest
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
+                                                                                 .getMetadataSchemaService();
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
     protected MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
 
@@ -50,8 +61,7 @@ public class ITMetadata  extends AbstractIntegrationTest
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
     }
 
@@ -64,8 +74,7 @@ public class ITMetadata  extends AbstractIntegrationTest
      */
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         super.destroy();
     }
 
@@ -73,8 +82,7 @@ public class ITMetadata  extends AbstractIntegrationTest
      * Tests the creation of a new metadata schema with some values
      */
     @Test
-    public void testCreateSchema() throws SQLException, AuthorizeException, NonUniqueMetadataException, IOException
-    {
+    public void testCreateSchema() throws SQLException, AuthorizeException, NonUniqueMetadataException, IOException {
         String schemaName = "integration";
 
         //we create the structure
@@ -106,12 +114,10 @@ public class ITMetadata  extends AbstractIntegrationTest
         List<MetadataField> fields = metadataFieldService.findAllInSchema(context, schema);
         assertTrue("testCreateSchema 3", fields.size() == 2);
         boolean exist = true;
-        for(MetadataField f : fields)
-        {
-           if(!f.equals(field1) && !f.equals(field2))
-           {
-               exist = false;
-           }
+        for (MetadataField f : fields) {
+            if (!f.equals(field1) && !f.equals(field2)) {
+                exist = false;
+            }
         }
         assertTrue("testCreateSchema 4", exist);
 

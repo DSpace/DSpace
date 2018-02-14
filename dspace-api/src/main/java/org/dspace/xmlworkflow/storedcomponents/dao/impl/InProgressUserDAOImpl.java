@@ -7,17 +7,17 @@
  */
 package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 
-import org.dspace.core.Context;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.InProgressUserDAO;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the InProgressUser object.
@@ -26,21 +26,20 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> implements InProgressUserDAO
-{
-    protected InProgressUserDAOImpl()
-    {
+public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> implements InProgressUserDAO {
+    protected InProgressUserDAOImpl() {
         super();
     }
 
     @Override
-    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson) throws SQLException {
+    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+        throws SQLException {
         Criteria criteria = createCriteria(context, InProgressUser.class);
         criteria.add(
-                Restrictions.and(
-                        Restrictions.eq("workflowItem", workflowItem),
-                        Restrictions.eq("ePerson", ePerson)
-                )
+            Restrictions.and(
+                Restrictions.eq("workflowItem", workflowItem),
+                Restrictions.eq("ePerson", ePerson)
+            )
         );
         return uniqueResult(criteria);
     }
@@ -65,10 +64,10 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
     public int countInProgressUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException {
         Criteria criteria = createCriteria(context, InProgressUser.class);
         criteria.add(
-                Restrictions.and(
-                        Restrictions.eq("workflowItem", workflowItem),
-                        Restrictions.eq("finished", false)
-                )
+            Restrictions.and(
+                Restrictions.eq("workflowItem", workflowItem),
+                Restrictions.eq("finished", false)
+            )
         );
 
         return count(criteria);
@@ -78,10 +77,10 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
     public int countFinishedUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException {
         Criteria criteria = createCriteria(context, InProgressUser.class);
         criteria.add(
-                Restrictions.and(
-                        Restrictions.eq("workflowItem", workflowItem),
-                        Restrictions.eq("finished", true)
-                )
+            Restrictions.and(
+                Restrictions.eq("workflowItem", workflowItem),
+                Restrictions.eq("finished", true)
+            )
         );
         return count(criteria);
     }

@@ -12,7 +12,8 @@ import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.statistics.util.SpiderDetectorService;
 
 /**
- * Abstract factory to get services for the statistics package, use StatisticsServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the statistics package, use StatisticsServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -22,8 +23,8 @@ public abstract class StatisticsServiceFactory {
 
     public abstract SpiderDetectorService getSpiderDetectorService();
 
-    public static StatisticsServiceFactory getInstance()
-    {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("statisticsServiceFactory", StatisticsServiceFactory.class);
+    public static StatisticsServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("statisticsServiceFactory", StatisticsServiceFactory.class);
     }
 }

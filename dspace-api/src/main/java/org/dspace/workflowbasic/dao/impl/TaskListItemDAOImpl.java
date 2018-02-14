@@ -7,8 +7,11 @@
  */
 package org.dspace.workflowbasic.dao.impl;
 
-import org.dspace.core.Context;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflowbasic.BasicWorkflowItem;
 import org.dspace.workflowbasic.TaskListItem;
@@ -17,9 +20,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 
-import java.sql.SQLException;
-import java.util.List;
-
 /**
  * Hibernate implementation of the Database Access Object interface class for the TaskListItem object.
  * This class is responsible for all database calls for the TaskListItem object and is autowired by spring
@@ -27,10 +27,8 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class TaskListItemDAOImpl extends AbstractHibernateDAO<TaskListItem> implements TaskListItemDAO
-{
-    protected TaskListItemDAOImpl()
-    {
+public class TaskListItemDAOImpl extends AbstractHibernateDAO<TaskListItem> implements TaskListItemDAO {
+    protected TaskListItemDAOImpl() {
         super();
     }
 

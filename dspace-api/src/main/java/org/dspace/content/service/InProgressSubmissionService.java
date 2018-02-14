@@ -17,31 +17,35 @@ import org.dspace.core.Context;
 
 /**
  * Service interface class for the InProgressSubmission.
- * All InProgressSubmission service classes should implement this class since it offers some basic methods which all InProgressSubmissions
+ * All InProgressSubmission service classes should implement this class since it offers some basic methods which all
+ * InProgressSubmissions
  * are required to have.
  *
- * @author kevinvandevelde at atmire.com
  * @param <T> class type
+ * @author kevinvandevelde at atmire.com
  */
 public interface InProgressSubmissionService<T extends InProgressSubmission> {
 
     /**
      * Deletes submission wrapper, doesn't delete item contents
-     * @param context context
+     *
+     * @param context              context
      * @param inProgressSubmission submission
-     * @throws SQLException if database error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     public void deleteWrapper(Context context, T inProgressSubmission) throws SQLException, AuthorizeException;
 
     /**
      * Update the submission, including the unarchived item.
-     * @param context context
+     *
+     * @param context              context
      * @param inProgressSubmission submission
-     * @throws SQLException if database error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     public void update(Context context, T inProgressSubmission) throws SQLException, AuthorizeException;
-    
-	public void move(Context context, T inProgressSubmission, Collection fromCollection, Collection toCollection) throws DCInputsReaderException;
+
+    public void move(Context context, T inProgressSubmission, Collection fromCollection, Collection toCollection)
+        throws DCInputsReaderException;
 }

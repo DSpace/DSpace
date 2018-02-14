@@ -7,6 +7,11 @@
  */
 package org.dspace.workflowbasic;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.apache.log4j.Logger;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.AbstractIntegrationTest;
@@ -44,54 +49,48 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
 /**
- * This is an integration test to ensure that the basic workflow system 
- * -including methods of the collection service dealing with it- works properly 
+ * This is an integration test to ensure that the basic workflow system
+ * -including methods of the collection service dealing with it- works properly
  * together with the authorization service.
+ *
  * @author Pascal-Nicolas Becker
  * @author Terry Brady
  */
 public class BasicWorkflowAuthorizationIT
-extends AbstractIntegrationTest
-{
-    /** log4j category */
+    extends AbstractIntegrationTest {
+    /**
+     * log4j category
+     */
     private static final Logger log = Logger.getLogger(BasicWorkflowAuthorizationIT.class);
-    
+
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
-    protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
+    protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance()
+                                                                                             .getBasicWorkflowItemService();
+    protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance()
+                                                                                     .getBasicWorkflowService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    
+
     protected Community owningCommunity;
     protected Collection collection;
     protected Group group;
     protected EPerson member;
-    
-    public BasicWorkflowAuthorizationIT()
-    {
+
+    public BasicWorkflowAuthorizationIT() {
         owningCommunity = null;
         collection = null;
         group = null;
         member = null;
     }
-    
+
     /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
@@ -101,35 +100,27 @@ extends AbstractIntegrationTest
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
-        
-        try
-        {
+
+        try {
             //we have to create a new community in the database
             configurationService.setProperty("workflow.notify.returned.tasks", false);
             context.turnOffAuthorisationSystem();
-            
+
             this.owningCommunity = communityService.create(null, context);
             this.collection = collectionService.create(context, owningCommunity);
             this.member = ePersonService.create(context);
             this.group = groupService.create(context);
             groupService.addMember(context, group, member);
             groupService.update(context, group);
-        }
-        catch (AuthorizeException ex)
-        {
+        } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             Assert.fail("Authorization Error in init: " + ex.getMessage());
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             Assert.fail("SQL Error in init: " + ex.getMessage());
-        }
-        finally
-        {
+        } finally {
             // restore the authorization system as tests expect it to be in place
             context.restoreAuthSystemState();
         }
@@ -147,7 +138,7 @@ extends AbstractIntegrationTest
     public void destroy() {
         try {
             context.turnOffAuthorisationSystem();
-            
+
             // reload collection, community, group and eperson
             if (collection != null) {
                 try {
@@ -165,9 +156,8 @@ extends AbstractIntegrationTest
                 }
                 owningCommunity = null;
             }
-                
-            if (member != null)
-            {
+
+            if (member != null) {
                 if (group != null) {
                     try {
                         groupService.removeMember(context, group, member);
@@ -181,36 +171,33 @@ extends AbstractIntegrationTest
                     }
                     group = null;
                 }
-                try{
+                try {
                     ePersonService.delete(context, member);
                 } catch (Exception e) {
                     log.error("deleting user", e);
-                } 
+                }
             }
-        }
-        finally
-        {
+        } finally {
             // restore the authorization system
             context.restoreAuthSystemState();
         }
         super.destroy();
     }
-    
 
-    private void setWorkflowGroup(Collection collection, Context context, int step, Group group) throws SQLException, AuthorizeException {
+
+    private void setWorkflowGroup(Collection collection, Context context, int step, Group group)
+        throws SQLException, AuthorizeException {
         collection.setWorkflowGroup(context, step, group);
         //collection.setWorkflowGroup(step, group);
     }
-    
-    
+
 
     /**
-     * Test if setWorkflowGroup method sets the appropriate policies for the 
+     * Test if setWorkflowGroup method sets the appropriate policies for the
      * new workflow group.
      */
     @Test
-    public void testsetWorkflowGroupSetsPermission() throws SQLException, AuthorizeException
-    {
+    public void testsetWorkflowGroupSetsPermission() throws SQLException, AuthorizeException {
         int step = 1;
         try {
             context.turnOffAuthorisationSystem();
@@ -219,18 +206,19 @@ extends AbstractIntegrationTest
         } finally {
             context.restoreAuthSystemState();
         }
-        Assert.assertThat("testsetWorkflowGroupSetsPermission 0", collectionService.getWorkflowGroup(collection, step), CoreMatchers.equalTo(group));
+        Assert.assertThat("testsetWorkflowGroupSetsPermission 0", collectionService.getWorkflowGroup(collection, step),
+                          CoreMatchers.equalTo(group));
         Assert.assertTrue(groupService.isDirectMember(group, member));
-        Assert.assertTrue("testsetWorkflowGroupSetsPermission 1", authorizeService.authorizeActionBoolean(context, member, collection, Constants.WORKFLOW_STEP_1, true));
+        Assert.assertTrue("testsetWorkflowGroupSetsPermission 1", authorizeService
+            .authorizeActionBoolean(context, member, collection, Constants.WORKFLOW_STEP_1, true));
     }
-    
+
     /**
-     * Test if setWorkflowGroup method revokes policies when a workflow group 
+     * Test if setWorkflowGroup method revokes policies when a workflow group
      * is removed.
      */
     @Test
-    public void testsetWorkflowGroupRevokesPermission() throws SQLException, AuthorizeException
-    {
+    public void testsetWorkflowGroupRevokesPermission() throws SQLException, AuthorizeException {
         int step = 1;
         try {
             context.turnOffAuthorisationSystem();
@@ -239,9 +227,12 @@ extends AbstractIntegrationTest
         } finally {
             context.restoreAuthSystemState();
         }
-        Assert.assertThat("testsetWorkflowGroupRevokesPermission 0", collectionService.getWorkflowGroup(collection, step), CoreMatchers
-                .equalTo(group));
-        Assert.assertTrue("testsetWorkflowGroupRevokesPermission 1", authorizeService.authorizeActionBoolean(context, member, collection, Constants.WORKFLOW_STEP_1, true));
+        Assert
+            .assertThat("testsetWorkflowGroupRevokesPermission 0", collectionService.getWorkflowGroup(collection, step),
+                        CoreMatchers
+                            .equalTo(group));
+        Assert.assertTrue("testsetWorkflowGroupRevokesPermission 1", authorizeService
+            .authorizeActionBoolean(context, member, collection, Constants.WORKFLOW_STEP_1, true));
         try {
             context.turnOffAuthorisationSystem();
             setWorkflowGroup(collection, context, step, null);
@@ -249,19 +240,21 @@ extends AbstractIntegrationTest
         } finally {
             context.restoreAuthSystemState();
         }
-        Assert.assertThat("testsetWorkflowGroupRevokesPermission 2", collectionService.getWorkflowGroup(collection, step), CoreMatchers
-                .nullValue());
-        Assert.assertFalse("testsetWorkflowGroupRevokesPermission 3", authorizeService.authorizeActionBoolean(context, member, collection, Constants.WORKFLOW_STEP_1, true));
+        Assert
+            .assertThat("testsetWorkflowGroupRevokesPermission 2", collectionService.getWorkflowGroup(collection, step),
+                        CoreMatchers
+                            .nullValue());
+        Assert.assertFalse("testsetWorkflowGroupRevokesPermission 3", authorizeService
+            .authorizeActionBoolean(context, member, collection, Constants.WORKFLOW_STEP_1, true));
     }
-    
+
     /**
      * Test that a member of a worfklow step group can claim a task and get the
      * appropriate policies.
      */
     @Test
     public void testReviewerPermissions()
-            throws SQLException, AuthorizeException, IOException, WorkflowException
-    {
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
         BasicWorkflowItem wfi = null;
         try {
             // prepare a task to claim
@@ -277,7 +270,7 @@ extends AbstractIntegrationTest
             bundleService.update(context, bundle);
             itemService.update(context, item);
             workspaceItemService.update(context, wsi);
-            
+
             wfi = basicWorkflowService.startWithoutNotify(context, wsi);
             basicWorkflowItemService.update(context, wfi);
         } finally {
@@ -288,31 +281,30 @@ extends AbstractIntegrationTest
         wfi = basicWorkflowItemService.find(context, wfi.getID());
         basicWorkflowService.claim(context, wfi, member);
         Item item = wfi.getItem();
-        
+
         int i = 0;
         // check item policies
-        for (int action : new int[] {Constants.READ, Constants.WRITE, Constants.ADD, Constants.REMOVE, Constants.DELETE})
-        {
+        for (int action : new int[] {Constants.READ, Constants.WRITE, Constants.ADD, Constants.REMOVE, Constants
+            .DELETE}) {
             Assert.assertTrue("testReviewerPermissions 1-" + i++,
-                    authorizeService.authorizeActionBoolean(context, member, item, action, false));
+                              authorizeService.authorizeActionBoolean(context, member, item, action, false));
         }
-        
+
         // ensure we can read the original bundle and its bitstream
         Bundle bundle = itemService.getBundles(item, "ORIGINAL").get(0);
         Bitstream bitstream = bundle.getBitstreams().get(0);
         Assert.assertTrue("testReviewerPermissions 2-1",
-                    authorizeService.authorizeActionBoolean(context, member, bundle, Constants.READ, false));
+                          authorizeService.authorizeActionBoolean(context, member, bundle, Constants.READ, false));
         Assert.assertTrue("testReviewerPermissions 2-2" + i++,
-                    authorizeService.authorizeActionBoolean(context, member, bitstream, Constants.READ, false));
+                          authorizeService.authorizeActionBoolean(context, member, bitstream, Constants.READ, false));
     }
-    
+
     /**
      * Test that a eperson not a member of a workflow step group can't claim a task.
      */
-    @Test(expected=AuthorizeException.class)
+    @Test(expected = AuthorizeException.class)
     public void testNonWorkflowGroupMemberCannotClaimTask()
-            throws SQLException, AuthorizeException, IOException, WorkflowException
-    {
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
         BasicWorkflowItem wfi = null;
         EPerson someone = null;
         try {
@@ -330,7 +322,7 @@ extends AbstractIntegrationTest
             bundleService.update(context, bundle);
             itemService.update(context, item);
             workspaceItemService.update(context, wsi);
-            
+
             wfi = basicWorkflowService.startWithoutNotify(context, wsi);
             basicWorkflowItemService.update(context, wfi);
         } finally {
@@ -341,9 +333,9 @@ extends AbstractIntegrationTest
         wfi = basicWorkflowItemService.find(context, wfi.getID());
         basicWorkflowService.claim(context, wfi, someone);
         Assert.fail("Someone, not part of a workflow step group was able to claim a "
-                + "task without an AUthorizeException.");
+                        + "task without an AUthorizeException.");
     }
-    
+
     /**
      * Test that the submitter of an item who is not member of the appropriate
      * workflow step group cannot claim the task of his/her own submission.
@@ -351,10 +343,9 @@ extends AbstractIntegrationTest
      * need to test that they are still not able to claim tasks for there own
      * items.
      */
-    @Test(expected=AuthorizeException.class)
+    @Test(expected = AuthorizeException.class)
     public void testNonWorkflowGroupSubmitterCannotClaimTask()
-            throws SQLException, AuthorizeException, IOException, WorkflowException
-    {
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
         BasicWorkflowItem wfi = null;
         EPerson submitter = null;
         try {
@@ -373,7 +364,7 @@ extends AbstractIntegrationTest
             bundleService.update(context, bundle);
             itemService.update(context, item);
             workspaceItemService.update(context, wsi);
-            
+
             wfi = basicWorkflowService.startWithoutNotify(context, wsi);
             basicWorkflowItemService.update(context, wfi);
         } finally {
@@ -384,7 +375,7 @@ extends AbstractIntegrationTest
         wfi = basicWorkflowItemService.find(context, wfi.getID());
         basicWorkflowService.claim(context, wfi, submitter);
         Assert.fail("A submitter was able to claim a task without being a member of the "
-                + "appropriate workflow step group. Expected: AuthorizeException.");
+                        + "appropriate workflow step group. Expected: AuthorizeException.");
     }
 
 }

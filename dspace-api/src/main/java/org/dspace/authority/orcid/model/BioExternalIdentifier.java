@@ -8,7 +8,6 @@
 package org.dspace.authority.orcid.model;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -64,11 +63,11 @@ public class BioExternalIdentifier {
     @Override
     public String toString() {
         return "BioExternalIdentifier{" +
-                "id_orcid='" + id_orcid + '\'' +
-                ", id_common_name='" + id_common_name + '\'' +
-                ", id_reference='" + id_reference + '\'' +
-                ", id_url='" + id_url + '\'' +
-                '}';
+            "id_orcid='" + id_orcid + '\'' +
+            ", id_common_name='" + id_common_name + '\'' +
+            ", id_reference='" + id_reference + '\'' +
+            ", id_url='" + id_url + '\'' +
+            '}';
     }
 
     @Override

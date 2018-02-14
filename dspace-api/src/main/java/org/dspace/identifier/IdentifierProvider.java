@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- *
- *
  * @author Fabio Bolognesi (fabio at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -39,7 +37,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Can this provider provide identifiers of a given type?
-     * 
+     *
      * @param identifier requested type.
      * @return true if the given type is assignable from this provider's type.
      */
@@ -47,7 +45,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Can this provider provide identifiers of a given type?
-     * 
+     *
      * @param identifier requested type.
      * @return true if this provider can provide the named type of identifier.
      */
@@ -55,10 +53,9 @@ public abstract class IdentifierProvider {
 
     /**
      * Create and apply an identifier to a DSpaceObject.
-     * 
-     * @param context
-     *     The relevant DSpace Context.
-     * @param item object to be named.
+     *
+     * @param context The relevant DSpace Context.
+     * @param item    object to be named.
      * @return existing identifier of {@code item} if it has one, else a new identifier.
      * @throws IdentifierException if identifier error
      */
@@ -66,10 +63,9 @@ public abstract class IdentifierProvider {
 
     /**
      * Create an identifier for a DSpaceObject.
-     * 
-     * @param context
-     *     The relevant DSpace Context.
-     * @param dso object to be named.
+     *
+     * @param context The relevant DSpace Context.
+     * @param dso     object to be named.
      * @return existing identifier of {@code dso} if it has one, else a new identifier.
      * @throws IdentifierException if identifier error
      */
@@ -77,45 +73,47 @@ public abstract class IdentifierProvider {
 
     /**
      * Find the object named by a given identifier.
-     * 
-     * @param context
-     *     The relevant DSpace Context.
+     *
+     * @param context    The relevant DSpace Context.
      * @param identifier to be resolved.
      * @param attributes additional information for resolving {@code identifier}.
      * @return the named object.
-     * @throws IdentifierNotFoundException if identifier not found
-     * @throws IdentifierNotResolvableException if identifier not resolvable 
+     * @throws IdentifierNotFoundException      if identifier not found
+     * @throws IdentifierNotResolvableException if identifier not resolvable
      */
-    public abstract DSpaceObject resolve(Context context, String identifier, String... attributes) throws IdentifierNotFoundException, IdentifierNotResolvableException;;
+    public abstract DSpaceObject resolve(Context context, String identifier, String... attributes)
+        throws IdentifierNotFoundException, IdentifierNotResolvableException;
+
+    ;
 
     /**
      * Return the identifier for a DSpaceObject.
-     * 
-     * @param context
-     *     The relevant DSpace Context.
-     * @param object The object to be looked up.
+     *
+     * @param context The relevant DSpace Context.
+     * @param object  The object to be looked up.
      * @return identifier for {@code object}.
-     * @throws IdentifierNotFoundException if identifier not found
-     * @throws IdentifierNotResolvableException if identifier not resolvable 
+     * @throws IdentifierNotFoundException      if identifier not found
+     * @throws IdentifierNotResolvableException if identifier not resolvable
      */
-    public abstract String lookup(Context context, DSpaceObject object) throws IdentifierNotFoundException, IdentifierNotResolvableException;;
+    public abstract String lookup(Context context, DSpaceObject object)
+        throws IdentifierNotFoundException, IdentifierNotResolvableException;
+
+    ;
 
     /**
      * Unbind this type of identifier(s) from an object.
-     * 
-     * @param context
-     *     The relevant DSpace Context.
-     * @param dso object to lose its identity.
+     *
+     * @param context The relevant DSpace Context.
+     * @param dso     object to lose its identity.
      * @throws IdentifierException if identifier error
      */
     public abstract void delete(Context context, DSpaceObject dso) throws IdentifierException;
 
     /**
      * Unbind the given identifier from an object.
-     * 
-     * @param context
-     *     The relevant DSpace Context.
-     * @param dso object to be de-identified.
+     *
+     * @param context    The relevant DSpace Context.
+     * @param dso        object to be de-identified.
      * @param identifier to be removed.
      * @throws IdentifierException if identifier error
      */
@@ -123,10 +121,9 @@ public abstract class IdentifierProvider {
 
     /**
      * Set an object's identifier.
-     * 
-     * @param context
-     *     The relevant DSpace Context.
-     * @param dso object to be identified.
+     *
+     * @param context    The relevant DSpace Context.
+     * @param dso        object to be identified.
      * @param identifier to be set on the object.
      * @throws IdentifierException if identifier error
      */
@@ -134,13 +131,12 @@ public abstract class IdentifierProvider {
 
     /**
      * Create a specific identifier and apply it to an object.
-     * 
-     * @param context
-     *     The relevant DSpace Context.
-     * @param object to be identified.
+     *
+     * @param context    The relevant DSpace Context.
+     * @param object     to be identified.
      * @param identifier to be created.
      * @throws IdentifierException if identifier error
      */
     public abstract void register(Context context, DSpaceObject object, String identifier)
-            throws IdentifierException;
+        throws IdentifierException;
 }

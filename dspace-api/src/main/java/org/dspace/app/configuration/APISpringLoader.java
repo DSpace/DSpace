@@ -7,11 +7,11 @@
  */
 package org.dspace.app.configuration;
 
-import org.dspace.kernel.config.SpringLoader;
-import org.dspace.services.ConfigurationService;
-
 import java.io.File;
 import java.net.MalformedURLException;
+
+import org.dspace.kernel.config.SpringLoader;
+import org.dspace.services.ConfigurationService;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -32,7 +32,7 @@ public class APISpringLoader implements SpringLoader {
 
 
         try {
-            return new String[]{new File(filePath.toString()).toURI().toURL().toString() + XML_SUFFIX};
+            return new String[] {new File(filePath.toString()).toURI().toURL().toString() + XML_SUFFIX};
         } catch (MalformedURLException e) {
             return new String[0];
         }

@@ -17,45 +17,41 @@ import org.dspace.core.Utils;
  * BasicDispatcher implements the primary task of a Dispatcher: it delivers a
  * filtered list of events, synchronously, to a configured list of consumers. It
  * may be extended for more elaborate behavior.
- * 
+ *
  * @version $Revision$
  */
-public class BasicDispatcher extends Dispatcher
-{
+public class BasicDispatcher extends Dispatcher {
 
-    public BasicDispatcher(String name)
-    {
+    public BasicDispatcher(String name) {
         super(name);
     }
 
-    /** log4j category */
+    /**
+     * log4j category
+     */
     private static Logger log = Logger.getLogger(BasicDispatcher.class);
 
     @Override
     public void addConsumerProfile(ConsumerProfile cp)
-            throws IllegalArgumentException
-    {
-        if (consumers.containsKey(cp.getName()))
-        {
+        throws IllegalArgumentException {
+        if (consumers.containsKey(cp.getName())) {
             throw new IllegalArgumentException(
-                    "This dispatcher already has a consumer named \""
-                            + cp.getName() + "\"");
+                "This dispatcher already has a consumer named \""
+                    + cp.getName() + "\"");
         }
 
         consumers.put(cp.getName(), cp);
 
-        if (log.isDebugEnabled())
-        {
+        if (log.isDebugEnabled()) {
             int n = 0;
-            for (Iterator i = cp.getFilters().iterator(); i.hasNext(); ++n)
-            {
+            for (Iterator i = cp.getFilters().iterator(); i.hasNext(); ++n) {
                 int f[] = (int[]) i.next();
                 log.debug("Adding Consumer=\"" + cp.getName() + "\", instance="
-                        + cp.getConsumer().toString() + ", filter["
-                        + String.valueOf(n) + "]=(ObjMask="
-                        + String.valueOf(f[Event.SUBJECT_MASK])
-                        + ", EventMask=" + String.valueOf(f[Event.EVENT_MASK])
-                        + ")");
+                              + cp.getConsumer().toString() + ", filter["
+                              + String.valueOf(n) + "]=(ObjMask="
+                              + String.valueOf(f[Event.SUBJECT_MASK])
+                              + ", EventMask=" + String.valueOf(f[Event.EVENT_MASK])
+                              + ")");
             }
         }
     }
@@ -63,25 +59,20 @@ public class BasicDispatcher extends Dispatcher
     /**
      * Dispatch all events added to this Context according to configured
      * consumers.
-     * 
-     * @param ctx
-     *            the execution context
+     *
+     * @param ctx the execution context
      */
     @Override
-    public void dispatch(Context ctx)
-    {
-        if (!consumers.isEmpty())
-        {
+    public void dispatch(Context ctx) {
+        if (!consumers.isEmpty()) {
 
-            if (!ctx.hasEvents())
-            {
+            if (!ctx.hasEvents()) {
                 return;
             }
 
-            if (log.isDebugEnabled())
-            {
+            if (log.isDebugEnabled()) {
                 log.debug("Processing queue of "
-                        + String.valueOf(ctx.getEvents().size()) + " events.");
+                              + String.valueOf(ctx.getEvents().size()) + " events.");
             }
 
             // transaction identifier applies to all events created in
@@ -89,43 +80,35 @@ public class BasicDispatcher extends Dispatcher
             // some letters so RDF readers don't mistake it for an integer.
             String tid = "TX" + Utils.generateKey();
 
-            while (ctx.hasEvents())
-            {
+            while (ctx.hasEvents()) {
                 Event event = ctx.pollEvent();
                 event.setDispatcher(getIdentifier());
                 event.setTransactionID(tid);
 
-                if (log.isDebugEnabled())
-                {
+                if (log.isDebugEnabled()) {
                     log.debug("Iterating over "
-                            + String.valueOf(consumers.values().size())
-                            + " consumers...");
+                                  + String.valueOf(consumers.values().size())
+                                  + " consumers...");
                 }
 
-                for (Iterator ci = consumers.values().iterator(); ci.hasNext();)
-                {
+                for (Iterator ci = consumers.values().iterator(); ci.hasNext(); ) {
                     ConsumerProfile cp = (ConsumerProfile) ci.next();
 
-                    if (event.pass(cp.getFilters()))
-                    {
-                        if (log.isDebugEnabled())
-                        {
+                    if (event.pass(cp.getFilters())) {
+                        if (log.isDebugEnabled()) {
                             log.debug("Sending event to \"" + cp.getName()
-                                    + "\": " + event.toString());
+                                          + "\": " + event.toString());
                         }
 
-                        try
-                        {
+                        try {
                             cp.getConsumer().consume(ctx, event);
 
                             // Record that the event has been consumed by this
                             // consumer
                             event.setBitSet(cp.getName());
-                        }
-                        catch (Exception e)
-                        {
+                        } catch (Exception e) {
                             log.error("Consumer(\"" + cp.getName()
-                                    + "\").consume threw: " + e.toString(), e);
+                                          + "\").consume threw: " + e.toString(), e);
                         }
                     }
 
@@ -133,25 +116,19 @@ public class BasicDispatcher extends Dispatcher
             }
 
             // Call end on the consumers that got synchronous events.
-            for (Iterator ci = consumers.values().iterator(); ci.hasNext();)
-            {
+            for (Iterator ci = consumers.values().iterator(); ci.hasNext(); ) {
                 ConsumerProfile cp = (ConsumerProfile) ci.next();
-                if (cp != null)
-                {
-                    if (log.isDebugEnabled())
-                    {
+                if (cp != null) {
+                    if (log.isDebugEnabled()) {
                         log.debug("Calling end for consumer \"" + cp.getName()
-                                + "\"");
+                                      + "\"");
                     }
 
-                    try
-                    {
+                    try {
                         cp.getConsumer().end(ctx);
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         log.error("Error in Consumer(\"" + cp.getName()
-                                + "\").end: " + e.toString(), e);
+                                      + "\").end: " + e.toString(), e);
                     }
                 }
             }

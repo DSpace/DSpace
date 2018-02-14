@@ -42,26 +42,25 @@ import org.slf4j.LoggerFactory;
  *
  * @author Tim Donohue
  */
-public class DatabaseRegistryUpdater implements FlywayCallback
-{
-     /** logging category */
+public class DatabaseRegistryUpdater implements FlywayCallback {
+    /**
+     * logging category
+     */
     private static final Logger log = LoggerFactory.getLogger(DatabaseRegistryUpdater.class);
 
     /**
      * Method to actually update our registries from latest configs
      */
-    private void updateRegistries()
-    {
+    private void updateRegistries() {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         Context context = null;
-        try
-        {
+        try {
             context = new Context();
             context.turnOffAuthorisationSystem();
 
             String base = config.getProperty("dspace.dir")
-                            + File.separator + "config" + File.separator
-                            + "registries" + File.separator;
+                + File.separator + "config" + File.separator
+                + "registries" + File.separator;
 
             // Load updates to Bitstream format registry (if any)
             log.info("Updating Bitstream Format Registry based on " + base + "bitstream-formats.xml");
@@ -76,8 +75,7 @@ public class DatabaseRegistryUpdater implements FlywayCallback
             MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
 
             // Check if XML Workflow is enabled in workflow.cfg
-            if (WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService)
-            {
+            if (WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService) {
                 // If so, load in the workflow metadata types as well
                 MetadataImporter.loadRegistry(base + "workflow-types.xml", true);
             }
@@ -86,17 +84,14 @@ public class DatabaseRegistryUpdater implements FlywayCallback
             // Commit changes and close context
             context.complete();
             log.info("All Bitstream Format Regitry and Metadata Registry updates were completed.");
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             log.error("Error attempting to update Bitstream Format and/or Metadata Registries", e);
             throw new RuntimeException("Error attempting to update Bitstream Format and/or Metadata Registries", e);
-        }
-        finally
-        {
+        } finally {
             // Clean up our context, if it still exists & it was never completed
-            if(context!=null && context.isValid())
+            if (context != null && context.isValid()) {
                 context.abort();
+            }
         }
     }
 
