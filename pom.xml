@@ -185,6 +185,7 @@
                     <executions>
                         <execution>
                             <id>verify-style</id>
+                            <!-- Bind to process-classes so it runs after compile, but before package -->
                             <phase>process-classes</phase>
                             <goals>
                                 <goal>check</goal>
@@ -195,7 +196,9 @@
                         <configLocation>${root.basedir}/checkstyle.xml</configLocation>
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <logViolationsToConsole>true</logViolationsToConsole>
-                        <linkXRef>false</linkXRef>
+                        <failOnViolation>true</failOnViolation>
+                        <!-- TODO: Enable checks on tests too. Currently, they are excluded by default -->
+                        <!--<includeTestSourceDirectory>true</includeTestSourceDirectory>-->
                     </configuration>
                     <dependencies>
                         <!-- Override dependencies to use latest version of checkstyle -->
@@ -364,6 +367,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+
+            <!-- Enforce our code style via CheckStyle (see settings above) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
