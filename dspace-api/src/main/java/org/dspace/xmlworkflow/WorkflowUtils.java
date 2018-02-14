@@ -56,6 +56,11 @@ public class WorkflowUtils extends Util {
                                                                                             .getWorkflowFactory();
 
     /**
+     * Default constructor
+     */
+    private WorkflowUtils() { }
+
+    /**
      * Return a string for logging, containing useful information about the
      * current request - the URL, the method and parameters.
      *
