@@ -47,9 +47,9 @@ public class Util {
     private static Logger log = Logger.getLogger(Util.class);
 
     /**
-     * Default constructor
+     * Default constructor. Must be protected as org.dspace.xmlworkflow.WorkflowUtils extends it
      */
-    private Util() { }
+    protected Util() { }
 
     /**
      * Utility method to convert spaces in a string to HTML non-break space
