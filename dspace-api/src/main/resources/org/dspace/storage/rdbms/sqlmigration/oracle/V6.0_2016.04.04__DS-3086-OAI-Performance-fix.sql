@@ -15,7 +15,26 @@
 -- "ON DELETE CASCADE" to improve the performance of Item deletion.
 ---------------------------------------------------------------
 
-CREATE UNIQUE INDEX metadataschema_idx_short_id on metadataschemaregistry(short_id);
+--CREATE UNIQUE INDEX metadataschema_idx_short_id on metadataschemaregistry(short_id);
+DECLARE
+  COUNT_INDEXES INTEGER;
+  INDEX_NAME VARCHAR(256);
+  TABLE_NAME_D VARCHAR(256) := 'metadataschemaregistry';
+  COLUMN_NAME_D VARCHAR(256) := 'short_id';
+BEGIN
+  select count(c.INDEX_NAME) into COUNT_INDEXES
+  from USER_INDEXES i, USER_IND_COLUMNS c
+  where i.TABLE_NAME = upper(TABLE_NAME_D)
+        and i.UNIQUENESS = 'UNIQUE'
+        and i.TABLE_NAME = c.TABLE_NAME
+        and i.INDEX_NAME = c.INDEX_NAME
+        and c.COLUMN_NAME = upper(COLUMN_NAME_D);
+
+  IF COUNT_INDEXES = 0 THEN
+    EXECUTE IMMEDIATE 'CREATE UNIQUE INDEX metadataschema_idx_short_id on metadataschemaregistry(short_id);';
+  END IF;
+END;
+/
 
 CREATE INDEX metadatafield_idx_elem_qual on metadatafieldregistry(element, qualifier);
 

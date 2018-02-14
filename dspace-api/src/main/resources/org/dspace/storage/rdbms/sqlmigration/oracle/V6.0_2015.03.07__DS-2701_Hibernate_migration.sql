@@ -356,9 +356,9 @@ UPDATE versionitem SET version_number = -1 WHERE version_number IS NULL;
 ALTER TABLE handle RENAME COLUMN resource_id to resource_legacy_id;
 ALTER TABLE handle ADD resource_id RAW(16) REFERENCES dspaceobject(uuid);
 CREATE INDEX handle_object on handle(resource_id);
-UPDATE handle SET resource_id = (SELECT community.uuid FROM community WHERE handle.resource_legacy_id = community.community_id AND handle.resource_type_id = 4);
-UPDATE handle SET resource_id = (SELECT collection.uuid FROM collection WHERE handle.resource_legacy_id = collection.collection_id AND handle.resource_type_id = 3);
-UPDATE handle SET resource_id = (SELECT item.uuid FROM item WHERE handle.resource_legacy_id = item.item_id AND handle.resource_type_id = 2);
+UPDATE handle SET resource_id = (SELECT community.uuid FROM community WHERE handle.resource_legacy_id = community.community_id AND handle.resource_type_id = 4) where resource_type_id = 4;
+UPDATE handle SET resource_id = (SELECT collection.uuid FROM collection WHERE handle.resource_legacy_id = collection.collection_id AND handle.resource_type_id = 3) where resource_type_id = 3;
+UPDATE handle SET resource_id = (SELECT item.uuid FROM item WHERE handle.resource_legacy_id = item.item_id AND handle.resource_type_id = 2) where resource_type_id = 2;
 
 -- Migrate metadata value table
 DROP VIEW dcvalue;
