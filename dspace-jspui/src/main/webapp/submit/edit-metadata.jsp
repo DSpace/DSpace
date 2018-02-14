@@ -139,9 +139,14 @@
             boolean isSelect = "select".equals(cam.getPresentation(fieldName)) && !isName;
 
             // Append index to input @names
-            fieldInput += '_' + String.valueOf(idx+1);
-            String authorityName += fieldName + "_authority_" + String.valueOf(idx+1);
-            String confidenceName += fieldName + "_confidence_" + String.valueOf(idx+1);
+            String authorityName = fieldName + "_authority";
+            String confidenceName = fieldName + "_confidence";
+            if (repeatable)
+            {
+                fieldInput += '_'+String.valueOf(idx+1);
+                authorityName += '_'+String.valueOf(idx+1);
+                confidenceName += '_'+String.valueOf(idx+1);
+            }
 
             String confidenceSymbol = confidenceValue == unknownConfidence ? "blank" : Choices.getConfidenceText(confidenceValue).toLowerCase();
             String confIndID = fieldInput+"_confidence_indicator_id";
