@@ -9,9 +9,10 @@ package org.dspace.submit.step;
 
 import org.apache.log4j.Logger;
 
-public class UploadWithEmbargoStep extends UploadStep
-{
-    /** log4j logger */
+public class UploadWithEmbargoStep extends UploadStep {
+    /**
+     * log4j logger
+     */
     private static Logger log = Logger.getLogger(UploadWithEmbargoStep.class);
 
 }

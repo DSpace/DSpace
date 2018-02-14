@@ -20,7 +20,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
@@ -50,19 +49,19 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     @Autowired(required = true)
     protected WorkflowItemRoleService workflowItemRoleService;
 
-        /*
+    /*
      * The current step in the workflow system in which this workflow item is present
      */
     private Logger log = Logger.getLogger(XmlWorkflowItemServiceImpl.class);
 
 
-    protected XmlWorkflowItemServiceImpl()
-    {
+    protected XmlWorkflowItemServiceImpl() {
 
     }
 
     @Override
-    public XmlWorkflowItem create(Context context, Item item, Collection collection) throws SQLException, AuthorizeException {
+    public XmlWorkflowItem create(Context context, Item item, Collection collection)
+        throws SQLException, AuthorizeException {
         XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemDAO.create(context, new XmlWorkflowItem());
         xmlWorkflowItem.setItem(item);
         xmlWorkflowItem.setCollection(collection);
@@ -74,20 +73,15 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
         XmlWorkflowItem workflowItem = xmlWorkflowItemDAO.findByID(context, XmlWorkflowItem.class, id);
 
 
-        if (workflowItem == null)
-        {
-            if (log.isDebugEnabled())
-            {
+        if (workflowItem == null) {
+            if (log.isDebugEnabled()) {
                 log.debug(LogManager.getHeader(context, "find_workflow_item",
-                        "not_found,workflowitem_id=" + id));
+                                               "not_found,workflowitem_id=" + id));
             }
-        }
-        else
-        {
-            if (log.isDebugEnabled())
-            {
+        } else {
+            if (log.isDebugEnabled()) {
                 log.debug(LogManager.getHeader(context, "find_workflow_item",
-                        "workflowitem_id=" + id));
+                                               "workflowitem_id=" + id));
             }
         }
         return workflowItem;
@@ -104,7 +98,8 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
-    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer pagesize, Collection collection) throws SQLException {
+    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer pagesize,
+                                                     Collection collection) throws SQLException {
         return xmlWorkflowItemDAO.findAllInCollection(context, offset, pagesize, collection);
     }
 
@@ -124,7 +119,8 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
-    public void deleteByCollection(Context context, Collection collection) throws SQLException, IOException, AuthorizeException {
+    public void deleteByCollection(Context context, Collection collection)
+        throws SQLException, IOException, AuthorizeException {
         List<XmlWorkflowItem> xmlWorkflowItems = findByCollection(context, collection);
         Iterator<XmlWorkflowItem> iterator = xmlWorkflowItems.iterator();
         while (iterator.hasNext()) {
@@ -135,7 +131,8 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
-    public void delete(Context context, XmlWorkflowItem workflowItem) throws SQLException, AuthorizeException, IOException {
+    public void delete(Context context, XmlWorkflowItem workflowItem)
+        throws SQLException, AuthorizeException, IOException {
         Item item = workflowItem.getItem();
         // Need to delete the workspaceitem row first since it refers
         // to item ID
@@ -157,9 +154,9 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
 
     @Override
     public void update(Context context, XmlWorkflowItem workflowItem) throws SQLException, AuthorizeException {
-                // FIXME check auth
+        // FIXME check auth
         log.info(LogManager.getHeader(context, "update_workflow_item",
-                "workflowitem_id=" + workflowItem.getID()));
+                                      "workflowitem_id=" + workflowItem.getID()));
 
         // Update the item
         itemService.update(context, workflowItem.getItem());
@@ -171,8 +168,7 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     public void deleteWrapper(Context context, XmlWorkflowItem workflowItem) throws SQLException, AuthorizeException {
         List<WorkflowItemRole> roles = workflowItemRoleService.findByWorkflowItem(context, workflowItem);
         Iterator<WorkflowItemRole> workflowItemRoleIterator = roles.iterator();
-        while (workflowItemRoleIterator.hasNext())
-        {
+        while (workflowItemRoleIterator.hasNext()) {
             WorkflowItemRole workflowItemRole = workflowItemRoleIterator.next();
             workflowItemRoleIterator.remove();
             workflowItemRoleService.delete(context, workflowItemRole);
@@ -184,11 +180,11 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
         // FIXME - auth?
         xmlWorkflowItemDAO.delete(context, workflowItem);
     }
-    
 
-	@Override
-	public void move(Context context, XmlWorkflowItem inProgressSubmission, Collection fromCollection,
-			Collection toCollection) {
-		// TODO not implemented yet
-	}
+
+    @Override
+    public void move(Context context, XmlWorkflowItem inProgressSubmission, Collection fromCollection,
+                     Collection toCollection) {
+        // TODO not implemented yet
+    }
 }

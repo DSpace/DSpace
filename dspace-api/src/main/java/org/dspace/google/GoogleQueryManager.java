@@ -8,9 +8,9 @@
 
 package org.dspace.google;
 
-import com.google.api.services.analytics.model.GaData;
-
 import java.io.IOException;
+
+import com.google.api.services.analytics.model.GaData;
 
 
 /**
@@ -22,26 +22,27 @@ public class GoogleQueryManager {
 
     public GaData getPageViews(String startDate, String endDate, String handle) throws IOException {
         return GoogleAccount.getInstance().getClient().data().ga().get(
-                GoogleAccount.getInstance().getTableId(),
-                startDate,
-                endDate,
-                "ga:pageviews") // Metrics.
-                .setDimensions("ga:year,ga:month")
-                .setSort("-ga:year,-ga:month")
-                .setFilters("ga:pagePath=~/handle/" + handle + "$")
-                .execute();
+            GoogleAccount.getInstance().getTableId(),
+            startDate,
+            endDate,
+            "ga:pageviews") // Metrics.
+                            .setDimensions("ga:year,ga:month")
+                            .setSort("-ga:year,-ga:month")
+                            .setFilters("ga:pagePath=~/handle/" + handle + "$")
+                            .execute();
     }
 
     public GaData getBitstreamDownloads(String startDate, String endDate, String handle) throws IOException {
         return GoogleAccount.getInstance().getClient().data().ga().get(
-                GoogleAccount.getInstance().getTableId(),
-                startDate,
-                endDate,
-                "ga:totalEvents") // Metrics.
-                .setDimensions("ga:year,ga:month")
-                .setSort("-ga:year,-ga:month")
-                .setFilters("ga:eventCategory==bitstream;ga:eventAction==download;ga:pagePath=~" + handle + "/")
-                .execute();
+            GoogleAccount.getInstance().getTableId(),
+            startDate,
+            endDate,
+            "ga:totalEvents") // Metrics.
+                            .setDimensions("ga:year,ga:month")
+                            .setSort("-ga:year,-ga:month")
+                            .setFilters(
+                                "ga:eventCategory==bitstream;ga:eventAction==download;ga:pagePath=~" + handle + "/")
+                            .execute();
     }
 
 }

@@ -8,6 +8,10 @@
 
 package org.dspace.google;
 
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -18,10 +22,6 @@ import com.google.api.services.analytics.Analytics;
 import com.google.api.services.analytics.AnalyticsScopes;
 import org.apache.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
-
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * User: Robin Taylor
@@ -51,10 +51,14 @@ public class GoogleAccount {
 
 
     private GoogleAccount() {
-        applicationName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("google-analytics.application.name");
-        tableId = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("google-analytics.table.id");
-        emailAddress = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("google-analytics.account.email");
-        certificateLocation = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("google-analytics.certificate.location");
+        applicationName = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                               .getProperty("google-analytics.application.name");
+        tableId = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                       .getProperty("google-analytics.table.id");
+        emailAddress = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                            .getProperty("google-analytics.account.email");
+        certificateLocation = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("google-analytics.certificate.location");
 
         jsonFactory = JacksonFactory.getDefaultInstance();
 
@@ -66,7 +70,8 @@ public class GoogleAccount {
         }
 
         // Create an Analytics instance
-        client = new Analytics.Builder(httpTransport, jsonFactory, credential).setApplicationName(applicationName).build();
+        client = new Analytics.Builder(httpTransport, jsonFactory, credential).setApplicationName(applicationName)
+                                                                              .build();
 
         log.info("Google Analytics client successfully initialised");
     }
@@ -91,13 +96,13 @@ public class GoogleAccount {
         scopes.add(AnalyticsScopes.ANALYTICS_PROVISION);
         scopes.add(AnalyticsScopes.ANALYTICS_READONLY);
 
-        credential = new  GoogleCredential.Builder()
-                .setTransport(httpTransport)
-                .setJsonFactory(jsonFactory)
-                .setServiceAccountId(emailAddress)
-                .setServiceAccountScopes(scopes)
-                .setServiceAccountPrivateKeyFromP12File(new File(certificateLocation))
-                .build();
+        credential = new GoogleCredential.Builder()
+            .setTransport(httpTransport)
+            .setJsonFactory(jsonFactory)
+            .setServiceAccountId(emailAddress)
+            .setServiceAccountScopes(scopes)
+            .setServiceAccountPrivateKeyFromP12File(new File(certificateLocation))
+            .build();
 
         return credential;
     }

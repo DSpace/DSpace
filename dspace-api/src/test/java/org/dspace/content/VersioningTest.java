@@ -7,11 +7,24 @@
  */
 package org.dspace.content;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.sql.SQLException;
+
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.*;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
@@ -23,13 +36,6 @@ import org.dspace.versioning.service.VersioningService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.sql.SQLException;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -54,9 +60,11 @@ public class VersioningTest extends AbstractUnitTest {
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected VersioningService versionService = VersionServiceFactory.getInstance().getVersionService();
-    protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+    protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance()
+                                                                                 .getVersionHistoryService();
 
-    //A regex that can be used to see if a handle contains the format of handle created by the org.dspace.identifier.VersionedHandleIdentifierProvider*
+    //A regex that can be used to see if a handle contains the format of handle created by the org.dspace.identifier
+    // .VersionedHandleIdentifierProvider*
     protected String versionedHandleRegex = ConfigurationManager.getProperty("handle.prefix") + "\\/[0-9]*\\.[0-9]";
 
     /**
@@ -68,11 +76,9 @@ public class VersioningTest extends AbstractUnitTest {
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
-        try
-        {
+        try {
             context.turnOffAuthorisationSystem();
             Community community = communityService.create(null, context);
 
@@ -87,14 +93,10 @@ public class VersioningTest extends AbstractUnitTest {
 
             versionedItem = installItemService.installItem(context, wsi);
             context.restoreAuthSystemState();
-        }
-        catch (AuthorizeException ex)
-        {
+        } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
@@ -110,16 +112,14 @@ public class VersioningTest extends AbstractUnitTest {
      */
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         context.abort();
         super.destroy();
     }
 
 
     @Test
-    public void testVersionFind() throws SQLException
-    {
+    public void testVersionFind() throws SQLException {
         VersionHistory versionHistory = versionHistoryService.findByItem(context, originalItem);
         assertThat("testFindVersionHistory", versionHistory, notNullValue());
         Version version = versionHistoryService.getVersion(context, versionHistory, versionedItem);
@@ -130,8 +130,7 @@ public class VersioningTest extends AbstractUnitTest {
      * Test of installItem method, of class InstallItem.
      */
     @Test
-    public void testVersionSummary() throws Exception
-    {
+    public void testVersionSummary() throws Exception {
         //Start by creating a new item !
         VersionHistory versionHistory = versionHistoryService.findByItem(context, originalItem);
         Version version = versionHistoryService.getVersion(context, versionHistory, versionedItem);
@@ -147,8 +146,8 @@ public class VersioningTest extends AbstractUnitTest {
         assertThat("Test_version_handle 1", versionedItem.getHandle(), notNullValue());
         assertThat("Test_version_handle 2", originalItem.getHandle(), notNullValue());
         assertTrue("Test_version_handle 3 ", originalItem.getHandles().size() == 1);
-        
-        /* The following assertments are specific to the VersionHandleIdentifier 
+
+        /* The following assertments are specific to the VersionHandleIdentifier
          * that use "canonical" handles that are moved from version to version.
          * It would be good to create Tests for each IdentifierProvider, which
          * would need to tell Spring which one to use for which test.
@@ -158,8 +157,10 @@ public class VersioningTest extends AbstractUnitTest {
          * assertTrue("Test_version_handle 6 ", originalItem.getHandle().startsWith(originalHandle + "."));
          * //The getHandle method should always return the original handle
          * assertTrue("Test_version_handle 7 ", versionedItem.getHandle().equals(originalHandle));
-         * assertTrue("Test_version_handle 8 ", versionedItem.getHandles().get(1).getHandle().startsWith(originalHandle + "."));
-         * assertTrue("Test_version_handle 9 ", versionedItem.getHandles().get(1).getHandle().matches(versionedHandleRegex));
+         * assertTrue("Test_version_handle 8 ", versionedItem.getHandles().get(1).getHandle().startsWith
+         * (originalHandle + "."));
+         * assertTrue("Test_version_handle 9 ", versionedItem.getHandles().get(1).getHandle().matches
+         * (versionedHandleRegex));
          */
     }
 

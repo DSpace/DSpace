@@ -15,11 +15,9 @@ import org.dspace.rdf.storage.URIGenerator;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- *
  * @author Pascal-Nicolas Becker (p dot becker at tu hyphen berlin dot de)
  */
-public class RDFFactoryImpl extends RDFFactory
-{
+public class RDFFactoryImpl extends RDFFactory {
     // we have several URIGenerators that use each other as fallback
     // following we have to instantiate all of them and cannot use autowiring
     // by type here. So we use setters and properties in Spring configuration
@@ -38,10 +36,9 @@ public class RDFFactoryImpl extends RDFFactory
 
     @Required
     public void setGenerator(URIGenerator generator) {
-        if (log.isDebugEnabled())
-        {
-            log.debug("Using '" + generator.getClass().getCanonicalName() 
-                    + "' as URIGenerator.");
+        if (log.isDebugEnabled()) {
+            log.debug("Using '" + generator.getClass().getCanonicalName()
+                          + "' as URIGenerator.");
         }
         this.generator = generator;
     }
@@ -65,5 +62,5 @@ public class RDFFactoryImpl extends RDFFactory
     public RDFConverter getRDFConverter() {
         return converter;
     }
-    
+
 }

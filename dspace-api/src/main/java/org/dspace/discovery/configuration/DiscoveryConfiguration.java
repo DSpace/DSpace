@@ -19,26 +19,34 @@ import org.springframework.beans.factory.annotation.Required;
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class DiscoveryConfiguration implements InitializingBean{
+public class DiscoveryConfiguration implements InitializingBean {
 
-    /** The configuration for the sidebar facets **/
+    /**
+     * The configuration for the sidebar facets
+     **/
     private List<DiscoverySearchFilterFacet> sidebarFacets = new ArrayList<>();
 
     private TagCloudFacetConfiguration tagCloudFacetConfiguration = new TagCloudFacetConfiguration();
-    
-    /** The default filter queries which will be applied to any search & the recent submissions **/
+
+    /**
+     * The default filter queries which will be applied to any search & the recent submissions
+     **/
     private List<String> defaultFilterQueries;
 
-    /** Configuration object for the recent submissions **/
+    /**
+     * Configuration object for the recent submissions
+     **/
     private DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration;
 
-    /** The search filters which can be selected on the search page**/
+    /**
+     * The search filters which can be selected on the search page
+     **/
     private List<DiscoverySearchFilter> searchFilters = new ArrayList<>();
 
     private DiscoverySortConfiguration searchSortConfiguration;
 
     private int defaultRpp = 10;
-    
+
     private String id;
     private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
     private DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration;
@@ -62,18 +70,18 @@ public class DiscoveryConfiguration implements InitializingBean{
     }
 
     public TagCloudFacetConfiguration getTagCloudFacetConfiguration() {
-		return tagCloudFacetConfiguration;
-	}
+        return tagCloudFacetConfiguration;
+    }
 
-	public void setTagCloudFacetConfiguration(TagCloudFacetConfiguration tagCloudFacetConfiguration) {
-		this.tagCloudFacetConfiguration = tagCloudFacetConfiguration;
-	}
+    public void setTagCloudFacetConfiguration(TagCloudFacetConfiguration tagCloudFacetConfiguration) {
+        this.tagCloudFacetConfiguration = tagCloudFacetConfiguration;
+    }
 
-	public List<String> getDefaultFilterQueries() {
+    public List<String> getDefaultFilterQueries() {
         //Since default filter queries are not mandatory we will return an empty list
-        if(defaultFilterQueries == null){
+        if (defaultFilterQueries == null) {
             return new ArrayList<String>();
-        }else{
+        } else {
             return defaultFilterQueries;
         }
     }
@@ -86,7 +94,8 @@ public class DiscoveryConfiguration implements InitializingBean{
         return recentSubmissionConfiguration;
     }
 
-    public void setRecentSubmissionConfiguration(DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration) {
+    public void setRecentSubmissionConfiguration(
+        DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration) {
         this.recentSubmissionConfiguration = recentSubmissionConfiguration;
     }
 
@@ -96,7 +105,7 @@ public class DiscoveryConfiguration implements InitializingBean{
 
     public DiscoverySearchFilter getSearchFilter(String name) {
         for (DiscoverySearchFilter filter : CollectionUtils.emptyIfNull(searchFilters)) {
-            if(StringUtils.equals(name, filter.getIndexFieldName())) {
+            if (StringUtils.equals(name, filter.getIndexFieldName())) {
                 return filter;
             }
         }
@@ -116,14 +125,12 @@ public class DiscoveryConfiguration implements InitializingBean{
     public void setSearchSortConfiguration(DiscoverySortConfiguration searchSortConfiguration) {
         this.searchSortConfiguration = searchSortConfiguration;
     }
-    
-    public void setDefaultRpp(int defaultRpp)
-    {
+
+    public void setDefaultRpp(int defaultRpp) {
         this.defaultRpp = defaultRpp;
     }
-    
-    public int getDefaultRpp()
-    {
+
+    public int getDefaultRpp() {
         return defaultRpp;
     }
 
@@ -157,15 +164,12 @@ public class DiscoveryConfiguration implements InitializingBean{
      * @throws Exception throws an exception if this isn't the case
      */
     @Override
-    public void afterPropertiesSet() throws Exception
-    {
+    public void afterPropertiesSet() throws Exception {
         Collection missingSearchFilters = CollectionUtils.subtract(getSidebarFacets(), getSearchFilters());
-        if(CollectionUtils.isNotEmpty(missingSearchFilters))
-        {
+        if (CollectionUtils.isNotEmpty(missingSearchFilters)) {
             StringBuilder error = new StringBuilder();
             error.append("The following sidebar facet configurations are not present in the search filters list: ");
-            for (Object missingSearchFilter : missingSearchFilters)
-            {
+            for (Object missingSearchFilter : missingSearchFilters) {
                 DiscoverySearchFilter searchFilter = (DiscoverySearchFilter) missingSearchFilter;
                 error.append(searchFilter.getIndexFieldName()).append(" ");
 
@@ -174,14 +178,13 @@ public class DiscoveryConfiguration implements InitializingBean{
 
             throw new DiscoveryConfigurationException(error.toString());
         }
-        
-        Collection missingTagCloudSearchFilters = CollectionUtils.subtract(getTagCloudFacetConfiguration().getTagCloudFacets(), getSearchFilters());
-        if(CollectionUtils.isNotEmpty(missingTagCloudSearchFilters))
-        {
+
+        Collection missingTagCloudSearchFilters = CollectionUtils
+            .subtract(getTagCloudFacetConfiguration().getTagCloudFacets(), getSearchFilters());
+        if (CollectionUtils.isNotEmpty(missingTagCloudSearchFilters)) {
             StringBuilder error = new StringBuilder();
             error.append("The following tagCloud facet configurations are not present in the search filters list: ");
-            for (Object missingSearchFilter : missingTagCloudSearchFilters)
-            {
+            for (Object missingSearchFilter : missingTagCloudSearchFilters) {
                 DiscoverySearchFilter searchFilter = (DiscoverySearchFilter) missingSearchFilter;
                 error.append(searchFilter.getIndexFieldName()).append(" ");
 
@@ -194,7 +197,7 @@ public class DiscoveryConfiguration implements InitializingBean{
 
     public DiscoverySearchFilterFacet getSidebarFacet(final String facetName) {
         for (DiscoverySearchFilterFacet sidebarFacet : sidebarFacets) {
-            if(StringUtils.equals(sidebarFacet.getIndexFieldName(), facetName)) {
+            if (StringUtils.equals(sidebarFacet.getIndexFieldName(), facetName)) {
                 return sidebarFacet;
             }
         }

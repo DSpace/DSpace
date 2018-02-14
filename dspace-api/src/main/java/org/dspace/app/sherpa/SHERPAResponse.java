@@ -10,7 +10,6 @@ package org.dspace.app.sherpa;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -21,12 +20,10 @@ import org.w3c.dom.Element;
 
 /**
  * JAVA representation for a SHERPA API Response
- * 
+ *
  * @author Andrea Bollini
- * 
  */
-public class SHERPAResponse
-{
+public class SHERPAResponse {
     private boolean error;
 
     private String message;
@@ -41,12 +38,10 @@ public class SHERPAResponse
 
     private List<SHERPAPublisher> publishers;
 
-    public SHERPAResponse(InputStream xmlData)
-    {
-        try
-        {
+    public SHERPAResponse(InputStream xmlData) {
+        try {
             DocumentBuilderFactory factory = DocumentBuilderFactory
-                    .newInstance();
+                .newInstance();
             factory.setValidating(false);
             factory.setIgnoringComments(true);
             factory.setIgnoringElementContentWhitespace(true);
@@ -56,16 +51,15 @@ public class SHERPAResponse
 
             Element xmlRoot = inDoc.getDocumentElement();
             Element headersElement = XMLUtils.getSingleElement(xmlRoot,
-                    "header");
+                                                               "header");
             Element journalsElement = XMLUtils.getSingleElement(xmlRoot,
-                    "journals");
+                                                                "journals");
             Element publishersElement = XMLUtils.getSingleElement(xmlRoot,
-                    "publishers");
+                                                                  "publishers");
 
             message = XMLUtils.getElementValue(headersElement, "message");
 
-            if (StringUtils.isNotBlank(message))
-            {
+            if (StringUtils.isNotBlank(message)) {
                 error = true;
                 return;
             }
@@ -75,147 +69,133 @@ public class SHERPAResponse
             disclaimer = XMLUtils.getElementValue(headersElement, "disclaimer");
 
             List<Element> journalsList = XMLUtils.getElementList(
-                    journalsElement, "journal");
+                journalsElement, "journal");
             List<Element> publishersList = XMLUtils.getElementList(
-                    publishersElement, "publisher");
+                publishersElement, "publisher");
 
-            if (journalsList != null)
-            {
+            if (journalsList != null) {
                 journals = new LinkedList<SHERPAJournal>();
-                for (Element journalElement : journalsList)
-                {
+                for (Element journalElement : journalsList) {
                     journals.add(new SHERPAJournal(
-                            XMLUtils.getElementValue(journalElement, "jtitle"),
-                            XMLUtils.getElementValue(journalElement, "issn"),
-                            XMLUtils.getElementValue(journalElement, "zetopub"),
-                            XMLUtils.getElementValue(journalElement, "romeopub")));
+                        XMLUtils.getElementValue(journalElement, "jtitle"),
+                        XMLUtils.getElementValue(journalElement, "issn"),
+                        XMLUtils.getElementValue(journalElement, "zetopub"),
+                        XMLUtils.getElementValue(journalElement, "romeopub")));
                 }
             }
 
-            if (publishersList != null)
-            {
+            if (publishersList != null) {
                 publishers = new LinkedList<SHERPAPublisher>();
-                for (Element publisherElement : publishersList)
-                {
+                for (Element publisherElement : publishersList) {
                     Element preprintsElement = XMLUtils.getSingleElement(
-                            publisherElement, "preprints");
+                        publisherElement, "preprints");
                     Element preprintsRestrictionElement = XMLUtils
-                            .getSingleElement(publisherElement,
-                                    "prerestrictions");
+                        .getSingleElement(publisherElement,
+                                          "prerestrictions");
 
                     Element postprintsElement = XMLUtils.getSingleElement(
-                            publisherElement, "postprints");
+                        publisherElement, "postprints");
                     Element postprintsRestrictionElement = XMLUtils
-                            .getSingleElement(publisherElement,
-                                    "postrestrictions");
+                        .getSingleElement(publisherElement,
+                                          "postrestrictions");
 
                     Element pdfversionElement = XMLUtils.getSingleElement(
-                            publisherElement, "pdfversion");
+                        publisherElement, "pdfversion");
                     Element pdfversionRestrictionElement = XMLUtils
-                            .getSingleElement(publisherElement,
-                                    "pdfrestrictions");
-                    
+                        .getSingleElement(publisherElement,
+                                          "pdfrestrictions");
+
                     Element conditionsElement = XMLUtils.getSingleElement(
-                            publisherElement, "conditions");
+                        publisherElement, "conditions");
                     Element paidaccessElement = XMLUtils.getSingleElement(
-                            publisherElement, "paidaccess");
+                        publisherElement, "paidaccess");
 
                     Element copyrightlinksElement = XMLUtils.getSingleElement(
-                            publisherElement, "copyrightlinks");
+                        publisherElement, "copyrightlinks");
 
                     publishers
-                            .add(new SHERPAPublisher(XMLUtils.getElementValue(
-                                    publisherElement, "name"),
-                                    XMLUtils.getElementValue(publisherElement,
-                                            "alias"), XMLUtils.getElementValue(
-                                            publisherElement, "homeurl"),
-                                            
-                                    XMLUtils.getElementValue(preprintsElement,
-                                            "prearchiving"),
-                                    XMLUtils.getElementValueList(
-                                            preprintsRestrictionElement,
-                                            "prerestriction"),
-                                            
-                                    XMLUtils.getElementValue(postprintsElement,
-                                            "postarchiving"),
-                                    XMLUtils.getElementValueList(
-                                            postprintsRestrictionElement,
-                                            "postrestriction"),
-                                            
-                                    XMLUtils.getElementValue(pdfversionElement,
-                                            "pdfarchiving"),
-                                    XMLUtils.getElementValueList(
-                                            pdfversionRestrictionElement,
-                                            "pdfrestriction"), 
-                                    
-                                    XMLUtils
-                                            .getElementValueList(
-                                                    conditionsElement,
-                                                    "condition"), XMLUtils
-                                            .getElementValue(paidaccessElement,
-                                                    "paidaccessurl"), XMLUtils
-                                            .getElementValue(paidaccessElement,
-                                                    "paidaccessname"), XMLUtils
-                                            .getElementValue(paidaccessElement,
-                                                    "paidaccessnotes"),
-                                    XMLUtils.getElementValueArrayList(
-                                            copyrightlinksElement,
-                                            "copyrightlink",
-                                            "copyrightlinktext",
-                                            "copyrightlinkurl"), XMLUtils
-                                            .getElementValue(publisherElement,
-                                                    "romeocolour"), XMLUtils
-                                            .getElementValue(publisherElement,
-                                                    "dateadded"), XMLUtils
-                                            .getElementValue(publisherElement,
-                                                    "dateupdated")));
+                        .add(new SHERPAPublisher(XMLUtils.getElementValue(
+                            publisherElement, "name"),
+                                                 XMLUtils.getElementValue(publisherElement,
+                                                                          "alias"), XMLUtils.getElementValue(
+                            publisherElement, "homeurl"),
+
+                                                 XMLUtils.getElementValue(preprintsElement,
+                                                                          "prearchiving"),
+                                                 XMLUtils.getElementValueList(
+                                                     preprintsRestrictionElement,
+                                                     "prerestriction"),
+
+                                                 XMLUtils.getElementValue(postprintsElement,
+                                                                          "postarchiving"),
+                                                 XMLUtils.getElementValueList(
+                                                     postprintsRestrictionElement,
+                                                     "postrestriction"),
+
+                                                 XMLUtils.getElementValue(pdfversionElement,
+                                                                          "pdfarchiving"),
+                                                 XMLUtils.getElementValueList(
+                                                     pdfversionRestrictionElement,
+                                                     "pdfrestriction"),
+
+                                                 XMLUtils
+                                                     .getElementValueList(
+                                                         conditionsElement,
+                                                         "condition"), XMLUtils
+                                                     .getElementValue(paidaccessElement,
+                                                                      "paidaccessurl"), XMLUtils
+                                                     .getElementValue(paidaccessElement,
+                                                                      "paidaccessname"), XMLUtils
+                                                     .getElementValue(paidaccessElement,
+                                                                      "paidaccessnotes"),
+                                                 XMLUtils.getElementValueArrayList(
+                                                     copyrightlinksElement,
+                                                     "copyrightlink",
+                                                     "copyrightlinktext",
+                                                     "copyrightlinkurl"), XMLUtils
+                                                     .getElementValue(publisherElement,
+                                                                      "romeocolour"), XMLUtils
+                                                     .getElementValue(publisherElement,
+                                                                      "dateadded"), XMLUtils
+                                                     .getElementValue(publisherElement,
+                                                                      "dateupdated")));
                 }
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             error = true;
         }
     }
 
-    public SHERPAResponse(String message)
-    {
+    public SHERPAResponse(String message) {
         this.message = message;
         this.error = true;
     }
 
-    public boolean isError()
-    {
+    public boolean isError() {
         return error;
     }
 
-    public String getMessage()
-    {
+    public String getMessage() {
         return message;
     }
 
-    public String getLicense()
-    {
+    public String getLicense() {
         return license;
     }
 
-    public String getLicenseURL()
-    {
+    public String getLicenseURL() {
         return licenseURL;
     }
 
-    public String getDisclaimer()
-    {
+    public String getDisclaimer() {
         return disclaimer;
     }
 
-    public List<SHERPAJournal> getJournals()
-    {
+    public List<SHERPAJournal> getJournals() {
         return journals;
     }
 
-    public List<SHERPAPublisher> getPublishers()
-    {
+    public List<SHERPAPublisher> getPublishers() {
         return publishers;
     }
 }

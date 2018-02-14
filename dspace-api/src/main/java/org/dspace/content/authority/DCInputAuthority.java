@@ -7,14 +7,13 @@
  */
 package org.dspace.content.authority;
 
-import java.util.Iterator;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
@@ -25,11 +24,11 @@ import org.dspace.core.SelfNamedPlugin;
  * configurable submission.
  *
  * Configuration:
- *   This MUST be configured aas a self-named plugin, e.g.:
- *   {@code
- *     plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
- *        org.dspace.content.authority.DCInputAuthority
- *   }
+ * This MUST be configured aas a self-named plugin, e.g.:
+ * {@code
+ * plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
+ * org.dspace.content.authority.DCInputAuthority
+ * }
  *
  * It AUTOMATICALLY configures a plugin instance for each {@code <value-pairs>}
  * element (within {@code <form-value-pairs>}) of the submission-forms.xml.  The name
@@ -42,8 +41,7 @@ import org.dspace.core.SelfNamedPlugin;
  * So you should not use them as the choice source for authority-controlled
  * fields.
  */
-public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
-{
+public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority {
     private static Logger log = Logger.getLogger(DCInputAuthority.class);
 
     private String values[] = null;
@@ -52,68 +50,52 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     private static DCInputsReader dci = null;
     private static String pluginNames[] = null;
 
-    public DCInputAuthority()
-    {
+    public DCInputAuthority() {
         super();
     }
 
-    public static String[] getPluginNames()
-    {
-        if (pluginNames == null)
-        {
+    public static String[] getPluginNames() {
+        if (pluginNames == null) {
             initPluginNames();
         }
-        
+
         return (String[]) ArrayUtils.clone(pluginNames);
     }
 
-    private static synchronized void initPluginNames()
-    {
-        if (pluginNames == null)
-        {
-            try
-            {
-                if (dci == null)
-                {
+    private static synchronized void initPluginNames() {
+        if (pluginNames == null) {
+            try {
+                if (dci == null) {
                     dci = new DCInputsReader();
                 }
-            }
-            catch (DCInputsReaderException e)
-            {
-                log.error("Failed reading DCInputs initialization: ",e);
+            } catch (DCInputsReaderException e) {
+                log.error("Failed reading DCInputs initialization: ", e);
             }
             List<String> names = new ArrayList<String>();
             Iterator pi = dci.getPairsNameIterator();
-            while (pi.hasNext())
-            {
-                names.add((String)pi.next());
+            while (pi.hasNext()) {
+                names.add((String) pi.next());
             }
 
             pluginNames = names.toArray(new String[names.size()]);
-            log.debug("Got plugin names = "+Arrays.deepToString(pluginNames));
+            log.debug("Got plugin names = " + Arrays.deepToString(pluginNames));
         }
     }
 
     // once-only load of values and labels
-    private void init()
-    {
-        if (values == null)
-        {
+    private void init() {
+        if (values == null) {
             String pname = this.getPluginInstanceName();
             List<String> pairs = dci.getPairs(pname);
-            if (pairs != null)
-            {
-                values = new String[pairs.size()/2];
-                labels = new String[pairs.size()/2];
-                for (int i = 0; i < pairs.size(); i += 2)
-                {
-                    labels[i/2] = pairs.get(i);
-                    values[i/2] = pairs.get(i+1);
+            if (pairs != null) {
+                values = new String[pairs.size() / 2];
+                labels = new String[pairs.size() / 2];
+                for (int i = 0; i < pairs.size(); i += 2) {
+                    labels[i / 2] = pairs.get(i);
+                    values[i / 2] = pairs.get(i + 1);
                 }
-                log.debug("Found pairs for name="+pname);
-            }
-            else
-            {
+                log.debug("Found pairs for name=" + pname);
+            } else {
                 log.error("Failed to find any pairs for name=" + pname, new IllegalStateException());
             }
         }
@@ -121,17 +103,14 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
 
 
     @Override
-    public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale)
-    {
+    public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
         init();
 
         int dflt = -1;
         Choice v[] = new Choice[values.length];
-        for (int i = 0; i < values.length; ++i)
-        {
+        for (int i = 0; i < values.length; ++i) {
             v[i] = new Choice(values[i], values[i], labels[i]);
-            if (values[i].equalsIgnoreCase(query))
-            {
+            if (values[i].equalsIgnoreCase(query)) {
                 dflt = i;
             }
         }
@@ -139,13 +118,10 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     }
 
     @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale)
-    {
+    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
         init();
-        for (int i = 0; i < values.length; ++i)
-        {
-            if (text.equalsIgnoreCase(values[i]))
-            {
+        for (int i = 0; i < values.length; ++i) {
+            if (text.equalsIgnoreCase(values[i])) {
                 Choice v[] = new Choice[1];
                 v[0] = new Choice(String.valueOf(i), values[i], labels[i]);
                 return new Choices(v, 0, v.length, Choices.CF_UNCERTAIN, false, 0);
@@ -155,19 +131,19 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     }
 
     @Override
-    public String getLabel(String field, String key, String locale)
-    {
-    	init();
-        int pos=-1;
+    public String getLabel(String field, String key, String locale) {
+        init();
+        int pos = -1;
         for (int i = 0; i < values.length; i++) {
-            if (values[i].equals(key)){
-                 pos = i;
-                 break;
+            if (values[i].equals(key)) {
+                pos = i;
+                break;
             }
         }
-        if (pos != -1)
+        if (pos != -1) {
             return labels[pos];
-        else
-            return "UNKNOWN KEY "+key;
+        } else {
+            return "UNKNOWN KEY " + key;
+        }
     }
 }

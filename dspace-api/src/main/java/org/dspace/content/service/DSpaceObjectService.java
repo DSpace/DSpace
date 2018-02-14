@@ -21,15 +21,14 @@ import org.dspace.core.Context;
 
 /**
  * Service interface class for the DSpaceObject.
- * All DSpaceObject service classes should implement this class since it offers some basic methods which all DSpaceObjects
+ * All DSpaceObject service classes should implement this class since it offers some basic methods which all
+ * DSpaceObjects
  * are required to have.
  *
- * @author kevinvandevelde at atmire.com
  * @param <T> class type
+ * @author kevinvandevelde at atmire.com
  */
 public interface DSpaceObjectService<T extends DSpaceObject> {
-
-
 
 
     /**
@@ -37,7 +36,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * a pair of type number and database ID.
      *
      * @param context - the context
-     * @param id - id within table of type'd objects
+     * @param id      - id within table of type'd objects
      * @return the object found, or null if it does not exist.
      * @throws SQLException only upon failure accessing the database.
      */
@@ -49,15 +48,16 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *
      * @param dso DSpaceObject
      * @return Name for the object, or <code>null</code> if it doesn't have
-     *         one
+     * one
      */
     public abstract String getName(T dso);
 
 
     /**
      * Tries to lookup all Identifiers of this DSpaceObject.
+     *
      * @param context DSpace context
-     * @param dso DSpaceObject
+     * @param dso     DSpaceObject
      * @return An array containing all found identifiers or an array with a length of 0.
      */
     public ArrayList<String> getIdentifiers(Context context, T dso);
@@ -71,9 +71,9 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * the object self.
      *
      * @param context DSpace context
-     * @param dso DSpaceObject
+     * @param dso     DSpaceObject
      * @return the dspace object that "own" the current object in
-     *         the hierarchy
+     * the hierarchy
      * @throws SQLException if database error
      */
     public DSpaceObject getParentObject(Context context, T dso) throws SQLException;
@@ -87,23 +87,22 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * needed.
      *
      * @param context DSpace context
-     * @param dso DSpaceObject
-     * @param action
-     *            ID of action being attempted, from
-     *            <code>org.dspace.core.Constants</code>. The ADMIN action is
-     *            not a valid parameter for this method, an
-     *            IllegalArgumentException should be thrown
+     * @param dso     DSpaceObject
+     * @param action  ID of action being attempted, from
+     *                <code>org.dspace.core.Constants</code>. The ADMIN action is
+     *                not a valid parameter for this method, an
+     *                IllegalArgumentException should be thrown
      * @return the dspace object, if any, where an ADMIN action is sufficient to
-     *         grant the original action
-     * @throws SQLException if database error
-     * @throws IllegalArgumentException
-     *             if the ADMIN action is supplied as parameter of the method
-     *             call
+     * grant the original action
+     * @throws SQLException             if database error
+     * @throws IllegalArgumentException if the ADMIN action is supplied as parameter of the method
+     *                                  call
      */
     public DSpaceObject getAdminObject(Context context, T dso, int action) throws SQLException;
 
     /**
      * Provide the text name of the type of this DSpaceObject. It is most likely all uppercase.
+     *
      * @param dso DSpaceObject
      * @return Object type as text
      */
@@ -136,37 +135,33 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * combination is significant. When retrieving with wildcards, values of a
      * particular element/qualifier/language combinations will be adjacent, but
      * the overall ordering of the combinations is indeterminate.
+     *
      * @param dSpaceObject DSpaceObject
-     * @param schema
-     *            the schema for the metadata field. <em>Must</em> match
-     *            the <code>name</code> of an existing metadata schema.
-     * @param element
-     *            the element name. <code>DSpaceObject.ANY</code> matches any
-     *            element. <code>null</code> doesn't really make sense as all
-     *            metadata must have an element.
-     * @param qualifier
-     *            the qualifier. <code>null</code> means unqualified, and
-     *            <code>DSpaceObject.ANY</code> means any qualifier (including
-     *            unqualified.)
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means only
-     *            values with no language are returned, and
-     *            <code>DSpaceObject.ANY</code> means values with any country code or
-     *            no country code are returned.
-     * 
+     * @param schema       the schema for the metadata field. <em>Must</em> match
+     *                     the <code>name</code> of an existing metadata schema.
+     * @param element      the element name. <code>DSpaceObject.ANY</code> matches any
+     *                     element. <code>null</code> doesn't really make sense as all
+     *                     metadata must have an element.
+     * @param qualifier    the qualifier. <code>null</code> means unqualified, and
+     *                     <code>DSpaceObject.ANY</code> means any qualifier (including
+     *                     unqualified.)
+     * @param lang         the ISO639 language code, optionally followed by an underscore
+     *                     and the ISO3166 country code. <code>null</code> means only
+     *                     values with no language are returned, and
+     *                     <code>DSpaceObject.ANY</code> means values with any country code or
+     *                     no country code are returned.
      * @return metadata fields that match the parameters
      */
-    public List<MetadataValue> getMetadata(T dSpaceObject, String schema, String element, String qualifier, String lang);
+    public List<MetadataValue> getMetadata(T dSpaceObject, String schema, String element, String qualifier,
+                                           String lang);
 
     /**
      * Retrieve metadata field values from a given metadata string
      * of the form {@code <schema prefix>.<element>[.<qualifier>|.*]}
      *
      * @param dSpaceObject DSpaceObject
-     * @param mdString
-     *            The metadata string of the form
-     *            {@code <schema prefix>.<element>[.<qualifier>|.*]}
+     * @param mdString     The metadata string of the form
+     *                     {@code <schema prefix>.<element>[.<qualifier>|.*]}
      * @return metadata fields that match the parameters
      */
     public List<MetadataValue> getMetadataByMetadataString(T dSpaceObject, String mdString);
@@ -176,20 +171,17 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * Get the value of a metadata field
      *
      * @param dSpaceObject DSpaceObject
-     * @param value
-     *            the name of the metadata field to get
-     *
+     * @param value        the name of the metadata field to get
      * @return the value of the metadata field (or null if the column is an SQL NULL)
-     *
-     * @throws IllegalArgumentException
-     *                if the requested metadata field doesn't exist
+     * @throws IllegalArgumentException if the requested metadata field doesn't exist
      */
     public String getMetadata(T dSpaceObject, String value);
 
 
     public List<MetadataValue> getMetadata(T dSpaceObject, String mdString, String authority);
 
-    public List<MetadataValue> getMetadata(T dSpaceObject, String schema, String element, String qualifier, String lang, String authority);
+    public List<MetadataValue> getMetadata(T dSpaceObject, String schema, String element, String qualifier, String lang,
+                                           String authority);
 
     /**
      * Add metadata fields. These are appended to existing values.
@@ -199,136 +191,116 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * If metadata authority control is available, try to get authority
      * values.  The authority confidence depends on whether authority is
      * <em>required</em> or not.
-     * 
-     * @param context DSpace context
-     * @param dso DSpaceObject
-     * @param schema
-     *            the schema for the metadata field. <em>Must</em> match
-     *            the <code>name</code> of an existing metadata schema.
-     * @param element
-     *            the metadata element name
-     * @param qualifier
-     *            the metadata qualifier name, or <code>null</code> for
-     *            unqualified
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means the
-     *            value has no language (for example, a date).
-     * @param values
-     *            the values to add.
+     *
+     * @param context   DSpace context
+     * @param dso       DSpaceObject
+     * @param schema    the schema for the metadata field. <em>Must</em> match
+     *                  the <code>name</code> of an existing metadata schema.
+     * @param element   the metadata element name
+     * @param qualifier the metadata qualifier name, or <code>null</code> for
+     *                  unqualified
+     * @param lang      the ISO639 language code, optionally followed by an underscore
+     *                  and the ISO3166 country code. <code>null</code> means the
+     *                  value has no language (for example, a date).
+     * @param values    the values to add.
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, List<String> values) throws SQLException;
+    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
+                            List<String> values) throws SQLException;
 
     /**
      * Add metadata fields. These are appended to existing values.
      * Use <code>clearDC</code> to remove values. The ordering of values
      * passed in is maintained.
-     * 
-     * @param context DSpace context
-     * @param dso DSpaceObject
-     * @param schema
-     *            the schema for the metadata field. <em>Must</em> match
-     *            the <code>name</code> of an existing metadata schema.
-     * @param element
-     *            the metadata element name
-     * @param qualifier
-     *            the metadata qualifier name, or <code>null</code> for
-     *            unqualified
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means the
-     *            value has no language (for example, a date).
-     * @param values
-     *            the values to add.
-     * @param authorities
-     *            the external authority key for this value (or null)
-     * @param confidences
-     *            the authority confidence (default 0)
+     *
+     * @param context     DSpace context
+     * @param dso         DSpaceObject
+     * @param schema      the schema for the metadata field. <em>Must</em> match
+     *                    the <code>name</code> of an existing metadata schema.
+     * @param element     the metadata element name
+     * @param qualifier   the metadata qualifier name, or <code>null</code> for
+     *                    unqualified
+     * @param lang        the ISO639 language code, optionally followed by an underscore
+     *                    and the ISO3166 country code. <code>null</code> means the
+     *                    value has no language (for example, a date).
+     * @param values      the values to add.
+     * @param authorities the external authority key for this value (or null)
+     * @param confidences the authority confidence (default 0)
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException;
+    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
+                            List<String> values, List<String> authorities, List<Integer> confidences)
+        throws SQLException;
 
     /**
      * Add metadata fields. These are appended to existing values.
      * Use <code>clearDC</code> to remove values. The ordering of values
      * passed in is maintained.
-     * 
-     * @param context DSpace context
-     * @param dso DSpaceObject
-     * @param metadataField
-     *            the metadata field to which the value is to be set
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means the
-     *            value has no language (for example, a date).
-     * @param values
-     *            the values to add.
-     * @param authorities
-     *            the external authority key for this value (or null)
-     * @param confidences
-     *            the authority confidence (default 0)
+     *
+     * @param context       DSpace context
+     * @param dso           DSpaceObject
+     * @param metadataField the metadata field to which the value is to be set
+     * @param lang          the ISO639 language code, optionally followed by an underscore
+     *                      and the ISO3166 country code. <code>null</code> means the
+     *                      value has no language (for example, a date).
+     * @param values        the values to add.
+     * @param authorities   the external authority key for this value (or null)
+     * @param confidences   the authority confidence (default 0)
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException;
+    public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
+                            List<String> authorities, List<Integer> confidences) throws SQLException;
 
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value, String authority, int confidence) throws SQLException;
+    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value,
+                            String authority, int confidence) throws SQLException;
 
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value) throws SQLException;
+    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
+        throws SQLException;
 
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, List<String> values) throws SQLException;
+    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, List<String> values)
+        throws SQLException;
 
     /**
      * Add a single metadata field. This is appended to existing
      * values. Use <code>clearDC</code> to remove values.
      *
-     * @param context DSpace context
-     * @param dso DSpaceObject
-     * @param schema
-     *            the schema for the metadata field. <em>Must</em> match
-     *            the <code>name</code> of an existing metadata schema.
-     * @param element
-     *            the metadata element name
-     * @param qualifier
-     *            the metadata qualifier, or <code>null</code> for
-     *            unqualified
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means the
-     *            value has no language (for example, a date).
-     * @param value
-     *            the value to add.
+     * @param context   DSpace context
+     * @param dso       DSpaceObject
+     * @param schema    the schema for the metadata field. <em>Must</em> match
+     *                  the <code>name</code> of an existing metadata schema.
+     * @param element   the metadata element name
+     * @param qualifier the metadata qualifier, or <code>null</code> for
+     *                  unqualified
+     * @param lang      the ISO639 language code, optionally followed by an underscore
+     *                  and the ISO3166 country code. <code>null</code> means the
+     *                  value has no language (for example, a date).
+     * @param value     the value to add.
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value) throws SQLException;
+    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
+                            String value) throws SQLException;
 
     /**
      * Add a single metadata field. This is appended to existing
      * values. Use <code>clearDC</code> to remove values.
      *
-     * @param context DSpace context
-     * @param dso DSpaceObject
-     * @param schema
-     *            the schema for the metadata field. <em>Must</em> match
-     *            the <code>name</code> of an existing metadata schema.
-     * @param element
-     *            the metadata element name
-     * @param qualifier
-     *            the metadata qualifier, or <code>null</code> for
-     *            unqualified
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means the
-     *            value has no language (for example, a date).
-     * @param value
-     *            the value to add.
-     * @param authority
-     *            the external authority key for this value (or null)
-     * @param confidence
-     *            the authority confidence (default 0)
+     * @param context    DSpace context
+     * @param dso        DSpaceObject
+     * @param schema     the schema for the metadata field. <em>Must</em> match
+     *                   the <code>name</code> of an existing metadata schema.
+     * @param element    the metadata element name
+     * @param qualifier  the metadata qualifier, or <code>null</code> for
+     *                   unqualified
+     * @param lang       the ISO639 language code, optionally followed by an underscore
+     *                   and the ISO3166 country code. <code>null</code> means the
+     *                   value has no language (for example, a date).
+     * @param value      the value to add.
+     * @param authority  the external authority key for this value (or null)
+     * @param confidence the authority confidence (default 0)
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence) throws SQLException;
+    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
+                            String value, String authority, int confidence) throws SQLException;
 
     /**
      * Clear metadata values. As with <code>getDC</code> above,
@@ -338,53 +310,49 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * Thus, <code>dspaceobject.clearDC(Item.ANY, Item.ANY, Item.ANY)</code> will
      * remove all Dublin Core metadata associated with an DSpaceObject.
      *
-     * @param context DSpace context
-     * @param dso DSpaceObject
-     * @param schema
-     *            the schema for the metadata field. <em>Must</em> match
-     *            the <code>name</code> of an existing metadata schema.
-     * @param element
-     *            the Dublin Core element to remove, or <code>Item.ANY</code>
-     * @param qualifier
-     *            the qualifier. <code>null</code> means unqualified, and
-     *            <code>Item.ANY</code> means any qualifier (including
-     *            unqualified.)
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means only
-     *            values with no language are removed, and <code>Item.ANY</code>
-     *            means values with any country code or no country code are
-     *            removed.
+     * @param context   DSpace context
+     * @param dso       DSpaceObject
+     * @param schema    the schema for the metadata field. <em>Must</em> match
+     *                  the <code>name</code> of an existing metadata schema.
+     * @param element   the Dublin Core element to remove, or <code>Item.ANY</code>
+     * @param qualifier the qualifier. <code>null</code> means unqualified, and
+     *                  <code>Item.ANY</code> means any qualifier (including
+     *                  unqualified.)
+     * @param lang      the ISO639 language code, optionally followed by an underscore
+     *                  and the ISO3166 country code. <code>null</code> means only
+     *                  values with no language are removed, and <code>Item.ANY</code>
+     *                  means values with any country code or no country code are
+     *                  removed.
      * @throws SQLException if database error
      */
-    public void clearMetadata(Context context, T dso, String schema, String element, String qualifier, String lang) throws SQLException;
+    public void clearMetadata(Context context, T dso, String schema, String element, String qualifier, String lang)
+        throws SQLException;
 
     public void removeMetadataValues(Context context, T dso, List<MetadataValue> values) throws SQLException;
 
     public String getMetadataFirstValue(T dso, String schema, String element, String qualifier, String language);
+
     /**
      * Set first metadata field value
-     * @param context DSpace context
-     * @param dso DSpaceObject
-     * @param schema
-     *            the schema for the metadata field. <em>Must</em> match
-     *            the <code>name</code> of an existing metadata schema.
-     * @param element
-     *            the Dublin Core element to remove, or <code>Item.ANY</code>
-     * @param qualifier
-     *            the qualifier. <code>null</code> means unqualified, and
-     *            <code>Item.ANY</code> means any qualifier (including
-     *            unqualified.)
-     * @param language
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means only
-     *            values with no language are removed, and <code>Item.ANY</code>
-     *            means values with any country code or no country code are
-     *            removed.
-     * @param value metadata value
+     *
+     * @param context   DSpace context
+     * @param dso       DSpaceObject
+     * @param schema    the schema for the metadata field. <em>Must</em> match
+     *                  the <code>name</code> of an existing metadata schema.
+     * @param element   the Dublin Core element to remove, or <code>Item.ANY</code>
+     * @param qualifier the qualifier. <code>null</code> means unqualified, and
+     *                  <code>Item.ANY</code> means any qualifier (including
+     *                  unqualified.)
+     * @param language  the ISO639 language code, optionally followed by an underscore
+     *                  and the ISO3166 country code. <code>null</code> means only
+     *                  values with no language are removed, and <code>Item.ANY</code>
+     *                  means values with any country code or no country code are
+     *                  removed.
+     * @param value     metadata value
      * @throws SQLException if database error
      */
-    public void setMetadataSingleValue(Context context, T dso, String schema, String element, String qualifier, String language, String value) throws SQLException;
+    public void setMetadataSingleValue(Context context, T dso, String schema, String element, String qualifier,
+                                       String language, String value) throws SQLException;
 
     public void updateLastModified(Context context, T dso) throws SQLException, AuthorizeException;
 
@@ -400,9 +368,12 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      */
     public int getSupportsTypeConstant();
 
-    void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException;
-    
-    void replaceMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException;
-    
-    void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to) throws SQLException;
+    void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
+                                  String value, String authority, int confidence, int index) throws SQLException;
+
+    void replaceMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
+                         String value, String authority, int confidence, int index) throws SQLException;
+
+    void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
+        throws SQLException;
 }

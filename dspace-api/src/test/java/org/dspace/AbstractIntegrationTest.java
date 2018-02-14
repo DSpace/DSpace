@@ -20,7 +20,6 @@ import org.junit.Ignore;
  * @author pvillega
  */
 @Ignore
-public class AbstractIntegrationTest extends AbstractUnitTest
-{
+public class AbstractIntegrationTest extends AbstractUnitTest {
     // This class intentionally left blank.
 }

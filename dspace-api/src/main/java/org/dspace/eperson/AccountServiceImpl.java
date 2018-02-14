@@ -7,21 +7,24 @@
  */
 package org.dspace.eperson;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Locale;
+import javax.mail.MessagingException;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.*;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
+import org.dspace.core.Utils;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Locale;
-
 /**
- *
  * Methods for handling registration by email and forgotten passwords. When
  * someone registers as a user, or forgets their password, the
  * sendRegistrationInfo or sendForgotPasswordInfo methods can be used to send an
@@ -35,17 +38,17 @@ import java.util.Locale;
  * @author Peter Breton
  * @version $Revision$
  */
-public class AccountServiceImpl implements AccountService
-{
-    /** log4j log */
+public class AccountServiceImpl implements AccountService {
+    /**
+     * log4j log
+     */
     private static Logger log = Logger.getLogger(AccountServiceImpl.class);
     @Autowired(required = true)
     protected EPersonService ePersonService;
     @Autowired(required = true)
     protected RegistrationDataService registrationDataService;
 
-    protected AccountServiceImpl()
-    {
+    protected AccountServiceImpl() {
 
     }
 
@@ -57,16 +60,13 @@ public class AccountServiceImpl implements AccountService
      * Error reading email template (throws IOException) Authorization error
      * (throws AuthorizeException)
      *
-     * @param context
-     *            DSpace context
-     * @param email
-     *            Email address to send the registration email to
+     * @param context DSpace context
+     * @param email   Email address to send the registration email to
      */
     @Override
     public void sendRegistrationInfo(Context context, String email)
-            throws SQLException, IOException, MessagingException,
-            AuthorizeException
-    {
+        throws SQLException, IOException, MessagingException,
+        AuthorizeException {
         sendInfo(context, email, true, true);
     }
 
@@ -78,16 +78,13 @@ public class AccountServiceImpl implements AccountService
      * sending email (throws MessagingException) Error reading email template
      * (throws IOException) Authorization error (throws AuthorizeException)
      *
-     * @param context
-     *            DSpace context
-     * @param email
-     *            Email address to send the forgot-password email to
+     * @param context DSpace context
+     * @param email   Email address to send the forgot-password email to
      */
     @Override
     public void sendForgotPasswordInfo(Context context, String email)
-            throws SQLException, IOException, MessagingException,
-            AuthorizeException
-    {
+        throws SQLException, IOException, MessagingException,
+        AuthorizeException {
         sendInfo(context, email, false, true);
     }
 
@@ -102,23 +99,18 @@ public class AccountServiceImpl implements AccountService
      * If the token is not found return null.
      * </p>
      *
-     * @param context
-     *            DSpace context
-     * @param token
-     *            Account token
+     * @param context DSpace context
+     * @param token   Account token
      * @return The EPerson corresponding to token, or null.
-     * @throws SQLException
-     *                If the token or eperson cannot be retrieved from the
-     *                database.
+     * @throws SQLException If the token or eperson cannot be retrieved from the
+     *                      database.
      */
     @Override
     public EPerson getEPerson(Context context, String token)
-            throws SQLException, AuthorizeException
-    {
+        throws SQLException, AuthorizeException {
         String email = getEmail(context, token);
 
-        if (email == null)
-        {
+        if (email == null) {
             return null;
         }
 
@@ -129,20 +121,16 @@ public class AccountServiceImpl implements AccountService
      * Return the e-mail address referred to by a token, or null if email
      * address can't be found ignores expiration of token
      *
-     * @param context
-     *            DSpace context
-     * @param token
-     *            Account token
+     * @param context DSpace context
+     * @param token   Account token
      * @return The email address corresponding to token, or null.
      */
     @Override
     public String getEmail(Context context, String token)
-            throws SQLException
-    {
+        throws SQLException {
         RegistrationData registrationData = registrationDataService.findByToken(context, token);
 
-        if (registrationData == null)
-        {
+        if (registrationData == null) {
             return null;
         }
 
@@ -157,17 +145,13 @@ public class AccountServiceImpl implements AccountService
     /**
      * Delete token.
      *
-     * @param context
-     *            DSpace context
-     * @param token
-     *            The token to delete
-     * @throws SQLException
-     *                If a database error occurs
+     * @param context DSpace context
+     * @param token   The token to delete
+     * @throws SQLException If a database error occurs
      */
     @Override
     public void deleteToken(Context context, String token)
-            throws SQLException
-    {
+        throws SQLException {
         registrationDataService.deleteByToken(context, token);
     }
 
@@ -180,29 +164,27 @@ public class AccountServiceImpl implements AccountService
      * email. If send is TRUE, the email is sent; otherwise it is skipped.
      *
      * Potential error conditions:
-     * @return null if no EPerson with that email found
-     * @throws SQLException Cannot create registration data in database 
-     * @throws MessagingException Error sending email
-     * @throws IOException Error reading email template
-     * @throws AuthorizeException Authorization error
      *
-     * @param context DSpace context
-     * @param email Email address to send the forgot-password email to
+     * @param context    DSpace context
+     * @param email      Email address to send the forgot-password email to
      * @param isRegister If true, this is for registration; otherwise, it is
-     *     for forgot-password 
-     * @param send If true, send email; otherwise do not send any email
+     *                   for forgot-password
+     * @param send       If true, send email; otherwise do not send any email
+     * @return null if no EPerson with that email found
+     * @throws SQLException       Cannot create registration data in database
+     * @throws MessagingException Error sending email
+     * @throws IOException        Error reading email template
+     * @throws AuthorizeException Authorization error
      */
     protected RegistrationData sendInfo(Context context, String email,
-            boolean isRegister, boolean send) throws SQLException, IOException,
-            MessagingException, AuthorizeException
-    {
+                                        boolean isRegister, boolean send) throws SQLException, IOException,
+        MessagingException, AuthorizeException {
         // See if a registration token already exists for this user
         RegistrationData rd = registrationDataService.findByEmail(context, email);
 
 
         // If it already exists, just re-issue it
-        if (rd == null)
-        {
+        if (rd == null) {
             rd = registrationDataService.create(context);
             rd.setToken(Utils.generateHexKey());
 
@@ -214,17 +196,15 @@ public class AccountServiceImpl implements AccountService
             // This is a potential problem -- if we create the callback
             // and then crash, registration will get SNAFU-ed.
             // So FIRST leave some breadcrumbs
-            if (log.isDebugEnabled())
-            {
+            if (log.isDebugEnabled()) {
                 log.debug("Created callback "
-                        + rd.getID()
-                        + " with token " + rd.getToken()
-                        + " with email \"" + email + "\"");
+                              + rd.getID()
+                              + " with token " + rd.getToken()
+                              + " with email \"" + email + "\"");
             }
         }
 
-        if (send)
-        {
+        if (send) {
             sendEmail(context, email, isRegister, rd);
         }
 
@@ -237,45 +217,36 @@ public class AccountServiceImpl implements AccountService
      * If isRegister is <code>true</code>, this is registration email;
      * otherwise, it is a forgot-password email.
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param email
-     *     The email address to mail to
-     * @param isRegister
-     *     If true, this is registration email; otherwise it is
-     *     forgot-password email.
-     * @param rd
-     *     The RDBMS row representing the registration data.
-     * @throws MessagingException
-     *     If an error occurs while sending email
-     * @throws IOException
-     *     A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SQLException
-     *     An exception that provides information on a database access error or other errors.
+     * @param context    The relevant DSpace Context.
+     * @param email      The email address to mail to
+     * @param isRegister If true, this is registration email; otherwise it is
+     *                   forgot-password email.
+     * @param rd         The RDBMS row representing the registration data.
+     * @throws MessagingException If an error occurs while sending email
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
      */
     protected void sendEmail(Context context, String email, boolean isRegister, RegistrationData rd)
-            throws MessagingException, IOException, SQLException
-    {
+        throws MessagingException, IOException, SQLException {
         String base = ConfigurationManager.getProperty("dspace.url");
 
         //  Note change from "key=" to "token="
         String specialLink = new StringBuffer().append(base).append(
-                base.endsWith("/") ? "" : "/").append(
-                isRegister ? "register" : "forgot").append("?")
-                .append("token=").append(rd.getToken())
-                .toString();
+            base.endsWith("/") ? "" : "/").append(
+            isRegister ? "register" : "forgot").append("?")
+                                               .append("token=").append(rd.getToken())
+                                               .toString();
         Locale locale = context.getCurrentLocale();
         Email bean = Email.getEmail(I18nUtil.getEmailFilename(locale, isRegister ? "register"
-                : "change_password"));
+            : "change_password"));
         bean.addRecipient(email);
         bean.addArgument(specialLink);
         bean.send();
 
         // Breadcrumbs
-        if (log.isInfoEnabled())
-        {
+        if (log.isInfoEnabled()) {
             log.info("Sent " + (isRegister ? "registration" : "account")
-                    + " information to " + email);
+                         + " information to " + email);
         }
     }
 }

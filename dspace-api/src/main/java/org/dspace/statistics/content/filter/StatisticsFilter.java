@@ -9,13 +9,16 @@ package org.dspace.statistics.content.filter;
 
 /**
  * A wrapper for some kind of Solr filter expression.
+ *
  * @author kevinvandevelde at atmire.com
  * Date: 12-mrt-2009
  * Time: 10:36:03
  */
 public interface StatisticsFilter {
 
-    /** Convert this filter's configuration to a query string fragment.
+    /**
+     * Convert this filter's configuration to a query string fragment.
+     *
      * @return a query fragment.
      */
     public String toQuery();

@@ -24,28 +24,26 @@ package org.dspace.content.packager;
  * @author Larry Stone
  * @version $Revision$
  */
-public class PackageValidationException extends PackageException
-{
+public class PackageValidationException extends PackageException {
     /**
      * Create a new exception with the given message.
+     *
      * @param message - diagnostic message.
      */
-    public PackageValidationException(String message)
-    {
+    public PackageValidationException(String message) {
         super(message);
     }
 
     /**
      * Create a new exception wrapping it around another exception.
+     *
      * @param exception - exception specifying the cause of this failure.
      */
-    public PackageValidationException(Exception exception)
-    {
+    public PackageValidationException(Exception exception) {
         super(exception);
     }
 
-    public PackageValidationException(String message, Exception exception)
-    {
+    public PackageValidationException(String message, Exception exception) {
         super(message, exception);
     }
 }

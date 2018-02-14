@@ -7,9 +7,12 @@
  */
 package org.dspace.identifier;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -23,8 +26,6 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static org.junit.Assert.*;
-
 /**
  * Test the HandleIdentifierProvider.
  * <p>
@@ -37,31 +38,32 @@ import static org.junit.Assert.*;
  * @author mwood
  */
 public class HandleIdentifierProviderTest
-        extends AbstractDSpaceTest
-{
-    /** A name for our testing bean definition. */
+    extends AbstractDSpaceTest {
+    /**
+     * A name for our testing bean definition.
+     */
     private static final String BEAN_NAME = "test-HandleIdentifierProvider";
 
-    /** Spring application context. */
+    /**
+     * Spring application context.
+     */
     private static AnnotationConfigApplicationContext applicationContext;
 
-    public HandleIdentifierProviderTest()
-    {
+    public HandleIdentifierProviderTest() {
     }
 
     /**
      * The special test bean for the target class is defined here.
      */
     @BeforeClass
-    public static void setUpClass()
-    {
+    public static void setUpClass() {
         ServiceManager serviceManager = kernelImpl.getServiceManager();
 
         // Get the normal ApplicationContext
         ApplicationContext parentApplicationContext
-                = (ApplicationContext) serviceManager.getServiceByName(
-                        ApplicationContext.class.getName(),
-                        ApplicationContext.class);
+            = (ApplicationContext) serviceManager.getServiceByName(
+            ApplicationContext.class.getName(),
+            ApplicationContext.class);
 
         // Wrap it in a new empty context that we can configure.
         applicationContext = new AnnotationConfigApplicationContext();
@@ -81,20 +83,17 @@ public class HandleIdentifierProviderTest
      * Clean up special test Spring stuff.
      */
     @AfterClass
-    public static void tearDownClass()
-    {
+    public static void tearDownClass() {
         // Clean up testing ApplicationContext and any beans within.
         applicationContext.close();
     }
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
     }
 
     @After
-    public void tearDown()
-    {
+    public void tearDown() {
     }
 
     /**
@@ -123,18 +122,18 @@ public class HandleIdentifierProviderTest
      * The list is a .properties on the class path.
      */
     @Test
-    public void testSupports_String()
-    {
+    public void testSupports_String() {
         System.out.println("supports(String)");
 
         DSpaceServicesFactory.getInstance().getConfigurationService().setProperty("handle.prefix", "123456789");
-        DSpaceServicesFactory.getInstance().getConfigurationService().setProperty("handle.additional.prefixes", "123456789.1,123456789.2");
-        
+        DSpaceServicesFactory.getInstance().getConfigurationService()
+                             .setProperty("handle.additional.prefixes", "123456789.1,123456789.2");
+
         // We have to get Spring to instantiate the provider as a Bean, because
         // the bean class has autowired fields.
         HandleIdentifierProvider instance = new HandleIdentifierProvider();
         applicationContext.getAutowireCapableBeanFactory().autowireBeanProperties(
-                instance, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+            instance, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
 
         // Load the test cases
         Properties forms = new Properties();
@@ -146,14 +145,13 @@ public class HandleIdentifierProviderTest
         }
 
         // Test each case
-        for (Map.Entry<Object, Object> entry : forms.entrySet())
-        {
-            String identifier = (String)entry.getKey();
-            boolean expResult = Boolean.parseBoolean((String)entry.getValue());
+        for (Map.Entry<Object, Object> entry : forms.entrySet()) {
+            String identifier = (String) entry.getKey();
+            boolean expResult = Boolean.parseBoolean((String) entry.getValue());
             boolean result = instance.supports(identifier);
             String message = expResult ?
-                    "This provider should support " + identifier :
-                    "This provider should not support " + identifier;
+                "This provider should support " + identifier :
+                "This provider should not support " + identifier;
             assertEquals(message, expResult, result);
         }
     }

@@ -7,17 +7,17 @@
  */
 package org.dspace.content.service;
 
+import java.sql.SQLException;
+
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-
-import java.sql.SQLException;
 
 /**
  * Service interface class that adds support to retrieve DSpaceObject by the old integer based identifier which was used
  * to identify DSpaceObjects prior to DSpace 6.0
  *
- * @author kevinvandevelde at atmire.com
  * @param <T> class type
+ * @author kevinvandevelde at atmire.com
  */
 public interface DSpaceObjectLegacySupportService<T extends DSpaceObject> {
 
@@ -29,7 +29,7 @@ public interface DSpaceObjectLegacySupportService<T extends DSpaceObject> {
      * a pair of type number and database ID.
      *
      * @param context - the context
-     * @param id - the legacy id within table of type'd objects
+     * @param id      - the legacy id within table of type'd objects
      * @return the object found, or null if it does not exist.
      * @throws java.sql.SQLException only upon failure accessing the database.
      */

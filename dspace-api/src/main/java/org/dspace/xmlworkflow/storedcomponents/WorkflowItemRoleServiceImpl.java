@@ -7,6 +7,11 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -14,11 +19,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.dao.WorkflowItemRoleDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Service implementation for the WorkflowItemRole object.
@@ -32,8 +32,7 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
     @Autowired(required = true)
     private WorkflowItemRoleDAO workflowItemRoleDAO;
 
-    protected WorkflowItemRoleServiceImpl()
-    {
+    protected WorkflowItemRoleServiceImpl() {
 
     }
 
@@ -43,12 +42,14 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
     }
 
     @Override
-    public List<WorkflowItemRole> findByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem) throws SQLException {
+    public List<WorkflowItemRole> findByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
+        throws SQLException {
         return workflowItemRoleDAO.findByWorkflowItem(context, xmlWorkflowItem);
     }
 
     @Override
-    public void deleteForWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem) throws SQLException, AuthorizeException {
+    public void deleteForWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
+        throws SQLException, AuthorizeException {
         Iterator<WorkflowItemRole> workflowItemRoles = findByWorkflowItem(context, xmlWorkflowItem).iterator();
         while (workflowItemRoles.hasNext()) {
             WorkflowItemRole workflowItemRole = workflowItemRoles.next();
@@ -78,8 +79,9 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
     }
 
     @Override
-    public void update(Context context, List<WorkflowItemRole> workflowItemRoles) throws SQLException, AuthorizeException {
-        if(CollectionUtils.isNotEmpty(workflowItemRoles)) {
+    public void update(Context context, List<WorkflowItemRole> workflowItemRoles)
+        throws SQLException, AuthorizeException {
+        if (CollectionUtils.isNotEmpty(workflowItemRoles)) {
             for (WorkflowItemRole workflowItemRole : workflowItemRoles) {
                 workflowItemRoleDAO.save(context, workflowItemRole);
             }

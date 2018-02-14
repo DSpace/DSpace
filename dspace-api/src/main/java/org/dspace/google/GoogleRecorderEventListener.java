@@ -8,6 +8,13 @@
 
 package org.dspace.google;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -26,13 +33,6 @@ import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 
 /**
  * User: Robin Taylor
@@ -40,7 +40,6 @@ import java.util.UUID;
  * Time: 10:05
  *
  * Notify Google Analytics of... well anything we want really.
- *
  */
 public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
@@ -69,8 +68,7 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
     @Override
     public void receiveEvent(Event event) {
-        if((event instanceof UsageEvent))
-        {
+        if ((event instanceof UsageEvent)) {
             log.debug("Usage event received " + event.getName());
 
             // This is a wee bit messy but these keys should be combined in future.
@@ -78,26 +76,26 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
             if (StringUtils.isNotBlank(analyticsKey)) {
                 try {
-                    UsageEvent ue = (UsageEvent)event;
+                    UsageEvent ue = (UsageEvent) event;
 
                     if (ue.getAction() == UsageEvent.Action.VIEW) {
                         if (ue.getObject().getType() == Constants.BITSTREAM) {
                             logEvent(ue, "bitstream", "download");
 
-                        //  Note: I've left this commented out code here to show how we could record page views as events,
-                        //  but since they are already taken care of by the Google Analytics Javascript there is not much point.
+                            //  Note: I've left this commented out code here to show how we could record page views
+                            // as events,
+                            //  but since they are already taken care of by the Google Analytics Javascript there is
+                            // not much point.
 
-                        //}  else if (ue.getObject().getType() == Constants.ITEM) {
-                        //    logEvent(ue, "item", "view");
-                        //}  else if (ue.getObject().getType() == Constants.COLLECTION) {
-                        //    logEvent(ue, "collection", "view");
-                        //}  else if (ue.getObject().getType() == Constants.COMMUNITY) {
-                        //    logEvent(ue, "community", "view");
+                            //}  else if (ue.getObject().getType() == Constants.ITEM) {
+                            //    logEvent(ue, "item", "view");
+                            //}  else if (ue.getObject().getType() == Constants.COLLECTION) {
+                            //    logEvent(ue, "collection", "view");
+                            //}  else if (ue.getObject().getType() == Constants.COMMUNITY) {
+                            //    logEvent(ue, "community", "view");
                         }
                     }
-                }
-                catch(Exception e)
-                {
+                } catch (Exception e) {
                     log.error(e.getMessage());
                 }
             }
@@ -146,17 +144,20 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
     private String getParentType(UsageEvent ue) {
         try {
-            int parentType = contentServiceFactory.getDSpaceObjectService(ue.getObject()).getParentObject(ue.getContext(), ue.getObject()).getType();
+            int parentType = contentServiceFactory.getDSpaceObjectService(ue.getObject())
+                                                  .getParentObject(ue.getContext(), ue.getObject()).getType();
             if (parentType == Constants.ITEM) {
                 return "item";
             } else if (parentType == Constants.COLLECTION) {
                 return "collection";
-            }  else if (parentType == Constants.COMMUNITY) {
+            } else if (parentType == Constants.COMMUNITY) {
                 return "community";
             }
         } catch (SQLException e) {
             // This shouldn't merit interrupting the user's transaction so log the error and continue.
-            log.error("Error in Google Analytics recording - can't determine ParentObjectType for bitstream " + ue.getObject().getID());
+            log.error(
+                "Error in Google Analytics recording - can't determine ParentObjectType for bitstream " + ue.getObject()
+                                                                                                            .getID());
             e.printStackTrace();
         }
 
@@ -166,14 +167,18 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
     private String getObjectName(UsageEvent ue) {
         try {
             if (ue.getObject().getType() == Constants.BITSTREAM) {
-                // For a bitstream download we really want to know the title of the owning item rather than the bitstream name.
-                return contentServiceFactory.getDSpaceObjectService(ue.getObject()).getParentObject(ue.getContext(), ue.getObject()).getName();
-            }  else {
+                // For a bitstream download we really want to know the title of the owning item rather than the
+                // bitstream name.
+                return contentServiceFactory.getDSpaceObjectService(ue.getObject())
+                                            .getParentObject(ue.getContext(), ue.getObject()).getName();
+            } else {
                 return ue.getObject().getName();
             }
         } catch (SQLException e) {
             // This shouldn't merit interrupting the user's transaction so log the error and continue.
-            log.error("Error in Google Analytics recording - can't determine ParentObjectName for bitstream " + ue.getObject().getID());
+            log.error(
+                "Error in Google Analytics recording - can't determine ParentObjectName for bitstream " + ue.getObject()
+                                                                                                            .getID());
             e.printStackTrace();
         }
 
@@ -183,7 +188,8 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
     private String getIPAddress(HttpServletRequest request) {
         String clientIP = request.getRemoteAddr();
-        if (ConfigurationManager.getBooleanProperty("useProxies", false) && request.getHeader("X-Forwarded-For") != null) {
+        if (ConfigurationManager.getBooleanProperty("useProxies", false) && request
+            .getHeader("X-Forwarded-For") != null) {
             /* This header is a comma delimited list */
             for (String xfip : request.getHeader("X-Forwarded-For").split(",")) {
                 /* proxy itself will sometime populate this header with the same value in

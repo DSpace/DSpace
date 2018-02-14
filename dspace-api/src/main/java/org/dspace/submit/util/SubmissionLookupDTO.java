@@ -17,32 +17,25 @@ import java.util.UUID;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class SubmissionLookupDTO implements Serializable
-{
+public class SubmissionLookupDTO implements Serializable {
     private static final long serialVersionUID = 1;
 
     private String uuid;
 
     private List<ItemSubmissionLookupDTO> items;
 
-    public SubmissionLookupDTO()
-    {
+    public SubmissionLookupDTO() {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public void setItems(List<ItemSubmissionLookupDTO> items)
-    {
+    public void setItems(List<ItemSubmissionLookupDTO> items) {
         this.items = items;
     }
 
-    public ItemSubmissionLookupDTO getLookupItem(String uuidLookup)
-    {
-        if (items != null)
-        {
-            for (ItemSubmissionLookupDTO item : items)
-            {
-                if (item.getUUID().equals(uuidLookup))
-                {
+    public ItemSubmissionLookupDTO getLookupItem(String uuidLookup) {
+        if (items != null) {
+            for (ItemSubmissionLookupDTO item : items) {
+                if (item.getUUID().equals(uuidLookup)) {
                     return item;
                 }
             }

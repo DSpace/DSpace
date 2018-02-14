@@ -17,7 +17,7 @@ import org.dspace.core.Context;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class SolrServiceIndexOutputPlugin implements SolrServiceIndexPlugin{
+public class SolrServiceIndexOutputPlugin implements SolrServiceIndexPlugin {
 
     @Override
     public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {

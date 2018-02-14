@@ -13,21 +13,21 @@ import org.dspace.app.util.service.WebAppService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Abstract factory to get services for the util package, use UtilServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the util package, use UtilServiceFactory.getInstance() to retrieve an
+ * implementation
  *
  * @author kevinvandevelde at atmire.com
  */
-public abstract class UtilServiceFactory
-{
+public abstract class UtilServiceFactory {
     public abstract WebAppService getWebAppService();
 
     public abstract OpenSearchService getOpenSearchService();
 
     public abstract MetadataExposureService getMetadataExposureService();
 
-    public static UtilServiceFactory getInstance()
-    {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("appUtilServiceFactory", UtilServiceFactory.class);
+    public static UtilServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("appUtilServiceFactory", UtilServiceFactory.class);
     }
 
 }

@@ -7,17 +7,17 @@
  */
 package org.dspace.content.dao.impl;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.dao.BitstreamFormatDAO;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the BitstreamFormat object.
@@ -26,11 +26,9 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat> implements BitstreamFormatDAO
-{
+public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat> implements BitstreamFormatDAO {
 
-    protected BitstreamFormatDAOImpl()
-    {
+    protected BitstreamFormatDAOImpl() {
         super();
     }
 
@@ -39,25 +37,22 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
      * If more than one bitstream format has the same MIME type, the
      * one returned is unpredictable.
      *
-     * @param context
-     *            DSpace context object
-     * @param mimeType
-     *            MIME type value
+     * @param context         DSpace context object
+     * @param mimeType        MIME type value
      * @param includeInternal whether to include internal mimetypes
-     *
      * @return the corresponding bitstream format, or <code>null</code> if
-     *         there's no bitstream format with the given MIMEtype.
+     * there's no bitstream format with the given MIMEtype.
      * @throws SQLException if database error
      */
     @Override
-    public BitstreamFormat findByMIMEType(Context context, String mimeType, boolean includeInternal) throws SQLException
-    {
+    public BitstreamFormat findByMIMEType(Context context, String mimeType, boolean includeInternal)
+        throws SQLException {
         // NOTE: Avoid internal formats since e.g. "License" also has
         // a MIMEtype of text/plain.
         Criteria criteria = createCriteria(context, BitstreamFormat.class);
         criteria.add(Restrictions.and(
-                Restrictions.eq("internal", includeInternal),
-                Restrictions.like("mimetype", mimeType)
+            Restrictions.eq("internal", includeInternal),
+            Restrictions.like("mimetype", mimeType)
         ));
 
         return singleResult(criteria);
@@ -66,31 +61,30 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
     /**
      * Find a bitstream format by its (unique) short description
      *
-     * @param context
-     *            DSpace context object
-     * @param desc
-     *            the short description
-     *
+     * @param context DSpace context object
+     * @param desc    the short description
      * @return the corresponding bitstream format, or <code>null</code> if
-     *         there's no bitstream format with the given short description
+     * there's no bitstream format with the given short description
      * @throws SQLException if database error
      */
     @Override
     public BitstreamFormat findByShortDescription(Context context,
-            String desc) throws SQLException
-    {
+                                                  String desc) throws SQLException {
         Criteria criteria = createCriteria(context, BitstreamFormat.class);
         criteria.add(Restrictions.and(
-                Restrictions.eq("shortDescription", desc)
+            Restrictions.eq("shortDescription", desc)
         ));
 
         return uniqueResult(criteria);
     }
 
     @Override
-    public int updateRemovedBitstreamFormat(Context context, BitstreamFormat deletedBitstreamFormat, BitstreamFormat newBitstreamFormat) throws SQLException {
+    public int updateRemovedBitstreamFormat(Context context, BitstreamFormat deletedBitstreamFormat,
+                                            BitstreamFormat newBitstreamFormat) throws SQLException {
         // Set bitstreams with this format to "unknown"
-        Query query = createQuery(context, "update Bitstream set bitstreamFormat = :unknown_format where bitstreamFormat = :deleted_format");
+        Query query = createQuery(context,
+                                  "update Bitstream set bitstreamFormat = :unknown_format where bitstreamFormat = " +
+                                      ":deleted_format");
         query.setParameter("unknown_format", newBitstreamFormat);
         query.setParameter("deleted_format", deletedBitstreamFormat);
 
@@ -101,8 +95,8 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
     public List<BitstreamFormat> findNonInternal(Context context) throws SQLException {
         Criteria criteria = createCriteria(context, BitstreamFormat.class);
         criteria.add(Restrictions.and(
-                Restrictions.eq("internal", false),
-                Restrictions.not(Restrictions.like("shortDescription", "Unknown"))
+            Restrictions.eq("internal", false),
+            Restrictions.not(Restrictions.like("shortDescription", "Unknown"))
         ));
         criteria.addOrder(Order.desc("supportLevel")).addOrder(Order.asc("shortDescription"));
 

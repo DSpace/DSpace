@@ -7,18 +7,18 @@
  */
 package org.dspace.identifier.dao.impl;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.dao.DOIDAO;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the DOI object.
@@ -27,10 +27,8 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
-{
-    protected DOIDAOImpl()
-    {
+public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
+    protected DOIDAOImpl() {
         super();
     }
 
@@ -42,8 +40,10 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
     }
 
     @Override
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude) throws SQLException {
-        //SELECT * FROM Doi WHERE resource_type_id = ? AND resource_id = ? AND resource_id = ? AND ((status != ? AND status != ?) OR status IS NULL)
+    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude)
+        throws SQLException {
+        //SELECT * FROM Doi WHERE resource_type_id = ? AND resource_id = ? AND resource_id = ? AND ((status != ? AND
+        // status != ?) OR status IS NULL)
         Criteria criteria = createCriteria(context, DOI.class);
         Disjunction statusQuery = Restrictions.or();
         Conjunction statusConjunctionAnd = Restrictions.and();
@@ -53,11 +53,11 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
         statusQuery.add(statusConjunctionAnd);
         statusQuery.add(Restrictions.isNull("status"));
         criteria.add(
-                Restrictions.and(
-                        Restrictions.eq("dSpaceObject", dso),
-                        statusQuery
+            Restrictions.and(
+                Restrictions.eq("dSpaceObject", dso),
+                statusQuery
 
-                )
+            )
         );
         return singleResult(criteria);
     }
@@ -72,12 +72,13 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
         criteria.add(statusQuery);
         return list(criteria);
     }
-    
+
     @Override
-    public List<DOI> findSimilarNotInState(Context context, String doi, List<Integer> excludedStatuses, boolean dsoNotNull)
-            throws SQLException
-    {
-        // SELECT * FROM Doi WHERE doi LIKE ? AND resource_type_id = ? AND resource_id IS NOT NULL AND status != ? AND status != ?
+    public List<DOI> findSimilarNotInState(Context context, String doi, List<Integer> excludedStatuses,
+                                           boolean dsoNotNull)
+        throws SQLException {
+        // SELECT * FROM Doi WHERE doi LIKE ? AND resource_type_id = ? AND resource_id IS NOT NULL AND status != ?
+        // AND status != ?
         Criteria criteria = createCriteria(context, DOI.class);
         Conjunction conjunctionAnd = Restrictions.and();
         Disjunction statusQuery = Restrictions.or();
@@ -86,8 +87,7 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
         }
         conjunctionAnd.add(Restrictions.like("doi", doi));
         conjunctionAnd.add(statusQuery);
-        if (dsoNotNull)
-        {
+        if (dsoNotNull) {
             conjunctionAnd.add(Restrictions.isNotNull("dSpaceObject"));
         }
         criteria.add(conjunctionAnd);
@@ -98,9 +98,9 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
     public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {
         Criteria criteria = createCriteria(context, DOI.class);
         criteria.add(
-                Restrictions.and(
-                        Restrictions.eq("dSpaceObject", dso)
-                )
+            Restrictions.and(
+                Restrictions.eq("dSpaceObject", dso)
+            )
         );
         return singleResult(criteria);
     }

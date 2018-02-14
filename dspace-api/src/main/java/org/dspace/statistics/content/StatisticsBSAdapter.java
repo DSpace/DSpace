@@ -20,7 +20,7 @@ import org.dspace.statistics.service.SolrLoggerService;
 /**
  * Class that will hold the data needed to show
  * statistics in the browse and search pages.
- * 
+ *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 
@@ -31,11 +31,17 @@ public class StatisticsBSAdapter {
     protected boolean displayTotalViews;
     protected List<StatisticsFilter> filters;
 
-    /** visitType is ITEM */
+    /**
+     * visitType is ITEM
+     */
     public static final int ITEM_VISITS = 0;
-    /** visitType is BITSTREAM */
+    /**
+     * visitType is BITSTREAM
+     */
     public static final int BITSTREAM_VISITS = 1;
-    /** visitType is TOTAL */
+    /**
+     * visitType is TOTAL
+     */
     public static final int TOTAL_VISITS = 2;
     protected final SolrLoggerService solrLoggerService;
 
@@ -49,34 +55,35 @@ public class StatisticsBSAdapter {
     /**
      * Returns the number of visits for the item.
      * Depending on the visitType it can either be item, bitstream, total, ...
-     * 
+     *
      * @param visitType the type of visits we want, from the item, bitstream, total
-     * @param item the item from which we need our visits
+     * @param item      the item from which we need our visits
      * @return the number of visits
-     * @throws SolrServerException
-     *     Exception from the Solr server to the solrj Java client.
+     * @throws SolrServerException Exception from the Solr server to the solrj Java client.
      */
     public long getNumberOfVisits(int visitType, Item item) throws SolrServerException {
-        switch (visitType){
+        switch (visitType) {
             case ITEM_VISITS:
-                return solrLoggerService.queryTotal("type: " + Constants.ITEM + " AND id: " + item.getID(), resolveFilterQueries()).getCount();
+                return solrLoggerService
+                    .queryTotal("type: " + Constants.ITEM + " AND id: " + item.getID(), resolveFilterQueries())
+                    .getCount();
             case BITSTREAM_VISITS:
-                return solrLoggerService.queryTotal("type: " + Constants.BITSTREAM + " AND owningItem: " + item.getID(), resolveFilterQueries()).getCount();
+                return solrLoggerService.queryTotal("type: " + Constants.BITSTREAM + " AND owningItem: " + item.getID(),
+                                                    resolveFilterQueries()).getCount();
             case TOTAL_VISITS:
                 return getNumberOfVisits(ITEM_VISITS, item) + getNumberOfVisits(BITSTREAM_VISITS, item);
-
+            default:
+                return -1;
         }
-        return -1;
     }
 
-    private String resolveFilterQueries(){
+    private String resolveFilterQueries() {
         StringBuilder out = new StringBuilder();
         for (int i = 0; i < filters.size(); i++) {
             StatisticsFilter statisticsFilter = filters.get(i);
             out.append(statisticsFilter.toQuery());
 
-            if(i != 0 && (i != filters.size() -1))
-            {
+            if (i != 0 && (i != filters.size() - 1)) {
                 out.append(" AND ");
             }
         }
@@ -111,12 +118,11 @@ public class StatisticsBSAdapter {
     }
 
 
-
     public List<StatisticsFilter> getFilters() {
         return filters;
     }
 
-    public void addFilter(StatisticsFilter filter){
+    public void addFilter(StatisticsFilter filter) {
         this.filters.add(filter);
     }
 

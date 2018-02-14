@@ -30,13 +30,12 @@ import org.dspace.handle.service.HandleService;
 /**
  * A command-line tool for setting/removing community/sub-community
  * relationships. Takes community DB Id or handle arguments as inputs.
- * 
+ *
  * @author rrodgers
  * @version $Revision$
  */
 
-public class CommunityFiliator
-{
+public class CommunityFiliator {
 
     protected CommunityService communityService;
     protected HandleService handleService;
@@ -47,12 +46,10 @@ public class CommunityFiliator
     }
 
     /**
-     *
      * @param argv the command line arguments given
      * @throws Exception if error
      */
-    public static void main(String[] argv) throws Exception
-    {
+    public static void main(String[] argv) throws Exception {
         // create an options object and populate it
         CommandLineParser parser = new PosixParser();
 
@@ -60,11 +57,11 @@ public class CommunityFiliator
 
         options.addOption("s", "set", false, "set a parent/child relationship");
         options.addOption("r", "remove", false,
-                "remove a parent/child relationship");
+                          "remove a parent/child relationship");
         options.addOption("p", "parent", true,
-                "parent community (handle or database ID)");
+                          "parent community (handle or database ID)");
         options.addOption("c", "child", true,
-                "child community (handle or databaseID)");
+                          "child community (handle or databaseID)");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, argv);
@@ -73,57 +70,48 @@ public class CommunityFiliator
         String parentID = null;
         String childID = null;
 
-        if (line.hasOption('h'))
-        {
+        if (line.hasOption('h')) {
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("CommunityFiliator\n", options);
             System.out
-                    .println("\nestablish a relationship: CommunityFiliator -s -p parentID -c childID");
+                .println("\nestablish a relationship: CommunityFiliator -s -p parentID -c childID");
             System.out
-                    .println("remove a relationship: CommunityFiliator -r -p parentID -c childID");
+                .println("remove a relationship: CommunityFiliator -r -p parentID -c childID");
 
             System.exit(0);
         }
 
-        if (line.hasOption('s'))
-        {
+        if (line.hasOption('s')) {
             command = "set";
         }
 
-        if (line.hasOption('r'))
-        {
+        if (line.hasOption('r')) {
             command = "remove";
         }
 
-        if (line.hasOption('p')) // parent
-        {
+        if (line.hasOption('p')) { // parent
             parentID = line.getOptionValue('p');
         }
 
-        if (line.hasOption('c')) // child
-        {
+        if (line.hasOption('c')) { // child
             childID = line.getOptionValue('c');
         }
 
         // now validate
         // must have a command set
-        if (command == null)
-        {
+        if (command == null) {
             System.out
-                    .println("Error - must run with either set or remove (run with -h flag for details)");
+                .println("Error - must run with either set or remove (run with -h flag for details)");
             System.exit(1);
         }
 
-        if ("set".equals(command) || "remove".equals(command))
-        {
-            if (parentID == null)
-            {
+        if ("set".equals(command) || "remove".equals(command)) {
+            if (parentID == null) {
                 System.out.println("Error - a parentID must be specified (run with -h flag for details)");
                 System.exit(1);
             }
 
-            if (childID == null)
-            {
+            if (childID == null) {
                 System.out.println("Error - a childID must be specified (run with -h flag for details)");
                 System.exit(1);
             }
@@ -135,71 +123,57 @@ public class CommunityFiliator
         // we are superuser!
         c.turnOffAuthorisationSystem();
 
-        try
-        {
+        try {
             // validate and resolve the parent and child IDs into commmunities
             Community parent = filiator.resolveCommunity(c, parentID);
             Community child = filiator.resolveCommunity(c, childID);
 
-            if (parent == null)
-            {
+            if (parent == null) {
                 System.out.println("Error, parent community cannot be found: "
-                        + parentID);
+                                       + parentID);
                 System.exit(1);
             }
 
-            if (child == null)
-            {
+            if (child == null) {
                 System.out.println("Error, child community cannot be found: "
-                        + childID);
+                                       + childID);
                 System.exit(1);
             }
 
-            if ("set".equals(command))
-            {
+            if ("set".equals(command)) {
                 filiator.filiate(c, parent, child);
-            }
-            else
-            {
+            } else {
                 filiator.defiliate(c, parent, child);
             }
-        }
-        catch (SQLException sqlE)
-        {
+        } catch (SQLException sqlE) {
             System.out.println("Error - SQL exception: " + sqlE.toString());
-        }
-        catch (AuthorizeException authE)
-        {
+        } catch (AuthorizeException authE) {
             System.out.println("Error - Authorize exception: "
-                    + authE.toString());
-        }
-        catch (IOException ioE)
-        {
+                                   + authE.toString());
+        } catch (IOException ioE) {
             System.out.println("Error - IO exception: " + ioE.toString());
         }
     }
 
     /**
-     *
-     * @param c context
+     * @param c      context
      * @param parent parent Community
-     * @param child child community
-     * @throws SQLException if database error
+     * @param child  child community
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorize error
-     * @throws IOException if IO error
+     * @throws IOException        if IO error
      */
     public void filiate(Context c, Community parent, Community child)
-            throws SQLException, AuthorizeException, IOException
-    {
+        throws SQLException, AuthorizeException, IOException {
         // check that a valid filiation would be established
         // first test - proposed child must currently be an orphan (i.e.
         // top-level)
-        Community childDad = CollectionUtils.isNotEmpty(child.getParentCommunities()) ? child.getParentCommunities().iterator().next() : null;
+        Community childDad = CollectionUtils.isNotEmpty(child.getParentCommunities()) ? child.getParentCommunities()
+                                                                                             .iterator().next() : null;
 
-        if (childDad != null)
-        {
+        if (childDad != null) {
             System.out.println("Error, child community: " + child.getID()
-                    + " already a child of: " + childDad.getID());
+                                   + " already a child of: " + childDad.getID());
             System.exit(1);
         }
 
@@ -207,12 +181,10 @@ public class CommunityFiliator
         // child
         List<Community> parentDads = parent.getParentCommunities();
 
-        for (int i = 0; i < parentDads.size(); i++)
-        {
-            if (parentDads.get(i).getID().equals(child.getID()))
-            {
+        for (int i = 0; i < parentDads.size(); i++) {
+            if (parentDads.get(i).getID().equals(child.getID())) {
                 System.out
-                        .println("Error, circular parentage - child is parent of parent");
+                    .println("Error, circular parentage - child is parent of parent");
                 System.exit(1);
             }
         }
@@ -223,39 +195,34 @@ public class CommunityFiliator
         // complete the pending transaction
         c.complete();
         System.out.println("Filiation complete. Community: '" + parent.getID()
-                + "' is parent of community: '" + child.getID() + "'");
+                               + "' is parent of community: '" + child.getID() + "'");
     }
 
     /**
-     *
-     * @param c context
+     * @param c      context
      * @param parent parent Community
-     * @param child child community
-     * @throws SQLException if database error
+     * @param child  child community
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorize error
-     * @throws IOException if IO error
+     * @throws IOException        if IO error
      */
     public void defiliate(Context c, Community parent, Community child)
-            throws SQLException, AuthorizeException, IOException
-    {
+        throws SQLException, AuthorizeException, IOException {
         // verify that child is indeed a child of parent
         List<Community> parentKids = parent.getSubcommunities();
         boolean isChild = false;
 
-        for (int i = 0; i < parentKids.size(); i++)
-        {
-            if (parentKids.get(i).getID().equals(child.getID()))
-            {
+        for (int i = 0; i < parentKids.size(); i++) {
+            if (parentKids.get(i).getID().equals(child.getID())) {
                 isChild = true;
 
                 break;
             }
         }
 
-        if (!isChild)
-        {
+        if (!isChild) {
             System.out
-                    .println("Error, child community not a child of parent community");
+                .println("Error, child community not a child of parent community");
             System.exit(1);
         }
 
@@ -269,37 +236,33 @@ public class CommunityFiliator
         // complete the pending transaction
         c.complete();
         System.out.println("Defiliation complete. Community: '" + child.getID()
-                + "' is no longer a child of community: '" + parent.getID()
-                + "'");
+                               + "' is no longer a child of community: '" + parent.getID()
+                               + "'");
     }
 
     /**
      * Find a community by ID
-     * @param c context
+     *
+     * @param c           context
      * @param communityID community ID
      * @return Community object
      * @throws SQLException if database error
      */
     protected Community resolveCommunity(Context c, String communityID)
-            throws SQLException
-    {
+        throws SQLException {
         Community community = null;
 
-        if (communityID.indexOf('/') != -1)
-        {
+        if (communityID.indexOf('/') != -1) {
             // has a / must be a handle
             community = (Community) handleService.resolveToObject(c,
-                    communityID);
+                                                                  communityID);
 
             // ensure it's a community
             if ((community == null)
-                    || (community.getType() != Constants.COMMUNITY))
-            {
+                || (community.getType() != Constants.COMMUNITY)) {
                 community = null;
             }
-        }
-        else
-        {
+        } else {
             community = communityService.find(c, UUID.fromString(communityID));
         }
 
