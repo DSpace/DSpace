@@ -30,6 +30,7 @@
         <jena.version>2.13.0</jena.version>
         <slf4j.version>1.7.22</slf4j.version>
         <jackson.version>2.8.6</jackson.version>
+        <jersey.version>2.26</jersey.version>
         <hibernate.version>5.2.8.Final</hibernate.version>
         <spring.version>4.3.6.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
@@ -1443,6 +1444,11 @@
                 <scope>test</scope>
             </dependency>
             <!-- Converge miscellaneous transitive dependencies. -->
+            <dependency>
+                <groupId>com.fasterxml</groupId>
+                <artifactId>classmate</artifactId>
+                <version>1.3.0</version>
+            </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
