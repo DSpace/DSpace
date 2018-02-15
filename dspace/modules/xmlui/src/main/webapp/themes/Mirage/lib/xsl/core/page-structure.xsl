@@ -887,7 +887,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
 
-        <script type="text/javascript" language="javascript" src="http://platform.twitter.com/widgets.js">
+        <script type="text/javascript" language="javascript" src="https://platform.twitter.com/widgets.js">
             <xsl:text>&#160;</xsl:text>
         </script>
 

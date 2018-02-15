@@ -243,13 +243,13 @@
     <xsl:template name="reddit-item">
         <a href="http://reddit.com/submit"
             onclick="window.open('http://reddit.com/submit?url='+encodeURIComponent('https://doi.org/doi:10.5061/dryad.87ht85rs')+'&amp;title=Data+from%3A+Robustness+of+compound+Dirichlet+priors+for+Bayesian+inference+of+branch+lengths.+','reddit','toolbar=no,width=550,height=550'); return false">
-            <img alt="Reddit" src="http://reddit.com/static/spreddit7.gif" border="0px;"/>
+            <img alt="Reddit" src="https://reddit.com/static/spreddit7.gif" border="0px;"/>
         </a>
     </xsl:template>
 
     <xsl:template name="twitter-item">
         <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true"
-            src="http://platform.twitter.com/widgets/tweet_button.1406859257.html#_=1407626732783&amp;count=none&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Fdatadryad.org%2Fresource%2Fdoi%3A10.5061%2Fdryad.87ht85rs%2F1&amp;size=m&amp;text=USYB-2011-142.SupplData%20from%3A%20Robustness%20of%20compound%20Dirichlet%20priors%20for%20Bayesian%20inference%20of%20branch%20lengths.%20-%20Dryad&amp;url=https%3A%2F%2Fdoi.org%2Fdoi%3A10.5061%2Fdryad.87ht85rs&amp;via=datadryad"
+            src="https://platform.twitter.com/widgets/tweet_button.1406859257.html#_=1407626732783&amp;count=none&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Fdatadryad.org%2Fresource%2Fdoi%3A10.5061%2Fdryad.87ht85rs%2F1&amp;size=m&amp;text=USYB-2011-142.SupplData%20from%3A%20Robustness%20of%20compound%20Dirichlet%20priors%20for%20Bayesian%20inference%20of%20branch%20lengths.%20-%20Dryad&amp;url=https%3A%2F%2Fdoi.org%2Fdoi%3A10.5061%2Fdryad.87ht85rs&amp;via=datadryad"
             class="twitter-share-button twitter-tweet-button twitter-share-button twitter-count-none"
             title="Twitter Tweet Button" data-twttr-rendered="true"/>
     </xsl:template>
@@ -264,7 +264,7 @@
     <xsl:template name="mendeley-item">
         <a
             href="http://www.mendeley.com/import/?url=http://datadryad.org/resource/doi:10.5061/dryad.87ht85rs">
-            <img alt="Mendeley" src="http://www.mendeley.com/graphics/mendeley.png" border="0px;"/>
+            <img alt="Mendeley" src="https://www.mendeley.com/graphics/mendeley.png" border="0px;"/>
         </a>
     </xsl:template>
 

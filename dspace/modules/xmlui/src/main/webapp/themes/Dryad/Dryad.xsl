@@ -202,7 +202,7 @@
             <link type="application/atom+xml" rel="alternate" href="/feed/atom_1.0/10255/3"/>
             <link rel="icon" type="image/ico" href="/themes/Dryad/images/favicon.ico"/>
 
-            <script type="text/javascript" language="javascript" src="http://platform.twitter.com/widgets.js">
+            <script type="text/javascript" language="javascript" src="https://platform.twitter.com/widgets.js">
                 <xsl:text>&#160;</xsl:text>
             </script>
 
