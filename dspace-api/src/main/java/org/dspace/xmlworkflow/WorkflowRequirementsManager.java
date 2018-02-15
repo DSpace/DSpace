@@ -60,6 +60,10 @@ public class WorkflowRequirementsManager {
         ipu.setUserID(user.getID());
         ipu.setFinished(false);
         ipu.update();
+        
+        //Make sure the user has the necessary rights to update the item after the tasks is removed from the pool
+        XmlWorkflowManager.grantUserAllItemPolicies(c, wfi.getItem(), user);
+        
         int totalUsers = InProgressUser.getNumberOfInProgressUsers(c, wfi.getID()) + InProgressUser.getNumberOfFinishedUsers(c, wfi.getID());
 
         if(totalUsers == step.getRequiredUsers()){
@@ -75,7 +79,10 @@ public class WorkflowRequirementsManager {
 
         //Then remove the current user from the inProgressUsers
         InProgressUser.findByWorkflowItemAndEPerson(c, wfi.getID(), user.getID()).delete();
-
+        
+        //Make sure the removed user has his custom rights removed
+        XmlWorkflowManager.removeUserItemPolicies(c, wfi.getItem(), user);
+        
         Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
         Step step = workflow.getStep(stepID);
 
