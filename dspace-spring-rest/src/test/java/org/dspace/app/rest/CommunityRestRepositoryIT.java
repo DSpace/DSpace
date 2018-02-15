@@ -267,7 +267,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunityChild1).withName("Collection 1").build();
 
-        getClient().perform(get("/api/core/communities/search/subCommunities/")
+        getClient().perform(get("/api/core/communities/search/subCommunities")
                 .param("parent", parentCommunity.getID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -288,7 +288,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.page.totalElements", is(2)))
         ;
 
-        getClient().perform(get("/api/core/communities/search/subCommunities/")
+        getClient().perform(get("/api/core/communities/search/subCommunities")
                 .param("parent", parentCommunityChild2.getID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -309,7 +309,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.page.totalElements", is(1)))
         ;
 
-        getClient().perform(get("/api/core/communities/search/subCommunities/")
+        getClient().perform(get("/api/core/communities/search/subCommunities")
                 .param("parent", parentCommunityChild2Child1.getID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
