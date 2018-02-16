@@ -317,9 +317,4 @@ public class IPAuthentication implements AuthenticationMethod
         return null;
     }
 
-    @Override
-    public String loginPageTitle(Context context)
-    {
-        return null;
-    }
 }

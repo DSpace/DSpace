@@ -200,10 +200,15 @@ public interface AuthenticationMethod {
         throws SQLException;
 
     /**
-     * Get login page to which to redirect.
+     * Get an external login page to which to redirect.
+     *
      * Returns URL (as string) to which to redirect to obtain
      * credentials (either password prompt or e.g. HTTPS port for client
      * cert.); null means no redirect.
+     *
+     * Note: Starting with DSpace 7, session logins will be managed through the REST
+     * API.  Therefore, only authn providers with external login pages (such as Shibboleth)
+     * should return a login page.
      *
      * @param context
      *  DSpace context, will be modified (ePerson set) upon success.
@@ -220,17 +225,4 @@ public interface AuthenticationMethod {
                             HttpServletRequest request,
                             HttpServletResponse response);
 
-    /**
-     * Get title of login page to which to redirect.
-     * Returns a <i>message key</i> that gets translated into the title
-     * or label for "login page" (or null, if not implemented) This
-     * title may be used to identify the link to the login page in a
-     * selection menu, when there are multiple ways to login.
-     *
-     * @param context
-     *  DSpace context, will be modified (ePerson set) upon success.
-     *
-     * @return title text.
-     */
-    public String loginPageTitle(Context context);
 }

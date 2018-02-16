@@ -700,8 +700,9 @@ public class LDAPAuthentication
     }
 
     /*
-     * Returns URL to which to redirect to obtain credentials (either password
-     * prompt or e.g. HTTPS port for client cert.); null means no redirect.
+     * Returns the URL of an external login page which is not applicable for this authn method.
+     * 
+     * Note: Prior to DSpace 7, this method return the page of login servlet.
      *
      * @param context
      *  DSpace context, will be modified (ePerson set) upon success.
@@ -719,25 +720,8 @@ public class LDAPAuthentication
                             HttpServletRequest request,
                             HttpServletResponse response)
     {
-        return response.encodeRedirectURL(request.getContextPath() +
-                                          "/ldap-login");
+        return null;
     }
-
-    /**
-     * Returns message key for title of the "login" page, to use
-     * in a menu showing the choice of multiple login methods.
-     *
-     * @param context
-     *  DSpace context, will be modified (ePerson set) upon success.
-     *
-     * @return Message key to look up in i18n message catalog.
-     */
-    @Override
-    public String loginPageTitle(Context context)
-    {
-        return "org.dspace.eperson.LDAPAuthentication.title";
-    }
-
 
     /*
      * Add authenticated users to the group defined in dspace.cfg by

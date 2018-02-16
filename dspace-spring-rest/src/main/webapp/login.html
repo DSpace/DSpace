@@ -61,6 +61,13 @@
 
 <script>
     $(document).ready(function() {
+        var successHandler = function(result, status, xhr) {
+            document.cookie = "MyHalBrowserToken=" + xhr.getResponseHeader('Authorization').split(" ")[1];
+            toastr.success('You are now logged in. Please wait while we redirect you...', 'Login Successful');
+            setTimeout(function() {
+                window.location.href = window.location.pathname.replace("login.html", "");
+            }, 2000);
+        };  
         toastr.options = {
             "closeButton": false,
             "debug": false,
@@ -79,6 +86,20 @@
             "onclick" : function() { toastr.remove(); }
         }
 
+        $.ajax({
+          url : window.location.href.replace("login.html", "") + 'api/authn/login',
+          success : successHandler,
+          error : function(result, status, xhr) {
+              if (xhr == 401) {
+                  var loc = result.getResponseHeader("location");
+                  if (loc != null && loc != "") {
+                      document.location = loc;
+                  }
+              }
+          }
+        });
+
+        
         $("#login").click(function() {
             $.ajax({
                 //This depends on this file to be called login.html
@@ -90,13 +111,7 @@
                     "Content-Type" : 'application/x-www-form-urlencoded',
                     "Accept:" : '*/*'
                 },
-                success : function(result, status, xhr) {
-                    document.cookie = "MyHalBrowserToken=" + xhr.getResponseHeader('Authorization').split(" ")[1];
-                    toastr.success('You are now logged in. Please wait while we redirect you...', 'Login Successful');
-                    setTimeout(function() {
-                        window.location.href = window.location.pathname.replace("login.html", "");
-                    }, 2000);
-                },
+                success : successHandler,
                 error : function() {
                     toastr.error('The credentials you entered are invalid. Please try again.', 'Login Failed');
                 }
