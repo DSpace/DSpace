@@ -125,6 +125,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 op.addImage(f.getAbsolutePath());
                 op.thumbnail(width, height);
                 op.addImage(f2.getAbsolutePath());
+                op.autoOrient();
                 if (verbose) {
                         System.out.println("IM Thumbnail Param: " + op);
                 }
