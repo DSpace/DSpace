@@ -17,6 +17,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
+@DSpaceRestCategory(AuthenticationStatusRest.CATEGORY)
 @RelNameDSpaceResource(AuthenticationStatusRest.NAME)
 public class AuthenticationStatusResource extends DSpaceResource<AuthenticationStatusRest> {
     public AuthenticationStatusResource(AuthenticationStatusRest data, Utils utils, String... rels) {

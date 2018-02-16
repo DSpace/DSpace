@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
+@DSpaceRestCategory(LicenseRest.SUBMISSION)
 @RelNameDSpaceResource(LicenseRest.NAME)
 public class LicenseResource extends HALResource {
 

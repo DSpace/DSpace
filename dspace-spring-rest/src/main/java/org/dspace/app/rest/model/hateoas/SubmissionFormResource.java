@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(SubmissionFormRest.CATEGORY)
 @RelNameDSpaceResource(SubmissionFormRest.NAME)
 public class SubmissionFormResource extends DSpaceResource<SubmissionFormRest> {
 	public SubmissionFormResource(SubmissionFormRest sd, Utils utils, String... rels) {

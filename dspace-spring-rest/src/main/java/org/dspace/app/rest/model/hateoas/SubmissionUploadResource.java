@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
+@DSpaceRestCategory(SubmissionUploadRest.CATEGORY)
 @RelNameDSpaceResource(SubmissionUploadRest.NAME)
 public class SubmissionUploadResource extends DSpaceResource<SubmissionUploadRest> {
 	public SubmissionUploadResource(SubmissionUploadRest sd, Utils utils, String... rels) {

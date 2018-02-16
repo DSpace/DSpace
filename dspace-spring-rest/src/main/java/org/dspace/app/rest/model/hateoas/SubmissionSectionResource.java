@@ -19,6 +19,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
+@DSpaceRestCategory(SubmissionSectionRest.SUBMISSION)
 @RelNameDSpaceResource(SubmissionSectionRest.NAME)
 public class SubmissionSectionResource extends DSpaceResource<SubmissionSectionRest> {
 

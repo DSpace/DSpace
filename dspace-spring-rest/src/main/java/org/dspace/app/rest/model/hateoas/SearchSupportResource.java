@@ -13,6 +13,7 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 /**
  * This class' purpose is to wrap the SearchSupportRest into a HAL resource
  */
+@DSpaceRestCategory(SearchSupportRest.CATEGORY)
 @RelNameDSpaceResource(SearchSupportRest.NAME)
 public class SearchSupportResource extends HALResource<SearchSupportRest> {
 

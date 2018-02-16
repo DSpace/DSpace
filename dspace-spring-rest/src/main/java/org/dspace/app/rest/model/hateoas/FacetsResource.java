@@ -15,6 +15,7 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import java.util.LinkedList;
 import java.util.List;
 
+@DSpaceRestCategory(SearchResultsRest.CATEGORY)
 @RelNameDSpaceResource(SearchResultsRest.NAME)
 public class FacetsResource extends HALResource<SearchResultsRest>{
 

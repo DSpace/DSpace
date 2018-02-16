@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(SubmissionDefinitionRest.CATEGORY)
 @RelNameDSpaceResource(SubmissionDefinitionRest.NAME)
 public class SubmissionDefinitionResource extends DSpaceResource<SubmissionDefinitionRest> {
 	public SubmissionDefinitionResource(SubmissionDefinitionRest sd, Utils utils, String... rels) {

@@ -27,7 +27,12 @@ public class DSpaceRelProvider extends EvoInflectorRelProvider {
 	public String getItemResourceRelFor(Class<?> type) {
         RelNameDSpaceResource nameAnnotation = type.getAnnotation(RelNameDSpaceResource.class);
         if (nameAnnotation != null) {
-            return dspaceCurieProvider.getNamespacedRelFor(nameAnnotation.value(), nameAnnotation.value());
+			DSpaceRestCategory categoryAnnotation = type.getAnnotation(DSpaceRestCategory.class);
+			if(categoryAnnotation == null) {
+				return dspaceCurieProvider.getNamespacedRelFor(nameAnnotation.value(), nameAnnotation.value());
+			} else {
+				return dspaceCurieProvider.getNamespacedRelFor(categoryAnnotation.value(), nameAnnotation.value());
+			}
         }
 		return super.getItemResourceRelFor(type);
 	}

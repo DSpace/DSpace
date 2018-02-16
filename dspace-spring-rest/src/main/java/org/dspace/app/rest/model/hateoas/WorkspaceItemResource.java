@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(WorkspaceItemRest.CATEGORY)
 @RelNameDSpaceResource(WorkspaceItemRest.NAME)
 public class WorkspaceItemResource extends DSpaceResource<WorkspaceItemRest> {
 	public WorkspaceItemResource(WorkspaceItemRest witem, Utils utils, String... rels) {

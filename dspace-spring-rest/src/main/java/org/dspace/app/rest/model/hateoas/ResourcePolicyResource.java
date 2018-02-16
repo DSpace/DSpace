@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
+@DSpaceRestCategory(ResourcePolicyRest.CATEGORY)
 @RelNameDSpaceResource(ResourcePolicyRest.NAME)
 public class ResourcePolicyResource extends DSpaceResource<ResourcePolicyRest> {
 	public ResourcePolicyResource(ResourcePolicyRest eperson, Utils utils, String... rels) {

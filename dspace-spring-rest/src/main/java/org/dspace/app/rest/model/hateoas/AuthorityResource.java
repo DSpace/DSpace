@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
+@DSpaceRestCategory(AuthorityRest.CATEGORY)
 @RelNameDSpaceResource(AuthorityRest.NAME)
 public class AuthorityResource extends DSpaceResource<AuthorityRest> {
 	public AuthorityResource(AuthorityRest sd, Utils utils, String... rels) {		

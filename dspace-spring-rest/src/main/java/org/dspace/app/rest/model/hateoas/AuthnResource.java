@@ -24,6 +24,7 @@ import org.springframework.hateoas.Link;
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
+@DSpaceRestCategory(AuthnRest.CATEGORY)
 @RelNameDSpaceResource(AuthnRest.NAME)
 public class AuthnResource extends DSpaceResource<AuthnRest> {
 

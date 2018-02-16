@@ -13,6 +13,7 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 /**
  * This class serves as a wrapper class to wrap the SearchConfigurationRest into a HAL resource
  */
+@DSpaceRestCategory(SearchConfigurationRest.CATEGORY)
 @RelNameDSpaceResource(SearchConfigurationRest.NAME)
 public class SearchConfigurationResource extends HALResource<SearchConfigurationRest> {
 

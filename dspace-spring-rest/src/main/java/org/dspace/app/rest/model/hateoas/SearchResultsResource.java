@@ -21,6 +21,7 @@ import org.dspace.app.rest.utils.Utils;
 /**
  * This class' purpose is to create a container with a list of the SearchResultEntryResources
  */
+@DSpaceRestCategory(SearchResultsRest.CATEGORY)
 @RelNameDSpaceResource(SearchResultsRest.NAME)
 public class SearchResultsResource extends HALResource<SearchResultsRest> {
 
