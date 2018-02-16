@@ -17,13 +17,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import java.util.Base64;
 
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration test that covers various authentication scenarios
@@ -32,6 +36,18 @@ import org.junit.Test;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public class AuthenticationRestControllerIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    ConfigurationService configurationService;
+
+    public static final String[] PASS_ONLY = {"org.dspace.authenticate.PasswordAuthentication"};
+    public static final String[] SHIB_ONLY = {"org.dspace.authenticate.ShibAuthentication"};
+
+    @Before
+    public void setup() throws Exception {
+        super.setUp();
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
+   }
 
     @Test
     public void testStatusAuthenticated() throws Exception {
@@ -293,4 +309,32 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isUnauthorized())
                 .andExpect(status().reason(containsString("Login failed")));
     }
+
+    @Test
+    public void testShibbolethLoginRequest() throws Exception {
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+
+        getClient().perform(get("/api/authn/login").header("Referer", "http://my.uni.edu"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("Location", "/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu"))
+                .andReturn().getResponse().getHeader("Location");
+
+        //Simulate that a shibboleth authentication has happened
+
+        String token = getClient().perform(get("/api/authn/login")
+                .requestAttr("SHIB-MAIL", eperson.getEmail()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
+
+        getClient(token).perform(get("/api/authn/status"))
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.okay", is(true)))
+                .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.type", is("status")))
+                .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())));
+    }
+
 }

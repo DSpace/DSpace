@@ -510,16 +510,18 @@ public class ShibAuthentication implements AuthenticationMethod
 			int port = request.getServerPort();
 			String contextPath = request.getContextPath();
 
-			String returnURL;
-			if (request.isSecure() || forceHTTPS)
-				returnURL = "https://";
-			else 
-				returnURL = "http://";
-
-			returnURL += host;
-			if (!(port == 443 || port == 80))
-				returnURL += ":" + port;
-			returnURL += "/" + contextPath + "/shibboleth-login";
+			String returnURL = request.getHeader("Referer");
+			if (returnURL == null) {
+				if (request.isSecure() || forceHTTPS) {
+					returnURL = "https://";
+				} else {
+					returnURL = "http://";
+				}
+				returnURL += host;
+				if (!(port == 443 || port == 80)) {
+					returnURL += ":" + port;
+				}
+			}
 
 			try {
 				shibURL += "?target="+URLEncoder.encode(returnURL, "UTF-8");
@@ -536,25 +538,6 @@ public class ShibAuthentication implements AuthenticationMethod
 					+ "/shibboleth-login");
 		}
 	}
-
-	/**
-	 * Get title of login page to which to redirect. Returns a <i>message
-	 * key</i> that gets translated into the title or label for "login page" (or
-	 * null, if not implemented) This title may be used to identify the link to
-	 * the login page in a selection menu, when there are multiple ways to
-	 * login.
-	 * 
-	 * @param context
-	 *            DSpace context, will be modified (ePerson set) upon success.
-	 * 
-	 * @return title text.
-	 */
-	@Override
-    public String loginPageTitle(Context context)
-	{
-		return "org.dspace.authenticate.ShibAuthentication.title";
-	}
-
 
 	/**
 	 * Identify an existing EPerson based upon the shibboleth attributes provided on
