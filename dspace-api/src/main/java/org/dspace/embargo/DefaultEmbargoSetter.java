@@ -169,7 +169,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter
                     for (ResourcePolicy rp : getAuthorizeService().getPoliciesActionFilter(context, bn, Constants.READ))
                     {
                         System.out.println("CHECK WARNING: Item "+item.getHandle()+", Bundle "+bn.getName()+" allows READ by "+
-                          ((rp.getEPerson() != null) ? "Group "+rp.getGroup().getName() :
+                          ((rp.getEPerson() == null) ? "Group "+rp.getGroup().getName() :
                                                       "EPerson "+rp.getEPerson().getFullName()));
                     }
                 }
@@ -179,7 +179,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter
                     for (ResourcePolicy rp : getAuthorizeService().getPoliciesActionFilter(context, bs, Constants.READ))
                     {
                         System.out.println("CHECK WARNING: Item "+item.getHandle()+", Bitstream "+bs.getName()+" (in Bundle "+bn.getName()+") allows READ by "+
-                          ((rp.getEPerson() != null) ? "Group "+rp.getGroup().getName() :
+                          ((rp.getEPerson() == null) ? "Group "+rp.getGroup().getName() :
                                                       "EPerson "+rp.getEPerson().getFullName()));
                     }
                 }
