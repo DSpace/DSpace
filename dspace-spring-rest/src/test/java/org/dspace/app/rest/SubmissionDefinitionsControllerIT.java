@@ -50,7 +50,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                 .andExpect(jsonPath("$._links.search.href", is(REST_SERVER_URL + "config/submissiondefinitions/search")))
 
                 //The array of browse index should have a size greater or equals to 1
-                .andExpect(jsonPath("$._embedded.submissiondefinition:submissiondefinitions", hasSize(greaterThanOrEqualTo(1))))
+                .andExpect(jsonPath("$._embedded.cf:submissiondefinitions", hasSize(greaterThanOrEqualTo(1))))
         ;
     }
 
@@ -105,8 +105,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 				// We expect the content type to be "application/hal+json;charset=UTF-8"
 				.andExpect(content().contentType(contentType))
 				// Match only that a section exists with a submission configuration behind
-				.andExpect(jsonPath("$._embedded.submissionsection:submissionsections",hasSize(5)))
-				.andExpect(jsonPath("$._embedded.submissionsection:submissionsections",
+				.andExpect(jsonPath("$._embedded.s:submissionsections",hasSize(5)))
+				.andExpect(jsonPath("$._embedded.s:submissionsections",
 								Matchers.hasItem(
 										allOf(
 								                hasJsonPath("$.id", is("traditionalpageone")),

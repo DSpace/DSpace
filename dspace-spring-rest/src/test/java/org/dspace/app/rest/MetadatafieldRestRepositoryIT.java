@@ -44,7 +44,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         getClient().perform(get("/api/core/metadatafields"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$._embedded.metadatafield:metadatafields", Matchers.hasItem(
+                    .andExpect(jsonPath("$._embedded.c:metadatafields", Matchers.hasItem(
                             MetadataFieldMatcher.matchMetadataField()
                     )))
                     .andExpect(jsonPath("$._links.first.href", Matchers.containsString("/api/core/metadatafields")))

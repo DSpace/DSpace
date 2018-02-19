@@ -48,7 +48,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/communities"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.community:communities", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.c:communities", Matchers.containsInAnyOrder(
                         CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle()),
                         CommunityMatcher.matchCommunityWithCollectionEntry(child1.getName(), child1.getID(), child1.getHandle(), col1)
                 )))
@@ -77,10 +77,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("size", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.community:communities", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.c:communities", Matchers.contains(
                         CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())
                 )))
-                .andExpect(jsonPath("$._embedded.community:communities", Matchers.not(
+                .andExpect(jsonPath("$._embedded.c:communities", Matchers.not(
                         Matchers.contains(
                                 CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
                         )
@@ -93,10 +93,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.community:communities", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.c:communities", Matchers.contains(
                         CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
                 )))
-                .andExpect(jsonPath("$._embedded.community:communities", Matchers.not(
+                .andExpect(jsonPath("$._embedded.c:communities", Matchers.not(
                         Matchers.contains(
                                 CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())
                         )
@@ -216,11 +216,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/communities/search/top"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.community:communities", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.c:communities", Matchers.containsInAnyOrder(
                         CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle()),
                         CommunityMatcher.matchCommunityEntry(parentCommunity2.getName(), parentCommunity2.getID(), parentCommunity2.getHandle())
                 )))
-                .andExpect(jsonPath("$._embedded.community:communities", Matchers.not(Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.c:communities", Matchers.not(Matchers.containsInAnyOrder(
                         CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle()),
                         CommunityMatcher.matchCommunityEntry(child12.getName(), child12.getID(), child12.getHandle())
                 ))))

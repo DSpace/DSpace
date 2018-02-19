@@ -104,6 +104,7 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 											.wrapResource(linkedRM);
 
 								}
+
 								else {
  									if (linkedObject instanceof List) {
 										List<RestAddressableModel> linkedRMList = (List<RestAddressableModel>) linkedObject;

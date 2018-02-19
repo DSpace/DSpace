@@ -48,7 +48,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.type", is("status")))
 
                 .andExpect(jsonPath("$._links.c:eperson.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._embedded.authn:eperson.email", is(eperson.getEmail())));
+                 .andExpect(jsonPath("$._embedded.an:eperson.email", is(eperson.getEmail())));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.type", is("status")))
 
                 .andExpect(jsonPath("$._links.c:eperson.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._embedded.authn:eperson.email", is(eperson.getEmail())));
+                .andExpect(jsonPath("$._embedded.an:eperson.email", is(eperson.getEmail())));
 
         getClient(token2, null).perform(get("/api/authn/status"))
 
@@ -100,7 +100,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.type", is("status")))
 
                 .andExpect(jsonPath("$._links.c:eperson.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._embedded.authn:eperson.email", is(eperson.getEmail())));
+                .andExpect(jsonPath("$._embedded.an:eperson.email", is(eperson.getEmail())));
 
     }
 
