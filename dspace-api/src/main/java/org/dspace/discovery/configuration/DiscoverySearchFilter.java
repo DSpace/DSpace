@@ -62,11 +62,11 @@ public class DiscoverySearchFilter {
         return FILTER_TYPE_DEFAULT;
     }
 
-    public boolean isOpenByDefault(){
+    public boolean isOpenByDefault() {
         return isOpenByDefault;
     }
 
-    public void setIsOpenByDefault(boolean isOpenByDefault){
+    public void setIsOpenByDefault(boolean isOpenByDefault) {
         this.isOpenByDefault = isOpenByDefault;
     }
 

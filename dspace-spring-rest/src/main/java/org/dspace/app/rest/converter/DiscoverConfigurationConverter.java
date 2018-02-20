@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
@@ -29,7 +28,8 @@ public class DiscoverConfigurationConverter {
     public SearchConfigurationRest convert(DiscoveryConfiguration configuration) {
         SearchConfigurationRest searchConfigurationRest = new SearchConfigurationRest();
         if (configuration != null) {
-            addSearchFilters(searchConfigurationRest, configuration.getSearchFilters(), configuration.getSidebarFacets());
+            addSearchFilters(searchConfigurationRest,
+                             configuration.getSearchFilters(), configuration.getSidebarFacets());
             addSortOptions(searchConfigurationRest, configuration.getSearchSortConfiguration());
             setDefaultSortOption(configuration, searchConfigurationRest);
         }
@@ -53,18 +53,22 @@ public class DiscoverConfigurationConverter {
     }
 
 
-    public void addSearchFilters(SearchConfigurationRest searchConfigurationRest, List<DiscoverySearchFilter> searchFilterList, List<DiscoverySearchFilterFacet> facetList){
-        List<String> facetFieldNames = facetList.stream().map(DiscoverySearchFilterFacet::getIndexFieldName).collect(Collectors.toList());
-            for(DiscoverySearchFilter discoverySearchFilter : CollectionUtils.emptyIfNull(searchFilterList)){
-                SearchConfigurationRest.Filter filter = new SearchConfigurationRest.Filter();
-                filter.setFilter(discoverySearchFilter.getIndexFieldName());if(facetFieldNames.stream().anyMatch(str -> str.equals(discoverySearchFilter.getIndexFieldName()))){
+    public void addSearchFilters(SearchConfigurationRest searchConfigurationRest,
+                                 List<DiscoverySearchFilter> searchFilterList,
+                                 List<DiscoverySearchFilterFacet> facetList) {
+        List<String> facetFieldNames = facetList.stream().map(DiscoverySearchFilterFacet::getIndexFieldName)
+                                                .collect(Collectors.toList());
+        for (DiscoverySearchFilter discoverySearchFilter : CollectionUtils.emptyIfNull(searchFilterList)) {
+            SearchConfigurationRest.Filter filter = new SearchConfigurationRest.Filter();
+            filter.setFilter(discoverySearchFilter.getIndexFieldName());
+            if (facetFieldNames.stream().anyMatch(str -> str.equals(discoverySearchFilter.getIndexFieldName()))) {
                 filter.setHasFacets(true);
             }
             filter.setType(discoverySearchFilter.getType());
             filter.setOpenByDefault(discoverySearchFilter.isOpenByDefault());
-                filter.addDefaultOperatorsToList();
-                searchConfigurationRest.addFilter(filter);
-            }
+            filter.addDefaultOperatorsToList();
+            searchConfigurationRest.addFilter(filter);
+        }
     }
 
     private void addSortOptions(SearchConfigurationRest searchConfigurationRest,
