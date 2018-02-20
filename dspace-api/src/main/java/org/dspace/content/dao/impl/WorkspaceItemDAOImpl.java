@@ -34,6 +34,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 import java.sql.SQLException;
+import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -155,14 +156,12 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
         Query query = createQuery(context,"SELECT wi.stageReached as stage_reached, count(*) as cnt from WorkspaceItem wi" +
                 " group by wi.stageReached order by wi.stageReached");
 
-        //TODO RAF WRITE
-//        query.setResultTransformer(new BasicTransformerAdapter() {
-//            @Override
-//            public Object transformTuple(Object[] tuple, String[] aliases) {
-//                return new java.util.AbstractMap.SimpleImmutableEntry((Integer) tuple[0], (Long) tuple[1]);
-//            }
-//        });
-        return (List<Map.Entry<Integer, Long>>)query.getResultList();
+        List<Object[]> list = query.getResultList();
+        List<Map.Entry<Integer, Long>> returnList = new LinkedList<>();
+        for(Object[] o : list) {
+            returnList.add(new AbstractMap.SimpleEntry<>((Integer) o[0], (Long) o[1]));
+        }
+        return returnList;
     }
 
 }
