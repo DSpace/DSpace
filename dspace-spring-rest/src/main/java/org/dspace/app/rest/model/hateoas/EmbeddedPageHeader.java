@@ -10,6 +10,7 @@ package org.dspace.app.rest.model.hateoas;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.utils.URLUtils;
 import org.springframework.data.domain.Page;
@@ -51,9 +52,9 @@ public class EmbeddedPageHeader {
         return pageInfo;
     }
 
-    @JsonProperty(value = "_links")
-    public Map<String, Object> getLinks() {
-        Map<String, Object> links = new HashMap<>();
+    @JsonIgnore
+    public Map<String, Href> getLinks() {
+        Map<String, Href> links = new HashMap<>();
         if (!page.isFirst()) {
             links.put("first", _link(page.getSort(), 0, page.getSize()));
             links.put("self", _link(page.getSort(), page.getNumber(), page.getSize()));
@@ -87,7 +88,7 @@ public class EmbeddedPageHeader {
         return new Href(uriComp.build().toUriString());
     }
 
-    private class Href {
+    public class Href {
         private String href;
 
         public Href(String href) {

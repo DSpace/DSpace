@@ -8,6 +8,7 @@
 package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.dspace.app.rest.model.FacetResultsRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPageHeader;
@@ -32,7 +33,12 @@ public class FacetResultsHalLinkFactory extends DiscoveryRestHalLinkFactory<Face
             PageImpl page = new PageImpl<>(data.getFacetResultList(), pageable,
                     pageable.getOffset() + data.getFacetResultList().size() + (data.getFacetEntry().isHasMore() ? 1 : 0));
 
-            halResource.setPageHeader(new EmbeddedPageHeader(buildFacetBaseLink(data), page, false));
+            EmbeddedPageHeader pageHeader = new EmbeddedPageHeader(buildFacetBaseLink(data), page, false);
+            halResource.setPageHeader(pageHeader);
+
+            for (Map.Entry<String, EmbeddedPageHeader.Href> entry : pageHeader.getLinks().entrySet()) {
+                list.add(buildLink(entry.getKey(), entry.getValue().getHref()));
+            }
         }
 
     }

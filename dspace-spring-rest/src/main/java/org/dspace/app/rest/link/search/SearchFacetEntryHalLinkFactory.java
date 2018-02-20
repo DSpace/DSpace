@@ -8,6 +8,7 @@
 package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -49,7 +50,12 @@ public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<
             PageImpl page = new PageImpl<>(facetData.getValues(), new PageRequest(0, facetData.getFacetLimit()),
                     facetData.getValues().size() + (BooleanUtils.isTrue(facetData.isHasMore()) ? 1 : 0));
 
-            halResource.setPageHeader(new EmbeddedPageHeader(uriBuilder, page, false));
+            EmbeddedPageHeader pageHeader = new EmbeddedPageHeader(uriBuilder, page, false);
+            halResource.setPageHeader(pageHeader);
+
+            for (Map.Entry<String, EmbeddedPageHeader.Href> entry : pageHeader.getLinks().entrySet()) {
+                list.add(buildLink(entry.getKey(), entry.getValue().getHref()));
+            }
 
         } else {
             list.add(buildLink(Link.REL_SELF, uriBuilder.build().toUriString()));

@@ -41,10 +41,10 @@ public class SearchResultsResource extends HALResource<SearchResultsRest> {
     private void addEmbeds(final SearchResultsRest data, final Utils utils) {
         embedSearchResults(data, utils);
 
-        embedFacetResults(data);
+        embedFacetResults(data, utils);
     }
 
-    private void embedFacetResults(final SearchResultsRest data) {
+    private void embedFacetResults(final SearchResultsRest data, final Utils utils) {
         List<SearchFacetEntryResource> facetResources = new LinkedList<>();
         for (SearchFacetEntryRest searchFacetEntryRest : CollectionUtils.emptyIfNull(data.getFacets())) {
             facetResources.add(new SearchFacetEntryResource(searchFacetEntryRest, data));
