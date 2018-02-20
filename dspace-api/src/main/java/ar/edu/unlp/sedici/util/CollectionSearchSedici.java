@@ -10,6 +10,9 @@ import java.util.List;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -29,13 +32,18 @@ public class CollectionSearchSedici {
 		        List<String> communitiesName = new ArrayList<String>();
 		        TableRowIterator tri;		        
 
-				tri = DatabaseManager.queryTable(context,null,
-				                "SELECT collection.*, community.name as community_name FROM collection, community, community2collection WHERE " +
-				                "community.community_id=community2collection.community_id "+
-				                " AND collection.collection_id=community2collection.collection_id" +
-				                " ORDER BY community_name, collection.name"
-				                );
-	
+		        String query = "SELECT col.*, m.text_value as community_name, m2.text_value as collection_name " 
+        				+ "FROM collection col, community2collection c2c "
+        				+ "LEFT JOIN metadatavalue m ON (m.resource_id = c2c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) "
+        				+ "LEFT JOIN metadatavalue m2 ON (m2.resource_id = c2c.collection_id and m2.resource_type_id = ? and m2.metadata_field_id = ?) "
+        				+ "WHERE col.collection_id=c2c.collection_id ORDER BY community_name, collection_name";
+		        
+		        int dcTitleID = MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID();
+		        
+		        tri = DatabaseManager.query(context,query,
+		        			Constants.COMMUNITY, dcTitleID,
+		        			Constants.COLLECTION, dcTitleID);
+		        
 		        // Build a list of Community objects
 		        Collection fromCache;
 		        String communityName;
@@ -103,6 +111,7 @@ public class CollectionSearchSedici {
         return new CollectionsWithCommunities(collections, communitiesName);
 	}
 	
+    //TODO: revisar si este método se usa, por lo que pude encontrar de las referencias hasta el momento, no hay ninguna clase que utilice este método
 	public static CollectionsWithCommunities findAllWithCommunitiesName(Context context) {
         // Get the bundle table rows
 
@@ -112,12 +121,17 @@ public class CollectionSearchSedici {
         TableRowIterator tri;
 		try {
 
-				tri = DatabaseManager.queryTable(context,null,
-				                "SELECT collection.*, community.name as community_name FROM collection, community, community2collection WHERE " +
-				                "community.community_id=community2collection.community_id "+
-				                " AND collection.collection_id=community2collection.collection_id" +
-				                " ORDER BY community_name, collection.name"
-				                );
+			String query = "SELECT col.*, m.text_value as community_name, m2.text_value as collection_name " 
+    				+ "FROM collection col, community2collection c2c "
+    				+ "LEFT JOIN metadatavalue m ON (m.resource_id = c2c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) "
+    				+ "LEFT JOIN metadatavalue m2 ON (m2.resource_id = c2c.collection_id and m2.resource_type_id = ? and m2.metadata_field_id = ?) "
+    				+ "WHERE col.collection_id=c2c.collection_id ORDER BY community_name, collection_name";
+	        
+	        int dcTitleID = MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID();
+	        
+	        tri = DatabaseManager.query(context,query,
+	        			Constants.COMMUNITY, dcTitleID,
+	        			Constants.COLLECTION, dcTitleID);
 
         // Build a list of Community objects
         Collection fromCache;
