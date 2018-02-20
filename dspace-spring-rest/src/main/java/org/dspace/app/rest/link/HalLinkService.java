@@ -65,7 +65,7 @@ public class HalLinkService {
                     }
                 }
             } else if (obj instanceof EmbeddedPage) {
-                for (Object subObj : ((EmbeddedPage) obj).getPageContent()) {
+                for (Object subObj : ((EmbeddedPage) obj).getPageContent().values()) {
                     if (subObj instanceof HALResource) {
                         addLinks((HALResource) subObj);
                     }

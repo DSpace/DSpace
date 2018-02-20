@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.DiscoveryRestController;
@@ -117,10 +116,10 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         public static final String OPERATOR_CONTAINS = "contains";
         public static final String OPERATOR_NOTCONTAINS = "notcontains";
 
-        public boolean isHasFacets(){
+        public boolean isHasFacets() {
             return hasFacets;
         }
-        public void setHasFacets(boolean hasFacets){
+        public void setHasFacets(boolean hasFacets) {
             this.hasFacets = hasFacets;
         }
 
@@ -180,7 +179,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
                 .append(operators)
                 .toHashCode();
         }
-        public static class Operator{
+        public static class Operator {
             private String operator;
 
             public Operator(String operator) {

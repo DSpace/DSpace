@@ -707,7 +707,7 @@ public class RestResourceController implements InitializingBean {
             // if we really want to implement pagination we should implement a
             // link repository so to fall in the previous block code
             EmbeddedPage ep = (EmbeddedPage) resource.getEmbeddedResources().get(rel);
-            List<? extends RestAddressableModel> fullList = ep.getFullList();
+            List<? extends RestAddressableModel> fullList = ep.getFullList().get(rel);
             if (fullList == null || fullList.size() == 0) {
                 return null;
             }

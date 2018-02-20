@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,25 +20,27 @@ import org.springframework.data.domain.Page;
  */
 public class EmbeddedPage extends EmbeddedPageHeader {
 
-    private List fullList;
+    //TODO Make map get relation name from constructor
+    private Map<String, List> fullMap;
 
-    public EmbeddedPage(String self, Page page, List fullList) {
-        this(self, page, fullList, true);
+    public EmbeddedPage(String self, Page page, List fullList, String relation) {
+        this(self, page, fullList, true, relation);
     }
 
-    public EmbeddedPage(String self, Page page, List fullList, boolean totalElementsIsKnown) {
+    public EmbeddedPage(String self, Page page, List fullList, boolean totalElementsIsKnown, String relation) {
         super(self, page, totalElementsIsKnown);
-        this.fullList = fullList;
+        fullMap = new HashMap<String, List>();
+        fullMap.put(relation, fullList);
     }
 
     @JsonProperty(value = "_embedded")
-    public List getPageContent() {
-        return page.getContent();
+    public Map<String, List> getPageContent() {
+        return fullMap;
     }
 
     @JsonIgnore
-    public List getFullList() {
-        return fullList;
+    public Map<String, List> getFullList() {
+        return fullMap;
     }
 
 }
