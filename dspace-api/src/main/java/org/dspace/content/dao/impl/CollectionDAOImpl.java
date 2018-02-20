@@ -28,6 +28,7 @@ import org.hibernate.transform.BasicTransformerAdapter;
 
 import javax.persistence.criteria.*;
 import java.sql.SQLException;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -194,13 +195,11 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         String q = "select col as collection, sum(bit.sizeBytes) as totalBytes from Item i join i.collections col join i.bundles bun join bun.bitstreams bit group by col";
         Query query = createQuery(context, q);
 
-        //TODO RAF WRITE WUTNOW
-//        query.setResultTransformer(new BasicTransformerAdapter() {
-//            @Override
-//            public Object transformTuple(Object[] tuple, String[] aliases) {
-//                return new java.util.AbstractMap.SimpleImmutableEntry<>((Collection)tuple[0], (Long)tuple[1]);
-//            }
-//        });
-        return ((List<Map.Entry<Collection, Long>>)query.getResultList());
+        List<Object[]> list = query.getResultList();
+        List<Map.Entry<Collection, Long>> returnList = new LinkedList<>();
+        for(Object[] o : list) {
+            returnList.add(new AbstractMap.SimpleEntry<>((Collection) o[0], (Long) o[1]));
+        }
+        return returnList;
     }
 }
