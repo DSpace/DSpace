@@ -406,14 +406,17 @@
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
 
-                        <!-- Endocrine Reviews -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aendocrine%5C+reviews%5C%7C%5C%7C%5C%7CEndocrine%5C+Reviews"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EDRV.png" alt="Endocrine Reviews" /></a>
-                        <!-- Endocrinology -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aendocrinology%5C%7C%5C%7C%5C%7CEndocrinology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ENDO.png" alt="Endocrinology" /></a>
-                        <!-- Journal of Clinical Endocrinology & Metabolism -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+clinical%5C+endocrinology%5C+%26%5C+metabolism%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Clinical%5C+Endocrinology%5C+%26%5C+Metabolism"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JCEM.png" alt="Journal of Clinical Endocrinology &amp; Metabolism" /></a>
-                        <!-- Journal of the Endocrine Society -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+the%5C+endocrine%5C+society%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+the%5C+Endocrine%5C+Society"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JES.png" alt="Journal of the Endocrine Society" /></a>
+                        <!-- JAMIA Open -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajamia%5C+open%5C%7C%5C%7C%5C%7CJAMIA%5C+Open"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JAMIAO.png" alt="JAMIA Open" /></a>
+
+                        <!-- Alpine Entomology -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aalpine%5C+entomology%5C%7C%5C%7C%5C%7CAlpine%5C+Entomology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-AlpEnt.png" alt="Alpine Entomology" /></a>
+
+                        <!-- Check List -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Acheck%5C+list%5C%7C%5C%7C%5C%7CCheck%5C+List"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-CheckList.png" alt="Check List" /></a>
+
+                        <!-- Evolutionary Systematics -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aevolutionary%5C+systematics%5C%7C%5C%7C%5C%7CEvolutionary%5C+Systematics"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EvolSyst.png" alt="Evolutionary Systematics" /></a>
 
                     </div>
                 </div>
