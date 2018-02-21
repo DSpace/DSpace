@@ -9,28 +9,29 @@ package org.dspace.content.dao.impl;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Item_;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.MetadataValue_;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.eperson.EPerson;
-import org.hibernate.Criteria;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
-
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Subqueries;
-import org.hibernate.type.StandardBasicTypes;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -212,7 +213,63 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 //        return list(criteria).iterator();
         //TODO RAF WRITE
 
-        return null;
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(itemRoot);
+
+
+        List<Predicate> predicateList = new LinkedList<>();
+
+        if(!collectionUuids.isEmpty()){
+            predicateList.add(criteriaBuilder.isTrue(itemRoot.get(Item_.owningCollection).in(collectionUuids)));
+        }
+
+        int index = Math.min(listFieldList.size(), Math.min(query_op.size(), query_val.size()));
+
+        for(int i = 0; i < index; i++){
+            OP op = OP.valueOf(query_op.get(i));
+        	if (op == null) {
+        		log.warn("Skipping Invalid Operator: " + query_op.get(i));
+        		continue;
+        	}
+
+        	if (op == OP.matches || op == OP.doesnt_match) {
+        		if (regexClause.isEmpty()) {
+            		log.warn("Skipping Unsupported Regex Operator: " + query_op.get(i));
+            		continue;
+        		}
+        	}
+
+            Subquery<DSpaceObject> subquery = criteriaQuery.subquery(DSpaceObject.class);
+        	Root<MetadataValue> subqueryRoot = subquery.from(MetadataValue.class);
+        	subquery.select(subqueryRoot.get(MetadataValue_.dSpaceObject));
+            List<Predicate> predicateListSubQuery = new LinkedList<>();
+
+            predicateListSubQuery.add(criteriaBuilder.equal(subqueryRoot.get(MetadataValue_.dSpaceObject), itemRoot.get(Item_.id)));
+
+            if (!listFieldList.get(i).isEmpty()) {
+                predicateListSubQuery.add(criteriaBuilder.isTrue(subqueryRoot.get(MetadataValue_.metadataField).in(listFieldList.get(i))));
+        	}
+        	if (op == OP.equals){
+                predicateListSubQuery.add(criteriaBuilder.equal(subqueryRoot.get(MetadataValue_.value), query_val.get(i)));
+        	} else if (op == OP.like){
+                predicateListSubQuery.add(criteriaBuilder.like(subqueryRoot.get(MetadataValue_.value), query_val.get(i)));
+            } else if (op == OP.contains){
+                predicateListSubQuery.add(criteriaBuilder.like(subqueryRoot.get(MetadataValue_.value), "%"+query_val.get(i)+"%"));
+            } else if (op == OP.not_equals){
+                predicateListSubQuery.add(criteriaBuilder.notEqual(subqueryRoot.get(MetadataValue_.value), query_val.get(i)));
+            } else if (op == OP.not_like){
+                predicateListSubQuery.add(criteriaBuilder.notLike(subqueryRoot.get(MetadataValue_.value), query_val.get(i)));
+            } else if (op == OP.doesnt_contain){
+                predicateListSubQuery.add(criteriaBuilder.notLike(subqueryRoot.get(MetadataValue_.value), "%"+query_val.get(i)+"%"));
+            }
+            subquery.where(predicateListSubQuery.toArray(new Predicate[]{}));
+            predicateList.add(criteriaBuilder.isTrue(itemRoot.get(Item_.id).in(subquery)));
+        }
+        criteriaQuery.where(predicateList.toArray(new Predicate[]{}));
+
+        return list(context, criteriaQuery, false, Item.class, offset, limit).iterator();
     }
 
     @Override
