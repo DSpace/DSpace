@@ -128,7 +128,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         for(Integer action : actions){
             orPredicates.add(criteriaBuilder.equal(join.get(ResourcePolicy_.actionId), action));
         }
-        Predicate orPredicate = criteriaBuilder.and(orPredicates.toArray(new Predicate[]{}));
+        Predicate orPredicate = criteriaBuilder.or(orPredicates.toArray(new Predicate[]{}));
         criteriaQuery.select(collectionRoot);
         criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(join.get(ResourcePolicy_.resourceTypeId), Constants.COLLECTION),
                                                 criteriaBuilder.equal(join.get(ResourcePolicy_.eperson), ePerson),
