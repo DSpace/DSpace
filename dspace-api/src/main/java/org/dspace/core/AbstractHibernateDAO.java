@@ -237,7 +237,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     public List<T> executeCriteriaQuery(Context context, CriteriaQuery<T> criteriaQuery, boolean cacheable,
                                         Class<T> clazz, int maxResults, int offset) throws SQLException {
         //This has to be here, otherwise a 500 gets thrown
-        Root<T> root = criteriaQuery.from(clazz);
         Query query = this.getHibernateSession(context).createQuery(criteriaQuery);
 
         //TODO Check if this works and is desireable
@@ -246,7 +245,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         if (maxResults != -1) {
             query.setMaxResults(maxResults);
         }
-        if (maxResults != -1) {
+        if(offset != -1){
             query.setFirstResult(offset);
         }
         return query.getResultList();
