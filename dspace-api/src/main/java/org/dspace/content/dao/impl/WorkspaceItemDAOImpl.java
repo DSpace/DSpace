@@ -105,11 +105,17 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     @Override
     public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException
     {
-        Criteria criteria = createCriteria(context, WorkspaceItem.class);
-        criteria.addOrder(Order.asc("item"));
-        criteria.setFirstResult(offset);
-        criteria.setMaxResults(limit);
-        return list(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
+        Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
+        criteriaQuery.select(workspaceItemRoot);
+
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.item)));
+        criteriaQuery.orderBy(orderList);
+
+
+        return list(context, criteriaQuery, false, WorkspaceItem.class, limit, offset);
     }
 
     @Override
