@@ -103,7 +103,7 @@
         "title" : "Biology Letters",
         "sponsor" : "The Royal Society",
         "integrated" : "Y",
-        "embargo" : "Y",
+        "embargo" : "N",
         "issn" : "1744-9561",
         "submission" : "R",
         "hidden" : "N"
@@ -528,7 +528,7 @@
         "integrated" : "N",
         "issn" : "2042-8898",
         "submission" : "A",
-        "embargo" : "Y",
+        "embargo" : "N",
         "hidden" : "Y"
      },
      {
@@ -742,7 +742,7 @@
         "hidden" : "Y",
         "submission" : "A",
         "issn" : "1742-5662",
-        "embargo" : "Y",
+        "embargo" : "N",
         "integrated" : "N",
         "sponsor" : "The Royal Society",
         "title" : "Journal of the Royal Society Interface"
@@ -914,7 +914,7 @@
         "sponsor" : "The Royal Society",
         "integrated" : "N",
         "issn" : "2046-2441",
-        "embargo" : "Y",
+        "embargo" : "N",
         "submission" : "A",
         "hidden" : "Y"
      },
@@ -959,14 +959,14 @@
         "hidden" : "Y",
         "submission" : "A",
         "issn" : "1364-503X",
-        "embargo" : "Y",
+        "embargo" : "N",
         "sponsor" : "The Royal Society",
         "title" : "Philosophical Transactions of the Royal Society A"
      },
      {
         "integrated" : "N",
         "issn" : "0962-8436",
-        "embargo" : "Y",
+        "embargo" : "N",
         "submission" : "A",
         "hidden" : "Y",
         "title" : "Philosophical Transactions of the Royal Society B",
@@ -1093,7 +1093,7 @@
         "integrated" : "N",
         "submission" : "A",
         "issn" : "0950-1207",
-        "embargo" : "Y",
+        "embargo" : "N",
         "hidden" : "Y",
         "title" : "Proceedings of the Royal Society A",
         "sponsor" : "The Royal Society"
@@ -1112,7 +1112,7 @@
         "hidden" : "N",
         "submission" : "R",
         "issn" : "0962-8452",
-        "embargo" : "Y",
+        "embargo" : "N",
         "sponsor" : "The Royal Society",
         "title" : "Proceedings of the Royal Society B"
      },
@@ -1121,7 +1121,7 @@
         "submission" : "R",
         "issn" : "2054-5703",
         "embargo" : "N",
-        "hidden" : "Y",
+        "hidden" : "N",
         "title" : "Royal Society Open Science",
         "sponsor" : "The Royal Society"
      },
