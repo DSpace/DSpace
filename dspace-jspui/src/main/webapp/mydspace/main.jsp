@@ -46,6 +46,10 @@
 <%@page import="org.dspace.services.ConfigurationService"%>
 <%@page import="org.dspace.utils.DSpace"%>
 <%@page import="org.dspace.app.itemimport.BatchUpload"%>
+<%@page import="org.dspace.content.authority.ChoiceAuthorityManager"%>
+<%@page import="org.dspace.content.authority.Choices"%>
+<%@page import="org.dspace.content.authority.Choice"%>
+<%@page import="org.dspace.authority.AuthorityValueGenerator" %>
 
 <%
     EPerson user = (EPerson) request.getAttribute("mydspace.user");
@@ -82,8 +86,11 @@
     
     ConfigurationService configurationService = new DSpace().getConfigurationService();
     boolean crisEnabled = ConfigurationManager.getBooleanProperty("cris", "mydspace.enabled", "enabled");
-    boolean rpChangeStatusAdmin =  configurationService.getPropertyAsType("cris.rp.changestatus.admin", false);
 
+    boolean rpChangeStatusAdmin =  configurationService.getPropertyAsType("cris.rp.changestatus.admin", false);
+    Boolean activateSelfClaim = (Boolean)request.getAttribute("activate.user.selfclaim");
+    List<Choices> possibleUsersMatches = (List<Choices>)request.getAttribute("possible.users.matches");
+    
     if (crisEnabled)
     {
 %>
@@ -149,7 +156,7 @@
         	                                       	   j('#h2-cris-rp-status').hide();
 		                                               j('#h2-cris-rp-status-active').show();
 		                                           <%}%>
-                                                               
+                                       	   			j('#cris-rp-choice').hide();
                                                }
                                                else if (data.myrp.url != null && !data.myrp.active)
                                                {
@@ -161,12 +168,13 @@
                                              	   	   j('#h2-cris-rp-status').hide();
                                                	   	   j('#h2-cris-rp-status-inactive').show();
                                                     <%}%>
-                                                       
+                                  	   			    j('#cris-rp-choice').hide();
                                                }
                                                else
                                                {
                                             	   j(".cris-rp-status").hide();
                                             	   j('#h2-cris-rp-status-undefined').show();
+                                            	   j('#cris-rp-choice').show();
                                                }
                                        }
                        });
@@ -216,15 +224,79 @@
         	<a href="#" class="cris-rp-status-inactive" data-toggle="modal" data-target="#cris-rp-change-admin"><span class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.rp-status-inactive"/></span>
         	<span class="fa fa-edit"></span></a>
         </h2>
+
+		<!-- No researcher profile available for the currently logged in user, so show a suggestion list or ask him to create an RP -->
         <h2 id="h2-cris-rp-status-undefined" class="cris-rp-status" style="display:none;">
-        	<fmt:message key="jsp.mydspace.cris.rp-status-label"/> 
-        	<a href="#" class="cris-rp-status-undefined" data-toggle="modal" data-target="#cris-rp-change-undefined"><span class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.rp-status-undefined"/></span>
-        	<span class="fa fa-edit"></span></a>
-        </h2>                                                                
-     
-<%        
-	}
- %>
+        	<fmt:message key="jsp.mydspace.cris.rp-status-label"/>
+           <fmt:message key="jsp.mydspace.cris.rp-status-undefined"/></h2>
+
+<div id="cris-rp-choice" class="panel-group" style="display:none;">
+    <div class="panel panel-default">
+
+	  <div class="panel-heading">
+        <h4 class="panel-title">
+          <a data-toggle="collapse" href="#collapseMatchRP"><fmt:message key="jsp.mydspace.cris.suggested-rps.button"/></a>
+        </h4>
+      </div>
+      <div id="collapseMatchRP" class="panel-collapse collapse in">
+        <div class="panel-body">
+			<ul class="list-group">
+<%
+    int idxUsersMatches = 0;
+	int suggestions = 0;
+	for(Choices possibleUsersMatch : possibleUsersMatches) {
+	
+        if (possibleUsersMatch!=null && possibleUsersMatch.values!=null && possibleUsersMatch.values.length > 0) {
+	        
+	        for (int i = 0; i < possibleUsersMatch.values.length; ++i)
+	        {
+	            Choice mdav = possibleUsersMatch.values[i];
+	            if (mdav.authority != null) {
+	                 if (!mdav.authority.startsWith(AuthorityValueGenerator.GENERATE)) {
+	                    suggestions++;
+%>
+	                    <li class="list-group-item"><a href="<%= request.getContextPath() %>/cris/rp/<%= mdav.authority %>">
+	                        <fmt:message key="jsp.mydspace.cris.suggested-rp">
+	                        	<fmt:param value="<%= mdav.value %>"/>
+	                        	<fmt:param value="<%= mdav.authority %>"/>
+	                        </fmt:message>
+	                    </a>
+	                    </li>
+	                <% }
+	            } 
+	     	}
+%>
+				</ul>
+<%
+		}
+
+        idxUsersMatches++;
+	}	    
+%>  	
+<% 		if (suggestions == 0) {
+%>
+            <fmt:message key="jsp.mydspace.cris.no-suggested-rps"/><br/>
+<%
+        } else { 
+%>
+   			<fmt:message key="jsp.mydspace.cris.yes-suggested-rps"/><br/>
+<%        	
+        }
+%>	 
+		</div>
+        <div class="panel-footer">
+       	<a href="#" class="cris-rp-status-undefined" data-toggle="modal" data-target="#cris-rp-change-undefined">
+       	<span class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.create-new-rp"/></span>
+       	<span class="fa fa-edit"></span></a>
+		</div>
+    </div>
+  </div>
+ </div>
+<br/>	
+<%
+} 
+%>        		
+        	 
 		    <form action="<%= request.getContextPath() %>/mydspace" method="post">
 		        <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>" />
                 <input class="btn btn-success" type="submit" name="submit_new" value="<fmt:message key="jsp.mydspace.main.start.button"/>" />

@@ -37,7 +37,7 @@
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
 
     // Is the logged in user an admin
-    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    Boolean admin = (Boolean)request.getAttribute("isAdmin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
     boolean changeStatusAdmin = ConfigurationManager.getBooleanProperty("cris","rp.changestatus.admin");
 %>

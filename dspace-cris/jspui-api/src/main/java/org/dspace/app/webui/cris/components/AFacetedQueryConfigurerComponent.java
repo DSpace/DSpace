@@ -246,7 +246,9 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
         }
         catch (Exception ex)
         {
-            log.error(ex.getMessage(), ex);
+            if(log.isDebugEnabled()) {
+                log.error(ex.getMessage(), ex);
+            }
         }
         return -1;
     }

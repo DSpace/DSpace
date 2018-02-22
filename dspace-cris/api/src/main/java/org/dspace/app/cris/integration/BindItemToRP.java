@@ -210,7 +210,7 @@ public class BindItemToRP
         return result;
     }
 
-    private static List<MetadataField> metadataFieldWithAuthorityRP(
+    public static List<MetadataField> metadataFieldWithAuthorityRP(
             Context context) throws SQLException
     {
         // find all metadata with authority support

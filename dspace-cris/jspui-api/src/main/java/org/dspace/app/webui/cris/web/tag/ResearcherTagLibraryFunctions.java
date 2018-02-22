@@ -7,22 +7,6 @@
  */
 package org.dspace.app.webui.cris.web.tag;
 
-import it.cilea.osd.jdyna.components.IBeanSubComponent;
-import it.cilea.osd.jdyna.components.IComponent;
-import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
-import it.cilea.osd.jdyna.model.ADecoratorTypeDefinition;
-import it.cilea.osd.jdyna.model.ANestedObject;
-import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
-import it.cilea.osd.jdyna.model.ATypeNestedObject;
-import it.cilea.osd.jdyna.model.AWidget;
-import it.cilea.osd.jdyna.model.AccessLevelConstants;
-import it.cilea.osd.jdyna.model.AnagraficaSupport;
-import it.cilea.osd.jdyna.model.Containable;
-import it.cilea.osd.jdyna.model.IContainable;
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
-import it.cilea.osd.jdyna.model.Property;
-import it.cilea.osd.jdyna.web.Box;
-
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -51,6 +35,9 @@ import org.dspace.app.cris.model.jdyna.BoxDynamicObject;
 import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.BoxProject;
 import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
+import org.dspace.app.cris.model.jdyna.DecoratorDynamicPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.DecoratorOUPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.DecoratorProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DecoratorRPTypeNested;
 import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
@@ -68,6 +55,22 @@ import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.cris.dto.AllMonthsStatsDTO;
 import org.dspace.core.ConfigurationManager;
+
+import it.cilea.osd.jdyna.components.IBeanSubComponent;
+import it.cilea.osd.jdyna.components.IComponent;
+import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ADecoratorTypeDefinition;
+import it.cilea.osd.jdyna.model.ANestedObject;
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
+import it.cilea.osd.jdyna.model.AWidget;
+import it.cilea.osd.jdyna.model.AccessLevelConstants;
+import it.cilea.osd.jdyna.model.AnagraficaSupport;
+import it.cilea.osd.jdyna.model.Containable;
+import it.cilea.osd.jdyna.model.IContainable;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.model.Property;
+import it.cilea.osd.jdyna.web.Box;
 
 public class ResearcherTagLibraryFunctions
 {
@@ -900,11 +903,67 @@ public class ResearcherTagLibraryFunctions
         return null;
     }
     
-    public static Object getPropertyDefinitionI18N(Object pd, String locale) {
+    public static Object getPropertyDefinitionI18N(Object pd, String locale) {        
     	if (pd instanceof PropertiesDefinition) {
+    	    if(pd instanceof RPPropertiesDefinition) {
+    	        String shortname = ((RPPropertiesDefinition) pd).getShortName()+"_"+locale;
+    	        RPPropertiesDefinition pdLocalized = applicationService.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, shortname);
+    	        if(pdLocalized!=null) {
+    	            return PropertyDefintionI18NWrapper.getWrapper(pdLocalized, locale);
+    	        }
+    	    }
+            if(pd instanceof ProjectPropertiesDefinition) {
+                String shortname = ((ProjectPropertiesDefinition) pd).getShortName()+"_"+locale;
+                ProjectPropertiesDefinition pdLocalized = applicationService.findPropertiesDefinitionByShortName(ProjectPropertiesDefinition.class, shortname);
+                if(pdLocalized!=null) {
+                    return PropertyDefintionI18NWrapper.getWrapper(pdLocalized, locale);
+                }
+            }
+            if(pd instanceof OUPropertiesDefinition) {
+                String shortname = ((OUPropertiesDefinition) pd).getShortName()+"_"+locale;
+                OUPropertiesDefinition pdLocalized = applicationService.findPropertiesDefinitionByShortName(OUPropertiesDefinition.class, shortname);
+                if(pdLocalized!=null) {
+                    return PropertyDefintionI18NWrapper.getWrapper(pdLocalized, locale);
+                }
+            }
+            if(pd instanceof DynamicPropertiesDefinition) {
+                String shortname = ((DynamicPropertiesDefinition) pd).getShortName()+"_"+locale;
+                DynamicPropertiesDefinition pdLocalized = applicationService.findPropertiesDefinitionByShortName(DynamicPropertiesDefinition.class, shortname);
+                if(pdLocalized!=null) {
+                    return PropertyDefintionI18NWrapper.getWrapper(pdLocalized, locale);
+                }
+            }            
     		return PropertyDefintionI18NWrapper.getWrapper((PropertiesDefinition) pd, locale);
     	}
     	else if (pd instanceof ADecoratorPropertiesDefinition) {
+            if(pd instanceof DecoratorRPPropertiesDefinition) {
+                String shortname = ((DecoratorRPPropertiesDefinition)pd).getShortName()+"_"+locale;
+                DecoratorRPPropertiesDefinition pdLocalized = (DecoratorRPPropertiesDefinition)applicationService.findContainableByDecorable(DecoratorRPPropertiesDefinition.class, shortname);
+                if(pdLocalized!=null) {
+                    return PropertyDefintionI18NWrapper.getWrapper(pdLocalized, locale);
+                }
+            }
+            if(pd instanceof DecoratorProjectPropertiesDefinition) {
+                String shortname = ((DecoratorProjectPropertiesDefinition) pd).getShortName()+"_"+locale;
+                DecoratorProjectPropertiesDefinition pdLocalized = (DecoratorProjectPropertiesDefinition)applicationService.findContainableByDecorable(DecoratorProjectPropertiesDefinition.class, shortname);
+                if(pdLocalized!=null) {
+                    return PropertyDefintionI18NWrapper.getWrapper(pdLocalized, locale);
+                }
+            }
+            if(pd instanceof DecoratorOUPropertiesDefinition) {
+                String shortname = ((DecoratorOUPropertiesDefinition) pd).getShortName()+"_"+locale;
+                DecoratorOUPropertiesDefinition pdLocalized = (DecoratorOUPropertiesDefinition)applicationService.findContainableByDecorable(DecoratorOUPropertiesDefinition.class, shortname);
+                if(pdLocalized!=null) {
+                    return PropertyDefintionI18NWrapper.getWrapper(pdLocalized, locale);
+                }
+            }
+            if(pd instanceof DecoratorDynamicPropertiesDefinition) {
+                String shortname = ((DecoratorDynamicPropertiesDefinition) pd).getShortName()+"_"+locale;
+                DecoratorDynamicPropertiesDefinition pdLocalized = (DecoratorDynamicPropertiesDefinition)applicationService.findContainableByDecorable(DecoratorDynamicPropertiesDefinition.class, shortname);
+                if(pdLocalized!=null) {
+                    return PropertyDefintionI18NWrapper.getWrapper(pdLocalized, locale);
+                }
+            }   
     		return PropertyDefintionI18NWrapper.getWrapper((ADecoratorPropertiesDefinition) pd, locale);
     	} 
     	return pd;

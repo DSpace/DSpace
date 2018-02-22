@@ -22,32 +22,34 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.itemexport.ItemExport;
 import org.dspace.app.itemexport.ItemExportException;
 import org.dspace.app.itemimport.BTEBatchImportService;
 import org.dspace.app.itemimport.BatchUpload;
 import org.dspace.app.itemimport.ItemImport;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EPersonCRISIntegration;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.util.ItemUtils;
 import org.dspace.utils.DSpace;
@@ -846,6 +848,24 @@ public class MyDSpaceServlet extends DSpaceServlet
         log.info(LogManager.getHeader(context, "view_mydspace", ""));
         EPerson currentUser = context.getCurrentUser();
 
+        //search for authority matches to show list of CRIS entity that match the fullname/lastname of the current user
+        EPersonCRISIntegration plugin = (EPersonCRISIntegration) PluginManager
+                .getSinglePlugin(org.dspace.content.EPersonCRISIntegration.class);
+        List<Choices> choices = plugin.getMatches(context, request, currentUser);
+        
+        boolean selfClaim = false;
+        String nameGroupSelfClaim = ConfigurationManager.getProperty("cris",
+                "rp.claim.group.name");
+        if (StringUtils.isNotBlank(nameGroupSelfClaim))
+        {
+            Group selfClaimGroup = Group.findByName(context,
+                    nameGroupSelfClaim);
+            if (Group.isMember(context, selfClaimGroup.getID()))
+            {
+                selfClaim = true;
+            }
+        }
+        
         // FIXME: WorkflowManager should return arrays
         List<WorkflowItem> ownedList = WorkflowManager.getOwnedTasks(context, currentUser);
         WorkflowItem[] owned = ownedList.toArray(new WorkflowItem[ownedList.size()]);
@@ -898,7 +918,8 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("supervised.items", supervisedItems);
         request.setAttribute("export.archives", exportArchives);
         request.setAttribute("import.uploads", importUploads);
-
+        request.setAttribute("possible.users.matches", choices);
+        request.setAttribute("activate.user.selfclaim", selfClaim);
         // Forward to main mydspace page
         JSPManager.showJSP(request, response, "/mydspace/main.jsp");
     }

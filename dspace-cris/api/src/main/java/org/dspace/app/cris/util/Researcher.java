@@ -7,10 +7,15 @@
  */
 package org.dspace.app.cris.util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
 import org.dspace.app.cris.discovery.CrisSearchService;
+import org.dspace.app.cris.integration.BindItemToRP;
 import org.dspace.app.cris.integration.CrisComponentsService;
 import org.dspace.app.cris.integration.ICRISComponent;
 import org.dspace.app.cris.integration.statistics.CrisStatComponentsService;
@@ -23,6 +28,13 @@ import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.statistics.service.StatSubscribeService;
 import org.dspace.content.EPersonCRISIntegration;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choices;
+import org.dspace.core.Context;
+import org.dspace.core.Utils;
+import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
 import org.hibernate.SessionFactory;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
@@ -30,6 +42,8 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 public class Researcher implements EPersonCRISIntegration
 {
     DSpace dspace = new DSpace();
+    
+    private static Logger log = Logger.getLogger(Researcher.class);
 
     public Researcher()
     {
@@ -215,5 +229,46 @@ public class Researcher implements EPersonCRISIntegration
             return null;
         }
         return compService;
+    }
+
+    @Override
+    public List<Choices> getMatches(Context context, HttpServletRequest request,
+            EPerson eperson)
+    {
+        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+
+        List<MetadataField> fields;
+        List<Choices> results = new ArrayList<Choices>();
+        try
+        {
+            
+            Choices result = null;
+            fields = BindItemToRP.metadataFieldWithAuthorityRP(context);
+
+            String query = eperson.getFullName();
+
+            for (MetadataField field : fields)
+            {
+                String ff = Utils.standardize(MetadataSchema.find(context, field.getSchemaID()).getName(),field.getElement(), field.getQualifier(), "_");
+                result = cam.getMatches(ff, query, 1, 0, 10, null);
+
+                if (result.values == null || (result.values != null
+                        && result.values.length == 0))
+                {
+                    query = eperson.getLastName();
+                    result = cam.getMatches(ff, query, 1, 0, 10, null);
+                }
+                
+                if (result.values != null && result.values.length > 0) 
+                {
+                    results.add(result);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            log.warn(e.getMessage());
+        }
+        return results;
     }
 }
