@@ -20,13 +20,12 @@ import org.springframework.stereotype.Component;
 /**
  * This class' purpose is to create a SearchConfigurationRest object from the DiscoveryConfiguration to be given
  * to the convert method.
- *
  */
 @Component
 public class DiscoverConfigurationConverter {
-    public SearchConfigurationRest convert(DiscoveryConfiguration configuration){
+    public SearchConfigurationRest convert(DiscoveryConfiguration configuration) {
         SearchConfigurationRest searchConfigurationRest = new SearchConfigurationRest();
-        if(configuration != null){
+        if (configuration != null) {
             addSearchFilters(searchConfigurationRest, configuration.getSearchFilters());
             addSortOptions(searchConfigurationRest, configuration.getSearchSortConfiguration());
             setDefaultSortOption(configuration, searchConfigurationRest);
@@ -34,11 +33,14 @@ public class DiscoverConfigurationConverter {
         return searchConfigurationRest;
     }
 
-    private void setDefaultSortOption(DiscoveryConfiguration configuration, SearchConfigurationRest searchConfigurationRest) {
+    private void setDefaultSortOption(DiscoveryConfiguration configuration,
+                                      SearchConfigurationRest searchConfigurationRest) {
         String defaultSort = configuration.getSearchSortConfiguration().SCORE;
-        if(configuration.getSearchSortConfiguration() != null){
-            DiscoverySortFieldConfiguration discoverySortFieldConfiguration = configuration.getSearchSortConfiguration().getSortFieldConfiguration(defaultSort);
-            if(discoverySortFieldConfiguration != null){
+        if (configuration.getSearchSortConfiguration() != null) {
+            DiscoverySortFieldConfiguration discoverySortFieldConfiguration = configuration.getSearchSortConfiguration()
+                                                                                           .getSortFieldConfiguration(
+                                                                                               defaultSort);
+            if (discoverySortFieldConfiguration != null) {
                 SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
                 sortOption.setName(discoverySortFieldConfiguration.getMetadataField());
                 sortOption.setActualName(discoverySortFieldConfiguration.getType());
@@ -48,18 +50,21 @@ public class DiscoverConfigurationConverter {
     }
 
 
-    public void addSearchFilters(SearchConfigurationRest searchConfigurationRest, List<DiscoverySearchFilter> searchFilterList){
-            for(DiscoverySearchFilter discoverySearchFilter : CollectionUtils.emptyIfNull(searchFilterList)){
-                SearchConfigurationRest.Filter filter = new SearchConfigurationRest.Filter();
-                filter.setFilter(discoverySearchFilter.getIndexFieldName());
-                filter.addDefaultOperatorsToList();
-                searchConfigurationRest.addFilter(filter);
-            }
+    public void addSearchFilters(SearchConfigurationRest searchConfigurationRest,
+                                 List<DiscoverySearchFilter> searchFilterList) {
+        for (DiscoverySearchFilter discoverySearchFilter : CollectionUtils.emptyIfNull(searchFilterList)) {
+            SearchConfigurationRest.Filter filter = new SearchConfigurationRest.Filter();
+            filter.setFilter(discoverySearchFilter.getIndexFieldName());
+            filter.addDefaultOperatorsToList();
+            searchConfigurationRest.addFilter(filter);
+        }
     }
 
-    private void addSortOptions(SearchConfigurationRest searchConfigurationRest, DiscoverySortConfiguration searchSortConfiguration) {
-        if(searchSortConfiguration!=null){
-            for(DiscoverySortFieldConfiguration discoverySearchSortConfiguration : CollectionUtils.emptyIfNull(searchSortConfiguration.getSortFields())){
+    private void addSortOptions(SearchConfigurationRest searchConfigurationRest,
+                                DiscoverySortConfiguration searchSortConfiguration) {
+        if (searchSortConfiguration != null) {
+            for (DiscoverySortFieldConfiguration discoverySearchSortConfiguration : CollectionUtils
+                .emptyIfNull(searchSortConfiguration.getSortFields())) {
                 SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
                 sortOption.setName(discoverySearchSortConfiguration.getMetadataField());
                 sortOption.setActualName(discoverySearchSortConfiguration.getType());

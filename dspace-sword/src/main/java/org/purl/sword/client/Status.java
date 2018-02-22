@@ -8,59 +8,54 @@
 package org.purl.sword.client;
 
 /**
- * Representation of the status code and message. 
- * 
+ * Representation of the status code and message.
+ *
  * @author Neil Taylor
  */
-public class Status 
-{
+public class Status {
     /**
-     * The status code. 
+     * The status code.
      */
-    private int code; 
-    
+    private int code;
+
     /**
-     * The status message. 
+     * The status message.
      */
-    private String message; 
-    
+    private String message;
+
     /**
-     * Create a new status message. 
-     * 
-     * @param code    The code. 
-     * @param message The message. 
+     * Create a new status message.
+     *
+     * @param code    The code.
+     * @param message The message.
      */
-    public Status( int code, String message)
-    {
+    public Status(int code, String message) {
         this.code = code;
         this.message = message;
     }
-    
+
     /**
-     * Retrieve the code. 
-     * 
-     * @return The code. 
+     * Retrieve the code.
+     *
+     * @return The code.
      */
-    public int getCode( )
-    {
-        return code; 
+    public int getCode() {
+        return code;
     }
-    
+
     /**
      * Get the message.
-     *  
-     * @return The message. 
+     *
+     * @return The message.
      */
-    public String getMessage()
-    {
-        return message; 
+    public String getMessage() {
+        return message;
     }
-    
+
     /**
-     * Get a string representation of the status. 
+     * Get a string representation of the status.
      */
-    public String toString()
-    {
-        return "Code: " + code + ", Message: '" + message + "'";   
+    public String toString() {
+        return "Code: " + code + ", Message: '" + message + "'";
     }
 }

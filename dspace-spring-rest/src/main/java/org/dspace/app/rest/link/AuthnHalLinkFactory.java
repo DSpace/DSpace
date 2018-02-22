@@ -22,20 +22,20 @@ import org.springframework.stereotype.Component;
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  */
 @Component
-public class AuthnHalLinkFactory extends HalLinkFactory<AuthnResource,AuthenticationRestController> {
+public class AuthnHalLinkFactory extends HalLinkFactory<AuthnResource, AuthenticationRestController> {
 
     @Override
     protected void addLinks(AuthnResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
         AuthenticationRestController methodOn = getMethodOn();
 
         list.add(buildLink("login", methodOn
-                .login(null, null,  null)));
+            .login(null, null, null)));
 
         list.add(buildLink("logout", methodOn
-                .logout()));
+            .logout()));
 
         list.add(buildLink("status", methodOn
-                .status(null)));
+            .status(null)));
     }
 
     @Override

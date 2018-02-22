@@ -32,7 +32,7 @@ public class RESTSpringLoader implements SpringLoader {
 
 
         try {
-            return new String[]{new File(filePath.toString()).toURI().toURL().toString() + XML_SUFFIX};
+            return new String[] {new File(filePath.toString()).toURI().toURL().toString() + XML_SUFFIX};
         } catch (MalformedURLException e) {
             return new String[0];
         }

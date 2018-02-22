@@ -21,57 +21,56 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the converter from/to the Bitstream in the DSpace API data model and the REST data model
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
 public class BitstreamConverter
-		extends DSpaceObjectConverter<org.dspace.content.Bitstream, org.dspace.app.rest.model.BitstreamRest> {
-	@Autowired(required = true)
-	BitstreamFormatConverter bfConverter;
+    extends DSpaceObjectConverter<org.dspace.content.Bitstream, org.dspace.app.rest.model.BitstreamRest> {
+    @Autowired(required = true)
+    BitstreamFormatConverter bfConverter;
 
-	@Override
-	public org.dspace.content.Bitstream toModel(org.dspace.app.rest.model.BitstreamRest obj) {
-		return super.toModel(obj);
-	}
+    @Override
+    public org.dspace.content.Bitstream toModel(org.dspace.app.rest.model.BitstreamRest obj) {
+        return super.toModel(obj);
+    }
 
-	@Override
-	public BitstreamRest fromModel(org.dspace.content.Bitstream obj) {
-		BitstreamRest b = super.fromModel(obj);
-		List<Bundle> bundles = null;
-		try {
-			bundles = obj.getBundles();
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		if (bundles != null && bundles.size() > 0) {
-			b.setBundleName(bundles.get(0).getName());
-		}
-		CheckSumRest checksum = new CheckSumRest();
-		checksum.setCheckSumAlgorithm(obj.getChecksumAlgorithm());
-		checksum.setValue(obj.getChecksum());
-		b.setCheckSum(checksum);
-		BitstreamFormatRest format = null;
-		try {
-			format = bfConverter.fromModel(obj.getFormat(null));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		b.setFormat(format);
-		b.setSizeBytes(obj.getSize());
-		return b;
-	}
+    @Override
+    public BitstreamRest fromModel(org.dspace.content.Bitstream obj) {
+        BitstreamRest b = super.fromModel(obj);
+        List<Bundle> bundles = null;
+        try {
+            bundles = obj.getBundles();
+        } catch (SQLException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        if (bundles != null && bundles.size() > 0) {
+            b.setBundleName(bundles.get(0).getName());
+        }
+        CheckSumRest checksum = new CheckSumRest();
+        checksum.setCheckSumAlgorithm(obj.getChecksumAlgorithm());
+        checksum.setValue(obj.getChecksum());
+        b.setCheckSum(checksum);
+        BitstreamFormatRest format = null;
+        try {
+            format = bfConverter.fromModel(obj.getFormat(null));
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        b.setFormat(format);
+        b.setSizeBytes(obj.getSize());
+        return b;
+    }
 
-	@Override
-	protected BitstreamRest newInstance() {
-		return new BitstreamRest();
-	}
+    @Override
+    protected BitstreamRest newInstance() {
+        return new BitstreamRest();
+    }
 
-	@Override
-	protected Class<Bitstream> getModelClass() {
-		return Bitstream.class;
-	}
+    @Override
+    protected Class<Bitstream> getModelClass() {
+        return Bitstream.class;
+    }
 }

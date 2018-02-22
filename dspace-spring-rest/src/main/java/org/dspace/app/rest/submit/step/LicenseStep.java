@@ -24,35 +24,40 @@ import org.dspace.services.model.Request;
 
 /**
  * License step for DSpace Spring Rest. Expose the license information about the in progress submission.
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class LicenseStep extends org.dspace.submit.step.LicenseStep implements AbstractRestProcessingStep {
 
-	private static final String DCTERMS_RIGHTSDATE = "dcterms.accessRights";
+    private static final String DCTERMS_RIGHTSDATE = "dcterms.accessRights";
 
-	@Override
-	public DataLicense getData(SubmissionService submissionService, WorkspaceItem obj, SubmissionStepConfig config) throws Exception {
-		DataLicense result = new DataLicense();
-		Bitstream bitstream = bitstreamService.getBitstreamByName(obj.getItem(), Constants.LICENSE_BUNDLE_NAME, Constants.LICENSE_BITSTREAM_NAME);
-		if(bitstream!=null) {
-			String acceptanceDate = bitstreamService.getMetadata(bitstream, DCTERMS_RIGHTSDATE);
-			result.setAcceptanceDate(acceptanceDate);
-			result.setUrl(configurationService.getProperty("dspace.url")+"/api/"+BitstreamRest.CATEGORY +"/"+ English.plural(BitstreamRest.NAME) + "/" + bitstream.getID() + "/content");
-			result.setGranted(true);
-		}
-		return result;
-	}
+    @Override
+    public DataLicense getData(SubmissionService submissionService, WorkspaceItem obj, SubmissionStepConfig config)
+        throws Exception {
+        DataLicense result = new DataLicense();
+        Bitstream bitstream = bitstreamService
+            .getBitstreamByName(obj.getItem(), Constants.LICENSE_BUNDLE_NAME, Constants.LICENSE_BITSTREAM_NAME);
+        if (bitstream != null) {
+            String acceptanceDate = bitstreamService.getMetadata(bitstream, DCTERMS_RIGHTSDATE);
+            result.setAcceptanceDate(acceptanceDate);
+            result.setUrl(
+                configurationService.getProperty("dspace.url") + "/api/" + BitstreamRest.CATEGORY + "/" + English
+                    .plural(BitstreamRest.NAME) + "/" + bitstream.getID() + "/content");
+            result.setGranted(true);
+        }
+        return result;
+    }
 
-	@Override
-	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, Operation op) throws Exception {
-        
-		if(op.getPath().endsWith(LICENSE_STEP_OPERATION_ENTRY)) {
-			
-			PatchOperation<String> patchOperation = new PatchOperationFactory().instanceOf(LICENSE_STEP_OPERATION_ENTRY, op.getOp());
-			patchOperation.perform(context, currentRequest, source, op);
-				
-		}
-	}
+    @Override
+    public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, Operation op)
+        throws Exception {
+
+        if (op.getPath().endsWith(LICENSE_STEP_OPERATION_ENTRY)) {
+
+            PatchOperation<String> patchOperation = new PatchOperationFactory()
+                .instanceOf(LICENSE_STEP_OPERATION_ENTRY, op.getOp());
+            patchOperation.perform(context, currentRequest, source, op);
+
+        }
+    }
 }

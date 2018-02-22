@@ -46,7 +46,7 @@ public class MockSolrServer {
 
     protected void initSolrServer() throws Exception {
         solrServer = loadedCores.get(coreName);
-        if(solrServer == null) {
+        if (solrServer == null) {
             solrServer = initSolrServerForCore(coreName);
         }
 
@@ -56,7 +56,7 @@ public class MockSolrServer {
 
     private static synchronized SolrServer initSolrServerForCore(final String coreName) {
         SolrServer server = loadedCores.get(coreName);
-        if(server == null) {
+        if (server == null) {
             initSolrContainer();
 
             server = new EmbeddedSolrServer(container, coreName);
@@ -76,23 +76,23 @@ public class MockSolrServer {
     }
 
     public void destroy() throws Exception {
-        if(solrServer != null) {
+        if (solrServer != null) {
             long remainingUsers = usersPerCore.get(coreName).decrementAndGet();
-            if(remainingUsers <= 0) {
+            if (remainingUsers <= 0) {
                 solrServer.shutdown();
                 usersPerCore.remove(coreName);
                 loadedCores.remove(coreName);
                 log.info("SOLR Server for core " + coreName + " destroyed");
             }
 
-            if(usersPerCore.isEmpty()) {
+            if (usersPerCore.isEmpty()) {
                 destroyContainer();
             }
         }
     }
 
     private static synchronized void initSolrContainer() {
-        if(container == null) {
+        if (container == null) {
             String solrDir = AbstractDSpaceIntegrationTest.getDspaceDir() + File.separator + "solr";
             log.info("Initializing SOLR CoreContainer with directory " + solrDir);
             container = new CoreContainer(solrDir);

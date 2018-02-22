@@ -7,14 +7,14 @@
  */
 package org.dspace.app.util.service;
 
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-import org.w3c.dom.Document;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
+import org.w3c.dom.Document;
 
 /**
  * Utility Class with static methods for producing OpenSearch-compliant search results,
@@ -31,7 +31,6 @@ import java.util.Map;
  * </p>
  *
  * @author Richard Rodgers
- *
  */
 public interface OpenSearchService {
 
@@ -71,39 +70,42 @@ public interface OpenSearchService {
     /**
      * Returns a formatted set of search results as a string
      *
-     * @param context DSpace Context
-     * @param format results format - html, rss or atom
-     * @param query - the search query
+     * @param context      DSpace Context
+     * @param format       results format - html, rss or atom
+     * @param query        - the search query
      * @param totalResults - the hit count
-     * @param start - start result index
-     * @param pageSize - page size
-     * @param scope - search scope, null or community/collection handle
-     * @param results the retreived DSpace objects satisfying search
-     * @param labels labels to apply - format specific
+     * @param start        - start result index
+     * @param pageSize     - page size
+     * @param scope        - search scope, null or community/collection handle
+     * @param results      the retreived DSpace objects satisfying search
+     * @param labels       labels to apply - format specific
      * @return formatted search results
      * @throws IOException if IO error
      */
-    public String getResultsString(Context context, String format, String query, int totalResults, int start, int pageSize,
-                                          DSpaceObject scope, List<DSpaceObject> results,
-                                          Map<String, String> labels) throws IOException;
+    public String getResultsString(Context context, String format, String query, int totalResults, int start,
+                                   int pageSize,
+                                   DSpaceObject scope, List<DSpaceObject> results,
+                                   Map<String, String> labels) throws IOException;
+
     /**
      * Returns a formatted set of search results as a document
      *
-     * @param context DSpace Context
-     * @param format results format - html, rss or atom
-     * @param query - the search query
+     * @param context      DSpace Context
+     * @param format       results format - html, rss or atom
+     * @param query        - the search query
      * @param totalResults - the hit count
-     * @param start - start result index
-     * @param pageSize - page size
-     * @param scope - search scope, null or community/collection handle
-     * @param results the retreived DSpace objects satisfying search
-     * @param labels labels to apply - format specific
+     * @param start        - start result index
+     * @param pageSize     - page size
+     * @param scope        - search scope, null or community/collection handle
+     * @param results      the retreived DSpace objects satisfying search
+     * @param labels       labels to apply - format specific
      * @return formatted search results
      * @throws IOException if IO error
      */
-    public Document getResultsDoc(Context context, String format, String query, int totalResults, int start, int pageSize,
-                                         DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels)
-            throws IOException;
+    public Document getResultsDoc(Context context, String format, String query, int totalResults, int start,
+                                  int pageSize,
+                                  DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels)
+        throws IOException;
 
     public DSpaceObject resolveScope(Context context, String scope) throws SQLException;
 

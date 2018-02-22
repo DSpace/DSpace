@@ -19,50 +19,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Submission "replace" patch operation
- * 
- * {@link LicenseAddPatchOperation}
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * {@link LicenseAddPatchOperation}
+ *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class LicenseReplacePatchOperation extends ReplacePatchOperation<String> {
 
-	@Autowired
-	ItemService itemService;
+    @Autowired
+    ItemService itemService;
 
-	@Override
-	void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
-			throws Exception {
-		
-		Boolean grant = BooleanUtils.toBooleanObject((String)value);
-		
-		if(grant==null) {
-			throw new IllegalArgumentException("Value is not a valid boolean expression (permitted value: on/off, true/false and yes/no");
-		}
+    @Override
+    void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
+        throws Exception {
 
-		Item item = source.getItem();
-		EPerson submitter = context.getCurrentUser();
+        Boolean grant = BooleanUtils.toBooleanObject((String) value);
 
-		// remove any existing DSpace license (just in case the user
-		// accepted it previously)
-		itemService.removeDSpaceLicense(context, item);
+        if (grant == null) {
+            throw new IllegalArgumentException(
+                "Value is not a valid boolean expression (permitted value: on/off, true/false and yes/no");
+        }
 
-		if(grant) {
-			String license = LicenseUtils.getLicenseText(context.getCurrentLocale(), source.getCollection(), item,
-					submitter);
-	
-			LicenseUtils.grantLicense(context, item, license, null);
-		}
-	}
+        Item item = source.getItem();
+        EPerson submitter = context.getCurrentUser();
 
-	@Override
-	protected Class<String[]> getArrayClassForEvaluation() {
-		return String[].class;
-	}
+        // remove any existing DSpace license (just in case the user
+        // accepted it previously)
+        itemService.removeDSpaceLicense(context, item);
 
-	@Override
-	protected Class<String> getClassForEvaluation() {
-		return String.class;
-	}
+        if (grant) {
+            String license = LicenseUtils.getLicenseText(context.getCurrentLocale(), source.getCollection(), item,
+                                                         submitter);
+
+            LicenseUtils.grantLicense(context, item, license, null);
+        }
+    }
+
+    @Override
+    protected Class<String[]> getArrayClassForEvaluation() {
+        return String[].class;
+    }
+
+    @Override
+    protected Class<String> getClassForEvaluation() {
+        return String.class;
+    }
 
 }

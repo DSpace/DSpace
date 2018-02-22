@@ -24,53 +24,52 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Submission "move" PATCH operation.
  *
  * See {@link ItemMetadataValueMovePatchOperation}
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class BitstreamMetadataValueMovePatchOperation extends MetadataValueMovePatchOperation<Bitstream> {
 
-	@Autowired
-	BitstreamService bitstreamService;
+    @Autowired
+    BitstreamService bitstreamService;
 
-	@Autowired
-	ItemService itemService;
+    @Autowired
+    ItemService itemService;
 
-	@Override
-	void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
-			throws Exception {
-		//"path": "/sections/upload/files/0/metadata/dc.title/2"
-		//"abspath": "/files/0/metadata/dc.title/2"
-		String[] splitTo = getAbsolutePath(path).split("/");
-		Item item = source.getItem();
-		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
-		for (Bundle bb : bundle) {
-			int idx = 0;
-			for (Bitstream b : bb.getBitstreams()) {
-				if (idx == Integer.parseInt(splitTo[1])) {
+    @Override
+    void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
+        throws Exception {
+        //"path": "/sections/upload/files/0/metadata/dc.title/2"
+        //"abspath": "/files/0/metadata/dc.title/2"
+        String[] splitTo = getAbsolutePath(path).split("/");
+        Item item = source.getItem();
+        List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
+        for (Bundle bb : bundle) {
+            int idx = 0;
+            for (Bitstream b : bb.getBitstreams()) {
+                if (idx == Integer.parseInt(splitTo[1])) {
 
-					String evalFrom = getAbsolutePath(from);			
-					String[] splitFrom = evalFrom.split("/");
-					String metadata = splitFrom[3];
+                    String evalFrom = getAbsolutePath(from);
+                    String[] splitFrom = evalFrom.split("/");
+                    String metadata = splitFrom[3];
 
-					if (splitTo.length > 4) {
-						String stringTo = splitTo[4];
-						if (splitFrom.length > 4) {
-							String stringFrom = splitFrom[4];
+                    if (splitTo.length > 4) {
+                        String stringTo = splitTo[4];
+                        if (splitFrom.length > 4) {
+                            String stringFrom = splitFrom[4];
 
-							int intTo = Integer.parseInt(stringTo);
-							int intFrom = Integer.parseInt(stringFrom);
-							moveValue(context, b, metadata, intFrom, intTo);
-						}
-					}
-				}
-			}
-		}
-	}
+                            int intTo = Integer.parseInt(stringTo);
+                            int intFrom = Integer.parseInt(stringFrom);
+                            moveValue(context, b, metadata, intFrom, intTo);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-	@Override
-	protected BitstreamService getDSpaceObjectService() {
-		return bitstreamService;
-	}
+    @Override
+    protected BitstreamService getDSpaceObjectService() {
+        return bitstreamService;
+    }
 
 }

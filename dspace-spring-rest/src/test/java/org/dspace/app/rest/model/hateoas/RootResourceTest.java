@@ -22,25 +22,25 @@ public class RootResourceTest {
     private RootRest rootRest;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         rootRest = new RootRest();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testConstructorWithNullThrowsException() throws Exception{
+    public void testConstructorWithNullThrowsException() throws Exception {
         RootResource rootResource = new RootResource(null);
     }
 
 
     @Test
-    public void testConstructorAndGetterWithProperDataAndObjectNotNull() throws Exception{
+    public void testConstructorAndGetterWithProperDataAndObjectNotNull() throws Exception {
         RootResource rootResource = new RootResource(rootRest);
         assertNotNull(rootResource);
         assertNotNull(rootResource.getContent());
     }
 
     @Test
-    public void testConstructorAndGetterWithProperDataAndProperDataReturned() throws Exception{
+    public void testConstructorAndGetterWithProperDataAndProperDataReturned() throws Exception {
         RootResource rootResource = new RootResource(rootRest);
         assertEquals(rootRest, rootResource.getContent());
     }

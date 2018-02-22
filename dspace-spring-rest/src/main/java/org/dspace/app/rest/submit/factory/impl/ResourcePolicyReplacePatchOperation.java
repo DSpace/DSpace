@@ -32,95 +32,96 @@ import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Submission "replace" operation to replace resource policies in the Bitstream
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class ResourcePolicyReplacePatchOperation extends ReplacePatchOperation<ResourcePolicyRest> {
 
-	@Autowired
-	BitstreamService bitstreamService;
+    @Autowired
+    BitstreamService bitstreamService;
 
-	@Autowired
-	ItemService itemService;
+    @Autowired
+    ItemService itemService;
 
-	@Autowired
-	AuthorizeService authorizeService;
-	@Autowired
-	ResourcePolicyService resourcePolicyService;
+    @Autowired
+    AuthorizeService authorizeService;
+    @Autowired
+    ResourcePolicyService resourcePolicyService;
 
-	@Autowired
-	GroupService groupService;
-	@Autowired
-	EPersonService epersonService;
+    @Autowired
+    GroupService groupService;
+    @Autowired
+    EPersonService epersonService;
 
-	@Override
-	void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
-			throws Exception {
-		// "path": "/sections/upload/files/0/accessConditions/0"
-		// "abspath": "/files/0/accessConditions/0"
-		String[] split = getAbsolutePath(path).split("/");
-		Item item = source.getItem();
+    @Override
+    void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
+        throws Exception {
+        // "path": "/sections/upload/files/0/accessConditions/0"
+        // "abspath": "/files/0/accessConditions/0"
+        String[] split = getAbsolutePath(path).split("/");
+        Item item = source.getItem();
 
-		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
-		;
-		for (Bundle bb : bundle) {
-			int idx = 0;
-			for (Bitstream b : bb.getBitstreams()) {
-				if (idx == Integer.parseInt(split[1])) {
-					List<ResourcePolicy> policies = authorizeService.findPoliciesByDSOAndType(context, b,
-							ResourcePolicy.TYPE_CUSTOM);
-					String rpIdx = split[3];
+        List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
+        ;
+        for (Bundle bb : bundle) {
+            int idx = 0;
+            for (Bitstream b : bb.getBitstreams()) {
+                if (idx == Integer.parseInt(split[1])) {
+                    List<ResourcePolicy> policies = authorizeService.findPoliciesByDSOAndType(context, b,
+                                                                                              ResourcePolicy
+                                                                                                  .TYPE_CUSTOM);
+                    String rpIdx = split[3];
 
-					int index = 0;
-					for (ResourcePolicy policy : policies) {
-						Integer toReplace = Integer.parseInt(rpIdx);
-						if (index == toReplace) {
-							b.getResourcePolicies().remove(policy);
-							break;
-						}
-						index++;
-					}
+                    int index = 0;
+                    for (ResourcePolicy policy : policies) {
+                        Integer toReplace = Integer.parseInt(rpIdx);
+                        if (index == toReplace) {
+                            b.getResourcePolicies().remove(policy);
+                            break;
+                        }
+                        index++;
+                    }
 
-					if (split.length == 4) {
-						ResourcePolicyRest newAccessCondition = evaluateSingleObject((LateObjectEvaluator) value);
-						String name = newAccessCondition.getName();
-						String description = newAccessCondition.getDescription();
+                    if (split.length == 4) {
+                        ResourcePolicyRest newAccessCondition = evaluateSingleObject((LateObjectEvaluator) value);
+                        String name = newAccessCondition.getName();
+                        String description = newAccessCondition.getDescription();
 
-						//TODO manage error on select group and eperson
-						Group group = null;
-						if(newAccessCondition.getGroupUUID()!=null) {
-							group = groupService.find(context, newAccessCondition.getGroupUUID());
-						}
-						EPerson eperson = null;
-						if(newAccessCondition.getEpersonUUID()!=null) {
-							eperson = epersonService.find(context, newAccessCondition.getEpersonUUID());
-						}
-						
-						Date startDate = newAccessCondition.getStartDate();
-						Date endDate = newAccessCondition.getEndDate();
-						authorizeService.createResourcePolicy(context, b, group, eperson, Constants.READ,
-								ResourcePolicy.TYPE_CUSTOM, name, description, startDate, endDate);
-						// TODO manage duplicate policy
-					} else {
-						// "path":
-						// "/sections/upload/files/0/accessConditions/0/startDate"
-						// TODO
-					}
-				}
-				idx++;
-			}
-		}
-	}
+                        //TODO manage error on select group and eperson
+                        Group group = null;
+                        if (newAccessCondition.getGroupUUID() != null) {
+                            group = groupService.find(context, newAccessCondition.getGroupUUID());
+                        }
+                        EPerson eperson = null;
+                        if (newAccessCondition.getEpersonUUID() != null) {
+                            eperson = epersonService.find(context, newAccessCondition.getEpersonUUID());
+                        }
 
-	@Override
-	protected Class<ResourcePolicyRest[]> getArrayClassForEvaluation() {
-		return ResourcePolicyRest[].class;
-	}
+                        Date startDate = newAccessCondition.getStartDate();
+                        Date endDate = newAccessCondition.getEndDate();
+                        authorizeService.createResourcePolicy(context, b, group, eperson, Constants.READ,
+                                                              ResourcePolicy.TYPE_CUSTOM, name, description, startDate,
+                                                              endDate);
+                        // TODO manage duplicate policy
+                    } else {
+                        // "path":
+                        // "/sections/upload/files/0/accessConditions/0/startDate"
+                        // TODO
+                    }
+                }
+                idx++;
+            }
+        }
+    }
 
-	@Override
-	protected Class<ResourcePolicyRest> getClassForEvaluation() {
-		return ResourcePolicyRest.class;
-	}
+    @Override
+    protected Class<ResourcePolicyRest[]> getArrayClassForEvaluation() {
+        return ResourcePolicyRest[].class;
+    }
+
+    @Override
+    protected Class<ResourcePolicyRest> getClassForEvaluation() {
+        return ResourcePolicyRest.class;
+    }
 
 }

@@ -11,15 +11,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A directly addressable REST resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public interface RestAddressableModel extends RestModel {
-	
-	@JsonIgnore
-	public String getCategory();
-	
-	@JsonIgnore
-	public Class getController();
+
+    @JsonIgnore
+    public String getCategory();
+
+    @JsonIgnore
+    public Class getController();
 }

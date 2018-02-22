@@ -13,16 +13,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * This is the exception to capture details about call to search endpoint over
  * not search enabled repositories
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "This repository doesn't provide search options")
 public class RepositorySearchNotFoundException extends RuntimeException {
-	String model;
+    String model;
 
-	public RepositorySearchNotFoundException(String model) {
-		this.model = model;
-	}
+    public RepositorySearchNotFoundException(String model) {
+        this.model = model;
+    }
 
 }

@@ -33,51 +33,53 @@ import org.dspace.eperson.EPerson;
  * class
  *
  * @author Richard Jones
- *
  */
-public class SwordContext
-{
-    /** The primary authenticated user for the request */
+public class SwordContext {
+    /**
+     * The primary authenticated user for the request
+     */
     private EPerson authenticated = null;
 
-    /** The onBehalfOf user for the request */
+    /**
+     * The onBehalfOf user for the request
+     */
     private EPerson onBehalfOf = null;
 
-    /** The primary context, representing the on behalf of user if exists, and the authenticated user if not */
+    /**
+     * The primary context, representing the on behalf of user if exists, and the authenticated user if not
+     */
     private Context context;
 
-    /** the context for the authenticated user, which may not, therefore, be the primary context also */
+    /**
+     * the context for the authenticated user, which may not, therefore, be the primary context also
+     */
     private Context authenticatorContext;
 
     /**
      * @return the authenticated user
      */
-    public EPerson getAuthenticated()
-    {
+    public EPerson getAuthenticated() {
         return authenticated;
     }
 
     /**
-     * @param authenticated    the eperson to set
+     * @param authenticated the eperson to set
      */
-    public void setAuthenticated(EPerson authenticated)
-    {
+    public void setAuthenticated(EPerson authenticated) {
         this.authenticated = authenticated;
     }
 
     /**
      * @return the onBehalfOf user
      */
-    public EPerson getOnBehalfOf()
-    {
+    public EPerson getOnBehalfOf() {
         return onBehalfOf;
     }
 
     /**
-     * @param onBehalfOf    the eperson to set
+     * @param onBehalfOf the eperson to set
      */
-    public void setOnBehalfOf(EPerson onBehalfOf)
-    {
+    public void setOnBehalfOf(EPerson onBehalfOf) {
         this.onBehalfOf = onBehalfOf;
     }
 
@@ -88,13 +90,11 @@ public class SwordContext
      *
      * @return appropriate DSpace context
      */
-    public Context getContext()
-    {
+    public Context getContext() {
         return context;
     }
 
-    public void setContext(Context context)
-    {
+    public void setContext(Context context) {
         this.context = context;
     }
 
@@ -109,13 +109,11 @@ public class SwordContext
      *
      * @return DSpace context of the user who authenticated
      */
-    public Context getAuthenticatorContext()
-    {
+    public Context getAuthenticatorContext() {
         return authenticatorContext;
     }
 
-    public void setAuthenticatorContext(Context authenticatorContext)
-    {
+    public void setAuthenticatorContext(Context authenticatorContext) {
         this.authenticatorContext = authenticatorContext;
     }
 
@@ -130,11 +128,9 @@ public class SwordContext
      *
      * @return DSpace context of the on-behalf-of user
      */
-    public Context getOnBehalfOfContext()
-    {
+    public Context getOnBehalfOfContext() {
         // return the obo context if this is an obo deposit, else return null
-        if (this.onBehalfOf != null)
-        {
+        if (this.onBehalfOf != null) {
             return context;
         }
         return null;
@@ -144,16 +140,13 @@ public class SwordContext
      * Abort all of the contexts held by this class.  No changes will
      * be written to the database
      */
-    public void abort()
-    {
+    public void abort() {
         // abort both contexts
-        if (context != null && context.isValid())
-        {
+        if (context != null && context.isValid()) {
             context.abort();
         }
 
-        if (authenticatorContext != null && authenticatorContext.isValid())
-        {
+        if (authenticatorContext != null && authenticatorContext.isValid()) {
             authenticatorContext.abort();
         }
     }
@@ -165,29 +158,22 @@ public class SwordContext
      * operations are flushed.  You should, in general, not try to commit the contexts directly
      * when using the sword api.
      *
-     * @throws DSpaceSwordException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSwordException can be thrown by the internals of the DSpace SWORD implementation
      */
     public void commit()
-            throws DSpaceSwordException
-    {
-        try
-        {
+        throws DSpaceSwordException {
+        try {
             // commit the primary context
-            if (context != null && context.isValid())
-            {
+            if (context != null && context.isValid()) {
                 context.complete();
             }
 
             // the secondary context is for filtering permissions by only, and is
             // never committed, so we abort here
-            if (authenticatorContext != null && authenticatorContext.isValid())
-            {
+            if (authenticatorContext != null && authenticatorContext.isValid()) {
                 authenticatorContext.abort();
             }
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw new DSpaceSwordException(e);
         }
     }

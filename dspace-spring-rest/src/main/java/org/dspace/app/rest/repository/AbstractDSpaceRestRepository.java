@@ -18,23 +18,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * This is the base class for any Rest Repository. It provides utility method to
  * access the DSpaceContext
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public abstract class AbstractDSpaceRestRepository {
 
-	@Autowired
-	protected Utils utils;
+    @Autowired
+    protected Utils utils;
 
-	protected RequestService requestService = new DSpace().getRequestService();
+    protected RequestService requestService = new DSpace().getRequestService();
 
-	protected Context obtainContext() {
-		Request currentRequest = requestService.getCurrentRequest();
-		return ContextUtil.obtainContext(currentRequest.getServletRequest());
-	}
+    protected Context obtainContext() {
+        Request currentRequest = requestService.getCurrentRequest();
+        return ContextUtil.obtainContext(currentRequest.getServletRequest());
+    }
 
-	public RequestService getRequestService() {
-		return requestService;
-	}
+    public RequestService getRequestService() {
+        return requestService;
+    }
 }

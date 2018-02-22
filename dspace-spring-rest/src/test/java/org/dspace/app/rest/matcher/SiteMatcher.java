@@ -7,23 +7,22 @@
  */
 package org.dspace.app.rest.matcher;
 
-import org.dspace.content.Site;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
+import org.dspace.content.Site;
+import org.hamcrest.Matcher;
+
 public class SiteMatcher {
 
-    public static Matcher<? super Object> matchEntry(Site site){
+    public static Matcher<? super Object> matchEntry(Site site) {
         return allOf(
-                hasJsonPath("$.uuid", is(site.getID().toString())),
-                hasJsonPath("$.name", is(site.getName())),
-                hasJsonPath("$.type", is("site")),
-                hasJsonPath("$._links.self.href", containsString("/api/core/sites/" + site.getID()))
+            hasJsonPath("$.uuid", is(site.getID().toString())),
+            hasJsonPath("$.name", is(site.getName())),
+            hasJsonPath("$.type", is("site")),
+            hasJsonPath("$._links.self.href", containsString("/api/core/sites/" + site.getID()))
 
         );
     }

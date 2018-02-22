@@ -9,26 +9,26 @@ package org.dspace.submit.step;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.InProgressSubmission;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.dspace.submit.AbstractProcessingStep;
 
-public class LicenseStep extends AbstractProcessingStep
-{
+public class LicenseStep extends AbstractProcessingStep {
 
-    /** log4j logger */
+    /**
+     * log4j logger
+     */
     private static Logger log = Logger.getLogger(LicenseStep.class);
 
-	@Override
-	public void doProcessing(Context context, Request req, InProgressSubmission wsi) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void doProcessing(Context context, Request req, InProgressSubmission wsi) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void doPostProcessing(Context context, Request obj, InProgressSubmission wsi) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    @Override
+    public void doPostProcessing(Context context, Request obj, InProgressSubmission wsi) {
+        // TODO Auto-generated method stub
+
+    }
 }

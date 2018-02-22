@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscoverSearchSupportConverter {
 
-    public SearchSupportRest convert(){
+    public SearchSupportRest convert() {
         return new SearchSupportRest();
     }
 }

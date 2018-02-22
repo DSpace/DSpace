@@ -56,9 +56,9 @@ public class WorkTitle {
     @Override
     public String toString() {
         return "WorkTitle{" +
-                "title='" + title + '\'' +
-                ", subtitle='" + subtitle + '\'' +
-                ", translatedTitles=" + translatedTitles +
-                '}';
+            "title='" + title + '\'' +
+            ", subtitle='" + subtitle + '\'' +
+            ", translatedTitles=" + translatedTitles +
+            '}';
     }
 }

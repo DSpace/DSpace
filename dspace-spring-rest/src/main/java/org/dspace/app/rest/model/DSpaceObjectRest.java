@@ -13,57 +13,56 @@ import org.dspace.app.rest.RestResourceController;
 
 /**
  * Base REST representation for all the DSpaceObjects
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
-	private String uuid;
+    private String uuid;
 
-	private String name;
-	private String handle;
+    private String name;
+    private String handle;
 
-	List<MetadataEntryRest> metadata;
+    List<MetadataEntryRest> metadata;
 
-	@Override
-	public String getId() {
-		return uuid;
-	}
+    @Override
+    public String getId() {
+        return uuid;
+    }
 
-	public String getUuid() {
-		return uuid;
-	}
+    public String getUuid() {
+        return uuid;
+    }
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getHandle() {
-		return handle;
-	}
+    public String getHandle() {
+        return handle;
+    }
 
-	public void setHandle(String handle) {
-		this.handle = handle;
-	}
+    public void setHandle(String handle) {
+        this.handle = handle;
+    }
 
-	public List<MetadataEntryRest> getMetadata() {
-		return metadata;
-	}
+    public List<MetadataEntryRest> getMetadata() {
+        return metadata;
+    }
 
-	public void setMetadata(List<MetadataEntryRest> metadata) {
-		this.metadata = metadata;
-	}
+    public void setMetadata(List<MetadataEntryRest> metadata) {
+        this.metadata = metadata;
+    }
 
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
 }

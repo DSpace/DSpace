@@ -7,69 +7,66 @@
  */
 package org.dspace.app.rest.model;
 
-import org.springframework.data.annotation.ReadOnlyProperty;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 /**
  * An embeddable representation of the Metadata to use in with DSpace REST
  * Resource
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class MetadataValueRest {
 
-	String value;
+    String value;
 
-	String language;
-	
-	String authority;
-	
-	int confidence;
-	
-	@JsonProperty(access = Access.READ_ONLY)
-	int place;
+    String language;
 
-	public String getValue() {
-		return value;
-	}
+    String authority;
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    int confidence;
 
-	public String getLanguage() {
-		return language;
-	}
+    @JsonProperty(access = Access.READ_ONLY)
+    int place;
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+    public String getValue() {
+        return value;
+    }
 
-	public String getAuthority() {
-		return authority;
-	}
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-	public void setAuthority(String authority) {
-		this.authority = authority;
-	}
+    public String getLanguage() {
+        return language;
+    }
 
-	public int getConfidence() {
-		return confidence;
-	}
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
-	public void setConfidence(int confidence) {
-		this.confidence = confidence;
-	}
+    public String getAuthority() {
+        return authority;
+    }
 
-	public int getPlace() {
-		return place;
-	}
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
 
-	public void setPlace(int place) {
-		this.place = place;
-	}
+    public int getConfidence() {
+        return confidence;
+    }
+
+    public void setConfidence(int confidence) {
+        this.confidence = confidence;
+    }
+
+    public int getPlace() {
+        return place;
+    }
+
+    public void setPlace(int place) {
+        this.place = place;
+    }
 
 }

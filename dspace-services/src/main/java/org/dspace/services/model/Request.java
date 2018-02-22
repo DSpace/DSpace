@@ -20,7 +20,7 @@ public interface Request {
     public void setAttribute(String name, Object o);
 
     public ServletRequest getServletRequest();
-    
+
     public HttpServletRequest getHttpServletRequest();
 
     public ServletResponse getServletResponse();

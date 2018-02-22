@@ -23,14 +23,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * This factory provides a means to add links to the SearchFacetEntryResource. This class and addLinks method will be called
+ * This factory provides a means to add links to the SearchFacetEntryResource. This class and addLinks method will be
+ * called
  * from the HalLinkService addLinks method is called if the HalResource given is eligible
  */
 @Component
 public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchFacetEntryResource> {
 
     @Override
-    protected void addLinks(SearchFacetEntryResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
+    protected void addLinks(SearchFacetEntryResource halResource, Pageable pageable, LinkedList<Link> list)
+        throws Exception {
 
         SearchFacetEntryRest facetData = halResource.getFacetData();
         DiscoveryResultsRest searchData = halResource.getSearchData();
@@ -40,14 +42,16 @@ public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<
         String scope = searchData == null ? null : searchData.getScope();
 
         UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                .getFacetValues(facetData.getName(), query, dsoType, scope, null, null));
+                                                         .getFacetValues(facetData.getName(), query, dsoType, scope,
+                                                                         null, null));
 
         addFilterParams(uriBuilder, searchData);
 
         //If our rest data contains a list of values, construct the page links. Otherwise, only add a self link
-        if(CollectionUtils.isNotEmpty(facetData.getValues())) {
+        if (CollectionUtils.isNotEmpty(facetData.getValues())) {
             PageImpl page = new PageImpl<>(facetData.getValues(), new PageRequest(0, facetData.getFacetLimit()),
-                    facetData.getValues().size() + (BooleanUtils.isTrue(facetData.isHasMore()) ? 1 : 0));
+                                           facetData.getValues().size() + (BooleanUtils
+                                               .isTrue(facetData.isHasMore()) ? 1 : 0));
 
             halResource.setPageHeader(new EmbeddedPageHeader(uriBuilder, page, false));
 

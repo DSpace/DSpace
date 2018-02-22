@@ -8,7 +8,6 @@
 package org.dspace.authority.orcid.model;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -43,8 +42,8 @@ public class Citation {
     @Override
     public String toString() {
         return "Citation{" +
-                "type=" + type +
-                ", citation='" + citation + '\'' +
-                '}';
+            "type=" + type +
+            ", citation='" + citation + '\'' +
+            '}';
     }
 }

@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
+
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -24,26 +25,27 @@ import org.junit.Test;
  */
 public class SubmissionSectionsControllerIT extends AbstractControllerIntegrationTest {
 
-	@Test
+    @Test
     public void findAll() throws Exception {
         //When we call the root endpoint
         getClient().perform(get("/api/config/submissionsections"))
-                //The status has to be 200 OK
-                .andExpect(status().isOk())
-                //We expect the content type to be "application/hal+json;charset=UTF-8"
-                .andExpect(content().contentType(contentType))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
 
-                //By default we expect at least 1 submission forms so this to be reflected in the page object
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)))
-                .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
-                .andExpect(jsonPath("$.page.number", is(0)))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "config/submissionsections")))
+                   //By default we expect at least 1 submission forms so this to be reflected in the page object
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)))
+                   .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.startsWith(REST_SERVER_URL + "config/submissionsections")))
 
-                //The array of browse index should have a size greater or equals to 1
-                .andExpect(jsonPath("$._embedded.submissionsections", hasSize(greaterThanOrEqualTo(1))
-                ))
+                   //The array of browse index should have a size greater or equals to 1
+                   .andExpect(jsonPath("$._embedded.submissionsections", hasSize(greaterThanOrEqualTo(1))
+                   ))
         ;
     }
-    
+
 }

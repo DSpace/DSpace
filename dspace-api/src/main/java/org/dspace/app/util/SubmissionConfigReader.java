@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -39,42 +38,48 @@ import org.xml.sax.SAXException;
  * ordering of the steps (and number of steps) that occur during the Item
  * Submission Process. There may be multiple Item Submission processes defined,
  * where each definition is assigned a unique name.
- * 
+ *
  * The file also specifies which collections use which Item Submission process.
  * At a minimum, the definitions file must define a default mapping from the
  * placeholder collection # to the distinguished submission process 'default'.
  * Any collections that use a custom submission process are listed paired with
  * the name of the item submission process they use.
- * 
- * @see org.dspace.app.util.SubmissionConfig
- * @see org.dspace.app.util.SubmissionStepConfig
- * 
+ *
  * @author Tim Donohue based on DCInputsReader by Brian S. Hughes
  * @version $Revision$
+ * @see org.dspace.app.util.SubmissionConfig
+ * @see org.dspace.app.util.SubmissionStepConfig
  */
 
-public class SubmissionConfigReader
-{
+public class SubmissionConfigReader {
     /**
      * The ID of the default collection. Will never be the ID of a named
      * collection
      */
     public static final String DEFAULT_COLLECTION = "default";
 
-    /** Prefix of the item submission definition XML file */
+    /**
+     * Prefix of the item submission definition XML file
+     */
     static final String SUBMIT_DEF_FILE_PREFIX = "item-submission";
-    
-    /** Suffix of the item submission definition XML file */
+
+    /**
+     * Suffix of the item submission definition XML file
+     */
     static final String SUBMIT_DEF_FILE_SUFFIX = ".xml";
 
-    /** log4j logger */
+    /**
+     * log4j logger
+     */
     private static Logger log = Logger.getLogger(SubmissionConfigReader.class);
 
-	/** The fully qualified pathname of the directory containing the Item Submission Configuration file */
+    /**
+     * The fully qualified pathname of the directory containing the Item Submission Configuration file
+     */
     private String configDir = DSpaceServicesFactory.getInstance()
-            .getConfigurationService().getProperty("dspace.dir")
-            + File.separator + "config" + File.separator;
-            
+                                                    .getConfigurationService().getProperty("dspace.dir")
+        + File.separator + "config" + File.separator;
+
     /**
      * Hashmap which stores which submission process configuration is used by
      * which collection, computed from the item submission config file
@@ -102,22 +107,21 @@ public class SubmissionConfigReader
 
     /**
      * Load Submission Configuration from the
-     * item-submission.xml configuration file 
+     * item-submission.xml configuration file
+     *
      * @throws SubmissionConfigReaderException if servlet error
      */
-    public SubmissionConfigReader() throws SubmissionConfigReaderException
-    {
+    public SubmissionConfigReader() throws SubmissionConfigReaderException {
         buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + SUBMIT_DEF_FILE_SUFFIX);
     }
 
-    public void reload() throws SubmissionConfigReaderException
-    {
-    	collectionToSubmissionConfig = null;
-    	stepDefns = null;
-    	submitDefns = null;
+    public void reload() throws SubmissionConfigReaderException {
+        collectionToSubmissionConfig = null;
+        stepDefns = null;
+        submitDefns = null;
         buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + SUBMIT_DEF_FILE_SUFFIX);
     }
-    
+
     /**
      * Parse an XML encoded item submission configuration file.
      * <P>
@@ -129,17 +133,15 @@ public class SubmissionConfigReader
      * Submision Processes by name.
      * </ul>
      */
-    private void buildInputs(String fileName) throws SubmissionConfigReaderException
-    {
+    private void buildInputs(String fileName) throws SubmissionConfigReaderException {
         collectionToSubmissionConfig = new HashMap<String, String>();
         submitDefns = new HashMap<String, List<Map<String, String>>>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
-        try
-        {
+        try {
             DocumentBuilderFactory factory = DocumentBuilderFactory
-                    .newInstance();
+                .newInstance();
             factory.setValidating(false);
             factory.setIgnoringComments(true);
             factory.setIgnoringElementContentWhitespace(true);
@@ -147,109 +149,89 @@ public class SubmissionConfigReader
             DocumentBuilder db = factory.newDocumentBuilder();
             Document doc = db.parse(uri);
             doNodes(doc);
-        }
-        catch (FactoryConfigurationError fe)
-        {
+        } catch (FactoryConfigurationError fe) {
             throw new SubmissionConfigReaderException(
-                    "Cannot create Item Submission Configuration parser", fe);
-        }
-        catch (Exception e)
-        {
+                "Cannot create Item Submission Configuration parser", fe);
+        } catch (Exception e) {
             throw new SubmissionConfigReaderException(
-                    "Error creating Item Submission Configuration: " + e);
+                "Error creating Item Submission Configuration: " + e);
         }
-    }
-    
-    /**
-     * 
-     * @return the name of the default submission configuration
-     */
-    public String getDefaultSubmissionConfigName() 
-    {
-    	return collectionToSubmissionConfig.get(DEFAULT_COLLECTION);
     }
 
     /**
-     * Returns all the Item Submission process configs with pagination 
-     * 
-     * @param limit
-     *            max number of SubmissionConfig to return
-     * @param offset
-     *            number of SubmissionConfig to skip in the return
-     *            
-     * @return the list of SubmissionConfig 
-     * 
+     * @return the name of the default submission configuration
      */
-    public List<SubmissionConfig> getAllSubmissionConfigs(Integer limit, Integer offset)
-    {
-    	int idx = 0;
-    	int count = 0;
-    	List<SubmissionConfig> subConfigs = new LinkedList<SubmissionConfig>();
-    	for (String key : submitDefns.keySet()) {
-    		if (offset == null || idx >= offset) {
-    			count++;
-    			subConfigs.add(getSubmissionConfigByName(key));
-    		}
-    		idx++;
-    		if (count >= limit) {
-    			break;
-    		}
-    	}
-    	return subConfigs;
+    public String getDefaultSubmissionConfigName() {
+        return collectionToSubmissionConfig.get(DEFAULT_COLLECTION);
     }
-    
-    public int countSubmissionConfigs()
-    {
-    	return submitDefns.size();
+
+    /**
+     * Returns all the Item Submission process configs with pagination
+     *
+     * @param limit  max number of SubmissionConfig to return
+     * @param offset number of SubmissionConfig to skip in the return
+     * @return the list of SubmissionConfig
+     */
+    public List<SubmissionConfig> getAllSubmissionConfigs(Integer limit, Integer offset) {
+        int idx = 0;
+        int count = 0;
+        List<SubmissionConfig> subConfigs = new LinkedList<SubmissionConfig>();
+        for (String key : submitDefns.keySet()) {
+            if (offset == null || idx >= offset) {
+                count++;
+                subConfigs.add(getSubmissionConfigByName(key));
+            }
+            idx++;
+            if (count >= limit) {
+                break;
+            }
+        }
+        return subConfigs;
     }
+
+    public int countSubmissionConfigs() {
+        return submitDefns.size();
+    }
+
     /**
      * Returns the Item Submission process config used for a particular
      * collection, or the default if none is defined for the collection
-     * 
-     * @param collectionHandle
-     *            collection's unique Handle
+     *
+     * @param collectionHandle collection's unique Handle
      * @return the SubmissionConfig representing the item submission config
-     * 
-     * @throws SubmissionConfigReaderException
-     *             if no default submission process configuration defined
+     * @throws SubmissionConfigReaderException if no default submission process configuration defined
      */
-    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle)
-    {
+    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle) {
         // get the name of the submission process config for this collection
         String submitName = collectionToSubmissionConfig
-                .get(collectionHandle);
-        if (submitName == null)
-        {
+            .get(collectionHandle);
+        if (submitName == null) {
             submitName = collectionToSubmissionConfig
-                    .get(DEFAULT_COLLECTION);
+                .get(DEFAULT_COLLECTION);
         }
-        if (submitName == null)
-        {
+        if (submitName == null) {
             throw new IllegalStateException(
-                    "No item submission process configuration designated as 'default' in 'submission-map' section of 'item-submission.xml'.");
+                "No item submission process configuration designated as 'default' in 'submission-map' section of " +
+                    "'item-submission.xml'.");
         }
         return getSubmissionConfigByName(submitName);
     }
-    
+
     /**
-     * Returns the Item Submission process config 
-     * 
-     * @param submitName
-     *            submission process unique name
+     * Returns the Item Submission process config
+     *
+     * @param submitName submission process unique name
      * @return the SubmissionConfig representing the item submission config
-     * 
      */
-    public SubmissionConfig getSubmissionConfigByName(String submitName) 
-    {
+    public SubmissionConfig getSubmissionConfigByName(String submitName) {
         log.debug("Loading submission process config named '" + submitName
-                + "'");
+                      + "'");
 
         // check mini-cache, and return if match
         if (lastSubmissionConfig != null
-                && lastSubmissionConfig.getSubmissionName().equals(submitName))
-        {
+            && lastSubmissionConfig.getSubmissionName().equals(submitName)) {
             log.debug("Found submission process config '" + submitName
-                    + "' in cache.");
+                          + "' in cache.");
 
             return lastSubmissionConfig;
         }
@@ -257,21 +239,20 @@ public class SubmissionConfigReader
         // cache miss - construct new SubmissionConfig
         List<Map<String, String>> steps = submitDefns.get(submitName);
 
-        if (steps == null)
-        {
+        if (steps == null) {
             throw new IllegalStateException(
-                    "Missing the Item Submission process config '" + submitName
-                            + "' (or unable to load) from 'item-submission.xml'.");
+                "Missing the Item Submission process config '" + submitName
+                    + "' (or unable to load) from 'item-submission.xml'.");
         }
 
         log.debug("Submission process config '" + submitName
-                + "' not in cache. Reloading from scratch.");
+                      + "' not in cache. Reloading from scratch.");
 
-        lastSubmissionConfig = new SubmissionConfig(StringUtils.equals(getDefaultSubmissionConfigName(), submitName), 
-        		submitName, steps);
+        lastSubmissionConfig = new SubmissionConfig(StringUtils.equals(getDefaultSubmissionConfigName(), submitName),
+                                                    submitName, steps);
 
         log.debug("Submission process config has "
-                + lastSubmissionConfig.getNumberOfSteps() + " steps listed.");
+                      + lastSubmissionConfig.getNumberOfSteps() + " steps listed.");
 
         return lastSubmissionConfig;
     }
@@ -281,26 +262,19 @@ public class SubmissionConfigReader
      * <P>
      * Global step definitions are those defined in the {@code <step-definitions>}
      * section of the configuration file.
-     * 
-     * @param stepID
-     *            step's identifier
-     * 
+     *
+     * @param stepID step's identifier
      * @return the SubmissionStepConfig representing the step
-     * 
-     * @throws SubmissionConfigReaderException
-     *             if no default submission process configuration defined
+     * @throws SubmissionConfigReaderException if no default submission process configuration defined
      */
     public SubmissionStepConfig getStepConfig(String stepID)
-            throws SubmissionConfigReaderException
-    {
+        throws SubmissionConfigReaderException {
         // We should already have the step definitions loaded
-        if (stepDefns != null)
-        {
+        if (stepDefns != null) {
             // retreive step info
             Map<String, String> stepInfo = stepDefns.get(stepID);
 
-            if (stepInfo != null)
-            {
+            if (stepInfo != null) {
                 return new SubmissionStepConfig(stepInfo);
             }
         }
@@ -313,10 +287,8 @@ public class SubmissionConfigReader
      * should correspond to the collection-form maps, the form definitions, and
      * the display/storage word pairs.
      */
-    private void doNodes(Node n) throws SAXException, SubmissionConfigReaderException
-    {
-        if (n == null)
-        {
+    private void doNodes(Node n) throws SAXException, SubmissionConfigReaderException {
+        if (n == null) {
             return;
         }
         Node e = getElement(n);
@@ -325,44 +297,34 @@ public class SubmissionConfigReader
         boolean foundMap = false;
         boolean foundStepDefs = false;
         boolean foundSubmitDefs = false;
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
-            if ((nd == null) || isEmptyTextNode(nd))
-            {
+            if ((nd == null) || isEmptyTextNode(nd)) {
                 continue;
             }
             String tagName = nd.getNodeName();
-            if (tagName.equals("submission-map"))
-            {
+            if (tagName.equals("submission-map")) {
                 processMap(nd);
                 foundMap = true;
-            }
-            else if (tagName.equals("step-definitions"))
-            {
+            } else if (tagName.equals("step-definitions")) {
                 processStepDefinition(nd);
                 foundStepDefs = true;
-            }
-            else if (tagName.equals("submission-definitions"))
-            {
+            } else if (tagName.equals("submission-definitions")) {
                 processSubmissionDefinition(nd);
                 foundSubmitDefs = true;
             }
             // Ignore unknown nodes
         }
-        if (!foundMap)
-        {
+        if (!foundMap) {
             throw new SubmissionConfigReaderException(
-                    "No collection to item submission map ('submission-map') found in 'item-submission.xml'");
+                "No collection to item submission map ('submission-map') found in 'item-submission.xml'");
         }
-        if (!foundStepDefs)
-        {
+        if (!foundStepDefs) {
             throw new SubmissionConfigReaderException("No 'step-definitions' section found in 'item-submission.xml'");
         }
-        if (!foundSubmitDefs)
-        {
+        if (!foundSubmitDefs) {
             throw new SubmissionConfigReaderException(
-                    "No 'submission-definitions' section found in 'item-submission.xml'");
+                "No 'submission-definitions' section found in 'item-submission.xml'");
         }
     }
 
@@ -372,32 +334,26 @@ public class SubmissionConfigReader
      * the collection handle and item submission name, put name in hashmap keyed
      * by the collection handle.
      */
-    private void processMap(Node e) throws SAXException
-    {
+    private void processMap(Node e) throws SAXException {
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
-            if (nd.getNodeName().equals("name-map"))
-            {
+            if (nd.getNodeName().equals("name-map")) {
                 String id = getAttribute(nd, "collection-handle");
                 String value = getAttribute(nd, "submission-name");
                 String content = getValue(nd);
-                if (id == null)
-                {
+                if (id == null) {
                     throw new SAXException(
-                            "name-map element is missing collection-handle attribute in 'item-submission.xml'");
+                        "name-map element is missing collection-handle attribute in 'item-submission.xml'");
                 }
-                if (value == null)
-                {
+                if (value == null) {
                     throw new SAXException(
-                            "name-map element is missing submission-name attribute in 'item-submission.xml'");
+                        "name-map element is missing submission-name attribute in 'item-submission.xml'");
                 }
-                if (content != null && content.length() > 0)
-                {
+                if (content != null && content.length() > 0) {
                     throw new SAXException(
-                            "name-map element has content in 'item-submission.xml', it should be empty.");
+                        "name-map element has content in 'item-submission.xml', it should be empty.");
                 }
                 collectionToSubmissionConfig.put(id, value);
             } // ignore any child node that isn't a "name-map"
@@ -413,28 +369,23 @@ public class SubmissionConfigReader
      * HashMap whose key is the step's unique id.
      */
     private void processStepDefinition(Node e) throws SAXException,
-            SubmissionConfigReaderException
-    {
+        SubmissionConfigReaderException {
         stepDefns = new HashMap<String, Map<String, String>>();
 
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
             // process each step definition
-            if (nd.getNodeName().equals("step"))
-            {
+            if (nd.getNodeName().equals("step")) {
                 String stepID = getAttribute(nd, "id");
-                if (stepID == null)
-                {
+                if (stepID == null) {
                     throw new SAXException(
-                            "step element has no 'id' attribute in 'item-submission.xml', which is required in the 'step-definitions' section");
-                }
-                else if (stepDefns.containsKey(stepID))
-                {
+                        "step element has no 'id' attribute in 'item-submission.xml', which is required in the " +
+                            "'step-definitions' section");
+                } else if (stepDefns.containsKey(stepID)) {
                     throw new SAXException(
-                            "There are two step elements with the id '" + stepID + "' in 'item-submission.xml'");
+                        "There are two step elements with the id '" + stepID + "' in 'item-submission.xml'");
                 }
 
                 Map<String, String> stepInfo = processStepChildNodes("step-definition", nd);
@@ -444,10 +395,10 @@ public class SubmissionConfigReader
         }
 
         // Sanity check number of step definitions
-        if (stepDefns.size() < 1)
-        {
+        if (stepDefns.size() < 1) {
             throw new SubmissionConfigReaderException(
-                    "step-definition section has no steps! A step with id='collection' is required in 'item-submission.xml'!");
+                "step-definition section has no steps! A step with id='collection' is required in 'item-submission" +
+                    ".xml'!");
         }
 
     }
@@ -463,8 +414,7 @@ public class SubmissionConfigReader
      * whose key is the submission-process's unique name.
      */
     private void processSubmissionDefinition(Node e) throws SAXException,
-            SubmissionConfigReaderException
-    {
+        SubmissionConfigReaderException {
         int numSubmitProcesses = 0;
         List<String> submitNames = new ArrayList<String>();
 
@@ -472,25 +422,20 @@ public class SubmissionConfigReader
         // through
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
 
             // process each 'submission-process' node
-            if (nd.getNodeName().equals("submission-process"))
-            {
+            if (nd.getNodeName().equals("submission-process")) {
                 numSubmitProcesses++;
                 String submitName = getAttribute(nd, "name");
-                if (submitName == null)
-                {
+                if (submitName == null) {
                     throw new SAXException(
-                            "'submission-process' element has no 'name' attribute in 'item-submission.xml'");
-                }
-                else if (submitNames.contains(submitName))
-                {
+                        "'submission-process' element has no 'name' attribute in 'item-submission.xml'");
+                } else if (submitNames.contains(submitName)) {
                     throw new SAXException(
-                            "There are two 'submission-process' elements with the name '"
-                                    + submitName + "' in 'item-submission.xml'.");
+                        "There are two 'submission-process' elements with the name '"
+                            + submitName + "' in 'item-submission.xml'.");
                 }
                 submitNames.add(submitName);
 
@@ -501,13 +446,11 @@ public class SubmissionConfigReader
                 // loop through all the 'step' nodes of the 'submission-process'
                 NodeList pl = nd.getChildNodes();
                 int lenStep = pl.getLength();
-                for (int j = 0; j < lenStep; j++)
-                {
+                for (int j = 0; j < lenStep; j++) {
                     Node nStep = pl.item(j);
 
                     // process each 'step' definition
-                    if (nStep.getNodeName().equals("step"))
-                    {
+                    if (nStep.getNodeName().equals("step")) {
                         // check for an 'id' attribute
                         String stepID = getAttribute(nStep, "id");
 
@@ -515,33 +458,28 @@ public class SubmissionConfigReader
 
                         // if this step has an id, load its information from the
                         // step-definition section
-                        if ((stepID != null) && (stepID.length() > 0))
-                        {
-                            if (stepDefns.containsKey(stepID))
-                            {
+                        if ((stepID != null) && (stepID.length() > 0)) {
+                            if (stepDefns.containsKey(stepID)) {
                                 // load the step information from the
                                 // step-definition
                                 stepInfo = stepDefns.get(stepID);
-                            }
-                            else
-                            {
+                            } else {
                                 throw new SubmissionConfigReaderException(
-                                        "The Submission process config named "
-                                                + submitName
-                                                + " contains a step with id="
-                                                + stepID
-                                                + ".  There is no step with this 'id' defined in the 'step-definition' section of 'item-submission.xml'.");
+                                    "The Submission process config named "
+                                        + submitName
+                                        + " contains a step with id="
+                                        + stepID
+                                        + ".  There is no step with this 'id' defined in the 'step-definition' " +
+                                        "section of 'item-submission.xml'.");
                             }
 
                             // Ignore all children of a step element with an
                             // "id"
-                        }
-                        else
-                        {
+                        } else {
                             // get information about step from its children
                             // nodes
                             stepInfo = processStepChildNodes(
-                                    "submission-process", nStep);
+                                "submission-process", nStep);
                         }
 
                         steps.add(stepInfo);
@@ -550,19 +488,17 @@ public class SubmissionConfigReader
                 }
 
                 // sanity check number of steps
-                if (steps.size() < 1)
-                {
+                if (steps.size() < 1) {
                     throw new SubmissionConfigReaderException(
-                            "Item Submission process config named "
-                                    + submitName + " has no steps defined in 'item-submission.xml'");
+                        "Item Submission process config named "
+                            + submitName + " has no steps defined in 'item-submission.xml'");
                 }
 
             }
         }
-        if (numSubmitProcesses == 0)
-        {
+        if (numSubmitProcesses == 0) {
             throw new SubmissionConfigReaderException(
-                    "No 'submission-process' elements/definitions found in 'item-submission.xml'");
+                "No 'submission-process' elements/definitions found in 'item-submission.xml'");
         }
     }
 
@@ -570,89 +506,75 @@ public class SubmissionConfigReader
      * Process the children of the "step" tag of the XML file. Returns a HashMap
      * of all the fields under that "step" tag, where the key is the field name,
      * and the value is the field value.
-     * 
      */
     private Map<String, String> processStepChildNodes(String configSection, Node nStep)
-            throws SubmissionConfigReaderException
-    {
+        throws SubmissionConfigReaderException {
         // initialize the HashMap of step Info
         Map<String, String> stepInfo = new HashMap<String, String>();
 
         NodeList flds = nStep.getChildNodes();
         int lenflds = flds.getLength();
-        for (int k = 0; k < lenflds; k++)
-        {
+        for (int k = 0; k < lenflds; k++) {
             // process each child node of a <step> tag
             Node nfld = flds.item(k);
 
             String tagName = nfld.getNodeName();
-            if (!isEmptyTextNode(nfld))
-            {
+            if (!isEmptyTextNode(nfld)) {
                 String value = getValue(nfld);
                 stepInfo.put(tagName, value);
             }
-            
+
             for (int idx = 0; idx < nfld.getAttributes().getLength(); idx++) {
-            	Node nAttr = nfld.getAttributes().item(idx);
-            	String attrName = nAttr.getNodeName();
-            	String attrValue = nAttr.getNodeValue();
-            	stepInfo.put(tagName+"."+attrName, attrValue);
+                Node nAttr = nfld.getAttributes().item(idx);
+                String attrName = nAttr.getNodeName();
+                String attrValue = nAttr.getNodeValue();
+                stepInfo.put(tagName + "." + attrName, attrValue);
             }
-        }// end for each field
+        } // end for each field
 
         // check for ID attribute & save to step info
         String stepID = getAttribute(nStep, "id");
-        if (StringUtils.isNotBlank(stepID))
-        {
+        if (StringUtils.isNotBlank(stepID)) {
             stepInfo.put("id", stepID);
         }
 
         String mandatory = getAttribute(nStep, "mandatory");
-        if (StringUtils.isNotBlank(mandatory))
-        {
+        if (StringUtils.isNotBlank(mandatory)) {
             stepInfo.put("mandatory", mandatory);
         }
 
         // look for REQUIRED 'step' information
         String missing = null;
-        if (stepInfo.get("processing-class") == null)
-        {
+        if (stepInfo.get("processing-class") == null) {
             missing = "'processing-class'";
         }
-        if (missing != null)
-        {
+        if (missing != null) {
             String msg = "Required field " + missing
-                    + " missing in a 'step' in the " + configSection
-                    + " of the item submission configuration file ('item-submission.xml')";
+                + " missing in a 'step' in the " + configSection
+                + " of the item submission configuration file ('item-submission.xml')";
             throw new SubmissionConfigReaderException(msg);
         }
 
         return stepInfo;
     }
 
-    private Node getElement(Node nd)
-    {
+    private Node getElement(Node nd) {
         NodeList nl = nd.getChildNodes();
         int len = nl.getLength();
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             Node n = nl.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE)
-            {
+            if (n.getNodeType() == Node.ELEMENT_NODE) {
                 return n;
             }
         }
         return null;
     }
 
-    private boolean isEmptyTextNode(Node nd)
-    {
+    private boolean isEmptyTextNode(Node nd) {
         boolean isEmpty = false;
-        if (nd.getNodeType() == Node.TEXT_NODE)
-        {
+        if (nd.getNodeType() == Node.TEXT_NODE) {
             String text = nd.getNodeValue().trim();
-            if (text.length() == 0)
-            {
+            if (text.length() == 0) {
                 isEmpty = true;
             }
         }
@@ -662,18 +584,14 @@ public class SubmissionConfigReader
     /**
      * Returns the value of the node's attribute named <name>
      */
-    private String getAttribute(Node e, String name)
-    {
+    private String getAttribute(Node e, String name) {
         NamedNodeMap attrs = e.getAttributes();
         int len = attrs.getLength();
-        if (len > 0)
-        {
+        if (len > 0) {
             int i;
-            for (i = 0; i < len; i++)
-            {
+            for (i = 0; i < len; i++) {
                 Node attr = attrs.item(i);
-                if (name.equals(attr.getNodeName()))
-                {
+                if (name.equals(attr.getNodeName())) {
                     return attr.getNodeValue().trim();
                 }
             }
@@ -686,36 +604,34 @@ public class SubmissionConfigReader
      * Returns the value found in the Text node (if any) in the node list that's
      * passed in.
      */
-    private String getValue(Node nd)
-    {
+    private String getValue(Node nd) {
         NodeList nl = nd.getChildNodes();
         int len = nl.getLength();
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             Node n = nl.item(i);
             short type = n.getNodeType();
-            if (type == Node.TEXT_NODE)
-            {
+            if (type == Node.TEXT_NODE) {
                 return n.getNodeValue().trim();
             }
         }
         // Didn't find a text node
         return null;
     }
-    
-    public List<Collection> getCollectionsBySubmissionConfig(Context context, String submitName) throws IllegalStateException, SQLException
-    {
-    	List<Collection> results = new ArrayList<>();
+
+    public List<Collection> getCollectionsBySubmissionConfig(Context context, String submitName)
+        throws IllegalStateException, SQLException {
+        List<Collection> results = new ArrayList<>();
         // get the submission-map keys
-        for(String handle : collectionToSubmissionConfig.keySet()) {
-        	if(!DEFAULT_COLLECTION.equals(handle)) {
-	        	if(collectionToSubmissionConfig.get(handle).equals(submitName)) {
-	        		DSpaceObject result = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handle);
-	        		if(result!=null) {
-	        			results.add((Collection)result);
-	        		}
-	        	}
-        	}
+        for (String handle : collectionToSubmissionConfig.keySet()) {
+            if (!DEFAULT_COLLECTION.equals(handle)) {
+                if (collectionToSubmissionConfig.get(handle).equals(submitName)) {
+                    DSpaceObject result = HandleServiceFactory.getInstance().getHandleService()
+                                                              .resolveToObject(context, handle);
+                    if (result != null) {
+                        results.add((Collection) result);
+                    }
+                }
+            }
         }
         return results;
     }

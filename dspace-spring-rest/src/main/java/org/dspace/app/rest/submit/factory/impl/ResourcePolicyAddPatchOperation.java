@@ -32,81 +32,82 @@ import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Submission "add" operation to add resource policies in the Bitstream
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class ResourcePolicyAddPatchOperation extends AddPatchOperation<ResourcePolicyRest> {
 
-	@Autowired
-	BitstreamService bitstreamService;
+    @Autowired
+    BitstreamService bitstreamService;
 
-	@Autowired
-	ItemService itemService;
+    @Autowired
+    ItemService itemService;
 
-	@Autowired
-	AuthorizeService authorizeService;
+    @Autowired
+    AuthorizeService authorizeService;
 
-	@Autowired
-	GroupService groupService;
-	@Autowired
-	EPersonService epersonService;
-	
-	@Override
-	void add(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
-			throws Exception {
-		//"path": "/sections/upload/files/0/accessConditions"
-		String[] split = getAbsolutePath(path).split("/");
-		Item item = source.getItem();
+    @Autowired
+    GroupService groupService;
+    @Autowired
+    EPersonService epersonService;
 
-		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
-		;
-		for (Bundle bb : bundle) {
-			int idx = 0;
-			for (Bitstream b : bb.getBitstreams()) {
-				if (idx == Integer.parseInt(split[1])) {
-					
-					List<ResourcePolicyRest> newAccessConditions = new ArrayList<ResourcePolicyRest>();
-					if (split.length == 3) {
-						authorizeService.removePoliciesActionFilter(context, b, Constants.READ);
-						newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
-					} else if (split.length == 4) {
-						// contains "-", call index-based accessConditions it make not sense  
-						newAccessConditions.add(evaluateSingleObject((LateObjectEvaluator)value));
-					}
-					
-					for (ResourcePolicyRest newAccessCondition : newAccessConditions) {
-						String name = newAccessCondition.getName();
-						String description = newAccessCondition.getDescription();
-						
-						//TODO manage error on select group and eperson
-						Group group = null;
-						if(newAccessCondition.getGroupUUID()!=null) {
-							group = groupService.find(context, newAccessCondition.getGroupUUID());
-						}
-						EPerson eperson = null;
-						if(newAccessCondition.getEpersonUUID()!=null) {
-							eperson = epersonService.find(context, newAccessCondition.getEpersonUUID());
-						}
+    @Override
+    void add(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
+        throws Exception {
+        //"path": "/sections/upload/files/0/accessConditions"
+        String[] split = getAbsolutePath(path).split("/");
+        Item item = source.getItem();
 
-						Date startDate = newAccessCondition.getStartDate();
-						Date endDate = newAccessCondition.getEndDate();
-						authorizeService.createResourcePolicy(context, b, group, eperson, Constants.READ, ResourcePolicy.TYPE_CUSTOM, name, description, startDate, endDate);
-						// TODO manage duplicate policy
-					}
-				}
-				idx++;
-			}
-		}
-	}
+        List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
+        ;
+        for (Bundle bb : bundle) {
+            int idx = 0;
+            for (Bitstream b : bb.getBitstreams()) {
+                if (idx == Integer.parseInt(split[1])) {
 
-	@Override
-	protected Class<ResourcePolicyRest[]> getArrayClassForEvaluation() {
-		return ResourcePolicyRest[].class;
-	}
+                    List<ResourcePolicyRest> newAccessConditions = new ArrayList<ResourcePolicyRest>();
+                    if (split.length == 3) {
+                        authorizeService.removePoliciesActionFilter(context, b, Constants.READ);
+                        newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
+                    } else if (split.length == 4) {
+                        // contains "-", call index-based accessConditions it make not sense
+                        newAccessConditions.add(evaluateSingleObject((LateObjectEvaluator) value));
+                    }
 
-	@Override
-	protected Class<ResourcePolicyRest> getClassForEvaluation() {
-		return ResourcePolicyRest.class;
-	}
+                    for (ResourcePolicyRest newAccessCondition : newAccessConditions) {
+                        String name = newAccessCondition.getName();
+                        String description = newAccessCondition.getDescription();
+
+                        //TODO manage error on select group and eperson
+                        Group group = null;
+                        if (newAccessCondition.getGroupUUID() != null) {
+                            group = groupService.find(context, newAccessCondition.getGroupUUID());
+                        }
+                        EPerson eperson = null;
+                        if (newAccessCondition.getEpersonUUID() != null) {
+                            eperson = epersonService.find(context, newAccessCondition.getEpersonUUID());
+                        }
+
+                        Date startDate = newAccessCondition.getStartDate();
+                        Date endDate = newAccessCondition.getEndDate();
+                        authorizeService.createResourcePolicy(context, b, group, eperson, Constants.READ,
+                                                              ResourcePolicy.TYPE_CUSTOM, name, description, startDate,
+                                                              endDate);
+                        // TODO manage duplicate policy
+                    }
+                }
+                idx++;
+            }
+        }
+    }
+
+    @Override
+    protected Class<ResourcePolicyRest[]> getArrayClassForEvaluation() {
+        return ResourcePolicyRest[].class;
+    }
+
+    @Override
+    protected Class<ResourcePolicyRest> getClassForEvaluation() {
+        return ResourcePolicyRest.class;
+    }
 }

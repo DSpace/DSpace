@@ -7,25 +7,24 @@
  */
 package org.dspace.sword;
 
-import org.purl.sword.base.AtomDocumentResponse;
-import org.purl.sword.base.SWORDErrorException;
-import org.purl.sword.base.SWORDEntry;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Bitstream;
+import org.dspace.content.DSpaceObject;
+import org.purl.sword.base.AtomDocumentResponse;
+import org.purl.sword.base.SWORDEntry;
+import org.purl.sword.base.SWORDErrorException;
 
 /**
  * @author Richard Jones
  *
  * Class to provide tools to manage media links and media entries for sword
- *
  */
-public class MediaEntryManager
-{
-    /** SWORD service implementation */
+public class MediaEntryManager {
+    /**
+     * SWORD service implementation
+     */
     private SWORDService swordService;
 
-    public MediaEntryManager(SWORDService swordService)
-    {
+    public MediaEntryManager(SWORDService swordService) {
         this.swordService = swordService;
     }
 
@@ -34,22 +33,18 @@ public class MediaEntryManager
      * unavailable this method will throw the appropriate SWORD errors,
      * with DSpace custom URLs.
      *
-     * @param url
-     *     URL to check
+     * @param url URL to check
      * @return media entry for the given URL request
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
-     * @throws SWORDErrorException on generic SWORD exception
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException  on generic SWORD exception
      */
     public AtomDocumentResponse getMediaEntry(String url)
-            throws DSpaceSWORDException, SWORDErrorException
-    {
+        throws DSpaceSWORDException, SWORDErrorException {
         SWORDUrlManager urlManager = swordService.getUrlManager();
 
         AtomDocumentResponse response = new AtomDocumentResponse(200);
 
-        if (url == null || urlManager.isBaseMediaLinkUrl(url))
-        {
+        if (url == null || urlManager.isBaseMediaLinkUrl(url)) {
             // we are dealing with a default media-link, indicating that something
             // is wrong
 
@@ -64,10 +59,9 @@ public class MediaEntryManager
         DSpaceObject dso = urlManager.extractDSpaceObject(url);
 
         // now, the media entry should always be to an actual file, so we only care that this is a bitstream
-        if (!(dso instanceof Bitstream))
-        {
+        if (!(dso instanceof Bitstream)) {
             throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
-                "The url you provided does not resolve to an appropriate object");
+                                          "The url you provided does not resolve to an appropriate object");
         }
 
         // now construct the atom entry for the bitstream

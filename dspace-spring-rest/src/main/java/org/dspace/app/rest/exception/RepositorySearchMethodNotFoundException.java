@@ -13,17 +13,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * This is the exception to capture details about call to a search methods not
  * exposed by the repository
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "This repository doesn't provide the requested search method")
 public class RepositorySearchMethodNotFoundException extends RuntimeException {
-	String model;
-	String method;
-	public RepositorySearchMethodNotFoundException(String model, String method) {
-		this.model = model;
-		this.method = method;
-	}
+    String model;
+    String method;
+
+    public RepositorySearchMethodNotFoundException(String model, String method) {
+        this.model = model;
+        this.method = method;
+    }
 
 }

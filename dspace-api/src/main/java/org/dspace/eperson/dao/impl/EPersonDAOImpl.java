@@ -7,6 +7,15 @@
  */
 package org.dspace.eperson.dao.impl;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,9 +29,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 
-import java.sql.SQLException;
-import java.util.*;
-
 /**
  * Hibernate implementation of the Database Access Object interface class for the EPerson object.
  * This class is responsible for all database calls for the EPerson object and is autowired by spring
@@ -30,16 +36,13 @@ import java.util.*;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements EPersonDAO
-{
-    protected EPersonDAOImpl()
-    {
+public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements EPersonDAO {
+    protected EPersonDAOImpl() {
         super();
     }
 
     @Override
-    public EPerson findByEmail(Context context, String email) throws SQLException
-    {
+    public EPerson findByEmail(Context context, String email) throws SQLException {
         // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup
         Criteria criteria = createCriteria(context, EPerson.class);
         criteria.add(Restrictions.eq("email", email.toLowerCase()));
@@ -50,8 +53,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
 
 
     @Override
-    public EPerson findByNetid(Context context, String netid) throws SQLException
-    {
+    public EPerson findByNetid(Context context, String netid) throws SQLException {
         Criteria criteria = createCriteria(context, EPerson.class);
         criteria.add(Restrictions.eq("netid", netid));
 
@@ -60,26 +62,27 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     }
 
     @Override
-    public List<EPerson> search(Context context, String query, List<MetadataField> queryFields, List<MetadataField> sortFields, int offset, int limit) throws SQLException
-    {
-        String queryString = "SELECT " + EPerson.class.getSimpleName().toLowerCase() + " FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase() + " ";
-        if(query != null) query= "%"+query.toLowerCase()+"%";
+    public List<EPerson> search(Context context, String query, List<MetadataField> queryFields,
+                                List<MetadataField> sortFields, int offset, int limit) throws SQLException {
+        String queryString = "SELECT " + EPerson.class.getSimpleName()
+                                                      .toLowerCase() + " FROM EPerson as " + EPerson.class
+            .getSimpleName().toLowerCase() + " ";
+        if (query != null) {
+            query = "%" + query.toLowerCase() + "%";
+        }
         Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, sortFields, null);
 
-        if(0 <= offset)
-        {
+        if (0 <= offset) {
             hibernateQuery.setFirstResult(offset);
         }
-        if(0 <= limit)
-        {
+        if (0 <= limit) {
             hibernateQuery.setMaxResults(limit);
         }
         return list(hibernateQuery);
     }
 
     @Override
-    public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException
-    {
+    public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException {
         String queryString = "SELECT count(*) FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();
         Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, ListUtils.EMPTY_LIST, null);
 
@@ -87,16 +90,20 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     }
 
     @Override
-    public List<EPerson> findAll(Context context, MetadataField metadataSortField, String sortField, int pageSize, int offset) throws SQLException {
-        String queryString = "SELECT " + EPerson.class.getSimpleName().toLowerCase() + " FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();
+    public List<EPerson> findAll(Context context, MetadataField metadataSortField, String sortField, int pageSize,
+                                 int offset) throws SQLException {
+        String queryString = "SELECT " + EPerson.class.getSimpleName()
+                                                      .toLowerCase() + " FROM EPerson as " + EPerson.class
+            .getSimpleName().toLowerCase();
 
         List<MetadataField> sortFields = ListUtils.EMPTY_LIST;
 
-        if(metadataSortField!=null){
-            sortFields =  Collections.singletonList(metadataSortField);
+        if (metadataSortField != null) {
+            sortFields = Collections.singletonList(metadataSortField);
         }
 
-        Query query = getSearchQuery(context, queryString, null, ListUtils.EMPTY_LIST, sortFields, sortField, pageSize, offset);
+        Query query = getSearchQuery(context, queryString, null, ListUtils.EMPTY_LIST, sortFields, sortField, pageSize,
+                                     offset);
         return list(query);
 
     }
@@ -104,9 +111,9 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     @Override
     public List<EPerson> findByGroups(Context context, Set<Group> groups) throws SQLException {
         Query query = createQuery(context,
-                "SELECT DISTINCT e FROM EPerson e " +
-                        "JOIN e.groups g " +
-                        "WHERE g.id IN (:idList) ");
+                                  "SELECT DISTINCT e FROM EPerson e " +
+                                      "JOIN e.groups g " +
+                                      "WHERE g.id IN (:idList) ");
 
         List<UUID> idList = new ArrayList<>(groups.size());
         for (Group group : groups) {
@@ -122,8 +129,8 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     public List<EPerson> findWithPasswordWithoutDigestAlgorithm(Context context) throws SQLException {
         Criteria criteria = createCriteria(context, EPerson.class);
         criteria.add(Restrictions.and(
-                Restrictions.isNotNull("password"),
-                Restrictions.isNull("digestAlgorithm")
+            Restrictions.isNotNull("password"),
+            Restrictions.isNull("digestAlgorithm")
         ));
         return list(criteria);
     }
@@ -135,11 +142,15 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         return list(criteria);
     }
 
-    protected Query getSearchQuery(Context context, String queryString, String queryParam, List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField) throws SQLException {
-    	return getSearchQuery(context, queryString, queryParam, queryFields, sortFields, sortField, -1, -1);
+    protected Query getSearchQuery(Context context, String queryString, String queryParam,
+                                   List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField)
+        throws SQLException {
+        return getSearchQuery(context, queryString, queryParam, queryFields, sortFields, sortField, -1, -1);
     }
-    
-    protected Query getSearchQuery(Context context, String queryString, String queryParam, List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField, int pageSize, int offset) throws SQLException {
+
+    protected Query getSearchQuery(Context context, String queryString, String queryParam,
+                                   List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField,
+                                   int pageSize, int offset) throws SQLException {
 
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append(queryString);
@@ -147,25 +158,26 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         metadataFieldsToJoin.addAll(queryFields);
         metadataFieldsToJoin.addAll(sortFields);
 
-        if(!CollectionUtils.isEmpty(metadataFieldsToJoin)) {
+        if (!CollectionUtils.isEmpty(metadataFieldsToJoin)) {
             addMetadataLeftJoin(queryBuilder, EPerson.class.getSimpleName().toLowerCase(), metadataFieldsToJoin);
         }
-        if(queryParam != null) {
-            addMetadataValueWhereQuery(queryBuilder, queryFields, "like", EPerson.class.getSimpleName().toLowerCase() + ".email like :queryParam");
+        if (queryParam != null) {
+            addMetadataValueWhereQuery(queryBuilder, queryFields, "like",
+                                       EPerson.class.getSimpleName().toLowerCase() + ".email like :queryParam");
         }
-        if(!CollectionUtils.isEmpty(sortFields)) {
+        if (!CollectionUtils.isEmpty(sortFields)) {
             addMetadataSortQuery(queryBuilder, sortFields, Collections.singletonList(sortField));
         }
 
         Query query = createQuery(context, queryBuilder.toString());
         if (pageSize > 0) {
-        	query.setMaxResults(pageSize);
+            query.setMaxResults(pageSize);
         }
         if (offset > 0) {
-        	query.setFirstResult(offset);
+            query.setFirstResult(offset);
         }
-        if(StringUtils.isNotBlank(queryParam)) {
-            query.setParameter("queryParam", "%"+queryParam.toLowerCase()+"%");
+        if (StringUtils.isNotBlank(queryParam)) {
+            query.setParameter("queryParam", "%" + queryParam.toLowerCase() + "%");
         }
         for (MetadataField metadataField : metadataFieldsToJoin) {
             query.setParameter(metadataField.toString(), metadataField.getID());

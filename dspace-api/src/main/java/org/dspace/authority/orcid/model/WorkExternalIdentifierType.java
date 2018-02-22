@@ -17,7 +17,7 @@ package org.dspace.authority.orcid.model;
  */
 public enum WorkExternalIdentifierType {
 
-//    OTHER_ID,
+    //    OTHER_ID,
     ARXIV,
     ASIN,
     ASIN_TLD,

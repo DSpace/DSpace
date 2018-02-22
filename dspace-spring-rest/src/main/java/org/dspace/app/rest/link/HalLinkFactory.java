@@ -26,7 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
 
     public boolean supports(Class clazz) {
-        if(getResourceClass().isAssignableFrom(clazz)){
+        if (getResourceClass().isAssignableFrom(clazz)) {
             return true;
         } else {
             return false;
@@ -36,7 +36,7 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
     public List<Link> getLinksFor(HALResource halResource, Pageable pageable) throws Exception {
         LinkedList<Link> list = new LinkedList<>();
 
-        if(halResource != null && supports(halResource.getClass())){
+        if (halResource != null && supports(halResource.getClass())) {
             addLinks((RESOURCE) halResource, pageable, list);
         }
 
@@ -44,7 +44,7 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
     }
 
 
-    protected  <T> Link buildLink(String rel, T data) {
+    protected <T> Link buildLink(String rel, T data) {
         UriComponentsBuilder uriComponentsBuilder = uriBuilder(data);
 
         return buildLink(rel, uriComponentsBuilder.build().toUriString());
@@ -52,7 +52,7 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
 
     protected <T> UriComponentsBuilder uriBuilder(T data) {
         return linkTo(data)
-                    .toUriComponentsBuilder();
+            .toUriComponentsBuilder();
     }
 
     protected Link buildLink(String rel, String href) {

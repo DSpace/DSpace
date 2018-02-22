@@ -17,7 +17,7 @@
            http://www.springframework.org/schema/context/spring-context-2.5.xsd"
        default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
-    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+    <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
     <bean class="org.dspace.discovery.MockSolrServiceImpl" id="org.dspace.discovery.SearchService"/>
 

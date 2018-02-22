@@ -12,10 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -28,7 +26,6 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
@@ -58,8 +55,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     protected WorkflowService workflowService;
 
 
-    protected WorkspaceItemServiceImpl()
-    {
+    protected WorkspaceItemServiceImpl() {
 
     }
 
@@ -67,27 +63,23 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     public WorkspaceItem find(Context context, int id) throws SQLException {
         WorkspaceItem workspaceItem = workspaceItemDAO.findByID(context, WorkspaceItem.class, id);
 
-        if (workspaceItem == null)
-        {
-            if (log.isDebugEnabled())
-            {
+        if (workspaceItem == null) {
+            if (log.isDebugEnabled()) {
                 log.debug(LogManager.getHeader(context, "find_workspace_item",
-                        "not_found,workspace_item_id=" + id));
+                                               "not_found,workspace_item_id=" + id));
             }
-        }
-        else
-        {
-            if (log.isDebugEnabled())
-            {
+        } else {
+            if (log.isDebugEnabled()) {
                 log.debug(LogManager.getHeader(context, "find_workspace_item",
-                        "workspace_item_id=" + id));
+                                               "workspace_item_id=" + id));
             }
         }
         return workspaceItem;
     }
 
     @Override
-    public WorkspaceItem create(Context context, Collection collection, boolean template) throws AuthorizeException, SQLException {
+    public WorkspaceItem create(Context context, Collection collection, boolean template)
+        throws AuthorizeException, SQLException {
         // Check the user has permission to ADD to the collection
         authorizeService.authorizeAction(context, collection, Constants.ADD);
 
@@ -108,23 +100,25 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         // add permission
         authorizeService.addPolicy(context, item, Constants.ADD, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
         // remove contents permission
-        authorizeService.addPolicy(context, item, Constants.REMOVE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
+        authorizeService
+            .addPolicy(context, item, Constants.REMOVE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
         // delete permission
-        authorizeService.addPolicy(context, item, Constants.DELETE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
+        authorizeService
+            .addPolicy(context, item, Constants.DELETE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
 
 
         // Copy template if appropriate
         Item templateItem = collection.getTemplateItem();
 
-        if (template && (templateItem != null))
-        {
+        if (template && (templateItem != null)) {
             List<MetadataValue> md = itemService.getMetadata(templateItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
             for (MetadataValue aMd : md) {
                 MetadataField metadataField = aMd.getMetadataField();
                 MetadataSchema metadataSchema = metadataField.getMetadataSchema();
-                itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(), metadataField.getQualifier(), aMd.getLanguage(),
-                        aMd.getValue());
+                itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
+                                        metadataField.getQualifier(), aMd.getLanguage(),
+                                        aMd.getValue());
             }
         }
 
@@ -132,9 +126,9 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         workspaceItem.setItem(item);
 
         log.info(LogManager.getHeader(context, "create_workspace_item",
-                "workspace_item_id=" + workspaceItem.getID()
-                        + "item_id=" + item.getID() + "collection_id="
-                        + collection.getID()));
+                                      "workspace_item_id=" + workspaceItem.getID()
+                                          + "item_id=" + item.getID() + "collection_id="
+                                          + collection.getID()));
 
         return workspaceItem;
     }
@@ -177,18 +171,18 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     public List<WorkspaceItem> findAll(Context context) throws SQLException {
         return workspaceItemDAO.findAll(context);
     }
-    
+
     @Override
     public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-    	return workspaceItemDAO.findAll(context, limit, offset);
+        return workspaceItemDAO.findAll(context, limit, offset);
     }
 
     @Override
     public void update(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
-                // Authorisation is checked by the item.update() method below
+        // Authorisation is checked by the item.update() method below
 
         log.info(LogManager.getHeader(context, "update_workspace_item",
-                "workspace_item_id=" + workspaceItem.getID()));
+                                      "workspace_item_id=" + workspaceItem.getID()));
 
         // Update the item
         itemService.update(context, workspaceItem.getItem());
@@ -198,7 +192,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public void deleteAll(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException, IOException {
+    public void deleteAll(Context context, WorkspaceItem workspaceItem)
+        throws SQLException, AuthorizeException, IOException {
         /*
          * Authorisation is a special case. The submitter won't have REMOVE
          * permission on the collection, so our policy is this: Only the
@@ -207,18 +202,17 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
          */
         Item item = workspaceItem.getItem();
         if (!authorizeService.isAdmin(context)
-                && ((context.getCurrentUser() == null) || (context
-                        .getCurrentUser().getID() != item.getSubmitter()
-                        .getID())))
-        {
+            && ((context.getCurrentUser() == null) || (context
+            .getCurrentUser().getID() != item.getSubmitter()
+                                             .getID()))) {
             // Not an admit, not the submitter
             throw new AuthorizeException("Must be an administrator or the "
-                    + "original submitter to delete a workspace item");
+                                             + "original submitter to delete a workspace item");
         }
 
         log.info(LogManager.getHeader(context, "delete_workspace_item",
-                "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
-                        + "collection_id=" + workspaceItem.getCollection().getID()));
+                                      "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
+                                          + "collection_id=" + workspaceItem.getCollection().getID()));
 
         // Need to delete the epersongroup2workspaceitem row first since it refers
         // to workspaceitem ID
@@ -249,8 +243,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         authorizeService.authorizeAction(context, item, Constants.WRITE);
 
         log.info(LogManager.getHeader(context, "delete_workspace_item",
-                "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
-                        + "collection_id=" + workspaceItem.getCollection().getID()));
+                                      "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
+                                          + "collection_id=" + workspaceItem.getCollection().getID()));
 
         //        deleteSubmitPermissions();
 
@@ -261,22 +255,23 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
     }
 
-	@Override
-	public void move(Context context, WorkspaceItem source, Collection fromCollection, Collection toCollection) throws DCInputsReaderException {
-		source.setCollection(toCollection);
-		
-		List<MetadataValue> remove = new ArrayList<>();
-		List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
-		for(String toRemove : diff) {
-			for(MetadataValue value : source.getItem().getMetadata()) {
-				if(value.getMetadataField().toString('.').equals(toRemove)) {
-					remove.add(value);
-				}
-			}
-		}
-		
-		source.getItem().removeMetadata(remove);
-		
-	}
+    @Override
+    public void move(Context context, WorkspaceItem source, Collection fromCollection, Collection toCollection)
+        throws DCInputsReaderException {
+        source.setCollection(toCollection);
+
+        List<MetadataValue> remove = new ArrayList<>();
+        List<String> diff = Util.differenceInSubmissionFields(fromCollection, toCollection);
+        for (String toRemove : diff) {
+            for (MetadataValue value : source.getItem().getMetadata()) {
+                if (value.getMetadataField().toString('.').equals(toRemove)) {
+                    remove.add(value);
+                }
+            }
+        }
+
+        source.getItem().removeMetadata(remove);
+
+    }
 
 }

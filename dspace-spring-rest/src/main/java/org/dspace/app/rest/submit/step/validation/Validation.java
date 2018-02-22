@@ -18,17 +18,16 @@ import org.dspace.content.WorkspaceItem;
 
 /**
  * Interface to support validation on submission process
- * 
- * TODO should be supported InProgressSubmission (t.b.d)
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * TODO should be supported InProgressSubmission (t.b.d)
+ *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public interface Validation {
-	
-	String getName();
 
-	List<? extends ErrorRest> validate(SubmissionService submissionService, WorkspaceItem obj,
-			SubmissionStepConfig config) throws DCInputsReaderException, SQLException;
+    String getName();
+
+    List<? extends ErrorRest> validate(SubmissionService submissionService, WorkspaceItem obj,
+                                       SubmissionStepConfig config) throws DCInputsReaderException, SQLException;
 
 }

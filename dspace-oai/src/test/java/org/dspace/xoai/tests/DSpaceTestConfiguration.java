@@ -11,11 +11,11 @@ import com.lyncode.xoai.dataprovider.services.api.ItemRepository;
 import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
 import com.lyncode.xoai.dataprovider.services.api.SetRepository;
 import org.dspace.core.Context;
+import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
-import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.xoai.IdentifyResolver;
 import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
 import org.dspace.xoai.services.api.xoai.SetRepositoryResolver;
@@ -82,7 +82,8 @@ public class DSpaceTestConfiguration extends WebMvcConfigurerAdapter {
 
     private StubbedSetRepository setRepository = new StubbedSetRepository();
 
-    @Bean StubbedSetRepository setRepository () {
+    @Bean
+    StubbedSetRepository setRepository() {
         return setRepository;
     }
 
@@ -99,8 +100,9 @@ public class DSpaceTestConfiguration extends WebMvcConfigurerAdapter {
             }
         };
     }
+
     @Bean
-    public SetRepositoryResolver setRepositoryResolver () {
+    public SetRepositoryResolver setRepositoryResolver() {
         return new SetRepositoryResolver() {
             @Override
             public SetRepository getSetRepository() throws ContextServiceException {
@@ -108,13 +110,14 @@ public class DSpaceTestConfiguration extends WebMvcConfigurerAdapter {
             }
         };
     }
+
     @Bean
-    public IdentifyResolver identifyResolver () {
+    public IdentifyResolver identifyResolver() {
         return new DSpaceIdentifyResolver();
     }
 
     @Bean
-    public EarliestDateResolver earliestDateResolver () {
+    public EarliestDateResolver earliestDateResolver() {
         return new StubbedEarliestDateResolver();
     }
 }

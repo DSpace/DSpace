@@ -13,20 +13,20 @@ import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 
 /**
- * 
  * Class to manage HTTP PATCH method operation REMOVE
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  * @param <T>
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public abstract class RemovePatchOperation<T extends Object> extends PatchOperation<T> {
-	
-	@Override
-	public void perform(Context context, Request currentRequest, WorkspaceItem source, Operation operation) throws Exception{
-		remove(context, currentRequest, source, operation.getPath(), operation.getValue());
-	}
 
-	abstract void remove(Context context,Request currentRequest,WorkspaceItem source,String string,Object value) throws Exception;
-	
+    @Override
+    public void perform(Context context, Request currentRequest, WorkspaceItem source, Operation operation)
+        throws Exception {
+        remove(context, currentRequest, source, operation.getPath(), operation.getValue());
+    }
+
+    abstract void remove(Context context, Request currentRequest, WorkspaceItem source, String string, Object value)
+        throws Exception;
+
 }

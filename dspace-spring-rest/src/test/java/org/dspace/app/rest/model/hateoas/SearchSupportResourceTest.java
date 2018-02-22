@@ -21,24 +21,24 @@ public class SearchSupportResourceTest {
     private SearchSupportRest searchSupportRest;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         searchSupportRest = new SearchSupportRest();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testConstructorWithNullThrowsException() throws Exception{
+    public void testConstructorWithNullThrowsException() throws Exception {
         SearchSupportResource searchSupportResource = new SearchSupportResource(null);
     }
 
     @Test
-    public void testConstructorAndGetterWithProperDataAndObjectNotNull() throws Exception{
+    public void testConstructorAndGetterWithProperDataAndObjectNotNull() throws Exception {
         SearchSupportResource searchSupportResource = new SearchSupportResource(searchSupportRest);
         assertNotNull(searchSupportResource);
         assertNotNull(searchSupportResource.getContent());
     }
 
     @Test
-    public void testConstructorAndGetterWithProperDataAndProperDataReturned() throws Exception{
+    public void testConstructorAndGetterWithProperDataAndProperDataReturned() throws Exception {
         SearchSupportResource searchSupportResource = new SearchSupportResource(searchSupportRest);
         assertEquals(searchSupportRest, searchSupportResource.getContent());
     }

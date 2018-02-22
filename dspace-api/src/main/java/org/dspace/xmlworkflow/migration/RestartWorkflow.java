@@ -7,7 +7,14 @@
  */
 package org.dspace.xmlworkflow.migration;
 
-import org.apache.commons.cli.*;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -19,9 +26,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-
-import java.util.List;
-import java.util.UUID;
 
 /**
  * A utility class that will send all the worklfow items
@@ -43,6 +47,11 @@ public class RestartWorkflow {
 
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
+    /**
+     * Default constructor
+     */
+    private RestartWorkflow() { }
+
     public static void main(String[] args) {
         try {
             System.out.println("All workflowitems will be sent back to the first workflow step.");
@@ -53,11 +62,11 @@ public class RestartWorkflow {
 
             Options options = new Options();
             options.addOption("e", "eperson", true,
-                    "email of eperson doing importing");
+                              "email of eperson doing importing");
             options.addOption("n", "notify", false,
-                    "if sending submissions through the workflow, send notification emails");
+                              "if sending submissions through the workflow, send notification emails");
             options.addOption("p", "provenance", true,
-                    "the provenance description to be added to the item");
+                              "the provenance description to be added to the item");
             options.addOption("h", "help", false, "help");
 
             CommandLine line = parser.parse(options, args);
@@ -72,10 +81,10 @@ public class RestartWorkflow {
             if (line.hasOption('n')) {
                 useWorkflowSendEmail = true;
             }
-            if (line.hasOption('e')) // eperson
-            {
+            // eperson
+            if (line.hasOption('e')) {
                 eperson = line.getOptionValue('e');
-            }else{
+            } else {
                 System.out.println("The -e (eperson) option is mandatory !");
                 System.exit(1);
             }
@@ -96,7 +105,7 @@ public class RestartWorkflow {
             }
 
             String provenance = null;
-            if(line.hasOption('p')){
+            if (line.hasOption('p')) {
                 provenance = line.getOptionValue('p');
             }
 
@@ -125,11 +134,12 @@ public class RestartWorkflow {
 //            tasklog.update();
 
                 // convert into personal workspace
-                WorkspaceItem wsi = workflowService.sendWorkflowItemBackSubmission(context, workflowItem, myEPerson, provenance, "");
+                WorkspaceItem wsi = workflowService
+                    .sendWorkflowItemBackSubmission(context, workflowItem, myEPerson, provenance, "");
 
                 log.info(LogManager.getHeader(context, "restart_workflow", "workflow_item_id="
-                        + workflowItem.getID() + "item_id=" + workflowItem.getItem().getID()
-                        + "collection_id=" + workflowItem.getCollection().getID()));
+                    + workflowItem.getID() + "item_id=" + workflowItem.getItem().getID()
+                    + "collection_id=" + workflowItem.getCollection().getID()));
 
 
                 if (useWorkflowSendEmail) {

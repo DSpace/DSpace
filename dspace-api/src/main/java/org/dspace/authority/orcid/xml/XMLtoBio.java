@@ -7,23 +7,22 @@
  */
 package org.dspace.authority.orcid.xml;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import javax.xml.xpath.XPathExpressionException;
+
+import org.apache.log4j.Logger;
 import org.dspace.authority.orcid.model.Bio;
 import org.dspace.authority.orcid.model.BioExternalIdentifier;
 import org.dspace.authority.orcid.model.BioName;
 import org.dspace.authority.orcid.model.BioResearcherUrl;
 import org.dspace.authority.util.XMLUtils;
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.xpath.XPathExpressionException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -42,7 +41,7 @@ public class XMLtoBio extends Converter {
 
     protected String ORCID_BIO = "//orcid-bio";
 
-//    protected String ORCID = "parent::*/orcid";
+    //    protected String ORCID = "parent::*/orcid";
     protected String ORCID = "parent::*/orcid-identifier/path";
 
     protected String PERSONAL_DETAILS = "personal-details";
@@ -106,7 +105,7 @@ public class XMLtoBio extends Converter {
     private Bio convertBio(Node node) {
         Bio bio = new Bio();
 
-        setOrcid(node,bio);
+        setOrcid(node, bio);
         setPersonalDetails(node, bio);
         setContactDetails(node, bio);
         setKeywords(node, bio);
@@ -118,11 +117,10 @@ public class XMLtoBio extends Converter {
     }
 
     @Override
-    protected void processError(Document xml)  {
+    protected void processError(Document xml) {
         String errorMessage = XMLErrors.getErrorMessage(xml);
 
-        if(errorMessage.matches(ORCID_NOT_FOUND))
-        {
+        if (errorMessage.matches(ORCID_NOT_FOUND)) {
             // do something?
         }
 
@@ -177,7 +175,8 @@ public class XMLtoBio extends Converter {
                 String id_common_name = XMLUtils.getTextContent(external_identifier, EXTERNAL_ID_COMMNON_NAME);
                 String id_reference = XMLUtils.getTextContent(external_identifier, EXTERNAL_ID_REFERENCE);
                 String id_url = XMLUtils.getTextContent(external_identifier, EXTERNAL_ID_URL);
-                BioExternalIdentifier externalIdentifier = new BioExternalIdentifier(id_orcid, id_common_name, id_reference, id_url);
+                BioExternalIdentifier externalIdentifier = new BioExternalIdentifier(id_orcid, id_common_name,
+                                                                                     id_reference, id_url);
                 bio.addExternalIdentifier(externalIdentifier);
             }
 

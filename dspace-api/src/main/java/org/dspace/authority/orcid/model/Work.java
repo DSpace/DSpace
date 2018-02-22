@@ -10,7 +10,6 @@ package org.dspace.authority.orcid.model;
 import java.util.Set;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -103,15 +102,15 @@ public class Work {
     @Override
     public String toString() {
         return "Work{" +
-                "workTitle=" + workTitle +
-                ", description='" + description + '\'' +
-                ", citation=" + citation +
-                ", workType=" + workType +
-                ", publicationDate='" + publicationDate + '\'' +
-                ", workExternalIdentifier=" + workExternalIdentifier +
-                ", url='" + url + '\'' +
-                ", contributors=" + contributors +
-                ", workSource='" + workSource + '\'' +
-                '}';
+            "workTitle=" + workTitle +
+            ", description='" + description + '\'' +
+            ", citation=" + citation +
+            ", workType=" + workType +
+            ", publicationDate='" + publicationDate + '\'' +
+            ", workExternalIdentifier=" + workExternalIdentifier +
+            ", url='" + url + '\'' +
+            ", contributors=" + contributors +
+            ", workSource='" + workSource + '\'' +
+            '}';
     }
 }

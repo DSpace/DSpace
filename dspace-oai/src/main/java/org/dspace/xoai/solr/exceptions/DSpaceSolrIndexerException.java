@@ -9,34 +9,28 @@
 package org.dspace.xoai.solr.exceptions;
 
 /**
- * 
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 @SuppressWarnings("serial")
-public class DSpaceSolrIndexerException extends Exception
-{
+public class DSpaceSolrIndexerException extends Exception {
     /**
      * Creates a new instance of <code>DSpaceSolrException</code> without detail
      * message.
      */
-    public DSpaceSolrIndexerException()
-    {
+    public DSpaceSolrIndexerException() {
     }
 
     /**
      * Constructs an instance of <code>DSpaceSolrException</code> with the
      * specified detail message.
-     * 
-     * @param msg
-     *            the detail message.
+     *
+     * @param msg the detail message.
      */
-    public DSpaceSolrIndexerException(String msg)
-    {
+    public DSpaceSolrIndexerException(String msg) {
         super(msg);
     }
 
-    public DSpaceSolrIndexerException(String msg, Throwable t)
-    {
+    public DSpaceSolrIndexerException(String msg, Throwable t) {
         super(msg, t);
     }
 }

@@ -38,7 +38,7 @@ public class SearchResultsRest extends DiscoveryResultsRest {
     }
 
     public void addSearchResult(SearchResultEntryRest searchResultEntry) {
-        if(searchResults == null) {
+        if (searchResults == null) {
             searchResults = new LinkedList<>();
         }
 
@@ -55,7 +55,7 @@ public class SearchResultsRest extends DiscoveryResultsRest {
     }
 
     public void addFacetEntry(final SearchFacetEntryRest facetEntry) {
-        if(facets == null) {
+        if (facets == null) {
             facets = new LinkedList<>();
         }
 
@@ -121,9 +121,10 @@ public class SearchResultsRest extends DiscoveryResultsRest {
             this.by = by;
             this.order = order;
         }
-        public Sorting(String by){
-            this.by=by;
-            this.order=null;
+
+        public Sorting(String by) {
+            this.by = by;
+            this.order = null;
         }
 
         public String getBy() {

@@ -33,14 +33,16 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
         return parameter.getParameterType().equals(SearchFilter.class) || isSearchFilterList(parameter);
     }
 
-    public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer, final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
+                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory)
+        throws Exception {
         List<SearchFilter> result = new LinkedList<>();
 
         Iterator<String> parameterNames = webRequest.getParameterNames();
         while (parameterNames != null && parameterNames.hasNext()) {
             String parameterName = parameterNames.next();
 
-            if(parameterName.startsWith(SEARCH_FILTER_PREFIX)) {
+            if (parameterName.startsWith(SEARCH_FILTER_PREFIX)) {
                 String filterName = StringUtils.substringAfter(parameterName, SEARCH_FILTER_PREFIX);
 
                 for (String value : webRequest.getParameterValues(parameterName)) {
@@ -52,7 +54,7 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
             }
         }
 
-        if(parameter.getParameterType().equals(SearchFilter.class)) {
+        if (parameter.getParameterType().equals(SearchFilter.class)) {
             return result.isEmpty() ? null : result.get(0);
         } else {
             return result;
@@ -61,7 +63,8 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
 
     private boolean isSearchFilterList(final MethodParameter parameter) {
         return parameter.getParameterType().equals(List.class)
-                && parameter.getGenericParameterType() instanceof ParameterizedType
-                && ((ParameterizedType) parameter.getGenericParameterType()).getActualTypeArguments()[0].equals(SearchFilter.class);
+            && parameter.getGenericParameterType() instanceof ParameterizedType
+            && ((ParameterizedType) parameter.getGenericParameterType()).getActualTypeArguments()[0]
+            .equals(SearchFilter.class);
     }
 }

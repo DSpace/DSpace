@@ -7,6 +7,13 @@
  */
 package org.dspace.xoai.tests.integration.xoai;
 
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.xml.xpath.XPathExpressionException;
+
 import com.lyncode.builder.MapBuilder;
 import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
 import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
@@ -14,12 +21,18 @@ import com.lyncode.xoai.dataprovider.xml.xoaiconfig.Configuration;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.FormatConfiguration;
 import org.apache.solr.client.solrj.SolrServer;
 import org.dspace.xoai.controller.DSpaceOAIDataProvider;
-import org.dspace.xoai.services.api.config.ConfigurationService;
-import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.FieldResolver;
+import org.dspace.xoai.services.api.config.ConfigurationService;
+import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.tests.DSpaceTestConfiguration;
-import org.dspace.xoai.tests.helpers.stubs.*;
+import org.dspace.xoai.tests.helpers.stubs.ItemRepositoryBuilder;
+import org.dspace.xoai.tests.helpers.stubs.StubbedConfigurationService;
+import org.dspace.xoai.tests.helpers.stubs.StubbedEarliestDateResolver;
+import org.dspace.xoai.tests.helpers.stubs.StubbedFieldResolver;
+import org.dspace.xoai.tests.helpers.stubs.StubbedResourceResolver;
+import org.dspace.xoai.tests.helpers.stubs.StubbedSetRepository;
+import org.dspace.xoai.tests.helpers.stubs.StubbedXOAIManagerResolver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -33,20 +46,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.result.XpathResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.xml.xpath.XPathExpressionException;
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = { DSpaceTestConfiguration.class, DSpaceOAIDataProvider.class })
+@ContextConfiguration(classes = {DSpaceTestConfiguration.class, DSpaceOAIDataProvider.class})
 public abstract class AbstractDSpaceTest {
     private static BaseDateProvider baseDateProvider = new BaseDateProvider();
-    @Autowired WebApplicationContext wac;
+    @Autowired
+    WebApplicationContext wac;
     private MockMvc mockMvc;
 
     private StubbedXOAIManagerResolver xoaiManagerResolver;
@@ -69,7 +76,7 @@ public abstract class AbstractDSpaceTest {
         resourceResolver = (StubbedResourceResolver) this.wac.getBean(ResourceResolver.class);
         xoaiManagerResolver.configuration();
     }
-    
+
     @After
     public void teardown() {
         // Nullify all resources so that JUnit will clean them up
@@ -84,30 +91,32 @@ public abstract class AbstractDSpaceTest {
     }
 
     protected MockMvc againstTheDataProvider() {
-        if (this.mockMvc == null) this.mockMvc = webAppContextSetup(this.wac).build();
+        if (this.mockMvc == null) {
+            this.mockMvc = webAppContextSetup(this.wac).build();
+        }
         return this.mockMvc;
     }
 
-    protected Configuration theConfiguration () {
+    protected Configuration theConfiguration() {
         return xoaiManagerResolver.configuration();
     }
 
-    protected StubbedConfigurationService theDSpaceConfiguration () {
+    protected StubbedConfigurationService theDSpaceConfiguration() {
         return configurationService;
     }
 
-    protected StubbedFieldResolver theDatabase () {
+    protected StubbedFieldResolver theDatabase() {
         return databaseService;
     }
 
-    protected StubbedEarliestDateResolver theEarlistEarliestDate () {
+    protected StubbedEarliestDateResolver theEarlistEarliestDate() {
         return earliestDateResolver;
     }
 
     protected XpathResultMatchers oaiXPath(String xpath) throws XPathExpressionException {
         return MockMvcResultMatchers.xpath(this.replaceXpath(xpath), new MapBuilder<String, String>()
-                .withPair("o", "http://www.openarchives.org/OAI/2.0/")
-                .build());
+            .withPair("o", "http://www.openarchives.org/OAI/2.0/")
+            .build());
     }
 
     private String replaceXpath(String xpath) {
@@ -116,22 +125,25 @@ public abstract class AbstractDSpaceTest {
         Pattern pattern = Pattern.compile("/[^/]+");
         Matcher matcher = pattern.matcher(xpath);
         while (matcher.find()) {
-            if (matcher.start() > offset) newXpath += xpath.substring(offset, matcher.start());
-            if (!matcher.group().contains(":") && !matcher.group().startsWith("/@"))
+            if (matcher.start() > offset) {
+                newXpath += xpath.substring(offset, matcher.start());
+            }
+            if (!matcher.group().contains(":") && !matcher.group().startsWith("/@")) {
                 newXpath += "/o:" + matcher.group().substring(1);
-            else
+            } else {
                 newXpath += matcher.group();
+            }
             offset = matcher.end() + 1;
         }
 
         return newXpath;
     }
 
-    protected String representationOfDate (Date date) {
+    protected String representationOfDate(Date date) {
         return baseDateProvider.format(date);
     }
 
-    protected StubbedSetRepository theSetRepository () {
+    protected StubbedSetRepository theSetRepository() {
         return setRepository;
     }
 
@@ -166,8 +178,9 @@ public abstract class AbstractDSpaceTest {
     private ItemRepositoryBuilder itemRepositoryBuilder;
 
     public ItemRepositoryBuilder theItemRepository() {
-        if (itemRepositoryBuilder == null)
+        if (itemRepositoryBuilder == null) {
             itemRepositoryBuilder = new ItemRepositoryBuilder(solrServer);
+        }
         return itemRepositoryBuilder;
     }
 }

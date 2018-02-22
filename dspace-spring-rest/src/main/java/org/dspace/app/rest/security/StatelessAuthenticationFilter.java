@@ -9,7 +9,6 @@ package org.dspace.app.rest.security;
 
 import java.io.IOException;
 import java.util.List;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +33,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
-public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
+public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
 
     private static final Logger log = LoggerFactory.getLogger(StatelessAuthenticationFilter.class);
 
@@ -60,7 +59,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
                                     FilterChain chain) throws IOException, ServletException {
 
         Authentication authentication = getAuthentication(req);
-        if (authentication != null ) {
+        if (authentication != null) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 

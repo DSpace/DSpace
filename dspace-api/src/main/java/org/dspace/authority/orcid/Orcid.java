@@ -7,22 +7,21 @@
  */
 package org.dspace.authority.orcid;
 
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.orcid.model.Bio;
 import org.dspace.authority.orcid.model.Work;
 import org.dspace.authority.orcid.xml.XMLtoBio;
 import org.dspace.authority.orcid.xml.XMLtoWork;
 import org.dspace.authority.rest.RestSource;
-import org.apache.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -39,7 +38,8 @@ public class Orcid extends RestSource {
 
     public static Orcid getOrcid() {
         if (orcid == null) {
-            orcid = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("OrcidSource", Orcid.class);
+            orcid = DSpaceServicesFactory.getInstance().getServiceManager()
+                                         .getServiceByName("OrcidSource", Orcid.class);
         }
         return orcid;
     }
@@ -63,7 +63,8 @@ public class Orcid extends RestSource {
     }
 
     public List<Bio> queryBio(String name, int start, int rows) {
-        Document bioDocument = restConnector.get("search/orcid-bio?q=" + URLEncoder.encode("\"" + name + "\"") + "&start=" + start + "&rows=" + rows);
+        Document bioDocument = restConnector
+            .get("search/orcid-bio?q=" + URLEncoder.encode("\"" + name + "\"") + "&start=" + start + "&rows=" + rows);
         XMLtoBio converter = new XMLtoBio();
         return converter.convert(bioDocument);
     }

@@ -14,89 +14,88 @@ import org.dspace.app.rest.RestResourceController;
 
 /**
  * The BitstreamFormat REST Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class BitstreamFormatRest extends BaseObjectRest<Integer> {
-	public static final String NAME = "bitstreamformat";
-	
-	public static final String CATEGORY = RestAddressableModel.CORE;
-	
-	private String shortDescription;
+    public static final String NAME = "bitstreamformat";
 
-	private String description;
+    public static final String CATEGORY = RestAddressableModel.CORE;
 
-	private String mimetype;
+    private String shortDescription;
 
-	private int supportLevel;
+    private String description;
 
-	private boolean internal;
+    private String mimetype;
 
-	private List<String> extensions;
+    private int supportLevel;
 
-	public String getShortDescription() {
-		return shortDescription;
-	}
+    private boolean internal;
 
-	public void setShortDescription(String shortDescription) {
-		this.shortDescription = shortDescription;
-	}
+    private List<String> extensions;
 
-	public String getDescription() {
-		return description;
-	}
+    public String getShortDescription() {
+        return shortDescription;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
 
-	public String getMimetype() {
-		return mimetype;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public void setMimetype(String mimetype) {
-		this.mimetype = mimetype;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public int getSupportLevel() {
-		return supportLevel;
-	}
+    public String getMimetype() {
+        return mimetype;
+    }
 
-	public void setSupportLevel(int supportLevel) {
-		this.supportLevel = supportLevel;
-	}
+    public void setMimetype(String mimetype) {
+        this.mimetype = mimetype;
+    }
 
-	public boolean isInternal() {
-		return internal;
-	}
+    public int getSupportLevel() {
+        return supportLevel;
+    }
 
-	public void setInternal(boolean internal) {
-		this.internal = internal;
-	}
+    public void setSupportLevel(int supportLevel) {
+        this.supportLevel = supportLevel;
+    }
 
-	public List<String> getExtensions() {
-		return extensions;
-	}
+    public boolean isInternal() {
+        return internal;
+    }
 
-	public void setExtensions(List<String> extensions) {
-		this.extensions = extensions;
-	}
+    public void setInternal(boolean internal) {
+        this.internal = internal;
+    }
 
-	@JsonIgnore
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
-	
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    public List<String> getExtensions() {
+        return extensions;
+    }
 
-	@Override
-	@JsonIgnore
-	public Class getController() {
-		return RestResourceController.class;
-	}
+    public void setExtensions(List<String> extensions) {
+        this.extensions = extensions;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
+
+    @Override
+    public String getType() {
+        return NAME;
+    }
+
+    @Override
+    @JsonIgnore
+    public Class getController() {
+        return RestResourceController.class;
+    }
 }

@@ -7,6 +7,21 @@
  */
 package org.dspace.xoai.app;
 
+import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
+import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import javax.xml.stream.XMLStreamException;
+
 import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
 import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
@@ -25,15 +40,18 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
-import org.dspace.handle.Handle;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
@@ -46,17 +64,6 @@ import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import javax.xml.stream.XMLStreamException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.*;
-
-import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
-import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
 
 /**
  * @author Lyncode Development Team (dspace at lyncode dot com)
@@ -133,15 +140,16 @@ public class XOAI {
                 result = this.indexAll();
             } else {
                 SolrQuery solrParams = new SolrQuery("*:*")
-                        .addField("item.lastmodified")
-                        .addSortField("item.lastmodified", ORDER.desc).setRows(1);
+                    .addField("item.lastmodified")
+                    .addSortField("item.lastmodified", ORDER.desc).setRows(1);
 
                 SolrDocumentList results = DSpaceSolrSearch.query(solrServerResolver.getServer(), solrParams);
                 if (results.getNumFound() == 0) {
                     System.out.println("There are no indexed documents, using full import.");
                     result = this.indexAll();
-                } else
+                } else {
                     result = this.index((Date) results.get(0).getFieldValue("item.lastmodified"));
+                }
 
             }
             solrServerResolver.getServer().commit();
@@ -163,13 +171,13 @@ public class XOAI {
 
     private int index(Date last) throws DSpaceSolrIndexerException {
         System.out
-                .println("Incremental import. Searching for documents modified after: "
-                        + last.toString());
+            .println("Incremental import. Searching for documents modified after: "
+                         + last.toString());
         // Index both in_archive items AND withdrawn items. Withdrawn items will be flagged withdrawn
         // (in order to notify external OAI harvesters of their new status)
         try {
             Iterator<Item> iterator = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(
-                    context, last);
+                context, last);
             return this.index(iterator);
         } catch (SQLException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
@@ -182,7 +190,7 @@ public class XOAI {
             // Index both in_archive items AND withdrawn items. Withdrawn items will be flagged withdrawn
             // (in order to notify external OAI harvesters of their new status)
             Iterator<Item> iterator = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(
-                    context, null);
+                context, null);
             return this.index(iterator);
         } catch (SQLException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
@@ -190,7 +198,7 @@ public class XOAI {
     }
 
     private int index(Iterator<Item> iterator)
-            throws DSpaceSolrIndexerException {
+        throws DSpaceSolrIndexerException {
         try {
             int i = 0;
             SolrServer server = solrServerResolver.getServer();
@@ -203,11 +211,13 @@ public class XOAI {
                     context.uncacheEntity(item);
 
                 } catch (SQLException | MetadataBindException | ParseException
-                        | XMLStreamException | WritingXmlException ex) {
+                    | XMLStreamException | WritingXmlException ex) {
                     log.error(ex.getMessage(), ex);
                 }
                 i++;
-                if (i % 100 == 0) System.out.println(i + " items imported so far...");
+                if (i % 100 == 0) {
+                    System.out.println(i + " items imported so far...");
+                }
             }
             System.out.println("Total: " + i + " items");
             server.commit();
@@ -217,7 +227,8 @@ public class XOAI {
         }
     }
 
-    private SolrInputDocument index(Item item) throws SQLException, MetadataBindException, ParseException, XMLStreamException, WritingXmlException {
+    private SolrInputDocument index(Item item)
+        throws SQLException, MetadataBindException, ParseException, XMLStreamException, WritingXmlException {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("item.id", item.getID());
         boolean pub = this.isPublic(item);
@@ -229,20 +240,22 @@ public class XOAI {
             doc.addField("item.submitter", item.getSubmitter().getEmail());
         }
         doc.addField("item.deleted", item.isWithdrawn() ? "true" : "false");
-        for (Collection col : item.getCollections())
+        for (Collection col : item.getCollections()) {
             doc.addField("item.collections",
-                    "col_" + col.getHandle().replace("/", "_"));
-        for (Community com : collectionsService.flatParentCommunities(context, item))
+                         "col_" + col.getHandle().replace("/", "_"));
+        }
+        for (Community com : collectionsService.flatParentCommunities(context, item)) {
             doc.addField("item.communities",
-                    "com_" + com.getHandle().replace("/", "_"));
+                         "com_" + com.getHandle().replace("/", "_"));
+        }
 
         List<MetadataValue> allData = itemService.getMetadata(item,
-                Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+                                                              Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (MetadataValue dc : allData) {
             MetadataField field = dc.getMetadataField();
             String key = "metadata."
-                    + field.getMetadataSchema().getName() + "."
-                    + field.getElement();
+                + field.getMetadataSchema().getName() + "."
+                + field.getElement();
             if (field.getQualifier() != null) {
                 key += "." + field.getQualifier();
             }
@@ -286,8 +299,8 @@ public class XOAI {
     private static boolean getKnownExplanation(Throwable t) {
         if (t instanceof ConnectException) {
             System.err.println("Solr server ("
-                    + ConfigurationManager.getProperty("oai", "solr.url")
-                    + ") is down, turn it on.");
+                                   + ConfigurationManager.getProperty("oai", "solr.url")
+                                   + ") is down, turn it on.");
             return true;
         }
 
@@ -295,10 +308,12 @@ public class XOAI {
     }
 
     private static boolean searchForReason(Throwable t) {
-        if (getKnownExplanation(t))
+        if (getKnownExplanation(t)) {
             return true;
-        if (t.getCause() != null)
+        }
+        if (t.getCause() != null) {
             return searchForReason(t.getCause());
+        }
         return false;
     }
 
@@ -313,7 +328,8 @@ public class XOAI {
         }
     }
 
-    private static void cleanCache(XOAIItemCacheService xoaiItemCacheService,  XOAICacheService xoaiCacheService) throws IOException {
+    private static void cleanCache(XOAIItemCacheService xoaiItemCacheService, XOAICacheService xoaiCacheService)
+        throws IOException {
         System.out.println("Purging cached OAI responses.");
         xoaiItemCacheService.deleteAll();
         xoaiCacheService.deleteAll();
@@ -327,8 +343,8 @@ public class XOAI {
     public static void main(String[] argv) throws IOException, ConfigurationException {
 
 
-        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(new Class[]{
-                BasicConfiguration.class
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(new Class[] {
+            BasicConfiguration.class
         });
 
         ConfigurationService configurationService = applicationContext.getBean(ConfigurationService.class);
@@ -342,7 +358,7 @@ public class XOAI {
             Options options = new Options();
             options.addOption("c", "clear", false, "Clear index before indexing");
             options.addOption("o", "optimize", false,
-                    "Optimize index at the end");
+                              "Optimize index at the end");
             options.addOption("v", "verbose", false, "Verbose output");
             options.addOption("h", "help", false, "Shows some help");
             options.addOption("n", "number", true, "FOR DEVELOPMENT MUST DELETE");
@@ -378,14 +394,16 @@ public class XOAI {
                 if (COMMAND_IMPORT.equals(command)) {
                     ctx = new Context(Context.Mode.READ_ONLY);
                     XOAI indexer = new XOAI(ctx,
-                            line.hasOption('o'),
-                            line.hasOption('c'),
-                            line.hasOption('v'));
+                                            line.hasOption('o'),
+                                            line.hasOption('c'),
+                                            line.hasOption('v'));
 
                     applicationContext.getAutowireCapableBeanFactory().autowireBean(indexer);
 
                     int imported = indexer.index();
-                    if (imported > 0) cleanCache(itemCacheService, cacheService);
+                    if (imported > 0) {
+                        cleanCache(itemCacheService, cacheService);
+                    }
                 } else if (COMMAND_CLEAN_CACHE.equals(command)) {
                     cleanCache(itemCacheService, cacheService);
                 } else if (COMMAND_COMPILE_ITEMS.equals(command)) {
@@ -403,8 +421,8 @@ public class XOAI {
                 }
 
                 System.out.println("OAI 2.0 manager action ended. It took "
-                        + ((System.currentTimeMillis() - start) / 1000)
-                        + " seconds.");
+                                       + ((System.currentTimeMillis() - start) / 1000)
+                                       + " seconds.");
             } else {
                 usage();
             }
@@ -413,12 +431,11 @@ public class XOAI {
                 ex.printStackTrace();
             }
             log.error(ex.getMessage(), ex);
-        }
-        finally
-        {
+        } finally {
             // Abort our context, if still open
-            if(ctx!=null && ctx.isValid())
+            if (ctx != null && ctx.isValid()) {
                 ctx.abort();
+            }
         }
     }
 
@@ -442,7 +459,9 @@ public class XOAI {
 
             while (iterator.hasNext()) {
                 Item item = iterator.next();
-                if (verbose) System.out.println("Compiling item with handle: " + item.getHandle());
+                if (verbose) {
+                    System.out.println("Compiling item with handle: " + item.getHandle());
+                }
                 xoaiItemCacheService.put(item, retrieveMetadata(context, item));
             }
 

@@ -7,6 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -15,11 +20,6 @@ import org.dspace.content.Item;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Builder class to build bitstreams in test cases
@@ -37,12 +37,14 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
 
     }
 
-    public static BitstreamBuilder createBitstream(Context context, Item item, InputStream is) throws SQLException, AuthorizeException, IOException {
+    public static BitstreamBuilder createBitstream(Context context, Item item, InputStream is)
+        throws SQLException, AuthorizeException, IOException {
         BitstreamBuilder builder = new BitstreamBuilder(context);
         return builder.create(context, item, is);
     }
 
-    private BitstreamBuilder create(Context context, Item item, InputStream is) throws SQLException, AuthorizeException, IOException {
+    private BitstreamBuilder create(Context context, Item item, InputStream is)
+        throws SQLException, AuthorizeException, IOException {
         this.context = context;
         this.item = item;
 
@@ -77,13 +79,10 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         List<Bundle> bundles = itemService.getBundles(item, ORIGINAL);
         Bundle targetBundle = null;
 
-        if( bundles.size() < 1 )
-        {
+        if (bundles.size() < 1) {
             // not found, create a new one
             targetBundle = bundleService.create(context, item, ORIGINAL);
-        }
-        else
-        {
+        } else {
             // put bitstreams into first bundle
             targetBundle = bundles.iterator().next();
         }
@@ -106,7 +105,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
             itemService.update(context, item);
 
             //Check if we need to make this bitstream private.
-            if(readerGroup != null) {
+            if (readerGroup != null) {
                 setOnlyReadPermission(bitstream, readerGroup, null);
             }
 

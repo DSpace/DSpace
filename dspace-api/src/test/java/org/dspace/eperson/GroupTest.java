@@ -7,6 +7,20 @@
  */
 package org.dspace.eperson;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
@@ -16,13 +30,6 @@ import org.dspace.eperson.service.GroupService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
-
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for the Group class
@@ -43,7 +50,6 @@ public class GroupTest extends AbstractUnitTest {
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
 
-
     /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
@@ -53,8 +59,7 @@ public class GroupTest extends AbstractUnitTest {
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
         try {
             //Only admins can perform group operations, so add as default user
@@ -66,14 +71,13 @@ public class GroupTest extends AbstractUnitTest {
             level2Group = createGroup("level2Group");
             groupService.addMember(context, level1Group, level2Group);
 
-            groupService.update(context,  topGroup);
-            groupService.update(context,  level1Group);
-            groupService.update(context,  level2Group);
+            groupService.update(context, topGroup);
+            groupService.update(context, level1Group);
+            groupService.update(context, level2Group);
             context.restoreAuthSystemState();
 
 
-        }catch(SQLException ex)
-        {
+        } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         } catch (AuthorizeException ex) {
@@ -84,23 +88,19 @@ public class GroupTest extends AbstractUnitTest {
 
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         try {
             context.turnOffAuthorisationSystem();
-            if(level2Group != null)
-            {
-                groupService.delete(context,level2Group);
+            if (level2Group != null) {
+                groupService.delete(context, level2Group);
                 level2Group = null;
             }
-            if(level1Group != null)
-            {
+            if (level1Group != null) {
                 groupService.delete(context, level1Group);
                 level1Group = null;
             }
-            if(topGroup != null)
-            {
-                groupService.delete(context,topGroup);
+            if (topGroup != null) {
+                groupService.delete(context, topGroup);
                 topGroup = null;
             }
             context.restoreAuthSystemState();
@@ -125,8 +125,7 @@ public class GroupTest extends AbstractUnitTest {
             group = groupService.create(context);
             assertThat("testCreateGroup", group, notNullValue());
         } finally {
-            if(group != null)
-            {
+            if (group != null) {
                 groupService.delete(context, group);
             }
             context.restoreAuthSystemState();
@@ -190,7 +189,8 @@ public class GroupTest extends AbstractUnitTest {
 //            listNames.add(group.getID().toString());
 //            setNames.add(group.getID().toString());
 //        }
-//        assertTrue("findAllIdSort 2 ", ArrayUtils.isEquals(setNames.toArray(new String[setNames.size()]), listNames.toArray(new String[listNames.size()])));
+//        assertTrue("findAllIdSort 2 ", ArrayUtils.isEquals(setNames.toArray(new String[setNames.size()]), listNames
+// .toArray(new String[listNames.size()])));
 //    }
 
 
@@ -206,7 +206,8 @@ public class GroupTest extends AbstractUnitTest {
         List<String> names = new ArrayList<>();
         List<String> sortedNames = new ArrayList<>();
         for (Group group : groups) {
-            // Ignore any unnamed groups. This is only necessary when running unit tests via a persistent database (e.g. Postgres) as unnamed groups may be created by other tests.
+            // Ignore any unnamed groups. This is only necessary when running unit tests via a persistent database (e
+            // .g. Postgres) as unnamed groups may be created by other tests.
             if (group.getName() == null) {
                 continue;
             }
@@ -239,8 +240,7 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
-    public void searchByID() throws SQLException
-    {
+    public void searchByID() throws SQLException {
         List<Group> searchResult = groupService.search(context, String.valueOf(topGroup.getID()), 0, 10);
         assertEquals("searchID 1", searchResult.size(), 1);
         assertEquals("searchID 2", searchResult.iterator().next(), topGroup);
@@ -254,7 +254,7 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void addMemberEPerson() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
-        EPerson ePerson =  null;
+        EPerson ePerson = null;
         try {
             ePerson = createEPersonAndAddToGroup("addMemberEPerson@dspace.org", topGroup);
             groupService.update(context, topGroup);
@@ -262,8 +262,7 @@ public class GroupTest extends AbstractUnitTest {
             assertEquals("addMemberEPerson 1", topGroup.getMembers().size(), 1);
             assertTrue("addMemberEPerson 2", topGroup.getMembers().contains(ePerson));
         } finally {
-            if(ePerson != null)
-            {
+            if (ePerson != null) {
                 context.turnOffAuthorisationSystem();
                 ePersonService.delete(context, ePerson);
                 context.restoreAuthSystemState();
@@ -286,8 +285,9 @@ public class GroupTest extends AbstractUnitTest {
 
 
     @Test
-    public void deleteGroupEPersonMembers() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
-        EPerson ePerson =  null;
+    public void deleteGroupEPersonMembers()
+        throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+        EPerson ePerson = null;
         context.turnOffAuthorisationSystem();
         try {
             Group toDeleteGroup = createGroup("toDelete");
@@ -297,8 +297,7 @@ public class GroupTest extends AbstractUnitTest {
             groupService.delete(context, toDeleteGroup);
             assertEquals("deleteGroupEPersonMembers", ePerson.getGroups().size(), 0);
         } finally {
-            if(ePerson != null)
-            {
+            if (ePerson != null) {
                 ePersonService.delete(context, ePerson);
             }
             context.restoreAuthSystemState();
@@ -306,7 +305,8 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
-    public void deleteGroupGroupMembers() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+    public void deleteGroupGroupMembers()
+        throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
         //Delete parent first
         Group parentGroup = createGroup("toDeleteParent");
         Group childGroup = createGroup("toDeleteChild");
@@ -327,8 +327,7 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
-    public void isMemberGroup() throws SQLException
-    {
+    public void isMemberGroup() throws SQLException {
         assertTrue("isMemberGroup 1", groupService.isMember(topGroup, level1Group));
         assertTrue("isMemberGroup 2", groupService.isMember(level1Group, level2Group));
         assertFalse("isMemberGroup 3", groupService.isMember(level1Group, topGroup));
@@ -356,8 +355,7 @@ public class GroupTest extends AbstractUnitTest {
             assertTrue(groupService.isDirectMember(level1Group, ePerson));
             assertFalse(groupService.isDirectMember(topGroup, ePerson));
         } finally {
-            if(ePerson != null)
-            {
+            if (ePerson != null) {
                 ePersonService.delete(context, ePerson);
             }
             context.restoreAuthSystemState();
@@ -375,8 +373,7 @@ public class GroupTest extends AbstractUnitTest {
             assertTrue(groupService.isMember(context, ePerson, level1Group));
             assertTrue(groupService.isMember(context, ePerson, level2Group));
         } finally {
-            if(ePerson != null)
-            {
+            if (ePerson != null) {
                 context.turnOffAuthorisationSystem();
                 ePersonService.delete(context, ePerson);
             }
@@ -384,7 +381,8 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
-    public void isMemberContextGroupId() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+    public void isMemberContextGroupId()
+        throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
         EPerson ePerson = null;
         try {
             ePerson = createEPersonAndAddToGroup("isMemberContextGroupId@dspace.org", level2Group);
@@ -393,8 +391,7 @@ public class GroupTest extends AbstractUnitTest {
             assertTrue(groupService.isMember(context, ePerson, level1Group.getName()));
             assertTrue(groupService.isMember(context, ePerson, level2Group.getName()));
         } finally {
-            if(ePerson != null)
-            {
+            if (ePerson != null) {
                 context.turnOffAuthorisationSystem();
                 ePersonService.delete(context, ePerson);
             }
@@ -402,7 +399,8 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
-    public void isMemberContextSpecialGroup() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+    public void isMemberContextSpecialGroup()
+        throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
         EPerson ePerson = null;
         Group specialGroup = null;
         try {
@@ -421,13 +419,11 @@ public class GroupTest extends AbstractUnitTest {
             assertTrue(groupService.isMember(context, specialGroup));
 
         } finally {
-            if(ePerson != null)
-            {
+            if (ePerson != null) {
                 context.turnOffAuthorisationSystem();
                 ePersonService.delete(context, ePerson);
             }
-            if(specialGroup != null)
-            {
+            if (specialGroup != null) {
                 context.turnOffAuthorisationSystem();
                 groupService.delete(context, specialGroup);
             }
@@ -435,7 +431,8 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
-    public void isMemberContextSpecialGroupOtherUser() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+    public void isMemberContextSpecialGroupOtherUser()
+        throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
         EPerson ePerson1 = null;
         EPerson ePerson2 = null;
         Group specialGroup = null;
@@ -461,18 +458,15 @@ public class GroupTest extends AbstractUnitTest {
             assertTrue(groupService.isMember(context, ePerson1, specialGroup));
 
         } finally {
-            if(ePerson1 != null)
-            {
+            if (ePerson1 != null) {
                 context.turnOffAuthorisationSystem();
                 ePersonService.delete(context, ePerson1);
             }
-            if(ePerson2 != null)
-            {
+            if (ePerson2 != null) {
                 context.turnOffAuthorisationSystem();
                 ePersonService.delete(context, ePerson2);
             }
-            if(specialGroup != null)
-            {
+            if (specialGroup != null) {
                 context.turnOffAuthorisationSystem();
                 groupService.delete(context, specialGroup);
             }
@@ -480,7 +474,8 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
-    public void isMemberContextSpecialGroupDbMembership() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+    public void isMemberContextSpecialGroupDbMembership()
+        throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
         EPerson ePerson = null;
         Group specialGroup = null;
         try {
@@ -499,13 +494,11 @@ public class GroupTest extends AbstractUnitTest {
             assertTrue(groupService.isMember(context, specialGroup));
 
         } finally {
-            if(ePerson != null)
-            {
+            if (ePerson != null) {
                 context.turnOffAuthorisationSystem();
                 ePersonService.delete(context, ePerson);
             }
-            if(specialGroup != null)
-            {
+            if (specialGroup != null) {
                 context.turnOffAuthorisationSystem();
                 groupService.delete(context, specialGroup);
             }
@@ -514,8 +507,7 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void isPermanent()
-            throws SQLException
-    {
+        throws SQLException {
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
         assertTrue("Anonymous group should be 'permanent'", anonymousGroup.isPermanent());
         assertFalse("topGroup should *not* be 'permanent'", topGroup.isPermanent());
@@ -523,15 +515,14 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void setPermanent()
-            throws SQLException, AuthorizeException, IOException
-    {
+        throws SQLException, AuthorizeException, IOException {
         Group permaGroup = new Group();
         permaGroup.setPermanent(true);
         assertTrue("setPermanent(true) should be reflected in the group's state",
-                permaGroup.isPermanent());
+                   permaGroup.isPermanent());
         permaGroup.setPermanent(false);
         assertFalse("setPermanent(false) should be reflected in the group's state",
-                permaGroup.isPermanent());
+                    permaGroup.isPermanent());
     }
 
     @Test
@@ -560,8 +551,7 @@ public class GroupTest extends AbstractUnitTest {
             assertTrue(groupService.isMember(context, level1Group));
             assertTrue(groupService.isMember(context, level2Group));
         } finally {
-            if(ePerson != null)
-            {
+            if (ePerson != null) {
                 context.turnOffAuthorisationSystem();
                 ePersonService.delete(context, ePerson);
             }
@@ -584,7 +574,8 @@ public class GroupTest extends AbstractUnitTest {
     public void allMemberGroups() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
         EPerson ePerson = createEPersonAndAddToGroup("allMemberGroups@dspace.org", level1Group);
         try {
-            assertTrue(groupService.allMemberGroups(context, ePerson).containsAll(Arrays.asList(topGroup, level1Group)));
+            assertTrue(
+                groupService.allMemberGroups(context, ePerson).containsAll(Arrays.asList(topGroup, level1Group)));
         } finally {
             context.turnOffAuthorisationSystem();
             ePersonService.delete(context, ePerson);
@@ -629,7 +620,6 @@ public class GroupTest extends AbstractUnitTest {
         context.restoreAuthSystemState();
         assertTrue(groupService.isEmpty(level2Group));
     }
-
 
 
     protected Group createGroup(String name) throws SQLException, AuthorizeException {

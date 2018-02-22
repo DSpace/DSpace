@@ -23,21 +23,26 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * This class' purpose is to provide a factory to add links to the AuthorityEntryResource. The addLinks factory will be called
+ * This class' purpose is to provide a factory to add links to the AuthorityEntryResource. The addLinks factory will
+ * be called
  * from the HalLinkService class addLinks method.
  */
 @Component
 public class AuthorityEntryHalLinkFactory extends HalLinkFactory<AuthorityEntryResource, RestResourceController> {
 
-    protected void addLinks(final AuthorityEntryResource halResource, final Pageable pageable, final LinkedList<Link> list) throws Exception{
+    protected void addLinks(final AuthorityEntryResource halResource, final Pageable pageable,
+                            final LinkedList<Link> list) throws Exception {
         AuthorityEntryRest entry = halResource.getContent();
 
         if (entry.getOtherInformation() != null) {
             if (entry.getOtherInformation().containsKey(AuthorityUtils.RESERVED_KEYMAP_PARENT)) {
-                UriComponentsBuilder uriComponentsBuilder = linkTo(getMethodOn(AuthorityRest.CATEGORY, AuthorityRest.NAME)
+                UriComponentsBuilder uriComponentsBuilder = linkTo(
+                    getMethodOn(AuthorityRest.CATEGORY, AuthorityRest.NAME)
                         .findRel(null, AuthorityRest.CATEGORY,
-                        English.plural(AuthorityRest.NAME), entry.getAuthorityName() + "/" + AuthorityRest.ENTRY,
-                        entry.getOtherInformation().get(AuthorityUtils.RESERVED_KEYMAP_PARENT), null, null, null)).toUriComponentsBuilder();
+                                 English.plural(AuthorityRest.NAME),
+                                 entry.getAuthorityName() + "/" + AuthorityRest.ENTRY,
+                                 entry.getOtherInformation().get(AuthorityUtils.RESERVED_KEYMAP_PARENT), null, null,
+                                 null)).toUriComponentsBuilder();
 
                 list.add(buildLink(uriComponentsBuilder.build().toString(), AuthorityUtils.RESERVED_KEYMAP_PARENT));
             }

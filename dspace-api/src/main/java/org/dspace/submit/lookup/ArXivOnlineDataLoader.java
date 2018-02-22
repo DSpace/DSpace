@@ -7,16 +7,15 @@
  */
 package org.dspace.submit.lookup;
 
-import gr.ekt.bte.core.Record;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.http.HttpException;
 
+import gr.ekt.bte.core.Record;
+import org.apache.http.HttpException;
 import org.dspace.core.Context;
 
 /**
@@ -25,58 +24,47 @@ import org.dspace.core.Context;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class ArXivOnlineDataLoader extends NetworkSubmissionLookupDataLoader
-{
+public class ArXivOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
     protected ArXivService arXivService = new ArXivService();
 
     protected boolean searchProvider = true;
 
-    public void setArXivService(ArXivService arXivService)
-    {
+    public void setArXivService(ArXivService arXivService) {
         this.arXivService = arXivService;
     }
 
     @Override
-    public List<String> getSupportedIdentifiers()
-    {
-        return Arrays.asList(new String[] { ARXIV, DOI });
+    public List<String> getSupportedIdentifiers() {
+        return Arrays.asList(new String[] {ARXIV, DOI});
     }
 
-    public void setSearchProvider(boolean searchProvider)
-    {
+    public void setSearchProvider(boolean searchProvider) {
         this.searchProvider = searchProvider;
     }
 
     @Override
-    public boolean isSearchProvider()
-    {
+    public boolean isSearchProvider() {
         return searchProvider;
     }
 
     @Override
     public List<Record> getByIdentifier(Context context,
-            Map<String, Set<String>> keys) throws HttpException, IOException
-    {
+                                        Map<String, Set<String>> keys) throws HttpException, IOException {
         List<Record> results = new ArrayList<Record>();
-        if (keys != null)
-        {
+        if (keys != null) {
             Set<String> dois = keys.get(DOI);
             Set<String> arxivids = keys.get(ARXIV);
             List<Record> items = new ArrayList<Record>();
-            if (dois != null && dois.size() > 0)
-            {
+            if (dois != null && dois.size() > 0) {
                 items.addAll(arXivService.getByDOIs(dois));
             }
-            if (arxivids != null && arxivids.size() > 0)
-            {
-                for (String arxivid : arxivids)
-                {
+            if (arxivids != null && arxivids.size() > 0) {
+                for (String arxivid : arxivids) {
                     items.add(arXivService.getByArXivIDs(arxivid));
                 }
             }
 
-            for (Record item : items)
-            {
+            for (Record item : items) {
                 results.add(convertFields(item));
             }
         }
@@ -85,12 +73,10 @@ public class ArXivOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 
     @Override
     public List<Record> search(Context context, String title, String author,
-            int year) throws HttpException, IOException
-    {
+                               int year) throws HttpException, IOException {
         List<Record> results = new ArrayList<Record>();
         List<Record> items = arXivService.searchByTerm(title, author, year);
-        for (Record item : items)
-        {
+        for (Record item : items) {
             results.add(convertFields(item));
         }
         return results;

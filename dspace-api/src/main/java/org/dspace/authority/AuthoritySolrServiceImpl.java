@@ -7,7 +7,11 @@
  */
 package org.dspace.authority;
 
-import org.dspace.authority.indexer.AuthorityIndexingService;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -15,15 +19,10 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.authority.indexer.AuthorityIndexingService;
 import org.dspace.core.ConfigurationManager;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -33,8 +32,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
     private static final Logger log = Logger.getLogger(AuthoritySolrServiceImpl.class);
 
-    protected AuthoritySolrServiceImpl()
-    {
+    protected AuthoritySolrServiceImpl() {
 
     }
 
@@ -65,18 +63,18 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     public void indexContent(AuthorityValue value, boolean force) {
         SolrInputDocument doc = value.getSolrInputDocument();
 
-        try{
+        try {
             writeDocument(doc);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error while writing authority value to the index: " + value.toString(), e);
         }
     }
 
     @Override
     public void cleanIndex() throws Exception {
-        try{
+        try {
             getSolr().deleteByQuery("*:*");
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error while cleaning authority solr server index", e);
             throw new Exception(e);
         }
@@ -97,15 +95,19 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     public boolean isConfiguredProperly() {
         boolean solrReturn = false;
         try {
-            solrReturn = (getSolr()!=null);
+            solrReturn = (getSolr() != null);
         } catch (Exception e) {
-            log.error("Authority solr is not correctly configured, check \"solr.authority.server\" property in the dspace.cfg", e);
+            log.error(
+                "Authority solr is not correctly configured, check \"solr.authority.server\" property in the dspace" +
+                    ".cfg",
+                e);
         }
         return solrReturn;
     }
 
     /**
      * Write the document to the solr index
+     *
      * @param doc the solr document
      * @throws IOException if IO error
      */
@@ -115,7 +117,10 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
             getSolr().add(doc);
         } catch (Exception e) {
             try {
-                log.error("An error occurred for document: " + doc.getField("id").getFirstValue() + ", source: " + doc.getField("source").getFirstValue() + ", field: " + doc.getField("field").getFirstValue() + ", full-text: " + doc.getField("full-text").getFirstValue(), e);
+                log.error("An error occurred for document: " + doc.getField("id").getFirstValue() + ", source: " + doc
+                    .getField("source").getFirstValue() + ", field: " + doc.getField("field")
+                                                                           .getFirstValue() + ", full-text: " + doc
+                    .getField("full-text").getFirstValue(), e);
             } catch (Exception e1) {
                 //shouldn't happen
             }
@@ -130,6 +135,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
     /**
      * Retrieves all the metadata fields which are indexed in the authority control
+     *
      * @return a list of metadata fields
      * @throws Exception if error
      */
@@ -144,9 +150,9 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
         List<String> results = new ArrayList<String>();
         FacetField facetField = response.getFacetField("field");
-        if(facetField != null){
+        if (facetField != null) {
             List<FacetField.Count> values = facetField.getValues();
-            if(values != null){
+            if (values != null) {
                 for (FacetField.Count facetValue : values) {
                     if (facetValue != null && facetValue.getName() != null) {
                         results.add(facetValue.getName());

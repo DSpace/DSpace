@@ -13,49 +13,49 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The Collection REST Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-		@LinkRest(name = CollectionRest.LICENSE, linkClass = LicenseRest.class, method = "getLicenseCollection", optional = true)
+    @LinkRest(name = CollectionRest.LICENSE, linkClass = LicenseRest.class, method = "getLicenseCollection", optional
+        = true)
 })
 public class CollectionRest extends DSpaceObjectRest {
-	public static final String NAME = "collection";
-	public static final String CATEGORY = RestAddressableModel.CORE;
-	public static final String LICENSE = "license";
-	public static final String DEFAULT_ACCESS_CONDITIONS = "defaultAccessConditions";
-	@JsonIgnore
-	private BitstreamRest logo;
-	
-	@JsonIgnore
-	private List<ResourcePolicyRest> defaultAccessConditions;
-	
-	public BitstreamRest getLogo() {
-		return logo;
-	}
+    public static final String NAME = "collection";
+    public static final String CATEGORY = RestAddressableModel.CORE;
+    public static final String LICENSE = "license";
+    public static final String DEFAULT_ACCESS_CONDITIONS = "defaultAccessConditions";
+    @JsonIgnore
+    private BitstreamRest logo;
 
-	public void setLogo(BitstreamRest logo) {
-		this.logo = logo;
-	}
+    @JsonIgnore
+    private List<ResourcePolicyRest> defaultAccessConditions;
 
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
+    public BitstreamRest getLogo() {
+        return logo;
+    }
 
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    public void setLogo(BitstreamRest logo) {
+        this.logo = logo;
+    }
 
-	@LinkRest(linkClass = ResourcePolicyRest.class)
-	@JsonIgnore
-	public List<ResourcePolicyRest> getDefaultAccessConditions() {
-		return defaultAccessConditions;
-	}
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
 
-	public void setDefaultAccessConditions(List<ResourcePolicyRest> defaultAccessConditions) {
-		this.defaultAccessConditions = defaultAccessConditions;
-	}
+    @Override
+    public String getType() {
+        return NAME;
+    }
+
+    @LinkRest(linkClass = ResourcePolicyRest.class)
+    @JsonIgnore
+    public List<ResourcePolicyRest> getDefaultAccessConditions() {
+        return defaultAccessConditions;
+    }
+
+    public void setDefaultAccessConditions(List<ResourcePolicyRest> defaultAccessConditions) {
+        this.defaultAccessConditions = defaultAccessConditions;
+    }
 }

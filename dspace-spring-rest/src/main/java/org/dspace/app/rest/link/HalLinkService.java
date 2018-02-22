@@ -43,8 +43,8 @@ public class HalLinkService {
         LinkedList<Link> links = new LinkedList<>();
 
         List<HalLinkFactory> supportedFactories = getSupportedFactories(halResource);
-        for(HalLinkFactory halLinkFactory : supportedFactories){
-           links.addAll(halLinkFactory.getLinksFor(halResource, pageable));
+        for (HalLinkFactory halLinkFactory : supportedFactories) {
+            links.addAll(halLinkFactory.getLinksFor(halResource, pageable));
         }
 
         links.sort((Link l1, Link l2) -> ObjectUtils.compare(l1.getRel(), l2.getRel()));
@@ -52,25 +52,25 @@ public class HalLinkService {
         halResource.add(links);
 
         for (Object obj : halResource.getEmbeddedResources().values()) {
-            if(obj instanceof Collection) {
+            if (obj instanceof Collection) {
                 for (Object subObj : (Collection) obj) {
-                    if(subObj instanceof HALResource) {
+                    if (subObj instanceof HALResource) {
                         addLinks((HALResource) subObj);
                     }
                 }
-            } else if(obj instanceof Map) {
+            } else if (obj instanceof Map) {
                 for (Object subObj : ((Map) obj).values()) {
-                    if(subObj instanceof HALResource) {
+                    if (subObj instanceof HALResource) {
                         addLinks((HALResource) subObj);
                     }
                 }
-            } else if(obj instanceof EmbeddedPage) {
+            } else if (obj instanceof EmbeddedPage) {
                 for (Object subObj : ((EmbeddedPage) obj).getPageContent()) {
-                    if(subObj instanceof HALResource) {
+                    if (subObj instanceof HALResource) {
                         addLinks((HALResource) subObj);
                     }
                 }
-            } else if(obj instanceof HALResource) {
+            } else if (obj instanceof HALResource) {
                 addLinks((HALResource) obj);
             }
         }
@@ -79,11 +79,11 @@ public class HalLinkService {
     private List<HalLinkFactory> getSupportedFactories(HALResource halResource) {
         List<HalLinkFactory> factories = cachedMappings.get(getKey(halResource));
 
-        if(factories == null) {
+        if (factories == null) {
             //Go over all factories and collect the ones that support the current resource
             factories = halLinkFactories.stream()
-                    .filter(halLinkFactory -> halLinkFactory.supports(halResource.getClass()))
-                    .collect(Collectors.toList());
+                                        .filter(halLinkFactory -> halLinkFactory.supports(halResource.getClass()))
+                                        .collect(Collectors.toList());
 
             cachedMappings.put(getKey(halResource), factories);
         }

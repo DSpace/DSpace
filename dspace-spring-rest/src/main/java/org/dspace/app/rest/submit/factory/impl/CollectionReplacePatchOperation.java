@@ -11,7 +11,6 @@ import java.sql.SQLException;
 
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
-import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
@@ -23,38 +22,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Submission "replace" patch operation
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class CollectionReplacePatchOperation extends ReplacePatchOperation<String> {
 
-	@Autowired
-	CollectionService collectionService;
-	@Autowired
-	ItemService itemService;
-	@Autowired
-	WorkspaceItemService workspaceItemService;
+    @Autowired
+    CollectionService collectionService;
+    @Autowired
+    ItemService itemService;
+    @Autowired
+    WorkspaceItemService workspaceItemService;
 
-	@Override
-	void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
-			throws SQLException, DCInputsReaderException {
-		String uuid = (String) value;
+    @Override
+    void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
+        throws SQLException, DCInputsReaderException {
+        String uuid = (String) value;
 
-		Collection fromCollection = source.getCollection();
-		Collection toCollection = collectionService.find(context, UUIDUtils.fromString(uuid));
-		workspaceItemService.move(context, source, fromCollection, toCollection);
+        Collection fromCollection = source.getCollection();
+        Collection toCollection = collectionService.find(context, UUIDUtils.fromString(uuid));
+        workspaceItemService.move(context, source, fromCollection, toCollection);
 
-	}
+    }
 
-	@Override
-	protected Class<String[]> getArrayClassForEvaluation() {
-		return String[].class;
-	}
+    @Override
+    protected Class<String[]> getArrayClassForEvaluation() {
+        return String[].class;
+    }
 
-	@Override
-	protected Class<String> getClassForEvaluation() {
-		return String.class;
-	}
-	
+    @Override
+    protected Class<String> getClassForEvaluation() {
+        return String.class;
+    }
+
 }

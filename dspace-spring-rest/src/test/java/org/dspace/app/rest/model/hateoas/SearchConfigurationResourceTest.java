@@ -21,25 +21,27 @@ public class SearchConfigurationResourceTest {
     private SearchConfigurationRest searchConfigurationRest;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         searchConfigurationRest = new SearchConfigurationRest();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testConstructorWithNullThrowsException() throws Exception{
+    public void testConstructorWithNullThrowsException() throws Exception {
         SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(null);
     }
 
     @Test
-    public void testConstructorAndGetterWithProperDataAndObjectNotNull() throws Exception{
-        SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(searchConfigurationRest);
+    public void testConstructorAndGetterWithProperDataAndObjectNotNull() throws Exception {
+        SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(
+            searchConfigurationRest);
         assertNotNull(searchConfigurationResource);
         assertNotNull(searchConfigurationResource.getContent());
     }
 
     @Test
-    public void testConstructorAndGetterWithProperDataAndProperDataReturned() throws Exception{
-        SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(searchConfigurationRest);
+    public void testConstructorAndGetterWithProperDataAndProperDataReturned() throws Exception {
+        SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(
+            searchConfigurationRest);
         assertEquals(searchConfigurationRest, searchConfigurationResource.getContent());
     }
 }

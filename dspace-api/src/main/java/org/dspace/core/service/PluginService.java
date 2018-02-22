@@ -17,8 +17,7 @@ package org.dspace.core.service;
  *
  * @author Tim Donohue
  */
-public interface PluginService
-{
+public interface PluginService {
     /**
      * Returns all of the names under which a named plugin implementing
      * the interface can be requested (with getNamedPlugin()).
@@ -30,7 +29,7 @@ public interface PluginService
      *
      * @param interfaceClass plugin interface for which to return names.
      * @return an array of strings with every name; if none are
-     *   available an empty array is returned.
+     * available an empty array is returned.
      */
     public String[] getAllPluginNames(Class interfaceClass);
 
@@ -41,7 +40,7 @@ public interface PluginService
      * String.equals().
      *
      * @param interfaceClass the interface class of the plugin
-     * @param name under which the plugin implementation is configured.
+     * @param name           under which the plugin implementation is configured.
      * @return instance of plugin implementation, or null if there is no match or an error.
      */
     public Object getNamedPlugin(Class interfaceClass, String name);
@@ -52,7 +51,7 @@ public interface PluginService
      * return true. If there is no matching plugin, return false.
      *
      * @param interfaceClass the interface class of the plugin
-     * @param name under which the plugin implementation is configured.
+     * @param name           under which the plugin implementation is configured.
      * @return true if plugin was found to be configured, false otherwise
      */
     public boolean hasNamedPlugin(Class interfaceClass, String name);
@@ -67,7 +66,7 @@ public interface PluginService
      *
      * @param interfaceClass interface for which to find plugins.
      * @return an array of plugin instances; if none are
-     *   available an empty array is returned.
+     * available an empty array is returned.
      */
     public Object[] getPluginSequence(Class interfaceClass);
 

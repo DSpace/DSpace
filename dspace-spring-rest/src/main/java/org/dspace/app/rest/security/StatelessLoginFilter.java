@@ -42,10 +42,11 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
     private RestAuthenticationService restAuthenticationService;
 
     @Override
-    public void afterPropertiesSet()  {
+    public void afterPropertiesSet() {
     }
 
-    public StatelessLoginFilter(String url, AuthenticationManager authenticationManager, RestAuthenticationService restAuthenticationService) {
+    public StatelessLoginFilter(String url, AuthenticationManager authenticationManager,
+                                RestAuthenticationService restAuthenticationService) {
         super(new AntPathRequestMatcher(url));
         this.authenticationManager = authenticationManager;
         this.restAuthenticationService = restAuthenticationService;
@@ -59,16 +60,14 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
         String password = req.getParameter("password");
 
         try {
-             return authenticationManager.authenticate(
-                    new DSpaceAuthentication(
-                            user,
-                            password,
-                            new ArrayList<>()
-                    )
+            return authenticationManager.authenticate(
+                new DSpaceAuthentication(user, password, new ArrayList<>())
             );
-        } catch(BadCredentialsException e) {
-            AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
-            Iterator<AuthenticationMethod> authenticationMethodIterator = authenticationService.authenticationMethodIterator();
+        } catch (BadCredentialsException e) {
+            AuthenticationService authenticationService =
+                AuthenticateServiceFactory.getInstance().getAuthenticationService();
+            Iterator<AuthenticationMethod> authenticationMethodIterator =
+                authenticationService.authenticationMethodIterator();
             while (authenticationMethodIterator.hasNext()) {
                 AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
                 Context context = ContextUtil.obtainContext(req);

@@ -8,7 +8,6 @@
 package org.dspace.app.rest.security;
 
 import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,7 +24,8 @@ import org.springframework.stereotype.Service;
 @Service
 public interface RestAuthenticationService {
 
-    void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, DSpaceAuthentication authentication) throws IOException;
+    void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
+                                      DSpaceAuthentication authentication) throws IOException;
 
     EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context);
 
