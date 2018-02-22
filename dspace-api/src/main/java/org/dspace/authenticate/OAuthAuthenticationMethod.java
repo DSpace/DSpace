@@ -66,15 +66,19 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
         String email = null;
         EPerson eperson = null;
         
-        String orcid = (String) request.getAttribute("orcid");
-        String token = (String) request.getAttribute("access_token");
-        String scope = (String) request.getAttribute("scope");
+
 //        String refreshToken = (String) request.getAttribute("refresh_token");
-        if (request == null||orcid==null)
+        if (request == null)
         {
             return BAD_ARGS;
         }
         
+        String orcid = (String) request.getAttribute("orcid");
+        if(orcid== null ){
+        	return BAD_ARGS;
+        }
+        String token = (String) request.getAttribute("access_token");
+        String scope = (String) request.getAttribute("scope");        
         EPerson[] epersons = EPerson.search(context, orcid);
         
         if(epersons != null && epersons.length > 1) {
