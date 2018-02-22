@@ -7,12 +7,15 @@
  */
 package org.dspace.checker.dao.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
 import org.dspace.AbstractUnitTest;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.content.Bitstream;
@@ -27,39 +30,30 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
- *
  * @author mwood
  */
 public class ChecksumHistoryDAOImplTest
-        extends AbstractUnitTest
-{
-    public ChecksumHistoryDAOImplTest()
-    {
+    extends AbstractUnitTest {
+    public ChecksumHistoryDAOImplTest() {
     }
 
     @BeforeClass
     public static void setUpClass()
-            throws SQLException, ClassNotFoundException
-    {
+        throws SQLException, ClassNotFoundException {
     }
 
     @AfterClass
-    public static void tearDownClass()
-    {
+    public static void tearDownClass() {
     }
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
     }
 
     @After
     public void tearDown()
-            throws SQLException
-    {
+        throws SQLException {
     }
 
     /**
@@ -67,8 +61,7 @@ public class ChecksumHistoryDAOImplTest
      */
     @Test
     public void testDeleteByDateAndCode()
-            throws Exception
-    {
+        throws Exception {
         System.out.println("deleteByDateAndCode");
 
         GregorianCalendar cal = new GregorianCalendar();
@@ -78,9 +71,9 @@ public class ChecksumHistoryDAOImplTest
         // Create two older rows
         HibernateDBConnection dbc = (HibernateDBConnection) CoreHelpers.getDBConnection(context);
         Query qry = dbc.getSession().createSQLQuery(
-                "INSERT INTO checksum_history"
-                        + "(check_id, process_end_date, result, bitstream_id)"
-                        + " VALUES (:id, :date, :result, :bitstream)");
+            "INSERT INTO checksum_history"
+                + "(check_id, process_end_date, result, bitstream_id)"
+                + " VALUES (:id, :date, :result, :bitstream)");
         int checkId = 0;
 
         // Row with matching result code
@@ -124,12 +117,12 @@ public class ChecksumHistoryDAOImplTest
         ChecksumHistoryDAOImpl instance = new ChecksumHistoryDAOImpl();
         int expResult = 1;
         int result = instance.deleteByDateAndCode(context, retentionDate,
-                resultCode);
+                                                  resultCode);
         assertEquals(expResult, result);
 
         // See if matching old row is gone.
         qry = dbc.getSession().createQuery(
-                "SELECT COUNT(*) FROM ChecksumHistory WHERE process_end_date = :date");
+            "SELECT COUNT(*) FROM ChecksumHistory WHERE process_end_date = :date");
         long count;
 
         qry.setDate("date", matchDate);

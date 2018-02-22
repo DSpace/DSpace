@@ -14,7 +14,6 @@ import static org.mockito.Matchers.any;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -67,8 +66,8 @@ public class SpecialGroupClaimProviderTest {
         groupIds.add(id3);
 
         jwtClaimsSet = new JWTClaimsSet.Builder()
-                .claim(SpecialGroupClaimProvider.SPECIAL_GROUPS, groupIds)
-                .build();
+            .claim(SpecialGroupClaimProvider.SPECIAL_GROUPS, groupIds)
+            .build();
     }
 
     @After
@@ -81,7 +80,7 @@ public class SpecialGroupClaimProviderTest {
         specialGroupClaimProvider.parseClaim(context, httpServletRequest, jwtClaimsSet);
 
         assertThat(specialGroups, containsInAnyOrder(
-                UUID.fromString(id1), UUID.fromString(id2), UUID.fromString(id3)));
+            UUID.fromString(id1), UUID.fromString(id2), UUID.fromString(id3)));
 
     }
 

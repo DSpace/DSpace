@@ -7,15 +7,19 @@
  */
 package org.dspace.discovery;
 
-import org.dspace.content.*;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
-
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Util methods used by discovery
@@ -25,15 +29,20 @@ import java.util.*;
  * @author Ben Bosman (ben at atmire dot com)
  */
 public class SearchUtils {
-    /** Cached search service **/
+    /**
+     * Cached search service
+     **/
     private static SearchService searchService;
 
+    /**
+     * Default constructor
+     */
+    private SearchUtils() { }
 
-    public static SearchService getSearchService()
-    {
-        if (searchService ==  null) {
+    public static SearchService getSearchService() {
+        if (searchService == null) {
             org.dspace.kernel.ServiceManager manager = DSpaceServicesFactory.getInstance().getServiceManager();
-            searchService = manager.getServiceByName(SearchService.class.getName(),SearchService.class);
+            searchService = manager.getServiceByName(SearchService.class.getName(), SearchService.class);
         }
         return searchService;
     }
@@ -50,11 +59,11 @@ public class SearchUtils {
 
     public static DiscoveryConfigurationService getConfigurationService() {
         ServiceManager manager = DSpaceServicesFactory.getInstance().getServiceManager();
-        return manager.getServiceByName(DiscoveryConfigurationService.class.getName(), DiscoveryConfigurationService.class);
+        return manager
+            .getServiceByName(DiscoveryConfigurationService.class.getName(), DiscoveryConfigurationService.class);
     }
 
-    public static List<String> getIgnoredMetadataFields(int type)
-    {
+    public static List<String> getIgnoredMetadataFields(int type) {
         return getConfigurationService().getToIgnoreMetadataFields().get(type);
     }
 
@@ -64,8 +73,7 @@ public class SearchUtils {
      *
      * @param item the DSpace item
      * @return a list of configuration objects
-     * @throws SQLException
-     *     An exception that provides information on a database access error or other errors.
+     * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(Item item) throws SQLException {
         Map<String, DiscoveryConfiguration> result = new HashMap<String, DiscoveryConfiguration>();

@@ -7,16 +7,11 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 import java.sql.SQLException;
 
-import org.dspace.app.rest.AuthenticationRestController;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
-import org.springframework.hateoas.Link;
 
 /**
  * Authn Rest Resource, used to link to login, logout, status, ...

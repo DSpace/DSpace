@@ -23,52 +23,52 @@ import org.dspace.submit.model.UploadConfigurationService;
 
 /**
  * Execute file required check validation
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class UploadValidation extends AbstractValidation {
 
-	private static final String ERROR_VALIDATION_FILEREQUIRED = "error.validation.filerequired";
+    private static final String ERROR_VALIDATION_FILEREQUIRED = "error.validation.filerequired";
 
-	private static final Logger log = Logger.getLogger(UploadValidation.class);
+    private static final Logger log = Logger.getLogger(UploadValidation.class);
 
-	private ItemService itemService;
+    private ItemService itemService;
 
-	private UploadConfigurationService uploadConfigurationService; 
-	
-	@Override
-	public List<ErrorRest> validate(SubmissionService submissionService, WorkspaceItem obj,
-			SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
-		//TODO MANAGE METADATA
-		
-		for(String key : uploadConfigurationService.getMap().keySet()) {
-			if(getName().equals(key)) {
-				UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(key);
-				if(uploadConfig.isRequired() && !itemService.hasUploadedFiles(obj.getItem())) {
-					addError(ERROR_VALIDATION_FILEREQUIRED, "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
-							+ config.getId());
-				}
-			}
-		}
-		return getErrors();
-	}
+    private UploadConfigurationService uploadConfigurationService;
 
-	public ItemService getItemService() {
-		return itemService;
-	}
+    @Override
+    public List<ErrorRest> validate(SubmissionService submissionService, WorkspaceItem obj,
+                                    SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
+        //TODO MANAGE METADATA
 
-	public void setItemService(ItemService itemService) {
-		this.itemService = itemService;
-	}
+        for (String key : uploadConfigurationService.getMap().keySet()) {
+            if (getName().equals(key)) {
+                UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(key);
+                if (uploadConfig.isRequired() && !itemService.hasUploadedFiles(obj.getItem())) {
+                    addError(ERROR_VALIDATION_FILEREQUIRED,
+                             "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
+                                 + config.getId());
+                }
+            }
+        }
+        return getErrors();
+    }
 
-	public UploadConfigurationService getUploadConfigurationService() {
-		return uploadConfigurationService;
-	}
+    public ItemService getItemService() {
+        return itemService;
+    }
 
-	public void setUploadConfigurationService(UploadConfigurationService uploadConfigurationService) {
-		this.uploadConfigurationService = uploadConfigurationService;
-	}
+    public void setItemService(ItemService itemService) {
+        this.itemService = itemService;
+    }
+
+    public UploadConfigurationService getUploadConfigurationService() {
+        return uploadConfigurationService;
+    }
+
+    public void setUploadConfigurationService(UploadConfigurationService uploadConfigurationService) {
+        this.uploadConfigurationService = uploadConfigurationService;
+    }
 
 
 }

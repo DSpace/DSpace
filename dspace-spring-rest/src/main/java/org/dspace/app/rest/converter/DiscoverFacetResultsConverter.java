@@ -30,10 +30,13 @@ public class DiscoverFacetResultsConverter {
 
     private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
 
-    public FacetResultsRest convert(Context context, String facetName, String query, String dsoType, String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult, DiscoveryConfiguration configuration, Pageable page) {
+    public FacetResultsRest convert(Context context, String facetName, String query, String dsoType, String dsoScope,
+                                    List<SearchFilter> searchFilters, DiscoverResult searchResult,
+                                    DiscoveryConfiguration configuration, Pageable page) {
         FacetResultsRest facetResultsRest = new FacetResultsRest();
 
-        setRequestInformation(context, facetName, query, dsoType, dsoScope, searchFilters, searchResult, configuration, facetResultsRest, page);
+        setRequestInformation(context, facetName, query, dsoType, dsoScope, searchFilters, searchResult, configuration,
+                              facetResultsRest, page);
 
         addToFacetResultList(facetName, searchResult, facetResultsRest, configuration, page);
 
@@ -62,7 +65,10 @@ public class DiscoverFacetResultsConverter {
         return facetValueConverter.convert(value);
     }
 
-    private void setRequestInformation(Context context, String facetName, String query, String dsoType, String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult, DiscoveryConfiguration configuration, FacetResultsRest facetResultsRest, Pageable page) {
+    private void setRequestInformation(Context context, String facetName, String query, String dsoType, String dsoScope,
+                                       List<SearchFilter> searchFilters, DiscoverResult searchResult,
+                                       DiscoveryConfiguration configuration, FacetResultsRest facetResultsRest,
+                                       Pageable page) {
         facetResultsRest.setQuery(query);
         facetResultsRest.setScope(dsoScope);
         facetResultsRest.setDsoType(dsoType);
@@ -73,13 +79,16 @@ public class DiscoverFacetResultsConverter {
 
         facetResultsRest.setSearchFilters(searchFilters);
 
-        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter = new SearchFilterToAppliedFilterConverter();
+        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter = new
+            SearchFilterToAppliedFilterConverter();
         for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
-            facetResultsRest.addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
+            facetResultsRest
+                .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
         }
     }
 
-    private SearchFacetEntryRest convertFacetEntry(final String facetName, final DiscoverResult searchResult, final DiscoveryConfiguration configuration, final Pageable page) {
+    private SearchFacetEntryRest convertFacetEntry(final String facetName, final DiscoverResult searchResult,
+                                                   final DiscoveryConfiguration configuration, final Pageable page) {
         DiscoverySearchFilterFacet field = configuration.getSidebarFacet(facetName);
 
         SearchFacetEntryRest facetEntryRest = new SearchFacetEntryRest(facetName);

@@ -8,7 +8,6 @@
 package org.dspace.app.rest.repository;
 
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -22,48 +21,46 @@ import org.dspace.core.Context;
 import org.dspace.core.service.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.ResourceSupport;
 import org.springframework.stereotype.Component;
 
 /**
  * Controller for exposition of license
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.LICENSE)
 public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
-		implements LinkRestRepository<LicenseRest> {
+    implements LinkRestRepository<LicenseRest> {
 
-	@Autowired
-	CollectionService collectionService;
-	
-	@Autowired
-	LicenseService licenseService;
-	
-	@Override
-	public HALResource wrapResource(LicenseRest model, String... rels) {
-		return new LicenseResource(model);
-	}
-	
-	public LicenseRest getLicenseCollection(HttpServletRequest request, UUID uuid, Pageable pageable, String projection) throws Exception {
-		Context context = obtainContext();
-		Collection collection = collectionService.find(context, uuid);
-		
-		LicenseRest licenseRest = new LicenseRest();
-		String text = collection.getLicenseCollection();
-		if(StringUtils.isNotBlank(text)) { 
-			licenseRest.setCustom(true);
-			licenseRest.setText(text);
-		}
-		else {
-			licenseRest.setText(licenseService.getDefaultSubmissionLicense());
-		}
-		
-		return licenseRest;
-	}
-	
-	public boolean isEmbeddableRelation(LicenseRest data, String name) {
-		return false;
-	}
+    @Autowired
+    CollectionService collectionService;
+
+    @Autowired
+    LicenseService licenseService;
+
+    @Override
+    public HALResource wrapResource(LicenseRest model, String... rels) {
+        return new LicenseResource(model);
+    }
+
+    public LicenseRest getLicenseCollection(HttpServletRequest request, UUID uuid, Pageable pageable, String projection)
+        throws Exception {
+        Context context = obtainContext();
+        Collection collection = collectionService.find(context, uuid);
+
+        LicenseRest licenseRest = new LicenseRest();
+        String text = collection.getLicenseCollection();
+        if (StringUtils.isNotBlank(text)) {
+            licenseRest.setCustom(true);
+            licenseRest.setText(text);
+        } else {
+            licenseRest.setText(licenseService.getDefaultSubmissionLicense());
+        }
+
+        return licenseRest;
+    }
+
+    public boolean isEmbeddableRelation(LicenseRest data, String name) {
+        return false;
+    }
 }

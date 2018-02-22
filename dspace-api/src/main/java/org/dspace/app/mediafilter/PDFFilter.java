@@ -28,24 +28,20 @@ import org.dspace.core.ConfigurationManager;
  * instantiate filter - bitstream format doesn't exist
  *
  */
-public class PDFFilter extends MediaFilter
-{
+public class PDFFilter extends MediaFilter {
 
     private static Logger log = Logger.getLogger(PDFFilter.class);
 
     @Override
-    public String getFilteredName(String oldFilename)
-    {
+    public String getFilteredName(String oldFilename) {
         return oldFilename + ".txt";
     }
 
     /**
      * @return String bundle name
-     *
      */
     @Override
-    public String getBundleName()
-    {
+    public String getBundleName() {
         return "TEXT";
     }
 
@@ -53,8 +49,7 @@ public class PDFFilter extends MediaFilter
      * @return String bitstreamformat
      */
     @Override
-    public String getFormatString()
-    {
+    public String getFormatString() {
         return "Text";
     }
 
@@ -62,25 +57,21 @@ public class PDFFilter extends MediaFilter
      * @return String description
      */
     @Override
-    public String getDescription()
-    {
+    public String getDescription() {
         return "Extracted text";
     }
 
     /**
      * @param currentItem item
-     * @param source source input stream
-     * @param verbose verbose mode
-     *
+     * @param source      source input stream
+     * @param verbose     verbose mode
      * @return InputStream the resulting input stream
      * @throws Exception if error
      */
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
-            throws Exception
-    {
-        try
-        {
+        throws Exception {
+        try {
             boolean useTemporaryFile = ConfigurationManager.getBooleanProperty("pdffilter.largepdfs", false);
 
             // get input stream from bitstream
@@ -92,62 +83,43 @@ public class PDFFilter extends MediaFilter
             File tempTextFile = null;
             ByteArrayOutputStream byteStream = null;
 
-            if (useTemporaryFile)
-            {
+            if (useTemporaryFile) {
                 tempTextFile = File.createTempFile("dspacepdfextract" + source.hashCode(), ".txt");
                 tempTextFile.deleteOnExit();
                 writer = new OutputStreamWriter(new FileOutputStream(tempTextFile));
-            }
-            else
-            {
+            } else {
                 byteStream = new ByteArrayOutputStream();
                 writer = new OutputStreamWriter(byteStream);
             }
-            
-            try
-            {
+
+            try {
                 pdfDoc = PDDocument.load(source);
                 pts.writeText(pdfDoc, writer);
-            }
-            finally
-            {
-                try
-                {
-                    if (pdfDoc != null)
-                    {
+            } finally {
+                try {
+                    if (pdfDoc != null) {
                         pdfDoc.close();
                     }
-                }
-                catch(Exception e)
-                {
-                   log.error("Error closing PDF file: " + e.getMessage(), e);
+                } catch (Exception e) {
+                    log.error("Error closing PDF file: " + e.getMessage(), e);
                 }
 
-                try
-                {
+                try {
                     writer.close();
-                }
-                catch(Exception e)
-                {
-                   log.error("Error closing temporary extract file: " + e.getMessage(), e);
+                } catch (Exception e) {
+                    log.error("Error closing temporary extract file: " + e.getMessage(), e);
                 }
             }
 
-            if (useTemporaryFile)
-            {
+            if (useTemporaryFile) {
                 return new FileInputStream(tempTextFile);
-            }
-            else
-            {
+            } else {
                 byte[] bytes = byteStream.toByteArray();
                 return new ByteArrayInputStream(bytes);
             }
-        }
-        catch (OutOfMemoryError oome)
-        {
+        } catch (OutOfMemoryError oome) {
             log.error("Error parsing PDF document " + oome.getMessage(), oome);
-            if (!ConfigurationManager.getBooleanProperty("pdffilter.skiponmemoryexception", false))
-            {
+            if (!ConfigurationManager.getBooleanProperty("pdffilter.skiponmemoryexception", false)) {
                 throw oome;
             }
         }

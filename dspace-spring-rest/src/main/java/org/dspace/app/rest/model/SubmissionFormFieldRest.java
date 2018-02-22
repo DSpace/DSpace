@@ -11,116 +11,114 @@ package org.dspace.app.rest.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.submit.model.LanguageFormField;
-import org.dspace.submit.model.SelectableMetadata;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.dspace.submit.model.LanguageFormField;
+import org.dspace.submit.model.SelectableMetadata;
 
 /**
  * The InputFormField REST Resource. It is not addressable directly, only used
  * as inline object in the InputForm resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @JsonInclude(value = Include.NON_NULL)
 public class SubmissionFormFieldRest {
-	
-	private SubmissionFormInputTypeRest input;
-	private ScopeEnum scope;
-	private SubmissionVisibilityRest visibility;
-	private String label;
-	private boolean mandatory;
-	private boolean repeatable;
-	private String mandatoryMessage;
-	private String hints;
 
-	private List<SelectableMetadata> selectableMetadata;
-	private List<LanguageFormField> languageCodes;
-	
-	public List<SelectableMetadata> getSelectableMetadata() {
-		return selectableMetadata;
-	}
+    private SubmissionFormInputTypeRest input;
+    private ScopeEnum scope;
+    private SubmissionVisibilityRest visibility;
+    private String label;
+    private boolean mandatory;
+    private boolean repeatable;
+    private String mandatoryMessage;
+    private String hints;
 
-	public void setSelectableMetadata(List<SelectableMetadata> selectableMetadata) {
-		this.selectableMetadata = selectableMetadata;
-	}
-	
-	public String getLabel() {
-		return label;
-	}
+    private List<SelectableMetadata> selectableMetadata;
+    private List<LanguageFormField> languageCodes;
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+    public List<SelectableMetadata> getSelectableMetadata() {
+        return selectableMetadata;
+    }
 
-	public boolean isMandatory() {
-		return mandatory;
-	}
+    public void setSelectableMetadata(List<SelectableMetadata> selectableMetadata) {
+        this.selectableMetadata = selectableMetadata;
+    }
 
-	public void setMandatory(boolean mandatory) {
-		this.mandatory = mandatory;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public boolean isRepeatable() {
-		return repeatable;
-	}
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
-	public void setRepeatable(boolean repeatable) {
-		this.repeatable = repeatable;
-	}
+    public boolean isMandatory() {
+        return mandatory;
+    }
 
-	public String getMandatoryMessage() {
-		return mandatoryMessage;
-	}
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+    }
 
-	public void setMandatoryMessage(String mandatoryMessage) {
-		this.mandatoryMessage = mandatoryMessage;
-	}
+    public boolean isRepeatable() {
+        return repeatable;
+    }
 
-	public String getHints() {
-		return hints;
-	}
+    public void setRepeatable(boolean repeatable) {
+        this.repeatable = repeatable;
+    }
 
-	public void setHints(String hints) {
-		this.hints = hints;
-	}
+    public String getMandatoryMessage() {
+        return mandatoryMessage;
+    }
 
-	public List<LanguageFormField> getLanguageCodes() {
-		if(languageCodes==null) {
-			languageCodes = new ArrayList<LanguageFormField>();
-		}
-		return languageCodes;
-	}
+    public void setMandatoryMessage(String mandatoryMessage) {
+        this.mandatoryMessage = mandatoryMessage;
+    }
 
-	public void setLanguageCodes(List<LanguageFormField> languageCodes) {
-		this.languageCodes = languageCodes;
-	}
-	
-	public SubmissionFormInputTypeRest getInput() {
-		return input;
-	}
+    public String getHints() {
+        return hints;
+    }
 
-	public void setInput(SubmissionFormInputTypeRest input) {
-		this.input = input;
-	}
+    public void setHints(String hints) {
+        this.hints = hints;
+    }
 
-	public ScopeEnum getScope() {
-		return scope;
-	}
+    public List<LanguageFormField> getLanguageCodes() {
+        if (languageCodes == null) {
+            languageCodes = new ArrayList<LanguageFormField>();
+        }
+        return languageCodes;
+    }
 
-	public void setScope(ScopeEnum scope) {
-		this.scope = scope;
-	}
+    public void setLanguageCodes(List<LanguageFormField> languageCodes) {
+        this.languageCodes = languageCodes;
+    }
 
-	public SubmissionVisibilityRest getVisibility() {
-		return visibility;
-	}
+    public SubmissionFormInputTypeRest getInput() {
+        return input;
+    }
 
-	public void setVisibility(SubmissionVisibilityRest visibility) {
-		if (visibility != null && (visibility.getMain() != null || visibility.getOther() != null)) {
-			this.visibility = visibility;
-		}
-	}
+    public void setInput(SubmissionFormInputTypeRest input) {
+        this.input = input;
+    }
+
+    public ScopeEnum getScope() {
+        return scope;
+    }
+
+    public void setScope(ScopeEnum scope) {
+        this.scope = scope;
+    }
+
+    public SubmissionVisibilityRest getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(SubmissionVisibilityRest visibility) {
+        if (visibility != null && (visibility.getMain() != null || visibility.getOther() != null)) {
+            this.visibility = visibility;
+        }
+    }
 }

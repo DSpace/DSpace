@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.util.Date;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
@@ -20,20 +22,19 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.MutablePeriod;
 import org.joda.time.format.PeriodFormat;
 
-import java.util.Date;
-
 /**
  * Abstract builder to construct DSpace Objects
  *
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
-public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject> extends AbstractBuilder<T, DSpaceObjectService> {
+public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
+    extends AbstractBuilder<T, DSpaceObjectService> {
 
     /* Log4j logger*/
-    private static final Logger log =  Logger.getLogger(AbstractDSpaceObjectBuilder.class);
+    private static final Logger log = Logger.getLogger(AbstractDSpaceObjectBuilder.class);
 
-    protected AbstractDSpaceObjectBuilder(Context context){
+    protected AbstractDSpaceObjectBuilder(Context context) {
         super(context);
         this.context = context;
     }
@@ -50,7 +51,10 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject> extend
     }
 
 
-    protected <B extends AbstractDSpaceObjectBuilder<T>> B addMetadataValue(final T dso, final String schema, final String element, final String qualifier, final String value) {
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B addMetadataValue(final T dso, final String schema,
+                                                                            final String element,
+                                                                            final String qualifier,
+                                                                            final String value) {
         try {
             getService().addMetadata(context, dso, schema, element, qualifier, Item.ANY, value);
         } catch (Exception e) {
@@ -59,7 +63,10 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject> extend
         return (B) this;
     }
 
-    protected <B extends AbstractDSpaceObjectBuilder<T>> B setMetadataSingleValue(final T dso, final String schema, final String element, final String qualifier, final String value) {
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B setMetadataSingleValue(final T dso, final String schema,
+                                                                                  final String element,
+                                                                                  final String qualifier,
+                                                                                  final String value) {
         try {
             getService().setMetadataSingleValue(context, dso, schema, element, qualifier, Item.ANY, value);
         } catch (Exception e) {
@@ -81,13 +88,15 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject> extend
         }
     }
 
-    protected <B extends AbstractDSpaceObjectBuilder<T>> B setOnlyReadPermission(DSpaceObject dso, Group group, Date startDate) {
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B setOnlyReadPermission(DSpaceObject dso, Group group,
+                                                                                 Date startDate) {
         // add policy just for anonymous
         try {
             authorizeService.removeAllPolicies(context, dso);
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, group,
-                    null, startDate, Constants.READ, "Integration Test", dso);
+                                                                      null, startDate, Constants.READ,
+                                                                      "Integration Test", dso);
             if (rp != null) {
                 resourcePolicyService.update(context, rp);
             }
@@ -101,7 +110,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject> extend
 
     public void delete(T dso) throws Exception {
 
-        try(Context c = new Context()) {
+        try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             T attachedDso = c.reloadEntity(dso);
             if (attachedDso != null) {

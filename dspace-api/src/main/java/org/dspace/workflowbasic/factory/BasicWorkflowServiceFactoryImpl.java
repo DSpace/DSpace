@@ -15,7 +15,8 @@ import org.dspace.workflowbasic.service.TaskListItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the workflowbasic package, use BasicWorkflowServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the workflowbasic package, use BasicWorkflowServiceFactory.getInstance
+ * () to retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

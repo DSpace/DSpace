@@ -9,14 +9,13 @@ package org.dspace.app.rest.model.patch;
 
 /**
  * Operation to track the "copy" operation to the given "path".
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class CopyOperation extends FromOperation {
 
-	public CopyOperation(String path, String from) {
-		super("copy", path, from);
-	}
+    public CopyOperation(String path, String from) {
+        super("copy", path, from);
+    }
 
 }

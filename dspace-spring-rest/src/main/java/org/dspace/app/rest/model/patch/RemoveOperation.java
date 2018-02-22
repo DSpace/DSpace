@@ -9,14 +9,13 @@ package org.dspace.app.rest.model.patch;
 
 /**
  * Operation to track the "remove" operation to the given "path".
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class RemoveOperation extends Operation {
 
-	public RemoveOperation(String path) {
-		super("remove", path);
-	}
+    public RemoveOperation(String path) {
+        super("remove", path);
+    }
 
 }

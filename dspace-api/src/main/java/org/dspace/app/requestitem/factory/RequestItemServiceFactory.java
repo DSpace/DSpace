@@ -11,7 +11,8 @@ import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Abstract factory to get services for the requestitem package, use RequestItemServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the requestitem package, use RequestItemServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -19,8 +20,8 @@ public abstract class RequestItemServiceFactory {
 
     public abstract RequestItemService getRequestItemService();
 
-    public static RequestItemServiceFactory getInstance()
-    {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("requestItemServiceFactory", RequestItemServiceFactory.class);
+    public static RequestItemServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("requestItemServiceFactory", RequestItemServiceFactory.class);
     }
 }

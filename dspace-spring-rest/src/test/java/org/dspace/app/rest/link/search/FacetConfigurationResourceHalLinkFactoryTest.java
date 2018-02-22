@@ -21,8 +21,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 /**
  * This class' purpose is to test the FacetConfigurationResourceHalLinkFactory
  */
-public class FacetConfigurationResourceHalLinkFactoryTest{
-
+public class FacetConfigurationResourceHalLinkFactoryTest {
 
 
     @Mock
@@ -35,17 +34,17 @@ public class FacetConfigurationResourceHalLinkFactoryTest{
     private FacetConfigurationResourceHalLinkFactory facetConfigurationResourceHalLinkFactory;
 
     @Before
-    public void setUp() throws Exception{
-        facetConfigurationResourceHalLinkFactory  = new FacetConfigurationResourceHalLinkFactory();
+    public void setUp() throws Exception {
+        facetConfigurationResourceHalLinkFactory = new FacetConfigurationResourceHalLinkFactory();
     }
 
     @Test
-    public void testControllerClassIsSetCorrectlyAfterConstructor() throws Exception{
+    public void testControllerClassIsSetCorrectlyAfterConstructor() throws Exception {
         assertEquals(DiscoveryRestController.class, facetConfigurationResourceHalLinkFactory.getControllerClass());
     }
 
     @Test
-    public void testResourceClassIsSetCorrectlyAfterConstructor() throws Exception{
+    public void testResourceClassIsSetCorrectlyAfterConstructor() throws Exception {
         assertEquals(FacetConfigurationResource.class, facetConfigurationResourceHalLinkFactory.getResourceClass());
     }
 

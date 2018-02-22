@@ -12,25 +12,25 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 public abstract class UploadStatusResponse {
 
-	private Boolean status;
-	private String message;
+    private Boolean status;
+    private String message;
 
-	@JsonInclude(Include.NON_NULL)
-	public String getMessage() {	
-		return message;
-	}
+    @JsonInclude(Include.NON_NULL)
+    public String getMessage() {
+        return message;
+    }
 
-	@JsonInclude(Include.NON_NULL)
-	public Boolean isStatus() {
-		return status;
-	}
+    @JsonInclude(Include.NON_NULL)
+    public Boolean isStatus() {
+        return status;
+    }
 
-	public void setStatus(Boolean status) {
-		this.status = status;
-	}
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
 }

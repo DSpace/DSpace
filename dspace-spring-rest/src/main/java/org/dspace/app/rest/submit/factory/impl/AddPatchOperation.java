@@ -13,20 +13,20 @@ import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 
 /**
- * 
  * Class to manage HTTP PATCH method operation ADD. Please see https://tools.ietf.org/html/rfc6902
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  * @param <T>
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public abstract class AddPatchOperation<T extends Object> extends PatchOperation<T> {
-	
-	@Override
-	public void perform(Context context, Request currentRequest, WorkspaceItem source, Operation operation) throws Exception {
-		add(context, currentRequest, source, operation.getPath(), operation.getValue());
-	}
 
-	abstract void add(Context context,Request currentRequest,WorkspaceItem source,String string,Object value) throws Exception;
-	
+    @Override
+    public void perform(Context context, Request currentRequest, WorkspaceItem source, Operation operation)
+        throws Exception {
+        add(context, currentRequest, source, operation.getPath(), operation.getValue());
+    }
+
+    abstract void add(Context context, Request currentRequest, WorkspaceItem source, String string, Object value)
+        throws Exception;
+
 }

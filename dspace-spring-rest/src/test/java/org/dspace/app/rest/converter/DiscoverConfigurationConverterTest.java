@@ -9,7 +9,9 @@ package org.dspace.app.rest.converter;
 
 
 import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.LinkedList;
@@ -30,7 +32,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  * This class' purpose is to test the DiscoverConfigurationConverter
  */
 @RunWith(MockitoJUnitRunner.class)
-public class DiscoverConfigurationConverterTest{
+public class DiscoverConfigurationConverterTest {
 
     SearchConfigurationRest searchConfigurationRest;
 
@@ -44,25 +46,27 @@ public class DiscoverConfigurationConverterTest{
     private DiscoveryConfiguration discoveryConfiguration;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
     }
 
-    public void populateDiscoveryConfigurationWithEmptyList(){
+    public void populateDiscoveryConfigurationWithEmptyList() {
         discoveryConfiguration.setSearchFilters(new LinkedList<DiscoverySearchFilter>());
         discoveryConfiguration.setSearchSortConfiguration(new DiscoverySortConfiguration());
     }
 
     @Test
-    public void testReturnType() throws Exception{
+    public void testReturnType() throws Exception {
         populateDiscoveryConfigurationWithEmptyList();
         searchConfigurationRest = discoverConfigurationConverter.convert(discoveryConfiguration);
         assertTrue(searchConfigurationRest.getFilters().isEmpty());
         assertEquals(SearchConfigurationRest.class, searchConfigurationRest.getClass());
     }
+
     @Test
-    public void testConvertWithNullParamter() throws Exception{
+    public void testConvertWithNullParamter() throws Exception {
         assertNotNull(discoverConfigurationConverter.convert(null));
     }
+
     @Test
     public void testNoSearchSortConfigurationReturnObjectNotNull() throws Exception {
         discoveryConfiguration.setSearchFilters(new LinkedList<>());
@@ -71,22 +75,25 @@ public class DiscoverConfigurationConverterTest{
         assertTrue(searchConfigurationRest.getFilters().isEmpty());
         assertNotNull(searchConfigurationRest);
     }
+
     @Test
-    public void testNoSearchFilterReturnObjectNotNull() throws Exception{
+    public void testNoSearchFilterReturnObjectNotNull() throws Exception {
         discoveryConfiguration.setSearchSortConfiguration(new DiscoverySortConfiguration());
         searchConfigurationRest = discoverConfigurationConverter.convert(discoveryConfiguration);
         assertTrue(searchConfigurationRest.getFilters().isEmpty());
         assertNotNull(searchConfigurationRest);
     }
 
-    //Checks that the convert is still done properly without error even if the discoveryConfiguration's attributes are null
+    //Checks that the convert is still done properly without error even if the discoveryConfiguration's attributes
+    // are null
     @Test
-    public void testNoSearchSortConfigurationAndNoSearchFilterReturnObjectNotNull() throws Exception{
+    public void testNoSearchSortConfigurationAndNoSearchFilterReturnObjectNotNull() throws Exception {
         searchConfigurationRest = discoverConfigurationConverter.convert(discoveryConfiguration);
         assertNotNull(searchConfigurationRest);
     }
+
     @Test
-    public void testCorrectSortOptionsAfterConvert() throws Exception{
+    public void testCorrectSortOptionsAfterConvert() throws Exception {
         populateDiscoveryConfigurationWithEmptyList();
 
         DiscoverySortFieldConfiguration discoverySortFieldConfiguration = new DiscoverySortFieldConfiguration();
@@ -105,7 +112,7 @@ public class DiscoverConfigurationConverterTest{
         searchConfigurationRest = discoverConfigurationConverter.convert(discoveryConfiguration);
 
         int counter = 0;
-        for(SearchConfigurationRest.SortOption sortOption : searchConfigurationRest.getSortOptions()){
+        for (SearchConfigurationRest.SortOption sortOption : searchConfigurationRest.getSortOptions()) {
             assertEquals(mockedList.get(counter).getMetadataField(), sortOption.getName());
             assertEquals(mockedList.get(counter).getType(), sortOption.getActualName());
             counter++;
@@ -115,7 +122,7 @@ public class DiscoverConfigurationConverterTest{
     }
 
     @Test
-    public void testEmptySortOptionsAfterConvertWithConfigurationWithEmptySortFields() throws Exception{
+    public void testEmptySortOptionsAfterConvertWithConfigurationWithEmptySortFields() throws Exception {
         populateDiscoveryConfigurationWithEmptyList();
         searchConfigurationRest = discoverConfigurationConverter.convert(discoveryConfiguration);
         assertEquals(0, searchConfigurationRest.getSortOptions().size());
@@ -123,15 +130,16 @@ public class DiscoverConfigurationConverterTest{
     }
 
     @Test
-    public void testEmptySortOptionsAfterConvertWithConfigurationWithNullSortFields() throws Exception{
+    public void testEmptySortOptionsAfterConvertWithConfigurationWithNullSortFields() throws Exception {
         populateDiscoveryConfigurationWithEmptyList();
         when(discoveryConfiguration.getSearchSortConfiguration()).thenReturn(null);
         searchConfigurationRest = discoverConfigurationConverter.convert(discoveryConfiguration);
 
         assertEquals(0, searchConfigurationRest.getSortOptions().size());
     }
+
     @Test
-    public void testCorrectSearchFiltersAfterConvert() throws Exception{
+    public void testCorrectSearchFiltersAfterConvert() throws Exception {
         populateDiscoveryConfigurationWithEmptyList();
 
         LinkedList<DiscoverySearchFilter> mockedList = new LinkedList();
@@ -147,27 +155,27 @@ public class DiscoverConfigurationConverterTest{
         searchConfigurationRest = discoverConfigurationConverter.convert(discoveryConfiguration);
 
         int counter = 0;
-        for(SearchConfigurationRest.Filter filter: searchConfigurationRest.getFilters()){
+        for (SearchConfigurationRest.Filter filter : searchConfigurationRest.getFilters()) {
             DiscoverySearchFilter searchFilter = mockedList.get(counter);
             assertEquals(searchFilter.getIndexFieldName(), filter.getFilter());
             //TODO checkoperators
             SearchConfigurationRest.Filter.Operator operator = new SearchConfigurationRest.Filter.Operator("testing");
             filter.addOperator(operator);
-            assertEquals(filter.getOperators().get(filter.getOperators().size()-1), operator);
+            assertEquals(filter.getOperators().get(filter.getOperators().size() - 1), operator);
             counter++;
         }
         assertTrue(!(searchConfigurationRest.getFilters().isEmpty()));
     }
 
     @Test
-    public void testEmptySearchFilterAfterConvertWithConfigurationWithEmptySearchFilters() throws Exception{
+    public void testEmptySearchFilterAfterConvertWithConfigurationWithEmptySearchFilters() throws Exception {
         populateDiscoveryConfigurationWithEmptyList();
         searchConfigurationRest = discoverConfigurationConverter.convert(discoveryConfiguration);
         assertEquals(0, searchConfigurationRest.getFilters().size());
     }
 
     @Test
-    public void testEmptySearchFiltersAfterConvertWithConfigurationWithNullSearchFilters() throws Exception{
+    public void testEmptySearchFiltersAfterConvertWithConfigurationWithNullSearchFilters() throws Exception {
         populateDiscoveryConfigurationWithEmptyList();
 
         when(discoveryConfiguration.getSearchFilters()).thenReturn(null);

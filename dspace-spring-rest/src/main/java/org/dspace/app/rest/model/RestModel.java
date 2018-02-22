@@ -15,25 +15,24 @@ import org.atteo.evo.inflector.English;
 /**
  * A REST resource directly or indirectly (in a collection) exposed must have at
  * least a type attribute to facilitate deserialization
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public interface RestModel extends Serializable {
 
-	public static final String ROOT = "root";	
-	public static final String CORE = "core";
-	public static final String EPERSON = "eperson";
-	public static final String DISCOVER = "discover";
-	public static final String CONFIGURATION = "config";
-	public static final String INTEGRATION = "integration";
-	public static final String SUBMISSION = "submission";
-	public static final String AUTHORIZATION = "authz";
-	
-	public String getType();
+    public static final String ROOT = "root";
+    public static final String CORE = "core";
+    public static final String EPERSON = "eperson";
+    public static final String DISCOVER = "discover";
+    public static final String CONFIGURATION = "config";
+    public static final String INTEGRATION = "integration";
+    public static final String SUBMISSION = "submission";
+    public static final String AUTHORIZATION = "authz";
 
-	@JsonIgnore
-	default public String getTypePlural() {
-		return English.plural(getType());
-	}
+    public String getType();
+
+    @JsonIgnore
+    default public String getTypePlural() {
+        return English.plural(getType());
+    }
 }

@@ -8,36 +8,34 @@
     http://www.dspace.org/license/
 
 -->
-<beans 
-    xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
-                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
     <!-- Acquires the DSpace Utility Class with initialized Service Manager -->
     <bean id="dspace" class="org.dspace.utils.DSpace"/>
-    
-    <!-- Acquires reference to EventService --> 
+
+    <!-- Acquires reference to EventService -->
     <bean id="dspace.eventService" factory-bean="dspace" factory-method="getEventService"/>
 
     <!-- Inject the Default LoggerUsageEventListener into the EventService  -->
     <bean class="org.dspace.usage.LoggerUsageEventListener">
-    	<property name="eventService" >
-    		<ref bean="dspace.eventService"/>
-    	</property>
+        <property name="eventService">
+            <ref bean="dspace.eventService"/>
+        </property>
     </bean>
-       
+
     <!-- Inject the SolrLoggerUsageEventListener into the EventService  -->
     <bean class="org.dspace.statistics.SolrLoggerUsageEventListener">
-        <property name="eventService" >
+        <property name="eventService">
             <ref bean="dspace.eventService"/>
         </property>
     </bean>
 
     <!-- Google Analytics recording  -->
     <bean class="org.dspace.google.GoogleRecorderEventListener">
-        <property name="eventService" >
+        <property name="eventService">
             <ref bean="dspace.eventService"/>
         </property>
     </bean>

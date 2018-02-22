@@ -10,18 +10,17 @@ package org.dspace.app.rest.exception;
 /**
  * This is an exception to manage information about pagination errors.
  * Out-of-order or other invalid requests
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class PaginationException extends RuntimeException {
-	long total;
+    long total;
 
-	public PaginationException(long total) {
-		this.total = total;
-	}
+    public PaginationException(long total) {
+        this.total = total;
+    }
 
-	public long getTotal() {
-		return total;
-	}
+    public long getTotal() {
+        return total;
+    }
 }

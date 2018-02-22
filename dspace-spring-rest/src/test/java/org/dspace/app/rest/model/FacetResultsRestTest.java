@@ -21,18 +21,18 @@ public class FacetResultsRestTest {
     FacetResultsRest facetResultsRest;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         facetResultsRest = new FacetResultsRest();
     }
 
     @Test
-    public void testFacetResultListNotNullAfterEntrySet() throws Exception{
+    public void testFacetResultListNotNullAfterEntrySet() throws Exception {
         facetResultsRest.setFacetEntry(new SearchFacetEntryRest("test"));
         assertNotNull(facetResultsRest.getFacetResultList());
     }
 
     @Test
-    public void testAddToFacetResultListContainsCorrectValue() throws Exception{
+    public void testAddToFacetResultListContainsCorrectValue() throws Exception {
         SearchFacetValueRest searchFacetValueRest = new SearchFacetValueRest();
         facetResultsRest.setFacetEntry(new SearchFacetEntryRest("test"));
         facetResultsRest.addToFacetResultList(searchFacetValueRest);

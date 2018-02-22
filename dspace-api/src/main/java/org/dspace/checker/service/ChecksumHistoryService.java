@@ -7,18 +7,19 @@
  */
 package org.dspace.checker.service;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.Map;
+
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.MostRecentChecksum;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.Map;
-
 /**
  * Service interface class for the ChecksumHistory object.
- * The implementation of this class is responsible for all business logic calls for the ChecksumHistory object and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls for the ChecksumHistory object and is
+ * autowired by spring
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -35,11 +36,9 @@ public interface ChecksumHistoryService {
     /**
      * Prune the history records from the database.
      *
-     * @param context context
-     * @param interests
-     *            set of results and the duration of time before they are
-     *            removed from the database
-     *
+     * @param context   context
+     * @param interests set of results and the duration of time before they are
+     *                  removed from the database
      * @return number of bitstreams deleted
      * @throws SQLException if database error
      */

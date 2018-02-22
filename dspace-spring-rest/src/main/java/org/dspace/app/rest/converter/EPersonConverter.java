@@ -21,48 +21,47 @@ import org.springframework.stereotype.Component;
 /**
  * This is the converter from/to the EPerson in the DSpace API data model and the
  * REST data model
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
 public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.app.rest.model.EPersonRest> {
-	@Autowired(required = true)
-	private GroupConverter epersonGroupConverter;
+    @Autowired(required = true)
+    private GroupConverter epersonGroupConverter;
 
-	private static final Logger log = Logger.getLogger(EPersonConverter.class);
-	
-	@Override
-	public EPersonRest fromModel(EPerson obj) {
-		EPersonRest eperson = super.fromModel(obj);
-		eperson.setLastActive(obj.getLastActive());
-		eperson.setNetid(obj.getNetid());
-		eperson.setCanLogIn(obj.canLogIn());
-		eperson.setRequireCertificate(obj.getRequireCertificate());
-		eperson.setSelfRegistered(obj.getSelfRegistered());
-		eperson.setEmail(obj.getEmail());
-		List<GroupRest> groups = new ArrayList<GroupRest>();
-		for (Group g : obj.getGroups()) {
-			groups.add(epersonGroupConverter.convert(g));
-		}
-		eperson.setGroups(groups);
-		return eperson;
-	}
+    private static final Logger log = Logger.getLogger(EPersonConverter.class);
 
-	@Override
-	public EPerson toModel(EPersonRest obj) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public EPersonRest fromModel(EPerson obj) {
+        EPersonRest eperson = super.fromModel(obj);
+        eperson.setLastActive(obj.getLastActive());
+        eperson.setNetid(obj.getNetid());
+        eperson.setCanLogIn(obj.canLogIn());
+        eperson.setRequireCertificate(obj.getRequireCertificate());
+        eperson.setSelfRegistered(obj.getSelfRegistered());
+        eperson.setEmail(obj.getEmail());
+        List<GroupRest> groups = new ArrayList<GroupRest>();
+        for (Group g : obj.getGroups()) {
+            groups.add(epersonGroupConverter.convert(g));
+        }
+        eperson.setGroups(groups);
+        return eperson;
+    }
 
-	@Override
-	protected EPersonRest newInstance() {
-		return new EPersonRest();
-	}
+    @Override
+    public EPerson toModel(EPersonRest obj) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	protected Class<EPerson> getModelClass() {
-		return EPerson.class;
-	}
+    @Override
+    protected EPersonRest newInstance() {
+        return new EPersonRest();
+    }
+
+    @Override
+    protected Class<EPerson> getModelClass() {
+        return EPerson.class;
+    }
 
 }

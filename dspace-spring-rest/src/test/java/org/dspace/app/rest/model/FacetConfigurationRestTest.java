@@ -18,17 +18,17 @@ public class FacetConfigurationRestTest {
     FacetConfigurationRest facetConfigurationRest;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         facetConfigurationRest = new FacetConfigurationRest();
     }
 
     @Test
-    public void testSidebarFacetsNotNullAfterConstructor(){
+    public void testSidebarFacetsNotNullAfterConstructor() {
         assertNotNull(facetConfigurationRest.getSidebarFacets());
     }
 
     @Test
-    public void testAddSidebarFacetsContainsCorrectSidebarFacet(){
+    public void testAddSidebarFacetsContainsCorrectSidebarFacet() {
         SearchFacetEntryRest sidebarFacet = new SearchFacetEntryRest("dateName");
         sidebarFacet.setFacetType("date");
 

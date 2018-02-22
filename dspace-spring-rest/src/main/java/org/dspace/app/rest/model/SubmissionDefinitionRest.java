@@ -9,85 +9,81 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
-import org.dspace.app.rest.RestResourceController;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * The Submission Definition REST Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class SubmissionDefinitionRest extends BaseObjectRest<String> {
-	public static final String NAME = "submissiondefinition";
-	public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
+    public static final String NAME = "submissiondefinition";
+    public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
-	private String name;
-	
-	@JsonProperty(value="isDefault")
-	private boolean defaultConf;
-	
-	private List<SubmissionSectionRest> panels;
+    private String name;
 
-	private List<CollectionRest> collections;
-	
-	@Override
-	public String getId() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setPanels(List<SubmissionSectionRest> panels) {
-		this.panels = panels;
-	}
-	
-	@LinkRest(name=SubmissionSectionRest.ATTRIBUTE_NAME, linkClass = SubmissionSectionRest.class)
-	@JsonIgnore
-	public List<SubmissionSectionRest> getPanels() {
-		return panels;
-	}
-	
-	@Override
-	public String getType() {
-		return NAME;
-	}
-	
-	public void setDefaultConf(boolean isDefault) {
-		this.defaultConf = isDefault;
-	}
-	
-	public boolean isDefaultConf() {
-		return defaultConf;
-	}
-	
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
+    @JsonProperty(value = "isDefault")
+    private boolean defaultConf;
 
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
+    private List<SubmissionSectionRest> panels;
 
-	@LinkRest(linkClass = CollectionRest.class)	
-	@JsonIgnore
-	public List<CollectionRest> getCollections() {
-		return collections;
-	}
+    private List<CollectionRest> collections;
 
-	public void setCollections(List<CollectionRest> collections) {
-		this.collections = collections;
-	}
+    @Override
+    public String getId() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setPanels(List<SubmissionSectionRest> panels) {
+        this.panels = panels;
+    }
+
+    @LinkRest(name = SubmissionSectionRest.ATTRIBUTE_NAME, linkClass = SubmissionSectionRest.class)
+    @JsonIgnore
+    public List<SubmissionSectionRest> getPanels() {
+        return panels;
+    }
+
+    @Override
+    public String getType() {
+        return NAME;
+    }
+
+    public void setDefaultConf(boolean isDefault) {
+        this.defaultConf = isDefault;
+    }
+
+    public boolean isDefaultConf() {
+        return defaultConf;
+    }
+
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
+
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
+
+    @LinkRest(linkClass = CollectionRest.class)
+    @JsonIgnore
+    public List<CollectionRest> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<CollectionRest> collections) {
+        this.collections = collections;
+    }
 }

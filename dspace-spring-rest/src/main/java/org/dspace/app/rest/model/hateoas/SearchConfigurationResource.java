@@ -16,7 +16,7 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 @RelNameDSpaceResource(SearchConfigurationRest.NAME)
 public class SearchConfigurationResource extends HALResource<SearchConfigurationRest> {
 
-    public SearchConfigurationResource(SearchConfigurationRest searchConfigurationRest){
+    public SearchConfigurationResource(SearchConfigurationRest searchConfigurationRest) {
         super(searchConfigurationRest);
     }
 

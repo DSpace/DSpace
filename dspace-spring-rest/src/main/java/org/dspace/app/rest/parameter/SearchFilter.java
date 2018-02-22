@@ -43,9 +43,9 @@ public class SearchFilter {
 
     public String toString() {
         return "SearchFilter{" +
-                "name='" + name + '\'' +
-                ", operator='" + operator + '\'' +
-                ", value='" + value + '\'' +
-                '}';
+            "name='" + name + '\'' +
+            ", operator='" + operator + '\'' +
+            ", value='" + value + '\'' +
+            '}';
     }
 }

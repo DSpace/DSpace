@@ -21,7 +21,7 @@ public class RootRestRepository {
     @Autowired
     RootConverter rootConverter;
 
-    public RootRest getRoot(String restUrl){
+    public RootRest getRoot(String restUrl) {
         return rootConverter.convert(restUrl);
     }
 }

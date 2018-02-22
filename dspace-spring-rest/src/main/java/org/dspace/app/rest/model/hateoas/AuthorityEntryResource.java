@@ -13,15 +13,14 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 /**
  * Authority Rest HAL Resource. The HAL Resource wraps the REST Resource adding
  * support for the links and embedded resources
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @RelNameDSpaceResource(AuthorityEntryRest.NAME)
 public class AuthorityEntryResource extends HALResource<AuthorityEntryRest> {
 
 
-	public AuthorityEntryResource(AuthorityEntryRest entry) {
-		super(entry);
-	}
+    public AuthorityEntryResource(AuthorityEntryRest entry) {
+        super(entry);
+    }
 }

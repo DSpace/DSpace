@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
@@ -15,13 +18,10 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, MetadataFieldService> {
 
     /* Log4j logger*/
-    private static final Logger log =  Logger.getLogger(MetadataFieldBuilder.class);
+    private static final Logger log = Logger.getLogger(MetadataFieldBuilder.class);
 
     private MetadataField metadataField;
 
@@ -41,7 +41,7 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
 
     @Override
     public MetadataField build() {
-        try{
+        try {
 
             metadataFieldService.update(context, metadataField);
             context.dispatchEvents();
@@ -52,7 +52,8 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
         } catch (SQLException e) {
             log.error(e);
         } catch (AuthorizeException e) {
-            log.error(e);;
+            log.error(e);
+            ;
         } catch (NonUniqueMetadataException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -62,7 +63,7 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
     }
 
     public void delete(MetadataField dso) throws Exception {
-        try(Context c = new Context()) {
+        try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             MetadataField attachedDso = c.reloadEntity(dso);
             if (attachedDso != null) {
@@ -75,15 +76,19 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
     }
 
 
-    public static MetadataFieldBuilder createMetadataField(Context context, String element, String qualifier, String scopeNote) throws SQLException, AuthorizeException {
+    public static MetadataFieldBuilder createMetadataField(Context context, String element, String qualifier,
+                                                           String scopeNote) throws SQLException, AuthorizeException {
         MetadataFieldBuilder metadataFieldBuilder = new MetadataFieldBuilder(context);
         return metadataFieldBuilder.create(context, element, qualifier, scopeNote);
     }
-    private MetadataFieldBuilder create(Context context, String element, String qualifier, String scopeNote) throws SQLException, AuthorizeException {
+
+    private MetadataFieldBuilder create(Context context, String element, String qualifier, String scopeNote)
+        throws SQLException, AuthorizeException {
         this.context = context;
 
         try {
-            metadataField = metadataFieldService.create(context, metadataSchemaService.find(context, "dc"), element, qualifier,scopeNote);
+            metadataField = metadataFieldService
+                .create(context, metadataSchemaService.find(context, "dc"), element, qualifier, scopeNote);
         } catch (NonUniqueMetadataException e) {
             e.printStackTrace();
         }

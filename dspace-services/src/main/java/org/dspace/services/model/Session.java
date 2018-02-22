@@ -8,22 +8,21 @@
 package org.dspace.services.model;
 
 import java.util.Map;
-
 import javax.servlet.http.HttpSession;
 
 /**
- * Represents a user's session (login session) in the system.  Can hold 
+ * Represents a user's session (login session) in the system.  Can hold
  * some additional attributes as needed, but the underlying
  * implementation may limit the number and size of attributes to ensure
  * session replication is not impacted negatively.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface Session extends HttpSession {
 
     /**
-     * @return the session identifier.  This is not the {@link #getId()} 
-     * from HttpSession unless no session id was specified when the 
+     * @return the session identifier.  This is not the {@link #getId()}
+     * from HttpSession unless no session id was specified when the
      * session was bound.
      */
     public String getSessionId();
@@ -54,7 +53,7 @@ public interface Session extends HttpSession {
     public String getServerId();
 
     /**
-     * @return the IP Address from which this session originated 
+     * @return the IP Address from which this session originated
      */
     public String getOriginatingHostIP();
 
@@ -65,20 +64,17 @@ public interface Session extends HttpSession {
 
     /**
      * Get an attribute from the session if one exists.
-     * 
-     * @param key
-     *            the key for the attribute
+     *
+     * @param key the key for the attribute
      * @return the value if one exists OR null if none
      */
     public String getAttribute(String key);
 
     /**
      * Set an attribute on a session.
-     * 
-     * @param key
-     *            the key for the attribute
-     * @param value
-     *            the value (if this is null then the attribute is removed)
+     *
+     * @param key   the key for the attribute
+     * @param value the value (if this is null then the attribute is removed)
      */
     public void setAttribute(String key, String value);
 
@@ -91,7 +87,7 @@ public interface Session extends HttpSession {
     public Map<String, String> getAttributes();
 
     /**
-     * Purges all data from this session and effectively resets it to an 
+     * Purges all data from this session and effectively resets it to an
      * anonymous session.  Does not invalidate the session, though.
      */
     public void clear();

@@ -14,13 +14,12 @@ import org.dspace.app.rest.utils.Utils;
 /**
  * InputFrom Rest HAL Resource. The HAL Resource wraps the REST Resource
  * adding support for the links and embedded resources
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @RelNameDSpaceResource(SubmissionFormRest.NAME)
 public class SubmissionFormResource extends DSpaceResource<SubmissionFormRest> {
-	public SubmissionFormResource(SubmissionFormRest sd, Utils utils, String... rels) {
-		super(sd, utils, rels);
-	}
+    public SubmissionFormResource(SubmissionFormRest sd, Utils utils, String... rels) {
+        super(sd, utils, rels);
+    }
 }

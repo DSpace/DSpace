@@ -15,13 +15,14 @@ import org.springframework.stereotype.Service;
 
 /**
  * This bean is a bean which is annotated as a spring bean and should be found when the AC starts up
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 @Service
 public class SpringAnnotationBean {
 
     private ServiceExample serviceExample;
+
     @Autowired
     @Required
     public void setServiceExample(ServiceExample serviceExample) {
@@ -29,6 +30,7 @@ public class SpringAnnotationBean {
     }
 
     private ConcreteExample concreteExample;
+
     @Autowired
     @Required
     public void setConcreteExample(ConcreteExample concreteExample) {
@@ -48,6 +50,7 @@ public class SpringAnnotationBean {
     }
 
     private String value = null;
+
     public void setTestName(String testName) {
         value = testName;
     }

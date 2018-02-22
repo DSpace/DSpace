@@ -11,78 +11,77 @@ import org.dspace.app.rest.RestResourceController;
 
 /**
  * The authority REST resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-	@LinkRest(name = AuthorityRest.ENTRIES, linkClass = AuthorityEntryRest.class, method = "query", optional = true),
-	@LinkRest(name = AuthorityRest.ENTRY, linkClass = AuthorityEntryRest.class, method = "getResource", optional = true)	
+    @LinkRest(name = AuthorityRest.ENTRIES, linkClass = AuthorityEntryRest.class, method = "query", optional = true),
+    @LinkRest(name = AuthorityRest.ENTRY, linkClass = AuthorityEntryRest.class, method = "getResource", optional = true)
 })
 public class AuthorityRest extends BaseObjectRest<String> {
 
-	public static final String NAME = "authority";
-	public static final String CATEGORY = RestAddressableModel.INTEGRATION;
-	public static final String ENTRIES = "entries";
-	public static final String ENTRY = "entryValues";
-	
-	private String name;
+    public static final String NAME = "authority";
+    public static final String CATEGORY = RestAddressableModel.INTEGRATION;
+    public static final String ENTRIES = "entries";
+    public static final String ENTRY = "entryValues";
 
-	private boolean scrollable;
+    private String name;
 
-	private boolean hierarchical;
-	
-	private boolean identifier;
+    private boolean scrollable;
 
-	@Override
-	public String getId() {
-		return name;
-	}
+    private boolean hierarchical;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    private boolean identifier;
 
-	public String getName() {
-		return name;
-	}
+    @Override
+    public String getId() {
+        return name;
+    }
 
-	public boolean isScrollable() {
-		return scrollable;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setScrollable(boolean scrollable) {
-		this.scrollable = scrollable;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public boolean isHierarchical() {
-		return hierarchical;
-	}
+    public boolean isScrollable() {
+        return scrollable;
+    }
 
-	public void setHierarchical(boolean hierarchical) {
-		this.hierarchical = hierarchical;
-	}
+    public void setScrollable(boolean scrollable) {
+        this.scrollable = scrollable;
+    }
 
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    public boolean isHierarchical() {
+        return hierarchical;
+    }
 
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
+    public void setHierarchical(boolean hierarchical) {
+        this.hierarchical = hierarchical;
+    }
 
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
+    @Override
+    public String getType() {
+        return NAME;
+    }
 
-	public boolean hasIdentifier() {		
-		return identifier;
-	}
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
 
-	public void setIdentifier(boolean identifier) {
-		this.identifier = identifier;
-	}
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
+
+    public boolean hasIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(boolean identifier) {
+        this.identifier = identifier;
+    }
 }

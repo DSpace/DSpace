@@ -7,69 +7,66 @@
  */
 package org.dspace.app.rest.model;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The Browse Entry REST Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class BrowseEntryRest implements RestModel {
-	private static final long serialVersionUID = -3415049466402327251L;
-	public static final String NAME = "browseEntry";
-	private String authority;
-	private String value;
-	private String valueLang;
-	private long count;
+    private static final long serialVersionUID = -3415049466402327251L;
+    public static final String NAME = "browseEntry";
+    private String authority;
+    private String value;
+    private String valueLang;
+    private long count;
 
-	@JsonIgnore
-	private BrowseIndexRest browseIndex;
-	
-	public String getAuthority() {
-		return authority;
-	}
+    @JsonIgnore
+    private BrowseIndexRest browseIndex;
 
-	public void setAuthority(String authority) {
-		this.authority = authority;
-	}
+    public String getAuthority() {
+        return authority;
+    }
 
-	public String getValue() {
-		return value;
-	}
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    public String getValue() {
+        return value;
+    }
 
-	public String getValueLang() {
-		return valueLang;
-	}
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-	public void setValueLang(String valueLang) {
-		this.valueLang = valueLang;
-	}
+    public String getValueLang() {
+        return valueLang;
+    }
 
-	public long getCount() {
-		return count;
-	}
+    public void setValueLang(String valueLang) {
+        this.valueLang = valueLang;
+    }
 
-	public void setCount(long count) {
-		this.count = count;
-	}
-	
-	public BrowseIndexRest getBrowseIndex() {
-		return browseIndex;
-	}
-	
-	public void setBrowseIndex(BrowseIndexRest browseIndex) {
-		this.browseIndex = browseIndex;
-	}
-	
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    public long getCount() {
+        return count;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
+    }
+
+    public BrowseIndexRest getBrowseIndex() {
+        return browseIndex;
+    }
+
+    public void setBrowseIndex(BrowseIndexRest browseIndex) {
+        this.browseIndex = browseIndex;
+    }
+
+    @Override
+    public String getType() {
+        return NAME;
+    }
 }

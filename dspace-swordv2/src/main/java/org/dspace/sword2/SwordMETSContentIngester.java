@@ -10,7 +10,6 @@ package org.dspace.sword2;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -24,7 +23,6 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
-
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.swordapp.server.Deposit;
@@ -32,9 +30,10 @@ import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 
-public class SwordMETSContentIngester extends AbstractSwordContentIngester
-{
-    /** Log4j logger */
+public class SwordMETSContentIngester extends AbstractSwordContentIngester {
+    /**
+     * Log4j logger
+     */
     public static final Logger log = Logger.getLogger(
         SwordMETSContentIngester.class);
 
@@ -45,29 +44,25 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
         ContentServiceFactory.getInstance().getCollectionService();
 
     protected HandleService handleService =
-        HandleServiceFactory.getInstance() .getHandleService();
+        HandleServiceFactory.getInstance().getHandleService();
 
     public DepositResult ingest(Context context, Deposit deposit,
-            DSpaceObject dso, VerboseDescription verboseDescription)
-            throws DSpaceSwordException, SwordError, SwordAuthException,
-            SwordServerException
-    {
+                                DSpaceObject dso, VerboseDescription verboseDescription)
+        throws DSpaceSwordException, SwordError, SwordAuthException,
+        SwordServerException {
         return this.ingest(context, deposit, dso, verboseDescription, null);
     }
 
     @Override
     public DepositResult ingestToCollection(Context context, Deposit deposit,
-            Collection collection, VerboseDescription verboseDescription,
-            DepositResult result)
-            throws DSpaceSwordException, SwordError, SwordAuthException,
-            SwordServerException
-    {
-        try
-        {
+                                            Collection collection, VerboseDescription verboseDescription,
+                                            DepositResult result)
+        throws DSpaceSwordException, SwordError, SwordAuthException,
+        SwordServerException {
+        try {
             // if we are actuall given an item in the deposit result of a previous operation
             // then we do an ingestToItem
-            if (result != null)
-            {
+            if (result != null) {
                 Item item = result.getItem();
                 return this.ingestToItem(
                     context, deposit, item, verboseDescription, result);
@@ -86,10 +81,9 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
             // need to add a licence file, otherwise the METS replace function raises a NullPointerException
             String licence = collectionService.getLicense(collection);
-            if (PackageUtils.findDepositLicense(context, item) == null)
-            {
+            if (PackageUtils.findDepositLicense(context, item) == null) {
                 PackageUtils.addDepositLicense(
-                context, licence, item, collection);
+                    context, licence, item, collection);
             }
 
             // get deposited file as InputStream
@@ -97,17 +91,16 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
             // load the plugin manager for the required configuration
             String cfg = ConfigurationManager.getProperty("swordv2-server",
-                    "mets-ingester.package-ingester");
-            if (cfg == null || "".equals(cfg))
-            {
+                                                          "mets-ingester.package-ingester");
+            if (cfg == null || "".equals(cfg)) {
                 cfg = "METS";  // default to METS
             }
             verboseDescription.append("Using package manifest format: " + cfg);
 
             PackageIngester pi = (PackageIngester) CoreServiceFactory.getInstance().getPluginService()
-                .getNamedPlugin(PackageIngester.class, cfg);
+                                                                     .getNamedPlugin(PackageIngester.class, cfg);
             verboseDescription.append("Loaded package ingester: " +
-                pi.getClass().getName());
+                                          pi.getClass().getName());
 
             // Initialize parameters to packager
             PackageParameters params = new PackageParameters();
@@ -117,35 +110,30 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
             // Should restore mode be enabled, i.e. keep existing handle?
             if (ConfigurationManager.getBooleanProperty(
-                "swordv2-server", "restore-mode.enable", false))
-            {
+                "swordv2-server", "restore-mode.enable", false)) {
                 params.setRestoreModeEnabled(true);
             }
 
             // Whether or not to use the collection template
             params.setUseCollectionTemplate(ConfigurationManager
-                .getBooleanProperty(
-                    "mets.default.ingest.useCollectionTemplate", false));
+                                                .getBooleanProperty(
+                                                    "mets.default.ingest.useCollectionTemplate", false));
 
             // ingest the item from the temp file
             DSpaceObject ingestedObject = pi.replace(
                 context, item, depositFile, params);
-            if (ingestedObject == null)
-            {
+            if (ingestedObject == null) {
                 verboseDescription.append(
                     "Failed to ingest the package; throwing exception");
                 throw new SwordError(DSpaceUriRegistry.UNPACKAGE_FAIL,
-                    "METS package ingester failed to unpack package");
+                                     "METS package ingester failed to unpack package");
             }
 
             // Verify we have an Item as a result
-            if (!(ingestedObject instanceof Item))
-            {
+            if (!(ingestedObject instanceof Item)) {
                 throw new DSpaceSwordException(
                     "DSpace Ingester returned wrong object type -- not an Item result.");
-            }
-            else
-            {
+            } else {
                 //otherwise, we have an item, and a workflow should have already been started for it.
                 verboseDescription.append("Workflow process started");
             }
@@ -160,7 +148,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
             // DSpace ignores the slug value as suggested identifier, but
             // it does store it in the metadata
             this.setSlug(context, installedItem, deposit.getSlug(),
-                verboseDescription);
+                         verboseDescription);
 
             // in order to write these changes, we need to bypass the
             // authorisation briefly, because although the user may be
@@ -177,14 +165,11 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
             verboseDescription.append("Ingest successful");
             verboseDescription.append(
                 "Item created with internal identifier: " +
-                installedItem.getID());
-            if (handle != null)
-            {
+                    installedItem.getID());
+            if (handle != null) {
                 verboseDescription.append(
                     "Item created with external identifier: " + handle);
-            }
-            else
-            {
+            } else {
                 verboseDescription.append(
                     "No external identifier available at this stage (item in workflow)");
             }
@@ -194,14 +179,10 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
             dr.setTreatment(this.getTreatment());
 
             return dr;
-        }
-        catch (RuntimeException re)
-        {
+        } catch (RuntimeException re) {
             log.error("caught exception: ", re);
             throw re;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("caught exception: ", e);
             throw new DSpaceSwordException(e);
         }
@@ -209,34 +190,30 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
     @Override
     public DepositResult ingestToItem(Context context, Deposit deposit,
-            Item item, VerboseDescription verboseDescription,
-            DepositResult result)
-            throws DSpaceSwordException, SwordError, SwordAuthException,
-            SwordServerException
-    {
-        if (result == null)
-        {
+                                      Item item, VerboseDescription verboseDescription,
+                                      DepositResult result)
+        throws DSpaceSwordException, SwordError, SwordAuthException,
+        SwordServerException {
+        if (result == null) {
             result = new DepositResult();
         }
 
-        try
-        {
+        try {
             // get deposited file as InputStream
             File depositFile = deposit.getFile();
 
             // load the plugin manager for the required configuration
             String cfg = ConfigurationManager.getProperty(
                 "swordv2-server", "mets-ingester.package-ingester");
-            if (cfg == null || "".equals(cfg))
-            {
+            if (cfg == null || "".equals(cfg)) {
                 cfg = "METS";  // default to METS
             }
             verboseDescription.append("Using package manifest format: " + cfg);
 
             PackageIngester pi = (PackageIngester) CoreServiceFactory.getInstance().getPluginService()
-                .getNamedPlugin(PackageIngester.class, cfg);
+                                                                     .getNamedPlugin(PackageIngester.class, cfg);
             verboseDescription.append("Loaded package ingester: " +
-                pi.getClass().getName());
+                                          pi.getClass().getName());
 
             // Initialize parameters to packager
             PackageParameters params = new PackageParameters();
@@ -246,30 +223,27 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
             // Should restore mode be enabled, i.e. keep existing handle?
             if (ConfigurationManager.getBooleanProperty(
-                "swordv2-server", "restore-mode.enable", false))
-            {
+                "swordv2-server", "restore-mode.enable", false)) {
                 params.setRestoreModeEnabled(true);
             }
 
             // Whether or not to use the collection template
             params.setUseCollectionTemplate(ConfigurationManager
-                .getBooleanProperty(
-                    "mets.default.ingest.useCollectionTemplate", false));
+                                                .getBooleanProperty(
+                                                    "mets.default.ingest.useCollectionTemplate", false));
 
             // ingest the item from the temp file
             DSpaceObject ingestedObject = pi.replace(
                 context, item, depositFile, params);
-            if (ingestedObject == null)
-            {
+            if (ingestedObject == null) {
                 verboseDescription.append(
-                "Failed to replace the package; throwing exception");
+                    "Failed to replace the package; throwing exception");
                 throw new SwordError(DSpaceUriRegistry.UNPACKAGE_FAIL,
-                    "METS package ingester failed to unpack package");
+                                     "METS package ingester failed to unpack package");
             }
 
             // Verify we have an Item as a result
-            if (!(ingestedObject instanceof Item))
-            {
+            if (!(ingestedObject instanceof Item)) {
                 throw new DSpaceSwordException(
                     "DSpace Ingester returned wrong object type -- not an Item result.");
             }
@@ -297,14 +271,10 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
             result.setTreatment(this.getTreatment());
 
             return result;
-        }
-        catch (RuntimeException re)
-        {
+        } catch (RuntimeException re) {
             log.error("caught exception: ", re);
             throw re;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("caught exception: ", e);
             throw new DSpaceSwordException(e);
         }
@@ -315,11 +285,9 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
      * put the deposit through
      *
      * @return human readable description
-     * @throws DSpaceSwordException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSwordException can be thrown by the internals of the DSpace SWORD implementation
      */
-    private String getTreatment() throws DSpaceSwordException
-    {
+    private String getTreatment() throws DSpaceSwordException {
         return "The package has been deposited into DSpace.  Each file has been unpacked " +
             "and provided with a unique identifier.  The metadata in the manifest has been " +
             "extracted and attached to the DSpace item, which has been provided with " +

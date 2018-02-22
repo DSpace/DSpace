@@ -7,17 +7,17 @@
  */
 package org.dspace.xmlworkflow.state.actions.userassignment;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
-import org.dspace.xmlworkflow.state.actions.ActionResult;
-import org.dspace.xmlworkflow.state.Step;
-import org.dspace.xmlworkflow.RoleMembers;
-import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
+import javax.servlet.http.HttpServletRequest;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+import org.dspace.xmlworkflow.RoleMembers;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * A user selection action that does not assign any users
@@ -27,18 +27,19 @@ import java.sql.SQLException;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class NoUserSelectionAction extends UserSelectionAction{
+public class NoUserSelectionAction extends UserSelectionAction {
     @Override
     public boolean isFinished(XmlWorkflowItem wfi) {
         return true;
     }
 
     @Override
-    public void regenerateTasks(Context c, XmlWorkflowItem wfi,  RoleMembers roleMembers) throws SQLException {
+    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException {
     }
 
     @Override
-    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI) throws WorkflowConfigurationException, SQLException {
+    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI)
+        throws WorkflowConfigurationException, SQLException {
         return true;
     }
 
@@ -52,7 +53,8 @@ public class NoUserSelectionAction extends UserSelectionAction{
     }
 
     @Override
-    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+        throws SQLException, AuthorizeException, IOException {
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
     }
 }

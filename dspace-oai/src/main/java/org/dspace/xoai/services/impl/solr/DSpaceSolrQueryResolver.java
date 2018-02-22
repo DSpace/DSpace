@@ -7,6 +7,9 @@
  */
 package org.dspace.xoai.services.impl.solr;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.lyncode.xoai.dataprovider.filter.Scope;
 import com.lyncode.xoai.dataprovider.filter.ScopedFilter;
 import com.lyncode.xoai.dataprovider.filter.conditions.Condition;
@@ -15,9 +18,6 @@ import org.dspace.xoai.services.api.solr.SolrQueryResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DSpaceSolrQueryResolver implements SolrQueryResolver {
     @Autowired
     DSpaceFilterResolver filterResolver;
@@ -25,18 +25,20 @@ public class DSpaceSolrQueryResolver implements SolrQueryResolver {
     @Override
     public String buildQuery(List<ScopedFilter> filters) {
         List<String> whereCond = new ArrayList<String>();
-        for (ScopedFilter filter : filters)
+        for (ScopedFilter filter : filters) {
             whereCond.add(buildQuery(filter.getScope(), filter.getCondition()));
+        }
 
-        if (whereCond.isEmpty())
+        if (whereCond.isEmpty()) {
             whereCond.add("*:*");
+        }
         String where = "(" + StringUtils.join(whereCond.iterator(), ") AND (") + ")";
 
         return where;
     }
 
 
-    private String buildQuery (Scope scope, Condition condition) {
+    private String buildQuery(Scope scope, Condition condition) {
         return filterResolver.buildSolrQuery(scope, condition);
     }
 }

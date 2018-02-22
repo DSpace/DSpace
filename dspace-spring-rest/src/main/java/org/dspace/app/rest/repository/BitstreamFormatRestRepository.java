@@ -24,56 +24,55 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the repository responsible to manage BitstreamFormat Rest object
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(BitstreamFormatRest.CATEGORY + "." + BitstreamFormatRest.NAME)
 public class BitstreamFormatRestRepository extends DSpaceRestRepository<BitstreamFormatRest, Integer> {
 
-	@Autowired
-	BitstreamFormatService bfs;
+    @Autowired
+    BitstreamFormatService bfs;
 
-	@Autowired
-	BitstreamFormatConverter converter;
+    @Autowired
+    BitstreamFormatConverter converter;
 
-	public BitstreamFormatRestRepository() {
-		System.out.println("Repository initialized by Spring");
-	}
+    public BitstreamFormatRestRepository() {
+        System.out.println("Repository initialized by Spring");
+    }
 
-	@Override
-	public BitstreamFormatRest findOne(Context context, Integer id) {
-		BitstreamFormat bit = null;
-		try {
-			bit = bfs.find(context, id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (bit == null) {
-			return null;
-		}
-		return converter.fromModel(bit);
-	}
+    @Override
+    public BitstreamFormatRest findOne(Context context, Integer id) {
+        BitstreamFormat bit = null;
+        try {
+            bit = bfs.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (bit == null) {
+            return null;
+        }
+        return converter.fromModel(bit);
+    }
 
-	@Override
-	public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
-		List<BitstreamFormat> bit = null;
-		try {
-			bit = bfs.findAll(context);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		Page<BitstreamFormatRest> page = utils.getPage(bit, pageable).map(converter);
-		return page;
-	}
+    @Override
+    public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
+        List<BitstreamFormat> bit = null;
+        try {
+            bit = bfs.findAll(context);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<BitstreamFormatRest> page = utils.getPage(bit, pageable).map(converter);
+        return page;
+    }
 
-	@Override
-	public Class<BitstreamFormatRest> getDomainClass() {
-		return BitstreamFormatRest.class;
-	}
+    @Override
+    public Class<BitstreamFormatRest> getDomainClass() {
+        return BitstreamFormatRest.class;
+    }
 
-	@Override
-	public BitstreamFormatResource wrapResource(BitstreamFormatRest bs, String... rels) {
-		return new BitstreamFormatResource(bs, utils, rels);
-	}
+    @Override
+    public BitstreamFormatResource wrapResource(BitstreamFormatRest bs, String... rels) {
+        return new BitstreamFormatResource(bs, utils, rels);
+    }
 }

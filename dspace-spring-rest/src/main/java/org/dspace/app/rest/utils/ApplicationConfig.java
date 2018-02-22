@@ -14,27 +14,27 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 /**
  * This class provide extra configuration for our Spring Boot Application
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Configuration
 @EnableSpringDataWebSupport
-@ComponentScan({ "org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils" })
+@ComponentScan( {"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils"})
 public class ApplicationConfig {
-	@Value("${dspace.dir}")
-	private String dspaceHome;
+    @Value("${dspace.dir}")
+    private String dspaceHome;
 
-	@Value("${cors.allowed-origins}")
-	private String corsAllowedOrigins;
+    @Value("${cors.allowed-origins}")
+    private String corsAllowedOrigins;
 
-	public String getDspaceHome() {
-		return dspaceHome;
-	}
+    public String getDspaceHome() {
+        return dspaceHome;
+    }
 
-	public String[] getCorsAllowedOrigins() {
-		if (corsAllowedOrigins != null)
-			return corsAllowedOrigins.split("\\s*,\\s*");
-		return null;
-	}
+    public String[] getCorsAllowedOrigins() {
+        if (corsAllowedOrigins != null) {
+            return corsAllowedOrigins.split("\\s*,\\s*");
+        }
+        return null;
+    }
 }

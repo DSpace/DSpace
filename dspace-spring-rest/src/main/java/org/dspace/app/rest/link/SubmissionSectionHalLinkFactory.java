@@ -24,30 +24,38 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * This class' purpose is to provide a factory to add links to the AuthorityEntryResource. The addLinks factory will be called
+ * This class' purpose is to provide a factory to add links to the AuthorityEntryResource. The addLinks factory will
+ * be called
  * from the HalLinkService class addLinks method.
  */
 @Component
 public class SubmissionSectionHalLinkFactory extends HalLinkFactory<SubmissionSectionResource, RestResourceController> {
 
-    protected void addLinks(final SubmissionSectionResource halResource, final Pageable pageable, final LinkedList<Link> list) throws Exception{
+    protected void addLinks(final SubmissionSectionResource halResource, final Pageable pageable,
+                            final LinkedList<Link> list) throws Exception {
         SubmissionSectionRest sd = halResource.getContent();
 
-		if(SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(sd.getSectionType())) {
-            UriComponentsBuilder uriComponentsBuilder = linkTo(getMethodOn(SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME)
-                    .findRel(null, SubmissionFormRest.CATEGORY, English.plural(SubmissionFormRest.NAME), sd.getId(), "", null, null, null))
-                    .toUriComponentsBuilder();
+        if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(sd.getSectionType())) {
+            UriComponentsBuilder uriComponentsBuilder = linkTo(
+                getMethodOn(SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME)
+                    .findRel(null, SubmissionFormRest.CATEGORY, English.plural(SubmissionFormRest.NAME), sd.getId(), "",
+                             null, null, null))
+                .toUriComponentsBuilder();
             String uribuilder = uriComponentsBuilder.build().toString();
-			list.add(buildLink(SubmissionFormRest.NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
-		}
-		if(SubmissionStepConfig.UPLOAD_STEP_NAME.equals(sd.getSectionType())) {
-			UriComponentsBuilder uriComponentsBuilder = linkTo(getMethodOn(RestResourceController.class, SubmissionUploadRest.CATEGORY, SubmissionUploadRest.NAME)
-					.findRel(null, SubmissionUploadRest.CATEGORY, English.plural(SubmissionUploadRest.NAME), sd.getId(), "", null, null, null))
-					.toUriComponentsBuilder();
-			String uribuilder = uriComponentsBuilder.build().toString();
-			list.add(buildLink(SubmissionFormRest.NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
-		}
-		
+            list.add(
+                buildLink(SubmissionFormRest.NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
+        }
+        if (SubmissionStepConfig.UPLOAD_STEP_NAME.equals(sd.getSectionType())) {
+            UriComponentsBuilder uriComponentsBuilder = linkTo(
+                getMethodOn(RestResourceController.class, SubmissionUploadRest.CATEGORY, SubmissionUploadRest.NAME)
+                    .findRel(null, SubmissionUploadRest.CATEGORY, English.plural(SubmissionUploadRest.NAME), sd.getId(),
+                             "", null, null, null))
+                .toUriComponentsBuilder();
+            String uribuilder = uriComponentsBuilder.build().toString();
+            list.add(
+                buildLink(SubmissionFormRest.NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
+        }
+
     }
 
     protected Class<RestResourceController> getControllerClass() {

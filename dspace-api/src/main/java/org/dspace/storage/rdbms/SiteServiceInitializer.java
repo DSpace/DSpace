@@ -7,14 +7,14 @@
  */
 package org.dspace.storage.rdbms;
 
+import java.sql.Connection;
+
 import org.apache.log4j.Logger;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.Connection;
 
 /**
  * Callback method to ensure that the Site object is created (if no site exists)
@@ -32,29 +32,24 @@ public class SiteServiceInitializer implements FlywayCallback {
     public void initializeSiteObject() {
         // After every migrate, ensure default Site is setup correctly.
         Context context = null;
-        try
-        {
+        try {
             context = new Context();
             context.turnOffAuthorisationSystem();
             // While it's not really a formal "registry", we need to ensure the
             // default, required Groups exist in the DSpace database
-            if(siteService.findSite(context) == null)
-            {
+            if (siteService.findSite(context) == null) {
                 siteService.createSite(context);
             }
             context.restoreAuthSystemState();
             // Commit changes and close context
             context.complete();
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             log.error("Error attempting to add/update default DSpace Groups", e);
-        }
-        finally
-        {
+        } finally {
             // Clean up our context, if it still exists & it was never completed
-            if(context!=null && context.isValid())
+            if (context != null && context.isValid()) {
                 context.abort();
+            }
         }
 
 

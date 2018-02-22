@@ -43,8 +43,8 @@ public class EmbeddedPageHeader {
     public Map<String, Long> getPageInfo() {
         Map<String, Long> pageInfo = new HashMap<String, Long>();
         pageInfo.put("number", (long) page.getNumber());
-        pageInfo.put("size", (long) page.getSize() != 0?page.getSize():page.getTotalElements());
-        if(totalElementsIsKnown) {
+        pageInfo.put("size", (long) page.getSize() != 0 ? page.getSize() : page.getTotalElements());
+        if (totalElementsIsKnown) {
             pageInfo.put("totalPages", (long) page.getTotalPages());
             pageInfo.put("totalElements", page.getTotalElements());
         }
@@ -57,30 +57,29 @@ public class EmbeddedPageHeader {
         if (!page.isFirst()) {
             links.put("first", _link(page.getSort(), 0, page.getSize()));
             links.put("self", _link(page.getSort(), page.getNumber(), page.getSize()));
-        }
-        else {
+        } else {
             links.put("self", _link(page.getSort(), null, page.getSize()));
         }
         if (!page.isLast() && totalElementsIsKnown) {
-            links.put("last", _link(page.getSort(), page.getTotalPages()-1, page.getSize()));
+            links.put("last", _link(page.getSort(), page.getTotalPages() - 1, page.getSize()));
         }
         if (page.hasPrevious()) {
-            links.put("prev", _link(page.getSort(), page.getNumber()-1, page.getSize()));
+            links.put("prev", _link(page.getSort(), page.getNumber() - 1, page.getSize()));
         }
         if (page.hasNext()) {
-            links.put("next", _link(page.getSort(), page.getNumber()+1, page.getSize()));
+            links.put("next", _link(page.getSort(), page.getNumber() + 1, page.getSize()));
         }
         return links;
     }
 
     private Href _link(final Sort sort, Integer i, int size) {
         UriComponentsBuilder uriComp = self.cloneBuilder();
-        if(sort != null) {
+        if (sort != null) {
             for (Sort.Order order : sort) {
                 uriComp = uriComp.queryParam("sort", order.getProperty() + "," + order.getDirection());
             }
         }
-        if(i != null) {
+        if (i != null) {
             uriComp = uriComp.queryParam("page", i);
             uriComp = uriComp.queryParam("size", size);
         }

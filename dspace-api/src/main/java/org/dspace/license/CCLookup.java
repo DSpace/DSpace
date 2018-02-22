@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.license; 
+package org.dspace.license;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -42,41 +42,43 @@ import org.jdom.input.SAXBuilder;
  */
 public class CCLookup {
 
-    /** log4j logger */
+    /**
+     * log4j logger
+     */
     private static Logger log = Logger.getLogger(CCLookup.class);
 
     private String cc_root;
-    private String jurisdiction; 
+    private String jurisdiction;
     private List<String> lcFilter = new ArrayList<String>();
-    
-    private Document license_doc        = null;
-    private String rdfString            = null;
-    private String errorMessage         = null;
-    private boolean success             = false;
 
-    private SAXBuilder parser           = new SAXBuilder();
-    private List<CCLicense> licenses    = new ArrayList<CCLicense>();
+    private Document license_doc = null;
+    private String rdfString = null;
+    private String errorMessage = null;
+    private boolean success = false;
+
+    private SAXBuilder parser = new SAXBuilder();
+    private List<CCLicense> licenses = new ArrayList<CCLicense>();
     private List<CCLicenseField> licenseFields = new ArrayList<CCLicenseField>();
-    
-    protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
-    
+
+    protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance()
+                                                                                   .getCreativeCommonsService();
+
     /**
      * Constructs a new instance with the default web services root.
-     *
      */
     public CCLookup() {
         super();
-                
+
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-                
+
         cc_root = configurationService.getProperty("cc.api.rooturl");
-                
+
         String jurisProp = configurationService.getProperty("cc.license.jurisdiction");
         jurisdiction = (jurisProp != null) ? jurisProp : "";
-        
+
         String[] filters = configurationService.getArrayProperty("cc.license.classfilter");
         if (filters != null) {
-            for (String name: filters) {
+            for (String name : filters) {
                 lcFilter.add(name.trim());
             }
         }
@@ -88,15 +90,13 @@ public class CCLookup {
      *
      * @param class_label The CCLicense label to find.
      * @return Returns a String containing the License class ID if the label
-     *             is found; if not found, returns an empty string.
-     *
+     * is found; if not found, returns an empty string.
      * @see CCLicense
-     *
      */
-    public String getLicenseId (String class_label) {
+    public String getLicenseId(String class_label) {
         for (int i = 0; i < this.licenses.size(); i++) {
-            if ( ((CCLicense)this.licenses.get(i)).getLicenseName().equals(class_label)) {
-                return ( (CCLicense)this.licenses.get(i) ).getLicenseId();
+            if (((CCLicense) this.licenses.get(i)).getLicenseName().equals(class_label)) {
+                return ((CCLicense) this.licenses.get(i)).getLicenseId();
             }
         }
 
@@ -108,10 +108,8 @@ public class CCLookup {
      *
      * @param language The language to request labels and description strings in.
      * @return Returns a Map of CCLicense objects.
-     *
      * @see Map
      * @see CCLicense
-     *
      */
     public Collection<CCLicense> getLicenses(String language) {
 
@@ -128,8 +126,8 @@ public class CCLookup {
             for (int i = 0; i < results.size(); i++) {
                 Element license = results.get(i);
                 // add if not filtered
-                String liD = ((Attribute)xp_LicenseID.selectSingleNode(license)).getValue();
-                if (! lcFilter.contains(liD)) {
+                String liD = ((Attribute) xp_LicenseID.selectSingleNode(license)).getValue();
+                if (!lcFilter.contains(liD)) {
                     this.licenses.add(new CCLicense(liD, license.getText(), i));
                 }
             }
@@ -142,7 +140,7 @@ public class CCLookup {
         } catch (Exception e) {
             // do nothing... but we should
             return null;
-        }            
+        }
 
         return licenses;
     }
@@ -151,15 +149,11 @@ public class CCLookup {
     /**
      * Queries the web service for a set of licenseFields for a particular license class.
      *
-     * @param license
-         *     A String specifying the CCLicense identifier to
-     *     retrieve fields for.
-     * @param language
-         *     the locale string
+     * @param license  A String specifying the CCLicense identifier to
+     *                 retrieve fields for.
+     * @param language the locale string
      * @return A Collection of LicenseField objects.
-     *
      * @see CCLicense
-     *
      */
     public Collection<CCLicenseField> getLicenseFields(String license, String language) {
 
@@ -216,25 +210,26 @@ public class CCLookup {
             return null;
         }
 
-        for (int i=0; i < results.size(); i++) {
-            Element field = (Element)results.get(i);
+        for (int i = 0; i < results.size(); i++) {
+            Element field = (Element) results.get(i);
 
             try {
                 // create the field object
-                CCLicenseField cclicensefield = new CCLicenseField(((Attribute)xp_LicenseID.selectSingleNode(field)).getValue(),
-                        ((Element)xp_Label.selectSingleNode(field)).getText() );
+                CCLicenseField cclicensefield = new CCLicenseField(
+                    ((Attribute) xp_LicenseID.selectSingleNode(field)).getValue(),
+                    ((Element) xp_Label.selectSingleNode(field)).getText());
 
                 // extract additional properties
-                cclicensefield.setDescription( ((Element)xp_Description.selectSingleNode(field)).getText() );
-                cclicensefield.setType( ((Element)xp_FieldType.selectSingleNode(field)).getText() );
+                cclicensefield.setDescription(((Element) xp_Description.selectSingleNode(field)).getText());
+                cclicensefield.setType(((Element) xp_FieldType.selectSingleNode(field)).getText());
 
                 enumOptions = xp_Enum.selectNodes(field);
 
                 for (int j = 0; j < enumOptions.size(); j++) {
-                    String id = ((Attribute)xp_LicenseID.selectSingleNode(enumOptions.get(j))).getValue();
-                    String label =((Element)xp_Label.selectSingleNode(enumOptions.get(j))).getText();
+                    String id = ((Attribute) xp_LicenseID.selectSingleNode(enumOptions.get(j))).getValue();
+                    String label = ((Element) xp_Label.selectSingleNode(enumOptions.get(j))).getText();
 
-                    cclicensefield.getEnum().put( id, label);
+                    cclicensefield.getEnum().put(id, label);
 
                 } // for each enum option
 
@@ -251,18 +246,16 @@ public class CCLookup {
      * Passes a set of "answers" to the web service and retrieves a license.
      *
      * @param licenseId The identifier of the license class being requested.
-     * @param answers A Map containing the answers to the license fields;
-     *             each key is the identifier of a LicenseField, with the value
-     *             containing the user-supplied answer.
-     * @param lang The language to request localized elements in.
-     *
+     * @param answers   A Map containing the answers to the license fields;
+     *                  each key is the identifier of a LicenseField, with the value
+     *                  containing the user-supplied answer.
+     * @param lang      The language to request localized elements in.
      * @throws IOException if IO error
-     *
      * @see CCLicense
      * @see Map
      */
     public void issue(String licenseId, Map answers, String lang)
-        throws IOException{
+        throws IOException {
 
         // Determine the issue URL
         String issueUrl = this.cc_root + "/license/" + licenseId + "/issue";
@@ -271,11 +264,11 @@ public class CCLookup {
         Iterator keys = answers.keySet().iterator();
 
         try {
-            String current = (String)keys.next();
+            String current = (String) keys.next();
 
             while (true) {
-                answer_doc += "<" + current + ">" + (String)answers.get(current) + "</" + current + ">\n";
-                current = (String)keys.next();
+                answer_doc += "<" + current + ">" + (String) answers.get(current) + "</" + current + ">\n";
+                current = (String) keys.next();
             }
 
 
@@ -284,7 +277,7 @@ public class CCLookup {
             // entire collection; just swallow and continue
         }
         // answer_doc +=    "<jurisdiction></jurisidiction>\n";  FAILS with jurisdiction argument
-        answer_doc +=                        "</license-" + licenseId + ">\n</answers>\n";
+        answer_doc += "</license-" + licenseId + ">\n</answers>\n";
         String post_data;
 
         try {
@@ -311,7 +304,7 @@ public class CCLookup {
             java.io.InputStream stream = connection.getInputStream();
             this.license_doc = this.parser.build(stream);
         } catch (JDOMException jde) {
-                        log.warn(jde.getMessage());
+            log.warn(jde.getMessage());
         } catch (Exception e) {
             log.warn(e.getCause());
         }
@@ -323,15 +316,13 @@ public class CCLookup {
      *
      * @param licenseURI The uri of the license.
      *
-     * Note: does not support localization in 1.5 -- not yet
-     *
+     *                   Note: does not support localization in 1.5 -- not yet
      * @throws IOException if IO error
-     *
      * @see CCLicense
      * @see Map
      */
     public void issue(String licenseURI)
-        throws IOException{
+        throws IOException {
 
         // Determine the issue URL
         // Example: http://api.creativecommons.org/rest/1.5/details?
@@ -352,7 +343,7 @@ public class CCLookup {
             java.io.InputStream stream = connection.getInputStream();
             license_doc = this.parser.build(stream);
         } catch (JDOMException jde) {
-            log.warn( jde.getMessage());
+            log.warn(jde.getMessage());
         } catch (Exception e) {
             log.warn(e.getCause());
         }
@@ -368,15 +359,12 @@ public class CCLookup {
         String text = null;
         try {
             JDOMXPath xp_LicenseName = new JDOMXPath("//result/license-uri");
-            text =  ((Element)xp_LicenseName.selectSingleNode(this.license_doc)).getText();
-        }
-        catch (Exception e) {
+            text = ((Element) xp_LicenseName.selectSingleNode(this.license_doc)).getText();
+        } catch (Exception e) {
             log.warn(e.getMessage());
             setSuccess(false);
             text = "An error occurred getting the license - uri.";
-        }
-        finally
-        {
+        } finally {
             return text;
         }
     } // getLicenseUrl
@@ -390,15 +378,12 @@ public class CCLookup {
         String text = null;
         try {
             JDOMXPath xp_LicenseName = new JDOMXPath("//result/license-name");
-            text =  ((Element)xp_LicenseName.selectSingleNode(this.license_doc)).getText();
-        }
-        catch (Exception e) {
+            text = ((Element) xp_LicenseName.selectSingleNode(this.license_doc)).getText();
+        } catch (Exception e) {
             log.warn(e.getMessage());
             setSuccess(false);
             text = "An error occurred on the license name.";
-        }
-        finally
-        {
+        } finally {
             return text;
         }
     } // getLicenseName
@@ -410,13 +395,13 @@ public class CCLookup {
 
     public String getRdf()
         throws IOException {
-        String result = ""; 
+        String result = "";
         try {
             result = creativeCommonsService.fetchLicenseRDF(license_doc);
         } catch (Exception e) {
-            log.warn("An error occurred getting the rdf . . ." + e.getMessage() );
+            log.warn("An error occurred getting the rdf . . ." + e.getMessage());
             setSuccess(false);
-        } 
+        }
         return result;
     }
 
@@ -426,10 +411,9 @@ public class CCLookup {
         String text = null;
         try {
             xp_Success = new JDOMXPath("//message");
-            text =  ((Element)xp_Success.selectSingleNode(this.license_doc)).getText();
+            text = ((Element) xp_Success.selectSingleNode(this.license_doc)).getText();
             setErrorMessage(text);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.warn("There was an issue . . . " + text);
             setSuccess(true);
         }

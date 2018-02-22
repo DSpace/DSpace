@@ -24,17 +24,17 @@ public class SearchFilterToAppliedFilterConverter {
 
     public SearchResultsRest.AppliedFilter convertSearchFilter(Context context, SearchFilter searchFilter) {
         AuthorityValue authorityValue = null;
-        if(searchFilter.hasAuthorityOperator()) {
+        if (searchFilter.hasAuthorityOperator()) {
             authorityValue = authorityValueService.findByUID(context, searchFilter.getValue());
         }
 
         SearchResultsRest.AppliedFilter appliedFilter;
         if (authorityValue == null) {
             appliedFilter = new SearchResultsRest.AppliedFilter(searchFilter.getName(), searchFilter.getOperator(),
-                    searchFilter.getValue(), searchFilter.getValue());
+                                                                searchFilter.getValue(), searchFilter.getValue());
         } else {
             appliedFilter = new SearchResultsRest.AppliedFilter(searchFilter.getName(), searchFilter.getOperator(),
-                    searchFilter.getValue(), authorityValue.getValue());
+                                                                searchFilter.getValue(), authorityValue.getValue());
         }
 
         return appliedFilter;

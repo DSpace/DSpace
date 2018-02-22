@@ -7,40 +7,36 @@
  */
 package org.dspace.sword;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.purl.sword.base.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Community;
-import org.apache.log4j.Logger;
 
-import java.util.List;
-
-public class CommunityCollectionGenerator extends ATOMCollectionGenerator
-{
+public class CommunityCollectionGenerator extends ATOMCollectionGenerator {
     private static Logger log = Logger
-            .getLogger(CommunityCollectionGenerator.class);
+        .getLogger(CommunityCollectionGenerator.class);
 
     protected CommunityService communityService = ContentServiceFactory
-            .getInstance().getCommunityService();
+        .getInstance().getCommunityService();
 
-    public CommunityCollectionGenerator(SWORDService service)
-    {
+    public CommunityCollectionGenerator(SWORDService service) {
         super(service);
         log.debug("Created instance of CommunityCollectionGenerator");
     }
 
     public Collection buildCollection(DSpaceObject dso)
-            throws DSpaceSWORDException
-    {
-        if (!(dso instanceof Community))
-        {
+        throws DSpaceSWORDException {
+        if (!(dso instanceof Community)) {
             log.error(
-                    "buildCollection passed something other than a Community object");
+                "buildCollection passed something other than a Community object");
             throw new DSpaceSWORDException(
-                    "Incorrect ATOMCollectionGenerator instantiated");
+                "Incorrect ATOMCollectionGenerator instantiated");
         }
 
         // get the things we need out of the service
@@ -56,8 +52,7 @@ public class CommunityCollectionGenerator extends ATOMCollectionGenerator
 
         // collection title is just the community name
         String title = communityService.getName(com);
-        if (StringUtils.isNotBlank(title))
-        {
+        if (StringUtils.isNotBlank(title)) {
             scol.setTitle(title);
         }
 
@@ -67,12 +62,10 @@ public class CommunityCollectionGenerator extends ATOMCollectionGenerator
 
         // abstract is the short description of the collection
         List<MetadataValue> abstracts = communityService
-                .getMetadataByMetadataString(com, "short_description");
-        if (abstracts != null && !abstracts.isEmpty())
-        {
+            .getMetadataByMetadataString(com, "short_description");
+        if (abstracts != null && !abstracts.isEmpty()) {
             String firstValue = abstracts.get(0).getValue();
-            if (StringUtils.isNotBlank(firstValue))
-            {
+            if (StringUtils.isNotBlank(firstValue)) {
                 scol.setAbstract(firstValue);
             }
         }

@@ -23,55 +23,54 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the repository responsible to manage MetadataSchema Rest object
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(MetadataSchemaRest.CATEGORY + "." + MetadataSchemaRest.NAME)
 public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataSchemaRest, Integer> {
 
-	@Autowired
-	MetadataSchemaService metaScemaService;
+    @Autowired
+    MetadataSchemaService metaScemaService;
 
-	@Autowired
-	MetadataSchemaConverter converter;
+    @Autowired
+    MetadataSchemaConverter converter;
 
-	public MetadataSchemaRestRepository() {
-	}
+    public MetadataSchemaRestRepository() {
+    }
 
-	@Override
-	public MetadataSchemaRest findOne(Context context, Integer id) {
-		MetadataSchema metadataSchema = null;
-		try {
-			metadataSchema = metaScemaService.find(context, id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (metadataSchema == null) {
-			return null;
-		}
-		return converter.fromModel(metadataSchema);
-	}
+    @Override
+    public MetadataSchemaRest findOne(Context context, Integer id) {
+        MetadataSchema metadataSchema = null;
+        try {
+            metadataSchema = metaScemaService.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (metadataSchema == null) {
+            return null;
+        }
+        return converter.fromModel(metadataSchema);
+    }
 
-	@Override
-	public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
-		List<MetadataSchema> metadataSchema = null;
-		try {
-			metadataSchema = metaScemaService.findAll(context);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable).map(converter);
-		return page;
-	}
+    @Override
+    public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
+        List<MetadataSchema> metadataSchema = null;
+        try {
+            metadataSchema = metaScemaService.findAll(context);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable).map(converter);
+        return page;
+    }
 
-	@Override
-	public Class<MetadataSchemaRest> getDomainClass() {
-		return MetadataSchemaRest.class;
-	}
+    @Override
+    public Class<MetadataSchemaRest> getDomainClass() {
+        return MetadataSchemaRest.class;
+    }
 
-	@Override
-	public MetadataSchemaResource wrapResource(MetadataSchemaRest bs, String... rels) {
-		return new MetadataSchemaResource(bs, utils, rels);
-	}
+    @Override
+    public MetadataSchemaResource wrapResource(MetadataSchemaRest bs, String... rels) {
+        return new MetadataSchemaResource(bs, utils, rels);
+    }
 }

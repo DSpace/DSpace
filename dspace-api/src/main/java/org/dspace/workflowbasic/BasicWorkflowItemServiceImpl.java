@@ -20,7 +20,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflowbasic.dao.BasicWorkflowItemDAO;
 import org.dspace.workflowbasic.service.BasicWorkflowItemService;
 import org.dspace.workflowbasic.service.TaskListItemService;
@@ -35,7 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
 
-    /** log4j category */
+    /**
+     * log4j category
+     */
     protected static Logger log = Logger.getLogger(BasicWorkflowItem.class);
 
     @Autowired(required = true)
@@ -47,15 +48,16 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     protected TaskListItemService taskListItemService;
 
 
-    protected BasicWorkflowItemServiceImpl()
-    {
+    protected BasicWorkflowItemServiceImpl() {
 
     }
 
     @Override
-    public BasicWorkflowItem create(Context context, Item item, Collection collection) throws SQLException, AuthorizeException {
-        if(findByItem(context, item) != null){
-            throw new IllegalArgumentException("Unable to create a workflow item for an item that already has a workflow item.");
+    public BasicWorkflowItem create(Context context, Item item, Collection collection)
+        throws SQLException, AuthorizeException {
+        if (findByItem(context, item) != null) {
+            throw new IllegalArgumentException(
+                "Unable to create a workflow item for an item that already has a workflow item.");
         }
         BasicWorkflowItem workflowItem = workflowItemDAO.create(context, new BasicWorkflowItem());
         workflowItem.setItem(item);
@@ -68,20 +70,15 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     public BasicWorkflowItem find(Context context, int id) throws SQLException {
         BasicWorkflowItem workflowItem = workflowItemDAO.findByID(context, BasicWorkflowItem.class, id);
 
-        if (workflowItem == null)
-        {
-            if (log.isDebugEnabled())
-            {
+        if (workflowItem == null) {
+            if (log.isDebugEnabled()) {
                 log.debug(LogManager.getHeader(context, "find_workflow_item",
-                        "not_found,workflow_id=" + id));
+                                               "not_found,workflow_id=" + id));
             }
-        }
-        else
-        {
-            if (log.isDebugEnabled())
-            {
+        } else {
+            if (log.isDebugEnabled()) {
                 log.debug(LogManager.getHeader(context, "find_workflow_item",
-                        "workflow_id=" + id));
+                                               "workflow_id=" + id));
             }
         }
         return workflowItem;
@@ -98,7 +95,8 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     }
 
     @Override
-    public void deleteByCollection(Context context, Collection collection) throws SQLException, IOException, AuthorizeException {
+    public void deleteByCollection(Context context, Collection collection)
+        throws SQLException, IOException, AuthorizeException {
         List<BasicWorkflowItem> workflowItems = findByCollection(context, collection);
         Iterator<BasicWorkflowItem> iterator = workflowItems.iterator();
         while (iterator.hasNext()) {
@@ -109,7 +107,8 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     }
 
     @Override
-    public void delete(Context context, BasicWorkflowItem workflowItem) throws SQLException, AuthorizeException, IOException {
+    public void delete(Context context, BasicWorkflowItem workflowItem)
+        throws SQLException, AuthorizeException, IOException {
         Item item = workflowItem.getItem();
         deleteWrapper(context, workflowItem);
         itemService.delete(context, item);
@@ -136,9 +135,9 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
 
     @Override
     public void update(Context context, BasicWorkflowItem workflowItem) throws SQLException, AuthorizeException {
-                // FIXME check auth
+        // FIXME check auth
         log.info(LogManager.getHeader(context, "update_workflow_item",
-                "workflow_item_id=" + workflowItem.getID()));
+                                      "workflow_item_id=" + workflowItem.getID()));
 
 
         // Update the item
@@ -162,11 +161,11 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     public int countTotal(Context context) throws SQLException {
         return workflowItemDAO.countRows(context);
     }
-    
-	@Override
-	public void move(Context context, BasicWorkflowItem inProgressSubmission, Collection fromCollection,
-			Collection toCollection) {
-		// TODO not implemented yet
-		
-	}
+
+    @Override
+    public void move(Context context, BasicWorkflowItem inProgressSubmission, Collection fromCollection,
+                     Collection toCollection) {
+        // TODO not implemented yet
+
+    }
 }

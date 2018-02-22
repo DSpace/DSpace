@@ -7,6 +7,13 @@
  */
 package org.dspace.handle.dao.impl;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -21,13 +28,6 @@ import org.hibernate.engine.jdbc.dialect.spi.DatabaseMetaDataDialectResolutionIn
 import org.hibernate.engine.jdbc.dialect.spi.DialectResolver;
 import org.hibernate.jdbc.ReturningWork;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Hibernate implementation of the Database Access Object interface class for the Handle object.
  * This class is responsible for all database calls for the Handle object and is autowired by spring
@@ -35,26 +35,24 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements HandleDAO
-{
+public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements HandleDAO {
     // The name of the sequence used to determine next available handle
     private static final String HANDLE_SEQUENCE = "handle_seq";
 
-    protected HandleDAOImpl()
-    {
+    protected HandleDAOImpl() {
         super();
     }
 
     @Override
     public List<Handle> getHandlesByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {
-        if(dso == null) {
+        if (dso == null) {
             return Collections.emptyList();
         } else {
             Query query = createQuery(context,
-                    "SELECT h " +
-                    "FROM Handle h " +
-                    "LEFT JOIN FETCH h.dso " +
-                    "WHERE h.dso.id = :id ");
+                                      "SELECT h " +
+                                          "FROM Handle h " +
+                                          "LEFT JOIN FETCH h.dso " +
+                                          "WHERE h.dso.id = :id ");
 
             query.setParameter("id", dso.getID());
 
@@ -66,10 +64,10 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
     @Override
     public Handle findByHandle(Context context, String handle) throws SQLException {
         Query query = createQuery(context,
-                "SELECT h " +
-                "FROM Handle h " +
-                "LEFT JOIN FETCH h.dso " +
-                "WHERE h.handle = :handle ");
+                                  "SELECT h " +
+                                      "FROM Handle h " +
+                                      "LEFT JOIN FETCH h.dso " +
+                                      "WHERE h.handle = :handle ");
 
         query.setParameter("handle", handle);
 
@@ -92,9 +90,9 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
     }
 
     @Override
-    public int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException
-    {
-        String hql = "UPDATE Handle set handle = concat(:newPrefix, '/', substring(handle, :oldPrefixLength + 2)) WHERE handle like concat(:oldPrefix,'%')";
+    public int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException {
+        String hql = "UPDATE Handle set handle = concat(:newPrefix, '/', substring(handle, :oldPrefixLength + 2)) " +
+            "WHERE handle like concat(:oldPrefix,'%')";
         Query query = createQuery(context, hql);
         query.setString("newPrefix", newPrefix);
         query.setInteger("oldPrefixLength", oldPrefix.length());
@@ -109,13 +107,13 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
 
     /**
      * Return next available value of Handle suffix (based on DB sequence).
+     *
      * @param context Current DSpace Context
      * @return next available Handle suffix (as a Long)
      * @throws SQLException if database error or sequence doesn't exist
      */
     @Override
-    public Long getNextHandleSuffix(Context context) throws SQLException
-    {
+    public Long getNextHandleSuffix(Context context) throws SQLException {
         // Create a new Hibernate ReturningWork, which will return the
         // result of the next value in the Handle Sequence.
         ReturningWork<Long> nextValReturningWork = new ReturningWork<Long>() {
@@ -125,16 +123,15 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
 
                 // Determine what dialect we are using for this DB
                 DialectResolver dialectResolver = new StandardDialectResolver();
-                Dialect dialect = dialectResolver.resolveDialect(new DatabaseMetaDataDialectResolutionInfoAdapter(connection.getMetaData()));
+                Dialect dialect = dialectResolver
+                    .resolveDialect(new DatabaseMetaDataDialectResolutionInfoAdapter(connection.getMetaData()));
 
                 // Find the next value in our sequence (based on DB dialect)
-                try (PreparedStatement preparedStatement = connection.prepareStatement(dialect.getSequenceNextValString(HANDLE_SEQUENCE)))
-                {
+                try (PreparedStatement preparedStatement = connection
+                    .prepareStatement(dialect.getSequenceNextValString(HANDLE_SEQUENCE))) {
                     // Execute query and return results
-                    try(ResultSet resultSet = preparedStatement.executeQuery())
-                    {
-                        if(resultSet.next())
-                        {
+                    try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                        if (resultSet.next()) {
                             // Return result of query (from first column)
                             nextVal = resultSet.getLong(1);
                         }

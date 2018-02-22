@@ -7,7 +7,6 @@
  */
 package org.dspace.app.util;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -38,10 +37,8 @@ import org.apache.log4j.spi.LoggingEvent;
  * log4j.appender.A1.MaxLogs=3
  * log4j.appender.A1.layout=org.apache.log4j.PatternLayout
  * log4j.appender.A1.layout.ConversionPattern=%d %-5p %c @ %m%n
- *
  */
-public class DailyFileAppender extends FileAppender
-{
+public class DailyFileAppender extends FileAppender {
     /**
      * The fixed date pattern to be used if one is not specified.
      */
@@ -57,7 +54,7 @@ public class DailyFileAppender extends FileAppender
     /**
      * Used internally and contains the name of the date derived from current system date.
      */
-    private Date   mstrDate = new Date(System.currentTimeMillis());
+    private Date mstrDate = new Date(System.currentTimeMillis());
 
     /**
      * Holds the user specified DatePattern,
@@ -79,8 +76,7 @@ public class DailyFileAppender extends FileAppender
      * Default constructor. This is required as the appender class is dynamically
      * loaded.
      */
-    public DailyFileAppender()
-    {
+    public DailyFileAppender() {
         super();
     }
 
@@ -88,106 +84,87 @@ public class DailyFileAppender extends FileAppender
      * @see org.apache.log4j.FileAppender#activateOptions()
      */
     @Override
-    public void activateOptions()
-    {
+    public void activateOptions() {
         setFileName();
         cleanupOldFiles();
         super.activateOptions();
     }
 
-/*------------------------------------------------------------------------------
- * Getters
- *----------------------------------------------------------------------------*/
-    public String getDatePattern()
-    {
+    /*------------------------------------------------------------------------------
+     * Getters
+     *----------------------------------------------------------------------------*/
+    public String getDatePattern() {
         return this.mstrDatePattern;
     }
 
     @Override
-    public String getFile()
-    {
+    public String getFile() {
         return this.mstrFileName;
     }
 
-    public boolean getWithHost()
-    {
+    public boolean getWithHost() {
         return mWithHostName;
     }
 
-    public int getMaxLogs()
-    {
-    	return mMaxLogs;
+    public int getMaxLogs() {
+        return mMaxLogs;
     }
 
-/*------------------------------------------------------------------------------
- * Setters
- *----------------------------------------------------------------------------*/
-    public void setDatePattern(String pstrPattern)
-    {
+    /*------------------------------------------------------------------------------
+     * Setters
+     *----------------------------------------------------------------------------*/
+    public void setDatePattern(String pstrPattern) {
         this.mstrDatePattern = checkPattern(pstrPattern);
-        if (mstrDatePattern.contains("dd") || mstrDatePattern.contains("DD"))
-        {
+        if (mstrDatePattern.contains("dd") || mstrDatePattern.contains("DD")) {
             mMonthOnly = false;
-        }
-        else
-        {
+        } else {
             mMonthOnly = true;
         }
     }
 
     @Override
-    public void setFile(String file)
-    {
+    public void setFile(String file) {
         // Trim spaces from both ends. The users probably does not want
         // trailing spaces in file names.
         String val = file.trim();
         mstrFileName = val;
-     }
+    }
 
-    public void setWithHost(boolean wh)
-    {
+    public void setWithHost(boolean wh) {
         mWithHostName = wh;
     }
 
-    public void setMaxLogs(int ml)
-    {
-    	mMaxLogs = ml;
+    public void setMaxLogs(int ml) {
+        mMaxLogs = ml;
     }
 
-/*------------------------------------------------------------------------------
- * Methods
- *----------------------------------------------------------------------------*/
+    /*------------------------------------------------------------------------------
+     * Methods
+     *----------------------------------------------------------------------------*/
     /* (non-Javadoc)
      * @see org.apache.log4j.WriterAppender#subAppend(org.apache.log4j.spi.LoggingEvent)
      */
     @Override
-    protected void subAppend(LoggingEvent pobjEvent)
-    {
-        Date   dtNow = new Date(System.currentTimeMillis());
+    protected void subAppend(LoggingEvent pobjEvent) {
+        Date dtNow = new Date(System.currentTimeMillis());
 
         boolean rollover = false;
 
-        if (mMonthOnly)
-        {
+        if (mMonthOnly) {
             Calendar now = Calendar.getInstance();
             Calendar cur = Calendar.getInstance();
             now.setTime(dtNow);
             cur.setTime(mstrDate);
-            rollover = !(now.get(Calendar.YEAR) == cur.get(Calendar.YEAR) && now.get(Calendar.MONTH) == cur.get(Calendar.MONTH));
-        }
-        else
-        {
+            rollover = !(now.get(Calendar.YEAR) == cur.get(Calendar.YEAR) && now.get(Calendar.MONTH) == cur
+                .get(Calendar.MONTH));
+        } else {
             rollover = !(DateUtils.isSameDay(dtNow, mstrDate));
         }
 
-        if (rollover)
-        {
-            try
-            {
+        if (rollover) {
+            try {
                 rollOver(dtNow);
-            }
-            catch (IOException IOEx)
-            {
+            } catch (IOException IOEx) {
                 LogLog.error("rollOver() failed!", IOEx);
             }
         }
@@ -195,38 +172,32 @@ public class DailyFileAppender extends FileAppender
         super.subAppend(pobjEvent);
     }
 
-/*------------------------------------------------------------------------------
- * Helpers
- *----------------------------------------------------------------------------*/
+    /*------------------------------------------------------------------------------
+     * Helpers
+     *----------------------------------------------------------------------------*/
+
     /**
      * The helper function to validate the DatePattern.
+     *
      * @param pstrPattern The DatePattern to be validated.
      * @return The validated date pattern or defautlt DATE_PATTERN
      */
-    private String checkPattern(String pstrPattern)
-    {
+    private String checkPattern(String pstrPattern) {
         String strRet = null;
         SimpleDateFormat objFmt = new SimpleDateFormat(DATE_PATTERN);
 
-        try
-        {
+        try {
             this.mobjSDF = new SimpleDateFormat(pstrPattern);
             strRet = pstrPattern;
-        }
-        catch (NullPointerException NPExIgnore)
-        {
+        } catch (NullPointerException NPExIgnore) {
             LogLog.error("Invalid DatePattern " + pstrPattern, NPExIgnore);
             this.mobjSDF = objFmt;
             strRet = DATE_PATTERN;
-        }
-        catch (IllegalArgumentException IlArgExIgnore)
-        {
+        } catch (IllegalArgumentException IlArgExIgnore) {
             LogLog.error("Invalid DatePattern " + pstrPattern, IlArgExIgnore);
             this.mobjSDF = objFmt;
             strRet = DATE_PATTERN;
-        }
-        finally
-        {
+        } finally {
             objFmt = null;
         }
         return strRet;
@@ -234,98 +205,79 @@ public class DailyFileAppender extends FileAppender
 
     /**
      * This function is responsible for performing the actual file rollover.
+     *
      * @param pstrName The name of the new folder based on current system date.
      * @throws IOException if IO error
      */
     private static boolean deletingFiles = false;
-    private void cleanupOldFiles()
-    {
-        // If we need to delete log files
-        if (mMaxLogs > 0 && !deletingFiles)
-        {
-			deletingFiles = true;
 
-			// Determine the final file extension with the hostname
-    		String hostFileExt = null;
-            try
-            {
+    private void cleanupOldFiles() {
+        // If we need to delete log files
+        if (mMaxLogs > 0 && !deletingFiles) {
+            deletingFiles = true;
+
+            // Determine the final file extension with the hostname
+            String hostFileExt = null;
+            try {
                 hostFileExt = "." + java.net.InetAddress.getLocalHost().getHostName();
-            }
-            catch (UnknownHostException e)
-            {
+            } catch (UnknownHostException e) {
                 LogLog.error("Unable to retrieve host name");
             }
 
-			try
-			{
-				// Array to hold the logs we are going to keep
-				File[] logsToKeep = new File[mMaxLogs];
+            try {
+                // Array to hold the logs we are going to keep
+                File[] logsToKeep = new File[mMaxLogs];
 
-				// Get a 'master' file handle, and the parent directory from it
-		        File logMaster = new File(mstrFileName);
-		        File logDir = logMaster.getParentFile();
-		        if (logDir.isDirectory())
-		        {
-		        	// Iterate all the files in that directory
-		        	File[] logArr = logDir.listFiles();
-		        	for (File curLog : logArr)
-		        	{
-        				LogLog.debug("Comparing '" + curLog.getAbsolutePath() + "' to '" + mstrFileName + "'");
-		        		String name = curLog.getAbsolutePath();
+                // Get a 'master' file handle, and the parent directory from it
+                File logMaster = new File(mstrFileName);
+                File logDir = logMaster.getParentFile();
+                if (logDir.isDirectory()) {
+                    // Iterate all the files in that directory
+                    File[] logArr = logDir.listFiles();
+                    for (File curLog : logArr) {
+                        LogLog.debug("Comparing '" + curLog.getAbsolutePath() + "' to '" + mstrFileName + "'");
+                        String name = curLog.getAbsolutePath();
 
-		        		// First, see if we are not using hostname, or the log file ends with this host
-		                if (!mWithHostName || (hostFileExt != null && name.endsWith(hostFileExt)))
-		                {
-		                	// Check that the file is indeed one we want (contains the master file name)
-			        		if (name.contains(mstrFileName))
-			        		{
-			        			// Iterate through the array of logs we are keeping
-			        			for (int i = 0; curLog != null && i < logsToKeep.length; i++)
-			        			{
-			        				// Have we exhausted the 'to keep' array?
-			        				if (logsToKeep[i] == null)
-			        				{
-				        				// Empty space, retain this log file
-			        					logsToKeep[i] = curLog;
-			        					curLog = null;
-			        				}
-			        				// If the 'kept' file is older than the current one
-			        				else if (logsToKeep[i].getName().compareTo(curLog.getName()) < 0)
-			        				{
-			        					// Replace tested entry with current file
-			        					File temp = logsToKeep[i];
-			        					logsToKeep[i] = curLog;
-			        					curLog = temp;
-			        				}
-			        			}
+                        // First, see if we are not using hostname, or the log file ends with this host
+                        if (!mWithHostName || (hostFileExt != null && name.endsWith(hostFileExt))) {
+                            // Check that the file is indeed one we want (contains the master file name)
+                            if (name.contains(mstrFileName)) {
+                                // Iterate through the array of logs we are keeping
+                                for (int i = 0; curLog != null && i < logsToKeep.length; i++) {
+                                    // Have we exhausted the 'to keep' array?
+                                    if (logsToKeep[i] == null) {
+                                        // Empty space, retain this log file
+                                        logsToKeep[i] = curLog;
+                                        curLog = null;
+                                    } else if (logsToKeep[i].getName().compareTo(curLog.getName()) < 0) {
+                                        // If the 'kept' file is older than the current one
+                                        // Replace tested entry with current file
+                                        File temp = logsToKeep[i];
+                                        logsToKeep[i] = curLog;
+                                        curLog = temp;
+                                    }
+                                }
 
-			        			// If we have a 'current' entry at this point, it's a log we don't want
-			        			if (curLog != null)
-			        			{
-			        				LogLog.debug("Deleting log " + curLog.getName());
-		        					if (! curLog.delete())
-                                    {
+                                // If we have a 'current' entry at this point, it's a log we don't want
+                                if (curLog != null) {
+                                    LogLog.debug("Deleting log " + curLog.getName());
+                                    if (!curLog.delete()) {
                                         LogLog.error("Unable to delete log file");
                                     }
-			        			}
-			        		}
-		                }
-		        	}
-		        }
-			}
-			catch (Exception e)
-			{
-				// Don't worry about exceptions
-			}
-			finally
-			{
-				deletingFiles = false;
-			}
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // Don't worry about exceptions
+            } finally {
+                deletingFiles = false;
+            }
         }
     }
 
-    private void rollOver(Date dtNow) throws IOException
-    {
+    private void rollOver(Date dtNow) throws IOException {
         mstrDate = dtNow;
         setFileName();
         this.setFile(fileName, true, bufferedIO, bufferSize);
@@ -333,18 +285,13 @@ public class DailyFileAppender extends FileAppender
         cleanupOldFiles();
     }
 
-    private void setFileName()
-    {
+    private void setFileName() {
         fileName = mstrFileName + "." + mobjSDF.format(mstrDate);
 
-        if (mWithHostName)
-        {
-            try
-            {
+        if (mWithHostName) {
+            try {
                 fileName += "." + java.net.InetAddress.getLocalHost().getHostName();
-            }
-            catch (UnknownHostException e)
-            {
+            } catch (UnknownHostException e) {
                 LogLog.error("Unable to retrieve host name");
             }
         }

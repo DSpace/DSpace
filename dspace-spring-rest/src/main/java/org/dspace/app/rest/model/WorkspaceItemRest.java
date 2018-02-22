@@ -12,101 +12,97 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dspace.app.rest.RestResourceController;
-import org.dspace.app.rest.model.step.SectionData;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * The WorkspaceItem REST Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class WorkspaceItemRest extends BaseObjectRest<Integer> {
-	public static final String NAME = "workspaceitem";
-	public static final String CATEGORY = RestAddressableModel.SUBMISSION;
+    public static final String NAME = "workspaceitem";
+    public static final String CATEGORY = RestAddressableModel.SUBMISSION;
 
-	private Date lastModified = new Date();
+    private Date lastModified = new Date();
 
-	private Map<String, Serializable> sections;
-	
-	@JsonIgnore
-	private CollectionRest collection;
-	
-	@JsonIgnore
-	private ItemRest item;
-	
-	@JsonIgnore
-	private SubmissionDefinitionRest submissionDefinition;
-	
-	@JsonIgnore
-	private EPersonRest submitter;
-	
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
-	
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    private Map<String, Serializable> sections;
 
-	public Date getLastModified() {
-		return lastModified;
-	}
-	
-	public void setLastModified(Date lastModified){
-		this.lastModified = lastModified;
-	}
+    @JsonIgnore
+    private CollectionRest collection;
 
-	public ItemRest getItem() {
-		return item;
-	}
+    @JsonIgnore
+    private ItemRest item;
 
-	public void setItem(ItemRest item) {
-		this.item = item;
-	}
+    @JsonIgnore
+    private SubmissionDefinitionRest submissionDefinition;
 
-	public SubmissionDefinitionRest getSubmissionDefinition() {
-		return submissionDefinition;
-	}
+    @JsonIgnore
+    private EPersonRest submitter;
 
-	public void setSubmissionDefinition(SubmissionDefinitionRest submissionDefinition) {
-		this.submissionDefinition = submissionDefinition;
-	}
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
 
-	public EPersonRest getSubmitter() {
-		return submitter;
-	}
+    @Override
+    public String getType() {
+        return NAME;
+    }
 
-	public void setSubmitter(EPersonRest submitter) {
-		this.submitter = submitter;
-	}
-	
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
-	
-	public Map<String, Serializable> getSections() {
-		if(sections==null) {
-			sections = new HashMap<String, Serializable>();
-		}
-		return sections;
-	}
+    public Date getLastModified() {
+        return lastModified;
+    }
 
-	public void setSections(Map<String, Serializable> sections) {
-		this.sections = sections;
-	}
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
+    }
 
-	public CollectionRest getCollection() {
-		return collection;
-	}
+    public ItemRest getItem() {
+        return item;
+    }
 
-	public void setCollection(CollectionRest collection) {
-		this.collection = collection;
-	}
+    public void setItem(ItemRest item) {
+        this.item = item;
+    }
+
+    public SubmissionDefinitionRest getSubmissionDefinition() {
+        return submissionDefinition;
+    }
+
+    public void setSubmissionDefinition(SubmissionDefinitionRest submissionDefinition) {
+        this.submissionDefinition = submissionDefinition;
+    }
+
+    public EPersonRest getSubmitter() {
+        return submitter;
+    }
+
+    public void setSubmitter(EPersonRest submitter) {
+        this.submitter = submitter;
+    }
+
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
+
+    public Map<String, Serializable> getSections() {
+        if (sections == null) {
+            sections = new HashMap<String, Serializable>();
+        }
+        return sections;
+    }
+
+    public void setSections(Map<String, Serializable> sections) {
+        this.sections = sections;
+    }
+
+    public CollectionRest getCollection() {
+        return collection;
+    }
+
+    public void setCollection(CollectionRest collection) {
+        this.collection = collection;
+    }
 }

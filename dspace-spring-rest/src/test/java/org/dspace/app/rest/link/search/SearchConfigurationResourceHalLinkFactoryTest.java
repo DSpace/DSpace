@@ -21,8 +21,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 /**
  * This class' purpose is to test the SearchConfigurationResourceHalLinkFactory
  */
-public class SearchConfigurationResourceHalLinkFactoryTest{
-
+public class SearchConfigurationResourceHalLinkFactoryTest {
 
 
     @Mock
@@ -35,17 +34,17 @@ public class SearchConfigurationResourceHalLinkFactoryTest{
     private SearchConfigurationResourceHalLinkFactory searchConfigurationResourceHalLinkFactory;
 
     @Before
-    public void setUp() throws Exception{
-        searchConfigurationResourceHalLinkFactory  = new SearchConfigurationResourceHalLinkFactory();
+    public void setUp() throws Exception {
+        searchConfigurationResourceHalLinkFactory = new SearchConfigurationResourceHalLinkFactory();
     }
 
     @Test
-    public void testControllerClassIsSetCorrectlyAfterConstructor() throws Exception{
+    public void testControllerClassIsSetCorrectlyAfterConstructor() throws Exception {
         assertEquals(DiscoveryRestController.class, searchConfigurationResourceHalLinkFactory.getControllerClass());
     }
 
     @Test
-    public void testResourceClassIsSetCorrectlyAfterConstructor() throws Exception{
+    public void testResourceClassIsSetCorrectlyAfterConstructor() throws Exception {
         assertEquals(SearchConfigurationResource.class, searchConfigurationResourceHalLinkFactory.getResourceClass());
     }
 

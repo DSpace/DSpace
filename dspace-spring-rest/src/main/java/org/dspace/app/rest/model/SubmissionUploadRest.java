@@ -10,95 +10,91 @@ package org.dspace.app.rest.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.RestResourceController;
-import org.dspace.submit.model.AccessConditionOption;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * The Upload Section Configuration REST Resource
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class SubmissionUploadRest extends BaseObjectRest<String> {
-	
-	public static final String NAME = "submissionupload";
-	public static final String NAME_LINK_ON_PANEL = RestAddressableModel.CONFIGURATION;
-	public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
-	private String name;
-	
-	@JsonIgnore
-	private SubmissionFormRest metadata;
+    public static final String NAME = "submissionupload";
+    public static final String NAME_LINK_ON_PANEL = RestAddressableModel.CONFIGURATION;
+    public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
-	private List<AccessConditionOptionRest> accessConditionOptions;
-	
-	private boolean required;
-	
-	private Long maxSize;
-	
-	@Override
-	public String getId() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	@Override
-	public String getType() {
-		return NAME;
-	}
-	
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
+    private String name;
 
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
+    @JsonIgnore
+    private SubmissionFormRest metadata;
 
-	public List<AccessConditionOptionRest> getAccessConditionOptions() {
-		if(accessConditionOptions==null) {
-			accessConditionOptions = new ArrayList<>();
-		}
-		return accessConditionOptions;
-	}
+    private List<AccessConditionOptionRest> accessConditionOptions;
 
-	public void setAccessConditionOptions(List<AccessConditionOptionRest> accessConditions) {
-		this.accessConditionOptions = accessConditions;
-	}
+    private boolean required;
 
-	public boolean isRequired() {
-		return required;
-	}
+    private Long maxSize;
 
-	public void setRequired(boolean required) {
-		this.required = required;
-	}
+    @Override
+    public String getId() {
+        return name;
+    }
 
-	public Long getMaxSize() {
-		return maxSize;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setMaxSize(Long maxSize) {
-		this.maxSize = maxSize;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public SubmissionFormRest getMetadata() {
-		return metadata;
-	}
+    @Override
+    public String getType() {
+        return NAME;
+    }
 
-	public void setMetadata(SubmissionFormRest metadata) {
-		this.metadata = metadata;
-	}
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
+
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
+
+    public List<AccessConditionOptionRest> getAccessConditionOptions() {
+        if (accessConditionOptions == null) {
+            accessConditionOptions = new ArrayList<>();
+        }
+        return accessConditionOptions;
+    }
+
+    public void setAccessConditionOptions(List<AccessConditionOptionRest> accessConditions) {
+        this.accessConditionOptions = accessConditions;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
+    }
+
+    public Long getMaxSize() {
+        return maxSize;
+    }
+
+    public void setMaxSize(Long maxSize) {
+        this.maxSize = maxSize;
+    }
+
+    public SubmissionFormRest getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(SubmissionFormRest metadata) {
+        this.metadata = metadata;
+    }
 }

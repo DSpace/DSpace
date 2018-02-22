@@ -11,27 +11,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.app.rest.model.MetadataValueRest;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import org.dspace.app.rest.model.MetadataValueRest;
 
 /**
  * Java Bean to expose the section describe during in progress submission.
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class DataDescribe implements SectionData {
 
-	private Map<String, List<MetadataValueRest>> metadata = new HashMap<>();
-	
-	@JsonAnyGetter
-	public Map<String, List<MetadataValueRest>> getMetadata() {
-		return metadata;
-	}
+    private Map<String, List<MetadataValueRest>> metadata = new HashMap<>();
 
-	public void setMetadata(Map<String, List<MetadataValueRest>> metadata) {
-		this.metadata = metadata;
-	}
+    @JsonAnyGetter
+    public Map<String, List<MetadataValueRest>> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, List<MetadataValueRest>> metadata) {
+        this.metadata = metadata;
+    }
 
 }

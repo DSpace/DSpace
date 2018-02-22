@@ -15,7 +15,7 @@ import org.dspace.app.rest.AuthenticationRestController;
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
-public class AuthnRest extends BaseObjectRest<Integer>{
+public class AuthnRest extends BaseObjectRest<Integer> {
 
     public static final String NAME = "authn";
     public static final String CATEGORY = "authn";

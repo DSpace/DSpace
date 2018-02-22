@@ -19,18 +19,19 @@ import org.junit.Test;
  */
 public class SearchSupportHalLinkFactoryTest {
     SearchSupportHalLinkFactory searchSupportHalLinkFactory;
+
     @Before
-    public void setUp() throws Exception{
-        searchSupportHalLinkFactory  = new SearchSupportHalLinkFactory();
+    public void setUp() throws Exception {
+        searchSupportHalLinkFactory = new SearchSupportHalLinkFactory();
     }
 
     @Test
-    public void testControllerClassIsSetCorrectlyAfterConstructor() throws Exception{
+    public void testControllerClassIsSetCorrectlyAfterConstructor() throws Exception {
         assertEquals(DiscoveryRestController.class, searchSupportHalLinkFactory.getControllerClass());
     }
 
     @Test
-    public void testResourceClassIsSetCorrectlyAfterConstructor() throws Exception{
+    public void testResourceClassIsSetCorrectlyAfterConstructor() throws Exception {
         assertEquals(SearchSupportResource.class, searchSupportHalLinkFactory.getResourceClass());
     }
 

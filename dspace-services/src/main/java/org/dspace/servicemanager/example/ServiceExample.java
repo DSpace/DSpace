@@ -10,7 +10,7 @@ package org.dspace.servicemanager.example;
 
 /**
  * Sample service.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface ServiceExample {

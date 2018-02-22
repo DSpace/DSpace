@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.util.List;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
@@ -20,26 +22,28 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class DiscoverFacetsConverter {
 
     private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
 
 
-    public SearchResultsRest convert(Context context, String query, String dsoType, String configurationName, String dsoScope, List<SearchFilter> searchFilters, final Pageable page, DiscoveryConfiguration configuration, DiscoverResult searchResult) {
+    public SearchResultsRest convert(Context context, String query, String dsoType, String configurationName,
+                                     String dsoScope, List<SearchFilter> searchFilters, final Pageable page,
+                                     DiscoveryConfiguration configuration, DiscoverResult searchResult) {
 
         SearchResultsRest searchResultsRest = new SearchResultsRest();
 
-        setRequestInformation(context, query, dsoType, configurationName, dsoScope, searchFilters, page, searchResultsRest);
+        setRequestInformation(context, query, dsoType, configurationName, dsoScope, searchFilters, page,
+                              searchResultsRest);
         addFacetValues(searchResult, searchResultsRest, configuration);
 
         return searchResultsRest;
     }
 
 
-    private void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest searchResultsRest, final DiscoveryConfiguration configuration) {
+    private void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest searchResultsRest,
+                                final DiscoveryConfiguration configuration) {
 
         List<DiscoverySearchFilterFacet> facets = configuration.getSidebarFacets();
         for (DiscoverySearchFilterFacet field : CollectionUtils.emptyIfNull(facets)) {
@@ -71,8 +75,10 @@ public class DiscoverFacetsConverter {
         }
     }
 
-    private void setRequestInformation(final Context context, final String query, final String dsoType, final String configurationName, final String scope,
-                                       final List<SearchFilter> searchFilters, final Pageable page, final SearchResultsRest resultsRest) {
+    private void setRequestInformation(final Context context, final String query, final String dsoType,
+                                       final String configurationName, final String scope,
+                                       final List<SearchFilter> searchFilters, final Pageable page,
+                                       final SearchResultsRest resultsRest) {
         resultsRest.setQuery(query);
         resultsRest.setConfigurationName(configurationName);
         resultsRest.setDsoType(dsoType);
@@ -80,10 +86,12 @@ public class DiscoverFacetsConverter {
 
         resultsRest.setScope(scope);
 
-        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter = new SearchFilterToAppliedFilterConverter();
+        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter = new
+            SearchFilterToAppliedFilterConverter();
         for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
 
-            resultsRest.addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
+            resultsRest
+                .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
         }
     }
 }

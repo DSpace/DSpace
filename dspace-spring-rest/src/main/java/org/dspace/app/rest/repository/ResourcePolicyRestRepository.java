@@ -24,51 +24,50 @@ import org.springframework.stereotype.Component;
 
 /**
  * Controller for exposition of default access condition
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component(ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME)
-public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourcePolicyRest, Integer>  {
+public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourcePolicyRest, Integer> {
 
-	@Autowired
-	ResourcePolicyService resourcePolicyService;
+    @Autowired
+    ResourcePolicyService resourcePolicyService;
 
-	@Autowired
-	ResourcePolicyConverter resourcePolicyConverter;
+    @Autowired
+    ResourcePolicyConverter resourcePolicyConverter;
 
-	@Autowired
-	Utils utils;
+    @Autowired
+    Utils utils;
 
-	@Override
-	public ResourcePolicyRest findOne(Context context, Integer id) {
-		ResourcePolicy source = null;
-		try {
-			source = resourcePolicyService.find(context, id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (source == null) {
-			return null;
-		}
-		return resourcePolicyConverter.convert(source);
-	}
+    @Override
+    public ResourcePolicyRest findOne(Context context, Integer id) {
+        ResourcePolicy source = null;
+        try {
+            source = resourcePolicyService.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (source == null) {
+            return null;
+        }
+        return resourcePolicyConverter.convert(source);
+    }
 
-	@Override
-	public Page<ResourcePolicyRest> findAll(Context context, Pageable pageable) {
-		throw new RepositoryMethodNotImplementedException(ResourcePolicyRest.NAME, "findAll");
-	}
-
-
-	@Override
-	public Class<ResourcePolicyRest> getDomainClass() {
-		return ResourcePolicyRest.class;
-	}
+    @Override
+    public Page<ResourcePolicyRest> findAll(Context context, Pageable pageable) {
+        throw new RepositoryMethodNotImplementedException(ResourcePolicyRest.NAME, "findAll");
+    }
 
 
-	@Override
-	public ResourcePolicyResource wrapResource(ResourcePolicyRest model, String... rels) {
-		return new ResourcePolicyResource(model, utils, rels);
-	}
-	
+    @Override
+    public Class<ResourcePolicyRest> getDomainClass() {
+        return ResourcePolicyRest.class;
+    }
+
+
+    @Override
+    public ResourcePolicyResource wrapResource(ResourcePolicyRest model, String... rels) {
+        return new ResourcePolicyResource(model, utils, rels);
+    }
+
 }

@@ -7,17 +7,18 @@
  */
 package org.dspace.xmlworkflow.storedcomponents.service;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 
-import java.sql.SQLException;
-import java.util.List;
-
 /**
  * Service interface class for the CollectionRole object.
- * The implementation of this class is responsible for all business logic calls for the CollectionRole object and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls for the CollectionRole object and is
+ * autowired by spring
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -29,7 +30,8 @@ public interface CollectionRoleService {
 
     public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException;
 
-    public CollectionRole create(Context context, Collection collection, String roleId, Group group) throws SQLException;
+    public CollectionRole create(Context context, Collection collection, String roleId, Group group)
+        throws SQLException;
 
     public void update(Context context, CollectionRole collectionRole) throws SQLException;
 

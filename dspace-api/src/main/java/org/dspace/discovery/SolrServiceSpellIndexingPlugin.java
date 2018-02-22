@@ -7,15 +7,15 @@
  */
 package org.dspace.discovery;
 
+import java.util.List;
+
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,12 +31,12 @@ public class SolrServiceSpellIndexingPlugin implements SolrServiceIndexPlugin {
 
     @Override
     public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
-        if(dso instanceof Item){
+        if (dso instanceof Item) {
             Item item = (Item) dso;
             List<MetadataValue> dcValues = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
             for (MetadataValue dcValue : dcValues) {
-                if(!toIgnoreMetadataFields.contains(dcValue.getMetadataField().toString('.'))){
+                if (!toIgnoreMetadataFields.contains(dcValue.getMetadataField().toString('.'))) {
                     document.addField("a_spell", dcValue.getValue());
                 }
             }

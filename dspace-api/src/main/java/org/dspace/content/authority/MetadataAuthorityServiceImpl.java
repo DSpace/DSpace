@@ -9,10 +9,10 @@ package org.dspace.content.authority;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Enumeration;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -32,42 +32,41 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * Configuration keys, per metadata field (e.g. "dc.contributer.author")
  *
- *  {@code
- *  # is field authority controlled (i.e. store authority, confidence values)?
- *  authority.controlled.<FIELD> = true
+ * {@code
+ * # is field authority controlled (i.e. store authority, confidence values)?
+ * authority.controlled.<FIELD> = true
  *
- *  # is field required to have an authority value, or may it be empty?
- *  # default is false.
- *  authority.required.<FIELD> = true | false
+ * # is field required to have an authority value, or may it be empty?
+ * # default is false.
+ * authority.required.<FIELD> = true | false
  *
- *  # default value of minimum confidence level for ALL fields - must be
- *  # symbolic confidence level, see org.dspace.content.authority.Choices
- *  authority.minconfidence = uncertain
+ * # default value of minimum confidence level for ALL fields - must be
+ * # symbolic confidence level, see org.dspace.content.authority.Choices
+ * authority.minconfidence = uncertain
  *
- *  # minimum confidence level for this field
- *  authority.minconfidence.SCHEMA.ELEMENT.QUALIFIER = SYMBOL
- *    e.g.
- *  authority.minconfidence.dc.contributor.author = accepted
- *  }
+ * # minimum confidence level for this field
+ * authority.minconfidence.SCHEMA.ELEMENT.QUALIFIER = SYMBOL
+ * e.g.
+ * authority.minconfidence.dc.contributor.author = accepted
+ * }
  * NOTE: There is *expected* to be a "choices" (see ChoiceAuthorityManager)
  * configuration for each authority-controlled field.
  *
+ * @author Larry Stone
  * @see ChoiceAuthorityServiceImpl
  * @see Choices
- * @author Larry Stone
  */
-public class MetadataAuthorityServiceImpl implements MetadataAuthorityService
-{
+public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
     private static Logger log = Logger.getLogger(MetadataAuthorityServiceImpl.class);
 
     @Autowired(required = true)
     protected MetadataFieldService metadataFieldService;
 
     // map of field key to authority plugin
-    protected Map<String,Boolean> controlled = new HashMap<String,Boolean>();
+    protected Map<String, Boolean> controlled = new HashMap<String, Boolean>();
 
     // map of field key to answer of whether field is required to be controlled
-    protected Map<String,Boolean> isAuthorityRequired = null;
+    protected Map<String, Boolean> isAuthorityRequired = null;
 
     /**
      * map of field key to answer of which is the min acceptable confidence
@@ -75,64 +74,65 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService
      */
     protected Map<String, Integer> minConfidence = new HashMap<String, Integer>();
 
-    /** fallback default value unless authority.minconfidence = X is configured. */
+    /**
+     * fallback default value unless authority.minconfidence = X is configured.
+     */
     protected int defaultMinConfidence = Choices.CF_ACCEPTED;
 
-    protected MetadataAuthorityServiceImpl()
-    {
+    protected MetadataAuthorityServiceImpl() {
 
     }
 
     public void init() {
 
-        if(isAuthorityRequired == null)
-        {
-            isAuthorityRequired = new HashMap<String,Boolean>();
+        if (isAuthorityRequired == null) {
+            isAuthorityRequired = new HashMap<String, Boolean>();
             Enumeration pn = ConfigurationManager.propertyNames();
             final String authPrefix = "authority.controlled.";
             Context context = new Context();
             try {
-                while (pn.hasMoreElements())
-                {
-                    String key = (String)pn.nextElement();
-                    if (key.startsWith(authPrefix))
-                    {
+                while (pn.hasMoreElements()) {
+                    String key = (String) pn.nextElement();
+                    if (key.startsWith(authPrefix)) {
                         // field is expected to be "schema.element.qualifier"
                         String field = key.substring(authPrefix.length());
                         int dot = field.indexOf('.');
-                        if (dot < 0)
-                        {
-                            log.warn("Skipping invalid MetadataAuthority configuration property: "+key+": does not have schema.element.qualifier");
+                        if (dot < 0) {
+                            log.warn(
+                                "Skipping invalid MetadataAuthority configuration property: " + key + ": does not " +
+                                    "have schema.element.qualifier");
                             continue;
                         }
                         String schema = field.substring(0, dot);
-                        String element = field.substring(dot+1);
+                        String element = field.substring(dot + 1);
                         String qualifier = null;
                         dot = element.indexOf('.');
-                        if (dot >= 0)
-                        {
-                            qualifier = element.substring(dot+1);
+                        if (dot >= 0) {
+                            qualifier = element.substring(dot + 1);
                             element = element.substring(0, dot);
                         }
 
 
-                        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
-                        if(metadataField == null)
-                        {
-                            throw new IllegalStateException("Error while configuring authority control, metadata field: " + field + " could not be found");
+                        MetadataField metadataField = metadataFieldService
+                            .findByElement(context, schema, element, qualifier);
+                        if (metadataField == null) {
+                            throw new IllegalStateException(
+                                "Error while configuring authority control, metadata field: " + field + " could not " +
+                                    "be found");
                         }
                         boolean ctl = ConfigurationManager.getBooleanProperty(key, true);
-                        boolean req = ConfigurationManager.getBooleanProperty("authority.required."+field, false);
+                        boolean req = ConfigurationManager.getBooleanProperty("authority.required." + field, false);
                         controlled.put(metadataField.toString(), ctl);
                         isAuthorityRequired.put(metadataField.toString(), req);
 
                         // get minConfidence level for this field if any
-                        int mci = readConfidence("authority.minconfidence."+field);
-                        if (mci >= Choices.CF_UNSET)
-                        {
+                        int mci = readConfidence("authority.minconfidence." + field);
+                        if (mci >= Choices.CF_UNSET) {
                             minConfidence.put(metadataField.toString(), mci);
                         }
-                        log.debug("Authority Control: For schema="+schema+", elt="+element+", qual="+qualifier+", controlled="+ctl+", required="+req);
+                        log.debug(
+                            "Authority Control: For schema=" + schema + ", elt=" + element + ", qual=" + qualifier +
+                                ", controlled=" + ctl + ", required=" + req);
                     }
                 }
             } catch (SQLException e) {
@@ -141,65 +141,56 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService
 
             // get default min confidence if any:
             int dmc = readConfidence("authority.minconfidence");
-            if (dmc >= Choices.CF_UNSET)
-            {
+            if (dmc >= Choices.CF_UNSET) {
                 defaultMinConfidence = dmc;
             }
-            
+
             autoRegisterAuthorityFromInputReader();
         }
     }
-	
-    private int readConfidence(String key)
-    {
+
+    private int readConfidence(String key) {
         String mc = ConfigurationManager.getProperty(key);
-        if (mc != null)
-        {
-            int mci = Choices.getConfidenceValue(mc.trim(), Choices.CF_UNSET-1);
-            if (mci == Choices.CF_UNSET-1)
-            {
-                log.warn("IGNORING bad value in DSpace Configuration, key="+key+", value="+mc+", must be a valid Authority Confidence keyword.");
-            }
-            else
-            {
+        if (mc != null) {
+            int mci = Choices.getConfidenceValue(mc.trim(), Choices.CF_UNSET - 1);
+            if (mci == Choices.CF_UNSET - 1) {
+                log.warn(
+                    "IGNORING bad value in DSpace Configuration, key=" + key + ", value=" + mc + ", must be a valid " +
+                        "Authority Confidence keyword.");
+            } else {
                 return mci;
             }
         }
-        return Choices.CF_UNSET-1;
+        return Choices.CF_UNSET - 1;
     }
 
     @Override
-    public boolean isAuthorityControlled(MetadataField metadataField)
-    {
+    public boolean isAuthorityControlled(MetadataField metadataField) {
         init();
         return isAuthorityControlled(makeFieldKey(metadataField));
     }
 
     @Override
-    public boolean isAuthorityControlled(String fieldKey)
-    {
+    public boolean isAuthorityControlled(String fieldKey) {
         init();
         return controlled.containsKey(fieldKey) && controlled.get(fieldKey);
     }
 
     @Override
-    public boolean isAuthorityRequired(MetadataField metadataField)
-    {
+    public boolean isAuthorityRequired(MetadataField metadataField) {
         init();
         return isAuthorityRequired(makeFieldKey(metadataField));
     }
 
     @Override
-    public boolean isAuthorityRequired(String fieldKey)
-    {
+    public boolean isAuthorityRequired(String fieldKey) {
         init();
         Boolean result = isAuthorityRequired.get(fieldKey);
         return (result != null) && result;
     }
 
     @Override
-    public String makeFieldKey(MetadataField metadataField)
-    {
+    public String makeFieldKey(MetadataField metadataField) {
         init();
         return metadataField.toString();
     }
@@ -207,12 +198,9 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService
     @Override
     public String makeFieldKey(String schema, String element, String qualifier) {
         init();
-        if (qualifier == null)
-        {
+        if (qualifier == null) {
             return schema + "_" + element;
-        }
-        else
-        {
+        } else {
             return schema + "_" + element + "_" + qualifier;
         }
     }
@@ -221,12 +209,12 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService
     /**
      * Give the minimal level of confidence required to consider valid an authority value
      * for the given metadata.
+     *
      * @param metadataField metadata field
      * @return the minimal valid level of confidence for the given metadata
      */
     @Override
-    public int getMinConfidence(MetadataField metadataField)
-    {
+    public int getMinConfidence(MetadataField metadataField) {
         init();
         Integer result = minConfidence.get(makeFieldKey(metadataField));
         return result == null ? defaultMinConfidence : result;
@@ -236,38 +224,38 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService
     public List<String> getAuthorityMetadata() {
         init();
         List<String> copy = new ArrayList<>();
-        for (String s : controlled.keySet())
-        {
-            copy.add(s.replaceAll("_","."));
+        for (String s : controlled.keySet()) {
+            copy.add(s.replaceAll("_", "."));
         }
         return copy;
     }
-    
 
-	private void autoRegisterAuthorityFromInputReader() {
-		try {
-			DCInputsReader dcInputsReader = new DCInputsReader();
-			for (DCInputSet dcinputSet : dcInputsReader.getAllInputs(Integer.MAX_VALUE, 0)) {
-				DCInput[] dcinputs = dcinputSet.getFields();
-				for (DCInput dcinput : dcinputs) {
-					if (StringUtils.isNotBlank(dcinput.getPairsType())
-							|| StringUtils.isNotBlank(dcinput.getVocabulary())) {
-						String authorityName = dcinput.getPairsType();
-						if(StringUtils.isBlank(authorityName)) {
-							authorityName = dcinput.getVocabulary();
-						}
-						if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
-							String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
-									dcinput.getQualifier());
-							boolean req = ConfigurationManager.getBooleanProperty("authority.required."+fieldKey, false);
-	                        controlled.put(fieldKey, true);	                        
-	                        isAuthorityRequired.put(fieldKey, req);
-						}
-					}
-				}
-			}
-		} catch (DCInputsReaderException e) {
-			throw new IllegalStateException(e.getMessage(), e);
-		}
-	}
+
+    private void autoRegisterAuthorityFromInputReader() {
+        try {
+            DCInputsReader dcInputsReader = new DCInputsReader();
+            for (DCInputSet dcinputSet : dcInputsReader.getAllInputs(Integer.MAX_VALUE, 0)) {
+                DCInput[] dcinputs = dcinputSet.getFields();
+                for (DCInput dcinput : dcinputs) {
+                    if (StringUtils.isNotBlank(dcinput.getPairsType())
+                        || StringUtils.isNotBlank(dcinput.getVocabulary())) {
+                        String authorityName = dcinput.getPairsType();
+                        if (StringUtils.isBlank(authorityName)) {
+                            authorityName = dcinput.getVocabulary();
+                        }
+                        if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
+                            String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
+                                                           dcinput.getQualifier());
+                            boolean req = ConfigurationManager
+                                .getBooleanProperty("authority.required." + fieldKey, false);
+                            controlled.put(fieldKey, true);
+                            isAuthorityRequired.put(fieldKey, req);
+                        }
+                    }
+                }
+            }
+        } catch (DCInputsReaderException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+    }
 }

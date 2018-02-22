@@ -9,14 +9,13 @@ package org.dspace.app.rest.model.patch;
 
 /**
  * Operation to track the "move" operation to the given "path".
- * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class MoveOperation extends FromOperation {
 
-	public MoveOperation(String path, String from) {
-		super("move", path, from);
-	}
+    public MoveOperation(String path, String from) {
+        super("move", path, from);
+    }
 
 }

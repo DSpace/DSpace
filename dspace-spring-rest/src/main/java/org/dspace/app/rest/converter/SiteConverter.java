@@ -14,30 +14,29 @@ import org.springframework.stereotype.Component;
 /**
  * This is the converter from/to the community in the DSpace API data model and
  * the REST data model
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
 public class SiteConverter
-		extends DSpaceObjectConverter<org.dspace.content.Site, org.dspace.app.rest.model.SiteRest> {
-	@Override
-	public org.dspace.content.Site toModel(org.dspace.app.rest.model.SiteRest obj) {
-		return (org.dspace.content.Site) super.toModel(obj);
-	}
+    extends DSpaceObjectConverter<org.dspace.content.Site, org.dspace.app.rest.model.SiteRest> {
+    @Override
+    public org.dspace.content.Site toModel(org.dspace.app.rest.model.SiteRest obj) {
+        return (org.dspace.content.Site) super.toModel(obj);
+    }
 
-	@Override
-	public SiteRest fromModel(org.dspace.content.Site obj) {
-		return (SiteRest) super.fromModel(obj);
-	}
+    @Override
+    public SiteRest fromModel(org.dspace.content.Site obj) {
+        return (SiteRest) super.fromModel(obj);
+    }
 
-	@Override
-	protected SiteRest newInstance() {
-		return new SiteRest();
-	}
+    @Override
+    protected SiteRest newInstance() {
+        return new SiteRest();
+    }
 
-	@Override
-	protected Class<Site> getModelClass() {
-		return Site.class;
-	}
+    @Override
+    protected Class<Site> getModelClass() {
+        return Site.class;
+    }
 }

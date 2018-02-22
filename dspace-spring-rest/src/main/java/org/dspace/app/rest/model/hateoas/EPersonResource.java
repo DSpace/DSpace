@@ -14,13 +14,12 @@ import org.dspace.app.rest.utils.Utils;
 /**
  * EPerson Rest HAL Resource. The HAL Resource wraps the REST Resource
  * adding support for the links and embedded resources
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @RelNameDSpaceResource(EPersonRest.NAME)
 public class EPersonResource extends DSpaceResource<EPersonRest> {
-	public EPersonResource(EPersonRest eperson, Utils utils, String... rels) {
-		super(eperson, utils, rels);
-	}
+    public EPersonResource(EPersonRest eperson, Utils utils, String... rels) {
+        super(eperson, utils, rels);
+    }
 }

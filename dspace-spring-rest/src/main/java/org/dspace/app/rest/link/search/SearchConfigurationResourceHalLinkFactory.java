@@ -19,18 +19,21 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * This class' purpose is to build the links that go together with the SearchConfigurationResource. To be added on the /search endpoint.
+ * This class' purpose is to build the links that go together with the SearchConfigurationResource. To be added on
+ * the /search endpoint.
  */
 @Component
-public class SearchConfigurationResourceHalLinkFactory extends HalLinkFactory<SearchConfigurationResource, DiscoveryRestController> {
+public class SearchConfigurationResourceHalLinkFactory
+    extends HalLinkFactory<SearchConfigurationResource, DiscoveryRestController> {
 
-    protected void addLinks(SearchConfigurationResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
+    protected void addLinks(SearchConfigurationResource halResource, Pageable pageable, LinkedList<Link> list)
+        throws Exception {
         SearchConfigurationRest data = halResource.getContent();
 
-        if(data != null){
+        if (data != null) {
 
             list.add(buildLink(Link.REL_SELF, getMethodOn()
-                    .getSearchConfiguration(data.getScope(), data.getConfigurationName())));
+                .getSearchConfiguration(data.getScope(), data.getConfigurationName())));
 
             list.add(buildLink("objects", getMethodOn().getSearchObjects(null, null, null, null, null, null)));
             list.add(buildLink("facets", getMethodOn().getFacets(null, null, null, null, null)));

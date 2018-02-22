@@ -18,42 +18,41 @@ import org.springframework.stereotype.Component;
 /**
  * This is the converter from/to the Group in the DSpace API data model
  * and the REST data model
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
 public class GroupConverter extends DSpaceObjectConverter<Group, org.dspace.app.rest.model.GroupRest> {
 
-	private static final Logger log = Logger.getLogger(GroupConverter.class);
+    private static final Logger log = Logger.getLogger(GroupConverter.class);
 
-	@Override
-	public GroupRest fromModel(Group obj) {
-		GroupRest epersongroup = super.fromModel(obj);
-		epersongroup.setPermanent(obj.isPermanent());
-		List<GroupRest> groups = new ArrayList<GroupRest>();
-		for (Group g : obj.getMemberGroups()) {
-			groups.add(convert(g));
-		}
-		epersongroup.setGroups(groups);
-		
-		return epersongroup;
-	}
+    @Override
+    public GroupRest fromModel(Group obj) {
+        GroupRest epersongroup = super.fromModel(obj);
+        epersongroup.setPermanent(obj.isPermanent());
+        List<GroupRest> groups = new ArrayList<GroupRest>();
+        for (Group g : obj.getMemberGroups()) {
+            groups.add(convert(g));
+        }
+        epersongroup.setGroups(groups);
 
-	@Override
-	public Group toModel(GroupRest obj) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return epersongroup;
+    }
 
-	@Override
-	protected GroupRest newInstance() {
-		return new GroupRest();
-	}
+    @Override
+    public Group toModel(GroupRest obj) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	protected Class<Group> getModelClass() {
-		return Group.class;
-	}
+    @Override
+    protected GroupRest newInstance() {
+        return new GroupRest();
+    }
+
+    @Override
+    protected Class<Group> getModelClass() {
+        return Group.class;
+    }
 
 }

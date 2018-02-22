@@ -7,13 +7,13 @@
  */
 package org.dspace.xoai.tests.helpers.stubs;
 
-import org.dspace.core.Context;
-import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
-import org.dspace.xoai.services.api.FieldResolver;
-
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.dspace.core.Context;
+import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
+import org.dspace.xoai.services.api.FieldResolver;
 
 public class StubbedFieldResolver implements FieldResolver {
     private Map<String, Integer> fieldsMap = new HashMap<String, Integer>();
@@ -21,7 +21,9 @@ public class StubbedFieldResolver implements FieldResolver {
     @Override
     public int getFieldID(Context context, String field) throws InvalidMetadataFieldException, SQLException {
         Integer integer = fieldsMap.get(field);
-        if (integer == null) return -1;
+        if (integer == null) {
+            return -1;
+        }
         return integer;
     }
 
