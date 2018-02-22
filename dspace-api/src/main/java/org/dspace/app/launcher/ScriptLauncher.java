@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.app.launcher;
@@ -14,7 +14,6 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
@@ -25,8 +24,6 @@ import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
 import org.dspace.utils.DSpace;
 import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 
 /**
  * A DSpace script launcher.
@@ -43,7 +40,8 @@ public class ScriptLauncher {
     /**
      * Default constructor
      */
-    private ScriptLauncher() { }
+    private ScriptLauncher() {
+    }
 
     /**
      * Execute the DSpace script launcher
@@ -52,8 +50,7 @@ public class ScriptLauncher {
      * @throws IOException           if IO error
      * @throws FileNotFoundException if file doesn't exist
      */
-    public static void main(String[] args)
-        throws FileNotFoundException, IOException {
+    public static void main(String[] args) throws FileNotFoundException, IOException {
         // Check that there is at least one argument
 
         // Initialise the service manager kernel
@@ -100,12 +97,13 @@ public class ScriptLauncher {
         System.exit(status);
     }
 
-    protected static int runOneCommand(Document commandConfigs, String[] args) {
+    protected static int runOneCommand(List<CommandType> commandConfigs, String[] args) {
         return runOneCommand(commandConfigs, args, kernelImpl);
     }
 
     /**
      * Recognize and execute a single command.
+     *
      * @param commandConfigs
      * @param args
      */
@@ -146,9 +144,7 @@ public class ScriptLauncher {
                 className = step.getClassName();
             }
             try {
-                target = Class.forName(className,
-                                       true,
-                                       Thread.currentThread().getContextClassLoader());
+                target = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
             } catch (ClassNotFoundException e) {
                 System.err.println("Error in launcher.xml: Invalid class name: " + className);
                 return 1;
@@ -159,7 +155,7 @@ public class ScriptLauncher {
             String[] useargs = args.clone();
             Class[] argTypes = {useargs.getClass()};
             boolean passargs = true;
-            if ((StringUtils.equals("false",step.getPassuserargs()))) {
+            if ((StringUtils.equals("false", step.getPassuserargs()))) {
                 passargs = false;
             }
             if ((args.length == 1) || (("dsrun".equals(request)) && (args.length == 2)) || (!passargs)) {
@@ -193,11 +189,11 @@ public class ScriptLauncher {
             }
 
             // Establish the request service startup
-            RequestService requestService = kernelImpl.getServiceManager().getServiceByName(
-                RequestService.class.getName(), RequestService.class);
+            RequestService requestService = kernelImpl.getServiceManager().getServiceByName(RequestService.class
+                    .getName(), RequestService.class);
             if (requestService == null) {
-                throw new IllegalStateException(
-                    "Could not get the DSpace RequestService to start the request transaction");
+                throw new IllegalStateException("Could not get the DSpace RequestService to start the request " +
+                        "transaction");
             }
 
             // Establish a request related to the current session
@@ -248,23 +244,19 @@ public class ScriptLauncher {
 
     public static List<CommandType> getConfig(DSpaceKernelImpl kernelImpl) {
         // Load the launcher configuration file
-        String config = kernelImpl.getConfigurationService().getProperty("dspace.dir") +
-            System.getProperty("file.separator") + "config" +
-            System.getProperty("file.separator") + "launcher.xml";
+        String config = kernelImpl.getConfigurationService().getProperty("dspace.dir") + System.getProperty("file" +
+                ".separator") + "config" + System.getProperty("file.separator") + "launcher.xml";
         Document doc = null;
-        try
-        {
+        try {
             JAXBContext jaxbContext = JAXBContext.newInstance(CommandsType.class.getPackage().getName());
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            CommandsType commands = ((JAXBElement<CommandsType>)unmarshaller.unmarshal(new File(config))).getValue();
-            List<CommandType> composite=new LinkedList<>();
+            CommandsType commands = ((JAXBElement<CommandsType>) unmarshaller.unmarshal(new File(config))).getValue();
+            List<CommandType> composite = new LinkedList<>();
             composite.addAll(new DSpace().getServiceManager().getServicesByType(CommandType.class));
             composite.addAll(commands.getCommand());
             return composite;
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.err.println("Unable to load the launcher configuration file: [dspace]/config/launcher.xml");
             System.err.println(e.getMessage());
             e.printStackTrace();
@@ -278,7 +270,7 @@ public class ScriptLauncher {
      *
      * @param commandConfigs configs as Document
      */
-    private static void display(List<CommandType>  commandConfigs) {
+    private static void display(List<CommandType> commandConfigs) {
         // List all command elements
         List<CommandType> commands = commandConfigs;
 
@@ -293,8 +285,7 @@ public class ScriptLauncher {
         // Display the sorted list
         System.out.println("Usage: dspace [command-name] {parameters}");
         for (CommandType command : sortedCommands.values()) {
-            System.out.println(" - " + command.getName() +
-                                   ": " + command.getDescription());
+            System.out.println(" - " + command.getName() + ": " + command.getDescription());
         }
     }
 }
