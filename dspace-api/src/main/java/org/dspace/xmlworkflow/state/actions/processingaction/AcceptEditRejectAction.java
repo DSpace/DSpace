@@ -9,17 +9,23 @@ package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
+import org.dspace.xmlworkflow.WorkflowRequirementsManager;
 import org.dspace.xmlworkflow.XmlWorkflowManager;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
@@ -128,19 +134,38 @@ public class AcceptEditRejectAction extends ProcessingAction {
     
     public ActionResult processDeletePage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
     	if(request.getParameter("submit_delete") != null){
-            /* SEDICI-BEGIN --> comento el delete porque requiere acceder a elementos de cocoon de XMLUI
-             * if (AuthorizeManager.authorizeActionBoolean(c,wfi.getItem(),org.dspace.core.Constants.DELETE)){
-            	FlowResult resultado = FlowItemUtils.processDeleteItem(c,wfi.getItem().getID());
-            	if (resultado.getContinue()){
-            		FlashMessagesUtil.setNoticeMessage(request.getSession(), "xmlui.flashMessage.deleteItem.success");
-            		return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
-            	} else {
-                	FlashMessagesUtil.setErrorMessage(request.getSession(), "xmlui.flashMessage.deleteItem.failure");
-            	}
-            } else {
-            	FlashMessagesUtil.setErrorMessage(request.getSession(), "xmlui.flashMessage.deleteItem.failure");
-            }
-            */
+    		if (AuthorizeManager.authorizeActionBoolean(c,wfi.getItem(),org.dspace.core.Constants.DELETE)){
+        		
+        		Item item = Item.find(c, wfi.getItem().getID());
+    			
+                Collection[] collections = item.getCollections();
+
+                //removemos el workflowitem, y sus referencias de las tablas 'cwf_in_progress_user' y 'cwf_claimtask'
+                XmlWorkflowItem wfItem=XmlWorkflowManager.GetWorkflowItem(c, item);//WorkflowItem.findByItem(context, item);
+                if (wfItem!=null){
+                	List<ClaimedTask> tareas=ClaimedTask.find(c, wfItem);
+                	if (tareas.isEmpty()){
+                		wfItem.deleteWrapper();
+                	} else {
+                		if (tareas.get(0).getOwnerID()==c.getCurrentUser().getID()){
+                			WorkflowRequirementsManager.clearInProgressUsers(c, wfItem);
+                			wfItem.deleteWrapper();         			
+                		}
+                	}        	
+                } 
+            	// Remove item from all the collections it's in
+    	        for (Collection collection : collections)
+    	        {
+    	            collection.removeItem(item);
+    	        }	
+    	        
+    	        // Note: when removing an item from the last collection it will
+    	        // be removed from the system. So there is no need to also call
+    	        // an item.delete() method.        
+        	        
+    	        c.commit();
+        		return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+    		}  
         }
         //Cancel, go back to the main task page
         request.setAttribute("page", MAIN_PAGE);
