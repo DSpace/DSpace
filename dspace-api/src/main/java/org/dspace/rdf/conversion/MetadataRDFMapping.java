@@ -16,11 +16,14 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
+
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -391,13 +394,30 @@ public class MetadataRDFMapping {
     protected String parseResourceGenerator(Resource resourceGenerator, 
             String value, String dsoIRI)
     {
-        if (resourceGenerator.isURIResource() 
+        if (resourceGenerator.isURIResource()
                 && resourceGenerator.equals(DMRM.DSpaceObjectIRI))
         {
             return dsoIRI;
         }
 
-        return parseValueProcessor(resourceGenerator, value);
+        return getSafeIRI(parseValueProcessor(resourceGenerator, value));
+    }
+
+    private static String getSafeIRI(final String input) {
+        if (input == null) {
+            return null;
+        }
+        try {
+            URI.create(input);
+            return input;
+        } catch (IllegalArgumentException e) {
+            return input
+                    .replaceAll("\\[", "%5B")
+                    .replaceAll("\\]", "%5D")
+                    .replaceAll(" ", "%20")
+                    .replaceAll("\\(", "%28")
+                    .replaceAll("\\)", "%29");
+        }
     }
     
     protected Literal parseLiteralGenerator(Model m, Resource literalGenerator, 
