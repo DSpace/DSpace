@@ -28,6 +28,15 @@
         "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
      },
      {
+        "issn" : "2535-0730",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "Alpine Entomology",
+        "sponsor" : "$120"
+     },
+     {
         "issn" : "0002-9122",
         "embargo" : "Y",
         "submission" : "A",
@@ -197,6 +206,15 @@
         "integrated" : "Y",
         "sponsor" : "British Editorial Society of Bone & Joint Surgery",
         "title" : "Bone & Joint360"
+     },
+     {
+        "issn" : "1809-127X",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "Check List",
+        "sponsor" : "$120"
      },
      {
         "sponsor" : "$120",
@@ -397,6 +415,15 @@
         "title" : "Evolutionary Applications"
      },
      {
+        "issn" : "2535-0730",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "Evolutionary Systematics",
+        "sponsor" : "$120"
+     },
+     {
         "sponsor" : "British Ecological Society",
         "title" : "Functional Ecology",
         "hidden" : "Y",
@@ -539,6 +566,24 @@
         "integrated" : "Y",
         "sponsor" : "University of Chicago Press",
         "title" : "International Journal of Plant Sciences"
+     },
+     {
+        "issn" : "2531-4033",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "Italian Botanist",
+        "sponsor" : "$120"
+     },
+     {
+        "issn" : "2574-2531",
+        "embargo" : "Y",
+        "submission" : "R",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "JAMIA Open",
+        "sponsor" : "American Medical Informatics Association"
      },
      {
         "sponsor" : "American Medical Informatics Association",
@@ -703,6 +748,15 @@
         "submission" : "R"
      },
      {
+        "issn" : "1937-2426",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "Journal of Orthoptera Research",
+        "sponsor" : "$120"
+     },
+     {
         "title" : "Journal of Paleontology",
         "sponsor" : "The Paleontological Society",
         "submission" : "A",
@@ -764,6 +818,15 @@
         "embargo" : "N",
         "submission" : "R",
         "integrated" : "Y" 
+     },
+     {
+        "issn" : "2534-9708",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "Metabarcoding and Metagenomics",
+        "sponsor" : "$120"
      },
      {
         "sponsor" : "British Ecological Society",
@@ -1115,6 +1178,15 @@
         "embargo" : "N",
         "sponsor" : "The Royal Society",
         "title" : "Proceedings of the Royal Society B"
+     },
+     {
+        "issn" : "2534-9260",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "Rethinking Ecology",
+        "sponsor" : "$120"
      },
      {
         "integrated" : "Y",
