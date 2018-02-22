@@ -47,9 +47,9 @@ import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service implementation for the Collection object.

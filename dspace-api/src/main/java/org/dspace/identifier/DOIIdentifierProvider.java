@@ -837,5 +837,7 @@ public class DOIIdentifierProvider
     }
 
     @Override
-    public String getIdentifierTypeName() { return DOI.getIdentifierTypeName(); }
+    public String getIdentifierTypeName() {
+        return DOI.getIdentifierTypeName();
+    }
 }

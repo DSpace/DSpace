@@ -644,5 +644,7 @@ public class EZIDIdentifierProvider
     }
 
     @Override
-    public String getIdentifierTypeName() { return DOI.getIdentifierTypeName(); }
+    public String getIdentifierTypeName() {
+        return DOI.getIdentifierTypeName();
+    }
 }

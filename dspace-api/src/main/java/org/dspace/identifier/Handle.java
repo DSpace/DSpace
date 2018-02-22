@@ -15,6 +15,12 @@ package org.dspace.identifier;
  * @author Ben Bosman (ben at atmire dot com)
  */
 public class Handle implements Identifier {
+    private Handle() { }
+
+    /**
+     * What type of identifier is this?
+     * @return "Handle"
+     */
     public static String getTypeName() {
         return "Handle";
     }

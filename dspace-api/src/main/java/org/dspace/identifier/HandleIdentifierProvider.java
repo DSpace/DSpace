@@ -240,5 +240,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     }
 
     @Override
-    public String getIdentifierTypeName() { return Handle.getTypeName(); }
+    public String getIdentifierTypeName() {
+        return Handle.getTypeName();
+    }
 }

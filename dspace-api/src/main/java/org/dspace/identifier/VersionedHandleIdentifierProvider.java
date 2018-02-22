@@ -461,5 +461,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     }
 
     @Override
-    public String getIdentifierTypeName() { return Handle.getTypeName(); }
+    public String getIdentifierTypeName() {
+        return Handle.getTypeName();
+    }
 }
