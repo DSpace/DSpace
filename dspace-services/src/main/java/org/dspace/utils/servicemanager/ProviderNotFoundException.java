@@ -9,9 +9,9 @@ package org.dspace.utils.servicemanager;
 
 
 /**
- * This exception indicates that the provider was not found (the 
+ * This exception indicates that the provider was not found (the
  * reference was collected).
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class ProviderNotFoundException extends RuntimeException {
@@ -23,5 +23,5 @@ public class ProviderNotFoundException extends RuntimeException {
     public ProviderNotFoundException(String message) {
         super(message);
     }
-    
+
 }

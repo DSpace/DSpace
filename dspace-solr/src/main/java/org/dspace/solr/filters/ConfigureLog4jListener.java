@@ -14,6 +14,7 @@ import java.net.URL;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
 import org.apache.log4j.PropertyConfigurator;
@@ -30,15 +31,14 @@ import org.apache.log4j.xml.DOMConfigurator;
  * @author Mark H. Wood
  */
 public class ConfigureLog4jListener
-        implements ServletContextListener
-{
-    public void contextInitialized(ServletContextEvent sce)
-    {
+    implements ServletContextListener {
+    public void contextInitialized(ServletContextEvent sce) {
         ServletContext ctx = sce.getServletContext();
 
         String logConfig = ctx.getInitParameter("log4j.configuration");
-        if (null == logConfig)
+        if (null == logConfig) {
             logConfig = "log4j.properties";
+        }
 
         URL configURL;
         try {
@@ -47,41 +47,34 @@ public class ConfigureLog4jListener
             configURL = Loader.getResource(logConfig);
         }
 
-        if (null == configURL)
-        {
+        if (null == configURL) {
             ctx.log("Log4J configuration not found.  Left unconfigured.");
             return;
-        }
-        else
-        {
+        } else {
             ctx.log(" In context " + ctx.getContextPath() +
-                    ", configuring Log4J from " + configURL.toExternalForm());
+                        ", configuring Log4J from " + configURL.toExternalForm());
 
             String configuratorName = ctx.getInitParameter("log4j.configuratorClass");
-            if (null != configuratorName)
-            {
+            if (null != configuratorName) {
                 Configurator configurator;
-                try
-                {
+                try {
                     configurator = (Configurator) Class.forName(configuratorName).newInstance();
-                } catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     ctx.log("Unable to load custom Log4J configuration class '"
-                            + configuratorName + "':  " + ex.getMessage());
+                                + configuratorName + "':  " + ex.getMessage());
                     return;
                 }
 
                 configurator.doConfigure(configURL, new Hierarchy(new RootLogger(Level.OFF)));
-            }
-            else if (configURL.getFile().endsWith(".xml"))
+            } else if (configURL.getFile().endsWith(".xml")) {
                 DOMConfigurator.configure(configURL);
-            else
+            } else {
                 PropertyConfigurator.configure(configURL);
+            }
         }
     }
 
-    public void contextDestroyed(ServletContextEvent sce)
-    {
+    public void contextDestroyed(ServletContextEvent sce) {
         // Nothing to be done
     }
 }

@@ -9,7 +9,6 @@
 package org.dspace.xoai.filter.data;
 
 /**
- * 
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public enum DSpaceMetadataFilterOperator {

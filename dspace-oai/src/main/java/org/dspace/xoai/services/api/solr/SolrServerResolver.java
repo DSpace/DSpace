@@ -11,5 +11,5 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 
 public interface SolrServerResolver {
-    SolrServer getServer () throws SolrServerException;
+    SolrServer getServer() throws SolrServerException;
 }

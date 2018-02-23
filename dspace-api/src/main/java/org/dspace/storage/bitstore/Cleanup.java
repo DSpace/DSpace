@@ -13,32 +13,35 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-
 import org.apache.log4j.Logger;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 
 /**
  * Cleans up asset store.
- * 
+ *
  * @author Peter Breton
  * @version $Revision$
  */
-public class Cleanup
-{
-    /** log4j log */
+public class Cleanup {
+    /**
+     * log4j log
+     */
     private static Logger log = Logger.getLogger(Cleanup.class);
 
     /**
+     * Default constructor
+     */
+    private Cleanup() { }
+
+    /**
      * Cleans up asset store.
-     * 
+     *
      * @param argv the command line arguments given
      */
-    public static void main(String[] argv)
-    {
-        try
-        {
+    public static void main(String[] argv) {
+        try {
             log.info("Cleaning up asset store");
-            
+
             // set up command line parser
             CommandLineParser parser = new PosixParser();
             CommandLine line = null;
@@ -49,45 +52,38 @@ public class Cleanup
             options.addOption("l", "leave", false, "Leave database records but delete file from assetstore");
             options.addOption("v", "verbose", false, "Provide verbose output");
             options.addOption("h", "help", false, "Help");
-            
-            try
-            {
+
+            try {
                 line = parser.parse(options, argv);
-            }
-            catch (ParseException e)
-            {
+            } catch (ParseException e) {
                 log.fatal(e);
                 System.exit(1);
             }
-            
+
             // user asks for help
-            if (line.hasOption('h'))
-            {
+            if (line.hasOption('h')) {
                 printHelp(options);
                 System.exit(0);
             }
 
             boolean deleteDbRecords = true;
             // Prune stage
-            if (line.hasOption('l'))
-            {
+            if (line.hasOption('l')) {
                 log.debug("option l used setting flag to leave db records");
-                deleteDbRecords = false;    
+                deleteDbRecords = false;
             }
             log.debug("leave db records = " + deleteDbRecords);
-            StorageServiceFactory.getInstance().getBitstreamStorageService().cleanup(deleteDbRecords, line.hasOption('v'));
-            
+            StorageServiceFactory.getInstance().getBitstreamStorageService()
+                                 .cleanup(deleteDbRecords, line.hasOption('v'));
+
             System.exit(0);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.fatal("Caught exception:", e);
             System.exit(1);
         }
     }
-    
-    private static void printHelp(Options options)
-    {
+
+    private static void printHelp(Options options) {
         HelpFormatter myhelp = new HelpFormatter();
         myhelp.printHelp("Cleanup\n", options);
     }

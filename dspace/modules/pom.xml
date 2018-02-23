@@ -40,28 +40,6 @@
     -->
     <profiles>
         <profile>
-            <id>dspace-xmlui</id>
-            <activation>
-                <file>
-                    <exists>xmlui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>xmlui</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>dspace-jspui</id>
-            <activation>
-                <file>
-                    <exists>jspui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>jspui</module>
-            </modules>
-        </profile>
-        <profile>
             <id>dspace-rdf</id>
             <activation>
                 <file>
@@ -127,19 +105,15 @@
                 <module>oai</module>
             </modules>
         </profile>
-
         <profile>
-            <!--Activates mirage2 on the presence of the property mirage2.on with any value e.g. mvn clean package -Dmirage2.on=on
-                Note the absence of activeByDefault. This module is optional. Also activeByDefault only works when no other profiles are active.
-            -->
-            <id>mirage2</id>
+            <id>dspace-spring-rest</id>
             <activation>
-                <property>
-                    <name>mirage2.on</name>
-                </property>
+                <file>
+                    <exists>spring-rest/pom.xml</exists>
+                </file>
             </activation>
             <modules>
-                <module>xmlui-mirage2</module>
+                <module>spring-rest</module>
             </modules>
         </profile>
     </profiles>

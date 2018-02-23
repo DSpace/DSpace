@@ -7,16 +7,16 @@
  */
 package org.dspace.harvest.dao.impl;
 
+import java.sql.SQLException;
+
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.dao.HarvestedItemDAO;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-
-import java.sql.SQLException;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the HarvestedItem object.
@@ -25,10 +25,8 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> implements HarvestedItemDAO
-{
-    protected HarvestedItemDAOImpl()
-    {
+public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> implements HarvestedItemDAO {
+    protected HarvestedItemDAOImpl() {
         super();
     }
 
@@ -44,10 +42,10 @@ public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> im
         Criteria criteria = createCriteria(context, HarvestedItem.class);
         criteria.createAlias("item", "i");
         criteria.add(
-                Restrictions.and(
-                        Restrictions.eq("oaiId", itemOaiID),
-                        Restrictions.eq("i.owningCollection", collection)
-                )
+            Restrictions.and(
+                Restrictions.eq("oaiId", itemOaiID),
+                Restrictions.eq("i.owningCollection", collection)
+            )
         );
         return singleResult(criteria);
     }

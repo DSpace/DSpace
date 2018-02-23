@@ -7,25 +7,23 @@
  */
 package org.dspace.checker;
 
+import java.sql.SQLException;
+import java.util.Date;
+
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.MostRecentChecksumService;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 
-import java.sql.SQLException;
-import java.util.Date;
-
 /**
  * An implementation of the selection strategy that selects bitstreams in the
  * order that they were last checked, looping endlessly.
- * 
+ *
  * @author Jim Downing
  * @author Grace Carpenter
  * @author Nathan Sarr
- * 
  */
-public class SimpleDispatcher implements BitstreamDispatcher
-{
+public class SimpleDispatcher implements BitstreamDispatcher {
 
     /**
      * Should this dispatcher keep on dispatching around the collection?
@@ -46,16 +44,13 @@ public class SimpleDispatcher implements BitstreamDispatcher
 
     /**
      * Creates a new SimpleDispatcher.
-     * 
-     * @param context Context
-     * @param startTime
-     *            timestamp for beginning of checker process
-     * @param looping
-     *            indicates whether checker should loop infinitely through
-     *            most_recent_checksum table
+     *
+     * @param context   Context
+     * @param startTime timestamp for beginning of checker process
+     * @param looping   indicates whether checker should loop infinitely through
+     *                  most_recent_checksum table
      */
-    public SimpleDispatcher(Context context, Date startTime, boolean looping)
-    {
+    public SimpleDispatcher(Context context, Date startTime, boolean looping) {
         checksumService = CheckerServiceFactory.getInstance().getMostRecentChecksumService();
         this.context = context;
         this.processStartTime = (startTime == null ? null : new Date(startTime.getTime()));
@@ -65,13 +60,12 @@ public class SimpleDispatcher implements BitstreamDispatcher
     /**
      * Blanked off, no-op constructor. Do not use.
      */
-    private SimpleDispatcher()
-    {
+    private SimpleDispatcher() {
     }
 
     /**
      * Selects the next candidate bitstream.
-     * 
+     *
      * @throws SQLException if database error
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
@@ -79,23 +73,18 @@ public class SimpleDispatcher implements BitstreamDispatcher
     public synchronized Bitstream next() throws SQLException {
         // should process loop infinitely through the
         // bitstreams in most_recent_checksum table?
-        if (!loopContinuously && (processStartTime != null))
-        {
+        if (!loopContinuously && (processStartTime != null)) {
             MostRecentChecksum oldestRecord = checksumService.findOldestRecord(context, processStartTime);
-            if(oldestRecord != null)
-            {
+            if (oldestRecord != null) {
                 return oldestRecord.getBitstream();
-            }else{
+            } else {
                 return null;
             }
-        }
-        else
-        {
+        } else {
             MostRecentChecksum oldestRecord = checksumService.findOldestRecord(context);
-            if(oldestRecord != null)
-            {
+            if (oldestRecord != null) {
                 return oldestRecord.getBitstream();
-            }else{
+            } else {
                 return null;
             }
         }

@@ -13,6 +13,7 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
 import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
@@ -30,9 +31,8 @@ import org.springframework.beans.factory.annotation.Required;
  * @author mwood
  */
 public class EmailServiceImpl
-        extends Authenticator
-        implements EmailService, InitializedService
-{
+    extends Authenticator
+    implements EmailService, InitializedService {
     private static final Logger logger = (Logger) LoggerFactory.getLogger(EmailServiceImpl.class);
 
     private Session session = null;
@@ -41,12 +41,12 @@ public class EmailServiceImpl
 
     /**
      * Inject/set the ConfigurationService
+     *
      * @param cfg the configurationService object
      */
     @Autowired
     @Required
-    public void setCfg(ConfigurationService cfg)
-    {
+    public void setCfg(ConfigurationService cfg) {
         this.cfg = cfg;
     }
 
@@ -56,67 +56,53 @@ public class EmailServiceImpl
      * @return the managed Session, or null if none could be created.
      */
     @Override
-    public Session getSession()
-    {
+    public Session getSession() {
         return session;
     }
 
     @Override
-    public void init()
-    {
+    public void init() {
         // See if there is already a Session in our environment
         String sessionName = cfg.getProperty("mail.session.name");
-        if (null == sessionName)
-        {
+        if (null == sessionName) {
             sessionName = "Session";
         }
-        try
-        {
+        try {
             InitialContext ctx = new InitialContext(null);
             session = (Session) ctx.lookup("java:comp/env/mail/" + sessionName);
-        } catch (NamingException ex)
-        {
+        } catch (NamingException ex) {
             logger.warn("Couldn't get an email session from environment:  {}",
-                    ex.getMessage());
+                        ex.getMessage());
         }
 
-        if (null != session)
-        {
+        if (null != session) {
             logger.info("Email session retrieved from environment.");
-        }
-        else
-        { // No Session provided, so create one
+        } else { // No Session provided, so create one
             logger.info("Initializing an email session from configuration.");
             Properties props = new Properties();
             props.put("mail.transport.protocol", "smtp");
             String host = cfg.getProperty("mail.server");
-            if (null != host)
-            {
+            if (null != host) {
                 props.put("mail.host", cfg.getProperty("mail.server"));
             }
             String port = cfg.getProperty("mail.server.port");
-            if (null != port)
-            {
+            if (null != port) {
                 props.put("mail.smtp.port", port);
             }
             // Set extra configuration properties
             String[] extras = cfg.getArrayProperty("mail.extraproperties");
-            if (extras != null)
-            {
-                String key, value;
-                for (String argument : extras)
-                {
+            if (extras != null) {
+                String key;
+                String value;
+                for (String argument : extras) {
                     key = argument.substring(0, argument.indexOf('=')).trim();
                     value = argument.substring(argument.indexOf('=') + 1).trim();
                     props.put(key, value);
                 }
             }
-            if (null == cfg.getProperty("mail.server.username"))
-            {
+            if (null == cfg.getProperty("mail.server.username")) {
                 session = Session.getInstance(props);
-            }
-            else
-            {
+            } else {
                 props.put("mail.smtp.auth", "true");
                 session = Session.getInstance(props, this);
             }
@@ -126,15 +112,13 @@ public class EmailServiceImpl
     }
 
     @Override
-    protected PasswordAuthentication getPasswordAuthentication()
-    {
-        if (null == cfg)
-        {
+    protected PasswordAuthentication getPasswordAuthentication() {
+        if (null == cfg) {
             cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
         }
 
         return new PasswordAuthentication(
-                cfg.getProperty("mail.server.username"),
-                cfg.getProperty("mail.server.password"));
+            cfg.getProperty("mail.server.username"),
+            cfg.getProperty("mail.server.password"));
     }
 }

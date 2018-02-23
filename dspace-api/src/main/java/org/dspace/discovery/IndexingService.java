@@ -7,11 +7,11 @@
  */
 package org.dspace.discovery;
 
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-
 import java.io.IOException;
 import java.sql.SQLException;
+
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
 /**
  * Interface used for indexing dspaceobject into discovery
@@ -23,28 +23,28 @@ import java.sql.SQLException;
 public interface IndexingService {
 
     void indexContent(Context context, DSpaceObject dso)
-            throws SQLException;
+        throws SQLException;
 
     void indexContent(Context context, DSpaceObject dso,
                       boolean force) throws SQLException;
 
     void indexContent(Context context, DSpaceObject dso,
-            boolean force, boolean commit) throws SQLException, SearchServiceException;
-    
+                      boolean force, boolean commit) throws SQLException, SearchServiceException;
+
     void unIndexContent(Context context, DSpaceObject dso)
-            throws SQLException, IOException;
+        throws SQLException, IOException;
 
     void unIndexContent(Context context, DSpaceObject dso, boolean commit)
-            throws SQLException, IOException;
-    
+        throws SQLException, IOException;
+
     void unIndexContent(Context context, String handle)
-            throws SQLException, IOException;
+        throws SQLException, IOException;
 
     void unIndexContent(Context context, String handle, boolean commit)
-            throws SQLException, IOException;
+        throws SQLException, IOException;
 
     void reIndexContent(Context context, DSpaceObject dso)
-            throws SQLException, IOException;
+        throws SQLException, IOException;
 
     void createIndex(Context context) throws SQLException, IOException;
 
@@ -53,7 +53,7 @@ public interface IndexingService {
     void updateIndex(Context context, boolean force);
 
     void cleanIndex(boolean force) throws IOException,
-            SQLException, SearchServiceException;
+        SQLException, SearchServiceException;
 
     void commit() throws SearchServiceException;
 

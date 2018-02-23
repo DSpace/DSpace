@@ -7,6 +7,19 @@
  */
 package org.dspace.authority.orcid;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueServiceImpl;
 import org.dspace.authority.PersonAuthorityValue;
@@ -14,15 +27,8 @@ import org.dspace.authority.orcid.model.Bio;
 import org.dspace.authority.orcid.model.BioExternalIdentifier;
 import org.dspace.authority.orcid.model.BioName;
 import org.dspace.authority.orcid.model.BioResearcherUrl;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
-
-import java.util.*;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -119,6 +125,7 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
 
     /**
      * Create an authority based on a given orcid bio
+     *
      * @param bio Bio
      * @return OrcidAuthorityValue
      */
@@ -233,7 +240,8 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
 
     @Override
     public String generateString() {
-        String generateString = AuthorityValueServiceImpl.GENERATE + getAuthorityType() + AuthorityValueServiceImpl.SPLIT;
+        String generateString = AuthorityValueServiceImpl.GENERATE + getAuthorityType() + AuthorityValueServiceImpl
+            .SPLIT;
         if (StringUtils.isNotBlank(getOrcid_id())) {
             generateString += getOrcid_id();
         }
@@ -296,7 +304,7 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
         }
 
         for (String key : otherMetadata.keySet()) {
-            if(otherMetadata.get(key) != null){
+            if (otherMetadata.get(key) != null) {
                 List<String> metadata = otherMetadata.get(key);
                 List<String> otherMetadata = that.otherMetadata.get(key);
                 if (otherMetadata == null) {
@@ -308,8 +316,8 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
                         return false;
                     }
                 }
-            }else{
-                if(that.otherMetadata.get(key) != null){
+            } else {
+                if (that.otherMetadata.get(key) != null) {
                     return false;
                 }
             }

@@ -7,33 +7,27 @@
  */
 package org.dspace.discovery;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Restriction plugin that ensures that indexes all the resource policies.
@@ -43,7 +37,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
-public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlugin, SolrServiceSearchPlugin{
+public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlugin, SolrServiceSearchPlugin {
 
     private static final Logger log = Logger.getLogger(SolrServiceResourceRestrictionPlugin.class);
 
@@ -64,56 +58,61 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
             List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, Constants.READ);
             for (ResourcePolicy resourcePolicy : policies) {
                 String fieldValue;
-                if(resourcePolicy.getGroup() != null){
+                if (resourcePolicy.getGroup() != null) {
                     //We have a group add it to the value
                     fieldValue = "g" + resourcePolicy.getGroup().getID();
-                }else{
+                } else {
                     //We have an eperson add it to the value
                     fieldValue = "e" + resourcePolicy.getEPerson().getID();
 
                 }
 
                 document.addField("read", fieldValue);
+
+                //remove the policy from the cache to save memory
+                context.uncacheEntity(resourcePolicy);
             }
         } catch (SQLException e) {
-            log.error(LogManager.getHeader(context, "Error while indexing resource policies", "DSpace object: (id " + dso.getID() + " type " + dso.getType() + ")"));
+            log.error(LogManager.getHeader(context, "Error while indexing resource policies",
+                                           "DSpace object: (id " + dso.getID() + " type " + dso.getType() + ")"));
         }
     }
 
     @Override
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
-    	try {
-            if(!authorizeService.isAdmin(context)){
-            	StringBuilder resourceQuery = new StringBuilder();
+        try {
+            if (!authorizeService.isAdmin(context)) {
+                StringBuilder resourceQuery = new StringBuilder();
                 //Always add the anonymous group id to the query
-                Group anonymousGroup = groupService.findByName(context,Group.ANONYMOUS);
+                Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
                 String anonGroupId = "";
-                if(anonymousGroup!=null){
+                if (anonymousGroup != null) {
                     anonGroupId = anonymousGroup.getID().toString();
                 }
-                resourceQuery.append("read:(g"+anonGroupId);
+                resourceQuery.append("read:(g" + anonGroupId);
                 EPerson currentUser = context.getCurrentUser();
-                if(currentUser != null){
+                if (currentUser != null) {
                     resourceQuery.append(" OR e").append(currentUser.getID());
                 }
 
                 //Retrieve all the groups the current user is a member of !
-                List<Group> groups = groupService.allMemberGroups(context, currentUser);
+                Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
                 for (Group group : groups) {
                     resourceQuery.append(" OR g").append(group.getID());
                 }
 
-                resourceQuery.append(")"); 
-                
-                if(authorizeService.isCommunityAdmin(context) 
-                        || authorizeService.isCollectionAdmin(context))
-                {
+                resourceQuery.append(")");
+
+                if (authorizeService.isCommunityAdmin(context)
+                    || authorizeService.isCollectionAdmin(context)) {
                     resourceQuery.append(" OR ");
                     resourceQuery.append(DSpaceServicesFactory.getInstance()
-                            .getServiceManager().getServiceByName(SearchService.class.getName(), SearchService.class)
-                            .createLocationQueryForAdministrableItems(context));
+                                                              .getServiceManager()
+                                                              .getServiceByName(SearchService.class.getName(),
+                                                                                SearchService.class)
+                                                              .createLocationQueryForAdministrableItems(context));
                 }
-                
+
                 solrQuery.addFilterQuery(resourceQuery.toString());
             }
         } catch (SQLException e) {

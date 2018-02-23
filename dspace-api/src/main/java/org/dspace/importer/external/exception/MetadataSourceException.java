@@ -8,7 +8,9 @@
 
 package org.dspace.importer.external.exception;
 
-/** Represents a problem with the input source: e.g. cannot connect to the source.
+/**
+ * Represents a problem with the input source: e.g. cannot connect to the source.
+ *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class MetadataSourceException extends Exception {
@@ -27,8 +29,8 @@ public class MetadataSourceException extends Exception {
      * cause is not initialized, and may subsequently be initialized by
      * a call to {@link #initCause}.
      *
-     * @param   message   the detail message. The detail message is saved for
-     *          later retrieval by the {@link #getMessage()} method.
+     * @param message the detail message. The detail message is saved for
+     *                later retrieval by the {@link #getMessage()} method.
      */
     public MetadataSourceException(String message) {
         super(message);
@@ -40,12 +42,12 @@ public class MetadataSourceException extends Exception {
      * {@code cause} is <i>not</i> automatically incorporated in
      * this exception's detail message.
      *
-     * @param  message the detail message (which is saved for later retrieval
-     *         by the {@link #getMessage()} method).
-     * @param  cause the cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).  (A <tt>null</tt> value is
-     *         permitted, and indicates that the cause is nonexistent or
-     *         unknown.)
+     * @param message the detail message (which is saved for later retrieval
+     *                by the {@link #getMessage()} method).
+     * @param cause   the cause (which is saved for later retrieval by the
+     *                {@link #getCause()} method).  (A <tt>null</tt> value is
+     *                permitted, and indicates that the cause is nonexistent or
+     *                unknown.)
      */
     public MetadataSourceException(String message, Throwable cause) {
         super(message, cause);
@@ -59,10 +61,10 @@ public class MetadataSourceException extends Exception {
      * wrappers for other throwables (for example, {@link
      * java.security.PrivilegedActionException}).
      *
-     * @param  cause the cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).  (A <tt>null</tt> value is
-     *         permitted, and indicates that the cause is nonexistent or
-     *         unknown.)
+     * @param cause the cause (which is saved for later retrieval by the
+     *              {@link #getCause()} method).  (A <tt>null</tt> value is
+     *              permitted, and indicates that the cause is nonexistent or
+     *              unknown.)
      */
     public MetadataSourceException(Throwable cause) {
         super(cause);

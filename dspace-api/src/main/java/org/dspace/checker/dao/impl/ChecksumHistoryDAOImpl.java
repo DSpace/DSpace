@@ -14,8 +14,8 @@ import org.dspace.checker.ChecksumHistory;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.dao.ChecksumHistoryDAO;
 import org.dspace.content.Bitstream;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.hibernate.Query;
 
 /**
@@ -24,25 +24,23 @@ import org.hibernate.Query;
  * update,insert and delete database operations should go through this class for
  * checksum history operations.
  * </p>
- * 
+ *
  * @author Jim Downing
  * @author Grace Carpenter
  * @author Nathan Sarr
  * @author kevinvandevelde at atmire.com
- * 
- * 
  */
-public class ChecksumHistoryDAOImpl extends AbstractHibernateDAO<ChecksumHistory> implements ChecksumHistoryDAO
-{
+public class ChecksumHistoryDAOImpl extends AbstractHibernateDAO<ChecksumHistory> implements ChecksumHistoryDAO {
 
-    protected ChecksumHistoryDAOImpl()
-    {
+    protected ChecksumHistoryDAOImpl() {
         super();
     }
 
     @Override
-    public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode resultCode) throws SQLException {
-        String hql = "delete from ChecksumHistory where processEndDate < :processEndDate AND checksumResult.resultCode=:resultCode";
+    public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode resultCode)
+        throws SQLException {
+        String hql = "delete from ChecksumHistory where processEndDate < :processEndDate AND checksumResult" +
+            ".resultCode=:resultCode";
         Query query = createQuery(context, hql);
         query.setTimestamp("processEndDate", retentionDate);
         query.setParameter("resultCode", resultCode);

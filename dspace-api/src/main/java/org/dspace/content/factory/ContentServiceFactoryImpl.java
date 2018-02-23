@@ -7,14 +7,29 @@
  */
 package org.dspace.content.factory;
 
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.service.*;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.List;
 
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.DSpaceObjectLegacySupportService;
+import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.SiteService;
+import org.dspace.content.service.SupervisedItemService;
+import org.dspace.content.service.WorkspaceItemService;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
- * Factory implementation to get services for the content package, use ContentServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the content package, use ContentServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -65,62 +80,52 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     }
 
     @Override
-    public BitstreamFormatService getBitstreamFormatService()
-    {
+    public BitstreamFormatService getBitstreamFormatService() {
         return bitstreamFormatService;
     }
 
     @Override
-    public BitstreamService getBitstreamService()
-    {
+    public BitstreamService getBitstreamService() {
         return bitstreamService;
     }
 
     @Override
-    public BundleService getBundleService()
-    {
+    public BundleService getBundleService() {
         return bundleService;
     }
 
     @Override
-    public CollectionService getCollectionService()
-    {
+    public CollectionService getCollectionService() {
         return collectionService;
     }
 
     @Override
-    public CommunityService getCommunityService()
-    {
+    public CommunityService getCommunityService() {
         return communityService;
     }
 
     @Override
-    public ItemService getItemService()
-    {
+    public ItemService getItemService() {
         return itemService;
     }
 
     @Override
-    public MetadataSchemaService getMetadataSchemaService()
-    {
+    public MetadataSchemaService getMetadataSchemaService() {
         return metadataSchemaService;
     }
 
     @Override
-    public MetadataFieldService getMetadataFieldService()
-    {
+    public MetadataFieldService getMetadataFieldService() {
         return metadataFieldService;
     }
 
     @Override
-    public MetadataValueService getMetadataValueService()
-    {
+    public MetadataValueService getMetadataValueService() {
         return metadataValueService;
     }
 
     @Override
-    public WorkspaceItemService getWorkspaceItemService()
-    {
+    public WorkspaceItemService getWorkspaceItemService() {
         return workspaceItemService;
     }
 

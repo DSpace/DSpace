@@ -8,18 +8,16 @@
 package org.purl.sword.client;
 
 /**
- * Listener for any objects that want to be notified when a collection has been selected in the 
- * ServicePanel.  
- * 
- * @author Neil Taylor
+ * Listener for any objects that want to be notified when a collection has been selected in the
+ * ServicePanel.
  *
+ * @author Neil Taylor
  */
-public interface ServiceSelectedListener
-{
-   /**
-    * Called to provide an update on whether the selected node is a Collection. 
-    * 
-    * @param collection The location of the collection. <code>null</code>, otherwise. 
-    */
-   public void selected(String collection); 
+public interface ServiceSelectedListener {
+    /**
+     * Called to provide an update on whether the selected node is a Collection.
+     *
+     * @param collection The location of the collection. <code>null</code>, otherwise.
+     */
+    public void selected(String collection);
 }

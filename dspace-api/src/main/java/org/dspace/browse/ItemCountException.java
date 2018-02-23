@@ -9,30 +9,24 @@ package org.dspace.browse;
 
 /**
  * Exception type to handle item count specific problems
- * 
- * @author Richard Jones
  *
+ * @author Richard Jones
  */
-public class ItemCountException extends Exception
-{
+public class ItemCountException extends Exception {
 
-	public ItemCountException()
-	{
-	}
+    public ItemCountException() {
+    }
 
-	public ItemCountException(String message)
-	{
-		super(message);
-	}
+    public ItemCountException(String message) {
+        super(message);
+    }
 
-	public ItemCountException(Throwable cause)
-	{
-		super(cause);
-	}
+    public ItemCountException(Throwable cause) {
+        super(cause);
+    }
 
-	public ItemCountException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
+    public ItemCountException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }

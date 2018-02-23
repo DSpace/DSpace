@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
@@ -26,7 +27,7 @@
 
     <profiles>
 
-        <!-- Build Profile. This builds all Overlay modules for DSpace -->   
+        <!-- Build Profile. This builds all Overlay modules for DSpace -->
         <profile>
             <id>build</id>
             <activation>
@@ -38,7 +39,7 @@
             <!-- Build all Overlay submodules -->
             <modules>
                 <module>modules</module>
-            </modules> 
+            </modules>
         </profile>
 
         <!--
@@ -85,8 +86,8 @@
             </build>
         </profile>
 
-        <!-- This profile simply determines whether we are creating 
-             zip / tarball distributions to upload to SourceFore or similar. 
+        <!-- This profile simply determines whether we are creating
+             zip / tarball distributions to upload to SourceFore or similar.
              By running "mvn package -Ddistributions=true" you'll
              SKIP normal build & assembly (see above profiles) and
              INSTEAD just run the "distributions" profile below. -->
@@ -102,7 +103,7 @@
             <properties>
                 <distributions>false</distributions>
             </properties>
-        </profile> 
+        </profile>
 
 
         <!--
@@ -145,6 +146,136 @@
                  </plugin>
               </plugins>
            </build>
+        </profile>
+
+        <profile>
+            <id>skip-coveralls</id>
+            <activation>
+                <property>
+                    <name>!env.TRAVIS</name>
+                </property>
+            </activation>
+            <properties>
+                <coveralls.skip>true</coveralls.skip>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>test-coverage-report</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>maven.test.skip</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Aggregate unit test code coverage reports -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>aggregate-test-report</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>report-aggregate</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- By default, JaCoCo will lookup all *.exec in the target folders of the Reactor Build Order -->
+                                    <!-- Sets the path to the files which contain the execution data. -->
+                                    <dataFileIncludes>
+                                        <dataFileInclude>**/jacoco-ut.exec</dataFileInclude>
+                                        <dataFileInclude>**/jacoco-it.exec</dataFileInclude>
+                                    </dataFileIncludes>
+                                    <!-- Sets the output directory for the code coverage report. -->
+                                    <outputDirectory>${project.reporting.outputDirectory}/jacoco-aggregated</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.eluder.coveralls</groupId>
+                        <artifactId>coveralls-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>report-test-coverage</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <failOnServiceError>false</failOnServiceError>
+                                    <jacocoReports>
+                                        <jacocoReport>${project.reporting.outputDirectory}/jacoco-aggregated/jacoco.xml</jacocoReport>
+                                    </jacocoReports>
+                                    <sourceDirectories>
+                                        <sourceDirectory>${project.parent.basedir}/dspace-api/src/main/java</sourceDirectory>
+                                        <sourceDirectory>${project.parent.basedir}/dspace-oai/src/main/java</sourceDirectory>
+                                        <sourceDirectory>${project.parent.basedir}/dspace-rdf/src/main/java</sourceDirectory>
+                                        <sourceDirectory>${project.parent.basedir}/dspace-rest/src/main/java</sourceDirectory>
+                                        <sourceDirectory>${project.parent.basedir}/dspace-services/src/main/java</sourceDirectory>
+                                        <sourceDirectory>${project.parent.basedir}/dspace-spring-rest/src/main/java</sourceDirectory>
+                                        <sourceDirectory>${project.parent.basedir}/dspace-sword/src/main/java</sourceDirectory>
+                                        <sourceDirectory>${project.parent.basedir}/dspace-swordv2/src/main/java</sourceDirectory>
+                                    </sourceDirectories>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <!-- Add all modules that should be taken into account for the coverage reports -->
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-api</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-oai</artifactId>
+                    <classifier>classes</classifier>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-rdf</artifactId>
+                    <type>war</type>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-rest</artifactId>
+                    <classifier>classes</classifier>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-services</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-spring-rest</artifactId>
+                    <type>war</type>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-sword</artifactId>
+                    <classifier>classes</classifier>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-swordv2</artifactId>
+                    <classifier>classes</classifier>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
         </profile>
 
     </profiles>

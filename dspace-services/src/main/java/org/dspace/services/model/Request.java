@@ -15,14 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 public interface Request {
     public String getRequestId();
 
-    public Session getSession();
-
     public Object getAttribute(String name);
 
     public void setAttribute(String name, Object o);
 
     public ServletRequest getServletRequest();
-    
+
     public HttpServletRequest getHttpServletRequest();
 
     public ServletResponse getServletResponse();

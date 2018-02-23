@@ -9,8 +9,19 @@
 [Support](https://wiki.duraspace.org/display/DSPACE/Support)
 
 DSpace open source software is a turnkey repository application used by more than 
-1000+ organizations and institutions worldwide to provide durable access to digital resources.
+2,000 organizations and institutions worldwide to provide durable access to digital resources.
 For more information, visit http://www.dspace.org/
+
+***
+:warning: **Work on DSpace 7 has begun on our `master` branch.** This means that there is temporarily NO user interface on this `master` branch. DSpace 7 will feature a new, unified [Angular](https://angular.io/) user interface, along with an enhanced, rebuilt REST API. The latest status of this work can be found on the [DSpace 7 UI Working Group](https://wiki.duraspace.org/display/DSPACE/DSpace+7+UI+Working+Group) page.  Additionally, the codebases can be found in the following places:
+  * DSpace 7 REST API work is occurring on the [`master` branch](https://github.com/DSpace/DSpace/tree/master/dspace-spring-rest) of this repository.
+     * The REST Contract is being documented at https://github.com/DSpace/Rest7Contract
+  * DSpace 7 Angular UI work is occurring at https://github.com/DSpace/dspace-angular
+  
+**If you would like to get involved in our DSpace 7 development effort, we welcome new contributors.** Just join one of our meetings or get in touch via Slack. See the [DSpace 7 UI Working Group](https://wiki.duraspace.org/display/DSPACE/DSpace+7+UI+Working+Group) wiki page for more info.
+
+**If you are looking for the ongoing maintenance work for DSpace 6 (or prior releases)**, you can find that work on the corresponding maintenance branch (e.g. [`dspace-6_x`](https://github.com/DSpace/DSpace/tree/dspace-6_x)) in this repository.
+***
 
 ## Downloads
 

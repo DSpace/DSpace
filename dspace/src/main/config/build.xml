@@ -668,6 +668,7 @@ Common usage:
             <fileset dir="webapps">
                 <exclude name="**/web.xml" />
                 <exclude name="**/robots.txt" />
+            	<exclude name="**/application.properties" />
             </fileset>
         </copy>
 
@@ -676,6 +677,7 @@ Common usage:
             <fileset dir="webapps">
                 <include name="**/web.xml" />
                 <include name="**/robots.txt" />
+            	<include name="**/application.properties" />
             </fileset>
             <filterchain>
                 <expandproperties />
@@ -694,16 +696,8 @@ Common usage:
 
     <target name="build_webapps_wars" description="Compress Web Applications into .war files" if="wars">
 
-        <war destfile="${dspace.dir}/webapps/xmlui.war">
-            <fileset dir="${dspace.dir}/webapps/xmlui/" />
-        </war>
-
         <war destfile="${dspace.dir}/webapps/oai.war">
             <fileset dir="${dspace.dir}/webapps/oai/" />
-        </war>
-
-        <war destfile="${dspace.dir}/webapps/jspui.war">
-            <fileset dir="${dspace.dir}/webapps/jspui/" />
         </war>
 
         <war destfile="${dspace.dir}/webapps/rdf.war">

@@ -9,16 +9,16 @@
 
 -->
 <web-app id="XOAILynCode" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
-	
-	<display-name>XOAI Data Provider</display-name>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
-	<context-param>
-		<description>The location of the DSpace home directory</description>
-		<param-name>dspace.dir</param-name>
-		<param-value>${dspace.dir}</param-value>
-	</context-param>
+    <display-name>XOAI Data Provider</display-name>
+
+    <context-param>
+        <description>The location of the DSpace home directory</description>
+        <param-name>dspace.dir</param-name>
+        <param-value>${dspace.dir}</param-value>
+    </context-param>
 
 
     <!-- Location of root application context configs (to be loaded by ContextLoaderListener below) -->
@@ -36,7 +36,7 @@
     <!-- Initializes the DSpace Kernel -->
     <listener>
         <listener-class>
-		  org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
+            org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
         </listener-class>
     </listener>
 
@@ -50,7 +50,7 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
-	<servlet>
+    <servlet>
         <servlet-name>oai</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <!-- Configure DispatcherServlet to use AnnotationConfigWebApplicationContext

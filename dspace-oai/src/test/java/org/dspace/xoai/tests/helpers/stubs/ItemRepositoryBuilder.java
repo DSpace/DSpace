@@ -7,6 +7,16 @@
  */
 package org.dspace.xoai.tests.helpers.stubs;
 
+import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
+
+import java.io.ByteArrayOutputStream;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.xml.stream.XMLStreamException;
+
 import com.lyncode.xoai.builders.dataprovider.ElementBuilder;
 import com.lyncode.xoai.builders.dataprovider.MetadataBuilder;
 import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
@@ -16,16 +26,6 @@ import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.common.SolrInputDocument;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.ByteArrayOutputStream;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
-
 public class ItemRepositoryBuilder {
     private SolrServer solrServer;
 
@@ -33,7 +33,7 @@ public class ItemRepositoryBuilder {
         this.solrServer = solrServer;
     }
 
-    public ItemRepositoryBuilder withItem (DSpaceItemBuilder builder) {
+    public ItemRepositoryBuilder withItem(DSpaceItemBuilder builder) {
         try {
             solrServer.add(index(builder));
             solrServer.commit();
@@ -44,7 +44,8 @@ public class ItemRepositoryBuilder {
     }
 
 
-    private SolrInputDocument index(DSpaceItemBuilder item) throws SQLException, MetadataBindException, ParseException, XMLStreamException, WritingXmlException {
+    private SolrInputDocument index(DSpaceItemBuilder item)
+        throws SQLException, MetadataBindException, ParseException, XMLStreamException, WritingXmlException {
         SolrInputDocument doc = new SolrInputDocument();
 
         doc.addField("item.id", item.getId());
@@ -54,11 +55,13 @@ public class ItemRepositoryBuilder {
         doc.addField("item.handle", item.getHandle());
         doc.addField("item.deleted", item.isDeleted());
 
-        for (String col : item.getCollections())
+        for (String col : item.getCollections()) {
             doc.addField("item.collections", col);
+        }
 
-        for (String col : item.getCommunities())
+        for (String col : item.getCommunities()) {
             doc.addField("item.communities", col);
+        }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XmlOutputContext context = XmlOutputContext.emptyContext(out, Second);
@@ -82,38 +85,42 @@ public class ItemRepositoryBuilder {
         private boolean aPublic = true;
 
 
-        public DSpaceItemBuilder withLastModifiedDate (Date lastModifiedDate) {
+        public DSpaceItemBuilder withLastModifiedDate(Date lastModifiedDate) {
             this.lastModifiedDate = lastModifiedDate;
             return this;
         }
 
-        public DSpaceItemBuilder withCollection (String colName) {
+        public DSpaceItemBuilder withCollection(String colName) {
             collections.add(colName);
             return this;
         }
-        public DSpaceItemBuilder withCommunity (String comName) {
+
+        public DSpaceItemBuilder withCommunity(String comName) {
             communities.add(comName);
             return this;
         }
-        public DSpaceItemBuilder whichSsPublic () {
+
+        public DSpaceItemBuilder whichSsPublic() {
             aPublic = true;
             return this;
         }
-        public DSpaceItemBuilder whichSsPrivate () {
+
+        public DSpaceItemBuilder whichSsPrivate() {
             aPublic = false;
             return this;
         }
 
-        public DSpaceItemBuilder whichIsDeleted () {
+        public DSpaceItemBuilder whichIsDeleted() {
             this.deleted = true;
             return this;
         }
-        public DSpaceItemBuilder whichIsNotDeleted () {
+
+        public DSpaceItemBuilder whichIsNotDeleted() {
             this.deleted = false;
             return this;
         }
 
-        public DSpaceItemBuilder withMetadata (String schema, String element, String value) {
+        public DSpaceItemBuilder withMetadata(String schema, String element, String value) {
             metadataBuilder.withElement(new ElementBuilder().withName(schema).withField(element, value).build());
             return this;
         }
@@ -122,17 +129,17 @@ public class ItemRepositoryBuilder {
             return handle;
         }
 
-        public DSpaceItemBuilder withHandle (String handle) {
+        public DSpaceItemBuilder withHandle(String handle) {
             this.handle = handle;
             return this;
         }
 
-        public DSpaceItemBuilder withSubmitter (String submitter) {
+        public DSpaceItemBuilder withSubmitter(String submitter) {
             this.submitter = submitter;
             return this;
         }
 
-        public DSpaceItemBuilder withId (int id) {
+        public DSpaceItemBuilder withId(int id) {
             this.id = id;
             return this;
         }
