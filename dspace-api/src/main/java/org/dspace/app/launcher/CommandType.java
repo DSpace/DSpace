@@ -19,9 +19,9 @@ import org.springframework.beans.factory.annotation.Required;
 
 /**
  * <p>Java class for commandType complex type.
- *
+ * <p>
  * <p>The following schema fragment specifies the expected content contained within this class.
- *
+ * <p>
  * <pre>
  * &lt;complexType name="commandType">
  *   &lt;complexContent>
@@ -29,14 +29,12 @@ import org.springframework.beans.factory.annotation.Required;
  *       &lt;sequence>
  *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="description" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="step" type="{}stepType" maxOccurs="unbounded"/>
+ *         &lt;element name="step" type="{http://dspace.org/launcher}stepType" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- *
- *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "commandType", propOrder = {"name", "description", "step"})
@@ -46,18 +44,14 @@ public class CommandType {
     protected String name;
     @XmlElement(required = true)
     protected String description;
-
     @XmlElement(required = true)
-
     protected List<StepType> step;
 
     /**
      * Gets the value of the name property.
      *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
+     * @return possible object is
+     * {@link String }
      */
     public String getName() {
         return name;
@@ -66,12 +60,9 @@ public class CommandType {
     /**
      * Sets the value of the name property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
+     * @param value allowed object is
+     *              {@link String }
      */
-    @Required
     public void setName(String value) {
         this.name = value;
     }
@@ -79,10 +70,8 @@ public class CommandType {
     /**
      * Gets the value of the description property.
      *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDescription() {
         return description;
@@ -91,10 +80,8 @@ public class CommandType {
     /**
      * Sets the value of the description property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
+     * @param value allowed object is
+     *              {@link String }
      */
     @Required
     public void setDescription(String value) {
@@ -108,26 +95,23 @@ public class CommandType {
 
     /**
      * Gets the value of the step property.
-     *
+     * <p>
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the step property.
-     *
+     * <p>
      * <p>
      * For example, to add a new item, do as follows:
-
      * <pre>
      *    getStep().add(newItem);
      * </pre>
-     *
-     *
+     * <p>
+     * <p>
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link StepType }
-     *
-     *
      */
     public List<StepType> getStep() {
         if (step == null) {

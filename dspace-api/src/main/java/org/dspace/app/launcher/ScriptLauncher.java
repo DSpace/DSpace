@@ -23,7 +23,6 @@ import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
 import org.dspace.utils.DSpace;
-import org.jdom.Document;
 
 /**
  * A DSpace script launcher.
@@ -244,9 +243,9 @@ public class ScriptLauncher {
 
     public static List<CommandType> getConfig(DSpaceKernelImpl kernelImpl) {
         // Load the launcher configuration file
-        String config = kernelImpl.getConfigurationService().getProperty("dspace.dir") + System.getProperty("file" +
-                ".separator") + "config" + System.getProperty("file.separator") + "launcher.xml";
-        Document doc = null;
+        String config = kernelImpl.getConfigurationService().getProperty("dspace.dir") +
+            System.getProperty("file.separator") + "config" +
+            System.getProperty("file.separator") + "launcher.xml";
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(CommandsType.class.getPackage().getName());
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

@@ -89,7 +89,6 @@ public class StepType {
      * {@link String }
      */
     public List<String> getArgument() {
-
         if (argument == null) {
             argument = new ArrayList<String>();
         }

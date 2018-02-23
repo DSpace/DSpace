@@ -11,8 +11,10 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.launcher.CommandType;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.authorize.AuthorizeException;
@@ -23,7 +25,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.storage.rdbms.DatabaseUtils;
-import org.jdom.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -179,7 +180,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         int status = 0;
         try {
             // Load up the ScriptLauncher's configuration
-            Document commandConfigs = ScriptLauncher.getConfig(kernelImpl);
+            List<CommandType> commandConfigs = ScriptLauncher.getConfig(kernelImpl);
 
             // Check that there is at least one argument (if not display command options)
             if (args.length < 1) {
