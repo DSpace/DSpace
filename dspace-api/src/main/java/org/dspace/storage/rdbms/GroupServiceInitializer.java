@@ -7,14 +7,14 @@
  */
 package org.dspace.storage.rdbms;
 
+import java.sql.Connection;
+
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.service.GroupService;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.Connection;
 
 /**
  * Callback method to ensure that the default groups are created in the database
@@ -32,8 +32,7 @@ public class GroupServiceInitializer implements FlywayCallback {
     public void initGroups() {
         // After every migrate, ensure default Groups are setup correctly.
         Context context = null;
-        try
-        {
+        try {
             context = new Context();
             context.turnOffAuthorisationSystem();
             // While it's not really a formal "registry", we need to ensure the
@@ -42,17 +41,14 @@ public class GroupServiceInitializer implements FlywayCallback {
             context.restoreAuthSystemState();
             // Commit changes and close context
             context.complete();
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             log.error("Error attempting to add/update default DSpace Groups", e);
             throw new RuntimeException(e);
-        }
-        finally
-        {
+        } finally {
             // Clean up our context, if it still exists & it was never completed
-            if(context!=null && context.isValid())
+            if (context != null && context.isValid()) {
                 context.abort();
+            }
         }
 
     }

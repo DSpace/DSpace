@@ -9,67 +9,64 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
-import org.dspace.app.rest.RestResourceController;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * The Group REST Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class GroupRest extends DSpaceObjectRest {
-	public static final String NAME = "group";
-	
-	public static final String CATEGORY = RestModel.EPERSON;
+    public static final String NAME = "group";
 
-	private String name;
+    public static final String CATEGORY = RestAddressableModel.EPERSON;
 
-	private boolean permanent;
+    private String name;
 
-	// FIXME this should be annotated with @JsonIgnore but right now only simple
-	// rest resource can be embedded not list, see
-	// https://jira.duraspace.org/browse/DS-3483
-	private List<GroupRest> groups;
+    private boolean permanent;
 
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
-	
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    @JsonIgnore
+    private List<GroupRest> groups;
 
-	public String getName() {
-		return name;
-	}
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    @Override
+    public String getType() {
+        return NAME;
+    }
 
-	public boolean isPermanent() {
-		return permanent;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setPermanent(boolean permanent) {
-		this.permanent = permanent;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public List<GroupRest> getGroups() {
-		return groups;
-	}
+    public boolean isPermanent() {
+        return permanent;
+    }
 
-	public void setGroups(List<GroupRest> groups) {
-		this.groups = groups;
-	}
+    public void setPermanent(boolean permanent) {
+        this.permanent = permanent;
+    }
 
-	@Override
-	@JsonIgnore
-	public Class getController() {
-		return RestResourceController.class;
-	}
+    @LinkRest(linkClass = GroupRest.class)
+    public List<GroupRest> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<GroupRest> groups) {
+        this.groups = groups;
+    }
+
+    @Override
+    @JsonIgnore
+    public Class getController() {
+        return RestResourceController.class;
+    }
 }

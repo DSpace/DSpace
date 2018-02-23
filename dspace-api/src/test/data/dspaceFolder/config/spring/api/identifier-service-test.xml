@@ -21,10 +21,10 @@
           autowire="byType"
           scope="singleton"/>
 
-   <!-- provider for using the versioned handle identifier instead of the default one. -->
+    <!-- provider for using the versioned handle identifier instead of the default one. -->
     <!--<bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"-->
-          <!--scope="singleton">-->
-        <!--<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>-->
+    <!--scope="singleton">-->
+    <!--<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>-->
     <!--</bean>-->
 
     <!-- provider to mint and register DOIs with DSpace.
@@ -37,12 +37,12 @@
          agency,  take a look into dspace.cfg, and uncomment this.
              -->
     <bean id="org.dspace.identifier.DOIIdentifierProvider"
-        class="org.dspace.identifier.DOIIdentifierProvider"
-        scope="singleton">
+          class="org.dspace.identifier.DOIIdentifierProvider"
+          scope="singleton">
         <property name="configurationService"
-            ref="org.dspace.services.ConfigurationService" />
+                  ref="org.dspace.services.ConfigurationService"/>
         <property name="DOIConnector"
-            ref="org.dspace.identifier.doi.DOIConnector" />
+                  ref="org.dspace.identifier.doi.DOIConnector"/>
     </bean>
 
     <!-- The DOIConnector will handle the API calls to your DOI registration
@@ -68,9 +68,9 @@
 
     <!-- Provider to mint and register DOIs using EZID as the registrar.
     -->
-    <!-- 
+    <!--
          Set generateDataciteXML to true to send metadata in DataCite xml schema for EZID DOI mint requests.
-         When generateDataciteXML is enabled, EZIDIdentifierProvider uses 
+         When generateDataciteXML is enabled, EZIDIdentifierProvider uses
          dspace.cfg:crosswalk.dissemination.DataCite.stylesheet XSL configuration for metadata mapping
     -->
     <!-- Uncomment to enable DOI using EZID

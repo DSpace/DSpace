@@ -7,11 +7,11 @@
  */
 package org.dspace.servicemanager.config;
 
-import org.dspace.services.ConfigurationService;
-import org.dspace.test.DSpaceAbstractKernelTest;
-import static org.dspace.test.DSpaceAbstractTest.getKernel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import org.dspace.services.ConfigurationService;
+import org.dspace.test.DSpaceAbstractKernelTest;
 import org.junit.Test;
 
 /**
@@ -25,8 +25,7 @@ import org.junit.Test;
  * @author Tim Donohue
  */
 public class DSpaceConfigurationFactoryBeanTest
-    extends DSpaceAbstractKernelTest
-{
+    extends DSpaceAbstractKernelTest {
 
     /**
      * Test that property substitution is working properly in Spring XML configs.
@@ -43,13 +42,16 @@ public class DSpaceConfigurationFactoryBeanTest
 
         //Load example service which is configured using a dynamic property (which is specified in a config file)
         // See spring-test-beans.xml
-        TestDynamicPropertyBean bean = getKernel().getServiceManager().getServiceByName("dynamicPropertyBean", TestDynamicPropertyBean.class);
+        TestDynamicPropertyBean bean = getKernel().getServiceManager().getServiceByName("dynamicPropertyBean",
+                                                                                        TestDynamicPropertyBean.class);
 
         assertNotNull("Bean returned null", bean);
         assertNotNull("Bean.name() returned null", bean.getProperty());
 
-        // The name of the ServiceExample bean should be the SAME as the value of "serviceExample.bean.name" in configuration,
+        // The name of the ServiceExample bean should be the SAME as the value of "serviceExample.bean.name" in
+        // configuration,
         // as the spring-test-beans.xml uses ${serviceExample.bean.name} to set the name
-        assertEquals("Bean.name() does not match configuration", cfg.getProperty("testDynamicBean.property"), bean.getProperty());
+        assertEquals("Bean.name() does not match configuration", cfg.getProperty("testDynamicBean.property"),
+                     bean.getProperty());
     }
 }

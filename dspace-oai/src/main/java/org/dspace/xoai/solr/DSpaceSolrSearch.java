@@ -19,40 +19,37 @@ import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.SolrSearchEmptyException;
 
 /**
- * 
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
-public class DSpaceSolrSearch
-{
+public class DSpaceSolrSearch {
+
+    /**
+     * Default constructor
+     */
+    private DSpaceSolrSearch() { }
+
     public static SolrDocumentList query(SolrServer server, SolrQuery solrParams)
-            throws DSpaceSolrException
-    {
-        try
-        {
+        throws DSpaceSolrException {
+        try {
             solrParams.addSortField("item.id", ORDER.asc);
             QueryResponse response = server.query(solrParams);
             return response.getResults();
-        }
-        catch (SolrServerException ex)
-        {
+        } catch (SolrServerException ex) {
             throw new DSpaceSolrException(ex.getMessage(), ex);
         }
     }
 
     public static SolrDocument querySingle(SolrServer server, SolrQuery solrParams)
-            throws SolrSearchEmptyException
-    {
-        try
-        {
+        throws SolrSearchEmptyException {
+        try {
             solrParams.addSortField("item.id", ORDER.asc);
             QueryResponse response = server.query(solrParams);
-            if (response.getResults().getNumFound() > 0)
+            if (response.getResults().getNumFound() > 0) {
                 return response.getResults().get(0);
-            else
+            } else {
                 throw new SolrSearchEmptyException();
-        }
-        catch (SolrServerException ex)
-        {
+            }
+        } catch (SolrServerException ex) {
             throw new SolrSearchEmptyException(ex.getMessage(), ex);
         }
     }

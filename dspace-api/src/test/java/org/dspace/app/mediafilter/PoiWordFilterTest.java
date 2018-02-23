@@ -7,9 +7,12 @@
  */
 package org.dspace.app.mediafilter;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+
 import org.dspace.content.Item;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -17,37 +20,30 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Drive the POI-based MS Word filter.
+ *
  * @author mwood
  */
-public class PoiWordFilterTest
-{
+public class PoiWordFilterTest {
 
-    public PoiWordFilterTest()
-    {
+    public PoiWordFilterTest() {
     }
 
     @BeforeClass
-    public static void setUpClass()
-    {
+    public static void setUpClass() {
     }
 
     @AfterClass
-    public static void tearDownClass()
-    {
+    public static void tearDownClass() {
     }
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
     }
 
     @After
-    public void tearDown()
-    {
+    public void tearDown() {
     }
 
     /**
@@ -127,8 +123,7 @@ public class PoiWordFilterTest
      */
     @Test
     public void testGetDestinationStreamDoc()
-            throws Exception
-    {
+        throws Exception {
         System.out.println("getDestinationStream");
         Item currentItem = null;
         InputStream source;
@@ -149,8 +144,7 @@ public class PoiWordFilterTest
      */
     @Test
     public void testGetDestinationStreamDocx()
-            throws Exception
-    {
+        throws Exception {
         System.out.println("getDestinationStream");
         Item currentItem = null;
         InputStream source;
@@ -171,15 +165,15 @@ public class PoiWordFilterTest
      * @throws IOException
      */
     private static String readAll(InputStream stream)
-            throws IOException
-    {
-        if (null == stream) return null;
+        throws IOException {
+        if (null == stream) {
+            return null;
+        }
 
         byte[] bytes = new byte[stream.available()];
-        StringBuilder resultSb = new StringBuilder(bytes.length/2); // Guess:  average 2 bytes per character
+        StringBuilder resultSb = new StringBuilder(bytes.length / 2); // Guess:  average 2 bytes per character
         int howmany;
-        while((howmany = stream.read(bytes)) > 0)
-        {
+        while ((howmany = stream.read(bytes)) > 0) {
             resultSb.append(new String(bytes, 0, howmany, StandardCharsets.UTF_8));
         }
         return resultSb.toString();

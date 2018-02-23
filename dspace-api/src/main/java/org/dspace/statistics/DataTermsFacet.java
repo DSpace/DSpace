@@ -7,14 +7,13 @@
  */
 package org.dspace.statistics;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
+
 /**
  * A neutral data object to hold data for statistics.
- *
  */
 public class DataTermsFacet {
     private List<TermsFacet> terms;
@@ -22,7 +21,8 @@ public class DataTermsFacet {
     public DataTermsFacet() {
         terms = new ArrayList<TermsFacet>();
     }
-    public void addTermFacet(TermsFacet termsFacet ) {
+
+    public void addTermFacet(TermsFacet termsFacet) {
         terms.add(termsFacet);
     }
 
@@ -31,6 +31,7 @@ public class DataTermsFacet {
      *
      * An example of the output could be of the format:
      * [{"term":"247166","count":10},{"term":"247168","count":6}]
+     *
      * @return JSON-formatted data.
      */
     public String toJson() {
@@ -39,12 +40,10 @@ public class DataTermsFacet {
     }
 
 
-
-    
     public static class TermsFacet {
         private String term;
         private Integer count;
-        
+
         public TermsFacet(String term, Integer count) {
             setTerm(term);
             setCount(count);

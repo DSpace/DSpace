@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class LocalSchemaFilenameFilter implements FilenameFilter {
 
     static Pattern patt = Pattern.compile("^metadata_.*.xml$");
-    
+
     @Override
     public boolean accept(File arg0, String arg1) {
         return patt.matcher(arg1).matches();

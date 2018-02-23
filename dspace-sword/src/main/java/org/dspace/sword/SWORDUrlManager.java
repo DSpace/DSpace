@@ -7,8 +7,18 @@
  */
 package org.dspace.sword;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.ConfigurationManager;
@@ -17,23 +27,21 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.purl.sword.base.SWORDErrorException;
 
-import java.sql.SQLException;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.util.List;
-
 /**
  * @author Richard Jones
  *
  * Class responsible for constructing and de-constructing sword url space
  * urls
  */
-public class SWORDUrlManager
-{
-    /** the SWORD configuration */
+public class SWORDUrlManager {
+    /**
+     * the SWORD configuration
+     */
     private SWORDConfiguration config;
 
-    /** the active DSpace context */
+    /**
+     * the active DSpace context
+     */
     private Context context;
 
     protected HandleService handleService =
@@ -42,8 +50,7 @@ public class SWORDUrlManager
     protected BitstreamService bitstreamService =
         ContentServiceFactory.getInstance().getBitstreamService();
 
-    public SWORDUrlManager(SWORDConfiguration config, Context context)
-    {
+    public SWORDUrlManager(SWORDConfiguration config, Context context) {
         this.config = config;
         this.context = context;
     }
@@ -54,12 +61,10 @@ public class SWORDUrlManager
      *
      * @return the generator URL for ATOM entry documents
      */
-    public String getGeneratorUrl()
-    {
+    public String getGeneratorUrl() {
         String cfg = ConfigurationManager.getProperty(
             "sword-server", "generator.url");
-        if (cfg == null || "".equals(cfg))
-        {
+        if (cfg == null || "".equals(cfg)) {
             return SWORDProperties.SOFTWARE_URI;
         }
         return cfg;
@@ -70,15 +75,12 @@ public class SWORDUrlManager
      * should not be considered persistent, but will remain consistent
      * unless configuration changes are made to DSpace
      *
-     * @param collection
-     *     the collection to query
+     * @param collection the collection to query
      * @return The Deposit URL
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getDepositLocation(Collection collection)
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         return this.getBaseDepositUrl() + "/" + collection.getHandle();
     }
 
@@ -87,15 +89,12 @@ public class SWORDUrlManager
      * should not be considered persistent, but will remain consistent
      * unless configuration changes are made to DSpace
      *
-     * @param item
-     *     the item to query
+     * @param item the item to query
      * @return The Deposit URL
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getDepositLocation(Item item)
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         return this.getBaseDepositUrl() + "/" + item.getHandle();
     }
 
@@ -104,15 +103,12 @@ public class SWORDUrlManager
      * should not be considered persistent, but will remain consistent
      * unless configuration changes are made to DSpace
      *
-     * @param community
-     *     the community to query
+     * @param community the community to query
      * @return The Deposit URL
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getDepositLocation(Community community)
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         // FIXME: there is no deposit url for communities yet, so this could
         // be misleading
         return this.getBaseDepositUrl() + "/" + community.getHandle();
@@ -122,49 +118,40 @@ public class SWORDUrlManager
      * Obtain the collection which is represented by the given
      * URL
      *
-     * @param context    the DSpace context
-     * @param location    the URL to resolve to a collection
+     * @param context  the DSpace context
+     * @param location the URL to resolve to a collection
      * @return The collection to which the url resolves
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
-     * @throws SWORDErrorException on generic SWORD exception
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException  on generic SWORD exception
      */
     // FIXME: we need to generalise this to DSpaceObjects, so that we can support
     // Communities, Collections and Items separately
     public Collection getCollection(Context context, String location)
-            throws DSpaceSWORDException, SWORDErrorException
-    {
-        try
-        {
+        throws DSpaceSWORDException, SWORDErrorException {
+        try {
             String baseUrl = this.getBaseDepositUrl();
-            if (baseUrl.length() == location.length())
-            {
+            if (baseUrl.length() == location.length()) {
                 throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
-                    "The deposit URL is incomplete");
+                                              "The deposit URL is incomplete");
             }
             String handle = location.substring(baseUrl.length());
-            if (handle.startsWith("/"))
-            {
+            if (handle.startsWith("/")) {
                 handle = handle.substring(1);
             }
-            if ("".equals(handle))
-            {
+            if ("".equals(handle)) {
                 throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
-                    "The deposit URL is incomplete");
+                                              "The deposit URL is incomplete");
             }
 
             DSpaceObject dso = handleService.resolveToObject(context, handle);
 
-            if (!(dso instanceof Collection))
-            {
+            if (!(dso instanceof Collection)) {
                 throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
-                    "The deposit URL does not resolve to a valid collection");
+                                              "The deposit URL does not resolve to a valid collection");
             }
 
             return (Collection) dso;
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             // log.error("Caught exception:", e);
             throw new DSpaceSWORDException(
                 "There was a problem resolving the collection", e);
@@ -175,47 +162,38 @@ public class SWORDUrlManager
      * Obtain the collection which is represented by the given
      * URL
      *
-     * @param context    the DSpace context
-     * @param location    the URL to resolve to a collection
+     * @param context  the DSpace context
+     * @param location the URL to resolve to a collection
      * @return The collection to which the url resolves
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
-     * @throws SWORDErrorException on generic SWORD exception
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException  on generic SWORD exception
      */
     public DSpaceObject getDSpaceObject(Context context, String location)
-            throws DSpaceSWORDException, SWORDErrorException
-    {
-        try
-        {
+        throws DSpaceSWORDException, SWORDErrorException {
+        try {
             String baseUrl = this.getBaseDepositUrl();
-            if (baseUrl.length() == location.length())
-            {
+            if (baseUrl.length() == location.length()) {
                 throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
-                    "The deposit URL is incomplete");
+                                              "The deposit URL is incomplete");
             }
             String handle = location.substring(baseUrl.length());
-            if (handle.startsWith("/"))
-            {
+            if (handle.startsWith("/")) {
                 handle = handle.substring(1);
             }
-            if ("".equals(handle))
-            {
+            if ("".equals(handle)) {
                 throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
-                    "The deposit URL is incomplete");
+                                              "The deposit URL is incomplete");
             }
 
             DSpaceObject dso = handleService.resolveToObject(context, handle);
 
-            if (!(dso instanceof Collection) && !(dso instanceof Item))
-            {
+            if (!(dso instanceof Collection) && !(dso instanceof Item)) {
                 throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
-                    "The deposit URL does not resolve to a valid deposit target");
+                                              "The deposit URL does not resolve to a valid deposit target");
             }
 
             return dso;
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             // log.error("Caught exception:", e);
             throw new DSpaceSWORDException(
                 "There was a problem resolving the collection", e);
@@ -227,15 +205,12 @@ public class SWORDUrlManager
      * be supplied in the sword:service element of other service document
      * entries.
      *
-     * @param community
-     *     target community
+     * @param community target community
      * @return service document URL for the given object
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String constructSubServiceUrl(Community community)
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         String base = this.getBaseServiceDocumentUrl();
         String handle = community.getHandle();
         return base + "/" + handle;
@@ -246,15 +221,12 @@ public class SWORDUrlManager
      * be supplied in the sword:service element of other service document
      * entries.
      *
-     * @param collection
-     *     target collection
+     * @param collection target collection
      * @return service document URL for the given object
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String constructSubServiceUrl(Collection collection)
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         String base = this.getBaseServiceDocumentUrl();
         String handle = collection.getHandle();
         return base + "/" + handle;
@@ -265,49 +237,38 @@ public class SWORDUrlManager
      * locate a meaningful and appropriate DSpace object it will throw the
      * appropriate SWORD error.
      *
-     * @param url
-     *     URL to get DSpace object from
+     * @param url URL to get DSpace object from
      * @return DSpace object corresponding to given URL
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
-     * @throws SWORDErrorException on generic SWORD exception
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException  on generic SWORD exception
      */
     public DSpaceObject extractDSpaceObject(String url)
-            throws DSpaceSWORDException, SWORDErrorException
-    {
-        try
-        {
+        throws DSpaceSWORDException, SWORDErrorException {
+        try {
             String sdBase = this.getBaseServiceDocumentUrl();
             String mlBase = this.getBaseMediaLinkUrl();
 
-            if (url.startsWith(sdBase))
-            {
+            if (url.startsWith(sdBase)) {
                 // we are dealing with a service document request
 
                 // first, let's find the beginning of the handle
                 url = url.substring(sdBase.length());
-                if (url.startsWith("/"))
-                {
+                if (url.startsWith("/")) {
                     url = url.substring(1);
                 }
-                if (url.endsWith("/"))
-                {
+                if (url.endsWith("/")) {
                     url = url.substring(0, url.length() - 1);
                 }
 
                 DSpaceObject dso = handleService.resolveToObject(context, url);
-                if (dso instanceof Collection || dso instanceof Community)
-                {
+                if (dso instanceof Collection || dso instanceof Community) {
                     return dso;
-                }
-                else
-                {
+                } else {
                     throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
-                        "Service Document request does not refer to a DSpace Collection or Community");
+                                                  "Service Document request does not refer to a DSpace Collection or " +
+                                                      "Community");
                 }
-            }
-            else if (url.startsWith(mlBase))
-            {
+            } else if (url.startsWith(mlBase)) {
                 // we are dealing with a bitstream media link
 
                 // find the index of the "/bitstream/" segment of the url
@@ -317,21 +278,16 @@ public class SWORDUrlManager
                 String bsid = url.substring(bsi + 11);
 
                 // strip off extraneous slashes
-                if (bsid.endsWith("/"))
-                {
+                if (bsid.endsWith("/")) {
                     bsid = bsid.substring(0, url.length() - 1);
                 }
                 return bitstreamService.findByIdOrLegacyId(context, bsid);
-            }
-            else
-            {
+            } else {
                 throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
-                    "Unable to recognise URL as a valid service document: " +
-                    url);
+                                              "Unable to recognise URL as a valid service document: " +
+                                                  url);
             }
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw new DSpaceSWORDException(e);
         }
     }
@@ -340,36 +296,29 @@ public class SWORDUrlManager
      * Get the base URL for service document requests.
      *
      * @return the base URL for service document requests
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getBaseServiceDocumentUrl()
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         String depositUrl = ConfigurationManager.getProperty(
             "sword-server", "servicedocument.url");
-        if (depositUrl == null || "".equals(depositUrl))
-        {
+        if (depositUrl == null || "".equals(depositUrl)) {
             String dspaceUrl = ConfigurationManager.getProperty(
                 "dspace.baseUrl");
-            if (dspaceUrl == null || "".equals(dspaceUrl))
-            {
+            if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSWORDException(
                     "Unable to construct service document urls, due to missing/invalid " +
-                    "config in sword.servicedocument.url and/or dspace.baseUrl");
+                        "config in sword.servicedocument.url and/or dspace.baseUrl");
             }
 
-            try
-            {
+            try {
                 URL url = new URL(dspaceUrl);
                 depositUrl = new URL(url.getProtocol(), url.getHost(),
-                        url.getPort(), "/sword/servicedocument").toString();
-            }
-            catch (MalformedURLException e)
-            {
+                                     url.getPort(), "/sword/servicedocument").toString();
+            } catch (MalformedURLException e) {
                 throw new DSpaceSWORDException(
                     "Unable to construct service document urls, due to invalid dspace.baseUrl " +
-                    e.getMessage(), e);
+                        e.getMessage(), e);
             }
 
         }
@@ -390,36 +339,29 @@ public class SWORDUrlManager
      * where dspace.baseUrl is also in the configuration file.
      *
      * @return the base URL for SWORD deposit
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getBaseDepositUrl()
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         String depositUrl = ConfigurationManager.getProperty(
             "sword-server", "deposit.url");
-        if (depositUrl == null || "".equals(depositUrl))
-        {
+        if (depositUrl == null || "".equals(depositUrl)) {
             String dspaceUrl = ConfigurationManager.getProperty(
                 "dspace.baseUrl");
-            if (dspaceUrl == null || "".equals(dspaceUrl))
-            {
+            if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSWORDException(
                     "Unable to construct deposit urls, due to missing/invalid config in " +
-                    "sword.deposit.url and/or dspace.baseUrl");
+                        "sword.deposit.url and/or dspace.baseUrl");
             }
 
-            try
-            {
+            try {
                 URL url = new URL(dspaceUrl);
                 depositUrl = new URL(url.getProtocol(), url.getHost(),
-                    url.getPort(), "/sword/deposit").toString();
-            }
-            catch (MalformedURLException e)
-            {
+                                     url.getPort(), "/sword/deposit").toString();
+            } catch (MalformedURLException e) {
                 throw new DSpaceSWORDException(
                     "Unable to construct deposit urls, due to invalid dspace.baseUrl " +
-                    e.getMessage(), e);
+                        e.getMessage(), e);
             }
 
         }
@@ -429,29 +371,24 @@ public class SWORDUrlManager
     /**
      * Is the given URL the base service document URL?
      *
-     * @param url
-     *     URL to check
+     * @param url URL to check
      * @return true if the given URL the base service document URL
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean isBaseServiceDocumentUrl(String url)
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         return this.getBaseServiceDocumentUrl().equals(url);
     }
 
     /**
      * Is the given URL the base media link URL?
      *
-     * @param url
-     *     URL to check
+     * @param url URL to check
      * @return true if the given URL the base media link URL
      * @throws DSpaceSWORDException passed through.
      */
     public boolean isBaseMediaLinkUrl(String url)
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         return this.getBaseMediaLinkUrl().equals(url);
     }
 
@@ -459,57 +396,42 @@ public class SWORDUrlManager
      * Central location for constructing usable URLs for DSpace bitstreams.
      * There is no place in the main DSpace code base for doing this.
      *
-     * @param bitstream
-     *     target bitstream
+     * @param bitstream target bitstream
      * @return a URL to the given Bitstream.
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getBitstreamUrl(Bitstream bitstream)
-            throws DSpaceSWORDException
-    {
-        try
-        {
+        throws DSpaceSWORDException {
+        try {
             List<Bundle> bundles = bitstream.getBundles();
             Bundle parent = null;
-            if (!bundles.isEmpty())
-            {
+            if (!bundles.isEmpty()) {
                 parent = bundles.get(0);
-            }
-            else
-            {
+            } else {
                 throw new DSpaceSWORDException(
                     "Encountered orphaned bitstream");
             }
 
             List<Item> items = parent.getItems();
             Item item;
-            if (!items.isEmpty())
-            {
+            if (!items.isEmpty()) {
                 item = items.get(0);
-            }
-            else
-            {
+            } else {
                 throw new DSpaceSWORDException("Encountered orphaned bundle");
             }
 
             String handle = item.getHandle();
             String bsLink = ConfigurationManager.getProperty("dspace.url");
 
-            if (handle != null && !"".equals(handle))
-            {
+            if (handle != null && !"".equals(handle)) {
                 bsLink = bsLink + "/bitstream/" + handle + "/" +
-                        bitstream.getSequenceID() + "/" + bitstream.getName();
-            }
-            else
-            {
+                    bitstream.getSequenceID() + "/" + bitstream.getName();
+            } else {
                 bsLink = bsLink + "/retrieve/" + bitstream.getID();
             }
 
             return bsLink;
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw new DSpaceSWORDException(e);
         }
     }
@@ -521,36 +443,29 @@ public class SWORDUrlManager
      * {@code /sword/media-link}.
      *
      * @return that URL.
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getBaseMediaLinkUrl()
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         String mlUrl = ConfigurationManager.getProperty(
             "sword-server", "media-link.url");
-        if (StringUtils.isBlank(mlUrl))
-        {
+        if (StringUtils.isBlank(mlUrl)) {
             String dspaceUrl = ConfigurationManager.getProperty(
                 "dspace.baseUrl");
-            if (dspaceUrl == null || "".equals(dspaceUrl))
-            {
+            if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSWORDException(
                     "Unable to construct media-link urls, due to missing/invalid config in " +
-                    "media-link.url and/or dspace.baseUrl");
+                        "media-link.url and/or dspace.baseUrl");
             }
 
-            try
-            {
+            try {
                 URL url = new URL(dspaceUrl);
                 mlUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(),
-                    "/sword/media-link").toString();
-            }
-            catch (MalformedURLException e)
-            {
+                                "/sword/media-link").toString();
+            } catch (MalformedURLException e) {
                 throw new DSpaceSWORDException(
                     "Unable to construct media-link urls, due to invalid dspace.baseUrl " +
-                    e.getMessage(), e);
+                        e.getMessage(), e);
             }
 
         }
@@ -560,19 +475,15 @@ public class SWORDUrlManager
     /**
      * get the media link URL for the given item
      *
-     * @param dso
-     *     target DSpace object
+     * @param dso target DSpace object
      * @return media link URL for the given item
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     private String getMediaLink(Item dso)
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         String ml = this.getBaseMediaLinkUrl();
         String handle = dso.getHandle();
-        if (handle != null)
-        {
+        if (handle != null) {
             ml = ml + "/" + dso.getHandle();
         }
         return ml;
@@ -581,50 +492,37 @@ public class SWORDUrlManager
     /**
      * Get the media link URL for the given bitstream.
      *
-     * @param bitstream
-     *     target bitstream
+     * @param bitstream target bitstream
      * @return media link URL for the given bitstream
-     * @throws DSpaceSWORDException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getMediaLink(Bitstream bitstream)
-            throws DSpaceSWORDException
-    {
-        try
-        {
+        throws DSpaceSWORDException {
+        try {
             List<Bundle> bundles = bitstream.getBundles();
             Bundle parent = null;
-            if (!bundles.isEmpty())
-            {
+            if (!bundles.isEmpty()) {
                 parent = bundles.get(0);
-            }
-            else
-            {
+            } else {
                 throw new DSpaceSWORDException(
                     "Encountered orphaned bitstream");
             }
 
             List<Item> items = parent.getItems();
             Item item;
-            if (!items.isEmpty())
-            {
+            if (!items.isEmpty()) {
                 item = items.get(0);
-            }
-            else
-            {
+            } else {
                 throw new DSpaceSWORDException("Encountered orphaned bundle");
             }
 
             String itemUrl = this.getMediaLink(item);
-            if (itemUrl.equals(this.getBaseMediaLinkUrl()))
-            {
+            if (itemUrl.equals(this.getBaseMediaLinkUrl())) {
                 return itemUrl;
             }
 
             return itemUrl + "/bitstream/" + bitstream.getID();
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw new DSpaceSWORDException(e);
         }
     }

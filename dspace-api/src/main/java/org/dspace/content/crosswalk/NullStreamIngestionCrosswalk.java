@@ -7,8 +7,8 @@
  */
 package org.dspace.content.crosswalk;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
@@ -24,21 +24,18 @@ import org.dspace.core.Context;
  * AIP ingester, it is best to ignore the rightsMD fields since they
  * are already going to be ingested as member bitstreams anyway.
  *
- * @author  Larry Stone
+ * @author Larry Stone
  * @version $Revision: 1.0 $
  */
 public class NullStreamIngestionCrosswalk
-    implements StreamIngestionCrosswalk
-{
+    implements StreamIngestionCrosswalk {
     @Override
     public void ingest(Context context, DSpaceObject dso, InputStream in, String MIMEType)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
         in.close();
     }
 
-    public String getMIMEType()
-    {
+    public String getMIMEType() {
         return "text/plain";
     }
 }

@@ -7,15 +7,16 @@
  */
 package org.dspace.eperson.service;
 
+import java.sql.SQLException;
+
 import org.dspace.core.Context;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.service.DSpaceCRUDService;
 
-import java.sql.SQLException;
-
 /**
  * Service interface class for the RegistrationData object.
- * The implementation of this class is responsible for all business logic calls for the RegistrationData object and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls for the RegistrationData object and
+ * is autowired by spring
  *
  * @author kevinvandevelde at atmire.com
  */

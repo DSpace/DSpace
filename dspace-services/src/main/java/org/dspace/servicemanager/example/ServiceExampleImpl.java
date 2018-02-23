@@ -12,16 +12,17 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Service;
 
 /**
- * Example implementation of the example service.  Spring annotations 
- * will require the injection of a ConcreteExample instance, whose name 
+ * Example implementation of the example service.  Spring annotations
+ * will require the injection of a ConcreteExample instance, whose name
  * will be returned by {@link #getOtherName}.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 @Service // for Spring
 public final class ServiceExampleImpl implements ServiceExample {
 
     private ConcreteExample concreteExample;
+
     @Autowired // Spring
     @Required // Spring
     public void setConcreteExample(ConcreteExample concreteExample) {
@@ -29,6 +30,7 @@ public final class ServiceExampleImpl implements ServiceExample {
     }
 
     private String name = "aaronz";
+
     public String getName() {
         return name;
     }

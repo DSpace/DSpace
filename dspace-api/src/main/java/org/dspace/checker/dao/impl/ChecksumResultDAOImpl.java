@@ -7,15 +7,15 @@
  */
 package org.dspace.checker.dao.impl;
 
+import java.sql.SQLException;
+
 import org.dspace.checker.ChecksumResult;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.dao.ChecksumResultDAO;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-
-import java.sql.SQLException;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the ChecksumResult object.
@@ -24,11 +24,9 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class ChecksumResultDAOImpl extends AbstractHibernateDAO<ChecksumResult> implements ChecksumResultDAO
-{
+public class ChecksumResultDAOImpl extends AbstractHibernateDAO<ChecksumResult> implements ChecksumResultDAO {
 
-    protected ChecksumResultDAOImpl()
-    {
+    protected ChecksumResultDAOImpl() {
         super();
     }
 

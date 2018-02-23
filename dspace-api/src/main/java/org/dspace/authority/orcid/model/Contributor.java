@@ -11,7 +11,6 @@ package org.dspace.authority.orcid.model;
 import java.util.Set;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -66,11 +65,11 @@ public class Contributor {
     @Override
     public String toString() {
         return "Contributor{" +
-                "orcid='" + orcid + '\'' +
-                ", creditName='" + creditName + '\'' +
-                ", email='" + email + '\'' +
-                ", contributorAttributes=" + contributorAttributes +
-                '}';
+            "orcid='" + orcid + '\'' +
+            ", creditName='" + creditName + '\'' +
+            ", email='" + email + '\'' +
+            ", contributorAttributes=" + contributorAttributes +
+            '}';
     }
 
     @Override
@@ -84,7 +83,8 @@ public class Contributor {
 
         Contributor that = (Contributor) o;
 
-        if (contributorAttributes != null ? !contributorAttributes.equals(that.contributorAttributes) : that.contributorAttributes != null) {
+        if (contributorAttributes != null ? !contributorAttributes
+            .equals(that.contributorAttributes) : that.contributorAttributes != null) {
             return false;
         }
         if (creditName != null ? !creditName.equals(that.creditName) : that.creditName != null) {

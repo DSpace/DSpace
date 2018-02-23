@@ -7,20 +7,16 @@
  */
 package org.dspace.text.filter;
 
-public class StripLeadingNonAlphaNum implements TextFilter
-{
+public class StripLeadingNonAlphaNum implements TextFilter {
     @Override
-    public String filter(String str)
-    {
+    public String filter(String str) {
         int i = 0;
 
-        while (i < str.length() && !Character.isLetterOrDigit(str.charAt(i)))
-        {
+        while (i < str.length() && !Character.isLetterOrDigit(str.charAt(i))) {
             i++;
         }
 
-        if (i > 0)
-        {
+        if (i > 0) {
             return str.substring(i);
         }
 
@@ -28,8 +24,7 @@ public class StripLeadingNonAlphaNum implements TextFilter
     }
 
     @Override
-    public String filter(String str, String lang)
-    {
+    public String filter(String str, String lang) {
         return filter(str);
     }
 }

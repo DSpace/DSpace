@@ -8,7 +8,6 @@
 package org.dspace.authority.orcid.model;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -43,9 +42,9 @@ public class BioResearcherUrl {
     @Override
     public String toString() {
         return "BioResearcherUrl{" +
-                "name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                '}';
+            "name='" + name + '\'' +
+            ", url='" + url + '\'' +
+            '}';
     }
 
     @Override
