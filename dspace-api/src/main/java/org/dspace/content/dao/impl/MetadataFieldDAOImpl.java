@@ -17,7 +17,9 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataField_;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchema_;
 import org.dspace.content.dao.MetadataFieldDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
