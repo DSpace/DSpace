@@ -3955,6 +3955,11 @@ table.dropdown-table.ui-accordion tr:hover td{
   font-size: 10px;
 }
 
+/*	Agrego los separadores ';' para el metadato 'staff' en la vista de Comunidades y Colecciones */
+#aspect_artifactbrowser_CollectionViewer_div_collection-view .intro-text .staff .value::after {
+    content: ";";
+}
+
 .external-services-bar {
    display: inline-block;
 }

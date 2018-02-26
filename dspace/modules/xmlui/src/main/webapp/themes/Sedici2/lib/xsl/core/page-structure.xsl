@@ -801,7 +801,7 @@ placeholders for header images -->
 		<xsl:if test="/dri:document/dri:body/dri:div[@n='community-home' or @n='collection-home']">
 			<script type="text/javascript">
 					function isValidCCUrl(ccUrl) {
-				    	var CCRegex = /^(https?:\/\/)?(www\.)?creativecommons\.org\/licenses\/by(\-(nd|sa|nc(\-(nd|sa))?))?\/\d\.\d(\/\w*)?\/?$/i;
+				    	var CCRegex = /^(https?:\/\/)?(www\.)?creativecommons\.org\/licenses\/by(-nc(-sa)?(-nd)?)?(-sa)?\/\d\.\d(\/deed\.[a-z][a-z](_[A-Z][A-Z])?|\/)?$/i;
 				    	return CCRegex.test(ccUrl);
 				    };
 				
@@ -811,6 +811,15 @@ placeholders for header images -->
 							var cc_url = $('.licencia_cc span.value a').attr("href");
 							if(isValidCCUrl(cc_url)) {
 								var cc_type = cc_url.replace(/^(https?:\/\/)?(www\.)?creativecommons\.org\/licenses\//i,"");
+								//Se elimina la parte del idioma de la URL (p.e, se elimina "deed.[code]_[CODE]" de "https://creativecommons.org/licenses/by-sa/4.0/deed.es")...
+								if(cc_type.replace(/^by(-nc(-sa)?(-nd)?)?(-sa)?\/\d\.\d\//i,"").startsWith("deed.")){
+									cc_type = cc_type.replace(/deed\.[a-z][a-z](_[A-Z][A-Z])?$/i,"");
+								}
+								//Chequeamos si tiene la URL barra final, sino se la agregamos
+								if(!cc_type.endsWith("/")){
+									cc_type += "/";
+								}
+								
 								var cc_license_text = '<i18n:text>xmlui.dri2xhtml.METS-1.0.cc-license-text-collection-community</i18n:text>' + cc_type.toUpperCase().replace(/\//g,' ').trim();
 								$('.licencia_cc').hide();
 								<xsl:text disable-output-escaping="yes">
