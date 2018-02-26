@@ -89,7 +89,7 @@
 
     <alias name="OrcidSource" alias="AuthoritySource"/>
     <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcid">
-        <constructor-arg value="http://pub.orcid.org"/>
+        <constructor-arg value="http://pub.orcid.org/v1.2"/>
     </bean>
 
 

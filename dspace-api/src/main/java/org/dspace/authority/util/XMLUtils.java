@@ -13,14 +13,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -139,11 +136,7 @@ public class XMLUtils {
             try {
                 DocumentBuilder builder = domFactory.newDocumentBuilder();
                 result = builder.parse(is);
-            } catch (ParserConfigurationException e) {
-                log.error("Error", e);
-            } catch (SAXException e) {
-                log.error("Error", e);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("Error", e);
             }
         }
