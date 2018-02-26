@@ -7,23 +7,19 @@
  */
 package org.dspace.content.dao.impl;
 
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.BitstreamFormat_;
-import org.dspace.content.dao.BitstreamFormatDAO;
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.harvest.HarvestedItem;
-import javax.persistence.Query;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.BitstreamFormat_;
+import org.dspace.content.dao.BitstreamFormatDAO;
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the BitstreamFormat object.
@@ -32,11 +28,9 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat> implements BitstreamFormatDAO
-{
+public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat> implements BitstreamFormatDAO {
 
-    protected BitstreamFormatDAOImpl()
-    {
+    protected BitstreamFormatDAOImpl() {
         super();
     }
 
@@ -45,48 +39,42 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
      * If more than one bitstream format has the same MIME type, the
      * one returned is unpredictable.
      *
-     * @param context
-     *            DSpace context object
-     * @param mimeType
-     *            MIME type value
+     * @param context         DSpace context object
+     * @param mimeType        MIME type value
      * @param includeInternal whether to include internal mimetypes
-     *
      * @return the corresponding bitstream format, or <code>null</code> if
-     *         there's no bitstream format with the given MIMEtype.
+     * there's no bitstream format with the given MIMEtype.
      * @throws SQLException if database error
      */
     @Override
-    public BitstreamFormat findByMIMEType(Context context, String mimeType, boolean includeInternal) throws SQLException
-    {
+    public BitstreamFormat findByMIMEType(Context context, String mimeType, boolean includeInternal) throws
+        SQLException {
         // NOTE: Avoid internal formats since e.g. "License" also has
         // a MIMEtype of text/plain.
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
         criteriaQuery.select(bitstreamFormatRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(bitstreamFormatRoot.get(BitstreamFormat_.internal), includeInternal),
-                                                criteriaBuilder.like(bitstreamFormatRoot.get(BitstreamFormat_.mimetype), mimeType)
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(bitstreamFormatRoot.get(BitstreamFormat_
+                .internal), includeInternal),
+            criteriaBuilder.like(bitstreamFormatRoot.get(BitstreamFormat_.mimetype), mimeType)
+            )
+        );
         return singleResult(context, criteriaQuery);
     }
 
     /**
      * Find a bitstream format by its (unique) short description
      *
-     * @param context
-     *            DSpace context object
-     * @param desc
-     *            the short description
-     *
+     * @param context DSpace context object
+     * @param desc    the short description
      * @return the corresponding bitstream format, or <code>null</code> if
-     *         there's no bitstream format with the given short description
+     * there's no bitstream format with the given short description
      * @throws SQLException if database error
      */
     @Override
     public BitstreamFormat findByShortDescription(Context context,
-            String desc) throws SQLException
-    {
+                                                  String desc) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
@@ -96,9 +84,11 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
     }
 
     @Override
-    public int updateRemovedBitstreamFormat(Context context, BitstreamFormat deletedBitstreamFormat, BitstreamFormat newBitstreamFormat) throws SQLException {
+    public int updateRemovedBitstreamFormat(Context context, BitstreamFormat deletedBitstreamFormat, BitstreamFormat
+        newBitstreamFormat) throws SQLException {
         // Set bitstreams with this format to "unknown"
-        Query query = createQuery(context, "update Bitstream set bitstreamFormat = :unknown_format where bitstreamFormat = :deleted_format");
+        Query query = createQuery(context, "update Bitstream set bitstreamFormat = :unknown_format where " +
+            "bitstreamFormat = :deleted_format");
         query.setParameter("unknown_format", newBitstreamFormat);
         query.setParameter("deleted_format", deletedBitstreamFormat);
 
@@ -112,11 +102,12 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
         criteriaQuery.select(bitstreamFormatRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(bitstreamFormatRoot.get(BitstreamFormat_.internal), false),
-                                                criteriaBuilder.not(
-                                                                    criteriaBuilder.like(bitstreamFormatRoot.get(BitstreamFormat_.shortDescription), "Unknown"))
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(bitstreamFormatRoot.get(BitstreamFormat_
+                .internal), false),
+            criteriaBuilder.not(
+                criteriaBuilder.like(bitstreamFormatRoot.get(BitstreamFormat_.shortDescription), "Unknown"))
+            )
+        );
 
 
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();

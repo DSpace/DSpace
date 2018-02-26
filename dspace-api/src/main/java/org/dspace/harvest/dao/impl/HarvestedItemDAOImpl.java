@@ -7,23 +7,20 @@
  */
 package org.dspace.harvest.dao.impl;
 
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.Item_;
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.harvest.HarvestedItem;
-import org.dspace.harvest.HarvestedItem_;
-import org.dspace.harvest.dao.HarvestedItemDAO;
-import org.dspace.identifier.DOI;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
-
+import java.sql.SQLException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
-import java.sql.SQLException;
+
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.content.Item_;
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
+import org.dspace.harvest.HarvestedItem;
+import org.dspace.harvest.HarvestedItem_;
+import org.dspace.harvest.dao.HarvestedItemDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the HarvestedItem object.
@@ -32,10 +29,8 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> implements HarvestedItemDAO
-{
-    protected HarvestedItemDAOImpl()
-    {
+public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> implements HarvestedItemDAO {
+    protected HarvestedItemDAOImpl() {
         super();
     }
 
@@ -57,10 +52,11 @@ public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> im
         Root<HarvestedItem> harvestedItemRoot = criteriaQuery.from(HarvestedItem.class);
         Join<HarvestedItem, Item> join = harvestedItemRoot.join("item");
         criteriaQuery.select(harvestedItemRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(harvestedItemRoot.get(HarvestedItem_.oaiId), itemOaiID),
-                                                criteriaBuilder.equal(join.get(Item_.owningCollection), collection)
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(harvestedItemRoot.get(HarvestedItem_.oaiId),
+            itemOaiID),
+            criteriaBuilder.equal(join.get(Item_.owningCollection), collection)
+            )
+        );
         return singleResult(context, criteriaQuery);
 
     }

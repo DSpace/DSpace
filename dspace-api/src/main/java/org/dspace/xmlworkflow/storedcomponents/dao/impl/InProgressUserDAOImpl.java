@@ -7,22 +7,19 @@
  */
 package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 
-import org.dspace.content.Community;
-import org.dspace.core.Context;
+import java.sql.SQLException;
+import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
 import org.dspace.xmlworkflow.storedcomponents.InProgressUser_;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.InProgressUserDAO;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the InProgressUser object.
@@ -31,24 +28,24 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> implements InProgressUserDAO
-{
-    protected InProgressUserDAOImpl()
-    {
+public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> implements InProgressUserDAO {
+    protected InProgressUserDAOImpl() {
         super();
     }
 
     @Override
-    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson) throws SQLException {
+    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson
+        ePerson) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, InProgressUser.class);
         Root<InProgressUser> inProgressUserRoot = criteriaQuery.from(InProgressUser.class);
         criteriaQuery.select(inProgressUserRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.workflowItem), workflowItem),
-                                                criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.ePerson),ePerson)
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_
+                .workflowItem), workflowItem),
+            criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.ePerson), ePerson)
+            )
+        );
         return uniqueResult(context, criteriaQuery, false, InProgressUser.class, -1, -1);
 
     }
@@ -82,10 +79,11 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
 
         Root<InProgressUser> inProgressUserRoot = criteriaQuery.from(InProgressUser.class);
 
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.workflowItem), workflowItem),
-                                                criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.finished), false)
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_
+                .workflowItem), workflowItem),
+            criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.finished), false)
+            )
+        );
         return count(context, criteriaQuery, criteriaBuilder, inProgressUserRoot);
     }
 
@@ -97,9 +95,10 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
 
         Root<InProgressUser> inProgressUserRoot = criteriaQuery.from(InProgressUser.class);
 
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.workflowItem), workflowItem),
-                criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.finished), true)
-                )
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_
+                .workflowItem), workflowItem),
+            criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.finished), true)
+            )
         );
         return count(context, criteriaQuery, criteriaBuilder, inProgressUserRoot);
     }

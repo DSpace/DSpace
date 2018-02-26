@@ -7,30 +7,29 @@
  */
 package org.dspace.content.dao.impl;
 
-import org.apache.commons.collections.ListUtils;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.authorize.ResourcePolicy_;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Community_;
-import org.dspace.content.MetadataField;
-import org.dspace.content.dao.CommunityDAO;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDSODAO;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
-import org.hibernate.Criteria;
-import javax.persistence.Query;
-import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Restrictions;
-
-import javax.persistence.criteria.*;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.apache.commons.collections.ListUtils;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.ResourcePolicy_;
+import org.dspace.content.Community;
+import org.dspace.content.Community_;
+import org.dspace.content.MetadataField;
+import org.dspace.content.dao.CommunityDAO;
+import org.dspace.core.AbstractHibernateDSODAO;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Community object.
@@ -39,10 +38,8 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> implements CommunityDAO
-{
-    protected CommunityDAOImpl()
-    {
+public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> implements CommunityDAO {
+    protected CommunityDAOImpl() {
         super();
     }
 
@@ -50,31 +47,30 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
      * Get a list of all communities in the system. These are alphabetically
      * sorted by community name.
      *
-     * @param context DSpace context object
+     * @param context   DSpace context object
      * @param sortField sort field
-     *
      * @return the communities in the system
      * @throws SQLException if database error
      */
     @Override
-    public List<Community> findAll(Context context, MetadataField sortField) throws SQLException
-    {
+    public List<Community> findAll(Context context, MetadataField sortField) throws SQLException {
         return findAll(context, sortField, null, null);
     }
 
     @Override
-    public List<Community> findAll(Context context, MetadataField sortField, Integer limit, Integer offset) throws SQLException {
+    public List<Community> findAll(Context context, MetadataField sortField, Integer limit, Integer offset) throws
+        SQLException {
         StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT ").append(Community.class.getSimpleName()).append(" FROM Community as ").append(Community.class.getSimpleName()).append(" ");
+        queryBuilder.append("SELECT ").append(Community.class.getSimpleName()).append(" FROM Community as ").append
+            (Community.class.getSimpleName()).append(" ");
         addMetadataLeftJoin(queryBuilder, Community.class.getSimpleName(), Arrays.asList(sortField));
         addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), ListUtils.EMPTY_LIST);
 
         Query query = createQuery(context, queryBuilder.toString());
-        if(offset != null)
-        {
+        if (offset != null) {
             query.setFirstResult(offset);
         }
-        if(limit != null){
+        if (limit != null) {
             query.setMaxResults(limit);
         }
         query.setParameter(sortField.toString(), sortField.getID());
@@ -126,7 +122,8 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                         "  resourcepolicy.resource_id = community.community_id AND\n" +
                         " ( resourcepolicy.action_id = 3 OR \n" +
                         "  resourcepolicy.action_id = 11) AND \n" +
-                        "  resourcepolicy.resource_type_id = 4 AND eperson.eperson_id = ?", context.getCurrentUser().getID());
+                        "  resourcepolicy.resource_type_id = 4 AND eperson.eperson_id = ?", context.getCurrentUser()
+                        .getID());
         */
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
@@ -134,21 +131,23 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         Root<Community> communityRoot = criteriaQuery.from(Community.class);
         Join<Community, ResourcePolicy> join = communityRoot.join("resourcePolicies");
         List<Predicate> orPredicates = new LinkedList<Predicate>();
-        for(Integer action : actions){
+        for (Integer action : actions) {
             orPredicates.add(criteriaBuilder.equal(join.get(ResourcePolicy_.actionId), action));
         }
         Predicate orPredicate = criteriaBuilder.or(orPredicates.toArray(new Predicate[]{}));
         criteriaQuery.select(communityRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(join.get(ResourcePolicy_.resourceTypeId), Constants.COLLECTION),
-                                                criteriaBuilder.equal(join.get(ResourcePolicy_.eperson), ePerson),
-                                                orPredicate
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(join.get(ResourcePolicy_.resourceTypeId),
+            Constants.COLLECTION),
+            criteriaBuilder.equal(join.get(ResourcePolicy_.eperson), ePerson),
+            orPredicate
+            )
+        );
         return list(context, criteriaQuery, true, Community.class, -1, -1);
     }
 
     @Override
-    public List<Community> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions) throws SQLException {
+    public List<Community> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions) throws
+        SQLException {
 //        "SELECT \n" +
 //                "  * \n" +
 //                "FROM \n" +
@@ -169,14 +168,14 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         query.append("select c from Community c join c.resourcePolicies rp join rp.epersonGroup rpGroup WHERE ");
         for (int i = 0; i < actions.size(); i++) {
             Integer action = actions.get(i);
-            if(i != 0)
-            {
+            if (i != 0) {
                 query.append(" AND ");
             }
             query.append("rp.actionId=").append(action);
         }
         query.append(" AND rp.resourceTypeId=").append(Constants.COMMUNITY);
-        query.append(" AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in elements(epeople))");
+        query.append(" AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = " +
+            ":eperson_id) in elements(epeople))");
         Query persistenceQuery = createQuery(context, query.toString());
         persistenceQuery.setParameter("eperson_id", ePerson.getID());
 

@@ -7,22 +7,19 @@
  */
 package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 
-import org.dspace.content.WorkspaceItem;
-import org.dspace.core.Context;
+import java.sql.SQLException;
+import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask_;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.ClaimedTaskDAO;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the ClaimedTask object.
@@ -31,10 +28,8 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implements ClaimedTaskDAO
-{
-    protected ClaimedTaskDAOImpl()
-    {
+public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implements ClaimedTaskDAO {
+    protected ClaimedTaskDAOImpl() {
         super();
     }
 
@@ -50,15 +45,17 @@ public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implem
     }
 
     @Override
-    public ClaimedTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson) throws SQLException {
+    public ClaimedTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+        throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ClaimedTask.class);
         Root<ClaimedTask> claimedTaskRoot = criteriaQuery.from(ClaimedTask.class);
         criteriaQuery.select(claimedTaskRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.workflowItem), workflowItem),
-                                                criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.owner), ePerson)
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.workflowItem),
+            workflowItem),
+            criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.owner), ePerson)
+            )
+        );
         return uniqueResult(context, criteriaQuery, false, ClaimedTask.class, -1, -1);
 
 
@@ -75,44 +72,52 @@ public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implem
     }
 
     @Override
-    public List<ClaimedTask> findByWorkflowItemAndStepId(Context context, XmlWorkflowItem workflowItem, String stepID) throws SQLException {
+    public List<ClaimedTask> findByWorkflowItemAndStepId(Context context, XmlWorkflowItem workflowItem, String
+        stepID) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ClaimedTask.class);
         Root<ClaimedTask> claimedTaskRoot = criteriaQuery.from(ClaimedTask.class);
         criteriaQuery.select(claimedTaskRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.workflowItem), workflowItem),
-                                                criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.stepId), stepID)
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.workflowItem),
+            workflowItem),
+            criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.stepId), stepID)
+            )
+        );
         return list(context, criteriaQuery, false, ClaimedTask.class, -1, -1);
     }
 
     @Override
-    public ClaimedTask findByEPersonAndWorkflowItemAndStepIdAndActionId(Context context, EPerson ePerson, XmlWorkflowItem workflowItem, String stepID, String actionID) throws SQLException {
+    public ClaimedTask findByEPersonAndWorkflowItemAndStepIdAndActionId(Context context, EPerson ePerson,
+                                                                        XmlWorkflowItem workflowItem, String stepID,
+                                                                        String actionID) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ClaimedTask.class);
         Root<ClaimedTask> claimedTaskRoot = criteriaQuery.from(ClaimedTask.class);
         criteriaQuery.select(claimedTaskRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.workflowItem), workflowItem),
-                                                criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.stepId), stepID),
-                                                criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.owner), ePerson),
-                                                criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.actionId), actionID)
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.workflowItem),
+            workflowItem),
+            criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.stepId), stepID),
+            criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.owner), ePerson),
+            criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.actionId), actionID)
+            )
+        );
         return uniqueResult(context, criteriaQuery, false, ClaimedTask.class, -1, -1);
     }
 
     @Override
-    public List<ClaimedTask> findByWorkflowItemAndStepIdAndActionId(Context context, XmlWorkflowItem workflowItem, String stepID, String actionID) throws SQLException {
+    public List<ClaimedTask> findByWorkflowItemAndStepIdAndActionId(Context context, XmlWorkflowItem workflowItem,
+                                                                    String stepID, String actionID) throws
+        SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ClaimedTask.class);
         Root<ClaimedTask> claimedTaskRoot = criteriaQuery.from(ClaimedTask.class);
         criteriaQuery.select(claimedTaskRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.workflowItem), workflowItem),
-                                                criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.stepId), stepID),
-                                                criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.actionId), actionID)
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.workflowItem),
+            workflowItem),
+            criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.stepId), stepID),
+            criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.actionId), actionID)
+            )
+        );
         return list(context, criteriaQuery, false, ClaimedTask.class, -1, -1);
     }
 

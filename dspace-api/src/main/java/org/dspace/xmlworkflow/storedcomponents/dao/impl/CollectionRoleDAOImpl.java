@@ -7,21 +7,19 @@
  */
 package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 
-import org.dspace.content.Collection;
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
-import org.dspace.xmlworkflow.storedcomponents.CollectionRole_;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.dao.CollectionRoleDAO;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import java.sql.SQLException;
+import java.util.List;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.sql.SQLException;
-import java.util.List;
+
+import org.dspace.content.Collection;
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole_;
+import org.dspace.xmlworkflow.storedcomponents.dao.CollectionRoleDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the CollectionRole object.
@@ -30,10 +28,8 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> implements CollectionRoleDAO
-{
-    protected CollectionRoleDAOImpl()
-    {
+public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> implements CollectionRoleDAO {
+    protected CollectionRoleDAOImpl() {
         super();
     }
 
@@ -48,15 +44,17 @@ public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> 
     }
 
     @Override
-    public CollectionRole findByCollectionAndRole(Context context, Collection collection, String role) throws SQLException {
+    public CollectionRole findByCollectionAndRole(Context context, Collection collection, String role) throws
+        SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CollectionRole.class);
         Root<CollectionRole> collectionRoleRoot = criteriaQuery.from(CollectionRole.class);
         criteriaQuery.select(collectionRoleRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.collection), collection),
-                                                criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.roleId), role)
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_
+                .collection), collection),
+            criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.roleId), role)
+            )
+        );
         return uniqueResult(context, criteriaQuery, false, CollectionRole.class, -1, -1);
 
     }
