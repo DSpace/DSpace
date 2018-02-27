@@ -522,7 +522,7 @@
             <Configuration>
                 <string name="field">dc.rights</string>
                 <string name="operator">contains</string>
-                <list>
+                <list name="values">
                     <string>open access</string>
                     <string>openAccess</string>
                 </list>
@@ -572,7 +572,7 @@
 			 <Configuration>
                 <string name="field">sedici.subtype</string>
                 <string name="operator">equal</string>
-                <list>
+                <list name="values">
                     <string>Articulo</string>
     				<string>Documento de trabajo</string>
 	    			<string>Revision</string>
@@ -598,7 +598,7 @@
 			<Configuration>
                 <string name="field">sedici.description.fulltext</string>
                 <string name="operator">equal</string>
-                <list>
+                <list name="values">
                     <string>true</string>
 					<string>si</string>
 				</list>
