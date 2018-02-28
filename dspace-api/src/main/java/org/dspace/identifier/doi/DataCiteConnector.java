@@ -19,7 +19,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -28,7 +27,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.HttpContext;
+import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.util.EntityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -759,21 +758,7 @@ implements DOIConnector
             throws DOIIdentifierException
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
-        httpclient.setHttpRequestRetryHandler(new HttpRequestRetryHandler() {
-            @Override
-            public boolean retryRequest(IOException exception, int executionCount,
-                                        HttpContext context) {
-                if (executionCount > 3) {
-                    log.warn("Maximum tries reached for client http pool ");
-                    return false;
-                }
-                if (exception instanceof org.apache.http.NoHttpResponseException) {
-                    log.warn("No response from server on " + executionCount + " call");
-                    return true;
-                }
-                return false;
-            }
-        });
+        httpclient.setHttpRequestRetryHandler(new StandardHttpRequestRetryHandler(3, true));
         httpclient.getCredentialsProvider().setCredentials(
                 new AuthScope(HOST, 443),
                 new UsernamePasswordCredentials(this.getUsername(), this.getPassword()));
