@@ -144,11 +144,14 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         try{
             Item item = (Item) dso;
             String collection = getCollection(context, item);
-            String doiString = getDoiValue((Item) dso);
-            addNewDOItoItem(getCanonicalDOIString(doiString), item, true, collection);
+            // if this is a package, fix canonical: package will fix its own files
+            if (myDataPkgColl.equals(collection)) {
+                String doiString = getDoiValue((Item) dso);
+                addNewDOItoItem(getCanonicalDOIString(doiString), item, true, collection);
 
-            // if 1st version mint .1
-            mintDOIAtVersion(context, doiString, item, 1);
+                // if 1st version mint .1
+                mintDOIAtVersion(context, doiString, item, 1);
+            }
 
         }catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to addNewDOItoItem doi", "Item id: " + dso.getID()), e);
