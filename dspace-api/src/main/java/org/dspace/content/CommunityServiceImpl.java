@@ -452,12 +452,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         ArrayList<String> removedIdentifiers = getIdentifiers(context, childCommunity);
         String removedHandle = childCommunity.getHandle();
         UUID removedId = childCommunity.getID();
-
-        rawDelete(context, childCommunity);
-
+        
         childCommunity.removeParentCommunity(parentCommunity);
         parentCommunity.removeSubCommunity(childCommunity);
 
+        rawDelete(context, childCommunity);
+        
         log.info(LogManager.getHeader(context, "remove_subcommunity",
                 "parent_comm_id=" + parentCommunity.getID() + ",child_comm_id=" + childCommunity.getID()));
 
