@@ -1,6 +1,8 @@
 package org.dspace.identifier;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataFile;
+import org.datadryad.api.DryadDataPackage;
 import org.dspace.app.util.NoidGenerator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
@@ -292,6 +294,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     }
                 } else {
                     previousDOI = getVersionedDataPackageDOIString(previousDOI,1);
+                    DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
+                    Set<DryadDataFile> dryadDataFiles = dryadDataPackage.getDataFiles(context);
+                    for (DryadDataFile dryadDataFile : dryadDataFiles) {
+                        mintDOIAtVersion(context, dryadDataFile.getDryadDOI(), dryadDataFile.getItem(), 1);
+                    }
                 }
                 updateItemDOIMetadata(previousItem, previousDOI);
                 DOI firstDOI = new DOI(previousDOI, previousItem);
