@@ -93,11 +93,15 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
             }
         }
 
-        if (redirectUrl == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, failed.getMessage());
-        } else {
-            response.sendRedirect(redirectUrl);
+        String wwwAuthenticate = "Bearer realm=\"DSpace REST API\"";
+        if (redirectUrl != null) {
+            //We cannot reply with a 303 code because may browsers handle 3xx response codes transparently.
+            //This means that the JavaScript client code is not aware of the 303 status and fails to react accordingly.
+            wwwAuthenticate = wwwAuthenticate + ", location=\"" + redirectUrl + "\"";
         }
+
+        response.setHeader("WWW-Authenticate", wwwAuthenticate);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, failed.getMessage());
 
     }
 }

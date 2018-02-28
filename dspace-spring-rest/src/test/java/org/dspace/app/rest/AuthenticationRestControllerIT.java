@@ -24,6 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Base64;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -342,16 +344,28 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testShibbolethLoginRequestAttribute() throws Exception {
+        //Enable Shibboleth login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
 
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+
         getClient().perform(get("/api/authn/login").header("Referer", "http://my.uni.edu"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(header().string("Location", "/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "Bearer realm=\"DSpace REST API\", " +
+                                "location=\"/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu\""));
 
         //Simulate that a shibboleth authentication has happened
 
         String token = getClient().perform(post("/api/authn/login")
-                .requestAttr("SHIB-MAIL", eperson.getEmail()))
+                    .requestAttr("SHIB-MAIL", eperson.getEmail())
+                    .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty,staff"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
@@ -364,8 +378,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())))
-                .andExpect(jsonPath("$._embedded.eperson.groups", contains(
-                        GroupMatcher.matchGroupWithName("Anonymous"))));
+                .andExpect(jsonPath("$._embedded.eperson.groups", containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("Anonymous"), GroupMatcher.matchGroupWithName("Reviewers"))));
     }
 
     @Test
@@ -377,8 +391,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         getClient().perform(get("/api/authn/login")
                             .header("Referer", "http://my.uni.edu")
                             .with(ip("123.123.123.123")))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(header().string("Location", "/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "Bearer realm=\"DSpace REST API\", " +
+                                "location=\"/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu\""));
 
         //Simulate that a shibboleth authentication has happened
         String token = getClient().perform(get("/api/authn/login")
