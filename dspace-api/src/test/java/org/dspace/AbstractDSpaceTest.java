@@ -41,6 +41,12 @@ import org.junit.runner.RunWith;
 @Ignore
 @RunWith(JMockit.class)
 public class AbstractDSpaceTest {
+
+    /**
+     * Default constructor
+     */
+    protected AbstractDSpaceTest() { }
+
     /**
      * log4j category
      */
