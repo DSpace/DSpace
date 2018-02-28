@@ -728,10 +728,12 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         dataPackage.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null);
 
         for(DCValue value : doiVals){
-            if(!value.value.equals(idOld))
+            if(getCanonicalDOIString(value.value).equals(getCanonicalDOIString(idOld))) {
+                dataPackage.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null, idNew);
+            } else {
                 dataPackage.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null, value.value);
+            }
         }
-        dataPackage.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null, idNew);
         dataPackage.update();
     }
 
