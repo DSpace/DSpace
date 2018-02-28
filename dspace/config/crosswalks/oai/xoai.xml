@@ -109,7 +109,7 @@
             <Filter ref="doajFilter"/>
 
             <Format ref="doaj" />
-            <!--<Format ref="xoai"/>-->
+            <Format ref="xoai"/>
 			
             <Description>
                 This contexts complies with DOAJ rules for exporting journal articles.
@@ -251,8 +251,8 @@
                                 <Custom ref="driverDocumentTypeCondition"/>
                             </LeftCondition>
                             <RightCondition>
-                                <And>
-                                    <LeftCondition>
+<!--                                 <And>
+	                                     <LeftCondition> -->
                                         <Or>
                                             <LeftCondition>
                                                 <Custom ref="itemAccessCondition"/>
@@ -262,11 +262,12 @@
                                                 <Custom ref="externalResourceAccessCondition"/>
                                             </RightCondition>
                                         </Or>
-                                    </LeftCondition>
-                                    <RightCondition>
-                                        <Custom ref="driverAccessCondition"/>
-                                    </RightCondition>
-                                </And>
+<!--	                                 </LeftCondition>
+        	                             <RightCondition>
+        	                             	Debe existir al menos un dc:rights con algún tipo de AccessRight definido por la info-eu-repo. Mediante la utilización del transformer driver.xsl, se garantizá que siempre exista
+                                         <Custom ref="driverAccessCondition"/>
+            	                         </RightCondition>
+                	                 </And> -->
                             </RightCondition>
                         </And>
                     </RightCondition>
@@ -301,8 +302,8 @@
                                 <Custom ref="driverDocumentTypeCondition"/>
                             </LeftCondition>
                             <RightCondition>
-                                <And>
-                                    <LeftCondition>
+            <!--                <And>
+                                    <LeftCondition> -->
                                         <Or>
                                             <LeftCondition>
                                                 <Custom ref="itemAccessCondition"/>
@@ -311,11 +312,13 @@
                                                 <Custom ref="itemWithdrawnCondition"/>
                                             </RightCondition>
                                         </Or>
-                                    </LeftCondition>
+            <!--                    </LeftCondition>
                                     <RightCondition>
-                                        <Custom ref="openaireRelationCondition"/>
+						                Desactivamos la validacion de dc.relation ya que 
+						            	no usamos Project Identifier en nuestro repositorio.
+	                                    <Custom ref="openaireRelationCondition"/>
                                     </RightCondition>
-                                </And>
+                                </And> -->
                             </RightCondition>
                         </And>
                     </RightCondition>
