@@ -120,16 +120,19 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         try {
             itemService.delete(context, it);
         } catch (Exception e) {
+            // ignore
         }
 
         try {
             collectionService.delete(context, collection);
         } catch (Exception e) {
+            // ignore
         }
 
         try {
             communityService.delete(context, owningCommunity);
         } catch (Exception e) {
+            // ignore
         }
 
         context.restoreAuthSystemState();
@@ -139,6 +142,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         try {
             super.destroy();
         } catch (Exception e) {
+            // ignore
         }
     }
 
@@ -1396,9 +1400,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         Collection c = createCollection();
 
-        List<ResourcePolicy> defaultCollectionPolicies = authorizeService.getPoliciesActionFilter(context, c,
-                                                                                                  Constants
-                                                                                                      .DEFAULT_BITSTREAM_READ);
+        List<ResourcePolicy> defaultCollectionPolicies =
+            authorizeService.getPoliciesActionFilter(context, c, Constants.DEFAULT_BITSTREAM_READ);
         List<ResourcePolicy> newPolicies = new ArrayList<ResourcePolicy>();
         for (ResourcePolicy collRp : defaultCollectionPolicies) {
             ResourcePolicy rp = resourcePolicyService.clone(context, collRp);
