@@ -20,6 +20,8 @@ import org.hamcrest.Matchers;
 
 public class EPersonMatcher {
 
+    private EPersonMatcher() { }
+
     public static Matcher<? super Object> matchEPersonEntry(EPerson ePerson) {
         return allOf(
             hasJsonPath("$.uuid", is(ePerson.getID().toString())),

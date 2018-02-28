@@ -20,6 +20,8 @@ import org.hamcrest.Matchers;
 
 public class CollectionMatcher {
 
+    private CollectionMatcher() { }
+
     public static Matcher<? super Object> matchCollectionEntry(String name, UUID uuid, String handle) {
         return matchCollectionEntry(name, uuid, handle, null);
     }

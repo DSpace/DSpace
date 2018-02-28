@@ -17,6 +17,8 @@ import org.hamcrest.Matchers;
 
 public class MetadataFieldMatcher {
 
+    private MetadataFieldMatcher() { }
+
     public static Matcher<? super Object> matchMetadataField() {
         return allOf(
             hasJsonPath("$.element", Matchers.not(Matchers.empty())),

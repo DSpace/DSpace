@@ -19,9 +19,7 @@ import org.hamcrest.Matcher;
  */
 public class SubmissionDefinitionsMatcher {
 
-    public SubmissionDefinitionsMatcher() {
-
-    }
+    private SubmissionDefinitionsMatcher() { }
 
     public static Matcher<Object> matchSubmissionDefinition(boolean isDefault, String name, String id) {
         return allOf(

@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.converter;
 
-
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

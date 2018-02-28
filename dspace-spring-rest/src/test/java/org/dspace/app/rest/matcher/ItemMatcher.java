@@ -26,6 +26,8 @@ import org.hamcrest.Matcher;
  */
 public class ItemMatcher {
 
+    private ItemMatcher() { }
+
     public static Matcher<? super Object> matchItemWithTitleAndDateIssued(Item item, String title, String dateIssued) {
         return allOf(
             //Check item properties

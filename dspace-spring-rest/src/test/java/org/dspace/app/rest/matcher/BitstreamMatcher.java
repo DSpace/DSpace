@@ -22,6 +22,8 @@ import org.hamcrest.Matcher;
 
 public class BitstreamMatcher {
 
+    private BitstreamMatcher() { }
+
     public static Matcher<? super Object> matchBitstreamEntry(Bitstream bitstream) {
         return allOf(
             //Check core metadata (the JSON Path expression evaluates to a collection so we have to use contains)
