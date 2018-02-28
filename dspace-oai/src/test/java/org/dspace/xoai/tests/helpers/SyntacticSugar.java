@@ -8,6 +8,12 @@
 package org.dspace.xoai.tests.helpers;
 
 public class SyntacticSugar {
+
+    /**
+     * Default constructor
+     */
+    private SyntacticSugar() { }
+
     public static <T> T given(T elem) {
         return elem;
     }
