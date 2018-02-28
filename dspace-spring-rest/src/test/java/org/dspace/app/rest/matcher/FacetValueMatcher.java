@@ -17,6 +17,8 @@ import org.hamcrest.Matchers;
 
 public class FacetValueMatcher {
 
+    private FacetValueMatcher() { }
+
     public static Matcher<? super Object> entryAuthor(String label) {
         return allOf(
             hasJsonPath("$.label", is(label)),

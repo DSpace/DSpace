@@ -18,6 +18,8 @@ import org.hamcrest.Matcher;
  */
 public class BitstreamFormatMatcher {
 
+    private BitstreamFormatMatcher() { }
+
     public static Matcher<? super Object> matchBitstreamFormat(String mimetype, String description) {
         return allOf(
             hasJsonPath("$.mimetype", is(mimetype)),

@@ -15,6 +15,8 @@ import org.hamcrest.Matcher;
 
 public class EPersonMetadataMatcher {
 
+    private EPersonMetadataMatcher() { }
+
     public static Matcher<? super Object> matchFirstName(String firstName) {
         return allOf(
             hasJsonPath("$.key", is("eperson.firstname")),

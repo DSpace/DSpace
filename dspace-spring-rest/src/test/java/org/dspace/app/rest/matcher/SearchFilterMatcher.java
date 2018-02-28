@@ -15,9 +15,8 @@ import static org.hamcrest.Matchers.is;
 import org.hamcrest.Matcher;
 
 public class SearchFilterMatcher {
-    public SearchFilterMatcher() {
 
-    }
+    private SearchFilterMatcher() { }
 
     public static Matcher<? super Object> titleFilter() {
         return allOf(

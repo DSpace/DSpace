@@ -15,6 +15,8 @@ import org.hamcrest.Matcher;
 
 public class CommunityMetadataMatcher {
 
+    private CommunityMetadataMatcher() { }
+
     public static Matcher<? super Object> matchTitle(String title) {
         return allOf(
             hasJsonPath("$.key", is("dc.title")),
