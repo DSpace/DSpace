@@ -92,9 +92,13 @@
           success : successHandler,
           error : function(result, status, xhr) {
               if (xhr == 401) {
-                  var loc = result.getResponseHeader("location");
-                  if (loc != null && loc != "") {
-                      document.location = loc;
+                  var authenticate = result.getResponseHeader("WWW-Authenticate");
+                  if(authenticate !== null) {
+                      var loc = /location="([^,]*)"/.exec(authenticate);
+
+                      if (loc !== null && loc.length === 2) {
+                          document.location = loc[1];
+                      }
                   }
               }
           }
