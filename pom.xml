@@ -198,8 +198,11 @@
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <logViolationsToConsole>true</logViolationsToConsole>
                         <failOnViolation>true</failOnViolation>
-                        <!-- TODO: Enable checks on tests too. Currently, they are excluded by default -->
-                        <!--<includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+                        <!-- Enable checks on all test source files -->
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <!-- Define our suppressions file location, and the key used to pass it to checkstyle.xml-->
+                        <suppressionsLocation>${root.basedir}/checkstyle-suppressions.xml</suppressionsLocation>
+                        <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
                     </configuration>
                     <dependencies>
                         <!-- Override dependencies to use latest version of checkstyle -->
