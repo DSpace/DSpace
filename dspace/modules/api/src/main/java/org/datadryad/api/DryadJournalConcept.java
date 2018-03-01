@@ -43,6 +43,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     public static final String COVER_IMAGE = "coverImage";
 
     public static final String HASJOURNALPAGE = "hasJournalPage";
+    public static final String ALLOW_DATAFIRST_WORKFLOW = "allowDataFirstWorkflow";
 
     private static Logger log = Logger.getLogger(DryadJournalConcept.class);
 
@@ -63,6 +64,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         metadataProperties.setProperty(MEMBERNAME, "journal.memberName");
         metadataProperties.setProperty(HASJOURNALPAGE, "journal.hasJournalPage");
         metadataProperties.setProperty(COVER_IMAGE, "journal.coverImage");
+        metadataProperties.setProperty(ALLOW_DATAFIRST_WORKFLOW, "journal.allowDataFirstWorkflow");
 
         defaultMetadataValues.setProperty(metadataProperties.getProperty(JOURNAL_ID), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(CANONICAL_MANUSCRIPT_NUMBER_PATTERN), "");
@@ -80,6 +82,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         defaultMetadataValues.setProperty(metadataProperties.getProperty(MEMBERNAME), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(COVER_IMAGE), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(HASJOURNALPAGE), "");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(ALLOW_DATAFIRST_WORKFLOW), "false");
     }
 
     {
@@ -346,6 +349,19 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
 
     public void setAllowReviewWorkflow(String value) {
         setConceptMetadataValue(metadataProperties.getProperty(ALLOW_REVIEW_WORKFLOW), value);
+    }
+
+    public Boolean getAllowDataFirstWorkflow() {
+        String metadataValue = getConceptMetadataValue(metadataProperties.getProperty(ALLOW_DATAFIRST_WORKFLOW));
+        Boolean result = false;
+        if (metadataValue.equals("true")) {
+            result = true;
+        }
+        return result;
+    }
+
+    public void setAllowDataFirstWorkflow(String value) {
+        setConceptMetadataValue(metadataProperties.getProperty(ALLOW_DATAFIRST_WORKFLOW), value);
     }
 
     @JsonIgnore
