@@ -82,11 +82,15 @@ public class Journal {
             } else {
                 jGen.writeStringField("sponsor", "$120");
             }
+            String submission = "A";
             if (journal.dryadJournalConcept.getAllowReviewWorkflow()) {
-                jGen.writeStringField("submission", "R");
-            } else {
-                jGen.writeStringField("submission", "A");
+                submission = "R";
             }
+            // allowDataFirst is a subset of allowReview, so it needs to be checked after.
+            if (journal.dryadJournalConcept.getAllowDataFirstWorkflow()) {
+                submission = "D";
+            }
+            jGen.writeStringField("submission", submission);
             jGen.writeEndObject();
         }
     }
