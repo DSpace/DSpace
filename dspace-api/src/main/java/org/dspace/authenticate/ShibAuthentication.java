@@ -538,6 +538,11 @@ public class ShibAuthentication implements AuthenticationMethod {
         }
     }
 
+    @Override
+    public String getName() {
+        return "shibboleth";
+    }
+
     /**
      * Identify an existing EPerson based upon the shibboleth attributes provided on
      * the request object. There are three cases where this can occurr, each as

@@ -639,6 +639,11 @@ public class LDAPAuthentication
         return null;
     }
 
+    @Override
+    public String getName() {
+        return "ldap";
+    }
+
     /*
      * Add authenticated users to the group defined in dspace.cfg by
      * the authentication-ldap.login.groupmap.* key.

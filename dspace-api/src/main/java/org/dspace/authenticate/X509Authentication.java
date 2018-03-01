@@ -589,4 +589,9 @@ public class X509Authentication implements AuthenticationMethod {
                                HttpServletResponse response) {
         return loginPageURL;
     }
+
+    @Override
+    public String getName() {
+        return "x509";
+    }
 }

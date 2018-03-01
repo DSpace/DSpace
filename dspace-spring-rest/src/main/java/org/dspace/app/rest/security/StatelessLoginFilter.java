@@ -82,26 +82,26 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
         Iterator<AuthenticationMethod> authenticationMethodIterator
                 = authenticationService.authenticationMethodIterator();
         Context context = ContextUtil.obtainContext(request);
-        String redirectUrl = null;
 
+        StringBuilder wwwAuthenticate = new StringBuilder();
         while (authenticationMethodIterator.hasNext()) {
             AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
 
+            if (wwwAuthenticate.length() > 0) {
+                wwwAuthenticate.append(", ");
+            }
+
+            wwwAuthenticate.append(authenticationMethod.getName()).append(" realm=\"DSpace REST API\"");
+
             String loginPageURL = authenticationMethod.loginPageURL(context, request, response);
             if (StringUtils.isNotBlank(loginPageURL)) {
-                redirectUrl = loginPageURL;
+                // We cannot reply with a 303 code because may browsers handle 3xx response codes transparently. This
+                // means that the JavaScript client code is not aware of the 303 status and fails to react accordingly.
+                wwwAuthenticate.append(", location=\"").append(loginPageURL).append("\"");
             }
         }
 
-        String wwwAuthenticate = "Bearer realm=\"DSpace REST API\"";
-        if (redirectUrl != null) {
-            //We cannot reply with a 303 code because may browsers handle 3xx response codes transparently.
-            //This means that the JavaScript client code is not aware of the 303 status and fails to react accordingly.
-            wwwAuthenticate = wwwAuthenticate + ", location=\"" + redirectUrl + "\"";
-        }
-
-        response.setHeader("WWW-Authenticate", wwwAuthenticate);
+        response.setHeader("WWW-Authenticate", wwwAuthenticate.toString());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, failed.getMessage());
-
     }
 }
