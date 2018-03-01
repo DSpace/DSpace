@@ -3,13 +3,13 @@ package org.dspace;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
-import org.datadryad.rest.models.Author;
-import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.RESTModelException;
+import org.datadryad.rest.models.*;
+import org.datadryad.rest.models.Package;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
@@ -27,8 +27,10 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.workflow.DryadWorkflowUtils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -178,7 +180,7 @@ public class JournalUtils {
                 journalConceptHashMapByISSN.put(journalConcept.getISSN(), journalConcept);
             }
         }
-
+        writeJournalLookupJSON();
     }
 
     public static DryadJournalConcept createJournalConcept(String journalName) throws StorageException {
@@ -723,6 +725,33 @@ public class JournalUtils {
         }
         return false;
     }
+
+    public static void writeJournalLookupJSON() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.registerModule(new SimpleModule().addSerializer(Journal.class, new Journal.JournalLookupSerializer()));
+            StringBuffer sb = new StringBuffer();
+            ArrayList<String> journalJSONs = new ArrayList<String>();
+            ArrayList<DryadJournalConcept> journalConcepts = new ArrayList<DryadJournalConcept>();
+            journalConcepts.addAll(journalConceptHashMapByISSN.values());
+            journalConcepts.sort(Comparator.naturalOrder());
+            for (DryadJournalConcept journalConcept : journalConcepts) {
+                journalJSONs.add(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(new Journal(journalConcept)));
+            }
+            sb.append("{\n\"data\" : [\n");
+            sb.append(String.join(",", journalJSONs));
+            sb.append("\n]\n}");
+
+            String jsonFilePath = ConfigurationManager.getProperty("dspace.dir") + "/webapps/xmlui/static/json/journal-lookup.json";
+            File jsonFile = new File(jsonFilePath);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(jsonFile));
+            bw.write(sb.toString());
+            bw.close();
+
+        } catch (Exception e) {
+        }
+    }
+
 
 
     public static String cleanJournalCode(String journalCode) {
