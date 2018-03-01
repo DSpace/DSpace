@@ -344,6 +344,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testShibbolethLoginRequestAttribute() throws Exception {
+        context.turnOffAuthorisationSystem();
         //Enable Shibboleth login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
 
@@ -354,18 +355,19 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         //Faculty members are assigned to the Reviewers group
         configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/authn/login").header("Referer", "http://my.uni.edu"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate",
-                        "Bearer realm=\"DSpace REST API\", " +
+                        "shibboleth realm=\"DSpace REST API\", " +
                                 "location=\"/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu\""));
 
         //Simulate that a shibboleth authentication has happened
 
         String token = getClient().perform(post("/api/authn/login")
                     .requestAttr("SHIB-MAIL", eperson.getEmail())
-                    .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty,staff"))
+                    .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
@@ -393,7 +395,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                             .with(ip("123.123.123.123")))
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate",
-                        "Bearer realm=\"DSpace REST API\", " +
+                        "ip realm=\"DSpace REST API\", shibboleth realm=\"DSpace REST API\", " +
                                 "location=\"/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu\""));
 
         //Simulate that a shibboleth authentication has happened

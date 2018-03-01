@@ -91,7 +91,7 @@
           type : 'POST',
           success : successHandler,
           error : function(result, status, xhr) {
-              if (xhr == 401) {
+              if (result.status === 401) {
                   var authenticate = result.getResponseHeader("WWW-Authenticate");
                   if(authenticate !== null) {
                       var loc = /location="([^,]*)"/.exec(authenticate);
