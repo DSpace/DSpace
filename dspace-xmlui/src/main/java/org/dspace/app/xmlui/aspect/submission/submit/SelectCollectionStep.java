@@ -101,7 +101,43 @@ public class SelectCollectionStep extends AbstractSubmissionStep
 	    CollectionDropDown.CollectionPathEntry[] collectionPaths = CollectionDropDown.annotateWithPaths(collections);
         for (CollectionDropDown.CollectionPathEntry entry : collectionPaths)
         {
-            select.addOption(entry.collection.getHandle(), entry.path);
+        	if (entry.path.length() <= 110){
+        		select.addOption(entry.collection.getHandle(), entry.path);
+        	}
+        	else{
+        		String[] parents = entry.path.split(">");
+        		String path = parents[0];
+        		if (parents.length > 1) path += ">";
+        		// recorro padres
+        		for (int i = 1; (parents.length - 1) > i; i++) {
+        			if (parents[i].length() > 11){
+        				String [] words = parents[i].split(" ");
+        				int limit = 10;
+        				// recorro palabras
+        				for (int j = 0; words.length > j ; j++){
+        					// si la palabra no supera el limite, va toda
+        					if (words[j].length() < limit){
+                				path += words[j] + " ";
+                				limit = limit - words[j].length();
+        					}
+        					else {
+                				path += words[j].substring(0, limit) + "...";
+                				break;
+        					}
+        				}
+        			}else{
+        				path += parents[i];
+        			}
+        			path += ">";
+        		}
+        		if (parents[parents.length - 1].length() < 70){
+            		path += parents[parents.length - 1];        			
+        		}
+        		else{
+            		path += parents[parents.length - 1].substring(0, 70) + "...";        			
+        		}
+        		select.addOption(entry.collection.getHandle(), path);        		
+        	}
         }
         
         Button submit = list.addItem().addButton("submit");
