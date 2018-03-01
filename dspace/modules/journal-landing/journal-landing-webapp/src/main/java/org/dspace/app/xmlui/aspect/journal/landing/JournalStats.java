@@ -106,6 +106,10 @@ public class JournalStats extends AbstractDSpaceTransformer
             journalISSN = parameters.getParameter(Const.PARAM_JOURNAL_ISSN);
             journalName = parameters.getParameter(Const.PARAM_JOURNAL_NAME);
             journalAbbr = parameters.getParameter(Const.PARAM_JOURNAL_ABBR);
+
+            // refresh the journal concept that we have cached:
+            JournalUtils.addDryadJournalConcept(context, JournalUtils.getJournalConceptByISSN(journalISSN));
+            
             journalConcept = JournalUtils.getJournalConceptByISSN(journalISSN);
         } catch (Exception ex) {
             log.error(ex);
