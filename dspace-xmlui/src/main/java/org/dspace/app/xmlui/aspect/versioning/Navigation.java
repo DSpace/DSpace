@@ -126,7 +126,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
                     DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                     if(dso != null)
                     {
-                        validity.add(context, dso);
+                        validity.add(context, context.reloadEntity(dso));
                     }
 
 		            this.validity = validity.complete();
