@@ -221,12 +221,15 @@ public class SubmissionLookupJSONRequest extends JSONRequest
             // Parse the request
             Map<String, String> valueMap = new HashMap<String, String>();
             InputStream io = null;
-
+            
             // Parse the request
             List<FileItem> iter;
+            String filepath = null;
             String filename = null;
+            boolean skipPreview = false;
             try
             {
+            	
                 iter = upload.parseRequest(req);
                 for (FileItem item : iter)
                 {
@@ -278,7 +281,9 @@ public class SubmissionLookupJSONRequest extends JSONRequest
                 Utils.bufferedCopy(io, out);
                 dataLoader.setFile(file.getAbsolutePath(),
                         valueMap.get("provider_loader"));
-
+                filepath = file.getAbsolutePath();
+                filename = valueMap.containsKey("filename") ? valueMap.get("filename") :"";
+                skipPreview = valueMap.containsKey("skip_loader")? valueMap.get("skip_loader") .equals("true") :false;
                 try
                 {
                     SubmissionLookupOutputGenerator outputGenerator = (SubmissionLookupOutputGenerator) transformationEngine
@@ -288,41 +293,46 @@ public class SubmissionLookupJSONRequest extends JSONRequest
                     transformationEngine.transform(new TransformationSpec());
                     log.debug("BTE transformation finished!");
                     result = outputGenerator.getDtoList();
+                    
                 }
                 catch (BadTransformationSpec e1)
                 {
                     log.error(e1.getMessage(), e1);
+                    file.delete();
                 }
                 catch (MalformedSourceException e1)
                 {
                     log.error(e1.getMessage(), e1);
+                    file.delete();
+                    
                 }
                 finally
                 {
-                    file.delete();
+                    if(!valueMap.get("provider_loader").equals("pdf") || !skipPreview){
+                    	file.delete();
+                    }
                 }
             }
             subDTO.setItems(result);
             service.storeDTOs(req, suuid, subDTO);
             List<Map<String, Object>> dto = getLightResultList(result);
-            if (valueMap.containsKey("skip_loader"))
+            if (skipPreview)
             {
-                if (valueMap.get("skip_loader").equals("true"))
-                {
-                    Map<String, Object> skip = new HashMap<String, Object>();
-                    skip.put("skip", Boolean.TRUE);
-                    skip.put("uuid", valueMap.containsKey("s_uuid") ? suuid
-                            : -1);
-                    skip.put(
-                            "collectionid",
-                            valueMap.containsKey("select-collection-file") ? valueMap
-                                    .get("select-collection-file") : -1);
-                    dto.add(skip);
-                }
+                Map<String, Object> skip = new HashMap<String, Object>();
+                skip.put("skip", Boolean.TRUE);
+                skip.put("uuid", valueMap.containsKey("s_uuid") ? suuid
+                        : -1);
+                skip.put(
+                        "collectionid",
+                         valueMap.containsKey("select-collection-file") ? valueMap
+                                .get("select-collection-file") : -1);
+                dto.add(skip);
             }
             JsonElement tree = json.toJsonTree(dto);
             JsonObject jo = new JsonObject();
             jo.add("result", tree);
+            jo.addProperty("filePath",filepath);
+            jo.addProperty("filename",filename);
             resp.setContentType("text/plain");
 //            if you works in localhost mode and use IE10 to debug the feature uncomment the follow line
 //            resp.setHeader("Access-Control-Allow-Origin","*");

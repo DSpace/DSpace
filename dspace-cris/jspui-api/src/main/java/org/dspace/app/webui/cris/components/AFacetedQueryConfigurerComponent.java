@@ -229,7 +229,12 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
         {
             if(request == null) {
                 RequestService requestService = new DSpace().getServiceManager().getServiceByName(RequestService.class.getName(), RequestService.class);
-                request = requestService.getCurrentRequest().getHttpServletRequest();
+                if(requestService != null && requestService.getCurrentRequest() != null){
+                	request = requestService.getCurrentRequest().getHttpServletRequest();
+                }else{
+                	return -1;
+                }
+                
             }
             context = UIUtil.obtainContext(request);
             ACrisObject cris = getApplicationService().get(getTarget(), id);
@@ -239,7 +244,6 @@ public abstract class AFacetedQueryConfigurerComponent<T extends DSpaceObject>
             }
             return facetresults.get(0).getCount();
         }
-
         catch (Exception ex)
         {
             log.error(ex.getMessage(), ex);

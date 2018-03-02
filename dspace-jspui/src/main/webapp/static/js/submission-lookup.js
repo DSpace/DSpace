@@ -250,6 +250,9 @@ submissionLookupFile = function(form){
 	var suuid = j('<input type="hidden" name="s_uuid" value="'+suuidVal+'">');
 	var collectionidVal = j('#select-collection-file').val();
 	var collectionid = j('<input type="hidden" name="collectionid" value="'+collectionidVal+'">');
+	var fileNameVal= j('#file_upload').val();
+	fileNameVal = fileNameVal.slice(fileNameVal.lastIndexOf("\\")+1);
+	var filename=j('<input type="hidden" name="filename" value="'+fileNameVal +'"/>');
 	var preview_loader = "";
 	if(j('#preview_loader').is (':checked')) {
 		preview_loader = j('<input type="hidden" name="skip_loader" value="false">');
@@ -301,6 +304,8 @@ submissionLookupFile = function(form){
 						j('#collectionid').val(json.result[index].collectionid);
 						j('#suuid').val(json.result[index].uuid);
 						j('#fuuid').val(iindex);
+						j('#filePath').val(json.filePath);
+						j('#filename').val(json.filename);
 						j('#form-submission').submit();						
 						return false;
 					}
@@ -323,6 +328,7 @@ submissionLookupFile = function(form){
         j(form).append(collectionid);
         j(form).append(preview_loader);
         j(form).append(provider_loader);
+        j(form).append(filename);
 	    // Submit the form...
 	    form.submit();
 	 
