@@ -12,6 +12,7 @@ import org.dspace.JournalUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.File;
 import java.lang.*;
 import java.lang.Exception;
 import java.sql.SQLException;
@@ -218,6 +219,12 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public String getCoverImage() {
+        String coverImagePath = getConceptMetadataValue(metadataProperties.getProperty(COVER_IMAGE));
+        if (coverImagePath != null) {
+            File coverImageFile = new File(coverImagePath);
+            return "https://s3.amazonaws.com/dryad-web-assets/coverimages/" + coverImageFile.getName();
+        }
+
         return getConceptMetadataValue(metadataProperties.getProperty(COVER_IMAGE));
     }
 
