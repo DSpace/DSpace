@@ -88,14 +88,23 @@
     <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateissued">Data de envio</message>
     <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateaccessioned">Data de submissão</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.relevance">Relevância</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.relevance">Relevância</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by">Classificar Itens por</message>
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort-selections">Classificar Itens por</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.title_sort">Título</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_asc">Título (ascendente)</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_desc">Título (descendente)</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Data de Publicação</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_asc">Data de Publicação (ascendente)</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_desc">Data de Publicação (descendente)</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.accessioned_dt">Data de carga</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.accessioned_dt_asc">Data de carga (ascendente)</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.accessioned_dt_desc">Data de carga (descendente)</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.order">à pedido</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.asc">ascendente</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.desc">descendente</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Resultados/página</message>
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp-selections">Resultados/página</message>
 
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.tips_info_general">Pode tentar com as seguintes opções: </message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.tips_info1">Se estiver utilizando aspas, tente apagà-las para gerar uma nova procura com palavras individuais</message>

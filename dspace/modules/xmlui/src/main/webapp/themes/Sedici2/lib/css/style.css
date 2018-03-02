@@ -260,7 +260,7 @@ min-width:500px;
 	font-weight: bold;
 }
 #home_search input.ds-text-field, 
-.discover-search-box.search input.ds-text-field,
+.discover-search-box input.ds-text-field,
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-navigation input.ds-text-field,
 #aspect_discovery_SearchFacetFilter_div_filter-navigation input.ds-text-field {
 	border-radius: 7px 0px 0px 7px;
@@ -269,13 +269,13 @@ min-width:500px;
 	width:65%;
 	min-width:130px;
 }
-.discover-search-box.search input.ds-text-field {
+.discover-search-box input.ds-text-field {
 	width: 400px;
 }
 #home_search input.ds-button-field, 
 #aspect_discovery_SearchFacetFilter_field_submit,
 #aspect_artifactbrowser_ConfigurableBrowse_field_submit,
-.discover-search-box.search input.ds-button-field {
+.discover-search-box input.ds-button-field {
 	color: #FFFFFF;
 	background-image: url(../../images/lupita.png);
 	background-color: #3F7A9F;
@@ -288,6 +288,12 @@ min-width:500px;
 	padding: 0px;
 	width: 43px;
 }
+
+input#aspect_discovery_SimpleSearch_field_query {
+    margin-top: 0px;
+    padding: 2px;
+}
+
 #home_autoarchivo div {
 	margin-top: 20px;
 	text-align: center;

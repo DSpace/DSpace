@@ -2433,6 +2433,11 @@
 <message key="xmlui.Discovery.SimpleSearch.filter_apply">Update filters</message>
 <message key="xmlui.Discovery.SimpleSearch.sort_head">Sort options</message>
 <message key="xmlui.Discovery.SimpleSearch.sort_apply">Apply</message>
+<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.accessioned_dt_asc">Accessioned Date Asc</message>
+<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.accessioned_dt_desc">Accessioned Date Desc</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp-selections">Results</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.sort-selections">Sort By</message>
+
 
 <message key="xmlui.discovery.SearchFacetFilter.no-results">No values found according to the filters.</message>
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Refine your search</message>

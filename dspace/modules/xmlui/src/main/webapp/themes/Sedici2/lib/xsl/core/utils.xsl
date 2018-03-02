@@ -516,5 +516,121 @@
 			</div>		
 		</xsl:for-each>
     </xsl:template>
+    
+    <xsl:template name="build-anchor">
+		<xsl:param name="a.href">/</xsl:param>
+		<xsl:param name="a.value" select="$a.href"/>
+		<xsl:param name="a.class"></xsl:param>
+		<xsl:param name="img.src"></xsl:param>
+		<xsl:param name="img.alt"></xsl:param>
+		<xsl:param name="img.class"></xsl:param>
+		<a>
+			<xsl:attribute name="href">
+				<xsl:if test="starts-with($a.href, 'http://') or starts-with($a.href, 'https://')">
+					<xsl:value-of select="$a.href"/>
+				</xsl:if>
+				<xsl:if test="not(starts-with($a.href, 'http://') or starts-with($a.href, 'https://'))">
+					<xsl:call-template name="print-path">
+						<xsl:with-param name="path" select="$a.href"/>
+					</xsl:call-template>
+				</xsl:if>
+			</xsl:attribute>
+			<xsl:if test="$a.class">
+				<xsl:attribute name="class">
+					<xsl:copy-of select="$a.class"/>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="$img.src">
+				<xsl:call-template name="build-img">	
+					<xsl:with-param name="img.src" select="$img.src"/>
+					<xsl:with-param name="img.alt" select="$img.alt"/>
+					<xsl:with-param name="img.class" select="$img.class"/>
+				</xsl:call-template>
+			</xsl:if>
+			<xsl:if test="not($img.src) or ($a.value != $a.href)">
+				<xsl:copy-of select="$a.value"/>
+			</xsl:if>
+		</a>
+	</xsl:template>
+	
+	<xsl:template name="build-img">
+		<xsl:param name="img.src"></xsl:param>
+		<xsl:param name="img.alt">image</xsl:param>
+		<xsl:param name="img.class"></xsl:param>
+		<img alt="{$img.alt}" class="{$img.class}">
+			<xsl:attribute name="src">
+				<xsl:choose>
+					<xsl:when test="starts-with($img.src,'http') or starts-with($img.src,'https')">
+						<xsl:value-of select="$img.src"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:call-template name="print-theme-path">
+							<xsl:with-param name="path" select="$img.src"/>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+		</img>
+	</xsl:template>
+	
+	<!-- Imprime la ruta absoluta al recurso indicado con el parámetro path -->
+   	<xsl:template name="print-path">
+   		<xsl:param name="path">/</xsl:param>
+	
+		<xsl:if test="not(starts-with($path, $context-path))">
+			<!-- Imprimo el context path si la URL no es absolta -->
+			<xsl:value-of select="$context-path" />
+			
+		</xsl:if>
+		<xsl:if test="not(starts-with($path, '/'))">
+				<xsl:text>/</xsl:text>
+			</xsl:if>
+		<xsl:value-of select="$path" />
+	</xsl:template>
+	
+   <!-- Imprime la ruta absoluta al recurso indicado con el parámetro path -->   
+   <xsl:template name="print-theme-path">
+		<xsl:param name="path">/</xsl:param>
+		<xsl:variable name="theme-path" select="$global-theme-path" />
+		<xsl:variable name="context-path" select="$global-context-path" />
+		
+		<xsl:if test="not(starts-with($path, '/'))">
+			<!-- Imprimo el context path si la URL no es absoluta -->
+			<xsl:value-of select="$context-path" />
+			<xsl:text>/themes/</xsl:text>
+			<xsl:value-of select="$theme-path" />
+			<xsl:if test="not(starts-with($path, '/'))">
+				<xsl:text>/</xsl:text>
+			</xsl:if>
+		</xsl:if>
+		<xsl:value-of select="$path" />
+	</xsl:template>
+    
+   	<xsl:template name="renderDiscoveryField">
+		<xsl:param name="href"/>
+		<xsl:param name="value"/>
+		<xsl:param name="classname"/>
+		<span>
+			<xsl:if test="$classname">
+				<xsl:attribute name="class">
+					<xsl:value-of select="$classname"/>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:choose>
+				<xsl:when test="$href">
+					<xsl:call-template name="build-anchor">
+						<xsl:with-param name="a.href" select="$href"/>
+						<xsl:with-param name="a.value" select="$value"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="$value">
+					<xsl:copy-of select="$value"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<i18n:text>xmlui.cicdigital.discoveryList.no-value</i18n:text>
+				</xsl:otherwise>
+			</xsl:choose>
+		</span>
+	</xsl:template>
 	
 </xsl:stylesheet>

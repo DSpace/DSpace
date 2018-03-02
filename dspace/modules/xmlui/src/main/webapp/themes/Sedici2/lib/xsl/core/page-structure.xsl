@@ -149,7 +149,7 @@
 			
 			<!-- Controles para las busquedas -->
 			<xsl:if test="/dri:document/dri:body/dri:div/dri:div[@id='aspect.discovery.SimpleSearch.div.search-results' and @itemsTotal]">
-				<xsl:apply-templates select="dri:body/dri:div[@n='search']/dri:div[@id='aspect.discovery.SimpleSearch.div.search-controls']"/>
+				<xsl:apply-templates select="dri:body/dri:div[@n='search']/dri:div/dri:div/dri:div/dri:list[@n='sort-options']"/>
 			</xsl:if>
 			
 			<!-- Controles para los browse -->
