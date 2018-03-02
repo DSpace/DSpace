@@ -41,6 +41,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     public static final String ISSN = "issn";
     public static final String MEMBERNAME = "memberName";
     public static final String COVER_IMAGE = "coverImage";
+    public static final String RECENTLY_INTEGRATED = "recentlyIntegrated";
 
     public static final String HASJOURNALPAGE = "hasJournalPage";
     public static final String ALLOW_DATAFIRST_WORKFLOW = "allowDataFirstWorkflow";
@@ -65,6 +66,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         metadataProperties.setProperty(HASJOURNALPAGE, "journal.hasJournalPage");
         metadataProperties.setProperty(COVER_IMAGE, "journal.coverImage");
         metadataProperties.setProperty(ALLOW_DATAFIRST_WORKFLOW, "journal.allowDataFirstWorkflow");
+        metadataProperties.setProperty(RECENTLY_INTEGRATED, "journal.recentlyIntegrated");
 
         defaultMetadataValues.setProperty(metadataProperties.getProperty(JOURNAL_ID), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(CANONICAL_MANUSCRIPT_NUMBER_PATTERN), "");
@@ -83,6 +85,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         defaultMetadataValues.setProperty(metadataProperties.getProperty(COVER_IMAGE), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(HASJOURNALPAGE), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(ALLOW_DATAFIRST_WORKFLOW), "false");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(RECENTLY_INTEGRATED), "false");
     }
 
     {
@@ -407,6 +410,16 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
 
     public Boolean getPublicationBlackout() {
         String metadataValue = getConceptMetadataValue(metadataProperties.getProperty(PUBLICATION_BLACKOUT));
+        Boolean result = false;
+        if (metadataValue.equals("true")) {
+            result = true;
+        }
+        return result;
+    }
+
+    @JsonIgnore
+    public Boolean getRecentlyIntegrated() {
+        String metadataValue = getConceptMetadataValue(metadataProperties.getProperty(RECENTLY_INTEGRATED));
         Boolean result = false;
         if (metadataValue.equals("true")) {
             result = true;
