@@ -1831,6 +1831,8 @@ img.pub-cover {
     -moz-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
     -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+    height: 130px;
+    width: 100px;
 }
 .publication-header img.pub-cover {
     float: right;
