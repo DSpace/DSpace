@@ -120,7 +120,7 @@ public class CrisItemEnhancerUtility {
 
 	private static List<String[]> getCrisMetadata(Item item, CrisItemEnhancer enh, String qualifier) {
 		List<String> mdList = enh.getMetadata();
-		Set<String> validAuthorities = new HashSet<String>();
+		List<String> validAuthorities = new ArrayList<String>();
 		MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
 
 		for (String md : mdList) {
