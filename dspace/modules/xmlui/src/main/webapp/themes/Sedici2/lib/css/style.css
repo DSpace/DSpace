@@ -294,6 +294,10 @@ input#aspect_discovery_SimpleSearch_field_query {
     padding: 2px;
 }
 
+div#aspect_discovery_SimpleSearch_div_search-results ul ul {
+    margin-left: unset;
+}
+
 #home_autoarchivo div {
 	margin-top: 20px;
 	text-align: center;
