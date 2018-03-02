@@ -146,35 +146,42 @@ public class JournalUtils {
     }
 
     public static void updateDryadJournalConcept(DryadJournalConcept journalConcept) {
-        if (journalConceptHashMapByConceptIdentifier.containsValue(journalConcept)) {
+        if (journalConceptHashMapByConceptIdentifier.containsKey(journalConcept.getConceptID())) {
             for (String k : journalConceptHashMapByJournalName.keySet()) {
-                if (journalConceptHashMapByJournalName.get(k) == journalConcept) {
+                if (journalConceptHashMapByJournalName.get(k).compareTo(journalConcept) == 0) {
                     journalConceptHashMapByJournalName.remove(k);
-                }
-            }
-            for (String k : journalConceptHashMapByJournalID.keySet()) {
-                if (journalConceptHashMapByJournalID.get(k) == journalConcept) {
-                    journalConceptHashMapByJournalID.remove(k);
-                }
-            }
-            for (String k : journalConceptHashMapByCustomerID.keySet()) {
-                if (journalConceptHashMapByCustomerID.get(k) == journalConcept) {
-                    journalConceptHashMapByCustomerID.remove(k);
-                }
-            }
-            for (String k : journalConceptHashMapByISSN.keySet()) {
-                if (journalConceptHashMapByISSN.get(k) == journalConcept) {
-                    journalConceptHashMapByISSN.remove(k);
+                    break;
                 }
             }
             if (!"".equals(journalConcept.getFullName())) {
                 journalConceptHashMapByJournalName.put(journalConcept.getFullName().toUpperCase(), journalConcept);
             }
+
+            for (String k : journalConceptHashMapByJournalID.keySet()) {
+                if (journalConceptHashMapByJournalID.get(k).compareTo(journalConcept) == 0) {
+                    journalConceptHashMapByJournalID.remove(k);
+                    break;
+                }
+            }
             if (!"".equals(journalConcept.getJournalID())) {
                 journalConceptHashMapByJournalID.put(journalConcept.getJournalID().toUpperCase(), journalConcept);
             }
+
+            for (String k : journalConceptHashMapByCustomerID.keySet()) {
+                if (journalConceptHashMapByCustomerID.get(k).compareTo(journalConcept) == 0) {
+                    journalConceptHashMapByCustomerID.remove(k);
+                    break;
+                }
+            }
             if (!"".equals(journalConcept.getCustomerID())) {
                 journalConceptHashMapByCustomerID.put(journalConcept.getCustomerID(), journalConcept);
+            }
+
+            for (String k : journalConceptHashMapByISSN.keySet()) {
+                if (journalConceptHashMapByISSN.get(k).compareTo(journalConcept) == 0) {
+                    journalConceptHashMapByISSN.remove(k);
+                    break;
+                }
             }
             if (!"".equals(journalConcept.getISSN())) {
                 journalConceptHashMapByISSN.put(journalConcept.getISSN(), journalConcept);
