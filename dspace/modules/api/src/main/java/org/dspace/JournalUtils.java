@@ -67,6 +67,7 @@ public class JournalUtils {
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByJournalName = new HashMap<String, DryadJournalConcept>();
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByCustomerID = new HashMap<String, DryadJournalConcept>();
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByISSN = new HashMap<String, DryadJournalConcept>();
+    public static HashSet<DryadJournalConcept> recentlyIntegratedJournals = new HashSet<>();
 
     static {
         initializeJournalConcepts();
@@ -136,6 +137,9 @@ public class JournalUtils {
             if (journalConceptHashMapByISSN.containsValue(existingConcept)) {
                 journalConceptHashMapByISSN.remove(existingConcept.getISSN());
             }
+            if (recentlyIntegratedJournals.contains(existingConcept)) {
+                recentlyIntegratedJournals.remove(existingConcept);
+            }
             journalConceptHashMapByConceptIdentifier.remove(existingConcept.getIdentifier());
             try {
                 existingConcept.delete(context);
@@ -185,6 +189,16 @@ public class JournalUtils {
             }
             if (!"".equals(journalConcept.getISSN())) {
                 journalConceptHashMapByISSN.put(journalConcept.getISSN(), journalConcept);
+            }
+
+            for (DryadJournalConcept concept : recentlyIntegratedJournals) {
+                if (concept.getFullName().equals(journalConcept.getFullName())) {
+                    recentlyIntegratedJournals.remove(concept);
+                    break;
+                }
+            }
+            if (journalConcept.getRecentlyIntegrated()) {
+                recentlyIntegratedJournals.add(journalConcept);
             }
         }
         writeJournalLookupJSON();
