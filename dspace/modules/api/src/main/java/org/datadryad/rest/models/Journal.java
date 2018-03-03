@@ -91,6 +91,7 @@ public class Journal {
                 submission = "D";
             }
             jGen.writeStringField("submission", submission);
+            jGen.writeBooleanField("recentlyIntegrated", journal.dryadJournalConcept.getRecentlyIntegrated());
             jGen.writeEndObject();
         }
     }
