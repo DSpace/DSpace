@@ -1,5 +1,6 @@
 package org.datadryad.api;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import java.lang.*;
 import java.lang.Exception;
 import java.sql.SQLException;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -239,6 +241,11 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
             }
             fullName = value;
         }
+    }
+
+    @JsonIgnore
+    public String getSearchableName() {
+        return Normalizer.normalize(StringEscapeUtils.unescapeHtml(fullName), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "").replaceAll("\\W", " ").replaceAll("\\s+", " ");
     }
 
     public List<String> getAlternateNames() {
