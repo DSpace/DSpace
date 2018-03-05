@@ -210,9 +210,9 @@
 		 </div>
 	</xsl:template>
 	
-	<xsl:template match="dri:list[@id='aspect.artifactbrowser.CommunityViewer.list.community-browse' or @id='aspect.artifactbrowser.CollectionViewer.list.collection-browse']" >
+	<xsl:template match="dri:list[@id='aspect.browseArtifacts.CommunityBrowse.list.community-browse' or @id='aspect.browseArtifacts.CollectionBrowse.list.collection-browse']" >
 		<xsl:variable name="defaultDiscoveryQuery">
-			<xsl:text>?sort_by=dc.date.accessioned_dt&amp;order=DESC</xsl:text>
+			<xsl:text>?sort_by=dc.date.accessioned_dt&amp;order=desc</xsl:text>
 		</xsl:variable>
 		<xsl:variable name="URL">
           	<xsl:value-of select="$context-path"/>
