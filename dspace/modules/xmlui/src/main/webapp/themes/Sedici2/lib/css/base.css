@@ -92,6 +92,6 @@ button {  width: auto; overflow: visible; }
    code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/ */
 .ie7 img { -ms-interpolation-mode: bicubic; }
 
-#aspect_submission_submit_SelectCollectionStep_field_handle{
+#aspect_submission_submit_SelectCollectionStep_field_handle, #aspect_eperson_EditProfile_field_subscriptions{
 	width: 100%;
 }
