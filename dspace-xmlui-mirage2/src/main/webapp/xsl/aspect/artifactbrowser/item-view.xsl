@@ -125,6 +125,7 @@
                 <div class="col-sm-8">
                     <xsl:call-template name="itemSummaryView-DIM-abstract"/>
                     <xsl:call-template name="itemSummaryView-DIM-URI"/>
+                    <xsl:call-template name="itemSummaryView-DIM-PROJECTID"/>
                     <xsl:call-template name="itemSummaryView-collections"/>
                 </div>
             </div>
@@ -266,6 +267,10 @@
                 <xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
             </xsl:if>
             <xsl:copy-of select="node()"/>
+            <xsl:if test="@orcid_id">
+                 <xsl:text> </xsl:text>
+                 <a href="https://orcid.org/{@orcid_id}" target="_blank"><img src="{$theme-path}/images/orcid_16x16.png" alt="ORCID" /></a>
+            </xsl:if>
         </div>
     </xsl:template>
 
@@ -284,6 +289,19 @@
                         <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='uri']) != 0">
                             <br/>
                         </xsl:if>
+                    </xsl:for-each>
+                </span>
+            </div>
+        </xsl:if>
+    </xsl:template>
+    
+    <xsl:template name="itemSummaryView-DIM-PROJECTID">
+        <xsl:if test="dim:field[@element='relation' and @qualifier='projectID' and descendant::text()]">
+            <div class="simple-item-view-uri item-page-field-wrapper table">
+                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-projectid</i18n:text></h5>
+                <span>
+                    <xsl:for-each select="dim:field[@element='relation' and @qualifier='projectID']">
+                    	<xsl:copy-of select="./node()"/>
                     </xsl:for-each>
                 </span>
             </div>
