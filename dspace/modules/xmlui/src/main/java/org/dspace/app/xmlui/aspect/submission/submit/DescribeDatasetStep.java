@@ -43,6 +43,7 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
     private static final Message T_FORM_DATA_FILE_REPO_HELP = message("xmlui.submit.dataset.form.dataset.file-url.help");
     private static final Message T_FORM_REPO_NAME_HELP = message("xmlui.submit.dataset.form.dataset.repo-name.help");
     private static final Message T_cancel = message("xmlui.general.cancel_delete");
+    private static final Message T_DUP_SUBMISSION = message("xmlui.submit.publication.describe.duplicatesubmission");
 
 
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
@@ -67,6 +68,9 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
         String actionURL = contextPath + "/handle/" + collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
         body.addDivision("step-link","step-link").addPara(T_TRAIL);
+
+        Division dupDivision = body.addDivision("duplicate-info", "duplicate-info");
+        dupDivision.addPara(T_DUP_SUBMISSION);
 
         Division helpDivision = body.addDivision("general-help","general-help");
         helpDivision.setHead(T_HEAD);
