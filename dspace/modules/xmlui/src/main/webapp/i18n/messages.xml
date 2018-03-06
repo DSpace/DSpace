@@ -2934,6 +2934,10 @@
 	<message key="xmlui.submit.publication.describe.form.help">Publication metadata</message>
 
 	<message key="xmlui.submit.dataset.describe.head">Add and describe data file</message>
+	<message key="xmlui.submit.dataset.describe.qualitywarning">
+		<div><strong>ARE YOUR DATA FILES READY TO PUBLISH?</strong> Do they contain identifiable human subjects, info that could put vulnerable species or sites at risk, or copyrighted or licensed materials? Have you checked them for errors? <a href="/pages/faq#depositing-acceptable-data" target="_blank">View general guidance</a> about what types of data Dryad accepts and <a href="/pages/reusabilityBestPractices" target="_blank">best practices for reusability</a>.</div>
+	</message>
+
 	<message key="xmlui.submit.dataset.describe.trail">
         <div>
             <ul class="navigation-link">
