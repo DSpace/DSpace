@@ -63,6 +63,11 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.factory.AuthorityServiceFactory;
+import org.dspace.authority.orcid.OrcidAuthorityValue;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.eperson.Group;
@@ -87,7 +92,12 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ * @author Adán Román Ruiz (aroman@arvo.es)
+ * @author Sergio Fernández Celorio (sfernandez@arvo.es)
  */
+
+/*  Changes made by Sergio Fernandez and Adán Roman at Arvo Consultores under a contract awarded by  FECYT, Fundación Española de Ciencia y Tecnología (Spanish Foundation for Science and Technoloqy,)*/
+/*  Made avaliable to DSPACE by courtesy of FECYT (www.fecyt.es) */ 
 @Service
 public class SolrServiceImpl implements SearchService, IndexingService {
 
@@ -1193,6 +1203,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                         + AUTHORITY_SEPARATOR + authority);
                             }
                         }
+                        
+                        if(meta.getAuthority() != null) {
+                        	authority = meta.getAuthority();
+                        	AuthorityValue authorityValue = AuthorityServiceFactory.getInstance().getAuthorityValueService().findByUID(context, authority);
+                            
+                            if(authorityValue != null && authorityValue instanceof OrcidAuthorityValue)
+                            	doc.addField(searchFilter.getIndexFieldName() + "_orcid_id", ((OrcidAuthorityValue) authorityValue).getOrcid_id());
+                        }
 
                         //Add a dynamic fields for auto complete in search
                         doc.addField(searchFilter.getIndexFieldName() + "_ac",
@@ -2053,6 +2071,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 //Query the authority indexed field !
                 filterQuery.append("_authority");
+            }
+            else if ("orcid_id".equals(operator))
+            {
+            	//Query the orcid indexed field !
+                filterQuery.append("_orcid_id");
             }
             else if ("notequals".equals(operator)
                     || "notcontains".equals(operator)

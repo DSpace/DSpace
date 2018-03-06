@@ -39,8 +39,12 @@ import org.xml.sax.SAXException;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
- * @author Ad&aacute;n Rom&aacute;n Ruiz &lt;aroman@arvo.es&gt; (Bugfix)
+ * @author Adán Román Ruiz (aroman@arvo.es)
+ * @author Sergio Fernández Celorio (sfernandez@arvo.es)
  */
+
+/*  Changes made by Sergio Fernandez and Adán Roman at Arvo Consultores under a contract awarded by  FECYT, Fundación Española de Ciencia y Tecnología (Spanish Foundation for Science and Technoloqy,)*/
+/*  Made avaliable to DSPACE by courtesy of FECYT (www.fecyt.es) */
 public class SimpleSearch extends AbstractSearch implements CacheableProcessingComponent {
     /**
      * Language Strings
@@ -79,6 +83,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_filter_authority = message("xmlui.Discovery.SimpleSearch.filter.authority");
     private static final Message T_filter_notauthority = message("xmlui.Discovery.SimpleSearch.filter.notauthority");
     private static final Message T_did_you_mean = message("xmlui.Discovery.SimpleSearch.did_you_mean");
+    private static final Message T_filter_orcid = message("xmlui.Discovery.SimpleSearch.filter.orcid");
 
 
     /**
@@ -246,6 +251,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         {
             select.addOption(StringUtils.equals(searchFilter.getIndexFieldName(), selectedFilterType), searchFilter.getIndexFieldName(), message("xmlui.ArtifactBrowser.SimpleSearch.filter." + searchFilter.getIndexFieldName()));
         }
+        
         Select typeSelect = row.addCell("", Cell.ROLE_DATA, "selection").addSelect("filter_relational_operator_" + index);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "contains"), "contains", T_filter_contain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "equals"), "equals", T_filter_equals);
@@ -253,9 +259,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notcontains"), "notcontains", T_filter_notcontain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notequals"), "notequals", T_filter_notequals);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
-         
-
-
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "orcid_id"), "orcid_id", T_filter_orcid);
 
         //Add a box so we can search for our value
         row.addCell("", Cell.ROLE_DATA, "discovery-filter-input-cell").addText("filter_" + index, "discovery-filter-input").setValue(value == null ? "" : value);
