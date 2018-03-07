@@ -119,11 +119,11 @@
             margin-top: 10px;
         }
         #aspect_statistics_StatisticsTransformer_div_stats .ds-table-row {
-	        height: 40px;
-	    }
+            height: 40px;
+        }
         #aspect_statistics_StatisticsTransformer_div_stats tr.odd td {
-	        background-color: #eee;
-	    }
+            background-color: #eee;
+        }
         #aspect_statistics_StatisticsTransformer_div_stats th {
             padding: 0 8px;
             text-align: center;
@@ -137,12 +137,12 @@
         }
 
         #recently_integrated_journals img.pub-cover {
-	        margin: 7px 10px;
-	    }
+            margin: 7px 10px;
+        }
 
-	    #recently_integrated_journals .container {
-	        text-align: center;
-	    }
+        #recently_integrated_journals .container {
+            text-align: center;
+        }
 
             #dryad-home-carousel {
                 font-size: 23px;
@@ -214,7 +214,7 @@
 
             #connect-illustrated-prose img {
                 width: auto;
-                margin: 4px;		
+                margin: 4px;        
             }
 
             #aspect_discovery_SiteViewer_field_query {
@@ -246,7 +246,7 @@
                                 <img src="/themes/Mirage/images/integration-slide.jpg" alt="Publishers: Simplify data submission. Strengthen links between articles and data. For free. Integrate your journal with Dryad now" />
                             </a>
                         </div>
-                        <div><span class="publication-date">2015-02-15</span>
+                        <!--<div><span class="publication-date">2015-02-15</span>
                             <a href="/pages/dryadlab">
                                 <img alt="" src="/themes/Mirage/images/dryadlab-promo.png" />
                                 <p style="width: 580px; color: #444; font-size: 80%; top: 75px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
@@ -255,13 +255,13 @@
                                 <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 6px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn More &#187;</p>
                             </a>
                         </div>
-                        <!--><div><span class="publication-date">2015-03-23</span>
+                        <div><span class="publication-date">2015-03-23</span>
                             <a href="/pages/membershipOverview">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Help grow open data at Dryad:<br />Become an organizational member</p>
                                 <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn more &#187;</p>
                             </a>
-                        </div>-->
+                        </div>
                         <div><span class="publication-date">2013-02-01</span>
                             <p Xid="ds-dryad-is" style="font-size: 88%; line-height: 1.35em;"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
@@ -279,7 +279,7 @@
                             <a href="/pages/repository#keyFeatures">
                                 <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Deposit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
                             </a>
-                        </div>
+                        </div>-->
                     </div>
                 </div>
             </div>
@@ -294,7 +294,7 @@
             <div id="submit-data-sidebar-box" class="home-col-2 simple-box" style="padding: 8px 34px; width: 230px; margin: 8px 0 12px;">
                 <div class="ds-static-div primary" id="file_news_div_news" style="height: 75px;">
                     <p class="ds-paragraph">
-		      <!-- The next line should remain as one piece (without linebreaks) to allow it to be matched and replaced with mod_substitute on read-only servers -->
+              <!-- The next line should remain as one piece (without linebreaks) to allow it to be matched and replaced with mod_substitute on read-only servers -->
                         <a class="submitnowbutton"><xsl:attribute name="href"><xsl:value-of select="/dri:document/dri:options/dri:list[@n='submitNow']/dri:item[@n='submitnowitem']/dri:xref[@rend='submitnowbutton']/@target"/></xsl:attribute><xsl:text>Submit data now</xsl:text></a>
                     </p>
                     <p style="margin: 14px 0 4px;">
@@ -332,8 +332,8 @@
 
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 475px; font-size: 14px;">
                     <div id="connect-illustrated-prose">
-		      <a class="twitter-timeline" href="https://twitter.com/datadryad" data-widget-id="572434627277901824">Latest from @datadryad</a>
-		      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>	
+              <a class="twitter-timeline" href="https://twitter.com/datadryad" data-widget-id="572434627277901824">Latest from @datadryad</a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script> 
                     </div>
                 </div>
             </div>
@@ -567,14 +567,14 @@
         <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
             <p style="margin-bottom: 0;">
                 We encourage organizations to:</p>
-				<ul style="list-style: none; margin-left: 1em;">
-				<li><a href="/pages/membershipOverview">Become a member</a></li>
-				<li><a href="/pages/payment">Sponsor data publishing fees</a></li> 
-				<li><a href="/pages/submissionIntegration">Integrate your journal(s)</a>, or</li>
-				<li>All of the above</li>
-			</ul>
+                <ul style="list-style: none; margin-left: 1em;">
+                <li><a href="/pages/membershipOverview">Become a member</a></li>
+                <li><a href="/pages/payment">Sponsor data publishing fees</a></li> 
+                <li><a href="/pages/submissionIntegration">Integrate your journal(s)</a>, or</li>
+                <li>All of the above</li>
+            </ul>
         </div>      
-	  </div>
+      </div>
     </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='large-data-packages']" priority="3">
@@ -609,7 +609,7 @@
         <!-- START DEPOSIT -->
         <div class="ds-static-div primary" id="file_news_div_news">
             <p class="ds-paragraph">
-	      <!-- The next line should remain as one piece (without linebreaks) to allow it to be matched and replaced with mod_substitute on read-only servers -->
+          <!-- The next line should remain as one piece (without linebreaks) to allow it to be matched and replaced with mod_substitute on read-only servers -->
                 <a class="submitnowbutton"><xsl:attribute name="href"><xsl:value-of select="/dri:document/dri:options/dri:list[@n='submitNow']/dri:item[@n='submitnowitem']/dri:xref[@rend='submitnowbutton']/@target"/></xsl:attribute>Submit data now</a>
             </p>
             <p style="margin: 1em 0 4px;">
