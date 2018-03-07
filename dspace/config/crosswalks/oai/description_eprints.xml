@@ -1,0 +1,63 @@
+<eprints xmlns="http://www.openarchives.org/OAI/1.1/eprints" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/eprints http://www.openarchives.org/OAI/1.1/eprints.xsd">
+    <content>
+        <text>Content Policy for types of document &amp; data set held 
+1. This is an institutional or departmental repository.
+2. SEDICI holds all types of materials.
+3. Deposited items may include:
+(a) working drafts
+(b) submitted versions (as sent to journals for peer-review)
+(c) accepted versions (authors final peer-reviewed drafts)
+(d) published versions (publisher-created files)
+4. Items are individually tagged with:
+(a) their version type and date.
+(b) their peer-review status.
+(c) their publication status.
+5. Principal Languages: Spanish; English; Portuguese</text>
+    </content>
+    <metadataPolicy>
+        <text>1. Anyone may access the metadata free of charge.
+2. The metadata may be re-used in any medium without prior permission and re-sold commercially provided the OAI Identifier or a link to the original metadata record are given.
+3. For more information, please see webpage: http://sedici.unlp.edu.ar/pages/politicas</text>
+    </metadataPolicy>
+    <dataPolicy>
+        <text>Data Policy for full-text and other full data items 
+1. Anyone may access full items free of charge. 
+2. Copies of full items generally can be: reproduced, and displayed or performed, provided
+- the authors, title and full bibliographic details are given 
+- a hyperlink and/or URL are given for the original metadata page 
+3. Some full items are individually tagged with different rights permissions and conditions. 
+4. For more information see webpage: http://sedici.unlp.edu.ar/.</text>
+    </dataPolicy>
+    <submissionPolicy>
+        <text>Submission Policy concerning depositors, quality &amp; copyright 
+1. Items may only be deposited by accredited members, academic staff, registered students, and employees of the institution, or their delegated agents.
+2. Authors may only submit their own work for archiving.
+3. The administrator only vets items for relevance to the scope of SEDICI, valid layout &amp; format, and the exclusion of spam
+4. The validity and authenticity of the content of submissions is the sole responsibility of the depositor.
+5. Items can be deposited at any time, but will not be made publicly visible until any publishers or funders embargo period has expired.
+6. Any copyright violations are entirely the responsibility of the authors/depositors.
+7. If SEDICI receives proof of copyright violation, the relevant item will be removed immediately.</text>
+    </submissionPolicy>
+    <comment>Preservation Policy 
+1. Items will be retained indefinitely.
+2. SEDICI will try to ensure continued readability and accessibility.
+(a) Items will be migrated to new file formats where necessary.
+3. SEDICI is working with external partners to backup items in external archives  
+4. SEDICI regularly backs up its files according to current best practice.
+5. The original bit stream is retained for all items, in addition to any upgraded formats.
+6. Items may be removed at the request of the author/copyright holder, but this is strongly discouraged.
+7. Acceptable reasons for withdrawal include:
+(a) Journal publishers rules
+(b) Proven copyright violation or plagiarism
+(c) Legal requirements and proven violations
+(d) National Security
+(e) Falsified research
+8. Withdrawn items are not deleted per se, but are removed from public view.
+9. Withdrawn items identifiers/URLs are not retained.
+10. URLs will continue to point to tombstone citations, to avoid broken links and to retain item histories.  
+11. Errata and corrigenda lists may be included with the original record if required.
+12. If necessary, an updated version may be deposited.
+(a) The item s persistent URL will always link to the latest version.
+13. Items are allocated a checksum to facilitate the detection of alterations.
+14. No closure policy defined.</comment>
+</eprints>
