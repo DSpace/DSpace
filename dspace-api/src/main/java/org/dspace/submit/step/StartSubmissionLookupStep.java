@@ -300,7 +300,7 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             {
                 // update Submission Information with this Workspace Item
             	WorkspaceItem wsi= result.get(0);
-            	if(StringUtils.isNotBlank(fPath)){
+            	if(StringUtils.isNotBlank(fPath) && result.size() == 1){
             		File file = File.createTempFile("submission-lookup", uuid_batch);
             		if(file.exists()){
             			Item item = wsi.getItem();
