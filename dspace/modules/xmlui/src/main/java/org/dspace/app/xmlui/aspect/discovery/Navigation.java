@@ -234,7 +234,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
                 if (count++ > 3) break;
 
                 String journalName = journalConcept.getSearchableName();
-                String journalString = "@" + URLEncoder.encode(journalName, "UTF-8") + "@" +
+                String journalString = "@" + journalConcept.getISSN() + "@" +
                                        "#" + journalConcept.getCoverImage() + "#" +
                                        "$" + journalConcept.getFullName() + "$";
                 pageMeta.addMetadata("journal", "recentlyIntegrated").addContent(journalString);

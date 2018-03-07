@@ -1443,12 +1443,12 @@ parameter that is being used (see variable defined above) -->
     <xsl:template name="format-recently-integrated">
         <xsl:param name="nameString"/>
 
-        <xsl:variable name="journalSearch" select="substring-before(substring-after($nameString,'@'),'@')"/>
+        <xsl:variable name="issn" select="substring-before(substring-after($nameString,'@'),'@')"/>
         <xsl:variable name="imagelink" select="substring-before(substring-after($nameString,'#'),'#')"/>
         <xsl:variable name="journalName" select="substring-before(substring-after($nameString,'$'),'$')"/>
         <a class="single-image-link">
             <xsl:attribute name="href">
-                <xsl:value-of select="concat($context-path,'/discover?field=prism.publicationName_filter&amp;query=', $journalSearch)"/>
+                <xsl:value-of select="concat($context-path,'/journal/', $issn)"/>
             </xsl:attribute>
             <img class="pub-cover">
                 <xsl:attribute name="src">
