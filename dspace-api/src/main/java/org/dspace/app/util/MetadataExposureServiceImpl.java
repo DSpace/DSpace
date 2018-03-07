@@ -7,14 +7,19 @@
  */
 package org.dspace.app.util;
 
-import java.sql.*;
-import java.util.*;
-import org.apache.log4j.*;
-import org.dspace.app.util.service.*;
-import org.dspace.authorize.service.*;
-import org.dspace.core.*;
-import org.dspace.services.*;
-import org.springframework.beans.factory.annotation.*;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.dspace.app.util.service.MetadataExposureService;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Static utility class to manage configuration for exposure (hiding) of
@@ -138,7 +143,7 @@ public class MetadataExposureServiceImpl implements MetadataExposureService
             for (String key : propertyKeys) {
                 if (key.startsWith(CONFIG_PREFIX))
                 {
-                    if(configurationService.getBooleanProperty(key, true)){
+                    if (configurationService.getBooleanProperty(key, true)){
                     String mdField = key.substring(CONFIG_PREFIX.length());
                     String segment[] = mdField.split("\\.", 3);
 
