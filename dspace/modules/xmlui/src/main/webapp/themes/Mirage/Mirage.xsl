@@ -241,22 +241,12 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
-
-
                         <div><span class="publication-date">2015-04-14</span>
                             <a href="/pages/submissionIntegration">
                                 <img src="/themes/Mirage/images/integration-slide.jpg" alt="Publishers: Simplify data submission. Strengthen links between articles and data. For free. Integrate your journal with Dryad now" />
                             </a>
                         </div>
-
-                        <!--<<div><span class="publication-date">2015-04-14</span>
-                            <a href="/pages/submissionIntegration">
-                                <img src="/themes/Mirage/images/integration-slide.jpg" alt="Publishers: Simplify data submission. Strengthen links between articles and data. For free. Integrate your journal with Dryad now" />
-                            </a>
-                        </div>
-
-
-                        div><span class="publication-date">2015-02-15</span>
+                        <div><span class="publication-date">2015-02-15</span>
                             <a href="/pages/dryadlab">
                                 <img alt="" src="/themes/Mirage/images/dryadlab-promo.png" />
                                 <p style="width: 580px; color: #444; font-size: 80%; top: 75px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
@@ -265,17 +255,13 @@
                                 <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 6px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn More &#187;</p>
                             </a>
                         </div>
-
-
-                        <div><span class="publication-date">2015-03-23</span>
+                        <!--><div><span class="publication-date">2015-03-23</span>
                             <a href="/pages/membershipOverview">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Help grow open data at Dryad:<br />Become an organizational member</p>
                                 <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn more &#187;</p>
                             </a>
-                        </div>
-
-
+                        </div>-->
                         <div><span class="publication-date">2013-02-01</span>
                             <p Xid="ds-dryad-is" style="font-size: 88%; line-height: 1.35em;"
                                xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/">
@@ -289,16 +275,11 @@
                                 for a growing list of journals; submission of data from other publications is also welcome.
                             </p>
                         </div>
-                        
-
-
                         <div><span class="publication-date">2013-01-01</span>
                             <a href="/pages/repository#keyFeatures">
                                 <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Deposit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
                             </a>
                         </div>
-
-
                     </div>
                 </div>
             </div>
