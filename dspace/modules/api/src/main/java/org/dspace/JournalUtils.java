@@ -192,7 +192,7 @@ public class JournalUtils {
             }
 
             for (DryadJournalConcept concept : recentlyIntegratedJournals) {
-                if (concept.getFullName().equals(journalConcept.getFullName())) {
+                if (concept.getConceptID() == journalConcept.getConceptID()) {
                     recentlyIntegratedJournals.remove(concept);
                     break;
                 }
