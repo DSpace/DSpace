@@ -55,7 +55,7 @@
                 width: 100%;
             }
 
-            .myimg {display: block; margin-left: auto; margin-right: auto; width: 98%; border: none;}
+            .myimg {display: block; margin-left: auto; margin-right: auto; width: 100%; border: none;}
 
             .noborder {border: none;}
 
@@ -176,7 +176,11 @@
 
             #dryad-home-was-carousel > img,
             #dryad-home-was-carousel > a > img, {
-            display: block; margin-left: auto; margin-right: auto; width: 70%; 
+            display: block; margin-left: auto; margin-right: auto; width: 100%; height: 194px;
+
+            }
+            #dryad-home-was-carousel {
+            height: 194px;
 
             }
 
