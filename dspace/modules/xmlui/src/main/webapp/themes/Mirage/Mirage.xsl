@@ -248,16 +248,16 @@
             <!-- DF end -->
 
             <!-- CAROUSEL -->
-            <div class="home-col-1">
+            <!-- <div class="home-col-1">
                 <div id="dryad-home-carousel" class="ds-static-div primary">
-                    <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
-                    <div class="bxslider" style="">
+                    REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
+                    <!--<<div class="bxslider" style="">
                         <div><span class="publication-date">2015-04-14</span>
                             <a href="/pages/submissionIntegration">
                                 <img src="/themes/Mirage/images/openDataBestPractices.png" alt="Open data best practices: How to make your Dryad data package as reusable as possible " />
                             </a>
                         </div>
-                        <!--<div><span class="publication-date">2015-02-15</span>
+                        div><span class="publication-date">2015-02-15</span>
                             <a href="/pages/dryadlab">
                                 <img alt="" src="/themes/Mirage/images/dryadlab-promo.png" />
                                 <p style="width: 580px; color: #444; font-size: 80%; top: 75px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
@@ -290,10 +290,10 @@
                             <a href="/pages/repository#keyFeatures">
                                 <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Deposit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
                             </a>
-                        </div>-->
+                        </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
 
 
             <!-- START NEWS -->
