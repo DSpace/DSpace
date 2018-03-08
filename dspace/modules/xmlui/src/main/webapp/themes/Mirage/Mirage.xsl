@@ -252,6 +252,7 @@
 
 
             <!-- DF begin -->
+            
             <div class="home-col-1">
                        <div  id="dryad-home-was-carousel" class="ds-static-div primary">
                             <!-- <a href="/pages/reusabilityBestPractices" class = 'noborder'> -->
@@ -259,6 +260,7 @@
                             <!-- </a> -->
                         </div>
             </div>
+
             <!-- DF end -->
 
             <!-- CAROUSEL -->
