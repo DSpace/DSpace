@@ -254,7 +254,7 @@
                 </div>
             </div>
 
-            <!-- START BROWSE - DF -->
+            <!-- START BROWSE -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for data</h1>
                 <div id="browse-data-buttons" class="tab-buttons">
