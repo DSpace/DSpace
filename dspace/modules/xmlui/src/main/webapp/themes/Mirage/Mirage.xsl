@@ -151,66 +151,9 @@
             text-align: center;
         }
 
-            #dryad-home-carousel {
-                font-size: 23px;
-                font-weight: bold;
-                background-color: rgb(255, 255, 255);
-                height: 216px;
-                padding: 0px;
-                overflow: hidden;
-            }
-
-            #dryad-home-carousel .bx-viewport {
-                height: 194px;
-                width: 627px;
-            }
-
-            #dryad-home-carousel div.bxslider {
-                overflow: visible;
-            }
-
-            #dryad-home-carousel div.bxslider div {
-                height: 190px;
-                padding: 0;
-                margin: 0;
-                position: relative;
-                display: none;
-            }
-
-
             #dryad-home-top-left-display-box {
             height: 200px;
 
-            }
-
-            #dryad-home-carousel div.bxslider div > a > img,
-            #dryad-home-carousel div.bxslider div > img {
-                display: block;
-                height: 194px;
-                width: 627px;
-            }
-
-            #dryad-home-carousel div.bxslider div .publication-date {
-                display: none;
-            }
-
-            #dryad-home-carousel div.bxslider div p {
-                width: 550px;
-                margin: auto;
-                margin-top: 1em;
-            }
-
-            #dryad-home-carousel .bx-pager {
-            }
-            #dryad-home-carousel .bx-pager-item {
-            }
-
-            #dryad-home-carousel .bx-controls-auto {
-                bottom: -16px;
-            }
-            #dryad-home-carousel .bx-controls-auto-item {
-                float: right;
-                padding-right: 8px;
             }
 
             .blog-box ul {
