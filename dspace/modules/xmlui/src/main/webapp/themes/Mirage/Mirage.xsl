@@ -172,9 +172,8 @@
 
             #dryad-home-was-carousel > img,
             #dryad-home-was-carousel > a > img, {
-                display: block;
-                height: 189px;
-                width: 625px;
+            display: block; margin-left: auto; margin-right: auto; width: 70%; 
+
             }
 
             #dryad-home-carousel div.bxslider div > a > img,
