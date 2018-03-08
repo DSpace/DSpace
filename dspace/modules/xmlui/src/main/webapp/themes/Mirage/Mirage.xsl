@@ -250,14 +250,14 @@
             </xsl:if>
 
 
-            <!-- Start display box (was carousel) -->
+            <!-- Top Left display box (was carousel) -->
 
             <div class="home-col-1">
-                       <div  id="dryad-home-top-left-display-box" class="ds-static-div primary">
-                            <a href="/pages/reusabilityBestPractices">
-                                <img class = 'display-box-img' src="/themes/Mirage/images/openDataBestPractices.png" alt="Open data best practices: How to make your Dryad data package as reusable as possible " />
-                            </a>
-                        </div>
+                <div  id="dryad-home-top-left-display-box" class="ds-static-div primary">
+                    <a href="/pages/reusabilityBestPractices">
+                        <img class = 'display-box-img' src="/themes/Mirage/images/openDataBestPractices.png" alt="Open data best practices: How to make your Dryad data package as reusable as possible " />
+                    </a>
+                </div>
             </div>
 
 
