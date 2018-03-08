@@ -55,7 +55,7 @@
                 width: 100%;
             }
 
-            .myimg {display: block; margin-left: auto; margin-right: auto; width: 70%; }
+            .myimg {display: block; margin-left: auto; margin-right: auto; width: 90%; }
 
             .labelcell {
                 font-weight: bold;
