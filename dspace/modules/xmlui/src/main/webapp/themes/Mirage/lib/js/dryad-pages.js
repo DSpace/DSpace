@@ -407,11 +407,13 @@ jQuery(document).ready(function() {
     var apply_cell_markup = function(row, data, index) {
       // add link to /journal/nnnn-nnnn page if issn is available
       if (data.issn) {
-        var $link = $('<a></a>');
-        $link.attr('href', '/journal/' + data.issn);
-        $link.text(data.title);
-        $('td:eq(0)', row).text('');
-        $('td:eq(0)', row).append($link);
+          if (data.integrated === "Y" || data.sponsor !== "$120") {
+              var $link = $('<a></a>');
+              $link.attr('href', '/journal/' + data.issn);
+              $link.text(data.title);
+              $('td:eq(0)', row).text('');
+              $('td:eq(0)', row).append($link);
+          }
       }
       // apply markup for the currency selector
       if (data.sponsor.match(/^\$/)) {

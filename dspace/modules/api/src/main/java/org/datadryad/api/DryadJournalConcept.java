@@ -12,6 +12,7 @@ import org.dspace.JournalUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.File;
 import java.lang.*;
 import java.lang.Exception;
 import java.sql.SQLException;
@@ -41,8 +42,10 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     public static final String ISSN = "issn";
     public static final String MEMBERNAME = "memberName";
     public static final String COVER_IMAGE = "coverImage";
+    public static final String RECENTLY_INTEGRATED = "recentlyIntegrated";
 
     public static final String HASJOURNALPAGE = "hasJournalPage";
+    public static final String ALLOW_DATAFIRST_WORKFLOW = "allowDataFirstWorkflow";
 
     private static Logger log = Logger.getLogger(DryadJournalConcept.class);
 
@@ -63,6 +66,8 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         metadataProperties.setProperty(MEMBERNAME, "journal.memberName");
         metadataProperties.setProperty(HASJOURNALPAGE, "journal.hasJournalPage");
         metadataProperties.setProperty(COVER_IMAGE, "journal.coverImage");
+        metadataProperties.setProperty(ALLOW_DATAFIRST_WORKFLOW, "journal.allowDataFirstWorkflow");
+        metadataProperties.setProperty(RECENTLY_INTEGRATED, "journal.recentlyIntegrated");
 
         defaultMetadataValues.setProperty(metadataProperties.getProperty(JOURNAL_ID), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(CANONICAL_MANUSCRIPT_NUMBER_PATTERN), "");
@@ -80,6 +85,8 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         defaultMetadataValues.setProperty(metadataProperties.getProperty(MEMBERNAME), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(COVER_IMAGE), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(HASJOURNALPAGE), "");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(ALLOW_DATAFIRST_WORKFLOW), "false");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(RECENTLY_INTEGRATED), "false");
     }
 
     {
@@ -212,6 +219,12 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public String getCoverImage() {
+        String coverImagePath = getConceptMetadataValue(metadataProperties.getProperty(COVER_IMAGE));
+        if (coverImagePath != null) {
+            File coverImageFile = new File(coverImagePath);
+            return "https://s3.amazonaws.com/dryad-web-assets/coverimages/" + coverImageFile.getName();
+        }
+
         return getConceptMetadataValue(metadataProperties.getProperty(COVER_IMAGE));
     }
 
@@ -348,6 +361,19 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         setConceptMetadataValue(metadataProperties.getProperty(ALLOW_REVIEW_WORKFLOW), value);
     }
 
+    public Boolean getAllowDataFirstWorkflow() {
+        String metadataValue = getConceptMetadataValue(metadataProperties.getProperty(ALLOW_DATAFIRST_WORKFLOW));
+        Boolean result = false;
+        if (metadataValue.equals("true")) {
+            result = true;
+        }
+        return result;
+    }
+
+    public void setAllowDataFirstWorkflow(String value) {
+        setConceptMetadataValue(metadataProperties.getProperty(ALLOW_DATAFIRST_WORKFLOW), value);
+    }
+
     @JsonIgnore
     public void setBooleanAllowReviewWorkflow(Boolean value) {
         setAllowReviewWorkflow(value.toString());
@@ -391,6 +417,16 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
 
     public Boolean getPublicationBlackout() {
         String metadataValue = getConceptMetadataValue(metadataProperties.getProperty(PUBLICATION_BLACKOUT));
+        Boolean result = false;
+        if (metadataValue.equals("true")) {
+            result = true;
+        }
+        return result;
+    }
+
+    @JsonIgnore
+    public Boolean getRecentlyIntegrated() {
+        String metadataValue = getConceptMetadataValue(metadataProperties.getProperty(RECENTLY_INTEGRATED));
         Boolean result = false;
         if (metadataValue.equals("true")) {
             result = true;

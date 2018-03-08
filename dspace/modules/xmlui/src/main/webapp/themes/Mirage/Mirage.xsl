@@ -405,19 +405,13 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
-
-                        <!-- JAMIA Open -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajamia%5C+open%5C%7C%5C%7C%5C%7CJAMIA%5C+Open"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JAMIAO.png" alt="JAMIA Open" /></a>
-
-                        <!-- Alpine Entomology -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aalpine%5C+entomology%5C%7C%5C%7C%5C%7CAlpine%5C+Entomology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-AlpEnt.png" alt="Alpine Entomology" /></a>
-
-                        <!-- Check List -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Acheck%5C+list%5C%7C%5C%7C%5C%7CCheck%5C+List"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-CheckList.png" alt="Check List" /></a>
-
-                        <!-- Evolutionary Systematics -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aevolutionary%5C+systematics%5C%7C%5C%7C%5C%7CEvolutionary%5C+Systematics"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EvolSyst.png" alt="Evolutionary Systematics" /></a>
-
+                        <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='journal'][@qualifier='recentlyIntegrated']">
+                            <xsl:call-template name="format-recently-integrated">
+                                <xsl:with-param name="nameString">
+                                    <xsl:value-of select="self::*"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:for-each>
                     </div>
                 </div>
             </div>
@@ -1444,6 +1438,27 @@ parameter that is being used (see variable defined above) -->
         <xsl:call-template name="destructiveSubmitButton">
             <xsl:with-param name="confirmationText" select="'Are you sure you would like to delete this Data file?'" />
         </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template name="format-recently-integrated">
+        <xsl:param name="nameString"/>
+
+        <xsl:variable name="issn" select="substring-before(substring-after($nameString,'@'),'@')"/>
+        <xsl:variable name="imagelink" select="substring-before(substring-after($nameString,'#'),'#')"/>
+        <xsl:variable name="journalName" select="substring-before(substring-after($nameString,'$'),'$')"/>
+        <a class="single-image-link">
+            <xsl:attribute name="href">
+                <xsl:value-of select="concat($context-path,'/journal/', $issn)"/>
+            </xsl:attribute>
+            <img class="pub-cover">
+                <xsl:attribute name="src">
+                    <xsl:value-of select="$imagelink"/>
+                </xsl:attribute>
+                <xsl:attribute name="alt">
+                    <xsl:value-of select="$journalName"/>
+                </xsl:attribute>
+            </img>
+        </a>
     </xsl:template>
 
 </xsl:stylesheet>

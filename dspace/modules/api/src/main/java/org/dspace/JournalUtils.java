@@ -3,13 +3,13 @@ package org.dspace;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
-import org.datadryad.rest.models.Author;
-import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.RESTModelException;
+import org.datadryad.rest.models.*;
+import org.datadryad.rest.models.Package;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
@@ -27,8 +27,10 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.workflow.DryadWorkflowUtils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -65,6 +67,7 @@ public class JournalUtils {
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByJournalName = new HashMap<String, DryadJournalConcept>();
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByCustomerID = new HashMap<String, DryadJournalConcept>();
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByISSN = new HashMap<String, DryadJournalConcept>();
+    public static HashSet<DryadJournalConcept> recentlyIntegratedJournals = new HashSet<>();
 
     static {
         initializeJournalConcepts();
@@ -134,6 +137,9 @@ public class JournalUtils {
             if (journalConceptHashMapByISSN.containsValue(existingConcept)) {
                 journalConceptHashMapByISSN.remove(existingConcept.getISSN());
             }
+            if (recentlyIntegratedJournals.contains(existingConcept)) {
+                recentlyIntegratedJournals.remove(existingConcept);
+            }
             journalConceptHashMapByConceptIdentifier.remove(existingConcept.getIdentifier());
             try {
                 existingConcept.delete(context);
@@ -144,41 +150,58 @@ public class JournalUtils {
     }
 
     public static void updateDryadJournalConcept(DryadJournalConcept journalConcept) {
-        if (journalConceptHashMapByConceptIdentifier.containsValue(journalConcept)) {
+        if (journalConceptHashMapByConceptIdentifier.containsKey(journalConcept.getConceptID())) {
             for (String k : journalConceptHashMapByJournalName.keySet()) {
-                if (journalConceptHashMapByJournalName.get(k) == journalConcept) {
+                if (journalConceptHashMapByJournalName.get(k).compareTo(journalConcept) == 0) {
                     journalConceptHashMapByJournalName.remove(k);
-                }
-            }
-            for (String k : journalConceptHashMapByJournalID.keySet()) {
-                if (journalConceptHashMapByJournalID.get(k) == journalConcept) {
-                    journalConceptHashMapByJournalID.remove(k);
-                }
-            }
-            for (String k : journalConceptHashMapByCustomerID.keySet()) {
-                if (journalConceptHashMapByCustomerID.get(k) == journalConcept) {
-                    journalConceptHashMapByCustomerID.remove(k);
-                }
-            }
-            for (String k : journalConceptHashMapByISSN.keySet()) {
-                if (journalConceptHashMapByISSN.get(k) == journalConcept) {
-                    journalConceptHashMapByISSN.remove(k);
+                    break;
                 }
             }
             if (!"".equals(journalConcept.getFullName())) {
                 journalConceptHashMapByJournalName.put(journalConcept.getFullName().toUpperCase(), journalConcept);
             }
+
+            for (String k : journalConceptHashMapByJournalID.keySet()) {
+                if (journalConceptHashMapByJournalID.get(k).compareTo(journalConcept) == 0) {
+                    journalConceptHashMapByJournalID.remove(k);
+                    break;
+                }
+            }
             if (!"".equals(journalConcept.getJournalID())) {
                 journalConceptHashMapByJournalID.put(journalConcept.getJournalID().toUpperCase(), journalConcept);
+            }
+
+            for (String k : journalConceptHashMapByCustomerID.keySet()) {
+                if (journalConceptHashMapByCustomerID.get(k).compareTo(journalConcept) == 0) {
+                    journalConceptHashMapByCustomerID.remove(k);
+                    break;
+                }
             }
             if (!"".equals(journalConcept.getCustomerID())) {
                 journalConceptHashMapByCustomerID.put(journalConcept.getCustomerID(), journalConcept);
             }
+
+            for (String k : journalConceptHashMapByISSN.keySet()) {
+                if (journalConceptHashMapByISSN.get(k).compareTo(journalConcept) == 0) {
+                    journalConceptHashMapByISSN.remove(k);
+                    break;
+                }
+            }
             if (!"".equals(journalConcept.getISSN())) {
                 journalConceptHashMapByISSN.put(journalConcept.getISSN(), journalConcept);
             }
-        }
 
+            for (DryadJournalConcept concept : recentlyIntegratedJournals) {
+                if (concept.getConceptID() == journalConcept.getConceptID()) {
+                    recentlyIntegratedJournals.remove(concept);
+                    break;
+                }
+            }
+            if (journalConcept.getRecentlyIntegrated()) {
+                recentlyIntegratedJournals.add(journalConcept);
+            }
+        }
+        writeJournalLookupJSON();
     }
 
     public static DryadJournalConcept createJournalConcept(String journalName) throws StorageException {
@@ -723,6 +746,33 @@ public class JournalUtils {
         }
         return false;
     }
+
+    public static void writeJournalLookupJSON() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.registerModule(new SimpleModule().addSerializer(Journal.class, new Journal.JournalLookupSerializer()));
+            StringBuffer sb = new StringBuffer();
+            ArrayList<String> journalJSONs = new ArrayList<String>();
+            ArrayList<DryadJournalConcept> journalConcepts = new ArrayList<DryadJournalConcept>();
+            journalConcepts.addAll(journalConceptHashMapByISSN.values());
+            journalConcepts.sort(Comparator.naturalOrder());
+            for (DryadJournalConcept journalConcept : journalConcepts) {
+                journalJSONs.add(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(new Journal(journalConcept)));
+            }
+            sb.append("{\n\"data\" : [\n");
+            sb.append(String.join(",", journalJSONs));
+            sb.append("\n]\n}");
+
+            String jsonFilePath = ConfigurationManager.getProperty("dspace.dir") + "/webapps/xmlui/static/json/journal-lookup.json";
+            File jsonFile = new File(jsonFilePath);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(jsonFile));
+            bw.write(sb.toString());
+            bw.close();
+
+        } catch (Exception e) {
+        }
+    }
+
 
 
     public static String cleanJournalCode(String journalCode) {

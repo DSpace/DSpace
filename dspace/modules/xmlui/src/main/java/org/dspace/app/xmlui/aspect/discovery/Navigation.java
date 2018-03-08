@@ -13,6 +13,8 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
+import org.datadryad.api.DryadJournalConcept;
+import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -30,6 +32,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 
 /**
@@ -220,6 +223,22 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
                 pageMeta.addMetadata("focus","object").addContent("hdl:"+dso.getHandle());
                 this.getObjectManager().manageObject(dso);
                 dso = ((Item) dso).getOwningCollection();
+            }
+        }
+
+        // Add recently integrated journals
+        if (JournalUtils.recentlyIntegratedJournals.size() > 0) {
+            int count = 0;
+            for (DryadJournalConcept journalConcept : JournalUtils.recentlyIntegratedJournals) {
+                // we only have room for 4 journals:
+                if (count++ > 3) break;
+
+                String journalName = journalConcept.getSearchableName();
+                String journalString = "@" + journalConcept.getISSN() + "@" +
+                                       "#" + journalConcept.getCoverImage() + "#" +
+                                       "$" + journalConcept.getFullName() + "$";
+                pageMeta.addMetadata("journal", "recentlyIntegrated").addContent(journalString);
+
             }
         }
 

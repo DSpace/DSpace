@@ -90,4 +90,14 @@ Metadata that applies to journals may also be found in the Organization schema.-
         <schema>journal</schema>
         <element>coverImage</element>
     </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>allowDataFirstWorkflow</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>recentlyIntegrated</element>
+    </dc-type>
 </dspace-dc-types>
