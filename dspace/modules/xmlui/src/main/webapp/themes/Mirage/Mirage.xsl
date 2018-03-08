@@ -55,9 +55,9 @@
                 width: 100%;
             }
 
-            .myimg {display: block; margin-left: auto; margin-right: auto; width: 100%; border: none;}
+            .myimg {display: block; margin-left: auto; margin-right: auto; width: 100%; border: 0 none;}
 
-            .noborder {border: none;}
+            .noborder {border: 0 none;}
 
             .labelcell {
                 font-weight: bold;
@@ -255,7 +255,7 @@
             <div class="home-col-1">
                        <div  id="dryad-home-was-carousel" class="ds-static-div primary">
                             <a href="/pages/reusabilityBestPractices" class = 'noborder'>
-                                <img class = 'myimg' src="/themes/Mirage/images/openDataBestPractices.png" alt="Open data best practices: How to make your Dryad data package as reusable as possible " />
+                                <img class = 'myimg' src="/themes/Mirage/images/openDataBestPractices.png" alt="Open data best practices: How to make your Dryad data package as reusable as possible " style=”border-style: none;/>
                             </a>
                         </div>
             </div>
