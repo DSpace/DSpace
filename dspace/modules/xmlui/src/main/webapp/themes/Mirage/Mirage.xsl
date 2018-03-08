@@ -170,6 +170,7 @@
                 display: none;
             }
 
+            #dryad-home-was-carousel > a > img,
             #dryad-home-carousel div.bxslider div > a > img,
             #dryad-home-carousel div.bxslider div > img {
                 display: block;
@@ -239,7 +240,7 @@
 
             <!-- DF begin -->
             <div class="home-col-1">
-                       <div class="ds-static-div primary">
+                       <div  id="dryad-home-was-carousel" class="ds-static-div primary">
                             <a href="/pages/submissionIntegration">
                                 <img src="/themes/Mirage/images/openDataBestPractices.png" alt="Open data best practices: How to make your Dryad data package as reusable as possible " />
                             </a>
