@@ -179,6 +179,7 @@
                     </executions>
                 </plugin>
                 <!-- Used to validate all code style rules in source code via the Checkstyle config in checkstyle.xml -->
+                <!-- Can be skipped by passing -Dcheckstyle.skip=true to Maven. -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
@@ -186,8 +187,8 @@
                     <executions>
                         <execution>
                             <id>verify-style</id>
-                            <!-- Bind to process-classes so it runs after compile, but before package -->
-                            <phase>process-classes</phase>
+                            <!-- Bind to verify so it runs after package & unit tests, but before install -->
+                            <phase>verify</phase>
                             <goals>
                                 <goal>check</goal>
                             </goals>
