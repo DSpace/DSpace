@@ -170,7 +170,13 @@
                 display: none;
             }
 
-            #dryad-home-was-carousel > a > img,
+            #dryad-home-was-carousel > img,
+            #dryad-home-was-carousel > a > img, {
+                display: block;
+                height: 194px;
+                width: 627px;
+            }
+
             #dryad-home-carousel div.bxslider div > a > img,
             #dryad-home-carousel div.bxslider div > img {
                 display: block;
