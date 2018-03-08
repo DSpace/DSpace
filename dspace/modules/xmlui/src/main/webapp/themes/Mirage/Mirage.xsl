@@ -180,7 +180,7 @@
 
             }
             #dryad-home-was-carousel {
-            height: 194px;
+            height: 200px;
 
             }
 
