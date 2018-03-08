@@ -236,6 +236,13 @@
                 </div>
             </xsl:if>
 
+
+            <!-- DF begin -->
+            <div class="home-col-1">
+
+            </div>
+            <!-- DF end -->
+
             <!-- CAROUSEL -->
             <div class="home-col-1">
                 <div id="dryad-home-carousel" class="ds-static-div primary">
@@ -243,7 +250,7 @@
                     <div class="bxslider" style="">
                         <div><span class="publication-date">2015-04-14</span>
                             <a href="/pages/submissionIntegration">
-                                <img src="/themes/Mirage/images/integration-slide.jpg" alt="Publishers: Simplify data submission. Strengthen links between articles and data. For free. Integrate your journal with Dryad now" />
+                                <img src="/themes/Mirage/images/openDataBestPractices.png" alt="Open data best practices: How to make your Dryad data package as reusable as possible " />
                             </a>
                         </div>
                         <!--<div><span class="publication-date">2015-02-15</span>
@@ -338,7 +345,7 @@
                 </div>
             </div>
 
-            <!-- START BROWSE -->
+            <!-- START BROWSE - DF -->
             <div class="home-col-1">
                 <h1 class="ds-div-head">Browse for data</h1>
                 <div id="browse-data-buttons" class="tab-buttons">
