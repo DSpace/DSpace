@@ -55,6 +55,8 @@
                 width: 100%;
             }
 
+            .myimg {display: block; margin-left: auto; margin-right: auto; width: 70%; }
+
             .labelcell {
                 font-weight: bold;
             }
@@ -247,7 +249,7 @@
             <div class="home-col-1">
                        <div  id="dryad-home-was-carousel" class="ds-static-div primary">
                             <a href="/pages/submissionIntegration">
-                                <img src="/themes/Mirage/images/openDataBestPractices.png" alt="Open data best practices: How to make your Dryad data package as reusable as possible " />
+                                <img class = 'myimg' src="/themes/Mirage/images/openDataBestPractices.png" alt="Open data best practices: How to make your Dryad data package as reusable as possible " />
                             </a>
                         </div>
             </div>
