@@ -57,6 +57,8 @@
 
             .myimg {display: block; margin-left: auto; margin-right: auto; width: 98%; border: none;}
 
+            .noborder {border: none;}
+
             .labelcell {
                 font-weight: bold;
             }
@@ -248,7 +250,7 @@
             <!-- DF begin -->
             <div class="home-col-1">
                        <div  id="dryad-home-was-carousel" class="ds-static-div primary">
-                            <a href="/pages/submissionIntegration">
+                            <a href="/pages/reusabilityBestPractices" class = 'noborder'>
                                 <img class = 'myimg' src="/themes/Mirage/images/openDataBestPractices.png" alt="Open data best practices: How to make your Dryad data package as reusable as possible " />
                             </a>
                         </div>
