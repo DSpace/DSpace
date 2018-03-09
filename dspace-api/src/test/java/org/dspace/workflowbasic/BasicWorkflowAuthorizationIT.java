@@ -69,8 +69,8 @@ public class BasicWorkflowAuthorizationIT
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance()
-                                                                                             .getBasicWorkflowItemService();
+    protected BasicWorkflowItemService basicWorkflowItemService =
+        BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
     protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance()
                                                                                      .getBasicWorkflowService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();

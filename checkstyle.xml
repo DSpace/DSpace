@@ -22,6 +22,11 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
     <!-- Configure checker to run on files with these extensions -->
     <property name="fileExtensions" value="java, properties, cfg, xml"/>
 
+    <!-- Suppression configurations in checkstyle-suppressions.xml in same directory -->
+    <module name="SuppressionFilter">
+        <property name="file" value="${checkstyle.suppressions.file}" default="checkstyle-suppressions.xml"/>
+    </module>
+
     <!-- No tab characters ('\t') allowed in the source code -->
     <module name="FileTabCharacter">
         <property name="eachLine" value="true"/>
@@ -44,8 +49,8 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         <!-- Maximum line length is 120 characters -->
         <module name="LineLength">
             <property name="max" value="120"/>
-            <!-- Only exceptions are packages, imports and URLs -->
-            <property name="ignorePattern" value="^package.*|^import.*|http://|https://"/>
+            <!-- Only exceptions for packages, imports, URLs, and JavaDoc {@link} tags -->
+            <property name="ignorePattern" value="^package.*|^import.*|http://|https://|@link"/>
         </module>
 
         <!-- Highlight any TODO or FIXME comments in info messages -->

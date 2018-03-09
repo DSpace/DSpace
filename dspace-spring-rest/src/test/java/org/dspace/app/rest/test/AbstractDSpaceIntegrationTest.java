@@ -44,6 +44,11 @@ public class AbstractDSpaceIntegrationTest {
     protected static DSpaceKernelImpl kernelImpl;
 
     /**
+     * Default constructor
+     */
+    protected AbstractDSpaceIntegrationTest() { }
+
+    /**
      * This method will be run before the first test as per @BeforeClass. It will
      * initialize shared resources required for all tests of this class.
      *

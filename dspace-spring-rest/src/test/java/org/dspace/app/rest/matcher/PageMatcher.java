@@ -15,6 +15,7 @@ import org.hamcrest.Matcher;
 
 public class PageMatcher {
 
+    private PageMatcher() { }
 
     public static Matcher<? super Object> pageEntry(int number, int size) {
         return allOf(

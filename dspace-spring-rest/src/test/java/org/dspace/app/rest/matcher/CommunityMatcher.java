@@ -19,6 +19,8 @@ import org.hamcrest.Matchers;
 
 public class CommunityMatcher {
 
+    private CommunityMatcher() { }
+
     public static Matcher<? super Object> matchCommunityEntry(String name, UUID uuid, String handle) {
         return allOf(
             matchProperties(name, uuid, handle),

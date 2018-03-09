@@ -17,9 +17,7 @@ import org.hamcrest.Matcher;
 
 public class FacetEntryMatcher {
 
-    public FacetEntryMatcher() {
-
-    }
+    private FacetEntryMatcher() { }
 
     public static Matcher<? super Object> authorFacet(boolean hasNext) {
         return allOf(

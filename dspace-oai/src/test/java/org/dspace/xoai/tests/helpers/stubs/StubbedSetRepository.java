@@ -7,7 +7,6 @@
  */
 package org.dspace.xoai.tests.helpers.stubs;
 
-
 import static java.lang.Math.min;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 

@@ -176,7 +176,7 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         Cache c1 = cachingService.getCache("org.dspace.timtest.newcache", null);
         assertNotNull(c1);
 
-        // Test that new cache was created and total caches increases by one 
+        // Test that new cache was created and total caches increases by one
         caches = cachingService.getCaches();
         assertNotNull(caches);
         assertEquals(curSize + 1, caches.size());

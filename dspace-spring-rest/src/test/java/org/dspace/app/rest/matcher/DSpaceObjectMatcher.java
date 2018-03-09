@@ -15,6 +15,8 @@ import org.hamcrest.Matcher;
 
 public class DSpaceObjectMatcher {
 
+    private DSpaceObjectMatcher() { }
+
     public static Matcher<? super Object> match() {
         return allOf(
             hasJsonPath("$.uuid", notNullValue())

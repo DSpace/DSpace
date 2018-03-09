@@ -26,9 +26,7 @@ import org.hamcrest.Matchers;
  */
 public class BrowseIndexMatcher {
 
-    public BrowseIndexMatcher() {
-
-    }
+    private BrowseIndexMatcher() { }
 
     public static Matcher<? super Object> subjectBrowseIndex(final String order) {
         return allOf(

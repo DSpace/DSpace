@@ -343,7 +343,7 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
         File originalPdf = new File(testProps.getProperty("test.bitstream"));
 
 
-        try(InputStream is = new FileInputStream(originalPdf)) {
+        try (InputStream is = new FileInputStream(originalPdf)) {
 
             Item publicItem1 = ItemBuilder.createItem(context, col1)
                     .withTitle("Public item citation cover page test 1")
@@ -376,12 +376,14 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
                     //THe bytes of the content must match the original content
                     .andReturn().getResponse().getContentAsByteArray();
 
-            // The citation cover page contains the item title. We will now verify that the pdf text contains this title.
+            // The citation cover page contains the item title.
+            // We will now verify that the pdf text contains this title.
             String pdfText = extractPDFText(content);
             System.out.println(pdfText);
             assertTrue(StringUtils.contains(pdfText,"Public item citation cover page test 1"));
 
-            // The dspace-api/src/test/data/dspaceFolder/assetstore/ConstitutionofIreland.pdf file contains 64 pages, manually counted + 1 citation cover page
+            // The dspace-api/src/test/data/dspaceFolder/assetstore/ConstitutionofIreland.pdf file contains 64 pages,
+            // manually counted + 1 citation cover page
             assertEquals(65,getNumberOfPdfPages(content));
 
             //A If-None-Match HEAD request on the ETag must tell is the bitstream is not modified
@@ -399,8 +401,8 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
         pts.setSortByPosition(true);
 
         try (ByteArrayInputStream source = new ByteArrayInputStream(content);
-            Writer writer = new StringWriter();
-            PDDocument pdfDoc = PDDocument.load(source)){
+             Writer writer = new StringWriter();
+             PDDocument pdfDoc = PDDocument.load(source)) {
 
             pts.writeText(pdfDoc, writer);
             return writer.toString();
@@ -409,7 +411,7 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
 
     private int getNumberOfPdfPages(byte[] content) throws IOException {
         try (ByteArrayInputStream source = new ByteArrayInputStream(content);
-             PDDocument pdfDoc = PDDocument.load(source)){
+             PDDocument pdfDoc = PDDocument.load(source)) {
             return pdfDoc.getNumberOfPages();
         }
     }
