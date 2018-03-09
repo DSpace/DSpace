@@ -20,7 +20,7 @@ import java.util.Map;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -44,7 +44,7 @@ import org.dspace.statistics.content.filter.StatisticsFilter;
  */
 public class StatisticsDataWorkflow extends StatisticsData {
 
-    private static final Logger log = Logger.getLogger(StatisticsDataWorkflow.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StatisticsDataWorkflow.class);
 
     /**
      * Current DSpaceObject for which to generate the statistics.

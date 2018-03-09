@@ -17,7 +17,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.io.RandomAccessBufferedFileInputStream;
@@ -73,7 +73,7 @@ public class PDFPackager
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(PDFPackager.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PDFPackager.class);
 
     protected static final String BITSTREAM_FORMAT_NAME = "Adobe PDF";
 

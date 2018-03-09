@@ -9,7 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.DiscoverConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverFacetConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverFacetResultsConverter;
@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
 @Component(SearchResultsRest.CATEGORY + "." + SearchResultsRest.NAME)
 public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
-    private static final Logger log = Logger.getLogger(ScopeResolver.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopeResolver.class);
 
     @Autowired
     private DiscoveryConfigurationService searchConfigurationService;

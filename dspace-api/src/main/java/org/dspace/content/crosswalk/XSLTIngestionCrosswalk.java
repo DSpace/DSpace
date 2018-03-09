@@ -16,7 +16,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -55,7 +55,7 @@ public class XSLTIngestionCrosswalk
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(XSLTIngestionCrosswalk.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(XSLTIngestionCrosswalk.class);
 
     private static final String DIRECTION = "submission";
 

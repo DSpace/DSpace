@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;

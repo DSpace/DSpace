@@ -19,7 +19,7 @@ import java.util.UUID;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObjectServiceImpl;
@@ -50,7 +50,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     /**
      * log4j logger
      */
-    private final Logger log = Logger.getLogger(EPersonServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(EPersonServiceImpl.class);
 
     @Autowired(required = true)
     protected EPersonDAO ePersonDAO;

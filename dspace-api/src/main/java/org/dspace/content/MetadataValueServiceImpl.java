@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.MetadataValueDAO;
@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class MetadataValueServiceImpl implements MetadataValueService {
 
-    private static final Logger log = Logger.getLogger(MetadataValueServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValueServiceImpl.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;

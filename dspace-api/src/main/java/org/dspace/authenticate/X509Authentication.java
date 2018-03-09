@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
@@ -105,7 +105,7 @@ public class X509Authentication implements AuthenticationMethod {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(X509Authentication.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(X509Authentication.class);
 
     /**
      * public key of CA to check client certs against.

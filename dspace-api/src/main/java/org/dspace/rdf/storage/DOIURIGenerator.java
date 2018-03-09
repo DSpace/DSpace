@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Required;
  * @author pbecker
  */
 public class DOIURIGenerator implements URIGenerator {
-    private static final Logger log = Logger.getLogger(DOIURIGenerator.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DOIURIGenerator.class);
 
     protected static URIGenerator fallback;
 

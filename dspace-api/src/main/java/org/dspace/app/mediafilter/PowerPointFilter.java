@@ -10,7 +10,7 @@ package org.dspace.app.mediafilter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.hslf.extractor.PowerPointExtractor;
@@ -23,7 +23,7 @@ import org.dspace.content.Item;
  */
 public class PowerPointFilter extends MediaFilter {
 
-    private static Logger log = Logger.getLogger(PowerPointFilter.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PowerPointFilter.class);
 
     @Override
     public String getFilteredName(String oldFilename) {

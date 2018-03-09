@@ -22,7 +22,7 @@ import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.event.service.EventService;
 import org.dspace.services.ConfigurationService;
@@ -39,7 +39,7 @@ public class EventServiceImpl implements EventService {
     /**
      * log4j category
      */
-    private Logger log = Logger.getLogger(EventServiceImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(EventServiceImpl.class);
 
 
     protected DispatcherPoolFactory dispatcherFactory = null;

@@ -28,7 +28,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -95,7 +95,7 @@ public class SolrImportExport {
 
     private static final String MULTIPLE_VALUES_SPLITTER = ",";
 
-    private static final Logger log = Logger.getLogger(SolrImportExport.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrImportExport.class);
 
     /**
      * Default constructor

@@ -14,8 +14,8 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.InvalidDSpaceObjectTypeException;
 import org.dspace.app.rest.exception.InvalidRequestException;
 import org.dspace.app.rest.exception.InvalidSearchFacetException;
@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscoverQueryBuilder implements InitializingBean {
 
-    private static final Logger log = Logger.getLogger(DiscoverQueryBuilder.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DiscoverQueryBuilder.class);
 
     @Autowired
     private SearchService searchService;

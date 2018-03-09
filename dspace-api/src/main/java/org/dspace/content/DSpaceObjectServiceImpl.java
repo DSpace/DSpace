@@ -19,7 +19,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -48,7 +48,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(DSpaceObjectServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceObjectServiceImpl.class);
 
     @Autowired(required = true)
     protected ChoiceAuthorityService choiceAuthorityService;

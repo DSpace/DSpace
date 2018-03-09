@@ -22,7 +22,7 @@ import javax.mail.MessagingException;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -104,7 +104,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
     /**
      * log4j logger
      */
-    private final Logger log = Logger.getLogger(BasicWorkflowServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicWorkflowServiceImpl.class);
 
     @Override
     public int getWorkflowID(String state) {

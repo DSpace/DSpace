@@ -45,6 +45,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -103,9 +104,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author mdiggory at atmire.com
  */
 public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBean {
-    private static final Logger log
-        = LoggerFactory.getLogger(SolrLoggerServiceImpl.class);
-
+    
+	private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrLoggerServiceImpl.class);
+    
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
     protected SolrServer solr;
 

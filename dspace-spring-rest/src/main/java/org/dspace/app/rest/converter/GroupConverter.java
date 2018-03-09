@@ -10,7 +10,7 @@ package org.dspace.app.rest.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.eperson.Group;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GroupConverter extends DSpaceObjectConverter<Group, org.dspace.app.rest.model.GroupRest> {
 
-    private static final Logger log = Logger.getLogger(GroupConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(GroupConverter.class);
 
     @Override
     public GroupRest fromModel(Group obj) {

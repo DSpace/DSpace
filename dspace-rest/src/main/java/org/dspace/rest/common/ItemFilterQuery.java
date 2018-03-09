@@ -11,7 +11,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Metadata Query for DSpace Items using the REST API
@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
  */
 @XmlRootElement(name = "item-filter-query")
 public class ItemFilterQuery {
-    Logger log = Logger.getLogger(ItemFilterQuery.class);
+    Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemFilterQuery.class);
 
     private String field = "";
     private String operation = "";

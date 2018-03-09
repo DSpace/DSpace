@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -36,7 +36,7 @@ public class ItemCountDAOSolr implements ItemCountDAO {
     /**
      * Log4j logger
      */
-    private static Logger log = Logger.getLogger(ItemCountDAOSolr.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemCountDAOSolr.class);
 
     /**
      * DSpace context

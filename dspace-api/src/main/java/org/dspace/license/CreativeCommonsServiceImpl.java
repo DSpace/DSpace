@@ -22,7 +22,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -46,7 +46,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(CreativeCommonsServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsServiceImpl.class);
 
     /**
      * The Bundle Name

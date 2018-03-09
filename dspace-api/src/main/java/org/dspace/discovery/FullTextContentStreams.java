@@ -27,7 +27,7 @@ import com.google.common.collect.Iterables;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.util.ContentStreamBase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -42,7 +42,7 @@ import org.dspace.core.Context;
  * Construct a <code>ContentStream</code> from a <code>File</code>
  */
 public class FullTextContentStreams extends ContentStreamBase {
-    private static final Logger log = Logger.getLogger(FullTextContentStreams.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(FullTextContentStreams.class);
 
     public static final String FULLTEXT_BUNDLE = "TEXT";
 

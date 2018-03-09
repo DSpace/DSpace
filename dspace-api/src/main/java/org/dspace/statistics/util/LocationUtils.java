@@ -13,7 +13,7 @@ import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.I18nUtil;
 
 /**
@@ -24,7 +24,7 @@ import org.dspace.core.I18nUtil;
  * @author ben at atmire.com
  */
 public class LocationUtils {
-    private static final Logger logger = Logger.getLogger(LocationUtils.class);
+    private static final Logger logger = org.apache.logging.log4j.LogManager.getLogger(LocationUtils.class);
 
     private static final Properties countryToContinent = new Properties();
 

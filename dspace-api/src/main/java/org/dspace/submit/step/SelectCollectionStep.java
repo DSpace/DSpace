@@ -7,7 +7,7 @@
  */
 package org.dspace.submit.step;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
@@ -15,7 +15,7 @@ import org.dspace.submit.AbstractProcessingStep;
 
 public class SelectCollectionStep extends AbstractProcessingStep {
 
-    private static final Logger log = Logger.getLogger(SelectCollectionStep.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SelectCollectionStep.class);
 
     @Override
     public void doProcessing(Context context, Request req, InProgressSubmission wsi) {

@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -40,7 +40,7 @@ public abstract class AbstractCurationTask implements CurationTask {
     // curator-assigned taskId
     protected String taskId = null;
     // logger
-    private static Logger log = Logger.getLogger(AbstractCurationTask.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractCurationTask.class);
     protected CommunityService communityService;
     protected ItemService itemService;
     protected HandleService handleService;

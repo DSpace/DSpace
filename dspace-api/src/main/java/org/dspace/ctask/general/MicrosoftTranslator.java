@@ -16,7 +16,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -36,7 +36,7 @@ public class MicrosoftTranslator extends AbstractTranslator {
 
     protected final String baseUrl = "http://api.microsofttranslator.com/V2/Http.svc/Translate";
 
-    private static final Logger log = Logger.getLogger(MicrosoftTranslator.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MicrosoftTranslator.class);
 
 
     @Override

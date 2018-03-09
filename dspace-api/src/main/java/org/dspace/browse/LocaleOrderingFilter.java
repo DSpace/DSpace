@@ -12,7 +12,7 @@ import java.util.Locale;
 import com.ibm.icu.text.CollationElementIterator;
 import com.ibm.icu.text.Collator;
 import com.ibm.icu.text.RuleBasedCollator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.text.filter.TextFilter;
 
@@ -32,7 +32,7 @@ import org.dspace.text.filter.TextFilter;
  * @author Graham Triggs
  */
 public class LocaleOrderingFilter implements TextFilter {
-    private static Logger log = Logger.getLogger(LocaleOrderingFilter.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(LocaleOrderingFilter.class);
 
     /**
      * Uses a Locale dependent Collator to generate a sort string

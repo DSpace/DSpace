@@ -53,6 +53,7 @@ import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.MetsValidator;
 import edu.harvard.hul.ois.mets.helper.MetsWriter;
 import edu.harvard.hul.ois.mets.helper.PreformedXML;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -125,7 +126,8 @@ public abstract class AbstractMETSDisseminator
     /**
      * log4j category
      */
-    private static final Logger log = LoggerFactory.getLogger(AbstractMETSDisseminator.class);
+
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractMETSDisseminator.class);
 
     // JDOM xml output writer - indented format for readability.
     protected static XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());

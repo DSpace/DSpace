@@ -14,7 +14,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
 import org.dspace.app.rest.converter.ResourcePolicyConverter;
@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmissionService {
 
-    private static final Logger log = Logger.getLogger(SubmissionService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionService.class);
 
     @Autowired
     protected ConfigurationService configurationService;

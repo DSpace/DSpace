@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
@@ -70,7 +70,7 @@ public class ShibAuthentication implements AuthenticationMethod {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(ShibAuthentication.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ShibAuthentication.class);
 
     /**
      * Additional metadata mappings

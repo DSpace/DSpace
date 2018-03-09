@@ -32,7 +32,7 @@ import ORG.oclc.oai.harvester2.verb.ListIdentifiers;
 import ORG.oclc.oai.harvester2.verb.ListMetadataFormats;
 import ORG.oclc.oai.harvester2.verb.ListRecords;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -88,7 +88,7 @@ public class OAIHarvester {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(OAIHarvester.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OAIHarvester.class);
 
     private static final Namespace ATOM_NS = Namespace.getNamespace("http://www.w3.org/2005/Atom");
     private static final Namespace ORE_NS = Namespace.getNamespace("http://www.openarchives.org/ore/terms/");
