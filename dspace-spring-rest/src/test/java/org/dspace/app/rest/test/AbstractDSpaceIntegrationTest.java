@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
@@ -30,7 +30,7 @@ public class AbstractDSpaceIntegrationTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(AbstractDSpaceIntegrationTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractDSpaceIntegrationTest.class);
 
     /**
      * Test properties. These configure our general test environment

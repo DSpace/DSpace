@@ -10,7 +10,7 @@ package org.dspace.content.packager;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This is a superclass for exceptions representing a failure when

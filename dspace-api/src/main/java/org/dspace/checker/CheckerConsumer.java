@@ -7,7 +7,7 @@
  */
 package org.dspace.checker;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.content.Bitstream;
@@ -26,7 +26,7 @@ public class CheckerConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(CheckerConsumer.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CheckerConsumer.class);
 
     protected ChecksumHistoryService checksumHistoryService = CheckerServiceFactory.getInstance()
                                                                                    .getChecksumHistoryService();

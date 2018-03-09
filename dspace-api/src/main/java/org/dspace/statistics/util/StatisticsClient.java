@@ -15,7 +15,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.taskdefs.Get;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
@@ -27,7 +27,7 @@ import org.dspace.statistics.service.SolrLoggerService;
  * @author Stuart Lewis
  */
 public class StatisticsClient {
-    private static final Logger log = Logger.getLogger(StatisticsClient.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StatisticsClient.class);
 
     /**
      * Default constructor

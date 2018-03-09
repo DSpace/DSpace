@@ -17,7 +17,7 @@ import gr.ekt.bte.core.DataLoader;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.TransformationEngine;
 import gr.ekt.bte.dataloader.FileDataLoader;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.submit.util.SubmissionLookupDTO;
 
 /**
@@ -35,7 +35,7 @@ public class SubmissionLookupService {
 
     public static final String PROVIDER_NAME_FIELD = "provider_name_field";
 
-    private static Logger log = Logger.getLogger(SubmissionLookupService.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionLookupService.class);
 
     public static final String SEPARATOR_VALUE = "#######";
 

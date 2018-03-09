@@ -10,7 +10,7 @@ package org.dspace.discovery;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
@@ -30,7 +30,7 @@ public class IndexEventConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(IndexEventConsumer.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IndexEventConsumer.class);
 
     // collect Items, Collections, Communities that need indexing
     private Set<DSpaceObject> objectsToUpdate = null;

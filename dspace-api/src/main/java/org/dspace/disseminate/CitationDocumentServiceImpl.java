@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -59,7 +59,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     /**
      * Class Logger
      */
-    private static Logger log = Logger.getLogger(CitationDocumentServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CitationDocumentServiceImpl.class);
 
     /**
      * A set of MIME types that can have a citation page added to them. That is,

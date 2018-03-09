@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Resource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.exception.SourceExceptionHandler;
 
@@ -136,7 +136,7 @@ public abstract class AbstractRemoteMetadataSource {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(AbstractRemoteMetadataSource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractRemoteMetadataSource.class);
 
     /**
      * Command pattern implementation. the callable.call method will be retried

@@ -21,7 +21,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -33,7 +33,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class Report {
 
-    private static Logger log = Logger.getLogger(Report.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Report.class);
     public static final String EMAIL_PATH = "config/emails/healthcheck";
     // store the individual check reports
     private StringBuilder summary_;

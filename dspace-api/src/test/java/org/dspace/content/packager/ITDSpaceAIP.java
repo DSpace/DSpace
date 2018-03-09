@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -80,7 +80,7 @@ public class ITDSpaceAIP extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(ITDSpaceAIP.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ITDSpaceAIP.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();

@@ -17,7 +17,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.purl.sword.atom.Author;
 import org.purl.sword.atom.Content;
 import org.purl.sword.atom.Contributor;
@@ -62,7 +62,7 @@ public class DummyServer implements SWORDServer {
     /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(ServiceDocumentServlet.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ServiceDocumentServlet.class);
 
     /**
      * Provides a dumb but plausible service document - it contains

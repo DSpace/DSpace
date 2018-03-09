@@ -58,7 +58,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
@@ -124,7 +124,7 @@ import org.xml.sax.SAXException;
  * allow the registration of files (bitstreams) into DSpace.
  */
 public class ItemImportServiceImpl implements ItemImportService, InitializingBean {
-    private final Logger log = Logger.getLogger(ItemImportServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemImportServiceImpl.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;

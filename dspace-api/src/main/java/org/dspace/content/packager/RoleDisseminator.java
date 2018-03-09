@@ -21,7 +21,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -47,7 +47,7 @@ public class RoleDisseminator implements PackageDisseminator {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(RoleDisseminator.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RoleDisseminator.class);
 
     /**
      * DSpace Roles XML Namespace in JDOM form.

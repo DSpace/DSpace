@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
@@ -35,7 +35,7 @@ public class CreativeCommonsRDFStreamDisseminationCrosswalk
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(CreativeCommonsRDFStreamDisseminationCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsRDFStreamDisseminationCrosswalk.class);
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance()
                                                                                    .getCreativeCommonsService();

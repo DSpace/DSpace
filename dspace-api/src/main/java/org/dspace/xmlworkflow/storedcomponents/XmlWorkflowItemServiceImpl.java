@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -52,7 +52,7 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     /*
      * The current step in the workflow system in which this workflow item is present
      */
-    private Logger log = Logger.getLogger(XmlWorkflowItemServiceImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowItemServiceImpl.class);
 
 
     protected XmlWorkflowItemServiceImpl() {

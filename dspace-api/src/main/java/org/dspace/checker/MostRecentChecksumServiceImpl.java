@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.checker.dao.MostRecentChecksumDAO;
 import org.dspace.checker.service.ChecksumResultService;
 import org.dspace.checker.service.MostRecentChecksumService;
@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author kevinvandevelde at atmire.com
  */
 public class MostRecentChecksumServiceImpl implements MostRecentChecksumService {
-    private static final Logger log = Logger.getLogger(MostRecentChecksumServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MostRecentChecksumServiceImpl.class);
 
     @Autowired(required = true)
     protected MostRecentChecksumDAO mostRecentChecksumDAO;

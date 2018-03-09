@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
@@ -68,7 +68,7 @@ public class SolrBrowseDAO implements BrowseDAO {
     /**
      * Log4j log
      */
-    private static final Logger log = Logger.getLogger(SolrBrowseDAO.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrBrowseDAO.class);
 
     /**
      * The DSpace context

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Item;
@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DefaultItemVersionProvider extends AbstractVersionProvider implements ItemVersionProvider {
 
-    Logger log = Logger.getLogger(DefaultItemVersionProvider.class);
+    Logger log = org.apache.logging.log4j.LogManager.getLogger(DefaultItemVersionProvider.class);
 
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;

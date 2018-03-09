@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.purl.sword.base.HttpHeaders;
 import org.purl.sword.base.SWORDAuthenticationException;
 import org.purl.sword.base.SWORDErrorException;
@@ -49,7 +49,7 @@ public class ServiceDocumentServlet extends HttpServlet {
     /**
      * Logger
      */
-    private static final Logger log = Logger.getLogger(ServiceDocumentServlet.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ServiceDocumentServlet.class);
 
     /**
      * Initialise the servlet.

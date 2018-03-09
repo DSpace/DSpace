@@ -21,7 +21,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -45,7 +45,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 @Path("/hierarchy")
 @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class HierarchyResource extends Resource {
-    private static Logger log = Logger.getLogger(HierarchyResource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HierarchyResource.class);
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();

@@ -21,7 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -65,7 +65,7 @@ public class PackageUtils {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(PackageUtils.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PackageUtils.class);
 
     // Map of metadata elements for Communities and Collections
     // Format is alternating key/value in a straight array; use this

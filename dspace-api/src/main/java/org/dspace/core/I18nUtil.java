@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -35,7 +35,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 
 public class I18nUtil {
-    private static final Logger log = Logger.getLogger(I18nUtil.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(I18nUtil.class);
 
     // the default Locale of this DSpace Instance
     public static final Locale DEFAULTLOCALE = getDefaultLocale();

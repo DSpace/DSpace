@@ -16,7 +16,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -43,7 +43,7 @@ public class Item extends DSpaceObject {
                                                                                   .getMetadataExposureService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    Logger log = Logger.getLogger(Item.class);
+    Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
 
     String isArchived;
     String isWithdrawn;
