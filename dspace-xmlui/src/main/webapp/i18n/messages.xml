@@ -984,6 +984,7 @@
 	<message key="xmlui.administrative.FlowItemUtils.bitstream_delete">The selected bitstreams have been deleted.</message>
 	<message key="xmlui.administrative.FlowMapperUtils.map_items">The items were successfully mapped.</message>
 	<message key="xmlui.administrative.FlowMapperUtils.unmaped_items">The items have been unmapped.</message>
+	<message key="xmlui.administrative.FlowContainerUtils.entity.update_metadate_succuess">The metadata was successfully updated.</message>
 
 	<!-- general items for all of the eperson classes -->
 	<message key="xmlui.administrative.eperson.general.epeople_trail">Manage E-people</message>
@@ -1932,7 +1933,8 @@
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.label_existing_logo">Current logo</message>
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.submit_delete_logo">Remove logo</message>
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.submit_delete">Delete community</message>
-
+	<message key="xmlui.administrative.community.EditCommunityMetadataForm.submit_save">Save Updates</message>
+	
 	<!-- org.dspace.app.xmlui.administrative.community.CreateCommunityForm.java -->
 	<message key="xmlui.administrative.community.CreateCommunityForm.title">Create Community</message>
 	<message key="xmlui.administrative.community.CreateCommunityForm.trail">Create Community</message>
