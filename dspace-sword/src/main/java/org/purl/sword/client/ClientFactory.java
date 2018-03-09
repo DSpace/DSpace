@@ -7,7 +7,7 @@
  */
 package org.purl.sword.client;
 
-// Replace with log4j 2: import org.apache.logging.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.PropertyConfigurator;
 
 /**
  * Entry point for the SWORD Demonstration Client. This will parse the list of

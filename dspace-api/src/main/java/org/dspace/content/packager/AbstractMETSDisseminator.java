@@ -126,7 +126,6 @@ public abstract class AbstractMETSDisseminator
     /**
      * log4j category
      */
-
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractMETSDisseminator.class);
 
     // JDOM xml output writer - indented format for readability.
