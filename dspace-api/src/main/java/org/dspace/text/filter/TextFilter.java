@@ -9,11 +9,11 @@ package org.dspace.text.filter;
 
 /**
  * Define an interface for all browse ordering filters.
+ *
  * @author Graham Triggs
  */
-public interface TextFilter
-{
-	public String filter(String str);
-    
+public interface TextFilter {
+    public String filter(String str);
+
     public String filter(String str, String lang);
 }

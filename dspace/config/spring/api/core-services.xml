@@ -92,9 +92,7 @@
 
     <bean class="org.dspace.license.CreativeCommonsServiceImpl"/>
 
-    <!-- Statistics services are both lazy loaded (by name), as you are likely just using ONE of them and not both -->
-    <bean id="elasticSearchLoggerService" class="org.dspace.statistics.ElasticSearchLoggerServiceImpl" lazy-init="true"/>
-    <bean id="solrLoggerService" class="org.dspace.statistics.SolrLoggerServiceImpl" lazy-init="true"/>
+    <bean id="spiderDetectorService" class="org.dspace.statistics.util.SpiderDetectorServiceImpl"/>
 
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
@@ -103,19 +101,15 @@
     <bean class="org.dspace.workflowbasic.BasicWorkflowItemServiceImpl"/>
     <bean class="org.dspace.workflowbasic.BasicWorkflowServiceImpl"/>
 
-
-
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.InProgressUserServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.PoolTaskServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRoleServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItemServiceImpl"/>-->
-
-
     <!--Configurable workflow services, uncomment the xml workflow beans below to enable the configurable workflow-->
-    <!--<bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>-->
+    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.InProgressUserServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.PoolTaskServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRoleServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItemServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>-->
 
 </beans>

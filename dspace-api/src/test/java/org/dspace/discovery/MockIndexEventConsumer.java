@@ -19,13 +19,12 @@ import org.dspace.event.Event;
  * @author tdonohue
  */
 public class MockIndexEventConsumer
-        extends MockUp<IndexEventConsumer>
-{
+    extends MockUp<IndexEventConsumer> {
     @Mock
     public void consume(Context ctx, Event event) throws Exception {
         //do nothing - Solr is not running during unit testing, so we cannot index test content in Solr
     }
-    
+
     @Mock
     public void end(Context ctx) throws Exception {
         //do nothing - Solr is not running during unit testing, so we cannot index test content in Solr

@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.license; 
+package org.dspace.license;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -22,7 +22,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
-
+import org.dspace.license.factory.LicenseServiceFactory;
+import org.dspace.license.service.CreativeCommonsService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jaxen.JaxenException;
 import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Attribute;
@@ -30,430 +33,403 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 /**
- *  A wrapper around Creative Commons REST web services.
+ * A wrapper around Creative Commons REST web services.
  *
  * @author Wendy Bossons
  */
 public class CCLookup {
 
-        /** log4j logger */
-        private static Logger log = Logger.getLogger(CCLookup.class);
+    /**
+     * log4j logger
+     */
+    private static Logger log = Logger.getLogger(CCLookup.class);
 
-	private String cc_root;
-	private String jurisdiction; 
-	private List<String> lcFilter = new ArrayList<String>();
-	
-	private Document license_doc        = null;
-	private String rdfString            = null;
-	private String errorMessage         = null;
-	private boolean success             = false;
+    private String cc_root;
+    private String jurisdiction;
+    private List<String> lcFilter = new ArrayList<String>();
 
-	private SAXBuilder parser           = new SAXBuilder();
-	private List<CCLicense> licenses    = new ArrayList<CCLicense>();
-	private List<CCLicenseField> licenseFields = new ArrayList<CCLicenseField>();
+    private Document license_doc = null;
+    private String rdfString = null;
+    private String errorMessage = null;
+    private boolean success = false;
 
-	/**
-	 * Constructs a new instance with the default web services root.
-	 *
-	 */
-	public CCLookup() {
-		super();
-                
-                ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-                
-                cc_root = configurationService.getProperty("cc.api.rooturl");
-                
-                String jurisProp = configurationService.getProperty("cc.license.jurisdiction");
-		jurisdiction = (jurisProp != null) ? jurisProp : "";
-		
-		String[] filters = configurationService.getArrayProperty("cc.license.classfilter");
-		if (filters != null) {
-			for (String name: filters) {
-				lcFilter.add(name.trim());
-			}
-		}
-	}
+    private SAXBuilder parser = new SAXBuilder();
+    private List<CCLicense> licenses = new ArrayList<CCLicense>();
+    private List<CCLicenseField> licenseFields = new ArrayList<CCLicenseField>();
 
-	/**
-	 * Returns the id for a particular CCLicense label.  Returns an
-	 * empty string if no match is found.
-	 *
-	 * @param class_label The CCLicense label to find.
-	 * @return Returns a String containing the License class ID if the label
-	 * 			is found; if not found, returns an empty string.
-	 *
-	 * @see CCLicense
-	 *
-	 */
-	public String getLicenseId (String class_label) {
-		for (int i = 0; i < this.licenses.size(); i++) {
-			if ( ((CCLicense)this.licenses.get(i)).getLicenseName().equals(class_label)) {
-				return ( (CCLicense)this.licenses.get(i) ).getLicenseId();
-			}
-		}
+    protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance()
+                                                                                   .getCreativeCommonsService();
 
-		return "";
-	}
+    /**
+     * Constructs a new instance with the default web services root.
+     */
+    public CCLookup() {
+        super();
 
-	/**
-	 * Queries the web service for the available licenses.
-	 *
-	 * @param language The language to request labels and description strings in.
-	 * @return Returns a Map of CCLicense objects.
-	 *
-	 * @see Map
-	 * @see CCLicense
-	 *
-	 */
-	public Collection<CCLicense> getLicenses(String language) {
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-		// create XPath expressions
-		try {
-			JDOMXPath xp_Licenses = new JDOMXPath("//licenses/license");
-			JDOMXPath xp_LicenseID = new JDOMXPath("@id");
-			URL classUrl = new URL(this.cc_root + "/?locale=" + language);
-			Document classDoc = this.parser.build(classUrl);
-			// extract the identifiers and labels using XPath
-			List<Element> results = xp_Licenses.selectNodes(classDoc);
-			// populate licenses container
-			this.licenses.clear();
-			for (int i = 0; i < results.size(); i++) {
-				Element license = results.get(i);
-				// add if not filtered
-				String liD = ((Attribute)xp_LicenseID.selectSingleNode(license)).getValue();
-				if (! lcFilter.contains(liD)) {
-					this.licenses.add(new CCLicense(liD, license.getText(), i));
-				}
-			}
-		} catch (JaxenException jaxen_e) {
-			return null;
-		} catch (JDOMException jdom_e) {
-			return null;
-		} catch (IOException io_e) {
-			return null;
-		} catch (Exception e) {
-			// do nothing... but we should
-			return null;
-		}			
+        cc_root = configurationService.getProperty("cc.api.rooturl");
 
-		return licenses;
-	}
+        String jurisProp = configurationService.getProperty("cc.license.jurisdiction");
+        jurisdiction = (jurisProp != null) ? jurisProp : "";
 
+        String[] filters = configurationService.getArrayProperty("cc.license.classfilter");
+        if (filters != null) {
+            for (String name : filters) {
+                lcFilter.add(name.trim());
+            }
+        }
+    }
 
-	/**
-	 * Queries the web service for a set of licenseFields for a particular license class.
-	 *
-	 * @param license A String specifying the CCLicense identifier to
-	 * 			retrieve fields for.
-	 * @return A Collection of LicenseField objects.
-	 *
-	 * @see CCLicense
-	 *
-	 */
-	public Collection<CCLicenseField> getLicenseFields(String license, String language) {
+    /**
+     * Returns the id for a particular CCLicense label.  Returns an
+     * empty string if no match is found.
+     *
+     * @param class_label The CCLicense label to find.
+     * @return Returns a String containing the License class ID if the label
+     * is found; if not found, returns an empty string.
+     * @see CCLicense
+     */
+    public String getLicenseId(String class_label) {
+        for (int i = 0; i < this.licenses.size(); i++) {
+            if (((CCLicense) this.licenses.get(i)).getLicenseName().equals(class_label)) {
+                return ((CCLicense) this.licenses.get(i)).getLicenseId();
+            }
+        }
 
-		JDOMXPath xp_LicenseField;
-		JDOMXPath xp_LicenseID;
-		JDOMXPath xp_FieldType;
-		JDOMXPath xp_Description;
-		JDOMXPath xp_Label;
-		JDOMXPath xp_Enum;
+        return "";
+    }
 
-		Document fieldDoc;
+    /**
+     * Queries the web service for the available licenses.
+     *
+     * @param language The language to request labels and description strings in.
+     * @return Returns a Map of CCLicense objects.
+     * @see Map
+     * @see CCLicense
+     */
+    public Collection<CCLicense> getLicenses(String language) {
 
-		URL classUrl;
-		List results = null;
-		List enumOptions = null;
+        // create XPath expressions
+        try {
+            JDOMXPath xp_Licenses = new JDOMXPath("//licenses/license");
+            JDOMXPath xp_LicenseID = new JDOMXPath("@id");
+            URL classUrl = new URL(this.cc_root + "/?locale=" + language);
+            Document classDoc = this.parser.build(classUrl);
+            // extract the identifiers and labels using XPath
+            List<Element> results = xp_Licenses.selectNodes(classDoc);
+            // populate licenses container
+            this.licenses.clear();
+            for (int i = 0; i < results.size(); i++) {
+                Element license = results.get(i);
+                // add if not filtered
+                String liD = ((Attribute) xp_LicenseID.selectSingleNode(license)).getValue();
+                if (!lcFilter.contains(liD)) {
+                    this.licenses.add(new CCLicense(liD, license.getText(), i));
+                }
+            }
+        } catch (JaxenException jaxen_e) {
+            return null;
+        } catch (JDOMException jdom_e) {
+            return null;
+        } catch (IOException io_e) {
+            return null;
+        } catch (Exception e) {
+            // do nothing... but we should
+            return null;
+        }
 
-		// create XPath expressions
-		try {
-			xp_LicenseField = new JDOMXPath("//field");
-			xp_LicenseID = new JDOMXPath("@id");
-			xp_Description = new JDOMXPath("description");
-			xp_Label = new JDOMXPath("label");
-			xp_FieldType = new JDOMXPath("type");
-			xp_Enum = new JDOMXPath("enum");
-
-		} catch (JaxenException e) {
-			return null;
-		}
-
-		// retrieve and parse the license class document
-		try {
-			classUrl = new URL(this.cc_root + "/license/" + license + "?locale=" + language);
-		} catch (Exception err) {
-			// do nothing... but we should
-			return null;
-		}
-
-		// parse the licenses document
-		try {
-			fieldDoc = this.parser.build(classUrl);
-		} catch (JDOMException e) {
-			return null;
-		} catch (IOException e) {
-			return null;
-		}
-
-		// reset the field definition container
-		this.licenseFields.clear();
-
-		// extract the identifiers and labels using XPath
-		try {
-			results = xp_LicenseField.selectNodes(fieldDoc);
-		} catch (JaxenException e) {
-			return null;
-		}
-
-		for (int i=0; i < results.size(); i++) {
-			Element field = (Element)results.get(i);
-
-			try {
-				// create the field object
-				CCLicenseField cclicensefield = new CCLicenseField(((Attribute)xp_LicenseID.selectSingleNode(field)).getValue(),
-						((Element)xp_Label.selectSingleNode(field)).getText() );
-
-				// extract additional properties
-				cclicensefield.setDescription( ((Element)xp_Description.selectSingleNode(field)).getText() );
-				cclicensefield.setType( ((Element)xp_FieldType.selectSingleNode(field)).getText() );
-
-				enumOptions = xp_Enum.selectNodes(field);
-
-				for (int j = 0; j < enumOptions.size(); j++) {
-					String id = ((Attribute)xp_LicenseID.selectSingleNode(enumOptions.get(j))).getValue();
-					String label =((Element)xp_Label.selectSingleNode(enumOptions.get(j))).getText();
-
-					cclicensefield.getEnum().put( id, label);
-
-				} // for each enum option
-
-				this.licenseFields.add(cclicensefield);
-			} catch (JaxenException e) {
-				return null;
-			}
-		}
-
-		return licenseFields;
-	} // licenseFields
-
-	/**
-	 * Passes a set of "answers" to the web service and retrieves a license.
-	 *
-	 * @param licenseId The identifier of the license class being requested.
-	 * @param answers A Map containing the answers to the license fields;
-	 * 			each key is the identifier of a LicenseField, with the value
-	 * 			containing the user-supplied answer.
-	 * @param lang The language to request localized elements in.
-	 *
-	 * @throws IOException if IO error
-	 *
-	 * @see CCLicense
-	 * @see Map
-	 */
-	public void issue(String licenseId, Map answers, String lang)
-		throws IOException{
-
-		// Determine the issue URL
-		String issueUrl = this.cc_root + "/license/" + licenseId + "/issue";
-		// Assemble the "answers" document
-		String answer_doc = "<answers>\n<locale>" + lang + "</locale>\n" + "<license-" + licenseId + ">\n";
-		Iterator keys = answers.keySet().iterator();
-
-		try {
-			String current = (String)keys.next();
-
-			while (true) {
-				answer_doc += "<" + current + ">" + (String)answers.get(current) + "</" + current + ">\n";
-				current = (String)keys.next();
-			}
+        return licenses;
+    }
 
 
-		} catch (NoSuchElementException e) {
-			// exception indicates we've iterated through the
-			// entire collection; just swallow and continue
-		}
-		// answer_doc +=	"<jurisdiction></jurisidiction>\n";  FAILS with jurisdiction argument
-		answer_doc +=						"</license-" + licenseId + ">\n</answers>\n";
-		String post_data;
+    /**
+     * Queries the web service for a set of licenseFields for a particular license class.
+     *
+     * @param license  A String specifying the CCLicense identifier to
+     *                 retrieve fields for.
+     * @param language the locale string
+     * @return A Collection of LicenseField objects.
+     * @see CCLicense
+     */
+    public Collection<CCLicenseField> getLicenseFields(String license, String language) {
 
-		try {
-			post_data = URLEncoder.encode("answers", "UTF-8") + "=" + URLEncoder.encode(answer_doc, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			return;
-		}
+        JDOMXPath xp_LicenseField;
+        JDOMXPath xp_LicenseID;
+        JDOMXPath xp_FieldType;
+        JDOMXPath xp_Description;
+        JDOMXPath xp_Label;
+        JDOMXPath xp_Enum;
 
-		URL post_url;
-		try {
-			post_url = new URL(issueUrl);
-		} catch (MalformedURLException e) {
-			return;
-		}
-		URLConnection connection = post_url.openConnection();
-		// this will not be needed after I'm done TODO: remove
-		connection.setDoOutput(true);
-		OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-		writer.write(post_data);
-		writer.flush();
-		// end TODO
-		try {
-			// parsing document from input stream
-			java.io.InputStream stream = connection.getInputStream();
-			this.license_doc = this.parser.build(stream);
-		} catch (JDOMException jde) {
-                        log.warn(jde.getMessage());
-		} catch (Exception e) {
-			log.warn(e.getCause());
-		}
-		return;
-	} // issue
+        Document fieldDoc;
 
-/**
-	 * Passes a set of "answers" to the web service and retrieves a license.
-	 *
-	 * @param licenseURI The uri of the license.
-	 *
-	 * Note: does not support localization in 1.5 -- not yet
-	 *
-	 * @throws IOException if IO error
-	 *
-	 * @see CCLicense
-	 * @see Map
-	 */
-	public void issue(String licenseURI)
-		throws IOException{
+        URL classUrl;
+        List results = null;
+        List enumOptions = null;
 
-		// Determine the issue URL
-                 // Example: http://api.creativecommons.org/rest/1.5/details?
-                //  license-uri=http://creativecommons.org/licenses/by-nc-sa/3.0/
-		String issueUrl = cc_root + "/details?license-uri=" + licenseURI;
+        // create XPath expressions
+        try {
+            xp_LicenseField = new JDOMXPath("//field");
+            xp_LicenseID = new JDOMXPath("@id");
+            xp_Description = new JDOMXPath("description");
+            xp_Label = new JDOMXPath("label");
+            xp_FieldType = new JDOMXPath("type");
+            xp_Enum = new JDOMXPath("enum");
 
-		URL request_url;
-		try {
-			request_url = new URL(issueUrl);
-		} catch (MalformedURLException e) {
-			return;
-		}
-		URLConnection connection = request_url.openConnection();
-		// this will not be needed after I'm done TODO: remove
-		connection.setDoOutput(true);
-		try {
-			// parsing document from input stream
-			java.io.InputStream stream = connection.getInputStream();
-			license_doc = this.parser.build(stream);
-		} catch (JDOMException jde) {
-			log.warn( jde.getMessage());
-		} catch (Exception e) {
-			log.warn(e.getCause());
-		}
-		return;
-	} // issue
+        } catch (JaxenException e) {
+            return null;
+        }
 
-	/**
-	 * Retrieves the URI for the license issued.
-	 *
-	 * @return A String containing the URI for the license issued.
-	 */
-	public String getLicenseUrl() {
-		String text = null;
-		try {
-			JDOMXPath xp_LicenseName = new JDOMXPath("//result/license-uri");
-		    text =  ((Element)xp_LicenseName.selectSingleNode(this.license_doc)).getText();
-		}
-		catch (Exception e) {
-			log.warn(e.getMessage());
-			setSuccess(false);
-			text = "An error occurred getting the license - uri.";
-		}
-		finally
-		{
-			return text;
-		}
-	} // getLicenseUrl
+        // retrieve and parse the license class document
+        try {
+            classUrl = new URL(this.cc_root + "/license/" + license + "?locale=" + language);
+        } catch (Exception err) {
+            // do nothing... but we should
+            return null;
+        }
 
-	/**
-	 * Retrieves the human readable name for the license issued.
-	 *
-	 * @return A String containing the license name.
-	 */
-	public String getLicenseName() {
-		String text = null;
-		try {
-			JDOMXPath xp_LicenseName = new JDOMXPath("//result/license-name");
-			text =  ((Element)xp_LicenseName.selectSingleNode(this.license_doc)).getText();
-		}
-		catch (Exception e) {
-			log.warn(e.getMessage());
-			setSuccess(false);
-			text = "An error occurred on the license name.";
-		}
-		finally
-		{
-			return text;
-		}
-	} // getLicenseName
+        // parse the licenses document
+        try {
+            fieldDoc = this.parser.build(classUrl);
+        } catch (JDOMException e) {
+            return null;
+        } catch (IOException e) {
+            return null;
+        }
+
+        // reset the field definition container
+        this.licenseFields.clear();
+
+        // extract the identifiers and labels using XPath
+        try {
+            results = xp_LicenseField.selectNodes(fieldDoc);
+        } catch (JaxenException e) {
+            return null;
+        }
+
+        for (int i = 0; i < results.size(); i++) {
+            Element field = (Element) results.get(i);
+
+            try {
+                // create the field object
+                CCLicenseField cclicensefield = new CCLicenseField(
+                    ((Attribute) xp_LicenseID.selectSingleNode(field)).getValue(),
+                    ((Element) xp_Label.selectSingleNode(field)).getText());
+
+                // extract additional properties
+                cclicensefield.setDescription(((Element) xp_Description.selectSingleNode(field)).getText());
+                cclicensefield.setType(((Element) xp_FieldType.selectSingleNode(field)).getText());
+
+                enumOptions = xp_Enum.selectNodes(field);
+
+                for (int j = 0; j < enumOptions.size(); j++) {
+                    String id = ((Attribute) xp_LicenseID.selectSingleNode(enumOptions.get(j))).getValue();
+                    String label = ((Element) xp_Label.selectSingleNode(enumOptions.get(j))).getText();
+
+                    cclicensefield.getEnum().put(id, label);
+
+                } // for each enum option
+
+                this.licenseFields.add(cclicensefield);
+            } catch (JaxenException e) {
+                return null;
+            }
+        }
+
+        return licenseFields;
+    } // licenseFields
+
+    /**
+     * Passes a set of "answers" to the web service and retrieves a license.
+     *
+     * @param licenseId The identifier of the license class being requested.
+     * @param answers   A Map containing the answers to the license fields;
+     *                  each key is the identifier of a LicenseField, with the value
+     *                  containing the user-supplied answer.
+     * @param lang      The language to request localized elements in.
+     * @throws IOException if IO error
+     * @see CCLicense
+     * @see Map
+     */
+    public void issue(String licenseId, Map answers, String lang)
+        throws IOException {
+
+        // Determine the issue URL
+        String issueUrl = this.cc_root + "/license/" + licenseId + "/issue";
+        // Assemble the "answers" document
+        String answer_doc = "<answers>\n<locale>" + lang + "</locale>\n" + "<license-" + licenseId + ">\n";
+        Iterator keys = answers.keySet().iterator();
+
+        try {
+            String current = (String) keys.next();
+
+            while (true) {
+                answer_doc += "<" + current + ">" + (String) answers.get(current) + "</" + current + ">\n";
+                current = (String) keys.next();
+            }
 
 
-	public org.jdom.Document getLicenseDocument() {
-		return this.license_doc;
-	}
+        } catch (NoSuchElementException e) {
+            // exception indicates we've iterated through the
+            // entire collection; just swallow and continue
+        }
+        // answer_doc +=    "<jurisdiction></jurisidiction>\n";  FAILS with jurisdiction argument
+        answer_doc += "</license-" + licenseId + ">\n</answers>\n";
+        String post_data;
 
-	public String getRdf()
-		throws IOException {
-		String myString = null;
-		java.io.ByteArrayOutputStream outputstream = new java.io.ByteArrayOutputStream();
-		try {
-			outputstream.write("<result>\n".getBytes()); 
-			JDOMXPath xpathRdf 				= new JDOMXPath("//result/rdf");
-			JDOMXPath xpathLicenseRdf 				= new JDOMXPath("//result/licenserdf");
-			XMLOutputter xmloutputter 	= new XMLOutputter();
-			Element rdfParent     				= ((Element)xpathRdf.selectSingleNode(this.license_doc));
-			xmloutputter.output(rdfParent, outputstream);
-			Element licenseRdfParent       = ((Element)xpathLicenseRdf.selectSingleNode(this.license_doc));
-			outputstream.write("\n".getBytes());
-			xmloutputter.output(licenseRdfParent, outputstream);
-			outputstream.write("\n</result>\n".getBytes());
-		} catch (Exception e) {
-			log.warn("An error occurred getting the rdf . . ." + e.getMessage() );
-			setSuccess(false);
-		} finally {
-			outputstream.close();
-			return outputstream.toString();
-		}
-	}
+        try {
+            post_data = URLEncoder.encode("answers", "UTF-8") + "=" + URLEncoder.encode(answer_doc, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return;
+        }
 
-	public boolean isSuccess() {
-		setSuccess(false);
-		JDOMXPath xp_Success;
-		String text = null;
-		try {
-			xp_Success = new JDOMXPath("//message");
-			text =  ((Element)xp_Success.selectSingleNode(this.license_doc)).getText();
-			setErrorMessage(text);
-		}
-		catch (Exception e) {
-			log.warn("There was an issue . . . " + text);
-			setSuccess(true);
-		}
-		return this.success;
-	}
+        URL post_url;
+        try {
+            post_url = new URL(issueUrl);
+        } catch (MalformedURLException e) {
+            return;
+        }
+        URLConnection connection = post_url.openConnection();
+        // this will not be needed after I'm done TODO: remove
+        connection.setDoOutput(true);
+        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+        writer.write(post_data);
+        writer.flush();
+        // end TODO
+        try {
+            // parsing document from input stream
+            java.io.InputStream stream = connection.getInputStream();
+            this.license_doc = this.parser.build(stream);
+        } catch (JDOMException jde) {
+            log.warn(jde.getMessage());
+        } catch (Exception e) {
+            log.warn(e.getCause());
+        }
+        return;
+    } // issue
 
-	private void setSuccess(boolean success) {
-		this.success = success;
-	}
+    /**
+     * Passes a set of "answers" to the web service and retrieves a license.
+     *
+     * @param licenseURI The uri of the license.
+     *
+     *                   Note: does not support localization in 1.5 -- not yet
+     * @throws IOException if IO error
+     * @see CCLicense
+     * @see Map
+     */
+    public void issue(String licenseURI)
+        throws IOException {
 
-	public String getErrorMessage() {
-		return this.errorMessage;
-	}
+        // Determine the issue URL
+        // Example: http://api.creativecommons.org/rest/1.5/details?
+        //  license-uri=http://creativecommons.org/licenses/by-nc-sa/3.0/
+        String issueUrl = cc_root + "/details?license-uri=" + licenseURI;
 
-	private void setErrorMessage(String errorMessage) {
-		this.errorMessage = errorMessage;
-	}
+        URL request_url;
+        try {
+            request_url = new URL(issueUrl);
+        } catch (MalformedURLException e) {
+            return;
+        }
+        URLConnection connection = request_url.openConnection();
+        // this will not be needed after I'm done TODO: remove
+        connection.setDoOutput(true);
+        try {
+            // parsing document from input stream
+            java.io.InputStream stream = connection.getInputStream();
+            license_doc = this.parser.build(stream);
+        } catch (JDOMException jde) {
+            log.warn(jde.getMessage());
+        } catch (Exception e) {
+            log.warn(e.getCause());
+        }
+        return;
+    } // issue
+
+    /**
+     * Retrieves the URI for the license issued.
+     *
+     * @return A String containing the URI for the license issued.
+     */
+    public String getLicenseUrl() {
+        String text = null;
+        try {
+            JDOMXPath xp_LicenseName = new JDOMXPath("//result/license-uri");
+            text = ((Element) xp_LicenseName.selectSingleNode(this.license_doc)).getText();
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            setSuccess(false);
+            text = "An error occurred getting the license - uri.";
+        } finally {
+            return text;
+        }
+    } // getLicenseUrl
+
+    /**
+     * Retrieves the human readable name for the license issued.
+     *
+     * @return A String containing the license name.
+     */
+    public String getLicenseName() {
+        String text = null;
+        try {
+            JDOMXPath xp_LicenseName = new JDOMXPath("//result/license-name");
+            text = ((Element) xp_LicenseName.selectSingleNode(this.license_doc)).getText();
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            setSuccess(false);
+            text = "An error occurred on the license name.";
+        } finally {
+            return text;
+        }
+    } // getLicenseName
+
+
+    public org.jdom.Document getLicenseDocument() {
+        return this.license_doc;
+    }
+
+    public String getRdf()
+        throws IOException {
+        String result = "";
+        try {
+            result = creativeCommonsService.fetchLicenseRDF(license_doc);
+        } catch (Exception e) {
+            log.warn("An error occurred getting the rdf . . ." + e.getMessage());
+            setSuccess(false);
+        }
+        return result;
+    }
+
+    public boolean isSuccess() {
+        setSuccess(false);
+        JDOMXPath xp_Success;
+        String text = null;
+        try {
+            xp_Success = new JDOMXPath("//message");
+            text = ((Element) xp_Success.selectSingleNode(this.license_doc)).getText();
+            setErrorMessage(text);
+        } catch (Exception e) {
+            log.warn("There was an issue . . . " + text);
+            setSuccess(true);
+        }
+        return this.success;
+    }
+
+    private void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getErrorMessage() {
+        return this.errorMessage;
+    }
+
+    private void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
 
 }

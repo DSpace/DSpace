@@ -18,12 +18,14 @@ import org.junit.Test;
  * (no implementation) no tests are added. This class is created for
  * coberture purposes and in case we want to use this class as parent
  * of the unit tests related to this interface
+ *
  * @author pvillega
  */
-public class InProgressSubmissionTest extends AbstractUnitTest
-{
+public class InProgressSubmissionTest extends AbstractUnitTest {
 
-    /** log4j category */
+    /**
+     * log4j category
+     */
     private static final Logger log = Logger.getLogger(InProgressSubmissionTest.class);
 
     /**
@@ -35,8 +37,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
     }
 
@@ -49,8 +50,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      */
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         super.destroy();
     }
 
@@ -58,17 +58,15 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of getID method, of class InProgressSubmission.
      */
     @Test
-    public void testGetID()
-    {
-        
+    public void testGetID() {
+
     }
 
     /**
      * Test of deleteWrapper method, of class InProgressSubmission.
      */
     @Test
-    public void testDeleteWrapper() throws Exception
-    {
+    public void testDeleteWrapper() throws Exception {
 
     }
 
@@ -76,8 +74,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of update method, of class InProgressSubmission.
      */
     @Test
-    public void testUpdate() throws Exception
-    {
+    public void testUpdate() throws Exception {
 
     }
 
@@ -85,8 +82,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of getItem method, of class InProgressSubmission.
      */
     @Test
-    public void testGetItem()
-    {
+    public void testGetItem() {
 
     }
 
@@ -94,8 +90,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of getCollection method, of class InProgressSubmission.
      */
     @Test
-    public void testGetCollection() 
-    {
+    public void testGetCollection() {
 
     }
 
@@ -103,8 +98,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of getSubmitter method, of class InProgressSubmission.
      */
     @Test
-    public void testGetSubmitter() throws Exception
-    {
+    public void testGetSubmitter() throws Exception {
 
     }
 
@@ -112,8 +106,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of hasMultipleFiles method, of class InProgressSubmission.
      */
     @Test
-    public void testHasMultipleFiles()
-    {
+    public void testHasMultipleFiles() {
 
     }
 
@@ -121,8 +114,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of setMultipleFiles method, of class InProgressSubmission.
      */
     @Test
-    public void testSetMultipleFiles()
-    {
+    public void testSetMultipleFiles() {
 
     }
 
@@ -130,8 +122,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of hasMultipleTitles method, of class InProgressSubmission.
      */
     @Test
-    public void testHasMultipleTitles()
-    {
+    public void testHasMultipleTitles() {
 
     }
 
@@ -139,8 +130,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of setMultipleTitles method, of class InProgressSubmission.
      */
     @Test
-    public void testSetMultipleTitles()
-    {
+    public void testSetMultipleTitles() {
 
     }
 
@@ -148,8 +138,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of isPublishedBefore method, of class InProgressSubmission.
      */
     @Test
-    public void testIsPublishedBefore()
-    {
+    public void testIsPublishedBefore() {
 
     }
 
@@ -157,8 +146,7 @@ public class InProgressSubmissionTest extends AbstractUnitTest
      * Test of setPublishedBefore method, of class InProgressSubmission.
      */
     @Test
-    public void testSetPublishedBefore()
-    {
+    public void testSetPublishedBefore() {
 
     }
 

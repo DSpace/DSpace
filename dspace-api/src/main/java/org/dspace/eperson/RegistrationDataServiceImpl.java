@@ -7,13 +7,16 @@
  */
 package org.dspace.eperson;
 
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.dao.RegistrationDataDAO;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
 
 /**
  * Service implementation for the RegistrationData object.
@@ -22,13 +25,11 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class RegistrationDataServiceImpl implements RegistrationDataService
-{
+public class RegistrationDataServiceImpl implements RegistrationDataService {
     @Autowired(required = true)
     protected RegistrationDataDAO registrationDataDAO;
 
-    protected RegistrationDataServiceImpl()
-    {
+    protected RegistrationDataServiceImpl() {
 
     }
 
@@ -61,8 +62,17 @@ public class RegistrationDataServiceImpl implements RegistrationDataService
 
     @Override
     public void update(Context context, RegistrationData registrationData) throws SQLException, AuthorizeException {
-        registrationDataDAO.save(context, registrationData);
+        update(context, Collections.singletonList(registrationData));
+    }
 
+    @Override
+    public void update(Context context, List<RegistrationData> registrationDataRecords)
+        throws SQLException, AuthorizeException {
+        if (CollectionUtils.isNotEmpty(registrationDataRecords)) {
+            for (RegistrationData registrationData : registrationDataRecords) {
+                registrationDataDAO.save(context, registrationData);
+            }
+        }
     }
 
     @Override

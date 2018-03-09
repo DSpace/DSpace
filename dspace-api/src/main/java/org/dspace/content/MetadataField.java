@@ -7,10 +7,24 @@
  */
 package org.dspace.content;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
 
-import javax.persistence.*;
 
 /**
  * DSpace object that represents a metadata field, which is
@@ -23,17 +37,20 @@ import javax.persistence.*;
  * @see org.dspace.content.MetadataSchema
  */
 @Entity
-@Table(name="metadatafieldregistry")
-public class MetadataField {
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Table(name = "metadatafieldregistry")
+public class MetadataField implements ReloadableEntity<Integer> {
 
     @Id
-    @Column(name="metadata_field_id", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="metadatafieldregistry_seq")
-    @SequenceGenerator(name="metadatafieldregistry_seq", sequenceName="metadatafieldregistry_seq", allocationSize = 1, initialValue = 1)
-    private int id;
+    @Column(name = "metadata_field_id", nullable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "metadatafieldregistry_seq")
+    @SequenceGenerator(name = "metadatafieldregistry_seq", sequenceName = "metadatafieldregistry_seq", allocationSize
+        = 1, initialValue = 1)
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "metadata_schema_id",nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "metadata_schema_id", nullable = false)
     private MetadataSchema metadataSchema;
 
     @Column(name = "element", length = 64)
@@ -42,18 +59,16 @@ public class MetadataField {
     @Column(name = "qualifier", length = 64)
     private String qualifier = null;
 
-//    @Column(name = "scope_note")
+    //    @Column(name = "scope_note")
 //    @Lob
-    @Column(name="scope_note", columnDefinition = "text")
+    @Column(name = "scope_note", columnDefinition = "text")
     private String scopeNote;
 
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.MetadataFieldService#create(Context, MetadataSchema, String, String, String)}
-     *
      */
-    protected MetadataField()
-    {
+    protected MetadataField() {
 
     }
 
@@ -62,8 +77,7 @@ public class MetadataField {
      *
      * @return metadata field id
      */
-    public int getFieldID()
-    {
+    public Integer getID() {
         return id;
     }
 
@@ -72,8 +86,7 @@ public class MetadataField {
      *
      * @return element name
      */
-    public String getElement()
-    {
+    public String getElement() {
         return element;
     }
 
@@ -82,8 +95,7 @@ public class MetadataField {
      *
      * @param element new value for element
      */
-    public void setElement(String element)
-    {
+    public void setElement(String element) {
         this.element = element;
     }
 
@@ -92,8 +104,7 @@ public class MetadataField {
      *
      * @return qualifier
      */
-    public String getQualifier()
-    {
+    public String getQualifier() {
         return qualifier;
     }
 
@@ -102,8 +113,7 @@ public class MetadataField {
      *
      * @param qualifier new value for qualifier
      */
-    public void setQualifier(String qualifier)
-    {
+    public void setQualifier(String qualifier) {
         this.qualifier = qualifier;
     }
 
@@ -112,8 +122,7 @@ public class MetadataField {
      *
      * @return scope note
      */
-    public String getScopeNote()
-    {
+    public String getScopeNote() {
         return scopeNote;
     }
 
@@ -122,8 +131,7 @@ public class MetadataField {
      *
      * @param scopeNote new value for scope note
      */
-    public void setScopeNote(String scopeNote)
-    {
+    public void setScopeNote(String scopeNote) {
         this.scopeNote = scopeNote;
     }
 
@@ -146,57 +154,45 @@ public class MetadataField {
     }
 
 
-
     /**
      * Return <code>true</code> if <code>other</code> is the same MetadataField
      * as this object, <code>false</code> otherwise
      *
-     * @param obj
-     *            object to compare to
-     *
+     * @param obj object to compare to
      * @return <code>true</code> if object passed in represents the same
-     *         MetadataField as this object
+     * MetadataField as this object
      */
     @Override
-    public boolean equals(Object obj)
-    {
-        if (obj == null)
-        {
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-        if (getClass() != objClass)
-        {
+        if (getClass() != objClass) {
             return false;
         }
         final MetadataField other = (MetadataField) obj;
-        if (this.getFieldID() != other.getFieldID())
-        {
+        if (this.getID() != other.getID()) {
             return false;
         }
-        if (!getMetadataSchema().equals(other.getMetadataSchema()))
-        {
+        if (!getMetadataSchema().equals(other.getMetadataSchema())) {
             return false;
         }
         return true;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = 7;
-        hash = 47 * hash + getFieldID();
-        hash = 47 * hash + getMetadataSchema().getSchemaID();
+        hash = 47 * hash + getID();
+        hash = 47 * hash + getMetadataSchema().getID();
         return hash;
     }
 
     public String toString(char separator) {
-        if (qualifier == null)
-        {
+        if (qualifier == null) {
             return getMetadataSchema().getName() + separator + element;
-        }
-        else
-        {
+        } else {
             return getMetadataSchema().getName() + separator + element + separator + qualifier;
         }
     }

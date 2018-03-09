@@ -7,17 +7,18 @@
  */
 package org.dspace.content.dao;
 
+import java.sql.SQLException;
+
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
-import java.sql.SQLException;
-
 /**
- * Database Access Object interface interface class that adds support to retrieve DSpaceObject by the old integer based identifier which was used
+ * Database Access Object interface interface class that adds support to retrieve DSpaceObject by the old integer
+ * based identifier which was used
  * to identify DSpaceObjects prior to DSpace 6.0
  *
+ * @param <T> some implementation of DSpaceObject
  * @author kevinvandevelde at atmire.com
- * @param <T>
  */
 public interface DSpaceObjectLegacySupportDAO<T extends DSpaceObject> extends DSpaceObjectDAO<T> {
 

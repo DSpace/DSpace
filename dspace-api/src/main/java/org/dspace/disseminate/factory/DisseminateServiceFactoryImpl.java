@@ -11,7 +11,8 @@ import org.dspace.disseminate.service.CitationDocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the disseminate package, use DisseminateServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the disseminate package, use DisseminateServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

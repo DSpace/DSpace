@@ -17,13 +17,14 @@ import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class StubbedXOAIManagerResolver implements XOAIManagerResolver {
-    @Autowired ResourceResolver resourceResolver;
+    @Autowired
+    ResourceResolver resourceResolver;
     @Autowired
     DSpaceFilterResolver filterResolver;
 
     private Configuration builder = new Configuration();
 
-    public Configuration configuration () {
+    public Configuration configuration() {
         return builder;
     }
 

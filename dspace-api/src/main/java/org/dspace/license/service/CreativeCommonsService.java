@@ -7,19 +7,21 @@
  */
 package org.dspace.license.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.license.LicenseMetadataValue;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
+import org.jdom.Document;
 
 /**
  * Service interface class for the Creative commons licensing.
- * The implementation of this class is responsible for all business logic calls for the Creative commons licensing and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls for the Creative commons licensing
+ * and is autowired by spring
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -29,85 +31,122 @@ public interface CreativeCommonsService {
 
     /**
      * Simple accessor for enabling of CC
+     *
+     * @return is CC enabled?
      */
     public boolean isEnabled();
 
-    /** setLicenseRDF
-    *
-    * CC Web Service method for setting the RDF bitstream
-    *
-    */
-    public void setLicenseRDF(Context context, Item item, String licenseRdf) throws SQLException, IOException, AuthorizeException;
-
     /**
-     * This is a bit of the "do-the-right-thing" method for CC stuff in an item
+     * setLicenseRDF
+     *
+     * CC Web Service method for setting the RDF bitstream
+     *
+     * @param context    The relevant DSpace Context.
+     * @param item       The item to set license on.
+     * @param licenseRdf license RDF string
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      */
-    public void setLicense(Context context, Item item,
-            String cc_license_url) throws SQLException, IOException,
-            AuthorizeException;
+    public void setLicenseRDF(Context context, Item item, String licenseRdf)
+        throws SQLException, IOException, AuthorizeException;
+
 
     /**
      * Used by DSpaceMetsIngester
      *
-     * @param context
-     * @param item
-     * @param licenseStm
-     * @param mimeType
-     * @throws SQLException if database error
-     * @throws IOException if IO error
+     * @param context    The relevant DSpace Context.
+     * @param item       The item to set license on.
+     * @param licenseStm InputStream with the license text.
+     * @param mimeType   License text file MIME type ("text/xml", "text/rdf" or generic)
+     * @throws SQLException       if database error
+     *                            An exception that provides information on a database access error or other errors.
+     * @throws IOException        if IO error
+     *                            A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws AuthorizeException if authorization error
+     *                            Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      *
-     * * // PATCHED 12/01 FROM JIRA re: mimetypes for CCLicense and License RDF wjb
+     *                            * // PATCHED 12/01 FROM JIRA re: mimetypes for CCLicense and License RDF wjb
      */
     public void setLicense(Context context, Item item,
-                                  InputStream licenseStm, String mimeType)
-            throws SQLException, IOException, AuthorizeException;
+                           InputStream licenseStm, String mimeType)
+        throws SQLException, IOException, AuthorizeException;
 
     public void removeLicense(Context context, Item item)
-            throws SQLException, IOException, AuthorizeException;
+        throws SQLException, IOException, AuthorizeException;
 
     public boolean hasLicense(Context context, Item item)
-            throws SQLException, IOException;
+        throws SQLException, IOException;
 
-    public String getLicenseURL(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException;
+    public String getLicenseURL(Context context, Item item)
+        throws SQLException, IOException, AuthorizeException;
 
-    public String getLicenseText(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException;
-
-    public String getLicenseRDF(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException;
+    public String getLicenseRDF(Context context, Item item)
+        throws SQLException, IOException, AuthorizeException;
 
     /**
      * Get Creative Commons license RDF, returning Bitstream object.
+     *
+     * @param item bitstream's parent item
      * @return bitstream or null.
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      */
-    public Bitstream getLicenseRdfBitstream(Item item) throws SQLException,
-            IOException, AuthorizeException;
+    public Bitstream getLicenseRdfBitstream(Item item)
+        throws SQLException, IOException, AuthorizeException;
 
     /**
      * Get Creative Commons license Text, returning Bitstream object.
+     *
+     * @param item bitstream's parent item
      * @return bitstream or null.
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
+     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it
+     * is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
      */
-    public Bitstream getLicenseTextBitstream(Item item) throws SQLException,
-            IOException, AuthorizeException;
+    public Bitstream getLicenseTextBitstream(Item item)
+        throws SQLException, IOException, AuthorizeException;
 
-    public String fetchLicenseRdf(String ccResult);
-
-    /**
-    *
-    *  The next two methods are old CC.
-    * Remains until prev. usages are eliminated.
-    * @Deprecated
-    *
-    */
     /**
      * Get a few license-specific properties. We expect these to be cached at
      * least per server run.
+     *
+     * @param fieldId name of the property.
+     * @return its value.
      */
-    public String fetchLicenseText(String license_url);
-
-    public String fetchLicenseRDF(String license_url);
-
     public LicenseMetadataValue getCCField(String fieldId);
+
+    /**
+     * Apply same transformation on the document to retrieve only the most
+     * relevant part of the document passed as parameter. If no transformation
+     * is needed then take in consideration to empty the CreativeCommons.xml
+     *
+     * @param license - an element that could be contains as part of your content
+     *                the license rdf
+     * @return the document license in textual format after the transformation
+     */
+    public String fetchLicenseRDF(Document license);
+
+    /**
+     * Remove license information, delete also the bitstream
+     *
+     * @param context   - DSpace Context
+     * @param uriField  - the metadata field for license uri
+     * @param nameField - the metadata field for license name
+     * @param item      - the item
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     */
+    public void removeLicense(Context context, LicenseMetadataValue uriField,
+                              LicenseMetadataValue nameField, Item item)
+        throws AuthorizeException, IOException, SQLException;
 }

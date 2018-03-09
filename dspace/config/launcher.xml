@@ -222,8 +222,6 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>export</argument>
-	    <argument>-i</argument>
-	    <argument>statistics</argument>
         </step>
     </command>
     <command>
@@ -233,8 +231,6 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>import</argument>
-	    <argument>-i</argument>
-	    <argument>statistics</argument>
         </step>
     </command>
     <command>
@@ -244,8 +240,6 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>reindex</argument>
-	    <argument>-i</argument>
-	    <argument>statistics</argument>
         </step>
     </command>
     <command>
@@ -314,13 +308,6 @@
         <description>Import previously converted log files into solr statistics</description>
         <step>
             <class>org.dspace.statistics.util.StatisticsImporter</class>
-        </step>
-    </command>
-    <command>
-        <name>stats-log-importer-elasticsearch</name>
-        <description>Import solr-format converted log files into Elastic Search statistics</description>
-        <step>
-            <class>org.dspace.statistics.util.StatisticsImporterElasticSearch</class>
         </step>
     </command>
     <command>

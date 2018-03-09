@@ -10,15 +10,15 @@ package org.dspace.servicemanager.spring;
 import org.dspace.servicemanager.ServiceManagerSystem;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * This will allow us to put the configuration into beans as they are 
- * being created.  It also handles activator classes from the 
+ * This will allow us to put the configuration into beans as they are
+ * being created.  It also handles activator classes from the
  * configuration.
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
@@ -42,7 +42,8 @@ public final class DSpaceBeanFactoryPostProcessor implements BeanFactoryPostProc
     }
 
     /* (non-Javadoc)
-     * @see org.springframework.beans.factory.config.BeanFactoryPostProcessor#postProcessBeanFactory(org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
+     * @see org.springframework.beans.factory.config.BeanFactoryPostProcessor#postProcessBeanFactory(org
+     * .springframework.beans.factory.config.ConfigurableListableBeanFactory)
      */
 
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {

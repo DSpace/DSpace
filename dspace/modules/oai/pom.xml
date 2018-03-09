@@ -12,7 +12,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>6.0-rc2-SNAPSHOT</version>
+        <version>7.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -99,16 +99,8 @@
             <artifactId>additions</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>com.lyncode</groupId>
                     <artifactId>builder-commons</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -165,4 +157,3 @@
         </developer>
     </developers>
 </project>
-

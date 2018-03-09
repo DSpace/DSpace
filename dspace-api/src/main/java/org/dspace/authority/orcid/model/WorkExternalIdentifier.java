@@ -20,7 +20,8 @@ public class WorkExternalIdentifier {
     private WorkExternalIdentifierType workExternalIdentifierType;
     private String workExternalIdenfitierID;
 
-    public WorkExternalIdentifier(WorkExternalIdentifierType workExternalIdentifierType, String workExternalIdenfitierID) {
+    public WorkExternalIdentifier(WorkExternalIdentifierType workExternalIdentifierType,
+                                  String workExternalIdenfitierID) {
         this.workExternalIdentifierType = workExternalIdentifierType;
         this.workExternalIdenfitierID = workExternalIdenfitierID;
     }
@@ -36,9 +37,9 @@ public class WorkExternalIdentifier {
     @Override
     public String toString() {
         return "WorkExternalIdentifier{" +
-                "workExternalIdentifierType=" + workExternalIdentifierType +
-                ", workExternalIdenfitierID='" + workExternalIdenfitierID + '\'' +
-                '}';
+            "workExternalIdentifierType=" + workExternalIdentifierType +
+            ", workExternalIdenfitierID='" + workExternalIdenfitierID + '\'' +
+            '}';
     }
 
     @Override
@@ -52,7 +53,8 @@ public class WorkExternalIdentifier {
 
         WorkExternalIdentifier that = (WorkExternalIdentifier) o;
 
-        if (workExternalIdenfitierID != null ? !workExternalIdenfitierID.equals(that.workExternalIdenfitierID) : that.workExternalIdenfitierID != null) {
+        if (workExternalIdenfitierID != null ? !workExternalIdenfitierID
+            .equals(that.workExternalIdenfitierID) : that.workExternalIdenfitierID != null) {
             return false;
         }
         if (workExternalIdentifierType != that.workExternalIdentifierType) {

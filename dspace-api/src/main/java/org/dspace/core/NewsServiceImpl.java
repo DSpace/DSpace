@@ -31,54 +31,54 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author mhwood
  */
-public class NewsServiceImpl implements NewsService
-{
+public class NewsServiceImpl implements NewsService {
     private final Logger log = LoggerFactory.getLogger(NewsServiceImpl.class);
 
-	private List<String> acceptableFilenames;
+    private List<String> acceptableFilenames;
 
     @Autowired(required = true)
     private ConfigurationService configurationService;
-	
-	public void setAcceptableFilenames(List<String> acceptableFilenames) {
+
+    public void setAcceptableFilenames(List<String> acceptableFilenames) {
         this.acceptableFilenames = addLocalesToAcceptableFilenames(acceptableFilenames);
     }
 
-    protected List<String> addLocalesToAcceptableFilenames(List<String> acceptableFilenames){
-        String [] locales = configurationService.getArrayProperty("webui.supported.locales");
+    protected List<String> addLocalesToAcceptableFilenames(List<String> acceptableFilenames) {
+        String[] locales = configurationService.getArrayProperty("webui.supported.locales");
         List<String> newAcceptableFilenames = new ArrayList<>();
         newAcceptableFilenames.addAll(acceptableFilenames);
-        for(String local : locales){
-            for(String acceptableFilename : acceptableFilenames){
+        for (String local : locales) {
+            for (String acceptableFilename : acceptableFilenames) {
                 int lastPoint = acceptableFilename.lastIndexOf(".");
                 newAcceptableFilenames.add(
-                        acceptableFilename.substring(0, lastPoint)
-                                + "_"
-                                + local
-                                + acceptableFilename.substring(lastPoint));
+                    acceptableFilename.substring(0, lastPoint)
+                        + "_"
+                        + local
+                        + acceptableFilename.substring(lastPoint));
             }
         }
         return newAcceptableFilenames;
     }
 
 
-    /** Not instantiable. */
-    protected NewsServiceImpl() {}
+    /**
+     * Not instantiable.
+     */
+    protected NewsServiceImpl() {
+    }
 
     @Override
-    public String readNewsFile(String newsFile)
-    {
-    	if (!validate(newsFile)) {
-    		throw new IllegalArgumentException("The file "+ newsFile + " is not a valid news file");
-    	}
+    public String readNewsFile(String newsFile) {
+        if (!validate(newsFile)) {
+            throw new IllegalArgumentException("The file " + newsFile + " is not a valid news file");
+        }
         String fileName = getNewsFilePath();
 
         fileName += newsFile;
 
         StringBuilder text = new StringBuilder();
 
-        try
-        {
+        try {
             // retrieve existing news from file
             FileInputStream fir = new FileInputStream(fileName);
             InputStreamReader ir = new InputStreamReader(fir, "UTF-8");
@@ -86,17 +86,14 @@ public class NewsServiceImpl implements NewsService
 
             String lineIn;
 
-            while ((lineIn = br.readLine()) != null)
-            {
+            while ((lineIn = br.readLine()) != null) {
                 text.append(lineIn);
             }
 
             br.close();
             ir.close();
             fir.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             log.warn("news_read: " + e.getLocalizedMessage());
         }
 
@@ -104,26 +101,22 @@ public class NewsServiceImpl implements NewsService
     }
 
     @Override
-    public String writeNewsFile(String newsFile, String news)
-    {
-    	if (!validate(newsFile)) {
-    		throw new IllegalArgumentException("The file "+ newsFile + " is not a valid news file");
-    	}
+    public String writeNewsFile(String newsFile, String news) {
+        if (!validate(newsFile)) {
+            throw new IllegalArgumentException("The file " + newsFile + " is not a valid news file");
+        }
         String fileName = getNewsFilePath();
 
         fileName += newsFile;
 
-        try
-        {
+        try {
             // write the news out to the appropriate file
             FileOutputStream fos = new FileOutputStream(fileName);
             OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
             PrintWriter out = new PrintWriter(osr);
             out.print(news);
             out.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             log.warn("news_write: " + e.getLocalizedMessage());
         }
 
@@ -131,18 +124,17 @@ public class NewsServiceImpl implements NewsService
     }
 
     @Override
-    public String getNewsFilePath()
-    {
+    public String getNewsFilePath() {
         String filePath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
-                + File.separator + "config" + File.separator;
+            + File.separator + "config" + File.separator;
         return filePath;
     }
-    
-	@Override
-	public boolean validate(String newsName) {
-		if (acceptableFilenames != null) {
-			return acceptableFilenames.contains(newsName);
-		}
-		return false;
-	}
+
+    @Override
+    public boolean validate(String newsName) {
+        if (acceptableFilenames != null) {
+            return acceptableFilenames.contains(newsName);
+        }
+        return false;
+    }
 }

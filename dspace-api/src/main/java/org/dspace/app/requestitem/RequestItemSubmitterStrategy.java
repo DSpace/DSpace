@@ -15,22 +15,21 @@ import org.dspace.eperson.EPerson;
 
 /**
  * Basic strategy that looks to the original submitter.
- * 
- * @author Andrea Bollini
  *
+ * @author Andrea Bollini
  */
 public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor {
 
-	public RequestItemSubmitterStrategy() {		
-	}
+    public RequestItemSubmitterStrategy() {
+    }
 
-	@Override
-	public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
-			throws SQLException {
-		EPerson submitter = item.getSubmitter();
-		RequestItemAuthor author = new RequestItemAuthor(
-				submitter.getFullName(), submitter.getEmail());
-		return author;
-	}
+    @Override
+    public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
+        throws SQLException {
+        EPerson submitter = item.getSubmitter();
+        RequestItemAuthor author = new RequestItemAuthor(
+            submitter.getFullName(), submitter.getEmail());
+        return author;
+    }
 
 }

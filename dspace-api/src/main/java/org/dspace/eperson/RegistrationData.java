@@ -7,10 +7,19 @@
  */
 package org.dspace.eperson;
 
-import org.dspace.core.Context;
-
-import javax.persistence.*;
 import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 
 /**
  * Database entity representation of the registrationdata table
@@ -18,14 +27,14 @@ import java.util.Date;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name="registrationdata")
-public class RegistrationData {
+@Table(name = "registrationdata")
+public class RegistrationData implements ReloadableEntity<Integer> {
 
     @Id
-    @Column(name="registrationdata_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="registrationdata_seq")
-    @SequenceGenerator(name="registrationdata_seq", sequenceName="registrationdata_seq", allocationSize = 1)
-    private int id;
+    @Column(name = "registrationdata_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "registrationdata_seq")
+    @SequenceGenerator(name = "registrationdata_seq", sequenceName = "registrationdata_seq", allocationSize = 1)
+    private Integer id;
 
     @Column(name = "email", unique = true, length = 64)
     private String email;
@@ -40,14 +49,12 @@ public class RegistrationData {
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.eperson.service.RegistrationDataService#create(Context)}
-     *
      */
-    protected RegistrationData()
-    {
+    protected RegistrationData() {
 
     }
 
-    public int getId() {
+    public Integer getID() {
         return id;
     }
 

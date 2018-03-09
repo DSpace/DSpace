@@ -16,10 +16,10 @@ I will not go into detail to what exactly is configured for the pubmed integrati
 # Additional Config <a name="Additional-config"></a> #
 
 To be able to do the lookup for our configured import-service, we need to be able to know what url to use to check for publications.
-This can be done by setting the publication.url property though maven using 2 different ways.
+This can be done by setting the `publication-lookup.url` property in `publication-lookup.cfg` to one of two settings.
 
-- Setting the publication.url property to the address as defined in the configured importservice (PubmedImportService in this case) in the file spring-dspace-addon-import-services.xml. This will check this single configured url for publications.
-- Setting the publication url property to an askterisk '*'. This will check all configured importServices for their urls to base the search for publications on.
+- Setting the `publication-lookup.url` property to the address as defined in the configured importservice (PubmedImportService in this case) in the file `spring-dspace-addon-import-services.xml`. This will check this single configured url for publications.
+- Setting the `publication-lookup.url` property to an askterisk '*'. This will check all configured importServices for their urls to base the search for publications on.
 
 # Pubmed specific classes Config <a name="Pubmed-specific"></a> #
 
@@ -33,4 +33,4 @@ These classes are simply implementations based of the base classes defined in im
 ## Service classes <a name="Service-classes"></a> ##
 
 - "GeneratePubmedQueryService". Generates the pubmed query which is used to retrieve the records. This is based on a given item.
-- "ImportMetadataSourceServiceImpl". Child class of "AbstractImportMetadataSourceService", retrieving the records from pubmed.
+- "PubmedImportMetadataSourceServiceImpl". Child class of "AbstractImportMetadataSourceService", retrieving the records from pubmed.

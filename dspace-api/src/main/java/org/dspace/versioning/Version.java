@@ -7,30 +7,40 @@
  */
 package org.dspace.versioning;
 
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.hibernate.proxy.HibernateProxyHelper;
 
-import javax.persistence.*;
-import java.util.Date;
-
 /**
- *
- *
  * @author Fabio Bolognesi (fabio at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
 @Entity
-@Table(name="versionitem")
-public class Version {
+@Table(name = "versionitem")
+public class Version implements ReloadableEntity<Integer> {
 
     @Id
-    @Column(name="versionitem_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="versionitem_seq")
-    @SequenceGenerator(name="versionitem_seq", sequenceName="versionitem_seq", allocationSize = 1)
-    private int id;
+    @Column(name = "versionitem_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "versionitem_seq")
+    @SequenceGenerator(name = "versionitem_seq", sequenceName = "versionitem_seq", allocationSize = 1)
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
@@ -60,15 +70,14 @@ public class Version {
      * or
      * {@link org.dspace.versioning.service.VersioningService#createNewVersion(Context, Item, String)}
      * or
-     * {@link org.dspace.versioning.service.VersioningService#createNewVersion(Context, VersionHistory, Item, String, Date, int)}
-     *
+     * {@link org.dspace.versioning.service.VersioningService#createNewVersion(Context, VersionHistory,
+     * Item, String, Date, int)}
      */
-    protected Version()
-    {
+    protected Version() {
 
     }
 
-    public int getId() {
+    public Integer getID() {
         return id;
     }
 
@@ -122,19 +131,16 @@ public class Version {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-        {
+        if (this == o) {
             return true;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(o);
-        if (getClass() != objClass)
-        {
+        if (getClass() != objClass) {
             return false;
         }
 
-        final Version that = (Version)o;
-        if (this.getId() != that.getId())
-        {
+        final Version that = (Version) o;
+        if (this.getID() != that.getID()) {
             return false;
         }
 
@@ -143,8 +149,8 @@ public class Version {
 
     @Override
     public int hashCode() {
-        int hash=7;
-        hash=79*hash+ this.getId();
+        int hash = 7;
+        hash = 79 * hash + this.getID();
         return hash;
     }
 }

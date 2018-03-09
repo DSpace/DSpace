@@ -7,7 +7,6 @@
  */
 package org.dspace.app.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,182 +17,144 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class DCInputSet
-{
-	/** name of the input set  */
-	private String formName = null; 
-	/** the inputs ordered by page and row position */
-	private DCInput[][] inputPages = null;
-	
-        /** constructor
-         * @param formName form name
-         * @param pages pages
-         * @param listMap map
-         */
-	public DCInputSet(String formName, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
-	{
-		this.formName = formName;
-		inputPages = new DCInput[pages.size()][];
-		for ( int i = 0; i < inputPages.length; i++ )
-		{
-			List<Map<String, String>> page = pages.get(i);
-			inputPages[i] = new DCInput[page.size()];
-			for ( int j = 0; j < inputPages[i].length; j++ )
-			{
-				inputPages[i][j] = new DCInput(page.get(j), listMap);
-			}
-		}
-	}
-	
-	/**
-	 * Return the name of the form that defines this input set
-	 * @return formName 	the name of the form
-	 */
-	public String getFormName()
-	{
-		return formName;
-	}
-	
-	/**
-	 * Return the number of pages in this  input set
-	 * @return number of pages
-	 */
-	public int getNumberPages()
-	{
-		return inputPages.length;
-	}
-	
+public class DCInputSet {
     /**
-     * Get all the rows for a page from the form definition
-     *
-     * @param  pageNum	desired page within set
-     * @param  addTitleAlternative flag to add the additional title row
-     * @param  addPublishedBefore  flag to add the additional published info
-     *
-     * @return  an array containing the page's displayable rows
+     * name of the input set
      */
-	
-	public DCInput[] getPageRows(int pageNum, boolean addTitleAlternative,
-		      					 boolean addPublishedBefore)
-	{
-		List<DCInput> filteredInputs = new ArrayList<DCInput>();
-		if ( pageNum < inputPages.length )
-		{
-			for (int i = 0; i < inputPages[pageNum].length; i++ )
-			{
-				DCInput input = inputPages[pageNum][i];
-				if (doField(input, addTitleAlternative, addPublishedBefore))
-				{
-					filteredInputs.add(input);
-				}
-			}
-		}
+    private String formName = null;
+    /**
+     * the inputs ordered by row position
+     */
+    private DCInput[] inputs = null;
 
-		// Convert list into an array
-		DCInput[] inputArray = new DCInput[filteredInputs.size()];
-		return filteredInputs.toArray(inputArray);
-	}
-	
+    /**
+     * constructor
+     *
+     * @param formName       form name
+     * @param headings
+     * @param mandatoryFlags
+     * @param fields         fields
+     * @param listMap        map
+     */
+    public DCInputSet(String formName,
+                      List<Map<String, String>> fields, Map<String, List<String>> listMap) {
+        this.formName = formName;
+        this.inputs = new DCInput[fields.size()];
+        for (int i = 0; i < inputs.length; i++) {
+            Map<String, String> field = fields.get(i);
+            inputs[i] = new DCInput(field, listMap);
+
+        }
+    }
+
+    /**
+     * Return the name of the form that defines this input set
+     *
+     * @return formName     the name of the form
+     */
+    public String getFormName() {
+        return formName;
+    }
+
+    /**
+     * Return the number of fields in this  input set
+     *
+     * @return number of pages
+     */
+    public int getNumberFields() {
+        return inputs.length;
+    }
+
+    /**
+     * Get all the fields
+     *
+     * @return an array containing the fields
+     */
+
+    public DCInput[] getFields() {
+        return inputs;
+    }
+
     /**
      * Does this set of inputs include an alternate title field?
      *
      * @return true if the current set has an alternate title field
      */
-    public boolean isDefinedMultTitles()
-    {
-    	return isFieldPresent("title.alternative");
+    public boolean isDefinedMultTitles() {
+        return isFieldPresent("dc.title.alternative");
     }
-    
+
     /**
      * Does this set of inputs include the previously published fields?
      *
      * @return true if the current set has all the prev. published fields
      */
-    public boolean isDefinedPubBefore()
-    {
-    	return ( isFieldPresent("date.issued") && 
-    			 isFieldPresent("identifier.citation") &&
-				 isFieldPresent("publisher.null") );
+    public boolean isDefinedPubBefore() {
+        return (isFieldPresent("dc.date.issued") &&
+            isFieldPresent("dc.identifier.citation") &&
+            isFieldPresent("dc.publisher"));
     }
-    
+
     /**
      * Does the current input set define the named field?
      * Scan through every field in every page of the input set
      *
-     * @param fieldName
+     * @param fieldName selects the field.
      * @return true if the current set has the named field
      */
-    public boolean isFieldPresent(String fieldName)
-    {
-    	for (int i = 0; i < inputPages.length; i++)
-	    {
-    		DCInput[] pageInputs = inputPages[i];
-    		for (int row = 0; row < pageInputs.length; row++)
-    		{
-    			String fullName = pageInputs[row].getElement() + "." + 
-				              	  pageInputs[row].getQualifier();
-    			if (fullName.equals(fieldName))
-    			{
-    				return true;
-    			}
-    		}
-	    }
-    	return false;
+    public boolean isFieldPresent(String fieldName) {
+        for (int i = 0; i < inputs.length; i++) {
+            DCInput field = inputs[i];
+            String fullName = field.getFieldName();
+            if (fullName.equals(fieldName)) {
+                return true;
+            }
+        }
+        return false;
     }
-	
+
     /**
      * Does the current input set define the named field?
      * and is valid for the specified document type
      * Scan through every field in every page of the input set
      *
-     * @param fieldName field name
+     * @param fieldName    field name
      * @param documentType doc type
      * @return true if the current set has the named field
      */
-     public boolean isFieldPresent(String fieldName, String documentType)
-     {
-     	if(documentType == null){
-     		documentType = "";
-     	}
-     	for (int i = 0; i < inputPages.length; i++)
- 	    {
-     		DCInput[] pageInputs = inputPages[i];
-     		for (int row = 0; row < pageInputs.length; row++)
-     		{
-     			String fullName = pageInputs[row].getElement() + "." + 
- 				              	  pageInputs[row].getQualifier();
-     			if (fullName.equals(fieldName) )
-     			{
-     				if(pageInputs[row].isAllowedFor(documentType)){
-     					return true;
-     				}
-     			}
-     		}
- 	    }
-     	return false;
-     }
-    
-    protected boolean doField(DCInput dcf, boolean addTitleAlternative,
-		    					   boolean addPublishedBefore)
-    {
-    	String rowName = dcf.getElement() + "." + dcf.getQualifier();
-    	if ( rowName.equals("title.alternative") && ! addTitleAlternative )
-    	{
-    		return false;
-    	}
-    	if (rowName.equals("date.issued") && ! addPublishedBefore )
-    	{
-    		return false;
-    	}
-    	if (rowName.equals("publisher.null") && ! addPublishedBefore )
-    	{
-    		return false;
-    	}
-    	if (rowName.equals("identifier.citation") && ! addPublishedBefore )
-    	{
-    		return false;
-    	}
-
-    	return true;
+    public boolean isFieldPresent(String fieldName, String documentType) {
+        if (documentType == null) {
+            documentType = "";
+        }
+        for (int i = 0; i < inputs.length; i++) {
+            DCInput field = inputs[i];
+            String fullName = field.getFieldName();
+            if (fullName.equals(fieldName)) {
+                if (field.isAllowedFor(documentType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
+
+    protected boolean doField(DCInput dcf, boolean addTitleAlternative,
+                              boolean addPublishedBefore) {
+        String rowName = dcf.getFieldName();
+        if (rowName.equals("dc.title.alternative") && !addTitleAlternative) {
+            return false;
+        }
+        if (rowName.equals("dc.date.issued") && !addPublishedBefore) {
+            return false;
+        }
+        if (rowName.equals("dc.publisher.null") && !addPublishedBefore) {
+            return false;
+        }
+        if (rowName.equals("dc.identifier.citation") && !addPublishedBefore) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

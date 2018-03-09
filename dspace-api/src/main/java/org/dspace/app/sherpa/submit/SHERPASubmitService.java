@@ -19,59 +19,48 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
-public class SHERPASubmitService
-{
+public class SHERPASubmitService {
     private SHERPAService sherpaService;
 
     private SHERPASubmitConfigurationService configuration;
 
-    /** log4j logger */
+    /**
+     * log4j logger
+     */
     private static Logger log = Logger.getLogger(SHERPASubmitService.class);
 
-    public void setConfiguration(SHERPASubmitConfigurationService configuration)
-    {
+    public void setConfiguration(SHERPASubmitConfigurationService configuration) {
         this.configuration = configuration;
     }
 
-    public void setSherpaService(SHERPAService sherpaService)
-    {
+    public void setSherpaService(SHERPAService sherpaService) {
         this.sherpaService = sherpaService;
     }
 
-    public SHERPAResponse searchRelatedJournals(Context context, Item item)
-    {
+    public SHERPAResponse searchRelatedJournals(Context context, Item item) {
         Set<String> issns = getISSNs(context, item);
-        if (issns == null || issns.size() == 0)
-        {
+        if (issns == null || issns.size() == 0) {
             return null;
-        }
-        else
-        {
+        } else {
             return sherpaService.searchByJournalISSN(StringUtils.join(issns, ","));
         }
     }
 
-    public SHERPAResponse searchRelatedJournalsByISSN(String issn)
-    {
+    public SHERPAResponse searchRelatedJournalsByISSN(String issn) {
         return sherpaService.searchByJournalISSN(issn);
     }
 
-    public Set<String> getISSNs(Context context, Item item)
-    {
+    public Set<String> getISSNs(Context context, Item item) {
         Set<String> issns = new LinkedHashSet<String>();
-        if (configuration.getIssnItemExtractors() == null)
-        {
+        if (configuration.getIssnItemExtractors() == null) {
             log.warn(LogManager.getHeader(context, "searchRelatedJournals",
-                    "no issnItemExtractors defined"));
+                                          "no issnItemExtractors defined"));
             return null;
         }
-        for (ISSNItemExtractor extractor : configuration.getIssnItemExtractors())
-        {
+        for (ISSNItemExtractor extractor : configuration.getIssnItemExtractors()) {
             List<String> eIssns = extractor.getISSNs(context, item);
-            if (eIssns != null)
-            {
-                for (String eIssn : eIssns)
-                {
+            if (eIssns != null) {
+                for (String eIssn : eIssns) {
                     issns.add(eIssn.trim());
                 }
             }
@@ -79,15 +68,11 @@ public class SHERPASubmitService
         return issns;
     }
 
-    public boolean hasISSNs(Context context, Item item)
-    {
+    public boolean hasISSNs(Context context, Item item) {
         Set<String> issns = getISSNs(context, item);
-        if (issns == null || issns.size() == 0)
-        {
+        if (issns == null || issns.size() == 0) {
             return false;
-        }
-        else
-        {
+        } else {
             return true;
         }
     }

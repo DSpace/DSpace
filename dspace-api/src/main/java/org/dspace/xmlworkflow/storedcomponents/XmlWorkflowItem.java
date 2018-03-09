@@ -7,14 +7,25 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import java.sql.SQLException;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
-
-import javax.persistence.*;
-import java.sql.SQLException;
 
 /**
  * Class representing an item going through the workflow process in DSpace
@@ -25,14 +36,14 @@ import java.sql.SQLException;
  * @author Mark Diggory (markd at atmire dot com)
  */
 @Entity
-@Table(name="cwf_workflowitem")
-public class XmlWorkflowItem implements WorkflowItem {
+@Table(name = "cwf_workflowitem")
+public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> {
 
     @Id
-    @Column(name="workflowitem_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="cwf_workflowitem_seq")
-    @SequenceGenerator(name="cwf_workflowitem_seq", sequenceName="cwf_workflowitem_seq", allocationSize = 1)
-    private int id;
+    @Column(name = "workflowitem_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cwf_workflowitem_seq")
+    @SequenceGenerator(name = "cwf_workflowitem_seq", sequenceName = "cwf_workflowitem_seq", allocationSize = 1)
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
@@ -54,10 +65,8 @@ public class XmlWorkflowItem implements WorkflowItem {
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService#create(Context, Item, Collection)}
-     *
      */
-    protected XmlWorkflowItem()
-    {
+    protected XmlWorkflowItem() {
 
     }
 
@@ -67,70 +76,61 @@ public class XmlWorkflowItem implements WorkflowItem {
      * @return the internal identifier
      */
     @Override
-    public int getID()
-    {
+    public Integer getID() {
         return id;
     }
 
 
     @Override
-    public Collection getCollection(){
+    public Collection getCollection() {
         return this.collection;
     }
 
-    public void setCollection(Collection collection){
+    public void setCollection(Collection collection) {
         this.collection = collection;
     }
 
     @Override
-    public Item getItem()
-    {
+    public Item getItem() {
         return item;
     }
 
-    public void setItem(Item item){
+    public void setItem(Item item) {
         this.item = item;
     }
 
     @Override
-    public EPerson getSubmitter() throws SQLException
-    {
+    public EPerson getSubmitter() throws SQLException {
         return item.getSubmitter();
     }
 
     @Override
-    public boolean hasMultipleFiles()
-    {
+    public boolean hasMultipleFiles() {
         return multipleFiles;
     }
 
     @Override
-    public void setMultipleFiles(boolean b)
-    {
+    public void setMultipleFiles(boolean b) {
         this.multipleFiles = b;
     }
 
     @Override
-    public boolean hasMultipleTitles()
-    {
+    public boolean hasMultipleTitles() {
         return this.multipleTitles;
     }
 
     @Override
-    public void setMultipleTitles(boolean b)
-    {
+    public void setMultipleTitles(boolean b) {
         this.multipleTitles = b;
     }
 
     @Override
-    public boolean isPublishedBefore()
-    {
+    public boolean isPublishedBefore() {
         return this.publishedBefore;
     }
 
     @Override
-    public void setPublishedBefore(boolean b)
-    {
+    public void setPublishedBefore(boolean b) {
         this.publishedBefore = b;
     }
 

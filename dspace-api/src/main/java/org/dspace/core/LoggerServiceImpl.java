@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.Properties;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -26,9 +27,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  *
  * @author Tim Donohue
  */
-public class LoggerServiceImpl implements KernelStartupCallbackService
-{
-    /** log4j category */
+public class LoggerServiceImpl implements KernelStartupCallbackService {
+    /**
+     * log4j category
+     */
     private static Logger log = Logger.getLogger(LoggerServiceImpl.class);
 
     // System property which will disable DSpace's log4j setup
@@ -42,10 +44,8 @@ public class LoggerServiceImpl implements KernelStartupCallbackService
      * in our ConfigurationService.
      */
     @Override
-    public void executeCallback()
-    {
-        try
-        {
+    public void executeCallback() {
+        try {
             /*
              * Initialize Logging once ConfigurationManager is initialized.
              *
@@ -70,109 +70,89 @@ public class LoggerServiceImpl implements KernelStartupCallbackService
             ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
             String dsLogConfiguration = config.getProperty(LOG_CONFIG_PROPERTY);
 
-            if (dsLogConfiguration == null || System.getProperty(LOG_DISABLE_PROPERTY) != null)
-            {
+            if (dsLogConfiguration == null || System.getProperty(LOG_DISABLE_PROPERTY) != null) {
                 /*
                  * Do nothing if log config not set in dspace.cfg or "dspace.log.init.disable"
                  * system property set. Leave it upto log4j to properly init its logging
                  * via classpath or system properties.
                  */
                 info("Using default log4j provided log configuration." +
-                        "  If unintended, check your dspace.cfg for (" +LOG_CONFIG_PROPERTY+ ")");
-            }
-            else
-            {
-                info("Using dspace provided log configuration (" +LOG_CONFIG_PROPERTY+ ")");
+                         "  If unintended, check your dspace.cfg for (" + LOG_CONFIG_PROPERTY + ")");
+            } else {
+                info("Using dspace provided log configuration (" + LOG_CONFIG_PROPERTY + ")");
 
                 File logConfigFile = new File(dsLogConfiguration);
 
-                if(logConfigFile.exists())
-                {
+                if (logConfigFile.exists()) {
                     info("Loading: " + dsLogConfiguration);
 
                     // Check if we have an XML config
-                    if(logConfigFile.getName().endsWith(".xml"))
-                    {
+                    if (logConfigFile.getName().endsWith(".xml")) {
                         // Configure log4j via the DOMConfigurator
                         DOMConfigurator.configure(logConfigFile.toURI().toURL());
-                    }
-                    else // Otherwise, assume a Properties file
-                    {
+                    } else {
+                        // Otherwise, assume a Properties file
+
                         // Parse our log4j properties file
                         Properties log4jProps = new Properties();
-                        try(InputStream fis = new FileInputStream(logConfigFile))
-                        {
+                        try (InputStream fis = new FileInputStream(logConfigFile)) {
                             log4jProps.load(fis);
-                        }
-                        catch(IOException e)
-                        {
-                            fatal("Can't load dspace provided log4j configuration from " + logConfigFile.getAbsolutePath(), e);
+                        } catch (IOException e) {
+                            fatal("Can't load dspace provided log4j configuration from " + logConfigFile
+                                .getAbsolutePath(), e);
                         }
 
                         // Configure log4j based on all its properties
                         PropertyConfigurator.configure(log4jProps);
                     }
-                }
-                else
-                {
+                } else {
                     info("File does not exist: " + dsLogConfiguration);
                 }
             }
 
-        }
-        catch (MalformedURLException e)
-        {
+        } catch (MalformedURLException e) {
             fatal("Can't load dspace provided log4j configuration", e);
-            throw new IllegalStateException("Cannot load dspace provided log4j configuration",e);
+            throw new IllegalStateException("Cannot load dspace provided log4j configuration", e);
         }
     }
 
     /**
      * Attempt to log an INFO statement. If Log4j is not yet setup, send to System OUT
+     *
      * @param string
      */
-    private void info(String string)
-    {
-        if (!isLog4jConfigured())
-        {
+    private void info(String string) {
+        if (!isLog4jConfigured()) {
             System.out.println("INFO: " + string);
-        }
-        else
-        {
+        } else {
             log.info(string);
         }
     }
 
     /**
      * Attempt to log a WARN statement. If Log4j is not yet setup, send to System OUT
+     *
      * @param string
      */
-    private void warn(String string)
-    {
-        if (!isLog4jConfigured())
-        {
+    private void warn(String string) {
+        if (!isLog4jConfigured()) {
             System.out.println("WARN: " + string);
-        }
-        else
-        {
+        } else {
             log.warn(string);
         }
     }
 
     /**
      * Attempt to log a FATAL statement. If Log4j is not yet setup, send to System ERR
+     *
      * @param string
      * @param e
      */
-    private void fatal(String string, Exception e)
-    {
-        if (!isLog4jConfigured())
-        {
+    private void fatal(String string, Exception e) {
+        if (!isLog4jConfigured()) {
             System.err.println("FATAL: " + string);
             e.printStackTrace(System.err);
-        }
-        else
-        {
+        } else {
             log.fatal(string, e);
         }
     }
@@ -182,23 +162,17 @@ public class LoggerServiceImpl implements KernelStartupCallbackService
      * <p>
      * Based on samples here: http://wiki.apache.org/logging-log4j/UsefulCode
      */
-    private boolean isLog4jConfigured()
-    {
+    private boolean isLog4jConfigured() {
         Enumeration<?> appenders = org.apache.log4j.LogManager.getRootLogger()
-                .getAllAppenders();
+                                                              .getAllAppenders();
 
-        if (!(appenders instanceof org.apache.log4j.helpers.NullEnumeration))
-        {
+        if (!(appenders instanceof org.apache.log4j.helpers.NullEnumeration)) {
             return true;
-        }
-        else
-        {
+        } else {
             Enumeration<?> loggers = org.apache.log4j.LogManager.getCurrentLoggers();
-            while (loggers.hasMoreElements())
-            {
+            while (loggers.hasMoreElements()) {
                 Logger c = (Logger) loggers.nextElement();
-                if (!(c.getAllAppenders() instanceof org.apache.log4j.helpers.NullEnumeration))
-                {
+                if (!(c.getAllAppenders() instanceof org.apache.log4j.helpers.NullEnumeration)) {
                     return true;
                 }
             }

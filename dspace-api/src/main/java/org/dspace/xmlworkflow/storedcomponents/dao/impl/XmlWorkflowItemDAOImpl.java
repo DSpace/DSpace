@@ -7,18 +7,18 @@
  */
 package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the XmlWorkflowItem object.
@@ -27,28 +27,24 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem> implements XmlWorkflowItemDAO
-{
+public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem> implements XmlWorkflowItemDAO {
 
-    protected XmlWorkflowItemDAOImpl()
-    {
+    protected XmlWorkflowItemDAOImpl() {
         super();
     }
 
     @Override
-    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer limit, Collection collection) throws SQLException {
+    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer limit,
+                                                     Collection collection) throws SQLException {
         Criteria criteria = createCriteria(context, XmlWorkflowItem.class);
-        if(collection != null)
-        {
+        if (collection != null) {
             criteria.add(Restrictions.eq("collection", collection));
         }
 
-        if(offset != null)
-        {
+        if (offset != null) {
             criteria.setFirstResult(offset);
         }
-        if(limit != null)
-        {
+        if (limit != null) {
             criteria.setMaxResults(limit);
         }
 
@@ -63,8 +59,7 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
     @Override
     public int countAllInCollection(Context context, Collection collection) throws SQLException {
         Criteria criteria = createCriteria(context, XmlWorkflowItem.class);
-        if(collection != null)
-        {
+        if (collection != null) {
             criteria.add(Restrictions.eq("collection", collection));
         }
         return count(criteria);

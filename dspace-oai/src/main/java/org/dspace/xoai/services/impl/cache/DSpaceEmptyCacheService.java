@@ -7,11 +7,11 @@
  */
 package org.dspace.xoai.services.impl.cache;
 
-import com.lyncode.xoai.dataprovider.xml.oaipmh.OAIPMH;
-import org.dspace.xoai.services.api.cache.XOAICacheService;
-
 import java.io.IOException;
 import java.io.OutputStream;
+
+import com.lyncode.xoai.dataprovider.xml.oaipmh.OAIPMH;
+import org.dspace.xoai.services.api.cache.XOAICacheService;
 
 public class DSpaceEmptyCacheService implements XOAICacheService {
     @Override

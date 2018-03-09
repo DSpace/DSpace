@@ -8,7 +8,11 @@
 
 package org.dspace.eperson;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.sql.SQLException;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
@@ -16,21 +20,18 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- *
  * @author mwood
  */
-public class EPersonTest extends AbstractUnitTest
-{
+public class EPersonTest extends AbstractUnitTest {
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static final Logger log = Logger.getLogger(EPersonTest.class);
 
 
-    public EPersonTest()
-    {
+    public EPersonTest() {
     }
 
     /**
@@ -42,8 +43,7 @@ public class EPersonTest extends AbstractUnitTest
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
 
         context.turnOffAuthorisationSystem();
@@ -68,8 +68,7 @@ public class EPersonTest extends AbstractUnitTest
         context.turnOffAuthorisationSystem();
         try {
             EPerson testPerson = ePersonService.findByEmail(context, "kevin@dspace.org");
-            if(testPerson != null)
-            {
+            if (testPerson != null) {
                 ePersonService.delete(context, testPerson);
             }
         } catch (Exception ex) {
@@ -688,8 +687,7 @@ public class EPersonTest extends AbstractUnitTest
      */
     @Test
     public void testCheckPassword()
-            throws SQLException, DecoderException
-    {
+        throws SQLException, DecoderException {
         EPerson eperson = ePersonService.findByEmail(context, "kevin@dspace.org");
         ePersonService.checkPassword(context, eperson, "test");
     }
@@ -715,8 +713,7 @@ public class EPersonTest extends AbstractUnitTest
      */
     @Test
     public void testGetType()
-            throws SQLException
-    {
+        throws SQLException {
         System.out.println("getType");
         int expResult = Constants.EPERSON;
         int result = eperson.getType();

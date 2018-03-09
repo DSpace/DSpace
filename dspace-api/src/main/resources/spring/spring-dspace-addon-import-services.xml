@@ -17,14 +17,23 @@
            http://www.springframework.org/schema/context/spring-context.xsd"
        default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
-    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+    <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
     <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
           lazy-init="false" autowire="byType" destroy-method="destroy">
 
     </bean>
 
-    <bean id="PubmedImportService" class="org.dspace.importer.external.pubmed.service.other.ImportMetadataSourceServiceImpl" scope="singleton">
+    <!--If multiple importServices have been configured here but only one is to be used during the lookup step (StartSubmissionLookupStep),
+        this can be accomplished by specifying the property "publication-lookup.url" to the baseAddress of the required importService
+        So for example
+        publication-lookup.url=http://eutils.ncbi.nlm.nih.gov/entrez/eutils/
+        Will result in using the PubmedImportService for the lookup step
+        Omitting this property will default to searching over all configured ImportService implementations
+    -->
+
+    <bean id="PubmedImportService"
+          class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
 

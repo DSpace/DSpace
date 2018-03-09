@@ -7,8 +7,7 @@
  */
 package org.dspace;
 
-import org.databene.contiperf.junit.ContiPerfRule;
-import org.junit.Rule;
+import org.junit.Ignore;
 
 /**
  * This is the base class for Integration Tests. It inherits from the class
@@ -20,11 +19,7 @@ import org.junit.Rule;
  *
  * @author pvillega
  */
-public class AbstractIntegrationTest extends AbstractUnitTest
-{
-
-    //We only enable contiperf in the integration tests, as it doesn't
-    //seem so useful to run them in isolated unit tests
-    @Rule
-    public ContiPerfRule contiperfRules = new ContiPerfRule();
+@Ignore
+public class AbstractIntegrationTest extends AbstractUnitTest {
+    // This class intentionally left blank.
 }

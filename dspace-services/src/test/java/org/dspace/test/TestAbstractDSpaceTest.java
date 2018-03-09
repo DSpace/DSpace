@@ -7,14 +7,14 @@
  */
 package org.dspace.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import org.dspace.test.DSpaceAbstractKernelTest;
 import org.junit.Test;
 
 /**
  * A simple class to test that the abstract test case works
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class TestAbstractDSpaceTest extends DSpaceAbstractKernelTest {

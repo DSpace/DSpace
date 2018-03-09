@@ -11,7 +11,6 @@ package org.dspace.authority.indexer;
 import org.dspace.authority.AuthorityValue;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)

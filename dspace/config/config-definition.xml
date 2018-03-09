@@ -31,14 +31,14 @@
 
         <!-- Allow user to override any configs in a local.cfg -->
         <!-- Any properties in this config will override defaults in dspace.cfg (or any included *.cfg file) -->
-        <properties fileName="local.cfg" throwExceptionOnMissing="false" config-name="local" config-optional="true">
+        <properties fileName="local.cfg" throwExceptionOnMissing="false" config-name="local" config-optional="true" encoding="UTF-8">
             <!-- Reload this file if it has changed, and at least 5 seconds (5,000 ms) have passed -->
             <reloadingStrategy refreshDelay="5000"
                 config-class="org.apache.commons.configuration.reloading.FileChangedReloadingStrategy"/>
         </properties>
 
         <!-- Load our dspace.cfg (which in turn loads all module configs via "include=" statements) -->
-        <properties fileName="dspace.cfg" throwExceptionOnMissing="true">
+        <properties fileName="dspace.cfg" throwExceptionOnMissing="true" encoding="UTF-8">
             <!-- Reload this file if it has changed, and at least 5 seconds (5,000 ms) have passed -->
             <reloadingStrategy refreshDelay="5000"
                 config-class="org.apache.commons.configuration.reloading.FileChangedReloadingStrategy"/>

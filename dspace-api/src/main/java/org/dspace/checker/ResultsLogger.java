@@ -21,16 +21,12 @@ import org.dspace.core.I18nUtil;
  * <p>
  * Collects results from a Checksum process and outputs them to a Log4j Logger.
  * </p>
- * 
- * 
+ *
  * @author Jim Downing
  * @author Grace Carpenter
  * @author Nathan Sarr
- * 
- * 
  */
-public class ResultsLogger implements ChecksumResultsCollector
-{
+public class ResultsLogger implements ChecksumResultsCollector {
     /**
      * Usual Log4J logger.
      */
@@ -53,41 +49,36 @@ public class ResultsLogger implements ChecksumResultsCollector
     /**
      * Blanked off, no-op constructor. Do not use.
      */
-    private ResultsLogger()
-    {
+    private ResultsLogger() {
     }
 
     /**
      * Main constructor.
-     * 
-     * @param startDt
-     *            Date the checking run started.
+     *
+     * @param startDt Date the checking run started.
      */
-    public ResultsLogger(Date startDt)
-    {
+    public ResultsLogger(Date startDt) {
         LOG.info(msg("run-start-time") + ": " + DATE_FORMAT.get().format(startDt));
     }
 
     /**
      * Get the i18N string.
-     * 
-     * @param key
-     *            to get the message.
+     *
+     * @param key to get the message.
      * @return the message found.
      */
-    protected String msg(String key)
-    {
+    protected String msg(String key) {
         return I18nUtil.getMessage("org.dspace.checker.ResultsLogger." + key);
     }
 
     /**
      * Collect a result for logging.
-     * 
+     *
      * @param context Context
-     * @param info
-     *            the BitstreamInfo representing the result.
+     * @param info    the BitstreamInfo representing the result.
      * @throws SQLException if database error
-     * @see org.dspace.checker.ChecksumResultsCollector#collect(org.dspace.core.Context, org.dspace.checker.MostRecentChecksum)
+     * @see org.dspace.checker.ChecksumResultsCollector#collect(org.dspace.core.Context, org.dspace.checker
+     * .MostRecentChecksum)
      */
     @Override
     public void collect(Context context, MostRecentChecksum info) throws SQLException {
@@ -102,21 +93,23 @@ public class ResultsLogger implements ChecksumResultsCollector
         LOG.info(msg("name") + ": " + bitstream.getName());
         LOG.info(msg("store-number") + ": " + bitstream.getStoreNumber());
         LOG.info(msg("size") + ": " + bitstream.getSize());
-        LOG.info(msg("bitstream-format") + ": " + (bitstream.getFormat(context) != null ? bitstream.getFormat(context).getID() : "-1"));
+        LOG.info(msg("bitstream-format") + ": " + (bitstream.getFormat(context) != null ? bitstream.getFormat(context)
+                                                                                                   .getID() : "-1"));
         LOG.info(msg("user-format-description") + ": "
-                + bitstream.getUserFormatDescription());
+                     + bitstream.getUserFormatDescription());
         LOG.info(msg("source") + ": " + bitstream.getSource());
         LOG
-                .info(msg("checksum-algorithm") + ": "
-                        + info.getChecksumAlgorithm());
+            .info(msg("checksum-algorithm") + ": "
+                      + info.getChecksumAlgorithm());
         LOG.info(msg("previous-checksum") + ": " + info.getExpectedChecksum());
         LOG.info(msg("previous-checksum-date")
-                + ": "
-                + ((info.getProcessEndDate() != null) ? DATE_FORMAT.get().format(info
-                        .getProcessEndDate()) : "unknown"));
+                     + ": "
+                     + ((info.getProcessEndDate() != null) ? DATE_FORMAT.get().format(info
+                                                                                          .getProcessEndDate()) :
+            "unknown"));
         LOG.info(msg("new-checksum") + ": " + info.getCurrentChecksum());
         LOG.info(msg("checksum-comparison-result") + ": "
-                + (info.getChecksumResult().getResultCode()));
+                     + (info.getChecksumResult().getResultCode()));
         LOG.info("\n\n");
     }
 }

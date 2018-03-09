@@ -12,7 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -100,14 +99,14 @@ public class Bio {
     @Override
     public String toString() {
         return "Bio{" +
-                "orcid='" + orcid + '\'' +
-                ", name=" + name +
-                ", country='" + country + '\'' +
-                ", keywords=" + keywords +
-                ", bioExternalIdentifiers=" + bioExternalIdentifiers +
-                ", researcherUrls=" + researcherUrls +
-                ", biography='" + biography + '\'' +
-                '}';
+            "orcid='" + orcid + '\'' +
+            ", name=" + name +
+            ", country='" + country + '\'' +
+            ", keywords=" + keywords +
+            ", bioExternalIdentifiers=" + bioExternalIdentifiers +
+            ", researcherUrls=" + researcherUrls +
+            ", biography='" + biography + '\'' +
+            '}';
     }
 }
 

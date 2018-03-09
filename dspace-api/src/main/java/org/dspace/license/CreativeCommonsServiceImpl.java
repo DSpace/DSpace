@@ -7,12 +7,13 @@
  */
 package org.dspace.license;
 
-import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.List;
-
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -31,16 +32,20 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.license.service.CreativeCommonsService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.jdom.Document;
+import org.jdom.transform.JDOMSource;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class CreativeCommonsServiceImpl implements CreativeCommonsService, InitializingBean
-{
-    /** log4j category */
+public class CreativeCommonsServiceImpl implements CreativeCommonsService, InitializingBean {
+    /**
+     * log4j category
+     */
     private static Logger log = Logger.getLogger(CreativeCommonsServiceImpl.class);
 
     /**
@@ -51,9 +56,18 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     /**
      * Some BitStream Names (BSN)
+     *
+     * @deprecated use the metadata retrieved at {@link CreativeCommonsService#getCCField(String)} (see https://jira
+     * .duraspace.org/browse/DS-2604)
      */
+    @Deprecated
     protected static final String BSN_LICENSE_URL = "license_url";
 
+    /**
+     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it
+     * is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
+     */
+    @Deprecated
     protected static final String BSN_LICENSE_TEXT = "license_text";
 
     protected static final String BSN_LICENSE_RDF = "license_rdf";
@@ -69,54 +83,47 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     @Autowired(required = true)
     protected ItemService itemService;
 
-    protected CreativeCommonsServiceImpl()
-    {
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    protected CreativeCommonsServiceImpl() {
 
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception
-    {
+    public void afterPropertiesSet() throws Exception {
         // if defined, set a proxy server for http requests to Creative
         // Commons site
-        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+        String proxyHost = configurationService.getProperty("http.proxy.host");
+        String proxyPort = configurationService.getProperty("http.proxy.port");
 
-        if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort))
-        {
+        if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
             System.setProperty("http.proxyHost", proxyHost);
             System.setProperty("http.proxyPort", proxyPort);
         }
-        
-        try
-        {
+
+        try {
             templates = TransformerFactory.newInstance().newTemplates(
-                        new StreamSource(CreativeCommonsServiceImpl.class
-                                .getResourceAsStream("CreativeCommons.xsl")));
+                new StreamSource(CreativeCommonsServiceImpl.class
+                                     .getResourceAsStream("CreativeCommons.xsl")));
+        } catch (TransformerConfigurationException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
-        catch (TransformerConfigurationException e)
-        {
-            throw new RuntimeException(e.getMessage(),e);
-        }
-       
-        
+
+
     }
 
     @Override
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         return true;
     }
 
-        // create the CC bundle if it doesn't exist
-        // If it does, remove it and create a new one.
+    // create the CC bundle if it doesn't exist
+    // If it does, remove it and create a new one.
     protected Bundle getCcBundle(Context context, Item item)
-        throws SQLException, AuthorizeException, IOException
-    {
+        throws SQLException, AuthorizeException, IOException {
         List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
 
-        if ((bundles.size() > 0) && (bundles.get(0) != null))
-        {
+        if ((bundles.size() > 0) && (bundles.get(0) != null)) {
             itemService.removeBundle(context, item, bundles.get(0));
         }
         return bundleService.create(context, item, CC_BUNDLE_NAME);
@@ -124,72 +131,38 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     @Override
     public void setLicenseRDF(Context context, Item item, String licenseRdf)
-    	throws SQLException, IOException,
-            AuthorizeException
-    {
+        throws SQLException, IOException,
+        AuthorizeException {
         Bundle bundle = getCcBundle(context, item);
         // set the format
         BitstreamFormat bs_rdf_format = bitstreamFormatService.findByShortDescription(context, "RDF XML");
         // set the RDF bitstream
         setBitstreamFromBytes(context, item, bundle, BSN_LICENSE_RDF, bs_rdf_format, licenseRdf.getBytes());
     }
-    
-    @Override
-    public void setLicense(Context context, Item item,
-            String cc_license_url) throws SQLException, IOException,
-            AuthorizeException
-    {
-        Bundle bundle = getCcBundle(context, item);
 
-        // get some more information
-        String license_text = fetchLicenseText(cc_license_url);
-        String license_rdf = fetchLicenseRDF(cc_license_url);
-        
-        // set the formats
-        BitstreamFormat bs_url_format = bitstreamFormatService.findByShortDescription(
-                context, "License");
-        BitstreamFormat bs_text_format = bitstreamFormatService.findByShortDescription(
-                context, "CC License");
-        BitstreamFormat bs_rdf_format = bitstreamFormatService.findByShortDescription(
-                context, "RDF XML");
-
-        // set the URL bitstream
-        setBitstreamFromBytes(context, item, bundle, BSN_LICENSE_URL, bs_url_format,
-                cc_license_url.getBytes());
-
-        // set the license text bitstream
-        setBitstreamFromBytes(context, item, bundle, BSN_LICENSE_TEXT, bs_text_format,
-                license_text.getBytes());
-
-        // set the RDF bitstream
-        setBitstreamFromBytes(context, item, bundle, BSN_LICENSE_RDF, bs_rdf_format,
-                license_rdf.getBytes());
-    }
 
     @Override
     public void setLicense(Context context, Item item,
-                                  InputStream licenseStm, String mimeType)
-            throws SQLException, IOException, AuthorizeException
-    {
+                           InputStream licenseStm, String mimeType)
+        throws SQLException, IOException, AuthorizeException {
         Bundle bundle = getCcBundle(context, item);
 
-     // set the format
+        // set the format
         BitstreamFormat bs_format;
-        if (mimeType.equalsIgnoreCase("text/xml"))
-        {
-        	bs_format = bitstreamFormatService.findByShortDescription(context, "CC License");
+        if (mimeType.equalsIgnoreCase("text/xml")) {
+            bs_format = bitstreamFormatService.findByShortDescription(context, "CC License");
         } else if (mimeType.equalsIgnoreCase("text/rdf")) {
             bs_format = bitstreamFormatService.findByShortDescription(context, "RDF XML");
         } else {
-        	bs_format = bitstreamFormatService.findByShortDescription(context, "License");
+            bs_format = bitstreamFormatService.findByShortDescription(context, "License");
         }
 
         Bitstream bs = bitstreamService.create(context, bundle, licenseStm);
         bs.setSource(context, CC_BS_SOURCE);
         bs.setName(context, (mimeType != null &&
-                    (mimeType.equalsIgnoreCase("text/xml") ||
-                     mimeType.equalsIgnoreCase("text/rdf"))) ?
-                   BSN_LICENSE_RDF : BSN_LICENSE_TEXT);
+            (mimeType.equalsIgnoreCase("text/xml") ||
+                mimeType.equalsIgnoreCase("text/rdf"))) ?
+            BSN_LICENSE_RDF : BSN_LICENSE_TEXT);
         bs.setFormat(context, bs_format);
         bitstreamService.update(context, bs);
     }
@@ -197,40 +170,31 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     @Override
     public void removeLicense(Context context, Item item)
-            throws SQLException, IOException, AuthorizeException
-    {
+        throws SQLException, IOException, AuthorizeException {
         // remove CC license bundle if one exists
         List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
 
-        if ((bundles.size() > 0) && (bundles.get(0) != null))
-        {
+        if ((bundles.size() > 0) && (bundles.get(0) != null)) {
             itemService.removeBundle(context, item, bundles.get(0));
         }
     }
 
     @Override
     public boolean hasLicense(Context context, Item item)
-            throws SQLException, IOException
-    {
+        throws SQLException, IOException {
         // try to find CC license bundle
         List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
 
-        if (bundles.size() == 0)
-        {
+        if (bundles.size() == 0) {
             return false;
         }
 
         // verify it has correct contents
-        try
-        {
-            if ((getLicenseURL(context, item) == null) || (getLicenseText(context, item) == null)
-                    || (getLicenseRDF(context, item) == null))
-            {
+        try {
+            if ((getLicenseURL(context, item) == null)) {
                 return false;
             }
-        }
-        catch (AuthorizeException ae)
-        {
+        } catch (AuthorizeException ae) {
             return false;
         }
 
@@ -238,96 +202,72 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     }
 
     @Override
-    public String getLicenseURL(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException
-    {
-        return getStringFromBitstream(context, item, BSN_LICENSE_URL);
-    }
-
-    @Override
-    public String getLicenseText(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException
-    {
-        return getStringFromBitstream(context, item, BSN_LICENSE_TEXT);
-    }
-
-    @Override
     public String getLicenseRDF(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException
-    {
+        IOException, AuthorizeException {
         return getStringFromBitstream(context, item, BSN_LICENSE_RDF);
     }
 
     @Override
     public Bitstream getLicenseRdfBitstream(Item item) throws SQLException,
-            IOException, AuthorizeException
-    {
+        IOException, AuthorizeException {
         return getBitstream(item, BSN_LICENSE_RDF);
     }
 
+    @Deprecated
     @Override
     public Bitstream getLicenseTextBitstream(Item item) throws SQLException,
-            IOException, AuthorizeException
-    {
+        IOException, AuthorizeException {
         return getBitstream(item, BSN_LICENSE_TEXT);
     }
 
     @Override
-    public String fetchLicenseRdf(String ccResult) {
-    	StringWriter result 			= new StringWriter();
-        try {
-    		InputStream inputstream = new ByteArrayInputStream(ccResult.getBytes("UTF-8"));
-    		templates.newTransformer().transform(new StreamSource(inputstream), new StreamResult(result));
-    	} catch (TransformerException te) {
-    		throw new RuntimeException("Transformer exception " + te.getMessage(), te);
-    	} catch (IOException ioe) {
-    		throw new RuntimeException("IOexception " + ioe.getCause().toString(), ioe);
-    	} finally {
-    		return result.getBuffer().toString();
-    	}
-    }
-    
-
-    @Override
-    public String fetchLicenseText(String license_url)
-    {
-        String text_url = license_url;
-        byte[] urlBytes = fetchURL(text_url);
-
-        return (urlBytes != null) ? new String(urlBytes) : "";
-    }
-
-    @Override
-    public String fetchLicenseRDF(String license_url)
-    {
-        StringWriter result = new StringWriter();
-        
-        try
-        {
-            templates.newTransformer().transform(
-                    new StreamSource(license_url + "rdf"),
-                    new StreamResult(result)
-                    );
+    public String getLicenseURL(Context context, Item item) throws SQLException, IOException, AuthorizeException {
+        String licenseUri = getCCField("uri").ccItemValue(item);
+        if (StringUtils.isNotBlank(licenseUri)) {
+            return licenseUri;
         }
-        catch (TransformerException e)
-        {
-            throw new IllegalStateException(e.getMessage(),e);
+
+        // JSPUI backward compatibility see https://jira.duraspace.org/browse/DS-2604
+        return getStringFromBitstream(context, item, BSN_LICENSE_URL);
+    }
+
+    @Override
+    public String fetchLicenseRDF(Document license) {
+        StringWriter result = new StringWriter();
+
+        try {
+            templates.newTransformer().transform(
+                new JDOMSource(license),
+                new StreamResult(result)
+            );
+        } catch (TransformerException e) {
+            throw new IllegalStateException(e.getMessage(), e);
         }
 
         return result.getBuffer().toString();
     }
 
-    // The following two helper methods assume that the CC
-    // bitstreams are short and easily expressed as byte arrays in RAM
-
     /**
      * This helper method takes some bytes and stores them as a bitstream for an
      * item, under the CC bundle, with the given bitstream name
+     *
+     * Note: This helper method assumes that the CC
+     * bitstreams are short and easily expressed as byte arrays in RAM
+     *
+     * @param context        The relevant DSpace Context.
+     * @param item           parent item
+     * @param bundle         parent bundle
+     * @param bitstream_name bitstream name to set
+     * @param format         bitstream format
+     * @param bytes          bitstream data
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      */
     protected void setBitstreamFromBytes(Context context, Item item, Bundle bundle,
-            String bitstream_name, BitstreamFormat format, byte[] bytes)
-            throws SQLException, IOException, AuthorizeException
-    {
+                                         String bitstream_name, BitstreamFormat format, byte[] bytes)
+        throws SQLException, IOException, AuthorizeException {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         Bitstream bs = bitstreamService.create(context, bundle, bais);
 
@@ -342,15 +282,25 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * This helper method wraps a String around a byte array returned from the
      * bitstream method further down
+     *
+     * Note: This helper method assumes that the CC
+     * bitstreams are short and easily expressed as byte arrays in RAM
+     *
+     * @param context        The relevant DSpace Context.
+     * @param item           parent item
+     * @param bitstream_name bitstream name to set
+     * @return the bitstream as string
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      */
     protected String getStringFromBitstream(Context context, Item item,
-            String bitstream_name) throws SQLException, IOException,
-            AuthorizeException
-    {
+                                            String bitstream_name) throws SQLException, IOException,
+        AuthorizeException {
         byte[] bytes = getBytesFromBitstream(context, item, bitstream_name);
 
-        if (bytes == null)
-        {
+        if (bytes == null) {
             return null;
         }
 
@@ -360,28 +310,29 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * This helper method retrieves the bytes of a bitstream for an item under
      * the CC bundle, with the given bitstream name
+     *
+     * @param item           parent item
+     * @param bitstream_name bitstream name to set
+     * @return the bitstream
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      */
     protected Bitstream getBitstream(Item item, String bitstream_name)
-            throws SQLException, IOException, AuthorizeException
-    {
+        throws SQLException, IOException, AuthorizeException {
         Bundle cc_bundle = null;
 
         // look for the CC bundle
-        try
-        {
+        try {
             List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
 
-            if ((bundles != null) && (bundles.size() > 0))
-            {
+            if ((bundles != null) && (bundles.size() > 0)) {
                 cc_bundle = bundles.get(0);
-            }
-            else
-            {
+            } else {
                 return null;
             }
-        }
-        catch (Exception exc)
-        {
+        } catch (Exception exc) {
             // this exception catching is a bit generic,
             // but basically it happens if there is no CC bundle
             return null;
@@ -391,13 +342,11 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     }
 
     protected byte[] getBytesFromBitstream(Context context, Item item, String bitstream_name)
-            throws SQLException, IOException, AuthorizeException
-    {
+        throws SQLException, IOException, AuthorizeException {
         Bitstream bs = getBitstream(item, bitstream_name);
 
         // no such bitstream
-        if (bs == null)
-        {
+        if (bs == null) {
             return null;
         }
 
@@ -409,39 +358,29 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     }
 
     /**
-     * Fetch the contents of a URL
-     */
-    protected byte[] fetchURL(String url_string)
-    {
-        try
-        {
-            String line = "";
-            URL url = new URL(url_string);
-            URLConnection connection = url.openConnection();
-            InputStream inputStream = connection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder sb = new StringBuilder();
-
-            while ((line = reader.readLine()) != null)
-            {
-                sb.append(line);
-            }
-
-            return sb.toString().getBytes();
-        }
-        catch (Exception exc)
-        {
-            log.error(exc.getMessage());
-            return null;
-        }
-    }
-    /**
      * Returns a metadata field handle for given field Id
      */
     @Override
-    public LicenseMetadataValue getCCField(String fieldId)
-    {
-    	return new LicenseMetadataValue(ConfigurationManager.getProperty("cc.license." + fieldId));
+    public LicenseMetadataValue getCCField(String fieldId) {
+        return new LicenseMetadataValue(configurationService.getProperty("cc.license." + fieldId));
     }
-    
+
+    @Override
+    public void removeLicense(Context context, LicenseMetadataValue uriField,
+                              LicenseMetadataValue nameField, Item item)
+        throws AuthorizeException, IOException, SQLException {
+        // only remove any previous licenses
+        String licenseUri = uriField.ccItemValue(item);
+        if (licenseUri != null) {
+            uriField.removeItemValue(context, item, licenseUri);
+            if (configurationService.getBooleanProperty("cc.submit.setname")) {
+                String licenseName = nameField.keyedItemValue(item, licenseUri);
+                nameField.removeItemValue(context, item, licenseName);
+            }
+            if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
+                removeLicense(context, item);
+            }
+        }
+    }
+
 }

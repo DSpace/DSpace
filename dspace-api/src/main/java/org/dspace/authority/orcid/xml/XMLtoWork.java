@@ -7,19 +7,35 @@
  */
 package org.dspace.authority.orcid.xml;
 
-import org.dspace.authority.orcid.model.*;
-import org.dspace.authority.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.xml.xpath.XPathExpressionException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.authority.orcid.model.Citation;
+import org.dspace.authority.orcid.model.CitationType;
+import org.dspace.authority.orcid.model.Contributor;
+import org.dspace.authority.orcid.model.ContributorAttribute;
+import org.dspace.authority.orcid.model.ContributorAttributeRole;
+import org.dspace.authority.orcid.model.ContributorAttributeSequence;
+import org.dspace.authority.orcid.model.Work;
+import org.dspace.authority.orcid.model.WorkExternalIdentifier;
+import org.dspace.authority.orcid.model.WorkExternalIdentifierType;
+import org.dspace.authority.orcid.model.WorkTitle;
+import org.dspace.authority.orcid.model.WorkType;
+import org.dspace.authority.util.EnumUtils;
+import org.dspace.authority.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.xpath.XPathExpressionException;
-import java.util.*;
-
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -66,7 +82,7 @@ public class XMLtoWork extends Converter {
     protected String URL = "url";
 
     protected String WORK_CONTRIBUTOR = "work-contributors";
-    protected String CONTRIBUTOR = WORK_CONTRIBUTOR+"/contributor";
+    protected String CONTRIBUTOR = WORK_CONTRIBUTOR + "/contributor";
     protected String CONTRIBUTOR_ORCID = "contributor-orcid";
     protected String CREDIT_NAME = "credit-name";
     protected String CONTRIBUTOR_EMAIL = "contributor-email";
@@ -140,7 +156,8 @@ public class XMLtoWork extends Converter {
                 ContributorAttributeRole role = EnumUtils.lookup(ContributorAttributeRole.class, roleText);
 
                 String sequenceText = XMLUtils.getTextContent(nextAttribute, CONTRIBUTOR_SEQUENCE);
-                ContributorAttributeSequence sequence = EnumUtils.lookup(ContributorAttributeSequence.class, sequenceText);
+                ContributorAttributeSequence sequence = EnumUtils
+                    .lookup(ContributorAttributeSequence.class, sequenceText);
 
                 ContributorAttribute attribute = new ContributorAttribute(role, sequence);
                 contributorAttributes.add(attribute);

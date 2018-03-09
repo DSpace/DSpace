@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>6.0-rc2-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -23,16 +23,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-        <java.version>1.7</java.version>
+        <java.version>1.8</java.version>
+        <poi-version>3.17</poi-version>
+        <postgresql.driver.version>9.4.1211</postgresql.driver.version>
         <solr.version>4.10.4</solr.version>
         <jena.version>2.13.0</jena.version>
-        <slf4j.version>1.7.14</slf4j.version>
-        <!--
-            Hibernate version pinned to 4.2, 4.3 does not work with the spring version we are currently using
-            Upgrading the spring version will make the XMLUI crash
-        -->
-        <hibernate.version>4.2.21.Final</hibernate.version>
-        <spring.version>3.2.16.RELEASE</spring.version>
+        <slf4j.version>1.7.22</slf4j.version>
+        <jackson.version>2.8.6</jackson.version>
+        <jersey.version>2.26</jersey.version>
+        <hibernate.version>5.2.8.Final</hibernate.version>
+        <spring.version>4.3.6.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -59,7 +59,7 @@
                                     <requireJavaVersion>
                                         <version>${java.version}</version>
                                     </requireJavaVersion>
-                                </rules>    
+                                </rules>
                             </configuration>
                         </execution>
                         <!-- Make sure that we do not have conflicting dependencies-->
@@ -70,7 +70,7 @@
                             </goals>
                             <configuration>
                                 <rules>
-                                    <DependencyConvergence/>
+                                    <DependencyConvergence />
                                 </rules>
                             </configuration>
                         </execution>
@@ -81,9 +81,27 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.5.1</version>
                     <configuration>
+                      <!-- Turn on http://errorprone.info -->
+                      <compilerId>javac-with-errorprone</compilerId>
+                      <forceJavacCompilerUse>true</forceJavacCompilerUse>
                       <source>${java.version}</source>
                       <target>${java.version}</target>
                     </configuration>
+                    <!-- Extra dependencies for http://errorprone.info -->
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-compiler-javac-errorprone</artifactId>
+                        <version>2.8.2</version>
+                      </dependency>
+                      <!-- Override plexus-compiler-javac-errorprone's dependency on
+                           Error Prone with the latest version -->
+                      <dependency>
+                        <groupId>com.google.errorprone</groupId>
+                        <artifactId>error_prone_core</artifactId>
+                        <version>2.1.1</version>
+                      </dependency>
+                    </dependencies>
                 </plugin>
                 <!-- Used to package all DSpace JARs -->
                 <plugin>
@@ -124,7 +142,7 @@
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
-                        <argLine>${test.argLine}</argLine>
+                        <argLine>${test.argLine} ${surefireJacoco}</argLine>
                         <!-- tests whose name starts by Abstract will be ignored -->
                         <excludes>
                             <exclude>**/Abstract*</exclude>
@@ -144,7 +162,7 @@
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
-                        <argLine>${test.argLine}</argLine>
+                        <argLine>${test.argLine} ${failsafeJacoco}</argLine>
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
@@ -159,6 +177,38 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <!-- Used to validate all code style rules in source code via the Checkstyle config in checkstyle.xml -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <executions>
+                        <execution>
+                            <id>verify-style</id>
+                            <!-- Bind to process-classes so it runs after compile, but before package -->
+                            <phase>process-classes</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <configLocation>${root.basedir}/checkstyle.xml</configLocation>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <logViolationsToConsole>true</logViolationsToConsole>
+                        <failOnViolation>true</failOnViolation>
+                        <!-- TODO: Enable checks on tests too. Currently, they are excluded by default -->
+                        <!--<includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+                    </configuration>
+                    <dependencies>
+                        <!-- Override dependencies to use latest version of checkstyle -->
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>8.8</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -230,6 +280,16 @@
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>1.6</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.9</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.eluder.coveralls</groupId>
+                    <artifactId>coveralls-maven-plugin</artifactId>
+                    <version>4.3.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -261,10 +321,10 @@
                     <includes>
                         <include>src/**</include>
                     </includes>
-                    <!--Use all default exclusions for IDE files & Maven files, see: 
+                    <!--Use all default exclusions for IDE files & Maven files, see:
                         http://code.google.com/p/maven-license-plugin/wiki/Configuration#Default_excludes -->
                     <useDefaultExcludes>true</useDefaultExcludes>
-                    <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes> 
+                    <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes>
                          Individual Maven projects may choose to override these defaults. -->
                     <excludes>
                         <exclude>**/src/test/resources/**</exclude>
@@ -279,8 +339,8 @@
                         <exclude>**/readme*</exclude>
                         <exclude>**/.gitignore</exclude>
                     </excludes>
-                    <mapping> 
-                        <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin: 
+                    <mapping>
+                        <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin:
                              *.xmap, *.xslt, *.wsdd, *.wsdl, *.ttl, *.LICENSE -->
                         <xmap>XML_STYLE</xmap>
                         <xslt>XML_STYLE</xslt>
@@ -288,7 +348,7 @@
                         <wsdl>XML_STYLE</wsdl>
                         <ttl>SCRIPT_STYLE</ttl>
                         <LICENSE>TEXT</LICENSE>
-                    </mapping>  
+                    </mapping>
                     <encoding>UTF-8</encoding>
                     <!-- maven-license-plugin recommends a strict check (e.g. check spaces/tabs too) -->
                     <strictCheck>true</strictCheck>
@@ -303,14 +363,21 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Enforce our version of Java, Maven, dependencies, etc. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
+
+            <!-- Enforce our code style via CheckStyle (see settings above) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
-   
+
     <profiles>
         <!-- Skip Unit Tests by default, but allow override on command line
            by setting property "-Dmaven.test.skip=false" -->
@@ -345,8 +412,8 @@
         </profile>
 
         <!-- Allow for passing extra memory to Unit/Integration tests.
-             By default this gives unit tests 512MB of memory (when tests are enabled), 
-             unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since 
+             By default this gives unit tests 512MB of memory (when tests are enabled),
+             unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since
              m-surefire-p and m-failsafe-p both fork a new JVM for testing, they ignores MAVEN_OPTS. -->
         <profile>
             <id>test-argLine</id>
@@ -361,8 +428,8 @@
         </profile>
 
         <!-- This profile ensures that we ONLY generate the Unit Test Environment,
-             if the testEnvironment.xml file is found AND we are not skipping Unit 
-             Tests (see also skiptests profile). That way the Test Environment is 
+             if the testEnvironment.xml file is found AND we are not skipping Unit
+             Tests (see also skiptests profile). That way the Test Environment is
              also NOT built when running a 'mvn package' on a "binary" release. -->
         <profile>
             <id>generate-test-env</id>
@@ -404,7 +471,69 @@
             </build>
         </profile>
 
-        <!-- 
+        <profile>
+            <id>measure-test-coverage</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>maven.test.skip</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Report unit test code coverage -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <!--
+                                Prepares the property pointing to the JaCoCo runtime agent which
+                                is passed as VM argument when Maven the Surefire plugin is executed.
+                            -->
+                            <execution>
+                                <id>pre-unit-test</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Sets the path to the file which contains the execution data. -->
+                                    <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+                                    <!--
+                                        Sets the name of the property containing the settings
+                                        for JaCoCo runtime agent.
+                                    -->
+                                    <propertyName>surefireJacoco</propertyName>
+                                </configuration>
+                            </execution>
+
+                            <!--
+                                Prepares the property pointing to the JaCoCo runtime agent which
+                                is passed as VM argument when Maven the Failsafe plugin is executed.
+                            -->
+                            <execution>
+                                <id>pre-integration-test</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Sets the path to the file which contains the execution data. -->
+                                    <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+                                    <!--
+                                        Sets the name of the property containing the settings
+                                        for JaCoCo runtime agent.
+                                    -->
+                                    <propertyName>failsafeJacoco</propertyName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--
              Generate a list of all THIRD PARTY open source licenses for all DSpace dependencies.
              This list is automatically written to the [src]/LICENSES_THIRD_PARTY file.
              Third party tools whose licenses are unknown by Maven are maintained in
@@ -493,6 +622,42 @@
             </build>
         </profile>
 
+        <!-- PostgreSQL ships different JDBC drivers based on the version of Java
+             you are running. See https://jdbc.postgresql.org/download.html
+             These next two profiles handle pulling in the correct PostgreSQL JDBC driver. -->
+        <!-- Default PostgreSQL driver is only for Java 8 -->
+        <profile>
+            <id>postgresql-jdbc-default</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgresql.driver.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+        <!-- If running Java 7, use JRE7 PostgreSQL driver -->
+        <profile>
+            <id>postgresql-jdbc-jre7</id>
+            <activation>
+                <jdk>[1.7,1.8)</jdk>
+            </activation>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgresql.driver.version}.jre7</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+
         <!--
            These profiles activate the inclusion of various modules into
            the DSpace Build process. They activate automatically if the
@@ -557,21 +722,6 @@
             </activation>
             <modules>
                 <module>dspace-oai</module>
-            </modules>
-        </profile>
-
-        <!--
-           Builds JSPUI WAR for DSpace
-        -->
-        <profile>
-            <id>dspace-jspui</id>
-            <activation>
-                <file>
-                    <exists>dspace-jspui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>dspace-jspui</module>
             </modules>
         </profile>
 
@@ -650,33 +800,15 @@
             </modules>
         </profile>
 
-        <!--
-           Builds MIRAGE2 WAR for DSpace
-        -->
-        <profile>
-           <id>dspace-xmlui-mirage2</id>
-           <activation>
-               <file>
-                   <exists>dspace-xmlui-mirage2/pom.xml</exists>
-               </file>
-           </activation>
-           <modules>
-               <module>dspace-xmlui-mirage2</module>
-           </modules>
-        </profile>
-        
-        <!--
-           Builds XMLUI WAR for DSpace
-        -->
-        <profile>
-            <id>dspace-xmlui</id>
+		<profile>
+            <id>dspace-spring-rest</id>
             <activation>
                 <file>
-                    <exists>dspace-xmlui/pom.xml</exists>
+                    <exists>dspace-spring-rest/pom.xml</exists>
                 </file>
             </activation>
             <modules>
-                <module>dspace-xmlui</module>
+                <module>dspace-spring-rest</module>
             </modules>
         </profile>
 
@@ -695,7 +827,6 @@
                  as it does not include any Java source code to release. -->
             <modules>
                 <module>dspace-api</module>
-                <module>dspace-jspui</module>
                 <module>dspace-oai</module>
                 <module>dspace-rdf</module>
                 <module>dspace-rest</module>
@@ -703,8 +834,7 @@
                 <module>dspace-solr</module>
                 <module>dspace-sword</module>
                 <module>dspace-swordv2</module>
-                <module>dspace-xmlui-mirage2</module>
-                <module>dspace-xmlui</module>
+                <module>dspace-spring-rest</module>
             </modules>
             <build>
                 <plugins>
@@ -720,7 +850,8 @@
                                  MUST be specified for server 'ossrh' -->
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <!-- Require manual verification / release to Maven Central -->
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
                     <!-- For new releases, generate Source JAR files -->
@@ -749,7 +880,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- Sign any new releases via GPG. 
+                    <!-- Sign any new releases via GPG.
                          NOTE: you may optionall specify the "gpg.passphrase" in your settings.xml -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -782,118 +913,97 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-jspui</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-jspui</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-xmlui</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-xmlui</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rest</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rest</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-spring-rest</artifactId>
+                <version>7.0-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-solr</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-solr</artifactId>
-                <version>6.0-rc2-SNAPSHOT</version>
+                <version>7.0-SNAPSHOT</version>
                 <type>war</type>
                 <classifier>skinny</classifier>
             </dependency>
-
             <!-- DSpace Localization Packages -->
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -906,7 +1016,7 @@
                 <version>[6.0.0,7.0.0)</version>
                 <type>war</type>
             </dependency>
-         
+
             <!-- DSpace third Party Dependencies -->
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -1033,6 +1143,11 @@
                 <!-- <version>3.1</version> xmlui - wing -->
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.1</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-configuration</groupId>
                 <artifactId>commons-configuration</artifactId>
                 <version>1.10</version>
@@ -1050,7 +1165,7 @@
             <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
-                <version>1.3.1</version>
+                <version>1.3.3</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -1077,6 +1192,11 @@
                 <groupId>commons-validator</groupId>
                 <artifactId>commons-validator</artifactId>
                 <version>1.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.9.2</version>
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>
@@ -1118,12 +1238,12 @@
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
-                <version>2.0.0</version>
+                <version>2.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>fontbox</artifactId>
-                <version>2.0.0</version>
+                <version>2.0.2</version>
             </dependency>
             <dependency>
 	        <groupId>org.bouncycastle</groupId>
@@ -1138,17 +1258,22 @@
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
-                <version>3.13</version>
+                <version>${poi-version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-scratchpad</artifactId>
-                <version>3.13</version>
+                <version>${poi-version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
-                <version>3.13</version>
+                <version>${poi-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml-schemas</artifactId>
+                <version>${poi-version}</version>
             </dependency>
             <dependency>
                 <groupId>rome</groupId>
@@ -1214,11 +1339,6 @@
                 <version>56.1</version>
             </dependency>
             <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>9.4-1206-jdbc41</version>
-            </dependency>
-            <dependency>
                 <groupId>com.oracle</groupId>
                 <artifactId>ojdbc6</artifactId>
                 <version>11.2.0.4.0</version>
@@ -1278,7 +1398,13 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.11</version>
+                <version>4.12</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-all</artifactId>
+                <version>1.3</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1294,13 +1420,6 @@
                 <version>1.4.187</version>
                 <scope>test</scope>
             </dependency>
-            <!-- Contiperf is used for performance tests within our Unit/Integration tests -->
-            <dependency>
-                <groupId>org.databene</groupId>
-                <artifactId>contiperf</artifactId>
-                <version>2.3.4</version>
-                <scope>test</scope>
-            </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
@@ -1311,22 +1430,22 @@
             <dependency>
                 <groupId>com.google.apis</groupId>
                 <artifactId>google-api-services-analytics</artifactId>
-                <version>v3-rev123-1.21.0</version>
+                <version>v3-rev145-1.23.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.api-client</groupId>
                 <artifactId>google-api-client</artifactId>
-                <version>1.21.0</version>
+                <version>1.23.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client</artifactId>
-                <version>1.21.0</version>
+                <version>1.23.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client-jackson2</artifactId>
-                <version>1.21.0</version>
+                <version>1.23.0</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>jackson-core</artifactId>
@@ -1341,7 +1460,7 @@
             <dependency>
                 <groupId>com.google.oauth-client</groupId>
                 <artifactId>google-oauth-client</artifactId>
-                <version>1.21.0</version>
+                <version>1.23.0</version>
             </dependency>
             <!-- Findbugs annotations -->
             <dependency>
@@ -1355,6 +1474,58 @@
                 <artifactId>annotations</artifactId>
                 <version>3.0.1u2</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>1.10.19</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- Converge miscellaneous transitive dependencies. -->
+            <dependency>
+                <groupId>com.fasterxml</groupId>
+                <artifactId>classmate</artifactId>
+                <version>1.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>19.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lyncode</groupId>
+                <artifactId>builder-commons</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.20.0-GA</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.3.0.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>xom</groupId>
+                <artifactId>xom</artifactId>
+                <version>1.2.5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -1429,10 +1600,30 @@
         </mailingList>
     </mailingLists>
 
+    <developers>
+        <developer>
+           <name>DSpace Committers</name>
+           <email>dspace-devel@googlegroups.com</email>
+           <url>https://wiki.duraspace.org/display/DSPACE/DSpace+Committers</url>
+           <roles>
+             <role>committer</role>
+           </roles>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+           <name>DSpace Contributors</name>
+           <email>dspace-tech@googlegroups.com</email>
+           <url>https://wiki.duraspace.org/display/DSPACE/DSpaceContributors</url>
+           <roles>
+             <role>developer</role>
+           </roles>
+        </contributor>
+    </contributors>
+
     <!--
-      The SCM repository location is used by Continuum to update against
-      when changes have occurred.  This spawns a new build cycle and releases
-      snapshots into the snapshot repository below.
+      Information about the SCM repository where source code exists.
     -->
     <scm>
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
@@ -1455,4 +1646,16 @@
         </repository>
     </distributionManagement>
 
+    <dependencies>
+    	<dependency>
+    		<groupId>org.apache.poi</groupId>
+    		<artifactId>poi-ooxml</artifactId>
+    		<exclusions>
+    			<exclusion>
+    				<groupId>stax</groupId>
+    				<artifactId>stax-api</artifactId>
+    			</exclusion>
+    		</exclusions>
+    	</dependency>
+    </dependencies>
 </project>

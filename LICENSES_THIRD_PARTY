@@ -1,19 +1,19 @@
 
-DSpace uses third-party libraries which may be distributed under different 
+DSpace uses third-party libraries which may be distributed under different
 licenses. We have listed all of these third party libraries and their licenses
 below. This file can be regenerated at any time by simply running:
-    
+
     mvn clean verify -Dthird.party.licenses=true
 
-You must agree to the terms of these licenses, in addition to the DSpace 
+You must agree to the terms of these licenses, in addition to the DSpace
 source code license, in order to use this software.
 
 ---------------------------------------------------
 Third party Java libraries listed by License type.
 
 PLEASE NOTE: Some dependencies may be listed under multiple licenses if they
-are dual-licensed. This is especially true of anything listed as 
-"GNU General Public Library" below, as DSpace actually does NOT allow for any 
+are dual-licensed. This is especially true of anything listed as
+"GNU General Public Library" below, as DSpace actually does NOT allow for any
 dependencies that are solely released under GPL terms. For more info see:
 https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
 ---------------------------------------------------
@@ -22,7 +22,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
 
         * Ant-Contrib Tasks (ant-contrib:ant-contrib:1.0b3 - http://ant-contrib.sourceforge.net)
         * Code Generation Library (cglib:cglib:2.2.2 - http://cglib.sourceforge.net/)
-        * Code Generation Library (cglib:cglib:3.1 - http://cglib.sourceforge.net/)
         * AWS SDK for Java - Core (com.amazonaws:aws-java-sdk-core:1.10.50 - https://aws.amazon.com/sdkforjava)
         * AWS Java SDK for AWS KMS (com.amazonaws:aws-java-sdk-kms:1.10.50 - https://aws.amazon.com/sdkforjava)
         * AWS Java SDK for Amazon S3 (com.amazonaws:aws-java-sdk-s3:1.10.50 - https://aws.amazon.com/sdkforjava)
@@ -115,7 +114,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Apache Commons Compress (org.apache.commons:commons-compress:1.7 - http://commons.apache.org/proper/commons-compress/)
         * Apache Commons CSV (org.apache.commons:commons-csv:1.0 - http://commons.apache.org/proper/commons-csv/)
         * Apache Commons DBCP (org.apache.commons:commons-dbcp2:2.1.1 - http://commons.apache.org/dbcp/)
-        * Commons Lang (org.apache.commons:commons-lang3:3.1 - http://commons.apache.org/lang/)
         * Apache Commons Lang (org.apache.commons:commons-lang3:3.3.2 - http://commons.apache.org/proper/commons-lang/)
         * Apache Commons Pool (org.apache.commons:commons-pool2:2.4.2 - http://commons.apache.org/proper/commons-pool/)
         * Excalibur Pool API (org.apache.excalibur.components:excalibur-pool-api:2.2.1 - http://www.apache.org/excalibur/excalibur-components-modules/excalibur-pool-modules/excalibur-pool-api/)
@@ -125,6 +123,7 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Excalibur Instrument API (org.apache.excalibur.containerkit:excalibur-instrument-api:2.2.1 - http://www.apache.org/excalibur/excalibur-containerkit/excalibur-instrument-modules/excalibur-instrument-api/)
         * Excalibur Logger (org.apache.excalibur.containerkit:excalibur-logger:2.2.1 - http://www.apache.org/excalibur/excalibur-containerkit/excalibur-logger/)
         * Activation 1.1 (org.apache.geronimo.specs:geronimo-activation_1.1_spec:1.1 - http://geronimo.apache.org/maven/specs/geronimo-activation_1.1_spec/1.1)
+        * JavaMail 1.4 (org.apache.geronimo.specs:geronimo-javamail_1.4_spec:1.7.1 - http://geronimo.apache.org/maven/specs/geronimo-javamail_1.4_spec/1.7.1)
         * Streaming API for XML (STAX API 1.0) (org.apache.geronimo.specs:geronimo-stax-api_1.0_spec:1.0.1 - http://geronimo.apache.org/specs/geronimo-stax-api_1.0_spec)
         * Apache Hadoop Annotations (org.apache.hadoop:hadoop-annotations:2.2.0 - no url defined)
         * Apache Hadoop Auth (org.apache.hadoop:hadoop-auth:2.2.0 - no url defined)
@@ -172,9 +171,9 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Lucene Spatial (org.apache.lucene:lucene-spatial:4.10.4 - http://lucene.apache.org/lucene-parent/lucene-spatial)
         * Lucene Suggest (org.apache.lucene:lucene-suggest:4.10.2 - http://lucene.apache.org/lucene-parent/lucene-suggest)
         * Lucene Suggest (org.apache.lucene:lucene-suggest:4.10.4 - http://lucene.apache.org/lucene-parent/lucene-suggest)
-        * Apache FontBox (org.apache.pdfbox:fontbox:2.0.0 - http://pdfbox.apache.org/)
+        * Apache FontBox (org.apache.pdfbox:fontbox:2.0.2 - http://pdfbox.apache.org/)
         * Apache JempBox (org.apache.pdfbox:jempbox:1.8.4 - http://www.apache.org/pdfbox-parent/jempbox/)
-        * Apache PDFBox (org.apache.pdfbox:pdfbox:2.0.0 - http://www.apache.org/pdfbox-parent/pdfbox/)
+        * Apache PDFBox (org.apache.pdfbox:pdfbox:2.0.2 - http://www.apache.org/pdfbox-parent/pdfbox/)
         * Apache POI (org.apache.poi:poi:3.13 - http://poi.apache.org/)
         * Apache POI (org.apache.poi:poi-ooxml:3.13 - http://poi.apache.org/)
         * Apache POI (org.apache.poi:poi-ooxml-schemas:3.10.1 - http://poi.apache.org/)
@@ -189,20 +188,18 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Apache Tika core (org.apache.tika:tika-core:1.5 - http://tika.apache.org/)
         * Apache Tika parsers (org.apache.tika:tika-parsers:1.5 - http://tika.apache.org/)
         * Apache Tika XMP (org.apache.tika:tika-xmp:1.5 - http://tika.apache.org/)
-        * Axiom API (org.apache.ws.commons.axiom:axiom-api:1.2.17 - http://ws.apache.org/axiom/)
-        * LLOM (org.apache.ws.commons.axiom:axiom-impl:1.2.17 - http://ws.apache.org/axiom/implementations/axiom-impl/)
+        * Axiom API (org.apache.ws.commons.axiom:axiom-api:1.2.14 - http://ws.apache.org/axiom/)
+        * Axiom Impl (org.apache.ws.commons.axiom:axiom-impl:1.2.14 - http://ws.apache.org/axiom/)
         * XmlBeans (org.apache.xmlbeans:xmlbeans:2.6.0 - http://xmlbeans.apache.org)
         * zookeeper (org.apache.zookeeper:zookeeper:3.4.6 - no url defined)
         * Evo Inflector (org.atteo:evo-inflector:1.2.1 - http://atteo.org/static/evo-inflector)
         * TagSoup (org.ccil.cowan.tagsoup:tagsoup:1.2.1 - http://home.ccil.org/~cowan/XML/tagsoup/)
         * Jackson (org.codehaus.jackson:jackson-core-asl:1.9.13 - http://jackson.codehaus.org)
         * Data Mapper for Jackson (org.codehaus.jackson:jackson-mapper-asl:1.9.13 - http://jackson.codehaus.org)
-        * Woodstox (org.codehaus.woodstox:woodstox-core-asl:4.2.0 - http://woodstox.codehaus.org)
+        * Woodstox (org.codehaus.woodstox:woodstox-core-asl:4.1.4 - http://woodstox.codehaus.org)
         * Woodstox (org.codehaus.woodstox:wstx-asl:3.2.0 - http://woodstox.codehaus.org)
         * Woodstox (org.codehaus.woodstox:wstx-asl:3.2.7 - http://woodstox.codehaus.org)
-        * databene ContiPerf (org.databene:contiperf:2.3.4 - http://databene.org/contiperf)
-        * elasticsearch (org.elasticsearch:elasticsearch:1.4.0 - http://nexus.sonatype.org/oss-repository-hosting.html/elasticsearch)
-        * flyway-core (org.flywaydb:flyway-core:3.2.1 - http://flywaydb.org/flyway-core)
+        * flyway-core (org.flywaydb:flyway-core:4.0.3 - https://flywaydb.org/flyway-core)
         * Ogg and Vorbis for Java, Core (org.gagravarr:vorbis-java-core:0.1 - https://github.com/Gagravarr/VorbisJava)
         * Apache Tika plugin for Ogg, Vorbis and FLAC (org.gagravarr:vorbis-java-tika:0.1 - https://github.com/Gagravarr/VorbisJava)
         * Javassist (org.javassist:javassist:3.18.1-GA - http://www.javassist.org/)
@@ -211,10 +208,11 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Jetty Utilities (org.mortbay.jetty:jetty-util:6.1.26 - http://www.eclipse.org/jetty/jetty-parent/project/jetty-util)
         * Servlet Specification API (org.mortbay.jetty:servlet-api:2.5-20081211 - http://jetty.mortbay.org/servlet-api)
         * Noggit (org.noggit:noggit:0.5 - http://noggit.org)
+        * Objenesis (org.objenesis:objenesis:2.1 - http://objenesis.org)
         * parboiled-core (org.parboiled:parboiled-core:1.1.6 - http://parboiled.org)
         * parboiled-java (org.parboiled:parboiled-java:1.1.6 - http://parboiled.org)
-        * Restlet Core - API and Engine (org.restlet.jee:org.restlet:2.1.1 - http://www.restlet.org/org.restlet)
-        * Restlet Extension - Servlet (org.restlet.jee:org.restlet.ext.servlet:2.1.1 - http://www.restlet.org/org.restlet.ext.servlet)
+        * org.restlet (org.restlet.jee:org.restlet:2.1.1 - no url defined)
+        * org.restlet.ext.servlet (org.restlet.jee:org.restlet.ext.servlet:2.1.1 - no url defined)
         * rome-modules (org.rometools:rome-modules:1.0 - http://www.rometools.org)
         * Spring AOP (org.springframework:spring-aop:3.2.16.RELEASE - https://github.com/SpringSource/spring-framework)
         * Spring AOP (org.springframework:spring-aop:3.2.5.RELEASE - https://github.com/SpringSource/spring-framework)
@@ -229,7 +227,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Spring Expression Language (SpEL) (org.springframework:spring-expression:3.2.5.RELEASE - https://github.com/SpringSource/spring-framework)
         * Spring JDBC (org.springframework:spring-jdbc:3.2.16.RELEASE - https://github.com/SpringSource/spring-framework)
         * Spring JDBC (org.springframework:spring-jdbc:3.2.5.RELEASE - https://github.com/SpringSource/spring-framework)
-        * Spring Framework: Mock (org.springframework:spring-mock:2.0.8 - http://www.springframework.org)
         * Spring Object/Relational Mapping (org.springframework:spring-orm:3.2.16.RELEASE - https://github.com/SpringSource/spring-framework)
         * Spring Object/Relational Mapping (org.springframework:spring-orm:3.2.5.RELEASE - https://github.com/SpringSource/spring-framework)
         * Spring TestContext Framework (org.springframework:spring-test:3.2.5.RELEASE - https://github.com/SpringSource/spring-framework)
@@ -269,7 +266,7 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Protocol Buffer Java API (com.google.protobuf:protobuf-java:2.5.0 - http://code.google.com/p/protobuf)
         * Jena IRI (com.hp.hpl.jena:iri:0.8 - http://jena.sf.net/iri)
         * Jena (com.hp.hpl.jena:jena:2.6.4 - http://www.openjena.org/)
-        * yui compressor (com.yahoo.platform.yui:yuicompressor:2.4.8 - http://developer.yahoo.com/yui/compressor/)
+        * yui compressor (com.yahoo.platform.yui:yuicompressor:2.3.6 - http://developer.yahoo.com/yui/compressor/)
         * dnsjava (dnsjava:dnsjava:2.1.7 - http://www.dnsjava.org)
         * dom4j (dom4j:dom4j:1.6.1 - http://dom4j.org)
         * Biblio Transformation Engine :: Core (gr.ekt.bte:bte-core:0.9.3.5 - http://github.com/EKT/Biblio-Transformation-Engine/bte-core)
@@ -281,30 +278,29 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Morfologik Stemming Dictionary for Polish (org.carrot2:morfologik-polish:1.7.1 - http://morfologik.blogspot.com/morfologik-polish/)
         * Morfologik Stemming APIs (org.carrot2:morfologik-stemming:1.7.1 - http://morfologik.blogspot.com/morfologik-stemming/)
         * Stax2 API (org.codehaus.woodstox:stax2-api:3.1.1 - http://woodstox.codehaus.org/StAX2)
-        * DSpace Kernel :: API and Implementation (org.dspace:dspace-api:6.0-SNAPSHOT - https://github.com/dspace/DSpace/dspace-api)
-        * DSpace I18N :: Language Packs (org.dspace:dspace-api-lang:5.0.7 - http://nexus.sonatype.org/oss-repository-hosting.html/dspace-api-lang)
-        * DSpace JSP-UI (org.dspace:dspace-jspui:6.0-SNAPSHOT - https://github.com/dspace/DSpace/dspace-jspui)
-        * DSpace OAI-PMH (org.dspace:dspace-oai:6.0-SNAPSHOT - https://github.com/dspace/DSpace/dspace-oai)
-        * DSpace RDF (org.dspace:dspace-rdf:6.0-SNAPSHOT - https://github.com/dspace/DSpace/dspace-rdf)
-        * DSpace REST :: API and Implementation (org.dspace:dspace-rest:6.0-SNAPSHOT - http://demo.dspace.org)
-        * DSpace Services Framework :: API and Implementation (org.dspace:dspace-services:6.0-SNAPSHOT - https://github.com/dspace/DSpace/dspace-services)
-        * Apache Solr Webapp (org.dspace:dspace-solr:6.0-SNAPSHOT - https://github.com/dspace/DSpace/dspace-solr)
-        * DSpace SWORD (org.dspace:dspace-sword:6.0-SNAPSHOT - https://github.com/dspace/DSpace/dspace-sword)
-        * DSpace SWORD v2 (org.dspace:dspace-swordv2:6.0-SNAPSHOT - https://github.com/dspace/DSpace/dspace-swordv2)
-        * DSpace XML-UI (Manakin) (org.dspace:dspace-xmlui:6.0-SNAPSHOT - https://github.com/dspace/DSpace/dspace-xmlui)
-        * DSpace XML-UI (Manakin) I18N :: Language Packs (org.dspace:dspace-xmlui-lang:5.0.7 - http://nexus.sonatype.org/oss-repository-hosting.html/dspace-xmlui-lang)
+        * DSpace Kernel :: API and Implementation (org.dspace:dspace-api:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/dspace-api)
+        * DSpace I18N :: Language Packs (org.dspace:dspace-api-lang:6.0.3 - https://github.com/dspace/dspace-api-lang)
+        * DSpace JSP-UI (org.dspace:dspace-jspui:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/dspace-jspui)
+        * DSpace OAI-PMH (org.dspace:dspace-oai:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/dspace-oai)
+        * DSpace RDF (org.dspace:dspace-rdf:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/dspace-rdf)
+        * DSpace REST :: API and Implementation (org.dspace:dspace-rest:6.0-rc4-SNAPSHOT - http://demo.dspace.org)
+        * DSpace Services Framework :: API and Implementation (org.dspace:dspace-services:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/dspace-services)
+        * Apache Solr Webapp (org.dspace:dspace-solr:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/dspace-solr)
+        * DSpace SWORD (org.dspace:dspace-sword:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/dspace-sword)
+        * DSpace SWORD v2 (org.dspace:dspace-swordv2:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/dspace-swordv2)
+        * DSpace XML-UI (Manakin) (org.dspace:dspace-xmlui:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/dspace-xmlui)
+        * DSpace XML-UI (Manakin) I18N :: Language Packs (org.dspace:dspace-xmlui-lang:6.0.3 - https://github.com/dspace/dspace-xmlui-lang)
         * handle (org.dspace:handle:6.2 - no url defined)
         * jargon (org.dspace:jargon:1.4.25 - no url defined)
         * mets (org.dspace:mets:1.5.2 - no url defined)
         * oclc-harvester2 (org.dspace:oclc-harvester2:0.1.12 - no url defined)
         * XOAI : OAI-PMH Java Toolkit (org.dspace:xoai:3.2.10 - http://nexus.sonatype.org/oss-repository-hosting.html/xoai)
         * Repackaged Cocoon Servlet Service Implementation (org.dspace.dependencies.cocoon:dspace-cocoon-servlet-service-impl:1.0.3 - http://projects.dspace.org/dspace-pom/dspace-cocoon-servlet-service-impl)
-        * DSpace Kernel :: Additions and Local Customizations (org.dspace.modules:additions:6.0-SNAPSHOT - https://github.com/dspace/DSpace/modules/additions)
+        * DSpace Kernel :: Additions and Local Customizations (org.dspace.modules:additions:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/modules/additions)
         * Hamcrest All (org.hamcrest:hamcrest-all:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-all)
-        * Hamcrest Core (org.hamcrest:hamcrest-core:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-core)
+        * Hamcrest Core (org.hamcrest:hamcrest-all:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-all)
         * JBibTeX (org.jbibtex:jbibtex:1.0.10 - http://www.jbibtex.org)
         * ASM Core (org.ow2.asm:asm:4.1 - http://asm.objectweb.org/asm/)
-        * ASM Core (org.ow2.asm:asm:4.2 - http://asm.objectweb.org/asm/)
         * ASM Analysis (org.ow2.asm:asm-analysis:4.1 - http://asm.objectweb.org/asm-analysis/)
         * ASM Commons (org.ow2.asm:asm-commons:4.1 - http://asm.objectweb.org/asm-commons/)
         * ASM Tree (org.ow2.asm:asm-tree:4.1 - http://asm.objectweb.org/asm-tree/)
@@ -351,8 +347,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * jersey-media-json-jackson (org.glassfish.jersey.media:jersey-media-json-jackson:2.22.1 - https://jersey.java.net/project/jersey-media-json-jackson/)
         * Java Transaction API (org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec:1.0.1.Final - http://www.jboss.org/jboss-transaction-api_1.1_spec)
         * Type arithmetic library for Java5 (org.jvnet:tiger-types:1.4 - http://java.net/tiger-types/)
-        * Restlet Core - API and Engine (org.restlet.jee:org.restlet:2.1.1 - http://www.restlet.org/org.restlet)
-        * Restlet Extension - Servlet (org.restlet.jee:org.restlet.ext.servlet:2.1.1 - http://www.restlet.org/org.restlet.ext.servlet)
 
     Eclipse Public License:
 
@@ -362,8 +356,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Jetty Server (org.mortbay.jetty:jetty:6.1.26 - http://www.eclipse.org/jetty/jetty-parent/project/modules/jetty)
         * Jetty Servlet Tester (org.mortbay.jetty:jetty-servlet-tester:6.1.26 - http://www.eclipse.org/jetty/jetty-parent/project/jetty-servlet-tester)
         * Jetty Utilities (org.mortbay.jetty:jetty-util:6.1.26 - http://www.eclipse.org/jetty/jetty-parent/project/jetty-util)
-        * Restlet Core - API and Engine (org.restlet.jee:org.restlet:2.1.1 - http://www.restlet.org/org.restlet)
-        * Restlet Extension - Servlet (org.restlet.jee:org.restlet.ext.servlet:2.1.1 - http://www.restlet.org/org.restlet.ext.servlet)
 
     GNU General Public License, Version 2 with the Classpath Exception:
 
@@ -382,8 +374,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Javassist (org.javassist:javassist:3.18.1-GA - http://www.javassist.org/)
         * JBoss Logging 3 (org.jboss.logging:jboss-logging:3.1.0.GA - http://www.jboss.org)
         * org.jdesktop - Swing Worker (org.jdesktop:swing-worker:1.1 - no url defined)
-        * Restlet Core - API and Engine (org.restlet.jee:org.restlet:2.1.1 - http://www.restlet.org/org.restlet)
-        * Restlet Extension - Servlet (org.restlet.jee:org.restlet.ext.servlet:2.1.1 - http://www.restlet.org/org.restlet.ext.servlet)
         * xom (xom:xom:1.1 - http://www.xom.nu)
         * XOM (xom:xom:1.2.5 - http://xom.nu)
 
@@ -401,13 +391,10 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Bouncy Castle Provider (org.bouncycastle:bcprov-jdk15:1.46 - http://www.bouncycastle.org/java.html)
         * Main (org.jmockit:jmockit:1.21 - http://www.jmockit.org)
         * OpenCloud (org.mcavallo:opencloud:0.3 - http://opencloud.mcavallo.org/)
-        * Mockito (org.mockito:mockito-all:1.10.19 - http://www.mockito.org)
-        * Mockito (org.mockito:mockito-core:1.9.5 - http://www.mockito.org)
-        * Objenesis (org.objenesis:objenesis:1.0 - http://objenesis.googlecode.com/svn/docs/index.html)
+        * Mockito (org.mockito:mockito-core:1.10.19 - http://www.mockito.org)
         * JCL 1.1.1 implemented over SLF4J (org.slf4j:jcl-over-slf4j:1.7.14 - http://www.slf4j.org)
         * JUL to SLF4J bridge (org.slf4j:jul-to-slf4j:1.7.14 - http://www.slf4j.org)
         * SLF4J API Module (org.slf4j:slf4j-api:1.7.14 - http://www.slf4j.org)
-        * SLF4J JDK14 Binding (org.slf4j:slf4j-jdk14:1.7.14 - http://www.slf4j.org)
         * SLF4J LOG4J-12 Binding (org.slf4j:slf4j-log4j12:1.7.14 - http://www.slf4j.org)
 
     Mozilla Public License:
@@ -430,7 +417,7 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
 
     The PostgreSQL License:
 
-        * PostgreSQL JDBC Driver (org.postgresql:postgresql:9.4-1206-jdbc41 - http://jdbc.postgresql.org)
+        * PostgreSQL JDBC Driver - JDBC 4.2 (org.postgresql:postgresql:9.4.1211 - https://github.com/pgjdbc/pgjdbc)
 
     license.txt:
 

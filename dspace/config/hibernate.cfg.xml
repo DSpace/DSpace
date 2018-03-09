@@ -12,16 +12,20 @@
         <property name="hibernate.hbm2ddl.auto">validate</property>
         <property name="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.SingleLineSqlCommandExtractor</property>
         <property name="hibernate.connection.autocommit">false</property>
+        <property name="hibernate.jdbc.batch_size">20</property>
         <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
 
         <!--Debug property that can be used to display the sql-->
         <property name="show_sql">false</property>
 
-
         <!--Second level cache configuration-->
-        <property name="hibernate.cache.use_second_level_cache">true</property>
         <property name="hibernate.cache.use_query_cache">true</property>
-        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</property>
+        <property name="hibernate.cache.use_structured_entries">true</property>
+        <property name="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</property>
+        <!-- Set in config/spring/api/core-hibernate.xml -->
+        <!--<property name="net.sf.ehcache.configurationResourceName">file:${dspace.dir}/config/hibernate-ehcache-config.xml</property>-->
 
 
         <!-- Entities to be loaded by hibernate -->
@@ -62,22 +66,19 @@
         <mapping class="org.dspace.versioning.Version"/>
         <mapping class="org.dspace.versioning.VersionHistory"/>
 
+        <mapping class="org.dspace.app.requestitem.RequestItem"/>
+
+        <!--Basic workflow services, comment or remove when switching to the configurable workflow -->
         <mapping class="org.dspace.workflowbasic.BasicWorkflowItem"/>
         <mapping class="org.dspace.workflowbasic.TaskListItem"/>
 
-        <mapping class="org.dspace.app.requestitem.RequestItem"/>
+        <!--Configurable workflow services, uncomment the xml workflow classes below to enable the configurable workflow-->
+        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.ClaimedTask"/>
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.CollectionRole"/>
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.InProgressUser"/>
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.PoolTask"/>
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>-->
 
-        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.ClaimedTask"/>-->
-        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.CollectionRole"/>-->
-        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.InProgressUser"/>-->
-        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.PoolTask"/>-->
-        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>-->
-        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>-->
-
-        <!--*********************-->
-        <!-- Cache configuration -->
-        <!--*********************-->
-        <class-cache class="org.dspace.content.MetadataSchema" usage="read-write" />
-        <class-cache class="org.dspace.content.MetadataField" usage="read-write" />
     </session-factory>
 </hibernate-configuration>

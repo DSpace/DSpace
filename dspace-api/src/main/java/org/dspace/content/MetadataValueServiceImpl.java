@@ -7,20 +7,22 @@
  */
 package org.dspace.content;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.MetadataValueDAO;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Service implementation for the MetadataValue object.
@@ -64,7 +66,8 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     }
 
     @Override
-    public List<MetadataValue> findByField(Context context, MetadataField metadataField) throws IOException, SQLException {
+    public List<MetadataValue> findByField(Context context, MetadataField metadataField)
+        throws IOException, SQLException {
         return metadataValueDAO.findByField(context, metadataField);
     }
 
@@ -72,15 +75,20 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     public void update(Context context, MetadataValue metadataValue) throws SQLException {
         metadataValueDAO.save(context, metadataValue);
         log.info(LogManager.getHeader(context, "update_metadatavalue",
-                "metadata_value_id=" + metadataValue.getValueId()));
+                                      "metadata_value_id=" + metadataValue.getID()));
 
     }
 
     @Override
-    public void update(Context context, MetadataValue metadataValue, boolean updateLastModified) throws SQLException, AuthorizeException {
-        if(updateLastModified){
+    public void update(Context context, MetadataValue metadataValue, boolean updateLastModified)
+        throws SQLException, AuthorizeException {
+        if (updateLastModified) {
             authorizeService.authorizeAction(context, metadataValue.getDSpaceObject(), Constants.WRITE);
-            contentServiceFactory.getDSpaceObjectService(metadataValue.getDSpaceObject()).updateLastModified(context, metadataValue.getDSpaceObject());
+            DSpaceObjectService<DSpaceObject> dSpaceObjectService = contentServiceFactory
+                .getDSpaceObjectService(metadataValue.getDSpaceObject());
+            // get the right class for our dspaceobject not the DSpaceObject lazy proxy
+            DSpaceObject dso = dSpaceObjectService.find(context, metadataValue.getDSpaceObject().getID());
+            dSpaceObjectService.updateLastModified(context, dso);
         }
         update(context, metadataValue);
     }
@@ -89,12 +97,12 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Override
     public void delete(Context context, MetadataValue metadataValue) throws SQLException {
         log.info(LogManager.getHeader(context, "delete_metadata_value",
-                " metadata_value_id=" + metadataValue.getValueId()));
+                                      " metadata_value_id=" + metadataValue.getID()));
         metadataValueDAO.delete(context, metadataValue);
     }
 
     @Override
-    public List<MetadataValue> findByValueLike(Context context, String value) throws SQLException {
+    public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException {
         return metadataValueDAO.findByValueLike(context, value);
     }
 
@@ -105,10 +113,9 @@ public class MetadataValueServiceImpl implements MetadataValueService {
 
     @Override
     public MetadataValue getMinimum(Context context, int metadataFieldId)
-            throws SQLException
-    {
+        throws SQLException {
         return metadataValueDAO.getMinimum(context,
-                metadataFieldId);
+                                           metadataFieldId);
     }
 
     @Override
