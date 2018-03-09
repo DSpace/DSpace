@@ -27,7 +27,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-// Replace with new log4j 2: import org.apache.logging.log4j.Level;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
