@@ -28,7 +28,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -70,7 +70,7 @@ public class MetadataRegistryResource extends Resource {
     protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
                                                                                  .getMetadataSchemaService();
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
-    private static Logger log = Logger.getLogger(MetadataRegistryResource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataRegistryResource.class);
 
     /**
      * Return all metadata registry items in DSpace.

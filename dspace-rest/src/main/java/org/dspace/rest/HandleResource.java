@@ -18,7 +18,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -44,7 +44,7 @@ public class HandleResource extends Resource {
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    private static Logger log = Logger.getLogger(HandleResource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleResource.class);
 
     @GET
     @Path("/{prefix}/{suffix}")

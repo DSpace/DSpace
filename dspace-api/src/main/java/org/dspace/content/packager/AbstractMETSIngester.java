@@ -20,7 +20,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -109,7 +109,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(AbstractMETSIngester.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractMETSIngester.class);
 
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()

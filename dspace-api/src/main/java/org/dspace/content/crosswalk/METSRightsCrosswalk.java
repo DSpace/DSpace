@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -61,7 +61,7 @@ public class METSRightsCrosswalk
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(METSRightsCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(METSRightsCrosswalk.class);
 
     private static final Namespace METSRights_NS =
         Namespace.getNamespace("rights", "http://cosimo.stanford.edu/sdr/metsrights/");

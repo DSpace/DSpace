@@ -15,13 +15,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Hierarchy;
-import org.apache.log4j.Level;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.helpers.Loader;
-import org.apache.log4j.spi.Configurator;
-import org.apache.log4j.spi.RootLogger;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.apache.logging.log4j.Hierarchy;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.helpers.Loader;
+import org.apache.logging.log4j.spi.Configurator;
+import org.apache.logging.log4j.spi.RootLogger;
+import org.apache.logging.log4j.xml.DOMConfigurator;
 
 /**
  * Initialize Log4J at application startup.

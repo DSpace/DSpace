@@ -9,7 +9,7 @@ package org.dspace.harvest;
 
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -31,7 +31,7 @@ public class HarvestConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(HarvestConsumer.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HarvestConsumer.class);
 
     protected HarvestedCollectionService harvestedCollectionService;
     protected HarvestedItemService harvestedItemService;

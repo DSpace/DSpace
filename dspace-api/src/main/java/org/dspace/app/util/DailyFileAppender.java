@@ -15,9 +15,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.helpers.LogLog;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.FileAppender;
+import org.apache.logging.log4j.helpers.LogLog;
+import org.apache.logging.log4j.spi.LoggingEvent;
 
 /**
  * Special log appender for log4j. Adds the current date (ie. year-mon) to
@@ -35,7 +35,7 @@ import org.apache.log4j.spi.LoggingEvent;
  * log4j.appender.A1.File=@@log.dir@@/dspace.log
  * log4j.appender.A1.DatePattern=yyyy-MM
  * log4j.appender.A1.MaxLogs=3
- * log4j.appender.A1.layout=org.apache.log4j.PatternLayout
+ * log4j.appender.A1.layout=org.apache.logging.log4j.PatternLayout
  * log4j.appender.A1.layout.ConversionPattern=%d %-5p %c @ %m%n
  */
 public class DailyFileAppender extends FileAppender {
@@ -81,7 +81,7 @@ public class DailyFileAppender extends FileAppender {
     }
 
     /* (non-Javadoc)
-     * @see org.apache.log4j.FileAppender#activateOptions()
+     * @see org.apache.logging.log4j.FileAppender#activateOptions()
      */
     @Override
     public void activateOptions() {
@@ -142,7 +142,7 @@ public class DailyFileAppender extends FileAppender {
      * Methods
      *----------------------------------------------------------------------------*/
     /* (non-Javadoc)
-     * @see org.apache.log4j.WriterAppender#subAppend(org.apache.log4j.spi.LoggingEvent)
+     * @see org.apache.logging.log4j.WriterAppender#subAppend(org.apache.logging.log4j.spi.LoggingEvent)
      */
     @Override
     protected void subAppend(LoggingEvent pobjEvent) {

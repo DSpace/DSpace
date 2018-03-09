@@ -34,7 +34,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
  */
 public class CrossRefService {
 
-    private static final Logger log = Logger.getLogger(CrossRefService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CrossRefService.class);
 
     protected int timeout = 1000;
 

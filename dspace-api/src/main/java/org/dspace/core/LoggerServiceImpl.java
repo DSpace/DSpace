@@ -15,9 +15,9 @@ import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.xml.DOMConfigurator;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.KernelStartupCallbackService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -31,7 +31,7 @@ public class LoggerServiceImpl implements KernelStartupCallbackService {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(LoggerServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(LoggerServiceImpl.class);
 
     // System property which will disable DSpace's log4j setup
     private final String LOG_DISABLE_PROPERTY = "dspace.log.init.disable";
@@ -163,16 +163,16 @@ public class LoggerServiceImpl implements KernelStartupCallbackService {
      * Based on samples here: http://wiki.apache.org/logging-log4j/UsefulCode
      */
     private boolean isLog4jConfigured() {
-        Enumeration<?> appenders = org.apache.log4j.LogManager.getRootLogger()
+        Enumeration<?> appenders = org.apache.logging.log4j.LogManager.getRootLogger()
                                                               .getAllAppenders();
 
-        if (!(appenders instanceof org.apache.log4j.helpers.NullEnumeration)) {
+        if (!(appenders instanceof org.apache.logging.log4j.helpers.NullEnumeration)) {
             return true;
         } else {
-            Enumeration<?> loggers = org.apache.log4j.LogManager.getCurrentLoggers();
+            Enumeration<?> loggers = org.apache.logging.log4j.LogManager.getCurrentLoggers();
             while (loggers.hasMoreElements()) {
                 Logger c = (Logger) loggers.nextElement();
-                if (!(c.getAllAppenders() instanceof org.apache.log4j.helpers.NullEnumeration)) {
+                if (!(c.getAllAppenders() instanceof org.apache.logging.log4j.helpers.NullEnumeration)) {
                     return true;
                 }
             }

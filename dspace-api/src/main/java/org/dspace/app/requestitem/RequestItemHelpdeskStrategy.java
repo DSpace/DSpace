@@ -10,7 +10,7 @@ package org.dspace.app.requestitem;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
 
-    private Logger log = Logger.getLogger(RequestItemHelpdeskStrategy.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(RequestItemHelpdeskStrategy.class);
 
     @Autowired(required = true)
     protected EPersonService ePersonService;

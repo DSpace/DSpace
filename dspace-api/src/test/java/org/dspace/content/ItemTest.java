@@ -30,7 +30,7 @@ import java.util.UUID;
 
 import mockit.NonStrictExpectations;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -56,7 +56,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(ItemTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemTest.class);
 
     /**
      * Item instance for the tests

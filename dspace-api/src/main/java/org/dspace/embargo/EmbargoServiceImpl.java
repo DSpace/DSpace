@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
@@ -51,7 +51,7 @@ public class EmbargoServiceImpl implements EmbargoService {
     /**
      * log4j category
      */
-    private final Logger log = Logger.getLogger(EmbargoServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(EmbargoServiceImpl.class);
 
     // Metadata field components for user-supplied embargo terms
     // set from the DSpace configuration by init()

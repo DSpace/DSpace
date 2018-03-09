@@ -26,8 +26,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
@@ -55,7 +55,7 @@ import org.dspace.search.HarvestedItemInfo;
  */
 public class SubscribeCLITool {
 
-    private static final Logger log = Logger.getLogger(SubscribeCLITool.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubscribeCLITool.class);
 
     private static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     private static ItemService itemService = ContentServiceFactory.getInstance().getItemService();

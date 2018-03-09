@@ -36,7 +36,7 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedOutput;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -69,7 +69,7 @@ import org.w3c.dom.Document;
  * @author Larry Stone
  */
 public class SyndicationFeed {
-    protected final Logger log = Logger.getLogger(SyndicationFeed.class);
+    protected final Logger log = org.apache.logging.log4j.LogManager.getLogger(SyndicationFeed.class);
 
 
     /**

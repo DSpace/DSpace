@@ -23,7 +23,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.service.ClientInfoService;
@@ -46,7 +46,7 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
     private String analyticsKey;
     private CloseableHttpClient httpclient;
     private String GoogleURL = "https://www.google-analytics.com/collect";
-    private static Logger log = Logger.getLogger(GoogleRecorderEventListener.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(GoogleRecorderEventListener.class);
 
     protected ContentServiceFactory contentServiceFactory;
     protected ConfigurationService configurationService;

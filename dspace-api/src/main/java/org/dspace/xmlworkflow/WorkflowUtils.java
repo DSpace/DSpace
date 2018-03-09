@@ -18,7 +18,7 @@ import java.util.LinkedHashMap;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -47,7 +47,7 @@ public class WorkflowUtils extends Util {
     /**
      * log4j category
      */
-    public static Logger log = Logger.getLogger(WorkflowUtils.class);
+    public static Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkflowUtils.class);
 
     protected static final CollectionRoleService collectionRoleService =
         XmlWorkflowServiceFactory.getInstance().getCollectionRoleService();

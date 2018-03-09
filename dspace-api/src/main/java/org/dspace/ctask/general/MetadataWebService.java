@@ -33,7 +33,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -130,7 +130,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(MetadataWebService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataWebService.class);
     // transform token parsing pattern
     protected Pattern ttPattern = Pattern.compile("\'([^\']*)\'|(\\S+)");
     // URL of web service with template parameters

@@ -16,7 +16,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -37,7 +37,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class IndexClient {
 
-    private static final Logger log = Logger.getLogger(IndexClient.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(IndexClient.class);
 
     /**
      * Default constructor

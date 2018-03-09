@@ -10,7 +10,7 @@ package org.dspace.app.rest.submit.step;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataDescribe;
@@ -39,7 +39,7 @@ import org.dspace.services.model.Request;
  */
 public class DescribeStep extends org.dspace.submit.step.DescribeStep implements AbstractRestProcessingStep {
 
-    private static final Logger log = Logger.getLogger(DescribeStep.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DescribeStep.class);
 
     private DCInputsReader inputReader;
 

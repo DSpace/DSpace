@@ -10,7 +10,7 @@ package org.dspace.app.rest.builder;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -22,7 +22,7 @@ import org.dspace.discovery.SearchServiceException;
 public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, MetadataFieldService> {
 
     /* Log4j logger*/
-    private static final Logger log = Logger.getLogger(MetadataFieldBuilder.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataFieldBuilder.class);
 
     private MetadataField metadataField;
 

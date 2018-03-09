@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.AccessConditionOptionRest;
 import org.dspace.app.rest.model.SubmissionUploadRest;
 import org.dspace.app.rest.model.hateoas.SubmissionUploadResource;
@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 public class SubmissionUploadRestRepository extends DSpaceRestRepository<SubmissionUploadRest, String>
     implements LinkRestRepository<SubmissionUploadRest> {
 
-    private static final Logger log = Logger.getLogger(SubmissionUploadRestRepository.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionUploadRestRepository.class);
 
     private SubmissionConfigReader submissionConfigReader;
 

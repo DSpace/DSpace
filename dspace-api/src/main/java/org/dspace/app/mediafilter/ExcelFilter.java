@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.hssf.extractor.ExcelExtractor;
@@ -36,7 +36,7 @@ import org.dspace.content.Item;
  */
 public class ExcelFilter extends MediaFilter {
 
-    private static Logger log = Logger.getLogger(ExcelFilter.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ExcelFilter.class);
 
     public String getFilteredName(String oldFilename) {
         return oldFilename + ".txt";

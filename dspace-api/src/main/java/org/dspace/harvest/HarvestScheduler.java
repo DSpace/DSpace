@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -32,7 +32,7 @@ import org.dspace.harvest.service.HarvestedCollectionService;
  * @author alexey
  */
 public class HarvestScheduler implements Runnable {
-    protected static Logger log = Logger.getLogger(HarvestScheduler.class);
+    protected static Logger log = org.apache.logging.log4j.LogManager.getLogger(HarvestScheduler.class);
 
 
     protected static EPerson harvestAdmin;

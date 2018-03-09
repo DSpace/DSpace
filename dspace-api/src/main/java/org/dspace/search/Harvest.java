@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -46,7 +46,7 @@ public class Harvest {
     /**
      * log4j logger
      */
-    private static final Logger log = Logger.getLogger(Harvest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Harvest.class);
 
     protected static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance()
                                                                                       .getAuthorizeService();

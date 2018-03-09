@@ -17,7 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Utils;
 
@@ -33,7 +33,7 @@ public class DSBitStoreService implements BitStoreService {
     /**
      * log4j log
      */
-    private static Logger log = Logger.getLogger(DSBitStoreService.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSBitStoreService.class);
 
     // These settings control the way an identifier is hashed into
     // directory and file names

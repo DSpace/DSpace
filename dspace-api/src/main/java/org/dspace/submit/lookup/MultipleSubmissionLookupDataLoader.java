@@ -21,7 +21,7 @@ import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bte.exceptions.MalformedSourceException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 
 /**

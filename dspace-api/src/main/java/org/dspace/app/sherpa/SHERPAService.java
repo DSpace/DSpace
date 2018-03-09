@@ -16,7 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 public class SHERPAService {
@@ -29,7 +29,7 @@ public class SHERPAService {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(SHERPAService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SHERPAService.class);
 
     public SHERPAService() {
         HttpClientBuilder builder = HttpClientBuilder.create();

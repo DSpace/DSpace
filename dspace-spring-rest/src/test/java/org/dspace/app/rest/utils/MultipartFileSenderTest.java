@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.junit.After;
 import org.junit.Before;
@@ -41,7 +41,7 @@ public class MultipartFileSenderTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(MultipartFileSenderTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MultipartFileSenderTest.class);
 
     private InputStream is;
     private String mimeType;

@@ -11,7 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
@@ -30,7 +30,7 @@ public class CollectionLocation {
     /**
      * Log4j logger
      */
-    public static final Logger log = Logger.getLogger(CollectionLocation.class);
+    public static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionLocation.class);
 
     protected HandleService handleService = HandleServiceFactory.getInstance()
                                                                 .getHandleService();

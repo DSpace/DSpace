@@ -26,7 +26,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -51,7 +51,7 @@ import org.dspace.utils.DSpace;
  */
 public class DOIOrganiser {
 
-    private static final Logger LOG = Logger.getLogger(DOIOrganiser.class);
+    private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(DOIOrganiser.class);
 
     private DOIIdentifierProvider provider;
     private Context context;

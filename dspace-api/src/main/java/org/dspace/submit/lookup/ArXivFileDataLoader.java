@@ -26,7 +26,7 @@ import gr.ekt.bte.core.Value;
 import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
  */
 public class ArXivFileDataLoader extends FileDataLoader {
 
-    private static Logger log = Logger.getLogger(ArXivFileDataLoader.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ArXivFileDataLoader.class);
 
     Map<String, String> fieldMap; // mapping between service fields and local
     // intermediate fields
