@@ -22,12 +22,8 @@ import java.util.Collections;
 import java.util.List;
 
 import mockit.NonStrictExpectations;
-<<<<<<< HEAD
-import org.apache.log4j.Logger;
-=======
 import org.apache.commons.collections.ListUtils;
 import org.apache.logging.log4j.Logger;
->>>>>>> 1ab4ccf9a... Convert getLogger() and Log4J imports for Log4J 2
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeServiceImpl;
