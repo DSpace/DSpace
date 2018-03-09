@@ -8,6 +8,7 @@
 package org.dspace.app.cris.model.jdyna;
 
 import it.cilea.osd.jdyna.model.ADecoratorTypeDefinition;
+import it.cilea.osd.jdyna.model.AWidget;
 import it.cilea.osd.jdyna.model.IContainable;
 
 import javax.persistence.DiscriminatorValue;
@@ -91,6 +92,36 @@ public class DecoratorRPTypeNested extends
 
     public boolean isNewline() {
         return real.isNewline();
+    }
+
+    @Override
+    public Class getAnagraficaHolderClass()
+    {        
+        return getObject().getAnagraficaHolderClass();
+    }
+
+    @Override
+    public Class getPropertyHolderClass()
+    {
+        return getObject().getPropertyHolderClass();
+    }
+
+    @Override
+    public Class getDecoratorClass()
+    {
+        return getObject().getDecoratorClass();
+    }
+
+    @Override
+    public AWidget getRendering()
+    {
+        return getObject().getRendering();
+    }
+
+    @Override
+    public boolean isMandatory()
+    {
+        return getObject().isMandatory();
     }
     
 }
