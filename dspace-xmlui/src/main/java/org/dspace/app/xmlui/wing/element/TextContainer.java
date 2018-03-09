@@ -7,7 +7,6 @@
  */
 package org.dspace.app.xmlui.wing.element;
 
-
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingContext;
 import org.dspace.app.xmlui.wing.WingException;
@@ -36,6 +35,7 @@ public abstract class TextContainer extends Container
      * 
      * @param context
      *            (Required) The context this element is contained in.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected TextContainer(WingContext context) throws WingException
     {
@@ -48,6 +48,7 @@ public abstract class TextContainer extends Container
      * @param characters
      *            (Required) Direct content or a dictionary tag to be inserted
      *            into the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addContent(String characters) throws WingException
     {
@@ -60,6 +61,7 @@ public abstract class TextContainer extends Container
      * 
      * @param integer
      *            (Required) Add the integer into the element's container.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addContent(int integer) throws WingException
     {
@@ -73,6 +75,7 @@ public abstract class TextContainer extends Container
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addContent(Message message) throws WingException
     {

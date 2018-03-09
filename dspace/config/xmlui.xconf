@@ -59,19 +59,13 @@
         /xmlui/cocoon/aspects/ directory followed by a slash.
     -->
     <aspects>
-        <!--
-            @deprecated: the Artifact Browser has been devided into ViewArtifacts,
-            BrowseArtifacts, SearchArtifacts
-            <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
-        -->
-
         <!-- =====================
              Item Level Versioning
              ===================== -->
         <!--
              To enable Item Level Versioning features, uncomment this aspect.
-             This is currently disabled by default because of two known issues:
-             DS-1382 and DS-1349. Please, review them to see whether they apply
+             This is currently disabled by default because of one known issue:
+             DS-1382. Please, review them to see whether they apply
              to you before enabling versioning.
         -->
         <!--<aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />-->
@@ -114,25 +108,6 @@
              PLEASE NOTE: in order to use the configurable workflow you must also run the
              database migration scripts as detailed in the DSpace Documentation -->
         <!-- <aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" /> -->
-
-        <!-- ==============
-             Search Engines
-             ============== -->
-        <!--
-            To enable the old lucene based search (no facets, filters), uncomment this aspect.
-            Also make sure to comment out the above 'Discovery' aspect
-            (in the "Basic Features/Aspects" group) as leaving it on together
-            with Searching Artifacts aspect will cause UI overlap issues
-            
-			@deprecated Since DSpace 4 the system use an abstraction layer named
- 			Discovery to provide access to different search providers. The
- 			legacy system built upon Apache Lucene is likely to be removed in
- 			a future version. If you are interested in using Lucene as backend
- 			for the DSpace search system, please consider to build a Lucene
- 			implementation of the Discovery interfaces
-        -->
-        <!--<aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />-->
-
 
         <!-- ==============
              SWORDv1 Client

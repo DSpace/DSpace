@@ -8,20 +8,21 @@
 importClass(Packages.java.lang.Class);
 importClass(Packages.java.lang.ClassLoader);
 
-importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 importClass(Packages.org.apache.cocoon.environment.http.HttpEnvironment);
 importClass(Packages.org.apache.cocoon.servlet.multipart.Part);
 
-importClass(Packages.org.dspace.handle.HandleManager);
-importClass(Packages.org.dspace.core.Constants);
-importClass(Packages.org.dspace.workflow.WorkflowItem);
-importClass(Packages.org.dspace.workflow.WorkflowManager);
 importClass(Packages.org.dspace.content.WorkspaceItem);
-importClass(Packages.org.dspace.authorize.AuthorizeManager);
+importClass(Packages.org.dspace.core.Constants);
+
+importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
+importClass(Packages.org.dspace.app.xmlui.aspect.workflow.FlowUtils);
+
+importClass(Packages.org.dspace.workflow.WorkflowItem);
+importClass(Packages.org.dspace.workflow.WorkflowItemService);
+importClass(Packages.org.dspace.workflow.factory.WorkflowServiceFactory);
 
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
-importClass(Packages.org.dspace.app.xmlui.aspect.workflow.FlowUtils);
 
 /* Global variable which stores a comma-separated list of all fields
  * which errored out during processing of the last step.
@@ -47,6 +48,10 @@ function getDSContext()
 	return ContextUtil.obtainContext(getObjectModel());
 }
 
+function getWorkflowItemService()
+{
+    return WorkflowServiceFactory.getInstance().getWorkflowItemService();
+}
 
 /**
  * Return the HTTP Request object for this request
@@ -122,7 +127,7 @@ function doWorkflow()
     }
 
     // Get the collection handle for this item.
-    var handle = WorkflowItem.find(getDSContext(), workflowID).getCollection().getHandle();
+    var handle = getWorkflowItemService().find(getDSContext(), workflowID).getCollection().getHandle();
 
     // Specify that we are working with workflows.
     //(specify "W" for workflow item, for FlowUtils.findSubmission())

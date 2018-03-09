@@ -30,9 +30,9 @@ import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 import org.apache.jena.web.DatasetGraphAccessor;
 import org.apache.jena.web.DatasetGraphAccessorHTTP;
 import org.apache.log4j.Logger;
-import org.dspace.rdf.RDFConfiguration;
+import org.dspace.rdf.RDFUtil;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -42,86 +42,9 @@ public class RDFStorageImpl
 implements RDFStorage
 {
     private static final Logger log = Logger.getLogger(RDFStorageImpl.class);
-    
-    private final String GRAPHSTORE_ENDPOINT;
-    private final String GRAPHSTORE_LOGIN;
-    private final String GRAPHSTORE_PASSWORD;
-    private final String SPARQL_ENDPOINT;
-    private final String SPARQL_LOGIN;
-    private final String SPARQL_PASSWORD;
-    
-    private ConfigurationService configurationService;
-    
-    public RDFStorageImpl()
-    {
-        this.configurationService = new DSpace().getConfigurationService();
-        
-        this.GRAPHSTORE_ENDPOINT = this.configurationService
-                .getProperty(RDFConfiguration.STORAGE_GRAPHSTORE_ENDPOINT_KEY);
-        if (StringUtils.isEmpty(this.GRAPHSTORE_ENDPOINT))
-        {
-            log.warn("Cannot load Graph Store HTTP Protocol endpoint! Property "
-                    + RDFConfiguration.STORAGE_GRAPHSTORE_ENDPOINT_KEY + " does not "
-                    + "exist or is empty.");
-            throw new RuntimeException("Cannot load Graph Store HTTP Protocol "
-                    + "endpoint! Property " 
-                    + RDFConfiguration.STORAGE_GRAPHSTORE_ENDPOINT_KEY + " does not "
-                    + "exist or is empty.");
-        }
-        
-        boolean graphstore_use_auth = this.configurationService.getPropertyAsType(
-                RDFConfiguration.STORAGE_GRAPHSTORE_AUTHENTICATION_KEY, false);
-        String graphstore_login = this.configurationService.getProperty(
-                RDFConfiguration.STORAGE_GRAPHSTORE_LOGIN_KEY);
-        String graphstore_password = this.configurationService.getProperty(
-                RDFConfiguration.STORAGE_GRAPHSTORE_PASSWORD_KEY);
-        if (!graphstore_use_auth 
-                || (graphstore_use_auth && StringUtils.isEmpty(graphstore_login))
-                || (graphstore_use_auth && StringUtils.isEmpty(graphstore_password)))
-        {
-            this.GRAPHSTORE_LOGIN = null;
-            this.GRAPHSTORE_PASSWORD = null;
-            if (graphstore_use_auth)
-            {
-                log.warn("The rdf storage is configured to use authentication "
-                        + "to connect to the Graph Store HTTP Protocol endpoint, "
-                        + "but no credentials are configured.");
-            }
-        } else {
-            this.GRAPHSTORE_LOGIN = graphstore_login;
-            this.GRAPHSTORE_PASSWORD = graphstore_password;
-        }
-        
-        this.SPARQL_ENDPOINT = RDFConfiguration.getInternalSparqlEndpointAddress();
-        if (StringUtils.isEmpty(this.SPARQL_ENDPOINT))
-        {
-            log.warn("Cannot load internal or public SPARQL endpoint!");
-            throw new RuntimeException("Cannot load internal or public SPARQL "
-                    + "endpoint!");
-        }
 
-        boolean sparql_use_auth = this.configurationService.getPropertyAsType(
-                RDFConfiguration.STORAGE_SPARQL_AUTHENTICATION_KEY, false);
-        String sparql_login = this.configurationService.getProperty(
-                RDFConfiguration.STORAGE_SPARQL_LOGIN_KEY);
-        String sparql_password = this.configurationService.getProperty(
-                RDFConfiguration.STORAGE_SPARQL_PASSWORD_KEY);
-        if (!sparql_use_auth 
-                || (sparql_use_auth && StringUtils.isEmpty(sparql_login))
-                || (sparql_use_auth && StringUtils.isEmpty(sparql_password)))
-        {
-            this.SPARQL_LOGIN = null;
-            this.SPARQL_PASSWORD = null;
-            if (sparql_use_auth)
-            {
-                log.warn("The rdf storage is configured to use authentication "
-                        + "for sparql quries, but no credentials are configured.");
-            }
-        } else {
-            this.SPARQL_LOGIN = sparql_login;
-            this.SPARQL_PASSWORD = sparql_password;
-        }
-    }
+    @Autowired(required=true)
+    protected ConfigurationService configurationService;
     
     @Override
     public void store(String uri, Model model)
@@ -134,6 +57,7 @@ implements RDFStorage
         accessor.httpPut(graphNode, g);
     }
     
+    @Override
     public Model load(String uri)
     {
         Node graphNode = NodeFactory.createURI(uri);
@@ -152,14 +76,18 @@ implements RDFStorage
     protected DatasetGraphAccessor getAccessor()
     {
         DatasetGraphAccessor accessor;
-        if (this.GRAPHSTORE_LOGIN != null)
+        if (configurationService.hasProperty(RDFUtil.STORAGE_GRAPHSTORE_LOGIN_KEY)
+                && configurationService.hasProperty(RDFUtil.STORAGE_GRAPHSTORE_PASSWORD_KEY))
         {
             HttpAuthenticator httpAuthenticator = new SimpleAuthenticator(
-                    GRAPHSTORE_LOGIN, GRAPHSTORE_PASSWORD.toCharArray());
-            accessor = new DatasetGraphAccessorHTTP(GRAPHSTORE_ENDPOINT,
+                    configurationService.getProperty(RDFUtil.STORAGE_GRAPHSTORE_LOGIN_KEY),
+                    configurationService.getProperty(RDFUtil.STORAGE_GRAPHSTORE_PASSWORD_KEY).toCharArray());
+            accessor = new DatasetGraphAccessorHTTP(getGraphStoreEndpoint(),
                     httpAuthenticator);
         } else {
-            accessor = new DatasetGraphAccessorHTTP(GRAPHSTORE_ENDPOINT);
+            log.debug("Did not found credential to use for our connection to the "
+                    + "Graph Store HTTP endpoint, trying to connect unauthenticated.");
+            accessor = new DatasetGraphAccessorHTTP(getGraphStoreEndpoint());
         }
         return accessor;
     }
@@ -183,14 +111,16 @@ implements RDFStorage
     public List<String> getAllStoredGraphs() {
         String queryString = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }";
         QueryExecution qexec;
-        if (this.SPARQL_LOGIN != null)
+        if (configurationService.hasProperty(RDFUtil.STORAGE_SPARQL_LOGIN_KEY)
+                && configurationService.hasProperty(RDFUtil.STORAGE_SPARQL_PASSWORD_KEY))
         {
             HttpAuthenticator httpAuthenticator = new SimpleAuthenticator(
-                    SPARQL_LOGIN, SPARQL_PASSWORD.toCharArray());
-            qexec = QueryExecutionFactory.sparqlService(SPARQL_ENDPOINT, 
+                    configurationService.getProperty(RDFUtil.STORAGE_SPARQL_LOGIN_KEY),
+                    configurationService.getProperty(RDFUtil.STORAGE_GRAPHSTORE_PASSWORD_KEY).toCharArray());
+            qexec = QueryExecutionFactory.sparqlService(getSparqlEndpoint(), 
                     queryString, httpAuthenticator);
         } else {
-            qexec = QueryExecutionFactory.sparqlService(SPARQL_ENDPOINT,
+            qexec = QueryExecutionFactory.sparqlService(getSparqlEndpoint(),
                     queryString);
         }
         
@@ -206,22 +136,40 @@ implements RDFStorage
         }
         qexec.close();
         return graphs;
-        /*
-        } catch (QueryExceptionHTTP ex)
+    }
+    
+    protected String getGraphStoreEndpoint()
+    {
+        String endpoint = configurationService.getProperty(RDFUtil.STORAGE_GRAPHSTORE_ENDPOINT_KEY);
+        if (StringUtils.isEmpty(endpoint))
         {
-            System.err.println("== QUERYEXCEPTIONHTTP ==");
-            System.err.println(ex.getMessage());
-            System.err.println(ex.getResponseCode() + ": " + ex.getResponseMessage());
-            Throwable cause = ex.getCause();
-            int i = 1;
-            while (cause != null)
-            {
-                System.err.println("Cause " + i + " '" + cause.getClass().getName() + "': " + cause.getMessage());
-                cause = cause.getCause();
-                i++;
-            }
-            ex.printStackTrace(System.err);
-            throw new RuntimeException(ex);
-        }*/
+            log.warn("Cannot load Graph Store HTTP Protocol endpoint! Property "
+                    + RDFUtil.STORAGE_GRAPHSTORE_ENDPOINT_KEY + " does not "
+                    + "exist or is empty.");
+            throw new RuntimeException("Cannot load Graph Store HTTP Protocol "
+                    + "endpoint! Property " 
+                    + RDFUtil.STORAGE_GRAPHSTORE_ENDPOINT_KEY + " does not "
+                    + "exist or is empty.");
+        }
+        return endpoint;
+    }
+    
+    protected String getSparqlEndpoint()
+    {
+        // Lets see if a SPARQL endpoint is defined to be used by RDFStorageImpl
+        String endpoint = configurationService.getProperty(RDFUtil.STORAGE_SPARQL_ENDPOINT_KEY);
+        if (StringUtils.isEmpty(endpoint))
+        {
+            // try to load the public sparql endpoint
+            endpoint = configurationService.getProperty(RDFUtil.SPARQL_ENDPOINT_KEY);
+        }
+        // check if we found an endpoint
+        if (StringUtils.isEmpty(endpoint))
+        {
+            log.warn("Cannot load internal or public SPARQL endpoint!");
+            throw new RuntimeException("Cannot load internal or public SPARQL "
+                    + "endpoint!");
+        }
+        return endpoint;
     }
 }

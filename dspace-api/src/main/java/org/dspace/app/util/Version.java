@@ -12,8 +12,10 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+
+import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Display information about this DSpace, its environment, and how it was built.
@@ -50,28 +52,26 @@ public class Version
                           sys.get("os.version"));
 
         // UIs used
-        List<AbstractDSpaceWebapp> apps = AbstractDSpaceWebapp.getApps();
+        List<WebApp> apps = UtilServiceFactory.getInstance().getWebAppService().getApps();
         System.out.println("  Applications:");
-        for (AbstractDSpaceWebapp app : apps)
+        for (WebApp app : apps)
         {
             System.out.printf("                %s at %s\n",
-                    app.getKind(), app.getURL());
+                    app.getAppName(), app.getUrl());
         }
 
         // Is Discovery available?
-        ConfigurationService config = new DSpace().getConfigurationService();
-        String consumers = config.getPropertyAsType("event.dispatcher.default.consumers", ""); // Avoid null pointer
-        List<String> consumerList = Arrays.asList(consumers.split("\\s*,\\s*"));
-        if (consumerList.contains("discovery"))
-        {
-            System.out.println("     Discovery:  enabled.");
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String[] consumers = config.getArrayProperty("event.dispatcher.default.consumers");
+        String discoveryStatus = "not enabled.";
+        for (String consumer : consumers) {
+            if (consumer.equals("discovery"))
+            {
+                discoveryStatus = "enabled.";
+                break;
+            }
         }
-
-        // Is Lucene search enabled?
-        if (consumerList.contains("search"))
-        {
-            System.out.println(" Lucene search:  enabled.");
-        }
+        System.out.println("     Discovery:  " + discoveryStatus);
 
         // Java version
         System.out.printf("           JRE:  %s version %s\n",

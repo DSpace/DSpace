@@ -29,11 +29,12 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.license.CreativeCommons;
 import org.dspace.license.CCLicenseField;
 import org.dspace.license.CCLookup;
 import org.dspace.license.CCLicense;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.license.factory.LicenseServiceFactory;
+import org.dspace.license.service.CreativeCommonsService;
 import org.xml.sax.SAXException;
 
 /**
@@ -78,6 +79,8 @@ public class CCLicenseStep extends AbstractSubmissionStep
     /** CC specific variables */
     private String ccLocale;
 
+	protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+
 
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.
@@ -86,7 +89,7 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	{
 	    this.requireSubmission = true;
 	    this.requireStep = true;
-        this.ccLocale = ConfigurationManager.getProperty("cc.license.locale");
+        this.ccLocale = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("cc.license.locale");
         /** Default locale to 'en' */
         this.ccLocale = (this.ccLocale != null) ? this.ccLocale : "en";
 	}
@@ -140,7 +143,7 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    }
 	    selectList.addOption(T_no_license.getKey(), T_no_license);
 	    if(T_no_license.getKey().equals(selectedLicense)) {
-	       	selectList.setOptionSelected(T_no_license.getKey());
+	    	selectList.setOptionSelected(T_no_license.getKey());
 	    }
 	    if (selectedLicense  !=  null) {
 	    	// output the license fields chooser for the license class type
@@ -175,7 +178,7 @@ public class CCLicenseStep extends AbstractSubmissionStep
         	}    
 		Division statusDivision = div.addDivision("statusDivision");
 		List statusList = statusDivision.addList("statusList", List.TYPE_FORM);
-		String licenseUri = CreativeCommons.getCCField("uri").ccItemValue(item);
+		String licenseUri = creativeCommonsService.getCCField("uri").ccItemValue(item);
 		if (licenseUri != null)
 		{
 			statusList.addItem().addXref(licenseUri, licenseUri);

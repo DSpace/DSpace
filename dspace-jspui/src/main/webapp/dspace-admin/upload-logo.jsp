@@ -30,35 +30,53 @@
 <%
     Collection collection = (Collection) request.getAttribute("collection");
     Community community = (Community) request.getAttribute("community");
+        
+     // Is the logged in user an admin or community admin or collection admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
     
+    Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
+    boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
+    
+    Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
+    boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
+    
+    String naviAdmin = "admin";
+    String link = "/dspace-admin";
+    
+    if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+    {
+        naviAdmin = "community-or-collection-admin";
+        link = "/tools";
+    }
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.upload-logo.title"
-               navbar="admin"
+               navbar="<%= naviAdmin %>"
                locbar="link"
                parenttitlekey="jsp.administer"
-               parentlink="/dspace-admin" 
+               parentlink="<%= link %>" 
                nocache="true">
 
     <%-- <h1>Upload Logo</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.upload-logo.title"/></h1>   
     <%-- <p>Select the logo to upload for
-	<%= (collection != null ? "collection <strong>" + collection.getMetadata("name") + "</strong>"
-                                : "community <strong>" + community.getMetadata("name") + "</strong>") %>
+	<%= (collection != null ? "collection <strong>" + collection.getName()  + "</strong>"
+                                : "community <strong>" + community.getName()  + "</strong>") %>
     </p> --%>    
     	<p>
     	    <%
 	    	if (collection != null){
 	    %>
 	    		<fmt:message key="jsp.dspace-admin.upload-logo.select.col">
-                    <fmt:param><%= collection.getMetadata("name")%></fmt:param>
+                    <fmt:param><%= collection.getName() %></fmt:param>
                 </fmt:message>
 	    <%	
 	    	}
 	    	else{
 	    %>
 	    		<fmt:message key="jsp.dspace-admin.upload-logo.select.com">
-                    <fmt:param><%= community.getMetadata("name")%></fmt:param>
+                    <fmt:param><%= community.getName() %></fmt:param>
                 </fmt:message>
 	    <%
 	    	}

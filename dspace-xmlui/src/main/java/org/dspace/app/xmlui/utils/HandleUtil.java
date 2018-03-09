@@ -8,23 +8,23 @@
 package org.dspace.app.xmlui.utils;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * Simple utility class for extracting handles.
@@ -40,12 +40,17 @@ public class HandleUtil
 
     protected static final String DSPACE_OBJECT = "dspace.object";
 
+    protected static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
+
     /**
      * Obtain the current DSpace handle for the specified request.
      * 
      * @param objectModel
      *            The cocoon model.
      * @return A DSpace handle, or null if none found.
+     * @throws java.sql.SQLException passed through.
      */
     public static DSpaceObject obtainHandle(Map objectModel)
             throws SQLException
@@ -84,7 +89,7 @@ public class HandleUtil
             handle = handle.substring(0, secondSlash);
 
             Context context = ContextUtil.obtainContext(objectModel);
-            dso = HandleManager.resolveToObject(context, handle);
+            dso = handleService.resolveToObject(context, handle);
 
             request.setAttribute(DSPACE_OBJECT, dso);
         }
@@ -100,11 +105,11 @@ public class HandleUtil
      * @param parent
      *            The Handle to test against.
      * @return The matched DSO object or null if none found.
+     * @throws java.sql.SQLException passed through.
      */
     public static boolean inheritsFrom(DSpaceObject dso, String parent)
             throws SQLException
     {
-
         DSpaceObject current = dso;
 
         while (current != null)
@@ -122,11 +127,12 @@ public class HandleUtil
             }
             else if (current.getType() == Constants.COLLECTION)
             {
-                current = ((Collection) current).getCommunities()[0];
+                current = ((Collection) current).getCommunities().get(0);
             }
             else if (current.getType() == Constants.COMMUNITY)
             {
-                current = ((Community) current).getParentCommunity();
+                List<Community> parents = ((Community) current).getParentCommunities();
+                current = CollectionUtils.isNotEmpty(parents) ? parents.get(0) : null;
             }
         }
 
@@ -147,33 +153,39 @@ public class HandleUtil
      * If the terminal object in the trail is the passed object, do not link to
      * it, because that is (presumably) the page at which the user has arrived.
      *
-     * @param dso the DSpace who's parents we wil add to the pageMeta
+     * @param context session context.
+     * @param dso the DSpace who's parents we will add to the pageMeta
      * @param pageMeta the object to which we link our trial
      * @param contextPath The context path
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
-    public static void buildHandleTrail(DSpaceObject dso, PageMeta pageMeta,
+    public static void buildHandleTrail(Context context, DSpaceObject dso, PageMeta pageMeta,
                                         String contextPath) throws SQLException, WingException
     {
-        buildHandleTrail(dso, pageMeta, contextPath, false);
+        buildHandleTrail(context, dso, pageMeta, contextPath, false);
     }
 
-        /**
-        * Build a list of trail metadata starting with the owning collection and
-        * ending with the root level parent. If the Object is an item, a bundle,
-        * or a bitstream, then the object is not included, but its collection and
-        * community parents are. However, if the item is a community or collection
-        * then it is included along with all parents.
-        *
-        * <p>
-        * If the terminal object in the trail is the passed object, do not link to
-        * it, because that is (presumably) the page at which the user has arrived.
-        *
-        * @param dso the DSpace who's parents we wil add to the pageMeta
-        * @param pageMeta the object to which we link our trial
-        * @param contextPath The context path
-        * @param linkOriginalObject whether or not to make a link of the original object
-        */
-    public static void buildHandleTrail(DSpaceObject dso, PageMeta pageMeta,
+    /**
+     * Build a list of trail metadata starting with the owning collection and
+     * ending with the root level parent. If the Object is an item, a bundle,
+     * or a bitstream, then the object is not included, but its collection and
+     * community parents are. However, if the item is a community or collection
+     * then it is included along with all parents.
+     *
+     * <p>
+     * If the terminal object in the trail is the passed object, do not link to
+     * it, because that is (presumably) the page at which the user has arrived.
+     *
+     * @param context session context.
+     * @param dso the DSpace who's parents we will add to the pageMeta
+     * @param pageMeta the object to which we link our trial
+     * @param contextPath The context path
+     * @param linkOriginalObject whether or not to make a link of the original object
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     */
+    public static void buildHandleTrail(Context context, DSpaceObject dso, PageMeta pageMeta,
             String contextPath, boolean linkOriginalObject) throws SQLException, WingException
     {
         // Add the trail back to the repository root.
@@ -183,17 +195,17 @@ public class HandleUtil
         if (aDso instanceof Bitstream)
         {
         	Bitstream bitstream = (Bitstream) aDso;
-        	Bundle[] bundles = bitstream.getBundles();
+        	List<Bundle> bundles = bitstream.getBundles();
 
-        	aDso = bundles[0];
+        	aDso = bundles.get(0);
         }
 
         if (aDso instanceof Bundle)
         {
         	Bundle bundle = (Bundle) aDso;
-        	Item[] items = bundle.getItems();
+        	List<Item> items = bundle.getItems();
 
-        	aDso = items[0];
+        	aDso = items.get(0);
         }
 
         if (aDso instanceof Item)
@@ -208,9 +220,9 @@ public class HandleUtil
         {
             Collection collection = (Collection) aDso;
             stack.push(collection);
-            Community[] communities = collection.getCommunities();
+            List<Community> communities = collection.getCommunities();
 
-            aDso = communities[0];
+            aDso = communities.get(0);
         }
 
         if (aDso instanceof Community)
@@ -218,7 +230,7 @@ public class HandleUtil
             Community community = (Community) aDso;
             stack.push(community);
 
-            for (Community parent : community.getAllParents())
+            for (Community parent : communityService.getAllParents(context, community))
             {
                 stack.push(parent);
             }
@@ -237,7 +249,7 @@ public class HandleUtil
             if (pop instanceof Collection)
             {
             	Collection collection = (Collection) pop;
-            	String name = collection.getMetadata("name");
+            	String name = collection.getName();
             	if (name == null || name.length() == 0)
                 {
                     pageMeta.addTrailLink(target, new Message("default", "xmlui.general.untitled"));
@@ -247,10 +259,9 @@ public class HandleUtil
                     pageMeta.addTrailLink(target, name);
                 }
             }
-            else if (pop instanceof Community)
-            {
+            else if (pop instanceof Community) {
             	Community community = (Community) pop;
-            	String name = community.getMetadata("name");
+            	String name = community.getName();
             	if (name == null || name.length() == 0)
                 {
                     pageMeta.addTrailLink(target, new Message("default", "xmlui.general.untitled"));

@@ -44,6 +44,7 @@ public class SubmissionLookupPublication implements MutableRecord, Serializable
         return storage;
     }
 
+    @Override
     public Set<String> getFields()
     {
         return storage.keySet();

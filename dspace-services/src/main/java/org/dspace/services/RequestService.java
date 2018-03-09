@@ -39,11 +39,13 @@ public interface RequestService {
 
     /**
      * Initiates a request in the system,
-     * normally this would be triggered by a servlet request starting <br/>
+     * normally this would be triggered by a servlet request starting <br>
      * Only one request can be associated with the current thread so if another one is running it will be
-     * destroyed and a new one will be created <br/>
+     * destroyed and a new one will be created <br>
      * Note that requests are expected to be manually ended somehow and will not be closed out automatically
      *
+     * @param request servlet request
+     * @param response servlet response
      * @return the unique generated id for the new request
      * @throws IllegalArgumentException if the session is null, invalid, or there is no current session
      */

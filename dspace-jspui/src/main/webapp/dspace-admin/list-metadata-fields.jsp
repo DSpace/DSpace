@@ -30,15 +30,16 @@
 
 <%@ page import="org.dspace.content.MetadataField" %>
 <%@ page import="org.dspace.content.MetadataSchema" %>
+<%@ page import="java.util.List" %>
 
 
 <%
-    MetadataField[] types =
-        (MetadataField[]) request.getAttribute("types");
+    List<MetadataField> types =
+        (List<MetadataField>) request.getAttribute("types");
     MetadataSchema schema =
         (MetadataSchema) request.getAttribute("schema");
-    MetadataSchema[] schemas =
-        (MetadataSchema[]) request.getAttribute("schemas");
+    List<MetadataSchema> schemas =
+        (List<MetadataSchema>) request.getAttribute("schemas");
 %>
 
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.list-metadata-fields.title"
@@ -85,30 +86,30 @@ if (error!=null) {
            
 <%
     String row = "even";
-    for (int i = 0; i < types.length; i++)
+    for (int i = 0; i < types.size(); i++)
     {
 %>
       <tr>
          <td>
              <form class="form-inline" method="post" action="">
-                 <span class="col-md-1"><%= types[i].getFieldID() %></span>
+                 <span class="col-md-1"><%= types.get(i).getID() %></span>
 
                     <div class="form-group">
                     	<label class="sr-only" for="element"><fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/></label>
-                		<input class="form-control" type="text" name="element" value="<%= types[i].getElement() %>" size="12" placeholder="<fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/>"/>
+                		<input class="form-control" type="text" name="element" value="<%= types.get(i).getElement() %>" size="12" placeholder="<fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/>"/>
                 	</div>
                     <div class="form-group">
                     	<label class="sr-only" for="qualifier"><fmt:message key="jsp.dspace-admin.list-metadata-fields.qualifier"/></label>
-                		<input class="form-control" type="text" name="qualifier" value="<%= (types[i].getQualifier() == null ? "" : types[i].getQualifier()) %>" size="12" placeholder="<fmt:message key="jsp.dspace-admin.list-metadata-fields.qualifier"/>"/>
+                		<input class="form-control" type="text" name="qualifier" value="<%= (types.get(i).getQualifier() == null ? "" : types.get(i).getQualifier()) %>" size="12" placeholder="<fmt:message key="jsp.dspace-admin.list-metadata-fields.qualifier"/>"/>
                 	</div>                         
                     <div class="form-group">
                     	<label class="sr-only" for="scope_note"><fmt:message key="jsp.dspace-admin.list-metadata-fields.scope"/></label>
-                		<textarea class="form-control" name="scope_note" rows="3" cols="40"><%= (types[i].getScopeNote() == null ? "" : types[i].getScopeNote()) %></textarea>
+                		<textarea class="form-control" name="scope_note" rows="3" cols="40"><%= (types.get(i).getScopeNote() == null ? "" : types.get(i).getScopeNote()) %></textarea>
                 	</div>                             
                          
 					<div class="btn-group pull-right">                             
                          
-                            <input type="hidden" name="dc_type_id" value="<%= types[i].getFieldID() %>"/>
+                            <input type="hidden" name="dc_type_id" value="<%= types.get(i).getID() %>"/>
                             <input class="btn btn-primary" type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>"/>             
                          
                             <input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>"/>
@@ -124,7 +125,7 @@ if (error!=null) {
  </table>
 
       <form method="post" action="">
-        <input type="hidden" name="dc_schema_id" value="<%= schema.getSchemaID() %>"/>
+        <input type="hidden" name="dc_schema_id" value="<%= schema.getID() %>"/>
         	 <h2><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfield"/></h2>
               <p class="alert alert-info"><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfieldnote"/></p>
                       
@@ -145,7 +146,7 @@ if (error!=null) {
     <form method="post" action="">
       
       <h2><fmt:message key="jsp.dspace-admin.list-metadata-fields.move"/></h2>
-<% if (schemas.length > 1) { %>
+<% if (schemas.size() > 1) { %>
         <p class="alert alert-info">
         <fmt:message key="jsp.dspace-admin.list-metadata-fields.movenote"/></p>
       
@@ -153,21 +154,21 @@ if (error!=null) {
        <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/>:</p>
       <select class="form-control" name="dc_field_id" multiple="multiple" size="5">
 <%
-    for (int i = 0; i < types.length; i++)
+    for (int i = 0; i < types.size(); i++)
     {
-      String qualifier = (types[i].getQualifier() == null ? "" : "."+types[i].getQualifier());
-%>     <option value="<%= types[i].getFieldID() %>"><%= types[i].getElement()+qualifier %></option>
+      String qualifier = (types.get(i).getQualifier() == null ? "" : "."+types.get(i).getQualifier());
+%>     <option value="<%= types.get(i).getID() %>"><%= types.get(i).getElement()+qualifier %></option>
 <%  }
 %>
       </select>
       <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.schema"/>: </p>
       <select class="form-control" name="dc_dest_schema_id">
 <%
-    for (int i = 0; i < schemas.length; i++)
+    for (int i = 0; i < schemas.size(); i++)
     {
-              if (schemas[i].getSchemaID() != schema.getSchemaID())
+              if (schemas.get(i).getID() != schema.getID())
               {
-%>      <option value="<%= schemas[i].getSchemaID() %>"><%= schemas[i].getNamespace() %></option>
+%>      <option value="<%= schemas.get(i).getID() %>"><%= schemas.get(i).getNamespace() %></option>
 <%            }
     }
 %>

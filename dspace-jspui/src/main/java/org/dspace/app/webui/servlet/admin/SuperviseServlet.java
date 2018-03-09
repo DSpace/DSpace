@@ -9,21 +9,27 @@ package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.SupervisedItem;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.SupervisedItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.Supervisor;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.SupervisorService;
 
 /**
  * Servlet to handle administration of the supervisory system
@@ -35,8 +41,21 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
 {
     
      /** log4j category */
-    private static Logger log = Logger.getLogger(SuperviseServlet.class);
+    private static final Logger log = Logger.getLogger(SuperviseServlet.class);
     
+    private final transient GroupService groupService
+             = EPersonServiceFactory.getInstance().getGroupService();
+    
+    private final transient SupervisorService supervisorService
+             = EPersonServiceFactory.getInstance().getSupervisorService();
+    
+    private final transient SupervisedItemService supervisedItemService
+             = ContentServiceFactory.getInstance().getSupervisedItemService();
+    
+    private final transient WorkspaceItemService workspaceItemService
+             = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    
+    @Override
     protected void doDSGet(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -45,6 +64,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         doDSPost(c, request, response);
     }
     
+    @Override
     protected void doDSPost(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -83,11 +103,6 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
             removeSupervisionOrder(c, request, response);
             showMainPage(c, request, response);
         }
-        else if (button.equals("submit_clean"))
-        {
-            cleanSupervisorDatabase(c, request, response);
-            showMainPage(c, request, response);
-        }
     }
     
     //**********************************************************************
@@ -107,11 +122,11 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
     {
         // get the values from the request
         int wsItemID = UIUtil.getIntParameter(request,"siID");
-        int groupID = UIUtil.getIntParameter(request,"gID");
+        UUID groupID = UIUtil.getUUIDParameter(request,"gID");
         
         // get the workspace item and the group from the request values
-        WorkspaceItem wsItem = WorkspaceItem.find(context, wsItemID);
-        Group group = Group.find(context, groupID);
+        WorkspaceItem wsItem = workspaceItemService.find(context, wsItemID);
+        Group group = groupService.find(context, groupID);
         
         // set the attributes for the JSP
         request.setAttribute("wsItem",wsItem);
@@ -133,17 +148,17 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // get all the groups
-        Group[] groups = Group.findAll(context,1);
+        List<Group> groups = groupService.findAll(context,1);
         
         // get all the workspace items
-        WorkspaceItem[] wsItems = WorkspaceItem.findAll(context);
+        List<WorkspaceItem> wsItems = workspaceItemService.findAll(context);
         
         // set the attributes for the JSP
         request.setAttribute("groups",groups);
         request.setAttribute("wsItems",wsItems);
 
         // set error message key when there is no workspace item
-        if (wsItems.length == 0)
+        if (wsItems.size() == 0)
         {
             request.setAttribute("errorKey", 
                 "jsp.dspace-admin.supervise-no-workspaceitem.no-wsitems");
@@ -183,7 +198,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // get all the supervised items
-        SupervisedItem[] si = SupervisedItem.getAll(context);
+        List<WorkspaceItem> si = supervisedItemService.getAll(context);
         
         // set the attributes for the JSP
         request.setAttribute("supervised",si);
@@ -208,11 +223,12 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
     {
         
         // get the values from the request
-        int groupID = UIUtil.getIntParameter(request,"TargetGroup");
+        UUID groupID = UIUtil.getUUIDParameter(request,"TargetGroup");
         int wsItemID = UIUtil.getIntParameter(request,"TargetWSItem");
         int policyType = UIUtil.getIntParameter(request, "PolicyType");
-        
-        Supervisor.add(context, groupID, wsItemID, policyType);
+        Group group = groupService.find(context, groupID);
+        WorkspaceItem wi = workspaceItemService.find(context, wsItemID);
+        supervisorService.add(context, group, wi, policyType);
         
         log.info(LogManager.getHeader(context, 
             "Supervision Order Set", 
@@ -220,25 +236,6 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         
         context.complete();
     }
-    
-    /**
-     * Maintains integrity of the supervisory database.  Should be more closely
-     * integrated into the workspace code, perhaps
-     *
-     * @param context the context of the request
-     * @param request the servlet request
-     * @param response the servlet response
-     */
-    private void cleanSupervisorDatabase(Context context, 
-        HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
-    {
-        // ditch any supervision orders that are no longer relevant
-        Supervisor.removeRedundant(context);
-         
-        context.complete();
-    }
-    
     
     /**
      * Remove the supervisory group and its policies from the database
@@ -254,9 +251,12 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         
         // get the values from the request
         int wsItemID = UIUtil.getIntParameter(request,"siID");
-        int groupID = UIUtil.getIntParameter(request,"gID");
+        UUID groupID = UIUtil.getUUIDParameter(request,"gID");
         
-        Supervisor.remove(context, wsItemID, groupID);
+        WorkspaceItem wi = workspaceItemService.find(context, wsItemID);
+        Group group = groupService.find(context, groupID);
+        
+        supervisorService.remove(context, wi, group);
         
         log.info(LogManager.getHeader(context, 
             "Supervision Order Removed", 
@@ -277,7 +277,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        int groupID = UIUtil.getIntParameter(request,"TargetGroup");
+        UUID groupID = UIUtil.getUUIDParameter(request,"TargetGroup");
         int wsItemID = UIUtil.getIntParameter(request,"TargetWSItem");
         
         // set error message key when no workspace item is selected
@@ -289,8 +289,11 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
                 "/dspace-admin/supervise-no-workspaceitem.jsp" );
             return false;
         }
+        
+        WorkspaceItem wi = workspaceItemService.find(context, wsItemID);
+        Group group = groupService.find(context, groupID);
 
-        boolean invalid = Supervisor.isOrder(context, wsItemID, groupID);
+        boolean invalid = supervisorService.isOrder(context, wi, group);
         
         if (invalid)
         {

@@ -42,23 +42,44 @@
 <%@ page import="org.dspace.core.Constants"           %>
 <%@ page import="org.dspace.eperson.EPerson"          %>
 <%@ page import="org.dspace.eperson.Group"            %>
+<%@ page import="org.dspace.authorize.factory.AuthorizeServiceFactory" %>
+<%@ page import="org.dspace.authorize.service.ResourcePolicyService" %>
 
 
 <%
     Community community = (Community) request.getAttribute("community");
     List<ResourcePolicy> policies =
         (List<ResourcePolicy>) request.getAttribute("policies");
+    
+    // Is the logged in user an admin or community admin or collection admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
+    
+    Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
+    boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
+    
+    Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
+    boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
+    
+    String naviAdmin = "admin";
+    String link = "/dspace-admin";
+    
+    if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+    {
+        naviAdmin = "community-or-collection-admin";
+        link = "/tools";
+    }
 %>
 
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.authorize-community-edit.title"
-               navbar="admin"
+               navbar="<%= naviAdmin %>"
                locbar="link"
                parenttitlekey="jsp.administer"
-               parentlink="/dspace-admin"
+               parentlink="<%= link %>"
                nocache="true">
   
 	<h1><fmt:message key="jsp.dspace-admin.authorize-community-edit.policies">
-        <fmt:param><%= community.getMetadata("name") %></fmt:param>
+        <fmt:param><%= community.getName() %></fmt:param>
         <fmt:param>hdl:<%= community.getHandle() %></fmt:param>
         <fmt:param><%=community.getID()%></fmt:param>
     </fmt:message>
@@ -84,6 +105,7 @@
         </tr>
 
 <%
+    ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
     String row = "even";
     for (ResourcePolicy rp : policies)
     {
@@ -91,7 +113,7 @@
         <tr>
             <td headers="t1" class="<%= row %>RowOddCol"><%= rp.getID() %></td>
             <td headers="t2" class="<%= row %>RowEvenCol">
-                    <%= rp.getActionText() %>
+                    <%= resourcePolicyService.getActionText(rp) %>
             </td>
             <td headers="t3" class="<%= row %>RowOddCol">
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  

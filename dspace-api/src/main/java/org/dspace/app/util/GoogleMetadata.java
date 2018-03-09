@@ -10,16 +10,14 @@ package org.dspace.app.util;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
-import org.dspace.content.Metadatum;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.jdom.Element;
 
 import java.io.File;
@@ -30,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.Collection;
 import java.util.Map.Entry;
 
 /**
@@ -44,82 +43,85 @@ public class GoogleMetadata
 
     private final static Logger log = Logger.getLogger(GoogleMetadata.class);
 
-    private static final String GOOGLE_PREFIX = "google.";
+    protected static final String GOOGLE_PREFIX = "google.";
 
-    private Item item;
+    protected ItemService itemService;
 
-    private String itemURL;
+    protected Item item;
+
+    protected String itemURL;
 
     // Configuration keys and fields
-    private static Map<String, String> configuredFields = new HashMap<String, String>();
+    protected static Map<String, String> googleScholarSettings = new HashMap<String, String>();
 
     // Google field names (e.g. citation_fieldname) and formatted metadata
     // values
-    private ListMultimap<String, String> metadataMappings = ArrayListMultimap.create();
+    protected ListMultimap<String, String> metadataMappings = ArrayListMultimap.create();
 
-    public static final String TITLE = "citation_title";
+    protected final String TITLE = "citation_title";
 
-    public static final String JOURNAL_TITLE = "citation_journal_title";
+    protected final String JOURNAL_TITLE = "citation_journal_title";
 
-    public static final String PUBLISHER = "citation_publisher";
+    protected final String PUBLISHER = "citation_publisher";
 
-    public static final String AUTHORS = "citation_author";
+    protected final String AUTHORS = "citation_author";
 
-    public static final String DATE = "citation_date";
+    protected final String DATE = "citation_date";
 
-    public static final String VOLUME = "citation_volume";
+    protected final String VOLUME = "citation_volume";
 
-    public static final String ISSUE = "citation_issue";
+    protected final String ISSUE = "citation_issue";
 
-    public static final String FIRSTPAGE = "citation_firstpage";
+    protected final String FIRSTPAGE = "citation_firstpage";
 
-    public static final String LASTPAGE = "citation_lastpage";
+    protected final String LASTPAGE = "citation_lastpage";
 
-    public static final String DOI = "citation_doi";
+    protected final String DOI = "citation_doi";
 
-    public static final String PMID = "citation_pmid";
+    protected final String PMID = "citation_pmid";
 
-    public static final String ABSTRACT = "citation_abstract_html_url";
+    protected final String ABSTRACT = "citation_abstract_html_url";
 
-    public static final String FULLTEXT = "citation_fulltext_html_url";
+    protected final String FULLTEXT = "citation_fulltext_html_url";
 
-    public static final String PDF = "citation_pdf_url";
+    protected final String PDF = "citation_pdf_url";
 
-    public static final String ISSN = "citation_issn";
+    protected final String ISSN = "citation_issn";
 
-    public static final String ISBN = "citation_isbn";
+    protected final String ISBN = "citation_isbn";
 
-    public static final String LANGUAGE = "citation_language";
+    protected final String LANGUAGE = "citation_language";
 
-    public static final String KEYWORDS = "citation_keywords";
+    protected final String KEYWORDS = "citation_keywords";
 
-    public static final String CONFERENCE = "citation_conference";
+    protected final String CONFERENCE = "citation_conference";
 
-    public static final String DISSERTATION_ID = "identifiers.dissertation";
+    protected final String DISSERTATION_ID = "identifiers.dissertation";
 
-    public static final String DISSERTATION_NAME = "citation_dissertation_name";
+    protected final String DISSERTATION_NAME = "citation_dissertation_name";
 
-    public static final String DISSERTATION_INSTITUTION = "citation_dissertation_institution";
+    protected final String DISSERTATION_INSTITUTION = "citation_dissertation_institution";
 
-    public static final String PATENT_ID = "identifiers.patent";
+    protected final String PATENT_ID = "identifiers.patent";
 
-    public static final String PATENT_NUMBER = "citation_patent_number";
+    protected final String PATENT_NUMBER = "citation_patent_number";
 
-    public static final String PATENT_COUNTRY = "citation_patent_country";
+    protected final String PATENT_COUNTRY = "citation_patent_country";
 
-    public static final String TECH_REPORT_ID = "identifiers.technical_report";
+    protected final String TECH_REPORT_ID = "identifiers.technical_report";
 
-    public static final String TECH_REPORT_NUMBER = "citation_technical_report_number";
+    protected final String TECH_REPORT_NUMBER = "citation_technical_report_number";
 
-    public static final String TECH_REPORT_INSTITUTION = "citation_technical_report_institution";
+    protected final String TECH_REPORT_INSTITUTION = "citation_technical_report_institution";
 
-    private static final int SINGLE = 0;
+    protected final int SINGLE = 0;
 
-    private static final int MULTI = 1;
+    protected final int MULTI = 1;
 
-    private static final int ALL_FIELDS_IN_OPTION = 2;
+    protected final int ALL_FIELDS_IN_OPTION = 2;
 
-    private Context ourContext;
+    private static GoogleBitstreamComparator googleBitstreamComparator = null;
+
     // Load configured fields from google-metadata.properties
     static
     {
@@ -173,7 +175,7 @@ public class GoogleMetadata
                 if (null != name && !name.equals("") && null != field
                         && !field.equals(""))
                 {
-                    configuredFields.put(name.trim(), field.trim());
+                    googleScholarSettings.put(name.trim(), field.trim());
                 }
             }
         }
@@ -192,9 +194,9 @@ public class GoogleMetadata
     {
         log.debug("Google Metadata Configuration Mapping:");
 
-        for (String name : configuredFields.keySet())
+        for (String name : googleScholarSettings.keySet())
         {
-            log.debug("  " + name + " => " + configuredFields.get(name));
+            log.debug("  " + name + " => " + googleScholarSettings.get(name));
         }
     }
 
@@ -202,20 +204,19 @@ public class GoogleMetadata
      * Wrap the item, parse all configured fields and generate metadata field
      * values.
      * 
-     * @param item
-     *            - The item being viewed to extract metadata from
+     * @param context context
+     * @param item The item being viewed to extract metadata from
+     * @throws SQLException if database error
      */
     public GoogleMetadata(Context context, Item item) throws SQLException
     {
 
         // Hold onto the item in case we need to refresh a stale parse
         this.item = item;
-        itemURL = HandleManager.resolveToURL(context, item.getHandle());
-        ourContext=context;
-        EPerson currentUser = ourContext.getCurrentUser();
-        ourContext.setCurrentUser(null);
+        this.itemService = ContentServiceFactory.getInstance().getItemService();
+        itemURL = HandleServiceFactory.getInstance().getHandleService().resolveToURL(context, item.getHandle());
+        googleBitstreamComparator = new GoogleBitstreamComparator(context, googleScholarSettings);
         parseItem();
-        ourContext.setCurrentUser(currentUser);
     }
 
     /**
@@ -223,12 +224,12 @@ public class GoogleMetadata
      * first-encountered instance of the field for this Item.
      * 
      * @param fieldName
-     * @return
+     * @return successful?
      */
-    private boolean addSingleField(String fieldName)
+    protected boolean addSingleField(String fieldName)
     {
 
-        String config = configuredFields.get(fieldName);
+        String config = googleScholarSettings.get(fieldName);
 
         if (null == config || config.equals(""))
         {
@@ -266,11 +267,11 @@ public class GoogleMetadata
             }
         }
 
-        Metadatum v = resolveMetadataField(config);
+        MetadataValue v = resolveMetadataField(config);
 
-        if (null != v && (null != v.value) && !v.value.trim().equals(""))
+        if (null != v && (null != v.getValue()) && !v.getValue().trim().equals(""))
         {
-            metadataMappings.put(fieldName, v.value);
+            metadataMappings.put(fieldName, v.getValue());
             return true;
         }
         else
@@ -287,10 +288,10 @@ public class GoogleMetadata
      * @param configFilter
      * @return The first configured match of metadata field for the item.
      */
-    private Metadatum resolveMetadataField(String configFilter)
+    protected MetadataValue resolveMetadataField(String configFilter)
     {
 
-        ArrayList<Metadatum> fields = resolveMetadata(configFilter, SINGLE);
+        ArrayList<MetadataValue> fields = resolveMetadata(configFilter, SINGLE);
         if (null != fields && fields.size() > 0)
         {
             return fields.get(0);
@@ -306,10 +307,10 @@ public class GoogleMetadata
      * @return Aggregate of all matching metadata fields configured in the first
      *         option field-set to return any number of filter matches.
      */
-    private ArrayList<Metadatum> resolveMetadataFields(String configFilter)
+    protected ArrayList<MetadataValue> resolveMetadataFields(String configFilter)
     {
 
-        ArrayList<Metadatum> fields = resolveMetadata(configFilter, MULTI);
+        ArrayList<MetadataValue> fields = resolveMetadata(configFilter, MULTI);
         if (null != fields && fields.size() > 0)
         {
             return fields;
@@ -323,9 +324,9 @@ public class GoogleMetadata
      * 
      * @param configFilter
      * @param returnType
-     * @return Array of configuration -> item-field matches
+     * @return Array of configuration to item-field matches
      */
-    private ArrayList<Metadatum> resolveMetadata(String configFilter,
+    protected ArrayList<MetadataValue> resolveMetadata(String configFilter,
             int returnType)
     {
 
@@ -340,8 +341,7 @@ public class GoogleMetadata
         {
             configFilter = configFilter.trim();
         }
-        ArrayList<ArrayList<String>> parsedOptions = new ArrayList<ArrayList<String>>();
-        parsedOptions = parseOptions(configFilter);
+        ArrayList<ArrayList<String>> parsedOptions = parseOptions(configFilter);
 
         if (log.isDebugEnabled())
         {
@@ -366,19 +366,19 @@ public class GoogleMetadata
 
             int optionMatches = 0;
             String[] components;
-            Metadatum[] values;
-            ArrayList<Metadatum> resolvedFields = new ArrayList<Metadatum>();
+            List<MetadataValue> values;
+            ArrayList<MetadataValue> resolvedFields = new ArrayList<MetadataValue>();
 
             for (String field : optionFields)
             {
 
                 components = parseComponents(field);
-                values = item.getMetadata(components[0], components[1],
+                values = itemService.getMetadata(item, components[0], components[1],
                         components[2], Item.ANY);
 
-                if (values.length > 0)
+                if (values.size() > 0)
                 {
-                    for (Metadatum v : values)
+                    for (MetadataValue v : values)
                     {
 
                         resolvedFields.add(v);
@@ -387,11 +387,13 @@ public class GoogleMetadata
                         {
                             if (!resolvedFields.isEmpty())
                             {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Resolved Field Value For This Item:");
-                                    for (Metadatum r : resolvedFields)
+                                if (log.isDebugEnabled())
+                                {
+                                    log
+                                            .debug("Resolved Field Value For This Item:");
+                                    for (MetadataValue r : resolvedFields)
                                     {
-                                        log.debug("{" + r.value + "}");
+                                        log.debug("{" + r.getValue() + "}");
                                     }
                                 }
                                 return resolvedFields;
@@ -408,9 +410,9 @@ public class GoogleMetadata
                 if (log.isDebugEnabled())
                 {
                     log.debug("Resolved Field Values For This Item:");
-                    for (Metadatum v : resolvedFields)
+                    for (MetadataValue v : resolvedFields)
                     {
-                        log.debug("{" + v.value + "}");
+                        log.debug("{" + v.getValue() + "}");
                     }
                 }
 
@@ -438,9 +440,9 @@ public class GoogleMetadata
      * configuration.
      * 
      * @param configFilter
-     * @return
+     * @return array of parsed options or null
      */
-    private ArrayList<ArrayList<String>> parseOptions(String configFilter)
+    protected ArrayList<ArrayList<String>> parseOptions(String configFilter)
     {
 
         ArrayList<String> options = new ArrayList<String>();
@@ -534,7 +536,7 @@ public class GoogleMetadata
      *            - Value of one metadata field configuration
      * @return A vector of raw field configurations.
      */
-    private ArrayList<String> parseFields(String configString)
+    protected ArrayList<String> parseFields(String configString)
     {
 
         ArrayList<String> fields = new ArrayList<String>();
@@ -554,7 +556,7 @@ public class GoogleMetadata
      *            The configured field for one metadata field map
      * @return Schema, Element, Qualifier of metadata field
      */
-    private String[] parseComponents(String field)
+    protected String[] parseComponents(String field)
     {
 
         int index = 0;
@@ -577,7 +579,7 @@ public class GoogleMetadata
      *            The field identifier containing a wildcard character.
      * @return Expanded field list.
      */
-    private ArrayList<String> parseWildcard(String field)
+    protected ArrayList<String> parseWildcard(String field)
     {
 
         if (!field.contains("*"))
@@ -596,11 +598,11 @@ public class GoogleMetadata
                 }
             }
 
-            Metadatum[] allMD = item.getMetadata(components[0], components[1],
+            List<MetadataValue> allMD = itemService.getMetadata(item, components[0], components[1],
                     components[2], Item.ANY);
 
             ArrayList<String> expandedDC = new ArrayList<String>();
-            for (Metadatum v : allMD)
+            for (MetadataValue v : allMD)
             {
 
                 // De-dup multiple occurrences of field names in item
@@ -631,15 +633,17 @@ public class GoogleMetadata
      *            The Metadatum to construct a name for.
      * @return The complete metadata field name.
      */
-    private String buildFieldName(Metadatum v)
+    protected String buildFieldName(MetadataValue v)
     {
 
         StringBuilder name = new StringBuilder();
 
-        name.append(v.schema + "." + v.element);
-        if (null != v.qualifier)
+        MetadataField metadataField = v.getMetadataField();
+        MetadataSchema metadataSchema = v.getMetadataField().getMetadataSchema();
+        name.append(metadataSchema.getName()).append(".").append(metadataField.getElement());
+        if (null != metadataField.getQualifier())
         {
-            name.append("." + v.qualifier);
+            name.append("." + metadataField.getQualifier());
         }
 
         return name.toString();
@@ -648,10 +652,10 @@ public class GoogleMetadata
     /**
      * Using metadata field mappings contained in the loaded configuration,
      * parse through configured metadata fields, building valid Google metadata
-     * value strings. Field names & values contained in metadataMappings.
+     * value strings. Field names and values contained in metadataMappings.
      * 
      */
-    private void parseItem()
+    protected void parseItem()
     {
 
         // TITLE
@@ -729,7 +733,7 @@ public class GoogleMetadata
             addSingleField(PATENT_NUMBER);
 
             // Use config value for patent country. Should be a literal.
-            String countryConfig = configuredFields.get(PATENT_COUNTRY);
+            String countryConfig = googleScholarSettings.get(PATENT_COUNTRY);
             if (null != countryConfig && !countryConfig.trim().equals(""))
             {
                 metadataMappings.put(PATENT_COUNTRY, countryConfig.trim());
@@ -759,8 +763,8 @@ public class GoogleMetadata
      * Fetch retaining the order of the values for any given key in which they
      * where added (like authors).
      *
-     * Usage: GoogleMetadata gmd = new GoogleMetadata(item); for(Entry<String,
-     * String> mapping : googlemd.getMappings()) { ... }
+     * Usage: {@code GoogleMetadata gmd = new GoogleMetadata(item); for(Entry<String,
+     * String> mapping : googlemd.getMappings()) ...}
      * 
      * @return Iterable of metadata fields mapped to Google-formatted values
      */
@@ -771,6 +775,7 @@ public class GoogleMetadata
 
     /**
      * Produce meta elements that can easily be put into the head.
+     * @return List of elements
      */
     public List<Element> disseminateList()
     {
@@ -997,7 +1002,7 @@ public class GoogleMetadata
      * @param item
      * @return URL that the PDF can be directly downloaded from
      */
-    private String getPDFSimpleUrl(Item item)
+    protected String getPDFSimpleUrl(Item item)
     {
         try {
 	        Bitstream bitstream = findLinkableFulltext(item);
@@ -1036,40 +1041,43 @@ public class GoogleMetadata
 	 * </ul>
 	 * Additionally, this bitstream must be publicly viewable.
 	 * @param item
-	 * @return
-	 * @throws SQLException
+	 * @return a linkable bitstream or null if none found
+	 * @throws SQLException if database error
 	 */
-	private Bitstream findLinkableFulltext(Item item) throws SQLException {
+	protected Bitstream findLinkableFulltext(Item item) throws SQLException {
 		Bitstream bestSoFar = null;
-		Bundle[] contentBundles = item.getBundles("ORIGINAL");
+
+		List<Bundle> contentBundles = itemService.getBundles(item, "ORIGINAL");
+
 		for (Bundle bundle : contentBundles) {
-			int primaryBitstreamId = bundle.getPrimaryBitstreamID();
-			Bitstream[] bitstreams = bundle.getBitstreams();
-			for (Bitstream candidate : bitstreams) {
-				if (candidate.getID() == primaryBitstreamId) { // is primary -> use this one
-					if (isPublic(candidate)) {
-						return candidate;
-					}					
-				} else 
-					{
-						
-						if (bestSoFar == null && isPublic(candidate)) { //if bestSoFar is null but the candidate is not public you don't use it and try to find another
-						bestSoFar = candidate;
-						}					
-					}
-			}
-		}
+            List<Bitstream> bitstreams = bundle.getBitstreams();
+            Collections.sort(bitstreams, googleBitstreamComparator);
+
+            for (Bitstream candidate : bitstreams) {
+                if (candidate.equals(bundle.getPrimaryBitstream())) { // is primary -> use this one
+                    if (isPublic(candidate)) {
+                        return candidate;
+                    }
+                } else {
+                    if (bestSoFar == null && isPublic(candidate)) { //if bestSoFar is null but the candidate is not public you don't use it and try to find another
+                        bestSoFar = candidate;
+                    }
+                }
+            }
+        }
 
 		return bestSoFar;
 	}
 
-	private boolean isPublic(Bitstream bitstream) {
+	protected boolean isPublic(Bitstream bitstream) {
 		if (bitstream == null) {
 			return false;
 		}
 		boolean result = false;
+		Context context = null;
 		try {
-            result = AuthorizeManager.authorizeActionBoolean(ourContext, bitstream, Constants.READ, true);
+			context = new Context();
+			result = AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeActionBoolean(context, bitstream, Constants.READ, true);
 		} catch (SQLException e) {
 			log.error("Cannot determine whether bitstream is public, assuming it isn't. bitstream_id=" + bitstream.getID(), e);
 		}
@@ -1079,16 +1087,16 @@ public class GoogleMetadata
 	/**
      * 
      * 
-     * @param FIELD
+     * @param field
      *            to aggregate all values of in a matching option
-     * @param delim
+     * @param delimiter
      *            to delimit field values with
      */
-    private void addAggregateValues(String FIELD, String delim)
+    protected void addAggregateValues(String field, String delimiter)
     {
 
-        String authorConfig = configuredFields.get(FIELD);
-        ArrayList<Metadatum> fields = resolveMetadataFields(authorConfig);
+        String authorConfig = googleScholarSettings.get(field);
+        ArrayList<MetadataValue> fields = resolveMetadataFields(authorConfig);
 
         if (null != fields && !fields.isEmpty())
         {
@@ -1096,16 +1104,16 @@ public class GoogleMetadata
             StringBuilder fieldMetadata = new StringBuilder();
             int count = 0;
 
-            for (Metadatum field : fields)
+            for (MetadataValue metadataValue : fields)
             {
-                fieldMetadata.append(field.value);
+                fieldMetadata.append(metadataValue.getValue());
                 if (count < fields.size() - 1)
                 {
-                    fieldMetadata.append(delim + " ");
+                    fieldMetadata.append(delimiter).append(" ");
                     count++;
                 }
             }
-            metadataMappings.put(FIELD, fieldMetadata.toString());
+            metadataMappings.put(field, fieldMetadata.toString());
         }
     }
 
@@ -1113,30 +1121,30 @@ public class GoogleMetadata
      * If metadata field contains multiple values, then add each value to the map separately
      * @param FIELD
      */
-    private void addMultipleValues(String FIELD)
+    protected void addMultipleValues(String FIELD)
     {
-        String fieldConfig = configuredFields.get(FIELD);
-        ArrayList<Metadatum> fields = resolveMetadataFields(fieldConfig);
+        String fieldConfig = googleScholarSettings.get(FIELD);
+        ArrayList<MetadataValue> fields = resolveMetadataFields(fieldConfig);
 
         if (null != fields && !fields.isEmpty())
         {
-            for (Metadatum field : fields)
+            for (MetadataValue field : fields)
             {
                 //TODO if this is author field, first-name first
-                metadataMappings.put(FIELD, field.value);
+                metadataMappings.put(FIELD, field.getValue());
             }
         }
     }
-
+    
     /**
      * Determine, based on config values, if this item is a dissertation.
      * 
      * @return boolean
      */
-    private boolean itemIsDissertation()
+    protected boolean itemIsDissertation()
     {
 
-        String dConfig = configuredFields.get(DISSERTATION_ID);
+        String dConfig = googleScholarSettings.get(DISSERTATION_ID);
         if (null == dConfig || dConfig.trim().equals(""))
         {
             return false;
@@ -1152,10 +1160,10 @@ public class GoogleMetadata
      * 
      * @return boolean
      */
-    private boolean itemIsPatent()
+    protected boolean itemIsPatent()
     {
 
-        String dConfig = configuredFields.get(PATENT_ID);
+        String dConfig = googleScholarSettings.get(PATENT_ID);
         if (null == dConfig || dConfig.trim().equals(""))
         {
             return false;
@@ -1171,10 +1179,10 @@ public class GoogleMetadata
      * 
      * @return boolean
      */
-    private boolean itemIsTechReport()
+    protected boolean itemIsTechReport()
     {
 
-        String dConfig = configuredFields.get(TECH_REPORT_ID);
+        String dConfig = googleScholarSettings.get(TECH_REPORT_ID);
         if (null == dConfig || dConfig.trim().equals(""))
         {
             return false;
@@ -1191,9 +1199,9 @@ public class GoogleMetadata
      * metadata practice.
      * 
      * @param dConfig
-     * @return
+     * @return item matches configuration
      */
-    private boolean identifyItemType(String dConfig)
+    protected boolean identifyItemType(String dConfig)
     {
         // FIXME: Shouldn't have to parse identifiers for every identification.
 
@@ -1239,21 +1247,21 @@ public class GoogleMetadata
         StringBuilder sb = new StringBuilder();
         for (String value : mdPairs.keySet())
         {
-            sb.append(value + " | ");
+            sb.append(value).append(" | ");
         }
 
         // Check resolved/present metadata fields against configured values
-        ArrayList<Metadatum> presentMD = resolveMetadataFields(sb.toString());
+        ArrayList<MetadataValue> presentMD = resolveMetadataFields(sb.toString());
         if (null != presentMD && presentMD.size() != 0)
         {
-            for (Metadatum v : presentMD)
+            for (MetadataValue v : presentMD)
             {
                 String fieldName = buildFieldName(v);
                 if (mdPairs.containsKey(fieldName))
                 {
                     for (String configValue : mdPairs.get(fieldName))
                     {
-                        if (configValue.equals(v.value))
+                        if (configValue.equals(v.getValue()))
                         {
                             return true;
                         }

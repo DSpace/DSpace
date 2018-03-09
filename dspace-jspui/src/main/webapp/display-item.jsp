@@ -22,29 +22,39 @@
   -                  appear yet.  If this is omitted, the item display won't
   -                  display any collections.
   -    admin_button - Boolean, show admin 'edit' button
+  -    submitter_button - Boolean, show submitter "new version" button
   --%>
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@page contentType="text/html;charset=UTF-8" %>
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.Metadatum" %>
-<%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.handle.HandleManager" %>
-<%@ page import="org.dspace.license.CreativeCommons" %>
+<%@page import="org.dspace.content.Collection" %>
+<%@page import="org.dspace.content.Item" %>
+<%@page import="org.dspace.core.ConfigurationManager" %>
+<%@page import="org.dspace.handle.HandleServiceImpl" %>
+<%@page import="org.dspace.license.CreativeCommonsServiceImpl" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@page import="org.dspace.versioning.Version"%>
 <%@page import="org.dspace.core.Context"%>
 <%@page import="org.dspace.app.webui.util.VersionUtil"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
-<%@page import="org.dspace.authorize.AuthorizeManager"%>
+<%@page import="org.dspace.authorize.AuthorizeServiceImpl"%>
 <%@page import="java.util.List"%>
 <%@page import="org.dspace.core.Constants"%>
 <%@page import="org.dspace.eperson.EPerson"%>
 <%@page import="org.dspace.versioning.VersionHistory"%>
+<%@page import="org.dspace.plugin.PluginException"%>
+<%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
+<%@page import="org.dspace.content.factory.ContentServiceFactory" %>
+<%@page import="org.dspace.content.MetadataValue" %>
+<%@page import="org.dspace.license.factory.LicenseServiceFactory" %>
+<%@page import="org.dspace.license.service.CreativeCommonsService" %>
+<%@page import="org.dspace.handle.factory.HandleServiceFactory" %>
+<%@page import="org.dspace.versioning.service.VersionHistoryService" %>
+<%@page import="org.dspace.versioning.factory.VersionServiceFactory" %>
+
 <%
     // Attributes
     Boolean displayAllBoolean = (Boolean) request.getAttribute("display.all");
@@ -52,19 +62,29 @@
     Boolean suggest = (Boolean)request.getAttribute("suggest.enable");
     boolean suggestLink = (suggest == null ? false : suggest.booleanValue());
     Item item = (Item) request.getAttribute("item");
-    Collection[] collections = (Collection[]) request.getAttribute("collections");
+    List<Collection> collections = (List<Collection>) request.getAttribute("collections");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
-    
+    Boolean submitter_b = (Boolean) request.getAttribute("submitter_button");
+    boolean submitter_button = (submitter_b == null ? false : submitter_b.booleanValue());
     // get the workspace id if one has been passed
     Integer workspace_id = (Integer) request.getAttribute("workspace_id");
 
     // get the handle if the item has one yet
     String handle = item.getHandle();
+    Context context = UIUtil.obtainContext(request);
+    
+    // get the doi if the item has one
+    String doi = (String) request.getAttribute("doi");
+    // get the preferred identifier (as URL)
+    String preferredIdentifier = (String) request.getAttribute("preferred_identifier");
+    // get the latestVersionIdentifier
+    String latestVersionIdentifier = (String)request.getAttribute("versioning.latest_version_identifier");
 
     // CC URL & RDF
-    String cc_url = CreativeCommons.getLicenseURL(item);
-    String cc_rdf = CreativeCommons.getLicenseRDF(item);
+    CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+    String cc_url = creativeCommonsService.getLicenseURL(context, item);
+    String cc_rdf = creativeCommonsService.getLicenseRDF(context, item);
 
     // Full title needs to be put into a string to use as tag argument
     String title = "";
@@ -74,10 +94,10 @@
 	}
 	else 
 	{
-		Metadatum[] titleValue = item.getDC("title", null, Item.ANY);
-		if (titleValue.length != 0)
+		List<MetadataValue> titleValue = ContentServiceFactory.getInstance().getItemService().getMetadata(item, "dc", "title", null, Item.ANY);
+		if (titleValue.size() != 0)
 		{
-			title = titleValue[0].value;
+			title = titleValue.get(0).getValue();
 		}
 		else
 		{
@@ -97,14 +117,11 @@
     Boolean showVersionWorkflowAvailableBool = (Boolean)request.getAttribute("versioning.showversionwfavailable");
     boolean showVersionWorkflowAvailable = (showVersionWorkflowAvailableBool!=null && showVersionWorkflowAvailableBool.booleanValue());
     
-    String latestVersionHandle = (String)request.getAttribute("versioning.latestversionhandle");
-    String latestVersionURL = (String)request.getAttribute("versioning.latestversionurl");
-    
+    VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
     VersionHistory history = (VersionHistory)request.getAttribute("versioning.history");
     List<Version> historyVersions = (List<Version>)request.getAttribute("versioning.historyversions");
 %>
 
-<%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout title="<%= title %>">
 <%
     if (handle != null)
@@ -115,8 +132,8 @@
 		if (newVersionAvailable)
 		   {
 		%>
-		<div class="alert alert-warning"><b><fmt:message key="jsp.version.notice.new_version_head"/></b>		
-		<fmt:message key="jsp.version.notice.new_version_help"/><a href="<%=latestVersionURL %>"><%= latestVersionHandle %></a>
+		<div class="alert alert-warning"><b><fmt:message key="jsp.version.notice.new_version_head"/></b>
+		<fmt:message key="jsp.version.notice.new_version_help"/> <a href="<%= latestVersionIdentifier %>"><%= latestVersionIdentifier %></a>
 		</div>
 		<%
 		    }
@@ -137,7 +154,7 @@
                 <%-- <strong>Please use this identifier to cite or link to this item:
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
                 <div class="well"><fmt:message key="jsp.display-item.identifier"/>
-                <code><%= HandleManager.getCanonicalForm(handle) %></code></div>
+                <code><%= preferredIdentifier %></code></div>
 <%
         if (admin_button)  // admin edit button
         { %>
@@ -173,7 +190,7 @@
                 	<% if(hasVersionHistory) { %>			                
                 	<form method="get" action="<%= request.getContextPath() %>/tools/history">
                     	<input type="hidden" name="itemID" value="<%= item.getID() %>" />
-                    	<input type="hidden" name="versionID" value="<%= history.getVersion(item)!=null?history.getVersion(item).getVersionId():null %>" />                    
+                    	<input type="hidden" name="versionID" value="<%= versionHistoryService.getVersion(context, history, item)!=null?versionHistoryService.getVersion(context, history, item).getID():null %>" />
                     	<input class="btn btn-info col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.history.button"/>" />
                 	</form>         	         	
 					<% } %>
@@ -183,6 +200,22 @@
 <%      } %>
 
 <%
+        // submitter create new version button
+        if (submitter_button && hasVersionButton) {
+%>
+        <dspace:sidebar>
+            <div class="panel panel-warning">
+                <div class="panel-heading"><fmt:message key="jsp.submittertools"/></div>
+                <div class="panel-body">
+                    <form method="get" action="<%= request.getContextPath()%>/tools/version">
+                        <input type="hidden" name="itemID" value="<%= item.getID()%>" />
+                        <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.general.version.button"/>" />
+                    </form>
+                </div>
+            </div>
+        </dspace:sidebar>
+<%
+        }
     }
 
     String displayStyle = (displayAll ? "full" : "");
@@ -283,6 +316,8 @@
     {
         boolean item_history_view_admin = ConfigurationManager
                 .getBooleanProperty("versioning", "item.history.view.admin");
+        boolean item_history_include_submitter = ConfigurationManager
+                .getBooleanProperty("versioning", "item.history.include.submitter", false);
         if(!item_history_view_admin || admin_button) {         
 %>
 	<div id="versionHistory" class="panel panel-info">
@@ -293,8 +328,11 @@
 			<th id="tt1" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column1"/></th>
 			<th 			
 				id="tt2" class="oddRowOddCol"><fmt:message key="jsp.version.history.column2"/></th>
-			<th 
-				 id="tt3" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column3"/></th>
+            <%-- Add Information about submitter only for admins or if item.history.include.submitter is true --%>
+            <% if (item_history_include_submitter || admin_button) { %>
+    			<th 
+	    			 id="tt3" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column3"/></th>
+            <% } %>
 			<th 
 				
 				id="tt4" class="oddRowOddCol"><fmt:message key="jsp.version.history.column4"/></th>
@@ -304,14 +342,28 @@
 		
 		<% for(Version versRow : historyVersions) {  
 		
-			EPerson versRowPerson = versRow.getEperson();
-			String[] identifierPath = VersionUtil.addItemIdentifier(item, versRow);
+			EPerson versRowPerson = versRow.getEPerson();
+			String[] identifierPath = UIUtil.getItemIdentifier(UIUtil.obtainContext(request), versRow.getItem());
+                        String url = identifierPath[0];
+                        String identifier;
+                        if (ConfigurationManager.getBooleanProperty("webui.identifier.strip-prefixes", true))
+                        {
+                            identifier = identifierPath[2];
+                        } else {
+                            identifier = identifierPath[3];
+                        }
 		%>	
 		<tr>			
 			<td headers="tt1" class="oddRowEvenCol"><%= versRow.getVersionNumber() %></td>
-			<td headers="tt2" class="oddRowOddCol"><a href="<%= request.getContextPath() + identifierPath[0] %>"><%= identifierPath[1] %></a><%= item.getID()==versRow.getItemID()?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
-			<td headers="tt3" class="oddRowEvenCol"><% if(admin_button) { %><a
-				href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a><% } else { %><%=versRowPerson.getFullName() %><% } %></td>
+			<td headers="tt2" class="oddRowOddCol"><a href="<%= url %>"><%= identifier %></a><%= item.getID()==versRow.getItem().getID()?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
+
+                        <% if(admin_button) { %> 
+                            <td headers="tt3" class="oddRowEvenCol"><a
+                               href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a> </td>
+                        <% } 
+                        else if(item_history_include_submitter) { %>
+                            <td headers="tt3" class="oddRowEvenCol"> <%=versRowPerson.getFullName() %> </td>
+                        <% }%>
 			<td headers="tt4" class="oddRowOddCol"><%= versRow.getVersionDate() %></td>
 			<td headers="tt5" class="oddRowEvenCol"><%= versRow.getSummary() %></td>
 		</tr>

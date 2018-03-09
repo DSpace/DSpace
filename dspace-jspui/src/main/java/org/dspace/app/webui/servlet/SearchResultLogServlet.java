@@ -7,21 +7,23 @@
  */
 package org.dspace.app.webui.servlet;
 
-import org.apache.commons.lang.StringUtils;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
-import org.dspace.usage.UsageEvent;
-import org.dspace.usage.UsageSearchEvent;
-import org.dspace.utils.DSpace;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Arrays;
+
+import org.apache.commons.lang.StringUtils;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.usage.UsageEvent;
+import org.dspace.usage.UsageSearchEvent;
 
 /**
  * Every time a user clicks on a search result he will be redirected through this servlet
@@ -33,15 +35,19 @@ import java.util.Arrays;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class SearchResultLogServlet extends DSpaceServlet{
+public class SearchResultLogServlet extends DSpaceServlet
+{
+	private final transient HandleService handleService
+            = HandleServiceFactory.getInstance().getHandleService();
 
     @Override
-    protected void doDSPost(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException {
+    protected void doDSPost(Context context, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException, AuthorizeException {
         String redirectUrl = request.getParameter("redirectUrl");
         String scopeHandle = request.getParameter("scope");
-        DSpaceObject scope = HandleManager.resolveToObject(context, scopeHandle);
+        DSpaceObject scope = handleService.resolveToObject(context, scopeHandle);
         String resultHandle = StringUtils.substringAfter(redirectUrl, "/handle/");
-        DSpaceObject result = HandleManager.resolveToObject(context, resultHandle);
+        DSpaceObject result = handleService.resolveToObject(context, resultHandle);
 
         //Fire an event to log our search result
         UsageSearchEvent searchEvent = new UsageSearchEvent(
@@ -64,7 +70,7 @@ public class SearchResultLogServlet extends DSpaceServlet{
             searchEvent.setPage(Integer.parseInt(request.getParameter("page")));
         }
 
-        new DSpace().getEventService().fireEvent(
+        DSpaceServicesFactory.getInstance().getEventService().fireEvent(
                 searchEvent);
 
 

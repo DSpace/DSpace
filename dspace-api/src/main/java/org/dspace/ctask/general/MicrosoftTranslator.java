@@ -32,17 +32,16 @@ import org.dspace.core.ConfigurationManager;
 public class MicrosoftTranslator extends AbstractTranslator
 {
 
-    private static final String PLUGIN_PREFIX = "translator";
+    protected final String PLUGIN_PREFIX = "translator";
 
-    private static final String baseUrl = "http://api.microsofttranslator.com/V2/Http.svc/Translate";
-    private static String apiKey = "";
+    protected final String baseUrl = "http://api.microsofttranslator.com/V2/Http.svc/Translate";
 
     private static final Logger log = Logger.getLogger(MicrosoftTranslator.class);
 
 
     @Override
     protected void initApi() {
-        apiKey =  ConfigurationManager.getProperty(PLUGIN_PREFIX, "translate.api.key.microsoft");
+        apiKey =  ConfigurationManager.getProperty(PLUGIN_PREFIX, "api.key.microsoft");
     }
 
     @Override

@@ -8,7 +8,7 @@ See http://drum.lib.umd.edu/help/about_drum.jsp for more information.
 
 The original DSpace documentation:
 
-* [README](README)
+* [README-DSPACE.md](README-DSPACE.md)
 * [DSpace Manual](dspace/docs/pdf/DSpace-Manual.pdf)
 
 ### Installation

@@ -20,7 +20,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
@@ -51,24 +51,7 @@ public class SendFeedbackAction extends AbstractAction
         // The page where the user came from
         String fromPage = request.getHeader("Referer");
         // Prevent spammers and splogbots from poisoning the feedback page
-        String host = ConfigurationManager.getProperty("dspace.hostname");
-        String allowedReferrersString = ConfigurationManager.getProperty("mail.allowed.referrers");
-
-        String[] allowedReferrersSplit = null;
-        boolean validReferral = false;
-
-        if((allowedReferrersString != null) && (allowedReferrersString.length() > 0))
-        {
-            allowedReferrersSplit = allowedReferrersString.trim().split("\\s*,\\s*");
-            for(int i = 0; i < allowedReferrersSplit.length; i++)
-            {
-                if(fromPage.indexOf(allowedReferrersSplit[i]) != -1)
-                {
-                    validReferral = true;
-                    break;
-                }
-            }
-        }
+        String host = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname");
 
         String basicHost = "";
         if ("localhost".equals(host) || "127.0.0.1".equals(host)
@@ -84,7 +67,7 @@ public class SendFeedbackAction extends AbstractAction
             basicHost = host.substring(host.substring(0, lastDot).lastIndexOf('.'));
         }
 
-        if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (!validReferral)))
+        if ((fromPage == null) || ((!fromPage.contains(basicHost)) && (!isValidReferral(fromPage))))
         {
             // N.B. must use old message catalog because Cocoon i18n is only available to transformed pages.
             throw new AuthorizeException(I18nUtil.getMessage("feedback.error.forbidden"));
@@ -129,7 +112,7 @@ public class SendFeedbackAction extends AbstractAction
 
         // All data is there, send the email
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
-        email.addRecipient(ConfigurationManager
+        email.addRecipient(DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getProperty("feedback.recipient"));
 
         email.addArgument(new Date()); // Date
@@ -148,6 +131,23 @@ public class SendFeedbackAction extends AbstractAction
 
         // Finished, allow to pass.
         return null;
+    }
+
+    private boolean isValidReferral(String fromPage)
+    {
+        String[] allowedReferrers = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("mail.allowed.referrers");
+        if (allowedReferrers != null && fromPage != null)
+        {
+            for (String allowedReferrer : allowedReferrers)
+            {
+                if (fromPage.contains(allowedReferrer))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 }

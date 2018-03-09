@@ -20,9 +20,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.rdf.RDFUtil;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  *
@@ -34,6 +35,8 @@ public class DataProviderServlet extends HttpServlet {
     
     private static final Logger log = Logger.getLogger(DataProviderServlet.class);
     
+    protected final transient HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -60,7 +63,7 @@ public class DataProviderServlet extends HttpServlet {
         if (StringUtils.isEmpty(pathInfo) || StringUtils.countMatches(pathInfo, "/") < 2)
         {
             String dspaceURI = 
-                    (new DSpace()).getConfigurationService().getProperty("dspace.url");
+                    DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
             this.serveNamedGraph(dspaceURI, lang, cType, response);
             return;
         }
@@ -84,8 +87,8 @@ public class DataProviderServlet extends HttpServlet {
         DSpaceObject dso = null;
         try
         {
-            context = new Context(Context.READ_ONLY);
-            dso = HandleManager.resolveToObject(context, handle);
+            context = new Context(Context.Mode.READ_ONLY);
+            dso = handleService.resolveToObject(context, handle);
         }
         catch (SQLException ex)
         {
@@ -127,8 +130,8 @@ public class DataProviderServlet extends HttpServlet {
         if (identifier == null)
         {
             // cannot generate identifier for dso?!
-            log.error("Cannot generate identifier for " + dso.getTypeText() 
-                    + " " + dso.getID() + "!");
+            log.error("Cannot generate identifier for UUID " 
+                    + dso.getID().toString() + "!");
             context.abort();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;

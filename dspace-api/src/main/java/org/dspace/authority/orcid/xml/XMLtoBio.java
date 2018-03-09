@@ -81,6 +81,7 @@ public class XMLtoBio extends Converter {
     protected String ORCID_NOT_FOUND = "ORCID [\\d-]* not found";
 
 
+    @Override
     public List<Bio> convert(Document xml) {
         List<Bio> result = new ArrayList<Bio>();
 
@@ -116,6 +117,7 @@ public class XMLtoBio extends Converter {
         return bio;
     }
 
+    @Override
     protected void processError(Document xml)  {
         String errorMessage = XMLErrors.getErrorMessage(xml);
 

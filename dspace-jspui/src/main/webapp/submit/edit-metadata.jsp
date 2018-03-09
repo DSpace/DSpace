@@ -19,38 +19,29 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.net.URLEncoder" %>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
-<%@ page import="javax.servlet.jsp.tagext.TagSupport" %>
 <%@ page import="javax.servlet.jsp.PageContext" %>
-<%@ page import="javax.servlet.ServletException" %>
 
 <%@ page import="org.dspace.core.Context" %>
-<%@ page import="org.dspace.app.webui.jsptag.PopupTag" %>
 <%@ page import="org.dspace.app.util.DCInput" %>
 <%@ page import="org.dspace.app.util.DCInputSet" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
 <%@ page import="org.dspace.core.I18nUtil" %>
-<%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="org.dspace.content.DCLanguage" %>
-<%@ page import="org.dspace.content.DCPersonName" %>
-<%@ page import="org.dspace.content.DCSeriesNumber" %>
-<%@ page import="org.dspace.content.Metadatum" %>
-<%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.content.authority.MetadataAuthorityManager" %>
-<%@ page import="org.dspace.content.authority.ChoiceAuthorityManager" %>
 <%@ page import="org.dspace.content.authority.Choices" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.content.authority.factory.ContentAuthorityServiceFactory" %>
+<%@ page import="org.dspace.content.authority.service.ChoiceAuthorityService" %>
+<%@ page import="org.dspace.content.authority.service.MetadataAuthorityService" %>
+<%@ page import="org.dspace.content.*" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
+<%@ page import="java.io.IOException" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -111,16 +102,16 @@
     // is this field going to be rendered as Choice-driven <select>?
     boolean isSelectable(String fieldKey)
     {
-        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+        ChoiceAuthorityService cam = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
         return (cam.isChoicesConfigured(fieldKey) &&
             "select".equals(cam.getPresentation(fieldKey)));
     }
 
     // Get the presentation type of the authority if any, null otherwise
-    String getAuthorityType(PageContext pageContext, String fieldName, int collectionID)
+    String getAuthorityType(PageContext pageContext, String fieldName, Collection collection)
     {
-        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
-        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+        MetadataAuthorityService mam = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+        ChoiceAuthorityService cam = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
         StringBuffer sb = new StringBuffer();
 
         if (cam.isChoicesConfigured(fieldName))
@@ -135,10 +126,10 @@
     StringBuffer doAuthority(PageContext pageContext, String fieldName,
             int idx, int fieldCount, String fieldInput, String authorityValue,
             int confidenceValue, boolean isName, boolean repeatable,
-            Metadatum[] dcvs, StringBuffer inputBlock, int collectionID)
+            List<MetadataValue> dcvs, StringBuffer inputBlock, Collection collection)
     {
-        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
-        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+        MetadataAuthorityService mam = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+        ChoiceAuthorityService cam = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
         StringBuffer sb = new StringBuffer();
 
         if (cam.isChoicesConfigured(fieldName))
@@ -163,7 +154,7 @@
             if (authority)
             { 
                 sb.append(" <img id=\""+confIndID+"\" title=\"")
-                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
+                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.getAuthority().getConfidence().description."+confidenceSymbol))
                   .append("\" class=\"pull-left ds-authority-confidence cf-")                  
                   // set confidence to cf-blank if authority is empty
                   .append(authorityValue==null||authorityValue.length()==0 ? "blank" : confidenceSymbol)
@@ -198,8 +189,8 @@
                   .append("contextPath: '").append(contextPath)
                   .append("', confidenceName: '").append(confidenceName)
                   .append("', confidenceIndicatorID: '").append(confIndID)
-                  .append("', collection: ").append(String.valueOf(collectionID))
-                  .append(" }); </script>");
+                  .append("', collection: ").append(String.valueOf(collection.getID()))
+                        .append(" }); </script>");
             }
 
             // put up a SELECT element containing all choices
@@ -208,17 +199,17 @@
                 sb.append("<select class=\"form-control\" id=\"").append(fieldInput)
                    .append("_id\" name=\"").append(fieldInput)
                    .append("\" size=\"").append(String.valueOf(repeatable ? 6 : 1))
-                   .append(repeatable ? "\" multiple>\n" :"\">\n");
-                Choices cs = cam.getMatches(fieldName, "", collectionID, 0, 0, null);
+                        .append(repeatable ? "\" multiple>\n" : "\">\n");
+                Choices cs = cam.getMatches(fieldName, "", collection, 0, 0, null);
                 // prepend unselected empty value when nothing can be selected.
-                if (!repeatable && cs.defaultSelected < 0 && dcvs.length == 0)
+                if (!repeatable && cs.defaultSelected < 0 && dcvs.size() == 0)
                     sb.append("<option value=\"\"><!-- empty --></option>\n");
                 for (int i = 0; i < cs.values.length; ++i)
                 {
                     boolean selected = false;
-                    for (Metadatum dcv : dcvs)
+                    for (MetadataValue dcv : dcvs)
                     {
-                        if (dcv.value.equals(cs.values[i].value))
+                        if (dcv.getValue().equals(cs.values[i].value))
                             selected = true;
                     }
                     sb.append("<option value=\"")
@@ -241,9 +232,9 @@
                   .append(fieldName).append("','edit_metadata','")
                   .append(fieldInput).append("','").append(authorityName).append("','")
                   .append(confIndID).append("',")
-                  .append(String.valueOf(collectionID)).append(",")
+                  .append(String.valueOf(collection.getID())).append(",")
                   .append(String.valueOf(isName)).append(",false);\"")
-                  .append(" title=\"")
+                        .append(" title=\"")
                   .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.lookup"))
                   .append("\"><span class=\"glyphicon glyphicon-search\"></span></button>");
             }
@@ -256,13 +247,13 @@
 
     void doPersonalName(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required,
-      boolean readonly, int fieldCountIncr, String label, PageContext pageContext, int collectionID)
+      boolean readonly, int fieldCountIncr, String label, PageContext pageContext, Collection collection)
       throws java.io.IOException
     {
-   	  String authorityType = getAuthorityType(pageContext, fieldName, collectionID);
+   	  String authorityType = getAuthorityType(pageContext, fieldName, collection);
     	
-      Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
-      int fieldCount = defaults.length + fieldCountIncr;
+      List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
+      int fieldCount = defaults.size() + fieldCountIncr;
       StringBuffer headers = new StringBuffer();
       StringBuffer sb = new StringBuffer();
       org.dspace.content.DCPersonName dpn;
@@ -286,19 +277,19 @@
     	 }
          first.setLength(0);
          first.append(fieldName).append("_first");
-         if (repeatable && i != fieldCount-1)
+         if (repeatable)
             first.append('_').append(i+1);
 
          last.setLength(0);
          last.append(fieldName).append("_last");
-         if (repeatable && i != fieldCount-1)
+         if (repeatable)
             last.append('_').append(i+1);
 
-         if (i < defaults.length)
+         if (i < defaults.size())
          {
-            dpn = new org.dspace.content.DCPersonName(defaults[i].value);
-            auth = defaults[i].authority;
-            conf = defaults[i].confidence;
+            dpn = new org.dspace.content.DCPersonName(defaults.get(i).getValue());
+            auth = defaults.get(i).getAuthority();
+            conf = defaults.get(i).getConfidence();
          }
          else
          {
@@ -314,7 +305,7 @@
            .append("\" size=\"23\" ");
          if (readonly)
          {
-             sb.append("disabled=\"disabled\" ");
+             sb.append("readonly=\"readonly\" ");
          }
          sb.append("value=\"")
            .append(dpn.getLastName().replaceAll("\"", "&quot;")) // Encode "
@@ -325,7 +316,7 @@
            .append("\" size=\"23\" ");
          if (readonly)
          {
-             sb.append("disabled=\"disabled\" ");
+             sb.append("readonly=\"readonly\" ");
          }
          sb.append("value=\"")
            .append(dpn.getFirstNames()).append("\"/></span>");         
@@ -333,12 +324,12 @@
          if ("lookup".equalsIgnoreCase(authorityType))
     	 {
              sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
-                     auth, conf, true, repeatable, defaults, null, collectionID));
+                     auth, conf, true, repeatable, defaults, null, collection));
              sb.append("</div>");
     	 }
          
 
-         if (repeatable && !readonly && i < defaults.length)
+         if (repeatable && !readonly && i < fieldCount - 1)
          {
             name.setLength(0);
             name.append(Utils.addEntities(dpn.getLastName()))
@@ -374,8 +365,8 @@
       throws java.io.IOException
     {
 
-      Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
-      int fieldCount = defaults.length + fieldCountIncr;
+      List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
+      int fieldCount = defaults.size() + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       org.dspace.content.DCDate dateIssued;
 
@@ -388,8 +379,8 @@
       
       for (int i = 0; i < fieldCount; i++)
       {
-         if (i < defaults.length)
-            dateIssued = new org.dspace.content.DCDate(defaults[i].value);
+         if (i < defaults.size())
+            dateIssued = new org.dspace.content.DCDate(defaults.get(i).getValue());
          else
             dateIssued = new org.dspace.content.DCDate("");
     
@@ -399,13 +390,13 @@
             .append("</span><select class=\"form-control\" name=\"")
             .append(fieldName)
             .append("_month");
-         if (repeatable && i>0)
+         if (repeatable)
          {
-            sb.append('_').append(i);
+            sb.append('_').append(i+1);
          }
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\"><option value=\"-1\"")
             .append((dateIssued.getMonth() == -1 ? " selected=\"selected\"" : ""))
@@ -430,32 +421,32 @@
                 .append("</span><input class=\"form-control\" type=\"text\" name=\"")
             .append(fieldName)
             .append("_day");
-         if (repeatable && i>0)
-            sb.append("_").append(i);
+         if (repeatable)
+            sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
-            .append((dateIssued.getDay() > 0 ?
+                 .append((dateIssued.getDay() > 0 ?
                      String.valueOf(dateIssued.getDay()) : "" ))
                 .append("\"/></span><span class=\"input-group col-md-4\"><span class=\"input-group-addon\">")
                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.year"))
                 .append("</span><input class=\"form-control\" type=\"text\" name=\"")
             .append(fieldName)
             .append("_year");
-         if (repeatable && i>0)
-            sb.append("_").append(i);
+         if (repeatable)
+            sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
             .append((dateIssued.getYear() > 0 ?
                  String.valueOf(dateIssued.getYear()) : "" ))
             .append("\"/></span></div></div>\n");
     
-         if (repeatable && !readonly && i < defaults.length)
+         if (repeatable && !readonly && i < fieldCount - 1)
          {
             // put a remove button next to filled in values
             sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
@@ -488,8 +479,8 @@
       throws java.io.IOException
     {
 
-      Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
-      int fieldCount = defaults.length + fieldCountIncr;
+      List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
+      int fieldCount = defaults.size() + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       org.dspace.content.DCSeriesNumber sn;
       StringBuffer headers = new StringBuffer();
@@ -503,19 +494,19 @@
       
       for (int i = 0; i < fieldCount; i++)
       {
-         if (i < defaults.length)
-           sn = new org.dspace.content.DCSeriesNumber(defaults[i].value);
+         if (i < defaults.size())
+           sn = new org.dspace.content.DCSeriesNumber(defaults.get(i).getValue());
          else
            sn = new org.dspace.content.DCSeriesNumber();
 
          sb.append("<div class=\"row col-md-12\"><span class=\"col-md-5\"><input class=\"form-control\" type=\"text\" name=\"")
            .append(fieldName)
            .append("_series");
-         if (repeatable && i!= fieldCount)
+         if (repeatable)
            sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" placeholder=\"")
            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.seriesname").replaceAll("\"", "&quot;"));
@@ -524,11 +515,11 @@
            .append("\"/></span><span class=\"col-md-5\"><input class=\"form-control\" type=\"text\" name=\"")
            .append(fieldName)
            .append("_number");
-         if (repeatable && i!= fieldCount)
+         if (repeatable)
            sb.append("_").append(i+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" placeholder=\"")
            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.paperno").replaceAll("\"", "&quot;"));
@@ -536,7 +527,7 @@
            .append(sn.getNumber().replaceAll("\"", "&quot;"))
            .append("\"/></span>\n");
 
-         if (repeatable && !readonly && i < defaults.length)
+         if (repeatable && !readonly && i < fieldCount - 1)
          {
             // put a remove button next to filled in values
             sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
@@ -567,12 +558,13 @@
 
     void doTextArea(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required, boolean readonly,
-      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
+      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, Collection collection,
+      boolean language, List<String> valueLanguageList)
       throws java.io.IOException
     {
-      String authorityType = getAuthorityType(pageContext, fieldName, collectionID);
-      Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
-      int fieldCount = defaults.length + fieldCountIncr;
+      String authorityType = getAuthorityType(pageContext, fieldName, collection);
+      List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
+      int fieldCount = defaults.size() + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       String val, auth;
       int conf = unknownConfidence;
@@ -585,12 +577,15 @@
       	.append("</label><div class=\"col-md-10\">");
       
       for (int i = 0; i < fieldCount; i++)
-      {
-         if (i < defaults.length)
+      { 
+         String lang = null;
+         
+         if (i < defaults.size())
          {
-           val = defaults[i].value;
-              auth = defaults[i].authority;
-              conf = defaults[i].confidence;
+             val = defaults.get(i).getValue();
+             lang = defaults.get(i).getLanguage();
+             auth = defaults.get(i).getAuthority();
+             conf = defaults.get(i).getConfidence();
          }
          else
          {
@@ -598,8 +593,17 @@
             auth = "";
          }
          sb.append("<div class=\"row col-md-12\">\n");
-         String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
-         sb.append("<div class=\"col-md-10\">");
+         String fieldNameIdx = fieldName + ((repeatable)?"_" + (i+1):"");
+
+         if (language) 
+         {
+             sb.append("<div class=\"col-md-8\">");
+         }
+         else 
+         {
+             sb.append("<div class=\"col-md-10\">");
+         }
+
          if (authorityType != null)
          {
         	 sb.append("<div class=\"col-md-10\">");
@@ -607,24 +611,34 @@
          sb.append("<textarea class=\"form-control\" name=\"").append(fieldNameIdx)
            .append("\" rows=\"4\" cols=\"45\" id=\"")
            .append(fieldNameIdx).append("_id\" ")
-           .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
+           .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" readonly=\"readonly\" ":"")
            .append(">")
            .append(val)
            .append("</textarea>")
-           .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly));
+           .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))
+           .append("</div>");
+           
+         if (language) 
+         {
+             if (null == lang)
+             {
+                 lang = ConfigurationManager.getProperty("default.language");
+             }
+             sb.append("<div class=\"col-md-2\">");
+             sb = doLanguageTag(sb, fieldNameIdx, valueLanguageList, lang);
+             sb.append("</div>");
+         }
+            
          if (authorityType != null)
          {
         	 sb.append("</div><div class=\"col-md-2\">");
 	         sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
                             auth, conf, false, repeatable,
-                            defaults, null, collectionID));
+                            defaults, null, collection));
 	         sb.append("</div>");
          }
-
-         sb.append("</div>");
-           
          
-         if (repeatable && !readonly && i < defaults.length)
+         if (repeatable && !readonly && i < fieldCount - 1)
          {
             // put a remove button next to filled in values
             sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
@@ -655,12 +669,13 @@
 
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required, boolean readonly,
-      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
+      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, Collection collection,
+      boolean language, List<String> valueLanguageList)
       throws java.io.IOException
     {
-      String authorityType = getAuthorityType(pageContext, fieldName, collectionID);
-      Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
-      int fieldCount = defaults.length + fieldCountIncr;
+      String authorityType = getAuthorityType(pageContext, fieldName, collection);
+      List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
+      int fieldCount = defaults.size() + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       String val, auth;
       int conf= 0;
@@ -673,12 +688,15 @@
         .append("</label>");
       sb.append("<div class=\"col-md-10\">");  
       for (int i = 0; i < fieldCount; i++)
-      {
-           if (i < defaults.length)
+      { 
+          String lang = null;
+         
+           if (i < defaults.size())
            {
-             val = defaults[i].value.replaceAll("\"", "&quot;");
-             auth = defaults[i].authority;
-             conf = defaults[i].confidence;
+             val = defaults.get(i).getValue().replaceAll("\"", "&quot;");
+             lang = defaults.get(i).getLanguage();
+             auth = defaults.get(i).getAuthority();
+             conf = defaults.get(i).getConfidence();
            }
            else
            {
@@ -688,9 +706,17 @@
            }
 
            sb.append("<div class=\"row col-md-12\">");
-           String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
-           
-           sb.append("<div class=\"col-md-10\">");
+           String fieldNameIdx = fieldName + ((repeatable)?"_" + (i+1):""); 
+            
+           if (language)
+           {
+               sb.append("<div class=\"col-md-8\">");
+           }
+           else 
+           {
+               sb.append("<div class=\"col-md-10\">");
+           }
+         
            if (authorityType != null)
            {
         	   sb.append("<div class=\"row col-md-10\">");
@@ -700,21 +726,32 @@
              .append("\" id=\"")
              .append(fieldNameIdx).append("\" size=\"50\" value=\"")
              .append(val +"\"")
-             .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
+             .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" readonly=\"readonly\" ":"")
              .append("/>")
 			 .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))             
              .append("</div>");
            
+           if (language) 
+           {
+               if(null == lang)
+               {
+                    lang = ConfigurationManager.getProperty("default.language");
+               }
+               sb.append("<div class=\"col-md-2\">");
+               sb = doLanguageTag(sb, fieldNameIdx, valueLanguageList, lang);
+               sb.append("</div>");
+           }
+            
            if (authorityType != null)
            {
         	   sb.append("<div class=\"col-md-2\">");
 	           sb.append(doAuthority(pageContext, fieldName, i,  fieldCount,
                               fieldName, auth, conf, false, repeatable,
-                              defaults, null, collectionID));
+                              defaults, null, collection));
            	   sb.append("</div></div>");
            }             
 
-          if (repeatable && !readonly && i < defaults.length)
+          if (repeatable && !readonly && i < fieldCount - 1)
           {
              // put a remove button next to filled in values
              sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
@@ -745,162 +782,262 @@
 
     void doTwoBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required, boolean readonly,
-      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary)
+      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary,
+      boolean language, List<String> valueLanguageList)
       throws java.io.IOException
     {
-      Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
-      int fieldCount = defaults.length + fieldCountIncr;
-      StringBuffer sb = new StringBuffer();
-      StringBuffer headers = new StringBuffer();
+        /*
+    <div class="row"><label class="col-md-2">Subject Keywords</label>
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-5">
+                    <span class="col-md-6"><input type="text" class="form-control" name="dc_subject_1" size="15" value="test"></span>
+                    <span class="col-md-4"><select class="form-control" name="dc_subject_other_1[lang]"><option value="">N/A</option><option selected="selected" value="en">English</option><option value="de">German</option></select></span>
+                    <button value="Remove" name="submit_dc_subject_remove_0" class="btn btn-danger col-md-2"><span class="glyphicon glyphicon-trash"></span></button>
+                </div>
+                <div class="col-md-5">
+                    <span class="col-md-6"><input type="text" class="form-control" name="dc_subject_2" size="15" value="tes2"></span>
+                    <span class="col-md-4"><select class="form-control" name="dc_subject_other_1[lang]"><option value="">N/A</option><option selected="selected" value="en">English</option><option value="de">German</option></select></span>
+                    <button class="col-md-2 btn btn-danger" name="submit_dc_subject_remove_1" value="Remove"><span class="glyphicon glyphicon-trash"></span></button>
+                </div>
+                <span class="col-md-2"></span>
+            </div>
+            <div class="row">
+              <div class="col-md-5">
+                <span class="col-md-6"><input type="text" class="form-control" name="dc_subject_3" size="15"></span>
+                <span class="col-md-4"><select class="form-control" name="dc_subject_other_1[lang]"><option value="">N/A</option><option selected="selected" value="en">English</option><option value="de">German</option></select></span>
+                <span class="col-md-2"></span>
+              </div>
+              <div class="col-md-5">
+                <span class="col-md-6"><input type="text" class="form-control" name="dc_subject_3" size="15"></span>
+                <span class="col-md-4"><select class="form-control" name="dc_subject_other_1[lang]"><option value="">N/A</option><option selected="selected" value="en">English</option><option value="de">German</option></select></span>
+                <span class="col-md-2"></span>
+              </div>
+              <button class="btn btn-default col-md-2" name="submit_dc_subject_add" value="Add More"><span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;Add More</button>
+            </div>
+        </div>
+    </div>
+        */
 
-      String fieldParam = "";
+        List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
+        int fieldCount = defaults.size() + fieldCountIncr;
+        StringBuffer sb = new StringBuffer();
+        StringBuffer headers = new StringBuffer();
 
-      if (fieldCount == 0)
-         fieldCount = 1;
+        String fieldParam = "";
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
-        .append(label)
-        .append("</label>");
-      sb.append("<div class=\"col-md-10\">");
-      for (int i = 0; i < fieldCount; i++)
-      {
-     	 sb.append("<div class=\"row col-md-12\">");
-    	  
-         if(i != fieldCount)
-         {
-             //param is field name and index, starting from 1 (e.g. myfield_2)
-             fieldParam = fieldName + "_" + (i+1);
-         }
-         else
-         {
-             //param is just the field name
-             fieldParam = fieldName;
-         }
-                 
-         if (i < defaults.length)
-         {
-           sb.append("<span class=\"col-md-4\"><input class=\"form-control\" type=\"text\" name=\"")
-             .append(fieldParam)
-             .append("\" size=\"15\" value=\"")
-             .append(defaults[i].value.replaceAll("\"", "&quot;"))
-             .append("\"")
-             .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-             .append("\" />");
-          
-           sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
-           sb.append("</span>");
-          if (!readonly)
-          {
-                       sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
-                             .append(fieldName)
-                             .append("_remove_")
-                             .append(i)
-                             .append("\" value=\"")
-                             .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-                             .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
-          }
-          else {
-        	  sb.append("<span class=\"col-md-2\">&nbsp;</span>");
-          }
-         }
-         else
-         {
-           sb.append("<span class=\"col-md-4\"><input class=\"form-control\" type=\"text\" name=\"")
-             .append(fieldParam)
-             .append("\" size=\"15\"")
-             .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-             .append("/>")
-             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
-             .append("</span>\n")
-             .append("<span class=\"col-md-2\">&nbsp;</span>");
-         }
+        if (fieldCount == 0)
+           fieldCount = 1;
+
+        sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
+          .append(label)
+          .append("</label>");
+        sb.append("<div class=\"col-md-10\">");
+        for (int i = 0; i < fieldCount; i++)
+        {
+            sb.append("<div class=\"row\">\n");
+            sb.append("<div class=\"col-md-5\">");
          
-         i++;
+            if(repeatable)
+            {
+                //param is field name and index, starting from 1 (e.g. myfield_2)
+                fieldParam = fieldName + "_" + (i+1);
+            }
+            else
+            {
+                //param is just the field name
+                fieldParam = fieldName;
+            }
 
-         if(i != fieldCount)
-                 {
-                         //param is field name and index, starting from 1 (e.g. myfield_2)
-                     fieldParam = fieldName + "_" + (i+1);
-                 }
-                 else
-                 {
-                         //param is just the field name
-                         fieldParam = fieldName;
-                 }
-        
-                 if (i < defaults.length)
-                 {
-                   sb.append("<span class=\"col-md-4\"><input class=\"form-control\" type=\"text\" name=\"")
-                     .append(fieldParam)
-                     .append("\" size=\"15\" value=\"")
-                     .append(defaults[i].value.replaceAll("\"", "&quot;"))
-                         .append("\"")
-                         .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
-                         .append("/>");
-                   sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));      
-                   sb.append("</span>");
-                   if (!readonly)
-                   {
-                               sb.append(" <button class=\"btn btn-danger col-md-2\" name=\"submit_")
-                                     .append(fieldName)
-                                     .append("_remove_")
-                                     .append(i)
-                                     .append("\" value=\"")
-                                     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-                                     .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
-                   }
-                   else {
-                 	  sb.append("<span class=\"col-md-2\">&nbsp;</span>");
-                   }              
-                 }
-                 else
-                 {
-                   sb.append("<span class=\"col-md-4\"><input class=\"form-control\" type=\"text\" name=\"")
-                     .append(fieldParam)
-                     .append("\" size=\"15\"")
-                     .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
-                     .append("/>")
-                     .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
-        			 .append("</span>\n");
-                   if (i+1 >= fieldCount && !readonly)
-                   {
-                     sb.append(" <button class=\"btn btn-default col-md-2\" name=\"submit_")
-                       .append(fieldName)
-                       .append("_add\" value=\"")
-                       .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-                       .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>\n");
-                   }
-                 }
-       sb.append("</div>");          
-      }
-      sb.append("</div></div><br/>");
-      out.write(sb.toString());
+            if (i < defaults.size()) 
+            {
+                sb.append("<span class=\"col-md-")
+                    .append(language ? "6" : "10")
+                    .append("\"><input class=\"form-control\" type=\"text\" name=\"")
+                    .append(fieldParam)
+                    .append("\" size=\"15\" value=\"")
+                    .append(defaults.get(i).getValue().replaceAll("\"", "&quot;"))
+                    .append("\"")
+                    .append((hasVocabulary(vocabulary) && closedVocabulary) || readonly ? " readonly=\"readonly\" " : "")
+                    .append("/>");
+
+                sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
+                sb.append("</span>");
+                
+                if (language)
+                {
+                    String lang = defaults.get(i).getLanguage();
+                    if(null == lang)
+                    {
+                        lang = ConfigurationManager.getProperty("default.language");
+                    }
+                    sb.append("<span class=\"col-md-4\">");
+                    sb = doLanguageTag(sb, fieldParam, valueLanguageList, lang);
+                    sb.append("</span>");
+                }
+                
+                if (repeatable && !readonly)
+                {
+                    // put a remove button next to filled in values
+                    sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+                            .append(fieldName)
+                            .append("_remove_")
+                            .append(i)
+                            .append("\" value=\"")
+                            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
+                            .append("\"><span class=\"glyphicon glyphicon-trash\"></span></button>");
+                }
+                else 
+                {
+                    sb.append("<span class=\"col-md-2\">&nbsp;</span>");
+                }
+            }
+            else
+            {
+                sb.append("<span class=\"col-md-")
+                    .append(language ? "6" : "10")
+                    .append("\"><input class=\"form-control\" type=\"text\" name=\"")
+                    .append(fieldParam)
+                    .append("\" size=\"15\"")
+                    .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" readonly=\"readonly\" ":"")
+                    .append("/>")
+                    .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
+                    .append("</span>\n");
+                
+                if (language)
+                {
+                    String lang = ConfigurationManager.getProperty("default.language");
+                    sb.append("<span class=\"col-md-4\">");
+                    sb = doLanguageTag(sb, fieldParam, valueLanguageList, lang);
+                    sb.append("</span>");
+                }
+                
+                sb.append("<span class=\"col-md-2\">&nbsp;</span>"); // no remove button
+            }
+            sb.append("</div>\n"); //<div class="col-md-5>
+         
+            i++;
+         
+            sb.append("<div class=\"col-md-5\">");
+            if(repeatable)
+            {
+                    //param is field name and index, starting from 1 (e.g. myfield_2)
+                fieldParam = fieldName + "_" + (i+1);
+            }
+            else
+            {
+                    //param is just the field name
+                    fieldParam = fieldName;
+            }
+
+            if (i < defaults.size()) 
+            {
+                sb.append("<span class=\"col-md-")
+                 .append(language ? 6 : 10)
+                 .append("\"><input class=\"form-control\" type=\"text\" name=\"")
+                 .append(fieldParam)
+                 .append("\" size=\"15\" value=\"")
+                 .append(defaults.get(i).getValue().replaceAll("\"", "&quot;"))
+                 .append("\"")
+                 .append((hasVocabulary(vocabulary) && closedVocabulary) || readonly ? " readonly=\"readonly\" " : "")
+                 .append("/>");
+                sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
+                sb.append("</span>");
+
+                if (language)
+                {
+                    String lang = defaults.get(i).getLanguage();
+                    if(null == lang)
+                    {
+                        lang = ConfigurationManager.getProperty("default.language");
+                    }
+                    sb.append("<span class=\"col-md-4\">");
+                    sb = doLanguageTag(sb, fieldParam, valueLanguageList, lang);
+                    sb.append("</span>");
+                }
+
+                if (repeatable && !readonly) 
+                {
+                    // put a remove button next to filled in values
+                    sb.append(" <button class=\"btn btn-danger col-md-2\" name=\"submit_")
+                        .append(fieldName)
+                        .append("_remove_")
+                        .append(i)
+                        .append("\" value=\"")
+                        .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
+                        .append("\"><span class=\"glyphicon glyphicon-trash\" /></button>");
+                }
+                  else
+                {
+                    sb.append("<span class=\"col-md-2\">&nbsp;</span>");
+                }
+            }
+            else
+            {
+                sb.append("<span class=\"col-md-")
+                    .append(language ? "6" : "10")
+                    .append("\"><input class=\"form-control\" type=\"text\" name=\"")
+                    .append(fieldParam)
+                    .append("\" size=\"15\"")
+                     .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" readonly=\"readonly\" ":"")
+                    .append("/>")
+                    .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
+                    .append("</span>\n");
+                
+                if (language)
+                {
+                    String lang = ConfigurationManager.getProperty("default.language");
+                    sb.append("<span class=\"col-md-4\">");
+                    sb = doLanguageTag(sb, fieldParam, valueLanguageList, lang);
+                    sb.append("</span>");
+                }
+                
+                sb.append("<span class=\"col-md-2\">&nbsp;</span>"); // no remove button
+            }
+            sb.append("</div>\n"); //<div class="col-md-5>
+
+            
+            if (repeatable && !readonly && i >= fieldCount - 1)
+            {
+                sb.append(" <button class=\"btn btn-default col-md-2\" name=\"submit_")
+                .append(fieldName)
+                .append("_add\" value=\"")
+                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+                .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>\n");
+            } else {
+                sb.append("<!-- repeatable: " + (repeatable ? "true" : "false") + " readonly " + (readonly ? "true" : "false") + " i " + i + " fieldCount " + fieldCount + " -->");
+            }
+
+            sb.append("</div>"); //<div class="row">
+        }
+        sb.append("</div></div><br/>"); //<div class="row">...<div class="col-md-10">
+        out.write(sb.toString());
     }
     
     
 
-    void doQualdropValue(javax.servlet.jsp.JspWriter out, Item item,
+    void doQualdropValue(JspWriter out, Item item,
       String fieldName, String schema, String element, DCInputSet inputs, boolean repeatable, boolean required,
       boolean readonly, int fieldCountIncr, List qualMap, String label, PageContext pageContext)
-      throws java.io.IOException
+      throws IOException
     {
-      Metadatum[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
+      List<MetadataValue> unfiltered = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, Item.ANY, Item.ANY);
       // filter out both unqualified and qualified values occurring elsewhere in inputs
-      List<Metadatum> filtered = new ArrayList<Metadatum>();
-      for (int i = 0; i < unfiltered.length; i++)
+      List<MetadataValue> filtered = new ArrayList<MetadataValue>();
+      for (int i = 0; i < unfiltered.size(); i++)
       {
-          String unfilteredFieldName = unfiltered[i].element;
-          if(unfiltered[i].qualifier != null && unfiltered[i].qualifier.length()>0)
-              unfilteredFieldName += "." + unfiltered[i].qualifier;
+          String unfilteredFieldName = unfiltered.get(i).getMetadataField().getElement();
+          if(unfiltered.get(i).getMetadataField().getQualifier() != null && unfiltered.get(i).getMetadataField().getQualifier().length()>0)
+              unfilteredFieldName += "." + unfiltered.get(i).getMetadataField().getQualifier();
               
               if ( ! inputs.isFieldPresent(unfilteredFieldName) )
               {
-                      filtered.add( unfiltered[i] );
+                      filtered.add(unfiltered.get(i));
               }
       }
-      Metadatum[] defaults = filtered.toArray(new Metadatum[0]);
+      List<MetadataValue> defaults = filtered;
 
-      int fieldCount = defaults.length + fieldCountIncr;
+      int fieldCount = defaults.size() + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       String   q, v, currentQual, currentVal;
 
@@ -914,11 +1051,11 @@
       for (int j = 0; j < fieldCount; j++)
       {
 
-         if (j < defaults.length)
+         if (j < defaults.size())
          {
-            currentQual = defaults[j].qualifier;
+            currentQual = defaults.get(j).getMetadataField().getQualifier();
             if(currentQual==null) currentQual="";
-            currentVal = defaults[j].value;
+            currentVal = defaults.get(j).getValue();
          }
          else
          {
@@ -930,11 +1067,11 @@
          sb.append("<div class=\"row col-md-12\"><span class=\"input-group col-md-10\"><span class=\"input-group-addon\"><select name=\"")
            .append(fieldName)
            .append("_qualifier");
-         if (repeatable && j!= fieldCount-1)
+         if (repeatable)
            sb.append("_").append(j+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\">");
          for (int i = 0; i < qualMap.size(); i+=2)
@@ -954,19 +1091,19 @@
          sb.append("</select></span><input class=\"form-control\" type=\"text\" name=\"")
            .append(fieldName)
            .append("_value");
-         if (repeatable && j!= fieldCount-1)
+         if (repeatable)
            sb.append("_").append(j+1);
          if (readonly)
          {
-             sb.append("\" disabled=\"disabled");
+             sb.append("\" readonly=\"readonly\"");
          }
          sb.append("\" size=\"34\" value=\"")
            .append(currentVal.replaceAll("\"", "&quot;"))
            .append("\"/></span>\n");
 
-         if (repeatable && !readonly && j < defaults.length)
-         {
-            // put a remove button next to filled in values
+         if (repeatable && !readonly && j < fieldCount - 1)
+          {
+             // put a remove button next to filled in values
             sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
               .append(fieldName)
               .append("_remove_")
@@ -998,7 +1135,7 @@
       boolean required, boolean readonly, List valueList, String label)
       throws java.io.IOException
     {
-      Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+      List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
       StringBuffer sb = new StringBuffer();
       Iterator vals;
       String display, value;
@@ -1016,7 +1153,7 @@
         sb.append(" size=\"6\"  multiple=\"multiple\"");
       if (readonly)
       {
-          sb.append(" disabled=\"disabled\"");
+          sb.append(" readonly=\"readonly\"");
       }
       sb.append(">");
 
@@ -1024,13 +1161,13 @@
       {
          display = (String)valueList.get(i);
          value = (String)valueList.get(i+1);
-         for (j = 0; j < defaults.length; j++)
+         for (j = 0; j < defaults.size(); j++)
          {
-             if (value.equals(defaults[j].value))
+             if (value.equals(defaults.get(j).getValue()))
                  break;
          }
          sb.append("<option ")
-           .append(j < defaults.length ? " selected=\"selected\" " : "")
+           .append(j < defaults.size() ? " selected=\"selected\" " : "")
            .append("value=\"")
            .append(value.replaceAll("\"", "&quot;"))
            .append("\">")
@@ -1044,10 +1181,10 @@
     
     void doChoiceSelect(javax.servlet.jsp.JspWriter out, PageContext pageContext, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required,
-      boolean readonly, List valueList, String label, int collectionID)
+      boolean readonly, List valueList, String label, Collection collection)
       throws java.io.IOException
     {
-      Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+      List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
       StringBuffer sb = new StringBuffer();
 
       sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
@@ -1055,9 +1192,9 @@
       .append("</label>");
 
       sb.append("<span class=\"col-md-8\">")
-        .append(doAuthority(pageContext, fieldName, 0,  defaults.length,
+        .append(doAuthority(pageContext, fieldName, 0,  defaults.size(),
                               fieldName, null, Choices.CF_UNSET, false, repeatable,
-                              defaults, null, collectionID))
+                              defaults, null, collection))
 
         .append("</span></div><br/>");
       out.write(sb.toString());
@@ -1071,7 +1208,7 @@
             boolean required,boolean readonly, List valueList, String label)
             throws java.io.IOException
           {
-                Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+                List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
                 int valueCount = valueList.size();
                 
             StringBuffer sb = new StringBuffer();
@@ -1107,9 +1244,9 @@
          
                    boolean checked = false;
                    //check if this value has been selected previously
-                   for (j = 0; j < defaults.length; j++)
+                   for (j = 0; j < defaults.size(); j++)
                    {
-                        if (value.equals(defaults[j].value))
+                        if (value.equals(defaults.get(j).getValue()))
                         {
                         	checked = true;
                         	break;
@@ -1127,12 +1264,12 @@
                       sb.append("radio");
                    if (readonly)
                    {
-                       sb.append("\" disabled=\"disabled");
+                       sb.append("\" readonly=\"readonly\"");
                    }
                    sb.append("\" name=\"")
                      .append(fieldName)
                      .append("\"")
-                     .append(j < defaults.length ? " checked=\"checked\" " : "")
+                     .append(j < defaults.size() ? " checked=\"checked\" " : "")
                      .append(" value=\"")
                                  .append(value.replaceAll("\"", "&quot;"))
                                  .append("\">");
@@ -1159,6 +1296,32 @@
             
             out.write(sb.toString());
           }//end doList
+    
+    /** Display language tags **/
+     StringBuffer doLanguageTag(StringBuffer sb, String fieldNameIdx, List<String> valueLanguageList, String lang)
+     {
+         sb.append("<select class=\"form-control\" name=\"")
+                 .append(fieldNameIdx + "[lang]")
+                 .append("\"")
+                 .append(">");
+
+         for (int j = 0; j < valueLanguageList.size(); j += 2) 
+         {
+             String display = (String) valueLanguageList.get(j);
+             String value = (String) valueLanguageList.get(j + 1);
+
+             sb.append("<option ")
+                     .append(value.equals(lang) ? " selected=\"selected\" " : "")
+                     .append("value=\"")
+                     .append(value.replaceAll("\"", "&quot;"))
+                     .append("\">")
+                     .append(display)
+                     .append("</option>");
+         }
+
+         sb.append("</select>");
+         return sb;
+    }
 %>
 
 <%
@@ -1184,13 +1347,13 @@
     String scope = si.isInWorkflow() ? "workflow" : "submit";
 
     // owning Collection ID for choice authority calls
-    int collectionID = si.getSubmissionItem().getCollection().getID();
+    Collection collection = si.getSubmissionItem().getCollection();
 
     // Fetch the document type (dc.type)
     String documentType = "";
-    if( (item.getMetadataByMetadataString("dc.type") != null) && (item.getMetadataByMetadataString("dc.type").length >0) )
+    if( (ContentServiceFactory.getInstance().getItemService().getMetadataByMetadataString(item, "dc.type") != null) && (ContentServiceFactory.getInstance().getItemService().getMetadataByMetadataString(item, "dc.type").size() >0) )
     {
-        documentType = item.getMetadataByMetadataString("dc.type")[0].value;
+        documentType = ContentServiceFactory.getInstance().getItemService().getMetadataByMetadataString(item, "dc.type").get(0).getValue();
     }
 %>
 
@@ -1274,6 +1437,7 @@
        String dcElement = inputs[z].getElement();
        String dcQualifier = inputs[z].getQualifier();
        String dcSchema = inputs[z].getSchema();
+       boolean language = inputs[z].getLanguage();
        
        String fieldName;
        int fieldCountIncr;
@@ -1325,16 +1489,13 @@
 				<%
            }
        }
-
+       
        repeatable = inputs[z].getRepeatable();
        fieldCountIncr = 0;
-       if (repeatable && !readonly)
+      
+       if (si.getMoreBoxesFor() != null && si.getMoreBoxesFor().equals(fieldName)) 
        {
-         fieldCountIncr = 1;
-         if (si.getMoreBoxesFor() != null && si.getMoreBoxesFor().equals(fieldName))
-             {
-           fieldCountIncr = 2;
-         }
+           fieldCountIncr = 1;
        }
 
        String inputType = inputs[z].getInputType();
@@ -1344,12 +1505,12 @@
        if (inputType.equals("name"))
        {
            doPersonalName(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                          repeatable, required, readonly, fieldCountIncr, label, pageContext, collectionID);
+                                          repeatable, required, readonly, fieldCountIncr, label, pageContext, collection);
        }
        else if (isSelectable(fieldName))
        {
            doChoiceSelect(out, pageContext, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                   repeatable, required, readonly, inputs[z].getPairs(), label, collectionID);
+                                   repeatable, required, readonly, inputs[z].getPairs(), label, collection);
        }
        else if (inputType.equals("date"))
        {
@@ -1370,7 +1531,7 @@
        {
                    doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier,
                                   repeatable, required, readonly, fieldCountIncr, label, pageContext, vocabulary,
-                                  closedVocabulary, collectionID);
+                                  closedVocabulary, collection, language, inputs[z].getValueLanguageList());
        }
        else if (inputType.equals("dropdown"))
        {
@@ -1381,7 +1542,7 @@
        {
                         doTwoBox(out, item, fieldName, dcSchema, dcElement, dcQualifier,
                                  repeatable, required, readonly, fieldCountIncr, label, pageContext, 
-                                 vocabulary, closedVocabulary);
+                                 vocabulary, closedVocabulary, language, inputs[z].getValueLanguageList());
        }
        else if (inputType.equals("list"))
        {
@@ -1392,7 +1553,7 @@
        {
                         doOneBox(out, item, fieldName, dcSchema, dcElement, dcQualifier,
                                  repeatable, required, readonly, fieldCountIncr, label, pageContext, vocabulary,
-                                 closedVocabulary, collectionID);
+                                 closedVocabulary, collection, language, inputs[z].getValueLanguageList());
        }
        
      } // end of 'for rows'

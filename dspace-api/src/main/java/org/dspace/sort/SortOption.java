@@ -82,7 +82,7 @@ public class SortOption
 	 * @param name
 	 * @param md
 	 * @param type
-	 * @throws SortException
+	 * @throws SortException if sort error
 	 */
 	public SortOption(int number, String name, String md, String type)
 		throws SortException
@@ -100,7 +100,7 @@ public class SortOption
 	 * 
 	 * @param number
 	 * @param definition
-	 * @throws SortException
+	 * @throws SortException if sort error
 	 */
 	public SortOption(int number, String definition)
 		throws SortException
@@ -219,7 +219,7 @@ public class SortOption
 	/**
 	 * Tell the class to generate the metadata bits
 	 * 
-	 * @throws SortException
+	 * @throws SortException if sort error
 	 */
     private void generateMdBits()
     	throws SortException
@@ -293,7 +293,7 @@ public class SortOption
 
     /**
      * Return all the configured sort options.
-     * @throws SortException
+     * @throws SortException if sort error
      */
     public static Set<SortOption> getSortOptions() throws SortException
     {
@@ -308,7 +308,7 @@ public class SortOption
     /**
      * Get the defined sort option by number (.1, .2, etc).
      * @param number
-     * @throws SortException
+     * @throws SortException if sort error
      */
     public static SortOption getSortOption(int number) throws SortException
     {
@@ -325,7 +325,7 @@ public class SortOption
     
     /**
      * Get the default sort option - initially, just the first one defined.
-     * @throws SortException
+     * @throws SortException if sort error
      */
     public static SortOption getDefaultSortOption() throws SortException
     {

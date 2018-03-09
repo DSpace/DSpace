@@ -12,7 +12,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
-import org.dspace.xmlworkflow.XmlWorkflowManager;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
@@ -84,7 +84,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
             }
 
             //We have pressed reject, so remove the task the user has & put it back to a workspace item
-            XmlWorkflowManager.sendWorkflowItemBackSubmission(c, wfi, c.getCurrentUser(), this.getProvenanceStartId(), reason);
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().sendWorkflowItemBackSubmission(c, wfi, c.getCurrentUser(), this.getProvenanceStartId(), reason);
 
 
             return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
@@ -101,13 +101,13 @@ public class AcceptEditRejectAction extends ProcessingAction {
         String now = DCDate.getCurrent().toString();
 
         // Get user's name + email address
-        String usersName = XmlWorkflowManager.getEPersonName(c.getCurrentUser());
+        String usersName = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().getEPersonName(c.getCurrentUser());
 
         String provDescription = getProvenanceStartId() + " Approved for entry into archive by "
                 + usersName + " on " + now + " (GMT) ";
 
         // Add to item as a DC field
-        wfi.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
-        wfi.getItem().update();
+        itemService.addMetadata(c, wfi.getItem(), MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        itemService.update(c, wfi.getItem());
     }
 }

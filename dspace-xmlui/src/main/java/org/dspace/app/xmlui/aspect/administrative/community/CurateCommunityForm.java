@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.UUID;
+
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 import org.xml.sax.SAXException;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -29,7 +33,6 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
-import org.dspace.core.ConfigurationManager;
 
 /**
  *
@@ -56,7 +59,10 @@ public class CurateCommunityForm extends AbstractDSpaceTransformer   {
 
     private static final Message T_label_name = message("xmlui.administrative.community.CurateCommunityForm.label_name");
     private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
-    
+
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+
+    @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
     		          Parameters parameters) throws ProcessingException, SAXException, IOException
     {
@@ -64,33 +70,21 @@ public class CurateCommunityForm extends AbstractDSpaceTransformer   {
     	FlowCurationUtils.setupCurationTasks();
     }
 
-        /**
-         * common package method for initializing form gui elements
-         * Could be refactored.
-         * 
-         * @param pageMeta
-         * @throws WingException
-         */
-        public void addPageMeta(PageMeta pageMeta) throws WingException
+    @Override
+    public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         pageMeta.addTrail().addContent(T_community_trail);
         pageMeta.addTrail().addContent(T_trail);
     }
-        /** addBody
-     *
-     * @param body
-     * @throws WingException
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-        public void addBody(Body body)
-                                    throws WingException, SQLException,
-                                                        AuthorizeException, UnsupportedEncodingException
+
+    @Override
+    public void addBody(Body body)
+            throws WingException, SQLException, AuthorizeException, UnsupportedEncodingException
 	{
-		int communityID = parameters.getParameterAsInteger("communityID", -1);
-		Community thisCommunity = Community.find(context, communityID);
+		UUID communityID = UUID.fromString(parameters.getParameter("communityID", null));
+		Community thisCommunity = communityService.find(context, communityID);
 
 		String baseURL = contextPath + "/admin/community?administrative-continue=" + knot.getId();
 

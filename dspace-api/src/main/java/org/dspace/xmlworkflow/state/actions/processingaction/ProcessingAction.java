@@ -7,9 +7,12 @@
  */
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.state.actions.Action;
 import org.dspace.xmlworkflow.storedcomponents.*;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
@@ -25,11 +28,17 @@ import java.sql.SQLException;
  */
 public abstract class ProcessingAction extends Action {
 
+    @Autowired(required = true)
+    protected ClaimedTaskService claimedTaskService;
+    @Autowired(required = true)
+    protected ItemService itemService;
+
+
     @Override
     public boolean isAuthorized(Context context, HttpServletRequest request, XmlWorkflowItem wfi) throws SQLException {
         ClaimedTask task = null;
         if(context.getCurrentUser() != null)
-            task = ClaimedTask.findByWorkflowIdAndEPerson(context, wfi.getID(), context.getCurrentUser().getID());
+            task = claimedTaskService.findByWorkflowIdAndEPerson(context, wfi, context.getCurrentUser());
         //Check if we have claimed the current task
         return task != null &&
                 task.getWorkflowID().equals(getParent().getStep().getWorkflow().getID()) &&

@@ -9,11 +9,14 @@ package org.dspace.storage.rdbms;
 
 import java.io.File;
 import java.sql.Connection;
+
 import org.dspace.administer.MetadataImporter;
 import org.dspace.administer.RegistryLoader;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.slf4j.Logger;
@@ -21,16 +24,21 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is a FlywayCallback class which automatically updates the
- * Metadata Schema Registry and Bitstream Formats Registries BEFORE
- * any Database migration occurs.
+ * Metadata Schema Registry and Bitstream Formats Registries AFTER
+ * all Database migrations occur.
  * <P>
- * The reason this runs BEFORE a migration is to ensure that any new
- * metadata fields are FIRST added to our registries, so that the
- * migrations can make use of those new metadata fields, etc.
+ * The reason this runs AFTER all migrations is that the RegistryLoader
+ * and MetadataImporter now depend on Hibernate and Hibernate cannot be
+ * initialized until the Database is fully migrated.
  * <P>
- * However, there is one exception. If this is a "fresh install" of DSpace,
- * we'll need to wait until the necessary database tables are created. In
- * that scenario we will load registries AFTER the initial migration.
+ * If a migration needs to use on one or more registry values, there are
+ * two options:
+ * <UL>
+ * <LI>Create/insert those registry values in the migration itself (via SQL or similar).</LI>
+ * <LI>Alternatively, first check for the existence of the MetadataSchemaRegistry (or similar)
+ * before running the migration logic. If the table or fields do not yet exist, you might be
+ * able to skip the migration logic entirely. See "DatabaseUtils.tableExists()" and similar methods.</LI>
+ * </UL>
  *
  * @author Tim Donohue
  */
@@ -39,22 +47,19 @@ public class DatabaseRegistryUpdater implements FlywayCallback
      /** logging category */
     private static final Logger log = LoggerFactory.getLogger(DatabaseRegistryUpdater.class);
 
-    // Whether or not this is a fresh install of DSpace
-    // This determines whether to update registries PRE or POST migration
-    private boolean freshInstall = false;
-
     /**
      * Method to actually update our registries from latest configs
      */
     private void updateRegistries()
     {
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         Context context = null;
         try
         {
             context = new Context();
             context.turnOffAuthorisationSystem();
 
-            String base = ConfigurationManager.getProperty("dspace.dir")
+            String base = config.getProperty("dspace.dir")
                             + File.separator + "config" + File.separator
                             + "registries" + File.separator;
 
@@ -66,11 +71,12 @@ public class DatabaseRegistryUpdater implements FlywayCallback
             log.info("Updating Metadata Registries based on metadata type configs in " + base);
             MetadataImporter.loadRegistry(base + "dublin-core-types.xml", true);
             MetadataImporter.loadRegistry(base + "dcterms-types.xml", true);
+            MetadataImporter.loadRegistry(base + "local-types.xml", true);
             MetadataImporter.loadRegistry(base + "eperson-types.xml", true);
             MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
 
             // Check if XML Workflow is enabled in workflow.cfg
-            if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+            if (WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService)
             {
                 // If so, load in the workflow metadata types as well
                 MetadataImporter.loadRegistry(base + "workflow-types.xml", true);
@@ -84,68 +90,7 @@ public class DatabaseRegistryUpdater implements FlywayCallback
         catch(Exception e)
         {
             log.error("Error attempting to update Bitstream Format and/or Metadata Registries", e);
-        }
-        finally
-        {
-            // Clean up our context, if it still exists & it was never completed
-            if(context!=null && context.isValid())
-                context.abort();
-        }
-    }
-
-
-    @Override
-    public void afterClean(Connection connection)
-    {
-        // do nothing
-    }
-
-    @Override
-    public void afterEachMigrate(Connection connection, MigrationInfo info)
-    {
-        // do nothing
-    }
-
-    @Override
-    public void afterInfo(Connection connection)
-    {
-        // do nothing
-    }
-
-    @Override
-    public void afterInit(Connection connection)
-    {
-        // do nothing
-    }
-
-    @Override
-    public void afterMigrate(Connection connection)
-    {
-        // If this is a fresh install, we must update registries AFTER the
-        // initial migrations (since the registry tables won't exist until the
-        // initial migrations are performed)
-        if(freshInstall)
-        {
-            updateRegistries();
-            freshInstall = false;
-        }
-
-        // After every migrate, ensure default Groups are setup correctly.
-        Context context = null;
-        try
-        {
-            context = new Context();
-            context.turnOffAuthorisationSystem();
-            // While it's not really a formal "registry", we need to ensure the
-            // default, required Groups exist in the DSpace database
-            Group.initDefaultGroupNames(context);
-            context.restoreAuthSystemState();
-            // Commit changes and close context
-            context.complete();
-        }
-        catch(Exception e)
-        {
-            log.error("Error attempting to add/update default DSpace Groups", e);
+            throw new RuntimeException("Error attempting to update Bitstream Format and/or Metadata Registries", e);
         }
         finally
         {
@@ -156,71 +101,73 @@ public class DatabaseRegistryUpdater implements FlywayCallback
     }
 
     @Override
-    public void afterRepair(Connection connection)
-    {
-        // do nothing
+    public void beforeClean(Connection connection) {
+
     }
 
     @Override
-    public void afterValidate(Connection connection)
-    {
-        // do nothing
+    public void afterClean(Connection connection) {
+
     }
 
     @Override
-    public void beforeClean(Connection connection)
-    {
-        // do nothing
+    public void beforeMigrate(Connection connection) {
+
     }
 
     @Override
-    public void beforeEachMigrate(Connection connection, MigrationInfo info)
-    {
-        // do nothing
+    public void afterMigrate(Connection connection) {
+        // Must run AFTER all migrations complete, since it is dependent on Hibernate
+        updateRegistries();
     }
 
     @Override
-    public void beforeInfo(Connection connection)
-    {
-        // do nothing
+    public void beforeEachMigrate(Connection connection, MigrationInfo migrationInfo) {
+
     }
 
     @Override
-    public void beforeInit(Connection connection)
-    {
-        // do nothing
+    public void afterEachMigrate(Connection connection, MigrationInfo migrationInfo) {
+
     }
 
     @Override
-    public void beforeMigrate(Connection connection)
-    {
-        // Check if our MetadataSchemaRegistry table exists yet.
-        // If it does NOT, then this is a fresh install & we'll need to
-        // updateRegistries() AFTER migration
-        if(DatabaseUtils.tableExists(connection, "MetadataSchemaRegistry"))
-        {
-            // Ensure registries are updated BEFORE a database migration (upgrade)
-            // We need to ensure any new metadata fields are added before running
-            // migrations, just in case the migrations need to utilize those new fields
-            updateRegistries();
-        }
-        else
-        {
-            // this is a fresh install, need to migrate first in order to create
-            // the registry tables.
-            freshInstall = true;
-        }
+    public void beforeValidate(Connection connection) {
+
     }
 
     @Override
-    public void beforeRepair(Connection connection)
-    {
-        // do nothing
+    public void afterValidate(Connection connection) {
+
     }
 
     @Override
-    public void beforeValidate(Connection connection)
-    {
-        // do nothing
+    public void beforeBaseline(Connection connection) {
+
+    }
+
+    @Override
+    public void afterBaseline(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeRepair(Connection connection) {
+
+    }
+
+    @Override
+    public void afterRepair(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeInfo(Connection connection) {
+
+    }
+
+    @Override
+    public void afterInfo(Connection connection) {
+
     }
 }

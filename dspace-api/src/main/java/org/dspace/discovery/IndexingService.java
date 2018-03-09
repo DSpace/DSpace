@@ -7,7 +7,6 @@
  */
 package org.dspace.discovery;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 

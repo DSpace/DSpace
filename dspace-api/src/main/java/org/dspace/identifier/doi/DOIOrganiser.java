@@ -8,35 +8,25 @@
 
 package org.dspace.identifier.doi;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.Locale;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.handle.HandleManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.*;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.identifier.service.DOIService;
 import org.dspace.utils.DSpace;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.sql.SQLException;
+import java.util.*;
 
 
 /**
@@ -51,12 +41,18 @@ public class DOIOrganiser {
     private DOIIdentifierProvider provider;
     private Context context;
     private boolean quiet;
+    protected HandleService handleService;
+    protected ItemService itemService;
+    protected DOIService doiService;
 
     public DOIOrganiser(Context context, DOIIdentifierProvider provider)
     {
         this.context = context;
         this.provider = provider;
         this.quiet = false;
+        this.handleService = HandleServiceFactory.getInstance().getHandleService();
+        this.itemService = ContentServiceFactory.getInstance().getItemService();
+        this.doiService = IdentifierServiceFactory.getInstance().getDOIService();
     }
 
     public static void main(String[] args)
@@ -64,15 +60,8 @@ public class DOIOrganiser {
         LOG.debug("Starting DOI organiser ");
 
         // setup Context
-        Context context = null;
-        try {
-            context = new Context();
-        }
-        catch (SQLException sqle)
-        {
-            System.err.println("Can't connect to database: " + sqle.getMessage());
-            System.exit(-1);
-        }
+        Context context = new Context();
+
         // Started from commandline, don't use the authentication system.
         context.turnOffAuthorisationSystem();
 
@@ -188,26 +177,22 @@ public class DOIOrganiser {
             organiser.list("deletion", null, null, DOIIdentifierProvider.TO_BE_DELETED);
         }
 
+        DOIService doiService = IdentifierServiceFactory.getInstance().getDOIService();
+
         if (line.hasOption('s'))
         {
-            TableRowIterator it = organiser
-                                    .getDOIsByStatus(DOIIdentifierProvider.TO_BE_RESERVED);
-           
-            try { 
-                if (!it.hasNext()) 
+
+            try {
+                List<DOI> dois = doiService.getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_RESERVED));
+                if (0 == dois.size())
                 {
                     System.err.println("There are no objects in the database "
                             + "that could be reserved.");
                 }
-                
-                while (it.hasNext())
-                {
-                    TableRow doiRow = it.next();
-                    DSpaceObject dso = DSpaceObject.find(
-                            context, 
-                            doiRow.getIntColumn("resource_type_id"), 
-                            doiRow.getIntColumn("resource_id"));
-                    organiser.reserve(doiRow, dso);
+
+                for (DOI doi : dois) {
+                    organiser.reserve(doi);
+                    context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -217,23 +202,18 @@ public class DOIOrganiser {
 
         if (line.hasOption('r'))
         {
-            TableRowIterator it = organiser
-                                    .getDOIsByStatus(DOIIdentifierProvider.TO_BE_REGISTERED);
-            
+
             try {
-                if (!it.hasNext()) 
+                List<DOI> dois = doiService.getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_REGISTERED));
+                if (0 == dois.size())
                 {
                     System.err.println("There are no objects in the database "
                             + "that could be registered.");
                 }
-                while (it.hasNext())
+                for (DOI doi : dois)
                 {
-                    TableRow doiRow = it.next();
-                    DSpaceObject dso = DSpaceObject.find(
-                            context, 
-                            doiRow.getIntColumn("resource_type_id"), 
-                            doiRow.getIntColumn("resource_id"));
-                    organiser.register(doiRow, dso);
+                    organiser.register(doi);
+                    context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -243,26 +223,22 @@ public class DOIOrganiser {
         
         if (line.hasOption('u'))
         {
-            TableRowIterator it = organiser.getDOIsByStatus(
-                    DOIIdentifierProvider.UPDATE_BEFORE_REGISTRATION,
-                    DOIIdentifierProvider.UPDATE_RESERVED,
-                    DOIIdentifierProvider.UPDATE_REGISTERED);
-           
-            try { 
-                if (!it.hasNext()) 
+
+            try {
+                List<DOI> dois = doiService.getDOIsByStatus(context, Arrays.asList(
+                        DOIIdentifierProvider.UPDATE_BEFORE_REGISTRATION,
+                        DOIIdentifierProvider.UPDATE_RESERVED,
+                        DOIIdentifierProvider.UPDATE_REGISTERED));
+                if (0 == dois.size())
                 {
                     System.err.println("There are no objects in the database "
                             + "whose metadata needs an update.");
                 }
                 
-                while (it.hasNext())
+                for (DOI doi : dois)
                 {
-                    TableRow doiRow = it.next();
-                    DSpaceObject dso = DSpaceObject.find(
-                            context, 
-                            doiRow.getIntColumn("resource_type_id"), 
-                            doiRow.getIntColumn("resource_id"));
-                    organiser.update(doiRow, dso);
+                    organiser.update(doi);
+                    context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -272,20 +248,21 @@ public class DOIOrganiser {
 
         if (line.hasOption('d'))
         {
-            TableRowIterator it = organiser
-                                    .getDOIsByStatus(DOIIdentifierProvider.TO_BE_DELETED);
-           
-            try { 
-                if (!it.hasNext()) 
+
+            try {
+                List<DOI> dois = doiService.getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_DELETED));
+                if (0 == dois.size())
                 {
                     System.err.println("There are no objects in the database "
                             + "that could be deleted.");
                 }
-                
-                while (it.hasNext())
-                {
-                    TableRow doiRow = it.next();
-                    organiser.delete(doiRow.getStringColumn("doi"));
+
+                Iterator<DOI> iterator = dois.iterator();
+                while (iterator.hasNext()) {
+                    DOI doi = iterator.next();
+                    iterator.remove();
+                    organiser.delete(doi.getDoi());
+                    context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -305,12 +282,8 @@ public class DOIOrganiser {
             else
             {
                 try {
-                    TableRow doiRow = organiser.findTableRow(identifier);
-                    DSpaceObject dso = DSpaceObject.find(
-                            context, 
-                            doiRow.getIntColumn("resource_type_id"), 
-                            doiRow.getIntColumn("resource_id"));
-                    organiser.reserve(doiRow, dso);
+                    DOI doiRow = organiser.resolveToDOI(identifier);
+                    organiser.reserve(doiRow);
                 } 
                 catch (SQLException ex) 
                 {
@@ -340,12 +313,8 @@ public class DOIOrganiser {
             else
             {
                 try {
-                    TableRow doiRow = organiser.findTableRow(identifier);
-                    DSpaceObject dso = DSpaceObject.find(
-                            context, 
-                            doiRow.getIntColumn("resource_type_id"),
-                            doiRow.getIntColumn("resource_id"));
-                    organiser.register(doiRow, dso);
+                    DOI doiRow = organiser.resolveToDOI(identifier);
+                    organiser.register(doiRow);
                 } catch (SQLException ex) {
                     LOG.error(ex);
                 } catch (IllegalArgumentException ex) {
@@ -360,7 +329,7 @@ public class DOIOrganiser {
         
         if(line.hasOption("update-doi"))
         {
-            String identifier = line.getOptionValue('u');
+            String identifier = line.getOptionValue("update-doi");
             
             if(null == identifier)
             {
@@ -369,12 +338,8 @@ public class DOIOrganiser {
             else
             {
                 try {
-                    TableRow doiRow = organiser.findTableRow(identifier);
-                    DSpaceObject dso = DSpaceObject.find(
-                            context, 
-                            doiRow.getIntColumn("resource_type_id"), 
-                            doiRow.getIntColumn("resource_id"));
-                    organiser.update(doiRow, dso);
+                    DOI doiRow = organiser.resolveToDOI(identifier);
+                    organiser.update(doiRow);
                 } catch (SQLException ex) {
                     LOG.error(ex);
                 } catch (IllegalArgumentException ex) {
@@ -389,7 +354,7 @@ public class DOIOrganiser {
         
         if(line.hasOption("delete-doi"))
         {
-            String identifier = line.getOptionValue('d');
+            String identifier = line.getOptionValue("delete-doi");
 
             if (null == identifier) 
             {
@@ -407,39 +372,7 @@ public class DOIOrganiser {
         }
 
     }
-    
 
-    public TableRowIterator getDOIsByStatus(Integer ... status)
-    {
-        try 
-        {   
-            String sql = "SELECT * FROM Doi";
-            for (int i = 0; i < status.length ; i++)
-            {
-                if (0 == i)
-                {
-                    sql += " WHERE ";
-                }
-                else
-                {
-                    sql += " OR ";
-                }
-                sql += " status = ?";
-            }
-
-            if (status.length < 1)
-            {
-                return DatabaseManager.queryTable(context, "Doi", sql);
-            }
-            return DatabaseManager.queryTable(context, "Doi", sql, status);
-        }
-        catch (SQLException ex)
-        {
-            LOG.error("Error while trying to get data from database", ex);
-            throw new RuntimeException("Error while trying to get data from database", ex);
-        }
-    }
-    
     public void list(String processName, PrintStream out, PrintStream err, Integer ... status)
     {
         String indent = "    ";
@@ -451,12 +384,11 @@ public class DOIOrganiser {
         {
             err = System.err;
         }
-        
-        TableRowIterator it = this.getDOIsByStatus(status);
 
         try
         {
-            if (it.hasNext())
+            List<DOI> doiList = doiService.getDOIsByStatus(context, Arrays.asList(status));
+            if (0 < doiList.size())
             {
                 out.println("DOIs queued for " + processName + ": ");
             }
@@ -464,19 +396,13 @@ public class DOIOrganiser {
             {
                 out.println("There are no DOIs queued for " + processName + ".");
             }
-            while(it.hasNext())
+            for (DOI doiRow : doiList)
             {
-                TableRow doiRow = it.next();
-                DSpaceObject dso = DSpaceObject.find(context,
-                        doiRow.getIntColumn("resource_type_id"),
-                        doiRow.getIntColumn("resource_id"));
-                out.print(indent + DOI.SCHEME + doiRow.getStringColumn("doi"));
-                if (null != dso)
-                {
+                out.print(indent + DOI.SCHEME + doiRow.getDoi());
+                DSpaceObject dso = doiRow.getDSpaceObject();
+                if (null != dso) {
                     out.println(" (belongs to item with handle " + dso.getHandle() + ")");
-                }
-                else
-                {
+                } else {
                     out.println(" (cannot determine handle of assigned object)");
                 }
             }
@@ -487,14 +413,11 @@ public class DOIOrganiser {
             err.println("Error in database Connection: " + ex.getMessage());
             ex.printStackTrace(err);
         }
-        finally
-        {
-            it.close();
-        }
     }
 
-    public void register(TableRow doiRow, DSpaceObject dso) throws SQLException
+    public void register(DOI doiRow) throws SQLException
     {
+        DSpaceObject dso = doiRow.getDSpaceObject();
         if (Constants.ITEM != dso.getType())
         {
             throw new IllegalArgumentException("Currenty DSpace supports DOIs for Items only.");
@@ -502,12 +425,12 @@ public class DOIOrganiser {
         
         try {
             provider.registerOnline(context, dso,
-                    DOI.SCHEME + doiRow.getStringColumn("doi"));
+                    DOI.SCHEME + doiRow.getDoi());
             
             if(!quiet)
             {
                 System.out.println("This identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi") 
+                                 + DOI.SCHEME + doiRow.getDoi() 
                                  + " is successfully registered.");
             }
         } 
@@ -516,7 +439,7 @@ public class DOIOrganiser {
             if (!(ex instanceof DOIIdentifierException))
             {
                 LOG.error("It wasn't possible to register this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi")
+                                 + DOI.SCHEME + doiRow.getDoi()
                                  + " online. ", ex);
             }
 
@@ -525,7 +448,7 @@ public class DOIOrganiser {
             try 
             {
                 sendAlertMail("Register", dso,
-                              DOI.SCHEME + doiRow.getStringColumn("doi"),
+                              DOI.SCHEME + doiRow.getDoi(),
                               doiIdentifierException.codeToString(doiIdentifierException
                                                                     .getCode())); 
             }
@@ -535,7 +458,7 @@ public class DOIOrganiser {
             }
 
             LOG.error("It wasn't possible to register this identifier : " 
-                    + DOI.SCHEME + doiRow.getStringColumn("doi")
+                    + DOI.SCHEME + doiRow.getDoi()
                     + " online. Exceptions code: "
                     + doiIdentifierException
                         .codeToString(doiIdentifierException.getCode()), ex);
@@ -543,24 +466,24 @@ public class DOIOrganiser {
             if(!quiet)
             {
                 System.err.println("It wasn't possible to register this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                                 + DOI.SCHEME + doiRow.getDoi());
             }
              
         }
         catch (IllegalArgumentException ex) 
         {
             LOG.error("Database table DOI contains a DOI that is not valid: "
-                    + DOI.SCHEME + doiRow.getStringColumn("doi") + "!", ex);
+                    + DOI.SCHEME + doiRow.getDoi() + "!", ex);
             
             if(!quiet)
             {
                 System.err.println("It wasn't possible to register this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                                 + DOI.SCHEME + doiRow.getDoi());
             }
             
             throw new IllegalStateException("Database table DOI contains a DOI "
                     + " that is not valid: "
-                    + DOI.SCHEME + doiRow.getStringColumn("doi") + "!", ex);
+                    + DOI.SCHEME + doiRow.getDoi() + "!", ex);
         } 
         catch (SQLException ex) 
         {
@@ -569,14 +492,15 @@ public class DOIOrganiser {
             if(!quiet)
             {
                 System.err.println("It wasn't possible to register this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                                 + DOI.SCHEME + doiRow.getDoi());
             }
             throw new RuntimeException("Error while trying to get data from database", ex);
         }
     }
     
-    public void reserve(TableRow doiRow, DSpaceObject dso) throws SQLException
+    public void reserve(DOI doiRow) throws SQLException
     {
+        DSpaceObject dso = doiRow.getDSpaceObject();
         if (Constants.ITEM != dso.getType())
         {
             throw new IllegalArgumentException("Currenty DSpace supports DOIs for Items only.");
@@ -585,12 +509,12 @@ public class DOIOrganiser {
         try 
         {
             provider.reserveOnline(context, dso, 
-                    DOI.SCHEME + doiRow.getStringColumn("doi"));
+                    DOI.SCHEME + doiRow.getDoi());
             
             if(!quiet)
             {
                 System.out.println("This identifier : " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi") 
+                                 + DOI.SCHEME + doiRow.getDoi() 
                                  + " is successfully reserved.");
             }
         } 
@@ -599,7 +523,7 @@ public class DOIOrganiser {
             if (!(ex instanceof DOIIdentifierException)) 
             {
                 LOG.error("It wasn't possible to register this identifier : " 
-                    + DOI.SCHEME + doiRow.getStringColumn("doi")
+                    + DOI.SCHEME + doiRow.getDoi()
                     + " online. ",ex);
             }
             
@@ -608,7 +532,7 @@ public class DOIOrganiser {
             try 
             {
                 sendAlertMail("Reserve", dso,
-                              DOI.SCHEME + doiRow.getStringColumn("doi"),
+                              DOI.SCHEME + doiRow.getDoi(),
                               DOIIdentifierException.codeToString(
                                     doiIdentifierException.getCode()));
             } 
@@ -625,22 +549,22 @@ public class DOIOrganiser {
             if(!quiet)
             {
                 System.err.println("It wasn't possible to reserve this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                                 + DOI.SCHEME + doiRow.getDoi());
             }
         } 
         catch (IllegalArgumentException ex) 
         {
             LOG.error("Database table DOI contains a DOI that is not valid: "
-                    + DOI.SCHEME + doiRow.getStringColumn("doi") + "!", ex);
+                    + DOI.SCHEME + doiRow.getDoi() + "!", ex);
             
             if(!quiet)
             {
                 System.err.println("It wasn't possible to reserve this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                                 + DOI.SCHEME + doiRow.getDoi());
             }
             throw new IllegalStateException("Database table DOI contains a DOI "
                     + " that is not valid: "
-                    + DOI.SCHEME + doiRow.getStringColumn("doi") + "!", ex);
+                    + DOI.SCHEME + doiRow.getDoi() + "!", ex);
         } 
         catch (SQLException ex) 
         {
@@ -649,15 +573,16 @@ public class DOIOrganiser {
             if(!quiet)
             {
                 System.err.println("It wasn't possible to reserve this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                                 + DOI.SCHEME + doiRow.getDoi());
             }
             throw new RuntimeException("Error while trying to get data from database", ex);
 
         }
     }
     
-    public void update(TableRow doiRow, DSpaceObject dso)
+    public void update(DOI doiRow)
     {
+        DSpaceObject dso = doiRow.getDSpaceObject();
         if (Constants.ITEM != dso.getType())
         {
             throw new IllegalArgumentException("Currenty DSpace supports DOIs "
@@ -667,12 +592,12 @@ public class DOIOrganiser {
         try 
         {
             provider.updateMetadataOnline(context, dso,
-                    DOI.SCHEME + doiRow.getStringColumn("doi"));
+                    DOI.SCHEME + doiRow.getDoi());
             
             if(!quiet)
             {
                 System.out.println("Successfully updated metadata of DOI " + DOI.SCHEME
-                        + doiRow.getStringColumn("doi") + ".");
+                        + doiRow.getDoi() + ".");
             }
         }
         catch (IdentifierException ex) 
@@ -687,7 +612,7 @@ public class DOIOrganiser {
             try 
             {
                 sendAlertMail("Update", dso,
-                              DOI.SCHEME + doiRow.getStringColumn("doi"),
+                              DOI.SCHEME + doiRow.getDoi(),
                               doiIdentifierException.codeToString(doiIdentifierException
                                                                     .getCode()));
             } 
@@ -697,7 +622,7 @@ public class DOIOrganiser {
             }
 
             LOG.error("It wasn't possible to update this identifier:  "
-                    + DOI.SCHEME + doiRow.getStringColumn("doi")
+                    + DOI.SCHEME + doiRow.getDoi()
                     + " Exceptions code:  " 
                     + doiIdentifierException
                         .codeToString(doiIdentifierException.getCode()), ex);
@@ -705,24 +630,24 @@ public class DOIOrganiser {
             if(!quiet)
             {
                 System.err.println("It wasn't possible to update this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                                 + DOI.SCHEME + doiRow.getDoi());
             }
             
         } 
         catch (IllegalArgumentException ex) 
         {
             LOG.error("Database table DOI contains a DOI that is not valid: "
-                    + DOI.SCHEME + doiRow.getStringColumn("doi") + "!", ex);
+                    + DOI.SCHEME + doiRow.getDoi() + "!", ex);
             
              if(!quiet)
             {
                 System.err.println("It wasn't possible to update this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                                 + DOI.SCHEME + doiRow.getDoi());
             }
              
             throw new IllegalStateException("Database table DOI contains a DOI "
                     + " that is not valid: "
-                    + DOI.SCHEME + doiRow.getStringColumn("doi") + "!", ex);
+                    + DOI.SCHEME + doiRow.getDoi() + "!", ex);
         } 
         catch (SQLException ex) 
         {
@@ -734,14 +659,14 @@ public class DOIOrganiser {
             throws SQLException
     {
         String doi = null;
-        TableRow doiRow = null;
+        DOI doiRow = null;
         
         try 
         {
-            doi = DOI.formatIdentifier(identifier);
+            doi = doiService.formatIdentifier(identifier);
             
             // If there's no exception: we found a valid DOI. :)
-            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+            doiRow = doiService.findByDoi(context,
                     doi.substring(DOI.SCHEME.length()));
            
             if (null == doiRow) 
@@ -754,7 +679,7 @@ public class DOIOrganiser {
             if (!quiet) 
             {
                 System.err.println("It was possible to delete this identifier: "
-                        + DOI.SCHEME + doiRow.getStringColumn("doi")
+                        + DOI.SCHEME + doiRow.getDoi()
                         + " online.");
             }
         } 
@@ -777,7 +702,7 @@ public class DOIOrganiser {
             if (!quiet) 
             {
                 System.err.println("It wasn't possible to delete this identifier: "
-                        + DOI.SCHEME + doiRow.getStringColumn("doi")
+                        + DOI.SCHEME + doiRow.getDoi()
                         + " online. Take a look in log file.");
             }
         }
@@ -791,7 +716,7 @@ public class DOIOrganiser {
      * contains digits only we treat it as ItemID, if not we try to find a
      * matching doi or a handle (in this order).
      * @return The TableRow or null if the Object does not have a DOI.
-     * @throws SQLException
+     * @throws SQLException if database error
      * @throws IllegalArgumentException If the identifier is null, an empty
      * String or specifies an DSpaceObject that is not an item. We currently
      * support DOIs for items only, but this may change once...
@@ -799,7 +724,7 @@ public class DOIOrganiser {
      * not stored in our database or if it is a handle that is not bound to an
      * DSpaceObject.
      */
-    public TableRow findTableRow(String identifier)
+    public DOI resolveToDOI(String identifier)
             throws SQLException, IllegalArgumentException, IllegalStateException, IdentifierException
     {
         if (null == identifier || identifier.isEmpty()) 
@@ -807,28 +732,25 @@ public class DOIOrganiser {
             throw new IllegalArgumentException("Identifier is null or empty.");
         }
 
-        String sql = "SELECT * FROM Doi WHERE resource_type_id = ? AND resource_id = ? ";
-        TableRow doiRow = null;
+        DOI doiRow = null;
         String doi = null;
         
         // detect it identifer is ItemID, handle or DOI.
         // try to detect ItemID
-        if (identifier.matches("\\d*")) 
+        if (identifier.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}"))
         {
-            Integer itemID = Integer.valueOf(identifier);
-            DSpaceObject dso = Item.find(context, itemID);
+            DSpaceObject dso = itemService.find(context, UUID.fromString(identifier));
 
             if (null != dso) 
             {
-                doiRow = DatabaseManager.querySingleTable(context, "Doi",
-                        sql, Constants.ITEM, dso.getID());
+                doiRow = doiService.findDOIByDSpaceObject(context, dso);
                 
                 //Check if this Item has an Identifier, mint one if it doesn't
                 if (null == doiRow) 
                 {
                     doi = provider.mint(context, dso);
-                    doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
-                    doi.substring(DOI.SCHEME.length()));
+                    doiRow = doiService.findByDoi(context,
+                            doi.substring(DOI.SCHEME.length()));
                     return doiRow;
                 }
                 return doiRow;
@@ -841,7 +763,7 @@ public class DOIOrganiser {
         }
 
         // detect handle
-        DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
+        DSpaceObject dso = handleService.resolveToObject(context, identifier);
 
         if (null != dso) 
         {
@@ -852,22 +774,21 @@ public class DOIOrganiser {
                         + "Cannot process specified handle as it does not identify an Item.");
             }
             
-            doiRow = DatabaseManager.querySingleTable(context, "Doi", sql,
-                    Constants.ITEM, dso.getID());
+            doiRow = doiService.findDOIByDSpaceObject(context, dso);
 
             if (null == doiRow) 
             {
                 doi = provider.mint(context, dso);
-                doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+                doiRow = doiService.findByDoi(context,
                         doi.substring(DOI.SCHEME.length()));
             }
             return doiRow;
         }
         // detect DOI
         try {
-            doi = DOI.formatIdentifier(identifier);
+            doi = doiService.formatIdentifier(identifier);
             // If there's no exception: we found a valid DOI. :)
-            doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+            doiRow = doiService.findByDoi(context,
                     doi.substring(DOI.SCHEME.length()));
             if (null == doiRow)
             {
@@ -886,7 +807,7 @@ public class DOIOrganiser {
             if(!quiet)
             {
                 System.err.println("It wasn't possible to detect this identifier: " 
-                                 + DOI.SCHEME + doiRow.getStringColumn("doi"));
+                                 + DOI.SCHEME + doiRow.getDoi());
             }
         }
 
@@ -907,8 +828,8 @@ public class DOIOrganiser {
                 email.addRecipient(recipient);
                 email.addArgument(action);
                 email.addArgument(new Date());
-                email.addArgument(dso.getTypeText());
-                email.addArgument(new Integer(dso.getID()));
+                email.addArgument(ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getTypeText(dso));
+                email.addArgument(dso.getID().toString());
                 email.addArgument(doi);
                 email.addArgument(reason);
                 email.send();

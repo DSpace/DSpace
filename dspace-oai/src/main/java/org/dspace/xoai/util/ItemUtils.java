@@ -13,10 +13,7 @@ import com.lyncode.xoai.util.Base64Utils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -28,6 +25,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
+import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.app.util.service.MetadataExposureService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 
 /**
  * 
@@ -36,8 +39,16 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class ItemUtils
 {
-    private static Logger log = LogManager
-            .getLogger(ItemUtils.class);
+    private static final Logger log = LogManager.getLogger(ItemUtils.class);
+    
+    private static final MetadataExposureService metadataExposureService
+            = UtilServiceFactory.getInstance().getMetadataExposureService();
+
+    private static final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+
+    private static final BitstreamService bitstreamService
+            = ContentServiceFactory.getInstance().getBitstreamService();
 
     private static Element getElement(List<Element> list, String name)
     {
@@ -62,45 +73,58 @@ public class ItemUtils
         e.setName(name);
         return e;
     }
-    public static Metadata retrieveMetadata (Item item) {
+    public static Metadata retrieveMetadata (Context context, Item item) {
         Metadata metadata;
-        
-        //DSpaceDatabaseItem dspaceItem = new DSpaceDatabaseItem(item);
-        
+
         // read all metadata into Metadata Object
         metadata = new Metadata();
-        Metadatum[] vals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (Metadatum val : vals)
+        List<MetadataValue> vals = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (MetadataValue val : vals)
         {
+            MetadataField field = val.getMetadataField();
+            
+            // Don't expose fields that are hidden by configuration
+            try {
+                if (metadataExposureService.isHidden(context,
+                        field.getMetadataSchema().getName(),
+                        field.getElement(),
+                        field.getQualifier()))
+                {
+                    continue;
+                }
+            } catch(SQLException se) {
+                throw new RuntimeException(se);
+            }
+
             Element valueElem = null;
-            Element schema = getElement(metadata.getElement(), val.schema);
+            Element schema = getElement(metadata.getElement(), field.getMetadataSchema().getName());
             if (schema == null)
             {
-                schema = create(val.schema);
+                schema = create(field.getMetadataSchema().getName());
                 metadata.getElement().add(schema);
             }
             valueElem = schema;
 
             // Has element.. with XOAI one could have only schema and value
-            if (val.element != null && !val.element.equals(""))
+            if (field.getElement() != null && !field.getElement().equals(""))
             {
                 Element element = getElement(schema.getElement(),
-                        val.element);
+                        field.getElement());
                 if (element == null)
                 {
-                    element = create(val.element);
+                    element = create(field.getElement());
                     schema.getElement().add(element);
                 }
                 valueElem = element;
 
                 // Qualified element?
-                if (val.qualifier != null && !val.qualifier.equals(""))
+                if (field.getQualifier() != null && !field.getQualifier().equals(""))
                 {
                     Element qualifier = getElement(element.getElement(),
-                            val.qualifier);
+                            field.getQualifier());
                     if (qualifier == null)
                     {
-                        qualifier = create(val.qualifier);
+                        qualifier = create(field.getQualifier());
                         element.getElement().add(qualifier);
                     }
                     valueElem = qualifier;
@@ -108,13 +132,13 @@ public class ItemUtils
             }
 
             // Language?
-            if (val.language != null && !val.language.equals(""))
+            if (val.getLanguage() != null && !val.getLanguage().equals(""))
             {
                 Element language = getElement(valueElem.getElement(),
-                        val.language);
+                        val.getLanguage());
                 if (language == null)
                 {
-                    language = create(val.language);
+                    language = create(val.getLanguage());
                     valueElem.getElement().add(language);
                 }
                 valueElem = language;
@@ -131,11 +155,11 @@ public class ItemUtils
                 valueElem = language;
             }
 
-            valueElem.getField().add(createValue("value", val.value));
-            if (val.authority != null) {
-                valueElem.getField().add(createValue("authority", val.authority));
-                if (val.confidence != Choices.CF_NOVALUE)
-                    valueElem.getField().add(createValue("confidence", val.confidence + ""));
+            valueElem.getField().add(createValue("value", val.getValue()));
+            if (val.getAuthority() != null) {
+                valueElem.getField().add(createValue("authority", val.getAuthority()));
+                if (val.getConfidence() != Choices.CF_NOVALUE)
+                    valueElem.getField().add(createValue("confidence", val.getConfidence() + ""));
             }
         }
         // Done! Metadata has been read!
@@ -143,7 +167,7 @@ public class ItemUtils
         Element bundles = create("bundles");
         metadata.getElement().add(bundles);
 
-        Bundle[] bs;
+        List<Bundle> bs;
         try
         {
             bs = item.getBundles();
@@ -156,7 +180,7 @@ public class ItemUtils
 
                 Element bitstreams = create("bitstreams");
                 bundle.getElement().add(bitstreams);
-                Bitstream[] bits = b.getBitstreams();
+                List<Bitstream> bits = b.getBitstreams();
                 for (Bitstream bit : bits)
                 {
                     Element bitstream = create("bitstream");
@@ -169,20 +193,20 @@ public class ItemUtils
                     String handle = null;
                     // get handle of parent Item of this bitstream, if there
                     // is one:
-                    Bundle[] bn = bit.getBundles();
-                    if (bn.length > 0)
+                    List<Bundle> bn = bit.getBundles();
+                    if (!bn.isEmpty())
                     {
-                        Item bi[] = bn[0].getItems();
-                        if (bi.length > 0)
+                        List<Item> bi = bn.get(0).getItems();
+                        if (!bi.isEmpty())
                         {
-                            handle = bi[0].getHandle();
+                            handle = bi.get(0).getHandle();
                         }
                     }
                     if (bsName == null)
                     {
-                        String ext[] = bit.getFormat().getExtensions();
+                        List<String> ext = bit.getFormat(context).getExtensions();
                         bsName = "bitstream_" + sid
-                                + (ext.length > 0 ? ext[0] : "");
+                                + (ext.isEmpty() ? "" : ext.get(0));
                     }
                     if (handle != null && baseUrl != null)
                     {
@@ -212,7 +236,7 @@ public class ItemUtils
                         bitstream.getField().add(
                                 createValue("description", description));
                     bitstream.getField().add(
-                            createValue("format", bit.getFormat()
+                            createValue("format", bit.getFormat(context)
                                     .getMIMEType()));
                     bitstream.getField().add(
                             createValue("size", "" + bit.getSize()));
@@ -257,21 +281,21 @@ public class ItemUtils
 
         // Licensing info
         Element license = create("license");
-        Bundle[] licBundles;
+        List<Bundle> licBundles;
         try
         {
-            licBundles = item.getBundles(Constants.LICENSE_BUNDLE_NAME);
-            if (licBundles.length > 0)
+            licBundles = itemService.getBundles(item, Constants.LICENSE_BUNDLE_NAME);
+            if (!licBundles.isEmpty())
             {
-                Bundle licBundle = licBundles[0];
-                Bitstream[] licBits = licBundle.getBitstreams();
-                if (licBits.length > 0)
+                Bundle licBundle = licBundles.get(0);
+                List<Bitstream> licBits = licBundle.getBitstreams();
+                if (!licBits.isEmpty())
                 {
-                    Bitstream licBit = licBits[0];
+                    Bitstream licBit = licBits.get(0);
                     InputStream in;
                     try
                     {
-                        in = licBit.retrieve();
+                        in = bitstreamService.retrieve(context, licBit);
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         Utils.bufferedCopy(in, out);
                         license.getField().add(
@@ -279,15 +303,7 @@ public class ItemUtils
                                         Base64Utils.encode(out.toString())));
                         metadata.getElement().add(license);
                     }
-                    catch (AuthorizeException e)
-                    {
-                        log.warn(e.getMessage(), e);
-                    }
-                    catch (IOException e)
-                    {
-                        log.warn(e.getMessage(), e);
-                    }
-                    catch (SQLException e)
+                    catch (AuthorizeException | IOException | SQLException e)
                     {
                         log.warn(e.getMessage(), e);
                     }

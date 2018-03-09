@@ -16,7 +16,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@page import="org.dspace.core.ConfigurationManager"%>
-<%@page import="org.dspace.authorize.AuthorizeManager"%>
+<%@page import="org.dspace.authorize.AuthorizeServiceImpl"%>
 <%@page import="java.util.Date"%>
 <%@page import="org.dspace.authorize.ResourcePolicy"%>
 <%@page import="java.util.List"%>

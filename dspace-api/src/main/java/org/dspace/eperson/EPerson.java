@@ -7,33 +7,23 @@
  */
 package org.dspace.eperson;
 
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.DSpaceObjectLegacySupport;
+import org.dspace.content.Item;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.proxy.HibernateProxyHelper;
+
+import javax.persistence.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionGroup;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.codec.DecoderException;
-
-import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.core.Utils;
-import org.dspace.event.Event;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Class representing an e-person.
@@ -41,8 +31,46 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author David Stuve
  * @version $Revision$
  */
-public class EPerson extends DSpaceObject
+@Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
+@Table(name = "eperson")
+public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
 {
+    @Column(name="eperson_id", insertable = false, updatable = false)
+    private Integer legacyId;
+
+    @Column(name="netid", length = 64)
+    private String netid;
+
+    @Column(name="last_active")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastActive;
+
+    @Column(name="can_log_in", nullable = true)
+    private Boolean canLogIn;
+
+    @Column(name="email", unique=true, length = 64)
+    private String email;
+
+    @Column(name="require_certificate")
+    private boolean requireCertificate = false;
+
+    @Column(name="self_registered")
+    private boolean selfRegistered = false;
+
+    @Column(name="password", length = 128)
+    private String password;
+
+    @Column(name="salt", length = 32)
+    private String salt;
+
+    @Column(name="digest_algorithm", length = 16)
+    private String digestAlgorithm;
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "epeople")
+    private final List<Group> groups = new ArrayList<>();
+
     /** The e-mail field (for sorting) */
     public static final int EMAIL = 1;
 
@@ -57,37 +85,23 @@ public class EPerson extends DSpaceObject
 
     /** The e-mail field (for sorting) */
     public static final int LANGUAGE = 5;
-    
-    /** log4j logger */
-    private static final Logger log = Logger.getLogger(EPerson.class);
 
-    /** The row in the table representing this eperson */
-    private final TableRow myRow;
-
-    /** Flag set when data is modified, for events */
-    private boolean modified;
+    @Transient
+    protected transient EPersonService ePersonService;
 
     /**
-     * Construct an EPerson
-     * 
-     * @param context
-     *            the context this object exists in
-     * @param row
-     *            the corresponding row in the table
+     * Protected constructor, create object using:
+     * {@link org.dspace.eperson.service.EPersonService#create(Context)}
+     *
      */
-    EPerson(Context context, TableRow row) throws SQLException {
-        super(context);
+    protected EPerson()
+    {
 
-        // Ensure that my TableRow is typed.
-        if (null == row.getTable())
-            row.setTable("eperson");
+    }
 
-        myRow = row;
-
-        // Cache ourselves
-        context.cache(this, row.getIntColumn("eperson_id"));
-        modified = false;
-        clearDetails();
+    @Override
+    public Integer getLegacyId() {
+        return legacyId;
     }
 
     /**
@@ -103,7 +117,8 @@ public class EPerson extends DSpaceObject
         {
             return false;
         }
-        if (getClass() != obj.getClass())
+        Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
+        if (getClass() != objClass)
         {
             return false;
         }
@@ -112,11 +127,11 @@ public class EPerson extends DSpaceObject
         {
             return false;
         }
-        if (!this.getEmail().equals(other.getEmail()))
+        if (!StringUtils.equals(this.getEmail(), other.getEmail()))
         {
             return false;
         }
-        if (!this.getFullName().equals(other.getFullName()))
+        if (!StringUtils.equals(this.getFullName(), other.getFullName()))
         {
             return false;
         }
@@ -132,532 +147,12 @@ public class EPerson extends DSpaceObject
     public int hashCode()
     {
         int hash = 5;
-        hash = 89 * hash + this.getID();
+        hash = 89 * hash + this.getID().hashCode();
         hash = 89 * hash + (this.getEmail() != null? this.getEmail().hashCode():0);
         hash = 89 * hash + (this.getFullName() != null? this.getFullName().hashCode():0);
         return hash;
     }
 
-
-
-    /**
-     * Get an EPerson from the database.
-     * 
-     * @param context
-     *            DSpace context object
-     * @param id
-     *            ID of the EPerson
-     * 
-     * @return the EPerson format, or null if the ID is invalid.
-     */
-    public static EPerson find(Context context, int id) throws SQLException
-    {
-        // First check the cache
-        EPerson fromCache = (EPerson) context.fromCache(EPerson.class, id);
-
-        if (fromCache != null)
-        {
-            return fromCache;
-        }
-
-        TableRow row = DatabaseManager.find(context, "eperson", id);
-
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
-            return new EPerson(context, row);
-        }
-    }
-
-    /**
-     * Find the eperson by their email address.
-     * 
-     * @return EPerson, or {@code null} if none such exists.
-     */
-    public static EPerson findByEmail(Context context, String email)
-            throws SQLException, AuthorizeException
-    {
-        if (email == null)
-        {
-            return null;
-        }
-        
-        // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup 
-        TableRow row = DatabaseManager.findByUnique(context, "eperson",
-                "email", email.toLowerCase());
-
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
-            // First check the cache
-            EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
-                    .getIntColumn("eperson_id"));
-
-            if (fromCache != null)
-            {
-                return fromCache;
-            }
-            else
-            {
-                return new EPerson(context, row);
-            }
-        }
-    }
-
-    /**
-     * Find the eperson by their netid.
-     * 
-     * @param context
-     *            DSpace context
-     * @param netid
-     *            Network ID
-     * 
-     * @return corresponding EPerson, or <code>null</code>
-     */
-    public static EPerson findByNetid(Context context, String netid)
-            throws SQLException
-    {
-        if (netid == null)
-        {
-            return null;
-        }
-
-        TableRow row = DatabaseManager.findByUnique(context, "eperson", "netid", netid);
-
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
-            // First check the cache
-            EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
-                    .getIntColumn("eperson_id"));
-
-            if (fromCache != null)
-            {
-                return fromCache;
-            }
-            else
-            {
-                return new EPerson(context, row);
-            }
-        }
-    }
-
-    /**
-     * Find the epeople that match the search query across firstname, lastname or email.
-     * 
-     * @param context
-     *            DSpace context
-     * @param query
-     *            The search string
-     * 
-     * @return array of EPerson objects
-     */
-    public static EPerson[] search(Context context, String query)
-            throws SQLException
-    {
-        return search(context, query, -1, -1);
-    }
-    
-    /**
-     * Find the epeople that match the search query across firstname, lastname or email. 
-     * This method also allows offsets and limits for pagination purposes. 
-     * 
-     * @param context
-     *            DSpace context
-     * @param query
-     *            The search string
-     * @param offset
-     *            Inclusive offset 
-     * @param limit
-     *            Maximum number of matches returned
-     * 
-     * @return array of EPerson objects
-     */
-    public static EPerson[] search(Context context, String query, int offset, int limit) 
-    		throws SQLException
-	{
-		String params = "%"+query.toLowerCase()+"%";
-        StringBuffer queryBuf = new StringBuffer();
-        queryBuf.append("select e.* from eperson e " +
-                " LEFT JOIN metadatavalue fn on (resource_id=e.eperson_id AND fn.resource_type_id=? and fn.metadata_field_id=?) " +
-                " LEFT JOIN metadatavalue ln on (ln.resource_id=e.eperson_id AND ln.resource_type_id=? and ln.metadata_field_id=?) " +
-                " WHERE e.eperson_id = ? OR " +
-                "LOWER(fn.text_value) LIKE LOWER(?) OR LOWER(ln.text_value) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?) ORDER BY  ");
-
-        if(DatabaseManager.isOracle()) {
-            queryBuf.append(" dbms_lob.substr(ln.text_value), dbms_lob.substr(fn.text_value) ASC");
-        }else{
-            queryBuf.append(" ln.text_value, fn.text_value ASC");
-        }
-
-        // Add offset and limit restrictions - Oracle requires special code
-        if (DatabaseManager.isOracle())
-        {
-            // First prepare the query to generate row numbers
-            if (limit > 0 || offset > 0)
-            {
-                queryBuf.insert(0, "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
-                queryBuf.append(") ");
-            }
-
-            // Restrict the number of rows returned based on the limit
-            if (limit > 0)
-            {
-                queryBuf.append("rec WHERE rownum<=? ");
-                // If we also have an offset, then convert the limit into the maximum row number
-                if (offset > 0)
-                {
-                    limit += offset;
-                }
-            }
-
-            // Return only the records after the specified offset (row number)
-            if (offset > 0)
-            {
-                queryBuf.insert(0, "SELECT * FROM (");
-                queryBuf.append(") WHERE rnum>?");
-            }
-        }
-        else
-        {
-            if (limit > 0)
-            {
-                queryBuf.append(" LIMIT ? ");
-            }
-
-            if (offset > 0)
-            {
-                queryBuf.append(" OFFSET ? ");
-            }
-        }
-
-        String dbquery = queryBuf.toString();
-
-        // When checking against the eperson-id, make sure the query can be made into a number
-		Integer int_param;
-		try {
-			int_param = Integer.valueOf(query);
-		}
-
-		catch (NumberFormatException e) {
-			int_param = Integer.valueOf(-1);
-		}
-
-
-        Integer f = MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "firstname", null).getFieldID();
-        Integer l = MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "lastname", null).getFieldID();
-
-        // Create the parameter array, including limit and offset if part of the query
-        Object[] paramArr = new Object[] {Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params};
-        if (limit > 0 && offset > 0)
-        {
-            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params, limit, offset};
-        }
-        else if (limit > 0)
-        {
-            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params, limit};
-        }
-        else if (offset > 0)
-        {
-            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params, offset};
-        }
-
-        // Get all the epeople that match the query
-		TableRowIterator rows = DatabaseManager.query(context, 
-		        dbquery, paramArr);
-		try
-        {
-            List<TableRow> epeopleRows = rows.toList();
-            EPerson[] epeople = new EPerson[epeopleRows.size()];
-
-            for (int i = 0; i < epeopleRows.size(); i++)
-            {
-                TableRow row = (TableRow) epeopleRows.get(i);
-
-                // First check the cache
-                EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
-                        .getIntColumn("eperson_id"));
-
-                if (fromCache != null)
-                {
-                    epeople[i] = fromCache;
-                }
-                else
-                {
-                    epeople[i] = new EPerson(context, row);
-                }
-            }
-
-            return epeople;
-        }
-        finally
-        {
-            if (rows != null)
-            {
-                rows.close();
-            }
-        }
-    }
-
-    /**
-     * Returns the total number of epeople returned by a specific query, without the overhead 
-     * of creating the EPerson objects to store the results.
-     * 
-     * @param context
-     *            DSpace context
-     * @param query
-     *            The search string
-     * 
-     * @return the number of epeople matching the query
-     */
-    public static int searchResultCount(Context context, String query)
-    	throws SQLException
-	{
-		String dbquery = "%"+query.toLowerCase()+"%";
-		Long count;
-		
-		// When checking against the eperson-id, make sure the query can be made into a number
-		Integer int_param;
-		try {
-			int_param = Integer.valueOf(query);
-		}
-		catch (NumberFormatException e) {
-			int_param = Integer.valueOf(-1);
-		}
-
-		// Get all the epeople that match the query
-		TableRow row = DatabaseManager.querySingle(context,
-		        "SELECT count(*) as epcount FROM eperson " +
-                "WHERE eperson_id = ? OR " +
-		        "LOWER((select text_value from metadatavalue where resource_id=? and resource_type_id=? and metadata_field_id=?)) LIKE LOWER(?) " +
-                "OR LOWER((select text_value from metadatavalue where resource_id=? and resource_type_id=? and metadata_field_id=?)) LIKE LOWER(?) " +
-                "OR LOWER(eperson.email) LIKE LOWER(?)",
-		        new Object[] {
-                        int_param,
-
-                        int_param,
-                        Constants.EPERSON,
-                        MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "firstname", null).getFieldID(),
-                        dbquery,
-
-                        int_param,
-                        Constants.EPERSON,
-                        MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "lastname", null).getFieldID(),
-                        dbquery,
-
-                        dbquery
-                });
-				
-		// use getIntColumn for Oracle count data
-        if (DatabaseManager.isOracle())
-        {
-            count = Long.valueOf(row.getIntColumn("epcount"));
-        }
-        else  //getLongColumn works for postgres
-        {
-            count = Long.valueOf(row.getLongColumn("epcount"));
-        }
-        
-		return count.intValue();
-	}
-    
-    
-    
-    /**
-     * Find all the epeople that match a particular query
-     * <ul>
-     * <li><code>ID</code></li>
-     * <li><code>LASTNAME</code></li>
-     * <li><code>EMAIL</code></li>
-     * <li><code>NETID</code></li>
-     * </ul>
-     * 
-     * @return array of EPerson objects
-     */
-    public static EPerson[] findAll(Context context, int sortField)
-            throws SQLException
-    {
-        String s, t = "", theQuery = "";
-
-        switch (sortField)
-        {
-        case ID:
-            s = "e.eperson_id";
-            break;
-
-        case EMAIL:
-            s = "e.email";
-            break;
-
-        case LANGUAGE:
-            s = "m.text_value";
-            t = "language";
-            break;
-        case NETID:
-            s = "e.netid";
-            break;
-
-        default:
-            s = "m.text_value";
-            t = "lastname";
-        }
-
-        // NOTE: The use of 's' in the order by clause can not cause an SQL
-        // injection because the string is derived from constant values above.
-        TableRowIterator rows;
-        if(!t.equals("")) {
-            rows = DatabaseManager.query(context,
-                    "SELECT * FROM eperson e " +
-                    "LEFT JOIN metadatavalue m on (m.resource_id = e.eperson_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
-                    "ORDER BY " + s,
-                    Constants.EPERSON,
-                    MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), t, null).getFieldID()
-            );
-        }
-        else {
-        	rows =  DatabaseManager.query(context, "SELECT * FROM eperson e ORDER BY " + s);
-        }
-        
-
-
-
-        try
-        {
-            List<TableRow> epeopleRows = rows.toList();
-
-            EPerson[] epeople = new EPerson[epeopleRows.size()];
-
-            for (int i = 0; i < epeopleRows.size(); i++)
-            {
-                TableRow row = (TableRow) epeopleRows.get(i);
-
-                // First check the cache
-                EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
-                        .getIntColumn("eperson_id"));
-
-                if (fromCache != null)
-                {
-                    epeople[i] = fromCache;
-                }
-                else
-                {
-                    epeople[i] = new EPerson(context, row);
-                }
-            }
-
-            return epeople;
-        }
-        finally
-        {
-            if (rows != null)
-            {
-                rows.close();
-            }
-        }
-    }
-
-    /**
-     * Create a new eperson
-     * 
-     * @param context
-     *            DSpace context object
-     */
-    public static EPerson create(Context context) throws SQLException,
-            AuthorizeException
-    {
-        // authorized?
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to create an EPerson");
-        }
-
-        // Create a table row
-        TableRow row = DatabaseManager.create(context, "eperson");
-
-        EPerson e = new EPerson(context, row);
-
-        log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
-                + e.getID()));
-
-        context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(), 
-                null, e.getIdentifiers(context)));
-
-        return e;
-    }
-
-    /**
-     * Delete an eperson
-     * 
-     */
-    public void delete() throws SQLException, AuthorizeException,
-            EPersonDeletionException
-    {
-        // authorized?
-        if (!AuthorizeManager.isAdmin(ourContext))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to delete an EPerson");
-        }
-
-        // check for presence of eperson in tables that
-        // have constraints on eperson_id
-        List<String> constraintList = getDeleteConstraints();
-
-        // if eperson exists in tables that have constraints
-        // on eperson, throw an exception
-        if (constraintList.size() > 0)
-        {
-            throw new EPersonDeletionException(constraintList);
-        }
-
-        // Delete the Dublin Core
-        removeMetadataFromDatabase();
-
-        ourContext.addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), getEmail(), getIdentifiers(ourContext)));
-
-        // Remove from cache
-        ourContext.removeCached(this, getID());
-
-        // XXX FIXME: This sidesteps the object model code so it won't
-        // generate  REMOVE events on the affected Groups.
-
-        // Remove any group memberships first
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM EPersonGroup2EPerson WHERE eperson_id= ? ",
-                getID());
-
-        // Remove any subscriptions
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM subscription WHERE eperson_id= ? ",
-                getID());
-
-        // Remove ourself
-        DatabaseManager.delete(ourContext, myRow);
-
-        log.info(LogManager.getHeader(ourContext, "delete_eperson",
-                "eperson_id=" + getID()));
-    }
-
-    /**
-     * Get the e-person's internal identifier
-     * 
-     * @return the internal identifier
-     */
-    public int getID()
-    {
-        return myRow.getIntColumn("eperson_id");
-    }
-    
     /**
      * Get the e-person's language
      * 
@@ -665,7 +160,7 @@ public class EPerson extends DSpaceObject
      */
      public String getLanguage()
      {
-         return getMetadataFirstValue("eperson", "language", null, Item.ANY);
+         return getePersonService().getMetadataFirstValue(this, "eperson", "language", null, Item.ANY);
      }
      
      /**
@@ -676,21 +171,9 @@ public class EPerson extends DSpaceObject
      * @param language
      *            language code
      */
-     public void setLanguage(String language) {
-         setMetadataSingleValue("eperson", "language", null, null, language);
+     public void setLanguage(Context context, String language) throws SQLException {
+         getePersonService().setMetadataSingleValue(context, this, "eperson", "language", null, null, language);
      }
-  
-
-    /**
-     * Get the e-person's handle
-     * 
-     * @return current implementation always returns null
-     */
-    public String getHandle()
-    {
-        // No Handles for e-people
-        return null;
-    }
 
     /**
      * Get the e-person's email address
@@ -699,7 +182,7 @@ public class EPerson extends DSpaceObject
      */
     public String getEmail()
     {
-        return myRow.getStringColumn("email");
+        return email;
     }
 
     /**
@@ -710,13 +193,8 @@ public class EPerson extends DSpaceObject
      */
     public void setEmail(String s)
     {
-        if (s != null)
-        {
-            s = s.toLowerCase();
-        }
-
-        myRow.setColumn("email", s);
-        modified = true;
+        this.email = StringUtils.lowerCase(s);
+        setModified();
     }
 
     /**
@@ -726,18 +204,18 @@ public class EPerson extends DSpaceObject
      */
     public String getNetid()
     {
-        return myRow.getStringColumn("netid");
+        return netid;
     }
 
     /**
      * Set the EPerson's netid
      * 
-     * @param s
+     * @param netid
      *            the new netid
      */
-    public void setNetid(String s) {
-        myRow.setColumn("netid", s);
-        modified = true;
+    public void setNetid(String netid) {
+        this.netid = netid;
+        setModified();
     }
 
     /**
@@ -772,7 +250,7 @@ public class EPerson extends DSpaceObject
      */
     public String getFirstName()
     {
-        return getMetadataFirstValue("eperson", "firstname", null, Item.ANY);
+        return getePersonService().getMetadataFirstValue(this, "eperson", "firstname", null, Item.ANY);
     }
 
     /**
@@ -781,9 +259,9 @@ public class EPerson extends DSpaceObject
      * @param firstname
      *            the person's first name
      */
-    public void setFirstName(String firstname) {
-        setMetadataSingleValue("eperson", "firstname", null, null, firstname);
-        modified = true;
+    public void setFirstName(Context context, String firstname) throws SQLException {
+        getePersonService().setMetadataSingleValue(context, this, "eperson", "firstname", null, null, firstname);
+        setModified();
     }
 
     /**
@@ -793,7 +271,7 @@ public class EPerson extends DSpaceObject
      */
     public String getLastName()
     {
-        return getMetadataFirstValue("eperson", "lastname", null, Item.ANY);
+        return getePersonService().getMetadataFirstValue(this, "eperson", "lastname", null, Item.ANY);
     }
 
     /**
@@ -802,9 +280,9 @@ public class EPerson extends DSpaceObject
      * @param lastname
      *            the person's last name
      */
-    public void setLastName(String lastname) {
-        setMetadataSingleValue("eperson", "lastname", null, null, lastname);
-        modified = true;
+    public void setLastName(Context context, String lastname) throws SQLException {
+        getePersonService().setMetadataSingleValue(context, this, "eperson", "lastname", null, null, lastname);
+        setModified();
     }
 
     /**
@@ -815,8 +293,8 @@ public class EPerson extends DSpaceObject
      */
     public void setCanLogIn(boolean login)
     {
-        myRow.setColumn("can_log_in", login);
-        modified = true;
+        this.canLogIn = login;
+        setModified();
     }
 
     /**
@@ -826,7 +304,7 @@ public class EPerson extends DSpaceObject
      */
     public boolean canLogIn()
     {
-        return myRow.getBooleanColumn("can_log_in");
+        return BooleanUtils.isTrue(canLogIn);
     }
 
     /**
@@ -837,8 +315,8 @@ public class EPerson extends DSpaceObject
      */
     public void setRequireCertificate(boolean isrequired)
     {
-        myRow.setColumn("require_certificate", isrequired);
-        modified = true;
+        this.requireCertificate = isrequired;
+        setModified();
     }
 
     /**
@@ -848,7 +326,7 @@ public class EPerson extends DSpaceObject
      */
     public boolean getRequireCertificate()
     {
-        return myRow.getBooleanColumn("require_certificate");
+        return requireCertificate;
     }
 
     /**
@@ -859,8 +337,8 @@ public class EPerson extends DSpaceObject
      */
     public void setSelfRegistered(boolean sr)
     {
-        myRow.setColumn("self_registered", sr);
-        modified = true;
+        this.selfRegistered = sr;
+        setModified();
     }
 
     /**
@@ -870,143 +348,7 @@ public class EPerson extends DSpaceObject
      */
     public boolean getSelfRegistered()
     {
-        return myRow.getBooleanColumn("self_registered");
-    }
-
-    /**
-     * Get the value of a metadata field
-     *
-     * @param field
-     *            the name of the metadata field to get
-     *
-     * @return the value of the metadata field (or null if the column is an SQL NULL)
-     *
-     * @exception IllegalArgumentException
-     *                if the requested metadata field doesn't exist
-     */
-    @Deprecated
-    public String getMetadata(String field)
-    {
-        String[] MDValue = getMDValueByLegacyField(field);
-        return getMetadataFirstValue(MDValue[0], MDValue[1], MDValue[2], Item.ANY);
-    }
-
-    /**
-     * Set a metadata value
-     * 
-     * @param field
-     *            the name of the metadata field to set
-     * @param value
-     *            value to set the field to
-     * 
-     * @exception IllegalArgumentException
-     *                if the requested metadata field doesn't exist
-     */
-    @Deprecated
-    public void setMetadata(String field, String value)
-    {
-        String[] MDValue = getMDValueByLegacyField(field);
-        setMetadataSingleValue(MDValue[0], MDValue[1], MDValue[2], null, value);
-    }
-
-    /**
-     * Set the EPerson's password.
-     * 
-     * @param s
-     *            the new password.
-     */
-    public void setPassword(String s)
-    {
-        PasswordHash hash = new PasswordHash(s);
-        myRow.setColumn("password", Utils.toHex(hash.getHash()));
-        myRow.setColumn("salt", Utils.toHex(hash.getSalt()));
-        myRow.setColumn("digest_algorithm", hash.getAlgorithm());
-        modified = true;
-    }
-
-    /**
-     * Set the EPerson's password hash.
-     * 
-     * @param password
-     *          hashed password, or null to set row data to NULL.
-     */
-    public void setPasswordHash(PasswordHash password)
-    {
-        if (null == password)
-        {
-            myRow.setColumnNull("digest_algorithm");
-            myRow.setColumnNull("salt");
-            myRow.setColumnNull("password");
-        }
-        else
-        {
-            myRow.setColumn("digest_algorithm", password.getAlgorithm());
-            myRow.setColumn("salt", password.getSaltString());
-            myRow.setColumn("password", password.getHashString());
-        }
-        modified = true;
-    }
-
-    /**
-     * Return the EPerson's password hash.
-     *
-     * @return hash of the password, or null on failure (such as no password).
-     */
-    public PasswordHash getPasswordHash()
-    {
-        PasswordHash hash = null;
-        try {
-            hash = new PasswordHash(myRow.getStringColumn("digest_algorithm"),
-                    myRow.getStringColumn("salt"),
-                    myRow.getStringColumn("password"));
-        } catch (DecoderException ex) {
-            log.error("Problem decoding stored salt or hash:  " + ex.getMessage());
-        }
-        return hash;
-    }
-
-    /**
-     * Check EPerson's password.  Side effect:  original unsalted MD5 hashes are
-     * converted using the current algorithm.
-     * 
-     * @param attempt
-     *            the password attempt
-     * @return boolean successful/unsuccessful
-     */
-    public boolean checkPassword(String attempt)
-    {
-        PasswordHash myHash;
-        try
-        {
-            myHash = new PasswordHash(
-                    myRow.getStringColumn("digest_algorithm"),
-                    myRow.getStringColumn("salt"),
-                    myRow.getStringColumn("password"));
-        } catch (DecoderException ex)
-        {
-            log.error(ex.getMessage());
-            return false;
-        }
-        boolean answer = myHash.matches(attempt);
-
-        // If using the old unsalted hash, and this password is correct, update to a new hash
-        if (answer && (null == myRow.getStringColumn("digest_algorithm")))
-        {
-            log.info("Upgrading password hash for EPerson " + getID());
-            setPassword(attempt);
-            try {
-                ourContext.turnOffAuthorisationSystem();
-                update();
-            } catch (SQLException ex) {
-                log.error("Could not update password hash", ex);
-            } catch (AuthorizeException ex) {
-                log.error("Could not update password hash", ex);
-            } finally {
-                ourContext.restoreAuthSystemState();
-            }
-        }
-
-        return answer;
+        return selfRegistered;
     }
 
     /**
@@ -1016,7 +358,7 @@ public class EPerson extends DSpaceObject
      */
     public void setLastActive(Date when)
     {
-        myRow.setColumn("last_active", when);
+        this.lastActive = when;
     }
 
     /**
@@ -1026,205 +368,16 @@ public class EPerson extends DSpaceObject
      */
     public Date getLastActive()
     {
-        return myRow.getDateColumn("last_active");
-    }
-
-    /**
-     * Update the EPerson
-     */
-    public void update() throws SQLException, AuthorizeException
-    {
-        // Check authorisation - if you're not the eperson
-        // see if the authorization system says you can
-        if (!ourContext.ignoreAuthorization()
-                && ((ourContext.getCurrentUser() == null) || (getID() != ourContext
-                        .getCurrentUser().getID())))
-        {
-            AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
-        }
-
-        DatabaseManager.update(ourContext, myRow);
-
-        log.info(LogManager.getHeader(ourContext, "update_eperson",
-                "eperson_id=" + getID()));
-
-        if (modified)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.EPERSON,
-                    getID(), null, getIdentifiers(ourContext)));
-            modified = false;
-        }
-        if (modifiedMetadata)
-        {
-            updateMetadata();
-            clearDetails();
-        }
+        return lastActive;
     }
 
     /**
      * return type found in Constants
      */
+    @Override
     public int getType()
     {
         return Constants.EPERSON;
-    }
-
-    /**
-     * Check for presence of EPerson in tables that have constraints on
-     * EPersons. Called by delete() to determine whether the eperson can
-     * actually be deleted.
-     * 
-     * An EPerson cannot be deleted if it exists in the item, workflowitem, or
-     * tasklistitem tables.
-     * 
-     * @return List of tables that contain a reference to the eperson.
-     */
-    public List<String> getDeleteConstraints() throws SQLException
-    {
-        List<String> tableList = new ArrayList<String>();
-
-        // check for eperson in item table
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-                "SELECT * from item where submitter_id= ? ",
-                getID());
-
-        try
-        {
-            if (tri.hasNext())
-            {
-                tableList.add("item");
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-                tri.close();
-            }
-        }
-
-        if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
-            getXMLWorkflowConstraints(tableList);
-        }else{
-            getOriginalWorkflowConstraints(tableList);
-
-        }
-        // the list of tables can be used to construct an error message
-        // explaining to the user why the eperson cannot be deleted.
-        return tableList;
-    }
-
-    private void getXMLWorkflowConstraints(List<String> tableList) throws SQLException {
-         TableRowIterator tri;
-        // check for eperson in claimtask table
-        tri = DatabaseManager.queryTable(ourContext, "cwf_claimtask",
-                "SELECT * from cwf_claimtask where owner_id= ? ",
-                getID());
-
-        try
-        {
-            if (tri.hasNext())
-            {
-                tableList.add("cwf_claimtask");
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-                tri.close();
-            }
-        }
-
-        // check for eperson in pooltask table
-        tri = DatabaseManager.queryTable(ourContext, "cwf_pooltask",
-                "SELECT * from cwf_pooltask where eperson_id= ? ",
-                getID());
-
-        try
-        {
-            if (tri.hasNext())
-            {
-                tableList.add("cwf_pooltask");
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-                tri.close();
-            }
-        }
-
-        // check for eperson in workflowitemrole table
-        tri = DatabaseManager.queryTable(ourContext, "cwf_workflowitemrole",
-                "SELECT * from cwf_workflowitemrole where eperson_id= ? ",
-                getID());
-
-        try
-        {
-            if (tri.hasNext())
-            {
-                tableList.add("cwf_workflowitemrole");
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-                tri.close();
-            }
-        }
-
-    }
-
-    private void getOriginalWorkflowConstraints(List<String> tableList) throws SQLException {
-        TableRowIterator tri;
-        // check for eperson in workflowitem table
-        tri = DatabaseManager.query(ourContext,
-                "SELECT * from workflowitem where owner= ? ",
-                getID());
-
-        try
-        {
-            if (tri.hasNext())
-            {
-                tableList.add("workflowitem");
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-                tri.close();
-            }
-        }
-
-        // check for eperson in tasklistitem table
-        tri = DatabaseManager.query(ourContext,
-                "SELECT * from tasklistitem where eperson_id= ? ",
-                getID());
-
-        try
-        {
-            if (tri.hasNext())
-            {
-                tableList.add("tasklistitem");
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-                tri.close();
-            }
-        }
     }
 
     @Override
@@ -1233,418 +386,39 @@ public class EPerson extends DSpaceObject
         return getEmail();
     }
 
-    @Override
-    public void updateLastModified()
-    {
-
+    String getDigestAlgorithm() {
+        return digestAlgorithm;
     }
 
-    /*
-     * Commandline tool for manipulating EPersons.
-     */
-
-    private static final Option VERB_ADD = new Option("a", "add", false, "create a new EPerson");
-    private static final Option VERB_DELETE = new Option("d", "delete", false, "delete an existing EPerson");
-    private static final Option VERB_LIST = new Option("L", "list", false, "list EPersons");
-    private static final Option VERB_MODIFY = new Option("M", "modify", false, "modify an EPerson");
-
-    private static final Option OPT_GIVENNAME = new Option("g", "givenname", true, "the person's actual first or personal name");
-    private static final Option OPT_SURNAME = new Option("s", "surname", true, "the person's actual last or family name");
-    private static final Option OPT_PHONE = new Option("t", "telephone", true, "telephone number, empty for none");
-    private static final Option OPT_LANGUAGE = new Option("l", "language", true, "the person's preferred language");
-    private static final Option OPT_REQUIRE_CERTIFICATE = new Option("c", "requireCertificate", true, "if 'true', an X.509 certificate will be required for login");
-    private static final Option OPT_CAN_LOGIN = new Option("C", "canLogIn", true, "'true' if the user can log in");
-
-    private static final Option OPT_EMAIL = new Option("m", "email", true, "the user's email address, empty for none");
-    private static final Option OPT_NETID = new Option("n", "netid", true, "network ID associated with the person, empty for none");
-
-    private static final Option OPT_NEW_EMAIL = new Option("i", "newEmail", true, "new email address");
-    private static final Option OPT_NEW_NETID = new Option("I", "newNetid", true, "new network ID");
-    
-    /**
-     * Tool for manipulating user accounts.
-     */
-    public static void main(String argv[])
-            throws ParseException, SQLException, AuthorizeException {
-        final OptionGroup VERBS = new OptionGroup();
-        VERBS.addOption(VERB_ADD);
-        VERBS.addOption(VERB_DELETE);
-        VERBS.addOption(VERB_LIST);
-        VERBS.addOption(VERB_MODIFY);
-
-        final Options globalOptions = new Options();
-        globalOptions.addOptionGroup(VERBS);
-        globalOptions.addOption("h", "help", false, "explain options");
-
-        GnuParser parser = new GnuParser();
-        CommandLine command = parser.parse(globalOptions, argv, true);
-
-        Context context = new Context();
-
-        // Disable authorization since this only runs from the local commandline.
-        context.turnOffAuthorisationSystem();
-
-        int status = 0;
-        if (command.hasOption(VERB_ADD.getOpt()))
-        {
-            status = cmdAdd(context, argv);
-        }
-        else if (command.hasOption(VERB_DELETE.getOpt()))
-        {
-            status = cmdDelete(context, argv);
-        }
-        else if (command.hasOption(VERB_MODIFY.getOpt()))
-        {
-            status = cmdModify(context, argv);
-        }
-        else if (command.hasOption(VERB_LIST.getOpt()))
-        {
-            status = cmdList(context, argv);
-        }
-        else if (command.hasOption('h'))
-        {
-            new HelpFormatter().printHelp("user [options]", globalOptions);
-        }
-        else
-        {
-            System.err.println("Unknown operation.");
-            new HelpFormatter().printHelp("user [options]", globalOptions);
-            context.abort();
-            status = 1;
-            throw new IllegalArgumentException();
-        }
-
-        if (context.isValid())
-        {
-            try {
-                context.complete();
-            } catch (SQLException ex) {
-                System.err.println(ex.getMessage());
-            }
-        }
+    void setDigestAlgorithm(String digestAlgorithm) {
+        this.digestAlgorithm = digestAlgorithm;
     }
 
-    /** Command to create an EPerson. */
-    private static int cmdAdd(Context context, String[] argv) throws AuthorizeException {
-        Options options = new Options();
-
-        options.addOption(VERB_ADD);
-
-        final OptionGroup identityOptions = new OptionGroup();
-        identityOptions.addOption(OPT_EMAIL);
-        identityOptions.addOption(OPT_NETID);
-
-        options.addOptionGroup(identityOptions);
-
-        options.addOption(OPT_GIVENNAME);
-        options.addOption(OPT_SURNAME);
-        options.addOption(OPT_PHONE);
-        options.addOption(OPT_LANGUAGE);
-        options.addOption(OPT_REQUIRE_CERTIFICATE);
-
-        Option option = new Option("p", "password", true, "password to match the EPerson name");
-        options.addOption(option);
-
-        options.addOption("h", "help", false, "explain --add options");
-
-        // Rescan the command for more details.
-        GnuParser parser = new GnuParser();
-        CommandLine command;
-        try {
-            command = parser.parse(options, argv);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-            return 1;
-        }
-
-        if (command.hasOption('h'))
-        {
-            new HelpFormatter().printHelp("user --add [options]", options);
-            return 0;
-        }
-
-        // Check that we got sufficient credentials to define a user.
-        if ((!command.hasOption(OPT_EMAIL.getOpt())) && (!command.hasOption(OPT_NETID.getOpt())))
-        {
-            System.err.println("You must provide an email address or a netid to identify the new user.");
-            return 1;
-        }
-
-        if (!command.hasOption('p'))
-        {
-            System.err.println("You must provide a password for the new user.");
-            return 1;
-        }
-
-        // Create!
-        EPerson eperson = null;
-        try {
-            eperson = create(context);
-        } catch (SQLException ex) {
-            context.abort();
-            System.err.println(ex.getMessage());
-            return 1;
-        } catch (AuthorizeException ex) { /* XXX SNH */ }
-        eperson.setCanLogIn(true);
-        eperson.setSelfRegistered(false);
-
-        eperson.setEmail(command.getOptionValue(OPT_EMAIL.getOpt()));
-        eperson.setFirstName(command.getOptionValue(OPT_GIVENNAME.getOpt()));
-        eperson.setLastName(command.getOptionValue(OPT_SURNAME.getOpt()));
-        eperson.setLanguage(command.getOptionValue(OPT_LANGUAGE.getOpt(),
-                Locale.getDefault().getLanguage()));
-        eperson.setMetadata("phone", command.getOptionValue(OPT_PHONE.getOpt()));
-        eperson.setNetid(command.getOptionValue(OPT_NETID.getOpt()));
-        eperson.setPassword(command.getOptionValue('p'));
-        if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt()))
-        {
-            eperson.setRequireCertificate(Boolean.valueOf(command.getOptionValue(
-                OPT_REQUIRE_CERTIFICATE.getOpt())));
-        }
-        else
-        {
-            eperson.setRequireCertificate(false);
-        }
-
-        try {
-            eperson.update();
-            context.commit();
-            System.out.printf("Created EPerson %d\n", eperson.getID());
-        } catch (SQLException ex) {
-            context.abort();
-            System.err.println(ex.getMessage());
-            return 1;
-        } catch (AuthorizeException ex) { /* XXX SNH */ }
-
-        return 0;
+    String getSalt() {
+        return salt;
     }
 
-    /** Command to delete an EPerson. */
-    private static int cmdDelete(Context context, String[] argv)
-    {
-        Options options = new Options();
-
-        options.addOption(VERB_DELETE);
-
-        final OptionGroup identityOptions = new OptionGroup();
-        identityOptions.addOption(OPT_EMAIL);
-        identityOptions.addOption(OPT_NETID);
-
-        options.addOptionGroup(identityOptions);
-
-        options.addOption("h", "help", false, "explain --delete options");
-
-        GnuParser parser = new GnuParser();
-        CommandLine command;
-        try {
-            command = parser.parse(options, argv);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-            return 1;
-        }
-
-        if (command.hasOption('h'))
-        {
-            new HelpFormatter().printHelp("user --delete [options]", options);
-            return 0;
-        }
-
-        // Delete!
-        EPerson eperson = null;
-        try {
-            if (command.hasOption(OPT_NETID.getOpt()))
-            {
-                eperson = findByNetid(context, command.getOptionValue(OPT_NETID.getOpt()));
-            }
-            else if (command.hasOption(OPT_EMAIL.getOpt()))
-            {
-                eperson = findByEmail(context, command.getOptionValue(OPT_EMAIL.getOpt()));
-            }
-            else
-            {
-                System.err.println("You must specify the user's email address or netid.");
-                return 1;
-            }
-        } catch (SQLException e) {
-            System.err.append(e.getMessage());
-            return 1;
-        } catch (AuthorizeException e) { /* XXX SNH */ }
-
-        if (null == eperson)
-        {
-            System.err.println("No such EPerson");
-            return 1;
-        }
-
-        try {
-            eperson.delete();
-            context.commit();
-            System.out.printf("Deleted EPerson %d\n", eperson.getID());
-        } catch (SQLException ex) {
-            System.err.println(ex.getMessage());
-            return 1;
-        } catch (AuthorizeException ex) {
-            System.err.println(ex.getMessage());
-            return 1;
-        } catch (EPersonDeletionException ex) {
-            System.err.println(ex.getMessage());
-            return 1;
-        }
-
-        return 0;
+    void setSalt(String salt) {
+        this.salt = salt;
     }
 
-    /** Command to modify an EPerson. */
-    private static int cmdModify(Context context, String[] argv) throws AuthorizeException {
-        Options options = new Options();
-
-        options.addOption(VERB_MODIFY);
-
-        final OptionGroup identityOptions = new OptionGroup();
-        identityOptions.addOption(OPT_EMAIL);
-        identityOptions.addOption(OPT_NETID);
-
-        options.addOptionGroup(identityOptions);
-
-        options.addOption(OPT_GIVENNAME);
-        options.addOption(OPT_SURNAME);
-        options.addOption(OPT_PHONE);
-        options.addOption(OPT_LANGUAGE);
-        options.addOption(OPT_REQUIRE_CERTIFICATE);
-
-        options.addOption(OPT_CAN_LOGIN);
-        options.addOption(OPT_NEW_EMAIL);
-        options.addOption(OPT_NEW_NETID);
-
-        options.addOption("h", "help", false, "explain --modify options");
-
-        GnuParser parser = new GnuParser();
-        CommandLine command;
-        try {
-            command = parser.parse(options, argv);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-            return 1;
-        }
-
-        if (command.hasOption('h'))
-        {
-            new HelpFormatter().printHelp("user --modify [options]", options);
-            return 0;
-        }
-
-        // Modify!
-        EPerson eperson = null;
-        try {
-            if (command.hasOption(OPT_NETID.getOpt()))
-            {
-                eperson = findByNetid(context, command.getOptionValue(OPT_NETID.getOpt()));
-            }
-            else if (command.hasOption(OPT_EMAIL.getOpt()))
-            {
-                eperson = findByEmail(context, command.getOptionValue(OPT_EMAIL.getOpt()));
-            }
-            else
-            {
-                System.err.println("No EPerson selected");
-                return 1;
-            }
-        } catch (SQLException e) {
-            System.err.append(e.getMessage());
-            return 1;
-        } catch (AuthorizeException e) { /* XXX SNH */ }
-
-        boolean modified = false;
-        if (null == eperson)
-        {
-            System.err.println("No such EPerson");
-            return 1;
-        }
-        else
-        {
-            if (command.hasOption(OPT_NEW_EMAIL.getOpt()))
-            {
-                eperson.setEmail(command.getOptionValue(OPT_NEW_EMAIL.getOpt()));
-                modified = true;
-            }
-            if (command.hasOption(OPT_NEW_NETID.getOpt()))
-            {
-                eperson.setNetid(command.getOptionValue(OPT_NEW_NETID.getOpt()));
-                modified = true;
-            }
-            if (command.hasOption(OPT_GIVENNAME.getOpt()))
-            {
-                eperson.setFirstName(command.getOptionValue(OPT_GIVENNAME.getOpt()));
-                modified = true;
-            }
-            if (command.hasOption(OPT_SURNAME.getOpt()))
-            {
-                eperson.setLastName(command.getOptionValue(OPT_SURNAME.getOpt()));
-                modified = true;
-            }
-            if (command.hasOption(OPT_PHONE.getOpt()))
-            {
-                eperson.setMetadata("phone", command.getOptionValue(OPT_PHONE.getOpt()));
-                modified = true;
-            }
-            if (command.hasOption(OPT_LANGUAGE.getOpt()))
-            {
-                eperson.setLanguage(command.getOptionValue(OPT_LANGUAGE.getOpt()));
-                modified = true;
-            }
-            if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt()))
-            {
-                eperson.setRequireCertificate(Boolean.valueOf(command.getOptionValue(
-                        OPT_REQUIRE_CERTIFICATE.getOpt())));
-                modified = true;
-            }
-            if (command.hasOption(OPT_CAN_LOGIN.getOpt()))
-            {
-                eperson.setCanLogIn(Boolean.valueOf(command.getOptionValue(OPT_CAN_LOGIN.getOpt())));
-                modified = true;
-            }
-            if (modified)
-            {
-                try {
-                    eperson.update();
-                    context.commit();
-                    System.out.printf("Modified EPerson %d\n", eperson.getID());
-                } catch (SQLException ex) {
-                    context.abort();
-                    System.err.println(ex.getMessage());
-                    return 1;
-                } catch (AuthorizeException ex) { /* XXX SNH */ }
-            }
-            else
-            {
-                System.out.println("No changes.");
-            }
-        }
-
-        return 0;
+    String getPassword() {
+        return password;
     }
 
-    /** Command to list known EPersons. */
-    private static int cmdList(Context context, String[] argv)
-    {
-        // XXX ideas:
-        // specific user/netid
-        // wild or regex match user/netid
-        // select details (pseudo-format string)
-        try {
-            for (EPerson person : findAll(context, EMAIL))
-            {
-                System.out.printf("%d\t%s/%s\t%s, %s\n",
-                        person.getID(),
-                        person.getEmail(),
-                        person.getNetid(),
-                        person.getLastName(), person.getFirstName()); // TODO more user details
-            }
-        } catch (SQLException ex) {
-            System.err.println(ex.getMessage());
-            return 1;
-        }
+    void setPassword(String password) {
+        this.password = password;
+    }
 
-        return 0;
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    private EPersonService getePersonService() {
+        if(ePersonService == null)
+        {
+            ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+        }
+        return ePersonService;
     }
 }

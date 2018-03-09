@@ -9,12 +9,13 @@ package org.dspace.app.requestitem;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 
@@ -29,7 +30,10 @@ import java.sql.SQLException;
  */
 public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
 
-    private static Logger log = Logger.getLogger(RequestItemHelpdeskStrategy.class);
+    private Logger log = Logger.getLogger(RequestItemHelpdeskStrategy.class);
+
+    @Autowired(required = true)
+    protected EPersonService ePersonService;
 
     public RequestItemHelpdeskStrategy() {}
 
@@ -50,20 +54,17 @@ public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
      * Return a RequestItemAuthor object for the specified helpdesk email address.
      * It makes an attempt to find if there is a matching eperson for the helpdesk address, to use the name,
      * Otherwise it falls back to a helpdeskname key in the Messages.props.
-     * @param context
-     * @param helpDeskEmail
-     * @return
+     * @param context context
+     * @param helpDeskEmail email
+     * @return RequestItemAuthor
+     * @throws SQLException if database error
      */
     public RequestItemAuthor getHelpDeskPerson(Context context, String helpDeskEmail) throws SQLException{
         EPerson helpdeskEPerson = null;
 
-        try {
-            context.turnOffAuthorisationSystem();
-            helpdeskEPerson = EPerson.findByEmail(context, helpDeskEmail);
-            context.restoreAuthSystemState();
-        } catch (AuthorizeException e) {
-            log.error(e.getMessage());
-        }
+        context.turnOffAuthorisationSystem();
+        helpdeskEPerson = ePersonService.findByEmail(context, helpDeskEmail);
+        context.restoreAuthSystemState();
 
         if(helpdeskEPerson != null) {
             return new RequestItemAuthor(helpdeskEPerson);

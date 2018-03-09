@@ -45,8 +45,14 @@ public abstract class AbstractSubmissionStep extends AbstractStep
      *      The new sub-List object created by this step, which contains
      *      all the reviewable information.  If this step has nothing to
      *      review, then return null!   
+     * @throws org.xml.sax.SAXException whenever.
+     * @throws org.dspace.app.xmlui.wing.WingException whenever.
+     * @throws org.dspace.app.xmlui.utils.UIException whenever.
+     * @throws java.sql.SQLException whenever.
+     * @throws java.io.IOException whenever.
+     * @throws org.dspace.authorize.AuthorizeException whenever.
      */
-    public abstract List addReviewSection(List reviewList) throws SAXException,
-        WingException, UIException, SQLException, IOException,
+    public abstract List addReviewSection(List reviewList)
+            throws SAXException, WingException, UIException, SQLException, IOException,
         AuthorizeException;
 }

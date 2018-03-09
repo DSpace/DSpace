@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.rdf.RDFConfiguration;
+import org.dspace.rdf.RDFUtil;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  *
@@ -45,7 +46,8 @@ public class NegotiationFilter implements Filter
     {
         try
         {
-            if (!RDFConfiguration.isContentNegotiationEnabled())
+            if (!DSpaceServicesFactory.getInstance().getConfigurationService()
+                    .getBooleanProperty(RDFUtil.CONTENT_NEGOTIATION_KEY, false))
             {
                 chain.doFilter(request, response);
                 return;

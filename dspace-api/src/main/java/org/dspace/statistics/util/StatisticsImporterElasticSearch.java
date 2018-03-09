@@ -15,12 +15,16 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.statistics.ElasticSearchLogger;
-import org.dspace.statistics.SolrLogger;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.statistics.SolrLoggerServiceImpl;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
+import org.dspace.statistics.service.ElasticSearchLoggerService;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.Client;
@@ -31,14 +35,11 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 
 
 import java.io.*;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Class to load intermediate statistics files (produced from log files by <code>ClassicDSpaceLogConverter</code>) into Elastic Search
@@ -51,7 +52,12 @@ public class StatisticsImporterElasticSearch {
     private static final Logger log = Logger.getLogger(StatisticsImporterElasticSearch.class);
 
     /** Date format */
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        }
+    };
 
     //TODO ES Client
 
@@ -64,7 +70,8 @@ public class StatisticsImporterElasticSearch {
     /** Whether to skip the DNS reverse lookup or not */
     private static boolean skipReverseDNS = false;
 
-    private static ElasticSearchLogger elasticSearchLoggerInstance;
+    private static ElasticSearchLoggerService elasticSearchLoggerInstance = StatisticsServiceFactory.getInstance().getElasticSearchLoggerService();
+    ;
     private static Client client;
     private static BulkRequestBuilder bulkRequest;
 
@@ -114,8 +121,8 @@ public class StatisticsImporterElasticSearch {
 
             DNSCache dnsCache = new DNSCache(2500, 0.75f, 2500);
             Object fromCache;
-            Random rand = new Random();
 
+            ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
             while ((line = input.readLine()) != null)
             {
                 // Tokenise the line
@@ -129,7 +136,7 @@ public class StatisticsImporterElasticSearch {
 //                uuid = parts[0];
                 action = parts[1];
                 id = parts[2];
-                date = dateFormat.parse(parts[3]);
+                date = dateFormat.get().parse(parts[3]);
                 user = parts[4];
                 ip = parts[5];
 
@@ -203,25 +210,35 @@ public class StatisticsImporterElasticSearch {
                 }
 
                 // Now find our dso
+                DSpaceObjectLegacySupportService legacySupportService = null;
                 int type = 0;
                 if ("view_bitstream".equals(action))
                 {
+                    legacySupportService = contentServiceFactory.getBitstreamService();
                     type = Constants.BITSTREAM;
                 }
                 else if ("view_item".equals(action))
                 {
+                    legacySupportService = contentServiceFactory.getItemService();
                     type = Constants.ITEM;
                 }
                 else if ("view_collection".equals(action))
                 {
+                    legacySupportService = contentServiceFactory.getCollectionService();
                     type = Constants.COLLECTION;
                 }
                 else if ("view_community".equals(action))
                 {
+                    legacySupportService = contentServiceFactory.getCommunityService();
                     type = Constants.COMMUNITY;
                 }
+                if(legacySupportService == null)
+                {
+                    continue;
+                }
 
-                DSpaceObject dso = DSpaceObject.find(context, type, Integer.parseInt(id));
+
+                DSpaceObject dso = legacySupportService.findByIdOrLegacyId(context, id);
                 if (dso == null)
                 {
                     if (verbose)
@@ -232,7 +249,7 @@ public class StatisticsImporterElasticSearch {
                 }
 
                 // Get the eperson details
-                EPerson eperson = EPerson.findByEmail(context, user);
+                EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, user);
                 int epersonId = 0;
                 if (eperson != null)
                 {
@@ -245,7 +262,7 @@ public class StatisticsImporterElasticSearch {
                 XContentBuilder postBuilder = XContentFactory.jsonBuilder().startObject()
                         .field("id", dso.getID())
                         .field("typeIndex", dso.getType())
-                        .field("type", dso.getTypeText())
+                        .field("type", contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso))
 
                         .field("geo", new GeoPoint(latitude, longitude))
                         .field("continent", continent)
@@ -255,13 +272,13 @@ public class StatisticsImporterElasticSearch {
 
                         .field("ip", ip)
 
-                        .field("time", DateFormatUtils.format(date, SolrLogger.DATE_FORMAT_8601));
+                        .field("time", DateFormatUtils.format(date, SolrLoggerServiceImpl.DATE_FORMAT_8601));
 
                 // Unable to get UserAgent from logs. .field("userAgent")
 
                 if (dso instanceof Bitstream) {
                     Bitstream bit = (Bitstream) dso;
-                    Bundle[] bundles = bit.getBundles();
+                    List<Bundle> bundles = bit.getBundles();
                     postBuilder = postBuilder.field("bundleName").startArray();
                     for (Bundle bundle : bundles) {
                         postBuilder = postBuilder.value(bundle.getName());
@@ -369,15 +386,13 @@ public class StatisticsImporterElasticSearch {
             skipReverseDNS = true;
         }
 
-        elasticSearchLoggerInstance = new ElasticSearchLogger();
-
         log.info("Getting ElasticSearch Transport Client for StatisticsImporterElasticSearch...");
 
         // This is only invoked via terminal, do not use _this_ node as that data storing node.
         // Need to get a NodeClient or TransportClient, but definitely do not want to get a local data storing client.
-        client = elasticSearchLoggerInstance.getClient(ElasticSearchLogger.ClientType.TRANSPORT);
+        client = elasticSearchLoggerInstance.getClient(ElasticSearchLoggerService.ClientType.TRANSPORT);
 
-        client.admin().indices().prepareRefresh(ElasticSearchLogger.getIndexName()).execute().actionGet();
+        client.admin().indices().prepareRefresh(StatisticsServiceFactory.getInstance().getElasticSearchLoggerService().getIndexName()).execute().actionGet();
         bulkRequest = client.prepareBulk();
 
         // We got all our parameters now get the rest
@@ -409,6 +424,7 @@ public class StatisticsImporterElasticSearch {
             File dir = sample.getParentFile();
             FilenameFilter filter = new FilenameFilter()
             {
+                @Override
                 public boolean accept(File dir, String name)
                 {
                     return name.startsWith(sample.getName());

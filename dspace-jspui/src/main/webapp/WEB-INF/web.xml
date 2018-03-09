@@ -21,21 +21,10 @@
   
   <display-name>DSpace Web UI</display-name>
 
-
-  <!-- Configuration Information -->
-
+  <!-- ConfigurationService initialization for dspace.dir -->
   <context-param>
     <description>
-      The location of the main DSpace configuration file
-    </description>
-    <param-name>dspace-config</param-name>
-    <param-value>${dspace.dir}/config/dspace.cfg</param-value>
-  </context-param>
-
-  <!-- new ConfigurationService initialization for dspace.dir -->
-  <context-param>
-    <description>
-      The location of the main DSpace configuration file
+      The location of the DSpace home directory.
     </description>
     <param-name>dspace.dir</param-name>
     <param-value>${dspace.dir}</param-value>
@@ -125,17 +114,24 @@
       <filter-name>rdf-content-negotiation</filter-name>
       <url-pattern>/handle/*</url-pattern>
   </filter-mapping>
- 
 
-  <!--
-       DSpace Kernel startup listener. This listener is in charge of initializing/starting the
-       DSpace Kernel. It MUST be listed BEFORE any other DSpace listeners, as DSpace services
-       will not function until the Kernel is initialized.
-  -->
+
+    <!-- Listener to initialise / clean up the application -->
+    <listener>
+       <listener-class>
+          org.dspace.app.util.DSpaceContextListener
+       </listener-class>
+    </listener>
+
+  <!-- kernel start listener (from impl), starts up the kernel for standalong webapps -->
   <listener>
      <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
   </listener>
-  
+
+    <listener>
+   		<listener-class>org.dspace.app.util.DSpaceWebappListener</listener-class>
+   	</listener>
+
   <!-- Listener to clean up Commons-FileUpload -->
   <listener>
      <listener-class>
@@ -143,18 +139,12 @@
      </listener-class>
   </listener>
   
-  <!-- Listener to initialise / clean up the application -->
-  <listener>
-     <listener-class>
-        org.dspace.app.util.DSpaceContextListener
-     </listener-class>
-  </listener>
 
   <!-- Load Spring applicationContext -->
   <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
-  
+
   <!-- Servlets -->
 
   <servlet>
@@ -516,15 +506,20 @@
     <url-pattern>/exportdownload/*</url-pattern>
   </servlet-mapping>
 
-        <servlet-mapping>
-                <servlet-name>browse</servlet-name>
-                <url-pattern>/browse</url-pattern>
-        </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browse</servlet-name>
+    <url-pattern>/browse</url-pattern>
+  </servlet-mapping>
 
-        <servlet-mapping>
-                <servlet-name>browsewithdrawn</servlet-name>
-                <url-pattern>/dspace-admin/withdrawn</url-pattern>
-        </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>browsewithdrawn</servlet-name>
+    <url-pattern>/dspace-admin/withdrawn</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>browsewithdrawn</servlet-name>
+    <url-pattern>/tools/withdrawn</url-pattern>
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>community-list</servlet-name>
@@ -799,6 +794,11 @@
   <servlet-mapping>
     <servlet-name>privateitems</servlet-name>
     <url-pattern>/dspace-admin/privateitems</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>privateitems</servlet-name>
+    <url-pattern>/tools/privateitems</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

@@ -55,7 +55,7 @@ public class StatisticsSearchTransformer extends AbstractStatisticsDataTransform
 
         if(dso != null)
         {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath);
         }
         pageMeta.addTrailLink(contextPath + (dso != null && dso.getHandle() != null ? "/handle/" + dso.getHandle() : "") + "/search-statistics", T_trail);
 

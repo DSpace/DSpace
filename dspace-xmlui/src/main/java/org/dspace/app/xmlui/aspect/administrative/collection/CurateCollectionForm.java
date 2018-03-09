@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.UUID;
+
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.xml.sax.SAXException;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -29,7 +33,6 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.core.ConfigurationManager;
 
 /**
  *
@@ -57,7 +60,10 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
         private static final Message T_label_name = message("xmlui.administrative.collection.CurateCollectionForm.label_name");
         private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
         
-        
+
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+
+    @Override
         public void setup(SourceResolver resolver, Map objectModel, String src,
 		          Parameters parameters) throws ProcessingException, SAXException, IOException
 		{
@@ -65,33 +71,21 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
         	FlowCurationUtils.setupCurationTasks();
 		}
 
-        /**
-         * common package method for initializing form gui elements
-         * Could be refactored.
-         *
-         * @param pageMeta
-         * @throws WingException
-         */
-        public void addPageMeta(PageMeta pageMeta) throws WingException
+    @Override
+    public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         pageMeta.addTrail().addContent(T_collection_trail);
         pageMeta.addTrail().addContent(T_trail);
     }
-        /** addBody
-     *
-     * @param body
-     * @throws WingException
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-        public void addBody(Body body)
-                                    throws WingException, SQLException,
-                                                        AuthorizeException, UnsupportedEncodingException
+
+    @Override
+    public void addBody(Body body)
+            throws WingException, SQLException, AuthorizeException, UnsupportedEncodingException
 	{
-            int collectionID = parameters.getParameterAsInteger("collectionID", -1);
-            Collection thisCollection = Collection.find(context, collectionID);
+            UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
+            Collection thisCollection = collectionService.find(context, collectionID);
             String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
 
 		// DIVISION: main
@@ -133,9 +127,8 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
         taskSelect = FlowCurationUtils.getTaskSelectOptions(taskSelect, curateGroup);
         taskSelect.setSize(1);
         taskSelect.setRequired();
-	    
 
-            // need submit_curate_task and submit_return
+        // need submit_curate_task and submit_return
 	    Para buttonList = main.addPara();
             buttonList.addButton("submit_curate_task").setValue(T_submit_perform);
             buttonList.addButton("submit_queue_task").setValue(T_submit_queue);

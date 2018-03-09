@@ -1,11 +1,7 @@
 --
 -- update-sequences.sql
 --
--- Version: $Revision$
---
--- Date:    $Date$
---
--- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
+-- Copyright (c) 2002-2016, The DSpace Foundation.  All rights reserved.
 -- 
 -- Redistribution and use in source and binary forms, with or without
 -- modification, are permitted provided that the following conditions are
@@ -47,46 +43,27 @@
 -- org.dspace.content API which is safe to use concurrently and in multiple
 -- JVMs.  The SQL code below will typically only be required after a direct
 -- SQL data dump from a backup or somesuch.
- 
 
--- There should be one of these calls for every ID sequence defined in
--- database_schema.sql.
-
--- depends on being run from sqlplus with incseq.sql in the current path
--- you can find incseq.sql at: http://akadia.com/services/scripts/incseq.sql
+-- Depends on being run from sqlplus with incseq.sql in the current path
+-- you can find incseq.sql at: http://www.akadia.com/services/scripts/incseq.sql
+-- Here that script was renamed to updateseq.sql.
 
 @updateseq.sql bitstreamformatregistry_seq bitstreamformatregistry bitstream_format_id ""
 @updateseq.sql fileextension_seq fileextension file_extension_id ""
-@updateseq.sql bitstream_seq bitstream bitstream_id ""
-@updateseq.sql eperson_seq eperson eperson_id ""
-@updateseq.sql epersongroup_seq epersongroup eperson_group_id ""
-@updateseq.sql group2group_seq group2group id ""
-@updateseq.sql group2groupcache_seq group2groupcache id ""
-@updateseq.sql item_seq item item_id ""
-@updateseq.sql bundle_seq bundle bundle_id ""
-@updateseq.sql item2bundle_seq item2bundle id ""
-@updateseq.sql bundle2bitstream_seq bundle2bitstream id ""
-@updateseq.sql dcvalue_seq dcvalue dc_value_id ""
-@updateseq.sql community_seq community community_id ""
-@updateseq.sql community2community_seq community2community id ""
-@updateseq.sql collection_seq collection collection_id ""
-@updateseq.sql community2collection_seq community2collection id ""
-@updateseq.sql collection2item_seq collection2item id ""
 @updateseq.sql resourcepolicy_seq resourcepolicy policy_id ""
-@updateseq.sql epersongroup2eperson_seq epersongroup2eperson id ""
 @updateseq.sql workspaceitem_seq workspaceitem workspace_item_id ""
 @updateseq.sql workflowitem_seq workflowitem workflow_id ""
 @updateseq.sql tasklistitem_seq tasklistitem tasklist_id ""
 @updateseq.sql registrationdata_seq registrationdata registrationdata_id ""
 @updateseq.sql subscription_seq subscription subscription_id ""
-@updateseq.sql communities2item_seq communities2item id ""
-@updateseq.sql epersongroup2workspaceitem_seq epersongroup2workspaceitem id ""
 @updateseq.sql metadatafieldregistry_seq metadatafieldregistry metadata_field_id ""
 @updateseq.sql metadatavalue_seq metadatavalue metadata_value_id ""
 @updateseq.sql metadataschemaregistry_seq metadataschemaregistry metadata_schema_id ""
 @updateseq.sql harvested_collection_seq harvested_collection id ""
 @updateseq.sql harvested_item_seq harvested_item id ""
-@updateseq.sql webapp_seq webapp id ""
+@updateseq.sql webapp_seq webapp webapp_id ""
+@updateseq.sql requestitem_seq requestitem requestitem_id ""
+@updateseq.sql handle_id_seq handle handle_id ""
 
 -- Handle Sequence is a special case.  Since Handles minted by DSpace use the 'handle_seq',
 -- we need to ensure the next assigned handle will *always* be unique.  So, 'handle_seq'

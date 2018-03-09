@@ -24,8 +24,10 @@ import org.dspace.core.Constants;
  * returns true if the Item in the request has not been modified since that
  * date.  The expression is ignored since the test is inherent in the request.
  *
- * Typical sitemap usage:
+ * <p>Typical sitemap usage:
  *
+ * <pre>
+ * {@code
  *  <map:match type="HandleTypeMatcher" pattern="item">
  *    <map:select type="IfModifiedSinceSelector">
  *      <map:when test="true">
@@ -38,13 +40,15 @@ import org.dspace.core.Constants;
  *      </map:otherwise>
  *    </map:select>
  *  </map:match>
+ * }
+ * </pre>
  *
  * @author Larry Stone
  */
 public class IfModifiedSinceSelector implements Selector
 {
 
-    private static Logger log = Logger.getLogger(IfModifiedSinceSelector.class);
+    private static final Logger log = Logger.getLogger(IfModifiedSinceSelector.class);
 
     /**
      * Check for If-Modified-Since header on request,
@@ -53,9 +57,12 @@ public class IfModifiedSinceSelector implements Selector
      *
      * @param expression is ignored
      * @param objectModel
-     *            environment passed through via cocoon
+     *            environment passed through via Cocoon.
+     * @param parameters
+     *            sitemap parameters.
      * @return null or map containing value of sitemap parameter 'pattern'
      */
+    @Override
     public boolean select(String expression, Map objectModel,
             Parameters parameters)
     {

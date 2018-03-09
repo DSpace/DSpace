@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 
 /**
@@ -22,6 +23,7 @@ import org.dspace.core.Context;
  */
 public class DefaultEmbargoLifter implements EmbargoLifter
 {
+
     public DefaultEmbargoLifter()
     {
         super();
@@ -34,11 +36,12 @@ public class DefaultEmbargoLifter implements EmbargoLifter
      * @param context the DSpace context
      * @param item    the item to embargo
      */
+    @Override
     public void liftEmbargo(Context context, Item item)
             throws SQLException, AuthorizeException, IOException
     {
         // remove the item's policies and replace them with
         // the defaults from the collection
-        item.inheritCollectionDefaultPolicies(item.getOwningCollection());
+        ContentServiceFactory.getInstance().getItemService().inheritCollectionDefaultPolicies(context, item, item.getOwningCollection());
     }
 }

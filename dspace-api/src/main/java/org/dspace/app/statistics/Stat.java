@@ -143,7 +143,8 @@ public class Stat implements Comparable
      * @return      +1, 0, -1 if o is less than, equal to, or greater than the
      *              current object value.
      */
-    public int compareTo(Object o) 
+    @Override
+    public int compareTo(Object o)
     {
         int objectValue = ((Stat) o).getValue();
         

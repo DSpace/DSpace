@@ -28,10 +28,13 @@
 
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.dspace.eperson.service.EPersonService" %>
+<%@ page import="org.dspace.eperson.factory.EPersonServiceFactory" %>
 
 <%
-    EPerson[] epeople =
-        (EPerson[]) request.getAttribute("epeople");
+    List<EPerson> epeople =
+        (List<EPerson>) request.getAttribute("epeople");
     int pageSize  = ((Integer)request.getAttribute("page_size" )).intValue();
     int pageIndex = ((Integer)request.getAttribute("page_index")).intValue();
     int pageCount = ((Integer)request.getAttribute("page_count")).intValue();
@@ -40,10 +43,10 @@
     int lastEPerson  = firstEPerson + (pageSize - 1);  // index of last person
                                                        // most common case is full page
 
-    if (lastEPerson >= epeople.length)
+    if (lastEPerson >= epeople.size())
     {
         // oops, less than a full page left, trim
-        lastEPerson = -1 + firstEPerson + ((epeople.length-firstEPerson) % pageSize); 
+        lastEPerson = -1 + firstEPerson + ((epeople.size()-firstEPerson) % pageSize);
     }
 
 
@@ -78,7 +81,7 @@
     <h1><fmt:message key="jsp.dspace-admin.eperson-browse.heading">
         <fmt:param><%=firstEPerson%></fmt:param>
         <fmt:param><%=lastEPerson%></fmt:param>
-        <fmt:param><%=epeople.length%></fmt:param>
+        <fmt:param><%=epeople.size()%></fmt:param>
     </fmt:message></h1>
 
     <table class="miscTable" align="center" summary="Browse E-people">
@@ -104,9 +107,10 @@
 
 <%
     String row = "even";
+    EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     for (int i = firstEPerson; i <= lastEPerson; i++)
     {
-        EPerson e = epeople[i];
+        EPerson e = epeople.get(i);
         String commandString = request.getContextPath() + "/dspace-admin/edit-epeople?submit_edit&amp;eperson_id=" + e.getID();
 %>
         <form method="post" action="<%= request.getContextPath() %>/dspace-admin/edit-epeople">
@@ -131,7 +135,7 @@
                     <%= e.getSelfRegistered() ? "yes" : "no" %>
                 </td>
                 <td headers="t8" class="<%= row %>RowEvenCol">
-                    <%= (e.getMetadata("phone") == null ? "" : Utils.addEntities(e.getMetadata("phone"))) %>
+                    <%= (ePersonService.getMetadata(e, "phone") == null ? "" : Utils.addEntities(ePersonService.getMetadata(e, "phone"))) %>
                 </td>
                 <td headers="t9" class="<%= row %>RowOddCol">
                     <input type="hidden" name="eperson_id" value="<%= e.getID() %>"/>

@@ -1,51 +1,25 @@
 #!/bin/sh
-
 ###########################################################################
+# The contents of this file are subject to the license and copyright
+# detailed in the LICENSE and NOTICE files at the root of the source
+# tree and available online at
 #
-# start-handle-server
-#
-# Version: $Revision$
-#
-# Date: $Date$
-#
-# Copyright (c) 2002-2010, Duraspace.  All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are
-# met:
-#
-# - Redistributions of source code must retain the above copyright
-# notice, this list of conditions and the following disclaimer.
-#
-# - Redistributions in binary form must reproduce the above copyright
-# notice, this list of conditions and the following disclaimer in the
-# documentation and/or other materials provided with the distribution.
-#
-# - Neither the name of Duraspacen nor the names of its
-# contributors may be used to endorse or promote products derived from
-# this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-# HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-# OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-# TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-# USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-# DAMAGE.
-#
+# http://www.dspace.org/license/
 ###########################################################################
-
-# Shell script for starting Handle server.  WARNING this assumes the old
-# one has been terminated.
+# 'start-handle-server' script
+# Unix shell script for starting Handle server.  WARNING this assumes any
+# previously running Handle servers have been terminated.
 
 # Assume we're in the bin subdirectory of the DSpace installation directory
 BINDIR=`dirname $0`
-DSPACEDIR=`cd "$BINDIR/.." ; pwd`
+
+# Read parameters from DSpace config
+DSPACEDIR=`$BINDIR/dspace dsprop --property dspace.dir`
+HANDLEDIR=`$BINDIR/dspace dsprop --property handle.dir`
+
+# Assume log directory is a subdirectory of DSPACEDIR.
+# If you want your handle server logs stored elsewhere, change this value
+LOGDIR=$DSPACEDIR/log
 
 # Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
 JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
@@ -62,14 +36,10 @@ if [ "$JAVA_OPTS" = "" ]; then
     JAVA_OPTS=-Xmx256m
 fi
 
-# Read parameters from DSpace config
-handledir=`$BINDIR/dspace dsprop -property handle.dir`
-logdir=`$BINDIR/dspace dsprop -property log.dir`
-
 # Remove lock file, in case the old Handle server did not shut down properly
 rm -f $handledir/txns/lock
 
 # Start the Handle server, with a special log4j properties file.
 # We cannot simply write to the same logs, since log4j
 # does not support more than one JVM writing to the same rolling log.
-nohup java $JAVA_OPTS -classpath $FULLPATH -Ddspace.log.init.disable=true -Dlog4j.configuration=log4j-handle-plugin.properties net.handle.server.Main $handledir </dev/null >> $logdir/handle-server.log 2>&1 &
+nohup java $JAVA_OPTS -classpath $FULLPATH -Ddspace.log.init.disable=true -Dlog4j.configuration=log4j-handle-plugin.properties net.handle.server.Main $HANDLEDIR </dev/null >> $LOGDIR/handle-server.log 2>&1 &

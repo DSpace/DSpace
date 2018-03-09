@@ -9,12 +9,14 @@ package org.dspace.app.xmlui.aspect.general;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -103,11 +105,17 @@ public class HandleMatcher extends AbstractLogEnabled implements Matcher
             }
             else if (dso.getType() == Constants.COLLECTION)
             {
-                current = ((Collection) current).getCommunities()[0];
+                current = ((Collection) current).getCommunities().get(0);
             }
             else if (dso.getType() == Constants.COMMUNITY)
             {
-                current = ((Community) current).getParentCommunity();
+                List<Community> parentCommunities = ((Community) current).getParentCommunities();
+                if(CollectionUtils.isNotEmpty(parentCommunities))
+                {
+                    current = parentCommunities.get(0);
+                }else{
+                    current = null;
+                }
             }
         }
 

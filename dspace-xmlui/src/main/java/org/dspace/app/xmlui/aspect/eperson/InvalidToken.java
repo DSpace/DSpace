@@ -14,7 +14,7 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Display to the user that the token provided was invalid.
@@ -62,14 +62,14 @@ public class InvalidToken extends AbstractDSpaceTransformer
        invalid.addPara(T_para1);
 
        Para example1 = invalid.addPara("invalid-token-example","code");
-       example1.addContent(ConfigurationManager.getProperty("dspace.url") + "/register?token=ABCDEFGHIJK");
+       example1.addContent(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url") + "/register?token=ABCDEFGHIJK");
        Para example2 = invalid.addPara("invalid-token-example","code");
        example2.addContent("LMNOP");
        
        invalid.addPara(T_para2);
 
        Para example3 = invalid.addPara("valid-token-example","code");
-       example3.addContent(ConfigurationManager.getProperty("dspace.url") + "/register?token=ABCDEFGHIJKLMNOP");
+       example3.addContent(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url") + "/register?token=ABCDEFGHIJKLMNOP");
 
    }
    

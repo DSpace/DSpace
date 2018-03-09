@@ -10,18 +10,18 @@ package org.dspace.app.xmlui.wing;
 import java.io.Serializable;
 
 /**
- * 
+ *
  * This class represents an i18n message, which is composed of three parts: a 
  * catalogue, a key, and a set of dictionary parameters. The catalogue tells 
  * the translator where to find the key, the key tells the transformer which 
  * specific text should be used, and the parameters are provided for non-translated 
  * data to be inserted into the resulting string.
- * 
- * This class is designed in such a way that the Message object can be made static by any 
- * class that needs to use it. If dicionary parameters are used then a new 
- * instance is created specifically for those parameters, this prevents 
- * concurrent threads from overwriting each other's parameters.
- * 
+ *
+ * <p>This class is designed in such a way that the Message object can be made
+ * {@code static} by any class that needs to use it. If dictionary parameters
+ * are used then a new instance is created specifically for those parameters --
+ * this prevents concurrent threads from overwriting each other's parameters.
+ *
  * @author Scott Phillips
  */
 
@@ -73,6 +73,7 @@ public class Message implements Serializable
      * cloned copy that has been parameterized.
      * 
      * @param dictionaryParameters The dictionary parameters
+     * @return the message with parameters replaced.
      */
     public Message parameterize(Object ... dictionaryParameters)
     {
@@ -105,7 +106,7 @@ public class Message implements Serializable
      *
      * No one outside of this class should even know this class exists,
      * hence the privacy, but having two implementations allows us to
-     * separate all the functionality for paramaterization into this
+     * separate all the functionality for parameterization into this
      * one place. Since most of the messages used are unparameterized
      * this is not wasted on them and is only invoked when needed. There 
      * may be some performance increase by doing this but I doubt it is 
@@ -137,10 +138,11 @@ public class Message implements Serializable
         }
         
         /**
-         * Return the dicionary parameters for this message.
+         * Return the dictionary parameters for this message.
          * 
          * @return Any parameters to the catalogue key
          */
+        @Override
         public Object[] getDictionaryParameters()
         {
             return dictionaryParameters;

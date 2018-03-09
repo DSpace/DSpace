@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -27,10 +28,14 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 
 /**
  * Edit an existing EPerson, display all the eperson's metadata 
@@ -140,8 +145,10 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
     private static final Message T_telephone =
     	message("xmlui.EPerson.EditProfile.telephone");
     
-    
-    
+
+	protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+	protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+	protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -156,12 +163,12 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException 
 	{
 		// Get all our parameters
-		boolean admin = AuthorizeManager.isAdmin(context);
+		boolean admin = authorizeService.isAdmin(context);
 		
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		
 		// Get our parameters;
-		int epersonID = parameters.getParameterAsInteger("epersonID",-1);
+		UUID epersonID = UUID.fromString(parameters.getParameter("epersonID",null));
 		String errorString = parameters.getParameter("errors",null);
 		ArrayList<String> errors = new ArrayList<String>();
 		if (errorString != null)
@@ -173,7 +180,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		}
 		
 		// Grab the person in question 
-		EPerson eperson = EPerson.find(context, epersonID);
+		EPerson eperson = ePersonService.find(context, epersonID);
 		
 		if (eperson == null)
         {
@@ -183,10 +190,10 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		String emailValue = eperson.getEmail();
 		String firstValue = eperson.getFirstName();
 		String lastValue  = eperson.getLastName();
-		String phoneValue = eperson.getMetadata("phone");
+		String phoneValue = ePersonService.getMetadata(eperson, "phone");
 		boolean canLogInValue = eperson.canLogIn();
 		boolean certificatValue = eperson.getRequireCertificate();
-		java.util.List<String> deleteConstraints = eperson.getDeleteConstraints();
+		java.util.List<String> deleteConstraints = ePersonService.getDeleteConstraints(context, eperson);
 		
 		if (request.getParameter("email_address") != null)
         {
@@ -310,7 +317,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	       
 	        Button submitLoginAs = special.addButton("submit_login_as");
 	        submitLoginAs.setValue(T_submit_login_as);
-	        if (!ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false))
+	        if (!DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.user.assumelogin", false))
             {
                 submitLoginAs.setDisabled();
             }
@@ -374,7 +381,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        List member = edit.addList("eperson-member-of");
 	        member.setHead(T_member_head);
 
-	        Group[] groups = Group.allMemberGroups(context, eperson);
+	        java.util.Set<Group> groups = groupService.allMemberGroupsSet(context, eperson);
 	        for (Group group : groups)
 	        {
 	        	String url = contextPath + "/admin/groups?administrative-continue="+knot.getId()+"&submit_edit_group&groupID="+group.getID();
@@ -390,7 +397,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
                 }
 	        }
 	        
-	        if (groups.length <= 0)
+	        if (groups.size() <= 0)
             {
                 member.addItem().addHighlight("italic").addContent(T_member_none);
             }
@@ -424,9 +431,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		}
 			
 		// Otherwise check what group this eperson is a member through
-		Group[] targets = group.getMemberGroups();
+		java.util.List<Group> targets = group.getMemberGroups();
 		
-		Group[] groups = Group.allMemberGroups(context, eperson);
+		java.util.Set<Group> groups = groupService.allMemberGroupsSet(context, eperson);
 		for (Group member : groups)
 		{
 			for (Group target : targets)

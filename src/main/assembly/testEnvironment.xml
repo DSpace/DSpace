@@ -24,69 +24,67 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
 
-    <!-- First, copy the following from our 'dspace' subfolder assembly project into the
-         same subdirectory in the final ZIP file. NOTE: We do this in a <fileSet> INSTEAD
-         of a <moduleSet> so that we don't have to first build the "dspace" module. -->
-    <fileSets>
-        <fileSet>
-            <!-- Copy necessary DSpace subdirectories into Test environment -->
-            <includes>
-                <include>dspace/bin/**</include>
-                <include>dspace/config/**</include>
-                <include>dspace/etc/**</include>
-                <include>dspace/solr/**</include>
-            </includes>
-            <!-- But, exclude specific configs (which require filtering) -->
-            <excludes>
-                <exclude>dspace/config/dspace.cfg</exclude>
-                <exclude>dspace/config/log4j.properties</exclude>
-                <exclude>dspace/config/modules/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet> 
-            <!-- Copy specific configs (filtering their content) also into Test environment -->
-            <includes>
-                <include>dspace/config/modules/**</include>
-                <include>dspace/config/dspace.cfg</include>
-                <include>dspace/config/log4j.properties</include>
-            </includes>
-            <filtered>true</filtered>
-        </fileSet>        
-    </fileSets>
-
+    <!-- NOTE: first file in wins when using maven-assembly-plugin. So, overridden
+         files have to be included first. -->
     <moduleSets>
-        <!-- Next, search for a 'src/test/data/dspaceFolder' data directory in
+        <!-- FIRST, search for a 'src/test/data/dspaceFolder' data directory in
              ANY of our modules. If found, copy its contents into the same "dspace"
              subdirectory in the final ZIP file, as this is data to be used in testing.
-             NOTE: This *might* overwrite/overlay default files copied from above. -->
+             NOTE: This *might* overwrite/overlay default files copied below. -->
         <moduleSet>
+            <!-- Enable access to all projects in the current multimodule build! -->
+            <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
                 <include>org.dspace:*</include>
             </includes>
             <sources>
                 <outputDirectoryMapping>dspace</outputDirectoryMapping>
                 <fileSets>
+                    <!-- First, copy over custom/overridden configs -->
+                    <fileSet>
+                        <directory>src/test/data/dspaceFolder/config</directory>
+                        <outputDirectory>config</outputDirectory>
+                    </fileSet>
+                    <!-- Then copy over everything else (EXCEPT configs) -->
                     <fileSet>
                         <directory>src/test/data/dspaceFolder</directory>
+                        <excludes>
+                            <exclude>config/**</exclude>
+                        </excludes>
                     </fileSet>
                 </fileSets>
             </sources>
         </moduleSet>
-        <!-- Finally, copy the 'dspace.cfg.more' from the 'dspace-api' into
-             the root directory of the ZIP. This config will be merged/weaved
-             into the default dspace.cfg (see fileweaver maven plugin) -->
+        <!-- NEXT, we add in the default configuration/settings from the
+             DSpace Assembly module. -->
         <moduleSet>
             <includes>
-                <include>org.dspace:dspace-api</include>
+                <include>org.dspace:dspace</include>
             </includes>
             <sources>
-                <outputDirectoryMapping>/</outputDirectoryMapping>
+                <outputDirectoryMapping>dspace</outputDirectoryMapping>
                 <fileSets>
+                    <!-- First add in the config directory, filtering all config files  -->
                     <fileSet>
-                        <directory>src/test/data</directory>
+                        <!-- Include the config directory and all subdirectories
+                             (without this explicit include, the "modules"
+                              subdirectory is strangely excluded) -->
                         <includes>
-                            <include>dspace.cfg.more</include>
+                            <include>config/**</include>
                         </includes>
+                    </fileSet>
+                    <!-- Then add in other necessary directories -->
+                    <fileSet>
+                        <directory>bin</directory>
+                        <outputDirectory>bin</outputDirectory>
+                    </fileSet>
+                    <fileSet>
+                        <directory>etc</directory>
+                        <outputDirectory>etc</outputDirectory>
+                    </fileSet>
+                    <fileSet>
+                        <directory>solr</directory>
+                        <outputDirectory>solr</outputDirectory>
                     </fileSet>
                 </fileSets>
             </sources>

@@ -24,8 +24,8 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
+import org.dspace.workflowbasic.BasicWorkflowItem;
+import org.dspace.workflowbasic.BasicWorkflowServiceImpl;
 import org.xml.sax.SAXException;
 
 /**
@@ -78,12 +78,12 @@ public class PerformTaskStep extends AbstractStep
 	
 	
 	/** Copy the workflow manager's state values so that we can reference them easier. */
-	private static final int WFSTATE_STEP1POOL = WorkflowManager.WFSTATE_STEP1POOL;
-	private static final int WFSTATE_STEP1     = WorkflowManager.WFSTATE_STEP1;
-	private static final int WFSTATE_STEP2POOL = WorkflowManager.WFSTATE_STEP2POOL;
-	private static final int WFSTATE_STEP2     = WorkflowManager.WFSTATE_STEP2;
-	private static final int WFSTATE_STEP3POOL = WorkflowManager.WFSTATE_STEP3POOL;
-	private static final int WFSTATE_STEP3     = WorkflowManager.WFSTATE_STEP3;
+	private static final int WFSTATE_STEP1POOL = BasicWorkflowServiceImpl.WFSTATE_STEP1POOL;
+	private static final int WFSTATE_STEP1     = BasicWorkflowServiceImpl.WFSTATE_STEP1;
+	private static final int WFSTATE_STEP2POOL = BasicWorkflowServiceImpl.WFSTATE_STEP2POOL;
+	private static final int WFSTATE_STEP2     = BasicWorkflowServiceImpl.WFSTATE_STEP2;
+	private static final int WFSTATE_STEP3POOL = BasicWorkflowServiceImpl.WFSTATE_STEP3POOL;
+	private static final int WFSTATE_STEP3     = BasicWorkflowServiceImpl.WFSTATE_STEP3;
 	
 	
 	/**
@@ -102,7 +102,7 @@ public class PerformTaskStep extends AbstractStep
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
 		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/workflow";
-		int state = ((WorkflowItem) submission).getState();
+		int state = ((BasicWorkflowItem) submission).getState();
     	
     	Request request = ObjectModelHelper.getRequest(objectModel);
 		String showfull = request.getParameter("showfull");

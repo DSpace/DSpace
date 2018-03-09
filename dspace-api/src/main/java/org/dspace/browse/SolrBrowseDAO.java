@@ -7,12 +7,13 @@
  */
 package org.dspace.browse;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.*;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -26,15 +27,15 @@ import org.dspace.discovery.DiscoverResult.SearchDocument;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * 
+ *
  * @author Andrea Bollini (CILEA)
  * @author Adán Román Ruiz at arvo.es (bugfix)
  * @author Panagiotis Koutsourakis (National Documentation Centre) (bugfix)
  * @author Kostas Stamatis (National Documentation Centre) (bugfix)
- * 
+ *
  */
 public class SolrBrowseDAO implements BrowseDAO
 {
@@ -43,7 +44,8 @@ public class SolrBrowseDAO implements BrowseDAO
         this.context = context;
     }
 
-    static private class FacetValueComparator implements Comparator
+    static private class FacetValueComparator
+            implements Comparator, Serializable
     {
         @Override
         public int compare(Object o1, Object o2)
@@ -67,10 +69,10 @@ public class SolrBrowseDAO implements BrowseDAO
     }
 
     /** Log4j log */
-    private static Logger log = Logger.getLogger(SolrBrowseDAO.class);
+    private static final Logger log = Logger.getLogger(SolrBrowseDAO.class);
 
     /** The DSpace context */
-    private Context context;
+    private final Context context;
 
     // SQL query related attributes for this class
 
@@ -104,7 +106,7 @@ public class SolrBrowseDAO implements BrowseDAO
     private String containerIDField = null;
 
     /** the database id of the container we are constraining to */
-    private int containerID = -1;
+    private UUID containerID = null;
 
     /** the column that we are sorting results by */
     private String orderField = null;
@@ -125,12 +127,13 @@ public class SolrBrowseDAO implements BrowseDAO
     private boolean distinct = false;
 
     private String facetField;
-
+    
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    
     // administrative attributes for this class
 
-    DSpace dspace = new DSpace();
 
-    SearchService searcher = dspace.getServiceManager().getServiceByName(
+    SearchService searcher = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
             SearchService.class.getName(), SearchService.class);
 
     private DiscoverResult sResponse = null;
@@ -139,7 +142,7 @@ public class SolrBrowseDAO implements BrowseDAO
     private boolean itemsDiscoverable = true;
 
     private boolean showFrequencies;
-    
+
     private DiscoverResult getSolrResponse() throws BrowseException
     {
         if (sResponse == null)
@@ -208,13 +211,28 @@ public class SolrBrowseDAO implements BrowseDAO
         }
         else if (!itemsDiscoverable)
         {
-            query.addFilterQueries("discoverable:false");    
+            query.addFilterQueries("discoverable:false");
+            // TODO
+
+            try 
+            {
+                if (!authorizeService.isAdmin(context)
+                        && (authorizeService.isCommunityAdmin(context)
+                        || authorizeService.isCollectionAdmin(context))) 
+                {
+                        query.addFilterQueries(searcher.createLocationQueryForAdministrableItems(context));
+                }
+            } 
+            catch (SQLException ex) 
+            {
+                log.error(ex);
+            }
         }
     }
 
     private void addLocationScopeFilter(DiscoverQuery query)
     {
-        if (containerID > 0)
+        if (containerID != null)
         {
             if (containerIDField.startsWith("collection"))
             {
@@ -257,7 +275,7 @@ public class SolrBrowseDAO implements BrowseDAO
         int count = doCountQuery();
         int start = offset > 0 ? offset : 0;
         int max = limit > 0 ? limit : count; //if negative, return everything
-        List<String[]> result = new ArrayList<String[]>();
+        List<String[]> result = new ArrayList<>();
         if (ascending)
         {
             for (int i = start; i < (start + max) && i < count; i++)
@@ -286,19 +304,17 @@ public class SolrBrowseDAO implements BrowseDAO
     }
 
     @Override
-    public List doQuery() throws BrowseException
+    public List<Item> doQuery() throws BrowseException
     {
         DiscoverResult resp = getSolrResponse();
 
-        List<BrowseItem> bitems = new ArrayList<BrowseItem>();
+        List<Item> bitems = new ArrayList<>();
         for (DSpaceObject solrDoc : resp.getDspaceObjects())
         {
             // FIXME introduce project, don't retrieve Item immediately when
             // processing the query...
             Item item = (Item) solrDoc;
-            BrowseItem bitem = new BrowseItem(context, item.getID(),
-                    item.isArchived(), item.isWithdrawn(), item.isDiscoverable());
-            bitems.add(bitem);
+            bitems.add(item);
         }
         return bitems;
     }
@@ -395,34 +411,36 @@ public class SolrBrowseDAO implements BrowseDAO
             return doCountQuery() - ascValue;
         }
     }
-    
+
     @Override
     public boolean isEnableBrowseFrequencies()
     {
         return showFrequencies;
     }
-    
+
     @Override
     public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies)
     {
-        showFrequencies = enableBrowseFrequencies;        
+        showFrequencies = enableBrowseFrequencies;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getContainerID()
      */
-    public int getContainerID()
+    @Override
+    public UUID getContainerID()
     {
         return containerID;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getContainerIDField()
      */
+    @Override
     public String getContainerIDField()
     {
         return containerIDField;
@@ -430,15 +448,17 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getContainerTable()
      */
+    @Override
     public String getContainerTable()
     {
         return containerTable;
     }
 
     // FIXME is this in use?
+    @Override
     public String[] getCountValues()
     {
         return null;
@@ -446,9 +466,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getFocusField()
      */
+    @Override
     public String getJumpToField()
     {
         return focusField;
@@ -456,9 +477,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getFocusValue()
      */
+    @Override
     public String getJumpToValue()
     {
         return focusValue;
@@ -466,9 +488,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getLimit()
      */
+    @Override
     public int getLimit()
     {
         return limit;
@@ -476,9 +499,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getOffset()
      */
+    @Override
     public int getOffset()
     {
         return offset;
@@ -486,15 +510,17 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getOrderField()
      */
+    @Override
     public String getOrderField()
     {
         return orderField;
     }
 
     // is this in use?
+    @Override
     public String[] getSelectValues()
     {
         return null;
@@ -502,9 +528,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getTable()
      */
+    @Override
     public String getTable()
     {
         return table;
@@ -512,9 +539,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getValue()
      */
+    @Override
     public String getFilterValue()
     {
         return value;
@@ -522,9 +550,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#getValueField()
      */
+    @Override
     public String getFilterValueField()
     {
         return valueField;
@@ -532,9 +561,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#isAscending()
      */
+    @Override
     public boolean isAscending()
     {
         return ascending;
@@ -542,9 +572,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#isDistinct()
      */
+    @Override
     public boolean isDistinct()
     {
         return this.distinct;
@@ -552,9 +583,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setAscending(boolean)
      */
+    @Override
     public void setAscending(boolean ascending)
     {
         this.ascending = ascending;
@@ -563,10 +595,11 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setContainerID(int)
      */
-    public void setContainerID(int containerID)
+    @Override
+    public void setContainerID(UUID containerID)
     {
         this.containerID = containerID;
 
@@ -574,9 +607,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setContainerIDField(java.lang.String)
      */
+    @Override
     public void setContainerIDField(String containerIDField)
     {
         this.containerIDField = containerIDField;
@@ -585,9 +619,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setContainerTable(java.lang.String)
      */
+    @Override
     public void setContainerTable(String containerTable)
     {
         this.containerTable = containerTable;
@@ -595,6 +630,7 @@ public class SolrBrowseDAO implements BrowseDAO
     }
 
     // is this in use?
+    @Override
     public void setCountValues(String[] fields)
     {
         // this.countValues = fields;
@@ -603,9 +639,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setDistinct(boolean)
      */
+    @Override
     public void setDistinct(boolean bool)
     {
         this.distinct = bool;
@@ -614,9 +651,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setEqualsComparator(boolean)
      */
+    @Override
     public void setEqualsComparator(boolean equalsComparator)
     {
         this.equalsComparator = equalsComparator;
@@ -625,9 +663,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setFocusField(java.lang.String)
      */
+    @Override
     public void setJumpToField(String focusField)
     {
         this.focusField = focusField;
@@ -636,9 +675,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setFocusValue(java.lang.String)
      */
+    @Override
     public void setJumpToValue(String focusValue)
     {
         this.focusValue = focusValue;
@@ -647,9 +687,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setLimit(int)
      */
+    @Override
     public void setLimit(int limit)
     {
         this.limit = limit;
@@ -658,9 +699,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setOffset(int)
      */
+    @Override
     public void setOffset(int offset)
     {
         this.offset = offset;
@@ -669,9 +711,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setOrderField(java.lang.String)
      */
+    @Override
     public void setOrderField(String orderField)
     {
         this.orderField = orderField;
@@ -679,6 +722,7 @@ public class SolrBrowseDAO implements BrowseDAO
     }
 
     // is this in use?
+    @Override
     public void setSelectValues(String[] selectValues)
     {
         // this.selectValues = selectValues;
@@ -687,9 +731,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setTable(java.lang.String)
      */
+    @Override
     public void setTable(String table)
     {
         if (table.equals(BrowseIndex.getWithdrawnBrowseIndex().getTableName()))
@@ -703,6 +748,7 @@ public class SolrBrowseDAO implements BrowseDAO
         facetField = table;
     }
 
+    @Override
     public void setFilterMappingTables(String tableDis, String tableMap)
     {
         if (tableDis != null)
@@ -715,9 +761,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setValue(java.lang.String)
      */
+    @Override
     public void setFilterValue(String value)
     {
         this.value = value;
@@ -726,9 +773,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setFilterValuePartial(boolean)
      */
+    @Override
     public void setFilterValuePartial(boolean part)
     {
         this.valuePartial = part;
@@ -737,9 +785,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#setValueField(java.lang.String)
      */
+    @Override
     public void setFilterValueField(String valueField)
     {
         this.valueField = valueField;
@@ -748,9 +797,10 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dspace.browse.BrowseDAO#useEqualsComparator()
      */
+    @Override
     public boolean useEqualsComparator()
     {
         return equalsComparator;

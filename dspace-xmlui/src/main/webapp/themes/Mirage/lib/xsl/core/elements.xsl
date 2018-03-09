@@ -92,4 +92,24 @@
         </xsl:call-template>
     </xsl:template>
 
+    <xsl:template match="dri:div[@n='lookup-modal']" priority="2">
+        <div id="lookup-search-results" class="modal fade hidden" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close close-modal-results">&#215;</button>
+                        <h4 class="modal-title">Publication Results</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p/>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="ds-button-field btn btn-default pull-left" id="publication-pagination-previous">Previous results</button>
+                        <button class="ds-button-field btn btn-default pull-left" id="publication-pagination-next">Next results</button>
+                        <button type="button" class="btn btn-default close-modal-results">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </xsl:template>
 </xsl:stylesheet>

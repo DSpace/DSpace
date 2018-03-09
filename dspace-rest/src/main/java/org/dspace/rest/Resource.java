@@ -7,24 +7,35 @@
  */
 package org.dspace.rest;
 
+import java.net.CookieHandler;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.rest.exceptions.ContextException;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Superclass of all resource classes in REST API. It has methods for creating
@@ -38,29 +49,24 @@ import org.dspace.utils.DSpace;
 public class Resource
 {
 
-    @javax.ws.rs.core.Context public static ServletContext servletContext;
+    @javax.ws.rs.core.Context public ServletContext servletContext;
 
     private static Logger log = Logger.getLogger(Resource.class);
 
     private static final boolean writeStatistics;
     static
     {
-        writeStatistics = ConfigurationManager.getBooleanProperty("rest", "stats", false);
+        writeStatistics = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("rest.stats", false);
     }
 
-    static public String getServletContextPath() {
-        return servletContext.getContextPath();
-    }
     /**
      * Create context to work with DSpace database. It can create context
-     * with or without a logged in user (parameter user is null). Throws
+     * with or without a logged in user (retrieved from SecurityContextHolder). Throws
      * WebApplicationException caused by: SQLException if there was a problem
      * with reading from database. Throws AuthorizeException if there was
      * a problem with authorization to read from the database. Throws Exception
      * if there was a problem creating context.
      * 
-     * @param person
-     *            User which will be logged in context.
      * @return Newly created context with the logged in user unless the specified user was null.
      *         If user is null, create the context without a logged in user.
      * @throws ContextException
@@ -69,31 +75,21 @@ public class Resource
      *             log in. Can be caused by AuthorizeException if there was a
      *             problem authorizing the found user.
      */
-    protected static org.dspace.core.Context createContext(EPerson person) throws ContextException
-    {
+    protected static org.dspace.core.Context createContext() throws ContextException, SQLException {
+        org.dspace.core.Context context = new org.dspace.core.Context();
+        //context.getDBConnection().setAutoCommit(false); // Disable autocommit.
 
-        org.dspace.core.Context context = null;
-
-        try
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null)
         {
-            context = new org.dspace.core.Context();
-            context.getDBConnection().setAutoCommit(false); // Disable autocommit.
-
-            if (person != null)
-            {
-                context.setCurrentUser(person);
+            Collection<SimpleGrantedAuthority> specialGroups = (Collection<SimpleGrantedAuthority>) authentication.getAuthorities();
+            for (SimpleGrantedAuthority grantedAuthority : specialGroups) {
+                context.setSpecialGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, grantedAuthority.getAuthority()).getID());
             }
+            context.setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, authentication.getName()));
+        }
 
-            return context;
-        }
-        catch (SQLException e)
-        {
-            if ((context != null) && (context.isValid()))
-            {
-                context.abort();
-            }
-            throw new ContextException("Could not create context, SQLException. Message: " + e, e);
-        }
+        return context;
     }
 
     /**
@@ -119,11 +115,11 @@ public class Resource
 
         if ((user_ip == null) || (user_ip.length() == 0))
         {
-            new DSpace().getEventService().fireEvent(new UsageEvent(action, request, context, dspaceObject));
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(new UsageEvent(action, request, context, dspaceObject));
         }
         else
         {
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
                     new UsageEvent(action, user_ip, user_agent, xforwardedfor, context, dspaceObject));
         }
 
@@ -237,36 +233,4 @@ public class Resource
         return actionStr;
     }
 
-    /**
-     * Return EPerson based on stored token in headers under
-     * "rest-dspace-token".
-     * 
-     * @param headers
-     *            Only must have "rest-api-token" for successfull return of
-     *            user.
-     * @return Return EPerson logged under token in headers. If token was wrong
-     *         or header rest-dspace-token was missing, returns null.
-     */
-    protected static EPerson getUser(HttpHeaders headers)
-    {
-        List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
-        String token = null;
-        if ((list != null) && (list.size() > 0))
-        {
-            token = list.get(0);
-            return TokenHolder.getEPerson(token);
-        }
-        return null;
-    }
-
-    protected static String getToken(HttpHeaders headers) {
-        List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
-        String token = null;
-        if ((list != null) && (list.size() > 0))
-        {
-            token = list.get(0);
-            return token;
-        }
-        return null;
-    }
 }

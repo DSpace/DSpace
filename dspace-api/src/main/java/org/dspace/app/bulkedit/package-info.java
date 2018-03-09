@@ -9,7 +9,6 @@
 /**
  * <p>The DSpace Batch Metadata Editor, which uses a CSV file to export/import
  * item metadata.</p>
- * <p>
  * <ul>
  *   <li>works on items, communities, collections or the whole site</li>
  *   <li>can also create new items, delete items and withdraw/restore them</li>

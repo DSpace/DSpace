@@ -30,7 +30,7 @@ public interface ScriptedTask
      * 
      * @param curator the Curator controlling this task
      * @param taskId identifier task should use in invoking services
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public void init(Curator curator, String taskId) throws IOException;
 
@@ -39,7 +39,7 @@ public interface ScriptedTask
      *
      * @param dso the DSpace object
      * @return status code
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public int performDso(DSpaceObject dso) throws IOException;
 
@@ -49,7 +49,7 @@ public interface ScriptedTask
      * @param ctx DSpace context object
      * @param id persistent ID for DSpace object
      * @return status code
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public int performId(Context ctx, String id) throws IOException;
 }

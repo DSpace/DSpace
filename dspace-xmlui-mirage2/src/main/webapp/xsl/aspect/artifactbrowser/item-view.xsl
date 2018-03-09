@@ -181,14 +181,20 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:variable>
-                    <img alt="Thumbnail">
-                        <xsl:attribute name="src">
-                            <xsl:value-of select="$src"/>
-                        </xsl:attribute>
-                    </img>
+                    <!-- Checking if Thumbnail is restricted and if so, show a restricted image --> 
+                    <xsl:choose>
+                        <xsl:when test="contains($src,'isAllowed=n')"/>
+                        <xsl:otherwise>
+                            <img class="img-thumbnail" alt="Thumbnail">
+                                <xsl:attribute name="src">
+                                    <xsl:value-of select="$src"/>
+                                </xsl:attribute>
+                            </img>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
-                    <img alt="Thumbnail">
+                    <img class="img-thumbnail" alt="Thumbnail">
                         <xsl:attribute name="data-src">
                             <xsl:text>holder.js/100%x</xsl:text>
                             <xsl:value-of select="$thumbnail.maxheight"/>
@@ -536,7 +542,7 @@
                         <xsl:choose>
                             <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
                         mets:file[@GROUPID=current()/@GROUPID]">
-                                <img alt="Thumbnail">
+                                <img class="img-thumbnail" alt="Thumbnail">
                                     <xsl:attribute name="src">
                                         <xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
                                     mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
@@ -544,7 +550,7 @@
                                 </img>
                             </xsl:when>
                             <xsl:otherwise>
-                                <img alt="Thumbnail">
+                                <img class="img-thumbnail" alt="Thumbnail">
                                     <xsl:attribute name="data-src">
                                         <xsl:text>holder.js/100%x</xsl:text>
                                         <xsl:value-of select="$thumbnail.maxheight"/>

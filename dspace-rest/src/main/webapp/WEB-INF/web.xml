@@ -13,27 +13,38 @@
          xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          id="WebApp_ID" version="2.5">
+
+    <filter>
+        <filter-name>dspace.request</filter-name>
+        <filter-class>org.dspace.utils.servlet.DSpaceWebappServletFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>dspace.request</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
     <servlet>
         <servlet-name>DSpace REST API</servlet-name>
-        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+        <servlet-class>
+            org.glassfish.jersey.servlet.ServletContainer
+        </servlet-class>
         <init-param>
-            <!--
-             The jersey ServletContainer will look for our Root Resource Class
-             (i.e. our HelloWorld class) in the foo.bar package
-             There are other ways to register this; see the jersey documentation for
-             more details
-            -->
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.dspace.rest</param-value>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>org.dspace.rest.DSpaceRestApplication</param-value>
         </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <!--
-        Load the ServletContainer at startup.  A value of 1 indicates the ServletContainer
-        is a high priority servlet to load
-         -->
         <load-on-startup>1</load-on-startup>
     </servlet>
 
@@ -41,7 +52,12 @@
         <servlet-name>DSpace REST API</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
-    
+
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/static/*</url-pattern>
+    </servlet-mapping>
+
     <!-- Security settings and mapping -->
     <security-constraint>
         <web-resource-collection>
@@ -53,16 +69,10 @@
         </user-data-constraint>
     </security-constraint>
     
-    <!-- DSpace Configuration Information -->
-    <context-param>
-        <param-name>dspace-config</param-name>
-        <param-value>${dspace.dir}/config/dspace.cfg</param-value>
-    </context-param>
-
-    <!-- new ConfigurationService initialization for dspace.dir -->
+    <!-- ConfigurationService initialization for dspace.dir -->
     <context-param>
         <description>
-            The location of the main DSpace configuration file
+            The location of the DSpace home directory
         </description>
         <param-name>dspace.dir</param-name>
         <param-value>${dspace.dir}</param-value>
@@ -71,25 +81,22 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            /WEB-INF/applicationContext.xml
+            /WEB-INF/applicationContext.xml,
+            /WEB-INF/security-applicationContext.xml
         </param-value>
-        <!--
-            Add this context if using Spring Security
-            /WEB-INF/applicationContext-security.xml
-        -->
     </context-param>
-
-    <!-- 
-       DSpace Kernel startup listener. This listener is in charge of initializing/starting the
-       DSpace Kernel. It MUST be listed BEFORE any other DSpace listeners, as DSpace services
-       will not function until the Kernel is initialized.
-    -->
-    <listener>
-        <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
-    </listener>
 
     <listener>
         <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
+    </listener>
+
+    <!-- kernel start listener (from impl)
+        The following listener can be used instead of the filter below, it is simpler, cleaner
+        and eliminates the need for a DSpaceKernelServletFilter filter to be involved with the
+        request cycle.
+    -->
+    <listener>
+        <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
     </listener>
     
     <listener>
@@ -97,5 +104,10 @@
             org.springframework.web.context.ContextLoaderListener
         </listener-class>
     </listener>
+
+    <listener>
+        <listener-class>org.dspace.app.util.DSpaceWebappListener</listener-class>
+    </listener>
+
 
 </web-app>

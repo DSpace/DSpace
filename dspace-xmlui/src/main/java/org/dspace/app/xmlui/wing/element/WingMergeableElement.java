@@ -33,6 +33,8 @@ public interface WingMergeableElement extends WingElement
      * @param attributes
      *            The element's attributes
      * @return True if this WingElement is equivalent to the given SAX Event.
+     * @throws org.xml.sax.SAXException whenever.
+     * @throws org.dspace.app.xmlui.wing.WingException whenever.
      */
     public boolean mergeEqual(String namespace, String localName, String qName,
             Attributes attributes) throws SAXException, WingException;
@@ -53,6 +55,8 @@ public interface WingMergeableElement extends WingElement
      * @param attributes
      *            The element's attributes
      * @return The child element
+     * @throws org.xml.sax.SAXException whenever.
+     * @throws org.dspace.app.xmlui.wing.WingException whenever.
      */
     public WingMergeableElement mergeChild(String namespace, String localName,
             String qName, Attributes attributes) throws SAXException,
@@ -69,7 +73,10 @@ public interface WingMergeableElement extends WingElement
      * startElement event it may modify the attributes object passed to make
      * changes.
      * 
+     * @param attributes attributes.
      * @return The attributes for this merged element
+     * @throws org.xml.sax.SAXException whenever.
+     * @throws org.dspace.app.xmlui.wing.WingException whenever.
      */
     public Attributes merge(Attributes attributes) throws SAXException,
             WingException;

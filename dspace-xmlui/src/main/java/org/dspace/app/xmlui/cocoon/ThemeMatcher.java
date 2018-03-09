@@ -23,7 +23,7 @@ import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.configuration.Theme;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class determines the correct Theme to apply to the URL. This is
@@ -58,7 +58,7 @@ public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 
 			
 			// Allow the user to override the theme configuration
-			if (ConfigurationManager.getBooleanProperty("xmlui.theme.allowoverrides",false))
+			if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.theme.allowoverrides",false))
 			{
 				String themePathOverride  = request.getParameter("themepath");
 				if (themePathOverride != null && themePathOverride.length() > 0)

@@ -8,7 +8,7 @@
 package org.dspace.authority.orcid;
 
 import org.dspace.authority.AuthorityValue;
-import org.dspace.authority.AuthorityValueGenerator;
+import org.dspace.authority.AuthorityValueServiceImpl;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.orcid.model.Bio;
 import org.dspace.authority.orcid.model.BioExternalIdentifier;
@@ -119,6 +119,8 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
 
     /**
      * Create an authority based on a given orcid bio
+     * @param bio Bio
+     * @return OrcidAuthorityValue
      */
     public static OrcidAuthorityValue create(Bio bio) {
         OrcidAuthorityValue authority = OrcidAuthorityValue.create();
@@ -224,13 +226,14 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
         return map;
     }
 
+    @Override
     public String getAuthorityType() {
         return "orcid";
     }
 
     @Override
     public String generateString() {
-        String generateString = AuthorityValueGenerator.GENERATE + getAuthorityType() + AuthorityValueGenerator.SPLIT;
+        String generateString = AuthorityValueServiceImpl.GENERATE + getAuthorityType() + AuthorityValueServiceImpl.SPLIT;
         if (StringUtils.isNotBlank(getOrcid_id())) {
             generateString += getOrcid_id();
         }
@@ -274,6 +277,7 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
         return orcid_id != null ? orcid_id.hashCode() : 0;
     }
 
+    @Override
     public boolean hasTheSameInformationAs(Object o) {
         if (this == o) {
             return true;

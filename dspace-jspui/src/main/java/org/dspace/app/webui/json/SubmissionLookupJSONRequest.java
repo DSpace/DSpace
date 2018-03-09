@@ -44,13 +44,13 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
 import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.lookup.SubmissionLookupUtils;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.submit.util.SubmissionLookupDTO;
-import org.dspace.utils.DSpace;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -65,7 +65,7 @@ import com.google.gson.JsonObject;
 public class SubmissionLookupJSONRequest extends JSONRequest
 {
 
-    private SubmissionLookupService service = new DSpace().getServiceManager()
+    private SubmissionLookupService service = DSpaceServicesFactory.getInstance().getServiceManager()
             .getServiceByName(SubmissionLookupService.class.getName(),
                     SubmissionLookupService.class);
 

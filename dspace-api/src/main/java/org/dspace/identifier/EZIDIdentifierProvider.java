@@ -11,17 +11,15 @@ package org.dspace.identifier;
 import java.io.IOException;
 import java.net.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.identifier.ezid.EZIDRequest;
 import org.dspace.identifier.ezid.EZIDRequestFactory;
@@ -29,6 +27,7 @@ import org.dspace.identifier.ezid.EZIDResponse;
 import org.dspace.identifier.ezid.Transform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -104,13 +103,19 @@ public class EZIDIdentifierProvider
     protected String DATACITE_XML_CROSSWALK = "DataCite";
 
     /** Map DataCite metadata into local metadata. */
-    private static Map<String, String> crosswalk = new HashMap<>();
+    private Map<String, String> crosswalk = new HashMap<>();
 
     /** Converters to be applied to specific fields. */
     private static Map<String, Transform> transforms = new HashMap<>();
 
     /** Factory for EZID requests. */
-    private static EZIDRequestFactory requestFactory;
+    private EZIDRequestFactory requestFactory;
+
+    @Autowired(required = true)
+    protected ContentServiceFactory contentServiceFactory;
+
+    @Autowired(required = true)
+    protected ItemService itemService;
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier)
@@ -137,20 +142,20 @@ public class EZIDIdentifierProvider
     {
         log.debug("register {}", dso);
 
-        Metadatum[] identifiers = dso.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        for (Metadatum identifier : identifiers)
+        DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        List<MetadataValue> identifiers = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        for (MetadataValue identifier : identifiers)
         {
-            if ((null != identifier.value) && (identifier.value.startsWith(DOI_SCHEME)))
+            if ((null != identifier.getValue()) && (identifier.getValue().startsWith(DOI_SCHEME)))
             {
-                return identifier.value;
+                return identifier.getValue();
             }
         }
 
         String id = mint(context, dso);
-        dso.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, id);
         try {
-            dso.update();
-            context.commit();
+            dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, id);
+            dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException ex) {
             throw new IdentifierException("New identifier not stored", ex);
         }
@@ -167,7 +172,7 @@ public class EZIDIdentifierProvider
         try {
             EZIDRequest request = requestFactory.getInstance(loadAuthority(),
                     loadUser(), loadPassword());
-            response = request.create(identifier, crosswalkMetadata(object));
+            response = request.create(identifier, crosswalkMetadata(context, object));
         } catch (IdentifierException | IOException | URISyntaxException e) {
             log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
             return;
@@ -176,10 +181,10 @@ public class EZIDIdentifierProvider
         if (response.isSuccess())
         {
             try {
-                object.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+                DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(object);
+                dsoService.addMetadata(context, object, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
                         idToDOI(identifier));
-                object.update();
-                context.commit();
+                dsoService.update(context, object);
                 log.info("registered {}", identifier);
             } catch (SQLException | AuthorizeException | IdentifierException ex) {
                 // TODO throw new IdentifierException("New identifier not stored", ex);
@@ -203,7 +208,7 @@ public class EZIDIdentifierProvider
         try {
             EZIDRequest request = requestFactory.getInstance(loadAuthority(),
                     loadUser(), loadPassword());
-            Map<String, String> metadata = crosswalkMetadata(dso);
+            Map<String, String> metadata = crosswalkMetadata(context, dso);
             metadata.put("_status", "reserved");
             response = request.create(identifier, metadata);
         } catch (IOException | URISyntaxException e) {
@@ -213,10 +218,10 @@ public class EZIDIdentifierProvider
 
         if (response.isSuccess())
         {
-            dso.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, idToDOI(identifier));
+            DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
             try {
-                dso.update();
-                context.commit();
+                dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, idToDOI(identifier));
+                dsoService.update(context, dso);
                 log.info("reserved {}", identifier);
             } catch (SQLException | AuthorizeException ex) {
                 throw new IdentifierException("New identifier not stored", ex);
@@ -248,7 +253,7 @@ public class EZIDIdentifierProvider
         EZIDResponse response;
         try
         {
-            response = request.mint(crosswalkMetadata(dso));
+            response = request.mint(crosswalkMetadata(context, dso));
         } catch (IOException | URISyntaxException ex) {
             log.error("Failed to send EZID request:  {}", ex.getMessage());
             throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
@@ -296,31 +301,26 @@ public class EZIDIdentifierProvider
     {
         log.debug("resolve {}", identifier);
 
-        ItemIterator found;
+        Iterator<Item> found;
         try {
-            found = Item.findByMetadataField(context,
+            found = itemService.findByMetadataField(context,
                     MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER,
                     idToDOI(identifier));
         } catch (IdentifierException | SQLException | AuthorizeException | IOException ex) {
             log.error(ex.getMessage());
             throw new IdentifierNotResolvableException(ex);
         }
-        try {
-            if (!found.hasNext())
-            {
-                throw new IdentifierNotFoundException("No object bound to " + identifier);
-            }
-            Item found1 = found.next();
-            if (found.hasNext())
-            {
-                log.error("More than one object bound to {}!", identifier);
-            }
-            log.debug("Resolved to {}", found1);
-            return found1;
-        } catch (SQLException ex) {
-            log.error(ex.getMessage());
-            throw new IdentifierNotResolvableException(ex);
+        if (!found.hasNext())
+        {
+            throw new IdentifierNotFoundException("No object bound to " + identifier);
         }
+        Item found1 = found.next();
+        if (found.hasNext())
+        {
+            log.error("More than one object bound to {}!", identifier);
+        }
+        log.debug("Resolved to {}", found1);
+        return found1;
     }
 
     @Override
@@ -329,10 +329,11 @@ public class EZIDIdentifierProvider
     {
         log.debug("lookup {}", object);
 
-        Metadatum found = null;
-        for (Metadatum candidate : object.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null))
+        MetadataValue found = null;
+        DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(object);
+        for (MetadataValue candidate : dsoService.getMetadata(object, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null))
         {
-            if (candidate.value.startsWith(DOI_SCHEME))
+            if (candidate.getValue().startsWith(DOI_SCHEME))
             {
                 found = candidate;
                 break;
@@ -340,12 +341,12 @@ public class EZIDIdentifierProvider
         }
         if (null != found)
         {
-            log.debug("Found {}", found.value);
-            return found.value;
+            log.debug("Found {}", found.getValue());
+            return found.getValue();
         }
         else
         {
-            throw new IdentifierNotFoundException(object.getTypeText() + " "
+            throw new IdentifierNotFoundException(dsoService.getTypeText(object) + " "
                     + object.getID() + " has no DOI");
         }
     }
@@ -357,14 +358,15 @@ public class EZIDIdentifierProvider
         log.debug("delete {}", dso);
 
         // delete from EZID
-        Metadatum[] metadata = dso.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        List<MetadataValue> metadata = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         List<String> remainder = new ArrayList<>();
         int skipped = 0;
-        for (Metadatum id : metadata)
+        for (MetadataValue id : metadata)
         {
-            if (!id.value.startsWith(DOI_SCHEME))
+            if (!id.getValue().startsWith(DOI_SCHEME))
             {
-                remainder.add(id.value);
+                remainder.add(id.getValue());
                 continue;
             }
 
@@ -372,36 +374,34 @@ public class EZIDIdentifierProvider
             try {
                 EZIDRequest request = requestFactory.getInstance(loadAuthority(),
                         loadUser(), loadPassword());
-                response = request.delete(DOIToId(id.value));
+                response = request.delete(DOIToId(id.getValue()));
             } catch (URISyntaxException e) {
                 log.error("Bad URI in metadata value:  {}", e.getMessage());
-                remainder.add(id.value);
+                remainder.add(id.getValue());
                 skipped++;
                 continue;
             } catch (IOException e) {
                 log.error("Failed request to EZID:  {}", e.getMessage());
-                remainder.add(id.value);
+                remainder.add(id.getValue());
                 skipped++;
                 continue;
             }
             if (!response.isSuccess())
             {
-                log.error("Unable to delete {} from DataCite:  {}", id.value,
+                log.error("Unable to delete {} from DataCite:  {}", id.getValue(),
                         response.getEZIDStatusValue());
-                remainder.add(id.value);
+                remainder.add(id.getValue());
                 skipped++;
                 continue;
             }
-            log.info("Deleted {}", id.value);
+            log.info("Deleted {}", id.getValue());
         }
 
         // delete from item
-        dso.clearMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        dso.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
-                remainder.toArray(new String[remainder.size()]));
         try {
-            dso.update();
-            context.commit();
+            dsoService.clearMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+            dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, remainder);
+            dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException e) {
             log.error("Failed to re-add identifiers:  {}", e.getMessage());
         }
@@ -418,14 +418,15 @@ public class EZIDIdentifierProvider
     {
         log.debug("delete {} from {}", identifier, dso);
 
-        Metadatum[] metadata = dso.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        List<MetadataValue> metadata = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         List<String> remainder = new ArrayList<>();
         int skipped = 0;
-        for (Metadatum id : metadata)
+        for (MetadataValue id : metadata)
         {
-            if (!id.value.equals(idToDOI(identifier)))
+            if (!id.getValue().equals(idToDOI(identifier)))
             {
-                remainder.add(id.value);
+                remainder.add(id.getValue());
                 continue;
             }
 
@@ -433,37 +434,35 @@ public class EZIDIdentifierProvider
             try {
                 EZIDRequest request = requestFactory.getInstance(loadAuthority(),
                         loadUser(), loadPassword());
-                response = request.delete(DOIToId(id.value));
+                response = request.delete(DOIToId(id.getValue()));
             } catch (URISyntaxException e) {
-                log.error("Bad URI in metadata value {}:  {}", id.value, e.getMessage());
-                remainder.add(id.value);
+                log.error("Bad URI in metadata value {}:  {}", id.getValue(), e.getMessage());
+                remainder.add(id.getValue());
                 skipped++;
                 continue;
             } catch (IOException e) {
                 log.error("Failed request to EZID:  {}", e.getMessage());
-                remainder.add(id.value);
+                remainder.add(id.getValue());
                 skipped++;
                 continue;
             }
 
             if (!response.isSuccess())
             {
-                log.error("Unable to delete {} from DataCite:  {}", id.value,
+                log.error("Unable to delete {} from DataCite:  {}", id.getValue(),
                         response.getEZIDStatusValue());
-                remainder.add(id.value);
+                remainder.add(id.getValue());
                 skipped++;
                 continue;
             }
-            log.info("Deleted {}", id.value);
+            log.info("Deleted {}", id.getValue());
         }
 
         // delete from item
-        dso.clearMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        dso.addMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
-                remainder.toArray(new String[remainder.size()]));
         try {
-            dso.update();
-            context.commit();
+            dsoService.clearMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+            dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, remainder);
+            dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException e) {
             log.error("Failed to re-add identifiers:  {}", e.getMessage());
         }
@@ -506,7 +505,7 @@ public class EZIDIdentifierProvider
 
     /**
      * Get configured value of EZID username.
-     * @throws IdentifierException
+     * @throws IdentifierException if identifier error
      */
     private String loadUser()
             throws IdentifierException
@@ -524,7 +523,7 @@ public class EZIDIdentifierProvider
 
     /**
      * Get configured value of EZID password.
-     * @throws IdentifierException
+     * @throws IdentifierException if identifier error
      */
     private String loadPassword()
             throws IdentifierException
@@ -542,7 +541,7 @@ public class EZIDIdentifierProvider
 
     /**
      * Get configured value of EZID "shoulder".
-     * @throws IdentifierException
+     * @throws IdentifierException if identifier error
      */
     private String loadAuthority()
             throws IdentifierException
@@ -561,7 +560,7 @@ public class EZIDIdentifierProvider
     /**
      * Map selected DSpace metadata to fields recognized by DataCite.
      */
-    Map<String, String> crosswalkMetadata(DSpaceObject dso)
+    Map<String, String> crosswalkMetadata(Context context, DSpaceObject dso)
     {
         if ((null == dso) || !(dso instanceof Item))
         {
@@ -573,10 +572,10 @@ public class EZIDIdentifierProvider
 
         for (Entry<String, String> datum : crosswalk.entrySet())
         {
-            Metadatum[] values = item.getMetadataByMetadataString(datum.getValue());
+            List<MetadataValue> values = itemService.getMetadataByMetadataString(item, datum.getValue());
             if (null != values)
             {
-                for (Metadatum value : values)
+                for (MetadataValue value : values)
                 {
                     String key = datum.getKey();
                     String mappedValue;
@@ -584,11 +583,11 @@ public class EZIDIdentifierProvider
                     if (null != xfrm)
                     {
                         try {
-                            mappedValue = xfrm.transform(value.value);
+                            mappedValue = xfrm.transform(value.getValue());
                         } catch (Exception ex) {
                             log.error("Unable to transform '{}' from {} to {}:  {}",
                                     new String[] {
-                                        value.value,
+                                        value.getValue(),
                                         value.toString(),
                                         key,
                                         ex.getMessage()
@@ -598,7 +597,7 @@ public class EZIDIdentifierProvider
                     }
                     else
                     {
-                        mappedValue = value.value;
+                        mappedValue = value.getValue();
                     }
                     mapped.put(key, mappedValue);
                 }
@@ -609,7 +608,7 @@ public class EZIDIdentifierProvider
         {
             DataCiteXMLCreator xmlGen = new DataCiteXMLCreator();
             xmlGen.setDisseminationCrosswalkName(DATACITE_XML_CROSSWALK);
-            String xmlString = xmlGen.getXMLString(dso);
+            String xmlString = xmlGen.getXMLString(context, dso);
             log.debug("Generated DataCite XML:  {}", xmlString);
             mapped.put("datacite", xmlString);
         }
@@ -637,7 +636,7 @@ public class EZIDIdentifierProvider
         if (null == handle)
         {
             log.warn("{} #{} has no handle -- location not set.",
-                    dso.getTypeText(), dso.getID());
+                    contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso), dso.getID());
         }
         else
         {
@@ -662,6 +661,10 @@ public class EZIDIdentifierProvider
         crosswalk = aCrosswalk;
     }
 
+    public Map<String, String> getCrosswalk() {
+        return crosswalk;
+    }
+
     /**
      * Provide a map from DSO metadata keys to classes which can transform their
      * values to something acceptable to EZID.
@@ -684,8 +687,20 @@ public class EZIDIdentifierProvider
     }
 
     @Required
-    public static void setRequestFactory(EZIDRequestFactory aRequestFactory)
+    public void setRequestFactory(EZIDRequestFactory aRequestFactory)
     {
         requestFactory = aRequestFactory;
+    }
+
+    public EZIDRequestFactory getRequestFactory() {
+        return requestFactory;
+    }
+
+    /**
+     * Method should never be used aside from the unit tests where we can cannot autowire this class.
+     * @param itemService
+     */
+    protected void setItemService(ItemService itemService){
+        this.itemService = itemService;
     }
 }

@@ -986,6 +986,9 @@ to administer DSpace.
             
             <!-- Access to Control Panel (limited to Administrators) -->
             <map:match pattern="admin/panel">
+                <map:transform type="IncludePageMeta">
+                    <map:parameter name="javascript#1" value="../../static/js/controlpanel.js"/>
+                </map:transform>
                 <map:select type="AuthenticatedSelector">
                     <map:when test="administrator">
                         <!-- If the 'clearcache' request parameter is specified, first clear

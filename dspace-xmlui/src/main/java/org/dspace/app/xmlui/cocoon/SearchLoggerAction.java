@@ -18,10 +18,11 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 import org.dspace.usage.UsageSearchEvent;
-import org.dspace.utils.DSpace;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -35,6 +36,8 @@ import java.util.Map;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public abstract class SearchLoggerAction extends AbstractAction {
+
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel, String source, Parameters parameters) throws Exception {
@@ -62,7 +65,7 @@ public abstract class SearchLoggerAction extends AbstractAction {
         }
 
         //Fire our event
-        new DSpace().getEventService().fireEvent(searchEvent);
+        DSpaceServicesFactory.getInstance().getEventService().fireEvent(searchEvent);
 
 
         // Finished, allow to pass.
@@ -77,7 +80,10 @@ public abstract class SearchLoggerAction extends AbstractAction {
      * handle if present or the scope parameter is given. If no scope is
      * specified then null is returned.
      *
+     * @param context session context.
+     * @param objectModel Cocoon object model.
      * @return The current scope.
+     * @throws java.sql.SQLException passed through.
      */
     protected DSpaceObject getScope(Context context, Map objectModel) throws SQLException
     {
@@ -94,11 +100,10 @@ public abstract class SearchLoggerAction extends AbstractAction {
         else
         {
             // Get the search scope from the location parameter
-            dso = HandleManager.resolveToObject(context, scopeString);
+            dso = handleService.resolveToObject(context, scopeString);
         }
 
         return dso;
     }
-
 
 }

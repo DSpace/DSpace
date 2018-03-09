@@ -30,7 +30,7 @@ import java.util.Map;
  * methods for sending SAX events that handle namespaces and attributes so that
  * each individual wing element does not.
  * 
- * There are also a set of utility methods for checking method parameters.
+ * <p>There are also a set of utility methods for checking method parameters.
  * 
  * @author Scott Phillips
  */
@@ -76,6 +76,7 @@ public abstract class AbstractWingElement implements WingElement
     /**
      * Return the currently registered wing context.
      * 
+     * @return the context.
      */
     protected WingContext getWingContext()
     {
@@ -108,6 +109,8 @@ public abstract class AbstractWingElement implements WingElement
      *            A non null and none empty string
      * @param message
      *            The exception message thrown if parameter is invalid.
+     * @throws org.dspace.app.xmlui.wing.WingInvalidArgument
+     *            if parameter is null or 0-length.
      */
     protected void require(String parameter, String message)
             throws WingInvalidArgument
@@ -125,6 +128,8 @@ public abstract class AbstractWingElement implements WingElement
      *            A non null and none empty string
      * @param message
      *            The exception message thrown if parameter is invalid.
+     * @throws org.dspace.app.xmlui.wing.WingInvalidArgument
+     *            if parameter is null.
      */
     protected void require(Message parameter, String message)
             throws WingInvalidArgument
@@ -147,6 +152,8 @@ public abstract class AbstractWingElement implements WingElement
      *            A list of possible values for the parameter.
      * @param message
      *            The exception message thrown if the parameter is invalid.
+     * @throws org.dspace.app.xmlui.wing.WingInvalidArgument
+     *            if {@code parameter} is not among {@code options}.
      */
     protected void restrict(String parameter, String[] options, String message)
             throws WingInvalidArgument
@@ -177,6 +184,8 @@ public abstract class AbstractWingElement implements WingElement
      *            An int who's value is lesser that greater.
      * @param message
      *            The exception message thrown if the parameter is invalid.
+     * @throws org.dspace.app.xmlui.wing.WingInvalidArgument
+     *            if parameter is too small.
      */
     protected void greater(int parameter, int greater, String message)
             throws WingInvalidArgument
@@ -197,6 +206,8 @@ public abstract class AbstractWingElement implements WingElement
      *            An int who's value is greater that lesser.
      * @param message
      *            The exception message thrown if the parameter is invalid.
+     * @throws org.dspace.app.xmlui.wing.WingInvalidArgument
+     *            if parameter is too large.
      */
     protected void lesser(int parameter, int lesser, String message)
             throws WingInvalidArgument
@@ -214,6 +225,8 @@ public abstract class AbstractWingElement implements WingElement
      *            A false value.
      * @param message
      *            The exception message thrown if "test" is invalid.
+     * @throws org.dspace.app.xmlui.wing.WingInvalidArgument
+     *            if true.
      */
     protected void requireFalse(boolean test, String message)
             throws WingInvalidArgument
@@ -231,6 +244,8 @@ public abstract class AbstractWingElement implements WingElement
      *            A true value.
      * @param message
      *            The exception message thrown if "test" is invalid.
+     * @throws org.dspace.app.xmlui.wing.WingInvalidArgument
+     *            if false.
      */
     protected void requireTrue(boolean test, String message)
             throws WingInvalidArgument
@@ -256,6 +271,8 @@ public abstract class AbstractWingElement implements WingElement
      *            (Required) The element's localName
      * @param attributes
      *            (May be null) Attributes for this element.
+     * @throws org.xml.sax.SAXException
+     *            passed through.
      */
     protected void startElement(ContentHandler contentHandler,
             NamespaceSupport namespaces, String name, AttributeMap attributes)
@@ -280,6 +297,8 @@ public abstract class AbstractWingElement implements WingElement
      *            (Required) The local name of this element.
      * @param attributes
      *            (May be null) Attributes for this element
+     * @throws org.xml.sax.SAXException
+     *            passed through.
      */
     protected void startElement(ContentHandler contentHandler,
             NamespaceSupport namespaces, Namespace namespace, String name,
@@ -299,6 +318,8 @@ public abstract class AbstractWingElement implements WingElement
      *            should be routed too.
      * @param characters
      *            (May be null) Characters to send.
+     * @throws org.xml.sax.SAXException
+     *            passed through.
      */
     protected void sendCharacters(ContentHandler contentHandler,
             String characters) throws SAXException
@@ -323,6 +344,8 @@ public abstract class AbstractWingElement implements WingElement
      *            to determine the correct prefix for a given namespace URI.
      * @param name
      *            (Required) The localName of this element.
+     * @throws org.xml.sax.SAXException
+     *            passed through.
      */
     protected void endElement(ContentHandler contentHandler,
             NamespaceSupport namespaces, String name) throws SAXException
@@ -343,6 +366,8 @@ public abstract class AbstractWingElement implements WingElement
      *            (Required) The namespace of this element.
      * @param name
      *            (Required) The local name of this element.
+     * @throws org.xml.sax.SAXException
+     *            passed through.
      */
     protected void endElement(ContentHandler contentHandler,
             NamespaceSupport namespaces, Namespace namespace, String name)
@@ -460,6 +485,7 @@ public abstract class AbstractWingElement implements WingElement
     /**
      * Dispose
      */
+    @Override
     public void dispose()
     {
         this.context = null;

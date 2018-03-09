@@ -23,14 +23,14 @@ import java.util.Properties;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.content.Site;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.jdom.Attribute;
 import org.jdom.Document;
@@ -71,7 +71,7 @@ import org.jdom.xpath.XPath;
  * Since there is significant overhead in reading the properties file to
  * configure the crosswalk, and a crosswalk instance may be used any number
  * of times, we recommend caching one instance of the crosswalk for each
- * name and simply reusing those instances.  The PluginManager does this
+ * name and simply reusing those instances.  The PluginService does this
  * by default.
  *
  * @author Larry Stone
@@ -85,6 +85,10 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private static Logger log = Logger.getLogger(MODSDisseminationCrosswalk.class);
 
     private static final String CONFIG_PREFIX = "crosswalk.mods.properties.";
+
+    protected final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Fill in the plugin alias table from DSpace configuration entries
@@ -218,7 +222,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         String myAlias = getPluginInstanceName();
         if (myAlias == null)
         {
-            log.error("Must use PluginManager to instantiate MODSDisseminationCrosswalk so the class knows its name.");
+            log.error("Must use PluginService to instantiate MODSDisseminationCrosswalk so the class knows its name.");
             return;
         }
         String cmPropName = CONFIG_PREFIX+myAlias;
@@ -289,6 +293,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     /**
      *  Return the MODS namespace
      */
+    @Override
     public Namespace[] getNamespaces()
     {
         return (Namespace[]) ArrayUtils.clone(namespaces);
@@ -297,6 +302,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     /**
      * Return the MODS schema
      */
+    @Override
     public String getSchemaLocation()
     {
         return schemaLocation;
@@ -304,8 +310,14 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
     /**
      * Returns object's metadata in MODS format, as List of XML structure nodes.
+     * @param context context
+     * @throws org.dspace.content.crosswalk.CrosswalkException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    public List<Element> disseminateList(DSpaceObject dso)
+    @Override
+    public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -314,8 +326,14 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
     /**
      * Disseminate an Item, Collection, or Community to MODS.
+     * @param context context
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    public Element disseminateElement(DSpaceObject dso)
+    @Override
+    public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -328,7 +346,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private List<Element> disseminateListInternal(DSpaceObject dso, boolean addSchema)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
-        Metadatum[] dcvs = null;
+        List<MockMetadataValue> dcvs = null;
         if (dso.getType() == Constants.ITEM)
         {
             dcvs = item2Metadata((Item) dso);
@@ -352,67 +370,51 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         }
         initMap();
 
-        List<Element> result = new ArrayList<Element>(dcvs.length);
+        List<Element> result = new ArrayList<Element>(dcvs.size());
 
-        for(int i=0; i < dcvs.length; i++)
+        for (MockMetadataValue dcv : dcvs)
         {
-            String qdc = dcvs[i].schema + "." + dcvs[i].element;
-            if (dcvs[i].qualifier != null)
+            String qdc = dcv.getSchema() + "." + dcv.getElement();
+            if (dcv.getQualifier() != null)
             {
-                qdc += "." + dcvs[i].qualifier;
+                qdc += "." + dcv.getQualifier();
             }
-            String value = dcvs[i].value;
+            String value = dcv.getValue();
 
             modsTriple trip = modsMap.get(qdc);
-            if (trip == null)
-            {
+            if (trip == null) {
                 log.warn("WARNING: " + getPluginInstanceName() + ": No MODS mapping for \"" + qdc + "\"");
-            }
-            else
-            {
-                try
-                {
-                    Element me = (Element)trip.xml.clone();
-                    if (addSchema)
-                    {
+            } else {
+                try {
+                    Element me = (Element) trip.xml.clone();
+                    if (addSchema) {
                         me.setAttribute("schemaLocation", schemaLocation, XSI_NS);
                     }
                     Iterator ni = trip.xpath.selectNodes(me).iterator();
-                    if (!ni.hasNext())
-                    {
+                    if (!ni.hasNext()) {
                         log.warn("XPath \"" + trip.xpath.getXPath() +
                                 "\" found no elements in \"" +
                                 outputUgly.outputString(me) +
                                 "\", qdc=" + qdc);
                     }
-                    while (ni.hasNext())
-                    {
+                    while (ni.hasNext()) {
                         Object what = ni.next();
-                        if (what instanceof Element)
-                        {
+                        if (what instanceof Element) {
                             ((Element) what).setText(checkedString(value));
-                        }
-                        else if (what instanceof Attribute)
-                        {
+                        } else if (what instanceof Attribute) {
                             ((Attribute) what).setValue(checkedString(value));
-                        }
-                        else if (what instanceof Text)
-                        {
+                        } else if (what instanceof Text) {
                             ((Text) what).setText(checkedString(value));
-                        }
-                        else
-                        {
+                        } else {
                             log.warn("Got unknown object from XPath, class=" + what.getClass().getName());
                         }
                     }
                     result.add(me);
-                }
-                catch (JDOMException je)
-                {
-                    log.error("Error following XPath in modsTriple: context="+
-                        outputUgly.outputString(trip.xml)+
-                        ", xpath="+trip.xpath.getXPath()+", exception="+
-                        je.toString());
+                } catch (JDOMException je) {
+                    log.error("Error following XPath in modsTriple: context=" +
+                            outputUgly.outputString(trip.xml) +
+                            ", xpath=" + trip.xpath.getXPath() + ", exception=" +
+                            je.toString());
                 }
             }
         }
@@ -422,6 +424,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     /**
      * ModsCrosswalk can disseminate: Items, Collections, Communities, and Site.
      */
+    @Override
     public boolean canDisseminate(DSpaceObject dso)
     {
         return (dso.getType() == Constants.ITEM ||
@@ -433,6 +436,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     /**
      * ModsCrosswalk prefer's element form over list.
      */
+    @Override
     public boolean preferList()
     {
         return false;
@@ -445,10 +449,11 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      *
      * @param site
      *            The site to derive metadata from
+     * @return list of metadata
      */
-    protected Metadatum[] site2Metadata(Site site)
+    protected List<MockMetadataValue> site2Metadata(Site site)
     {
-        List<Metadatum> metadata = new ArrayList<Metadatum>();
+        List<MockMetadataValue> metadata = new ArrayList<>();
 
         String identifier_uri = "http://hdl.handle.net/"
                 + site.getHandle();
@@ -471,7 +476,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             metadata.add(createDCValue("title", null, title));
         }
 
-        return (Metadatum[]) metadata.toArray(new Metadatum[metadata.size()]);
+        return metadata;
     }
     /**
      * Generate a list of metadata elements for the given DSpace
@@ -479,24 +484,21 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      *
      * @param community
      *            The community to derive metadata from
+     * @return list of metadata
      */
-    protected Metadatum[] community2Metadata(Community community)
+    protected List<MockMetadataValue> community2Metadata(Community community)
     {
-        List<Metadatum> metadata = new ArrayList<Metadatum>();
+        List<MockMetadataValue> metadata = new ArrayList<>();
 
-        String description = community.getMetadata("introductory_text");
-        String description_abstract = community
-                .getMetadata("short_description");
-        String description_table = community.getMetadata("side_bar_text");
+        String description = communityService.getMetadata(community, "introductory_text");
+        String description_abstract = communityService.getMetadata(community, "short_description");
+        String description_table = communityService.getMetadata(community,"side_bar_text");
         String identifier_uri = "http://hdl.handle.net/"
                 + community.getHandle();
-        String rights = community.getMetadata("copyright_text");
-        String title = community.getMetadata("name");
+        String rights = communityService.getMetadata(community,"copyright_text");
+        String title = communityService.getMetadata(community,"name");
 
-        if (description != null)
-        {
-            metadata.add(createDCValue("description", null, description));
-        }
+        metadata.add(createDCValue("description", null, description));
 
         if (description_abstract != null)
         {
@@ -523,7 +525,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             metadata.add(createDCValue("title", null, title));
         }
 
-        return (Metadatum[]) metadata.toArray(new Metadatum[metadata.size()]);
+        return metadata;
     }
 
     /**
@@ -532,21 +534,21 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      *
      * @param collection
      *            The collection to derive metadata from
+     * @return list of metadata
      */
-    protected Metadatum[] collection2Metadata(Collection collection)
+    protected List<MockMetadataValue> collection2Metadata(Collection collection)
     {
-        List<Metadatum> metadata = new ArrayList<Metadatum>();
+        List<MockMetadataValue> metadata = new ArrayList<>();
 
-        String description = collection.getMetadata("introductory_text");
-        String description_abstract = collection
-                .getMetadata("short_description");
-        String description_table = collection.getMetadata("side_bar_text");
+        String description = collectionService.getMetadata(collection, "introductory_text");
+        String description_abstract = collectionService.getMetadata(collection, "short_description");
+        String description_table = collectionService.getMetadata(collection, "side_bar_text");
         String identifier_uri = "http://hdl.handle.net/"
                 + collection.getHandle();
-        String provenance = collection.getMetadata("provenance_description");
-        String rights = collection.getMetadata("copyright_text");
-        String rights_license = collection.getMetadata("license");
-        String title = collection.getMetadata("name");
+        String provenance = collectionService.getMetadata(collection, "provenance_description");
+        String rights = collectionService.getMetadata(collection, "copyright_text");
+        String rights_license = collectionService.getMetadata(collection, "license");
+        String title = collectionService.getMetadata(collection, "name");
 
         if (description != null)
         {
@@ -588,7 +590,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             metadata.add(createDCValue("title", null, title));
         }
 
-        return (Metadatum[]) metadata.toArray(new Metadatum[metadata.size()]);
+        return metadata;
     }
 
     /**
@@ -596,21 +598,26 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      *
      * @param item
      *            The item to derive metadata from
+     * @return list of metadata
      */
-    protected Metadatum[] item2Metadata(Item item)
+    protected List<MockMetadataValue> item2Metadata(Item item)
     {
-        Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
+        List<MetadataValue> dcvs = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY,
                 Item.ANY);
+        List<MockMetadataValue> result = new ArrayList<>();
+        for (MetadataValue metadataValue : dcvs) {
+            result.add(new MockMetadataValue(metadataValue));
+        }
 
-        return dcvs;
+        return result;
     }
 
-    private Metadatum createDCValue(String element, String qualifier, String value) {
-        Metadatum dcv = new Metadatum();
-        dcv.schema = "dc";
-        dcv.element = element;
-        dcv.qualifier = qualifier;
-        dcv.value = value;
+    protected MockMetadataValue createDCValue(String element, String qualifier, String value) {
+        MockMetadataValue dcv = new MockMetadataValue();
+        dcv.setSchema("dc");
+        dcv.setElement(element);
+        dcv.setQualifier(qualifier);
+        dcv.setValue(value);
         return dcv;
     }
 
@@ -644,5 +651,4 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             return result.toString();
         }
     }
-
 }

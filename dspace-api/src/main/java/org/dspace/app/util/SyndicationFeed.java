@@ -17,18 +17,17 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.w3c.dom.Document;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCDate;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
-import org.dspace.handle.HandleManager;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
@@ -51,7 +50,8 @@ import com.sun.syndication.io.SyndFeedOutput;
 import com.sun.syndication.io.FeedException;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.Bundle;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Invoke ROME library to assemble a generic model of a syndication
@@ -66,7 +66,7 @@ import org.dspace.content.Bundle;
  */
 public class SyndicationFeed
 {
-    private static final Logger log = Logger.getLogger(SyndicationFeed.class);
+    protected  final Logger log = Logger.getLogger(SyndicationFeed.class);
 
 
     /** i18n key values */
@@ -82,52 +82,61 @@ public class SyndicationFeed
     public static final String UITYPE_JSPUI = "jspui";
 
     // default DC fields for entry
-    private static String defaultTitleField = "dc.title";
-    private static String defaultAuthorField = "dc.contributor.author";
-    private static String defaultDateField = "dc.date.issued";
-    private static String defaultDescriptionFields = "dc.description.abstract, dc.description, dc.title.alternative, dc.title";
-    private static String defaultExternalMedia = "dc.source.uri";
+    protected  String defaultTitleField = "dc.title";
+    protected  String defaultAuthorField = "dc.contributor.author";
+    protected  String defaultDateField = "dc.date.issued";
+    private static final String[] defaultDescriptionFields = new String[]{"dc.description.abstract", "dc.description", "dc.title.alternative", "dc.title"};
+    protected  String defaultExternalMedia = "dc.source.uri";
+
+    private final ConfigurationService configurationService = 
+            DSpaceServicesFactory.getInstance().getConfigurationService();
 
     // metadata field for Item title in entry:
-    private static String titleField =
-        getDefaultedConfiguration("webui.feed.item.title", defaultTitleField);
+    protected String titleField = 
+            configurationService.getProperty("webui.feed.item.title", defaultTitleField);
 
     // metadata field for Item publication date in entry:
-    private static String dateField =
-        getDefaultedConfiguration("webui.feed.item.date", defaultDateField);
+    protected String dateField =
+            configurationService.getProperty("webui.feed.item.date", defaultDateField);
 
     // metadata field for Item description in entry:
-    private static String descriptionFields[] =
-        getDefaultedConfiguration("webui.feed.item.description", defaultDescriptionFields).split("\\s*,\\s*");
-
-    private static String authorField =
-        getDefaultedConfiguration("webui.feed.item.author", defaultAuthorField);
+    private static final String descriptionFields[] =
+            DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.item.description", defaultDescriptionFields);
+    
+    protected String authorField =
+            configurationService.getProperty("webui.feed.item.author", defaultAuthorField);
 
     // metadata field for Podcast external media source url
-    private static String externalSourceField = getDefaultedConfiguration("webui.feed.podcast.sourceuri", defaultExternalMedia);
+    protected String externalSourceField = 
+            configurationService.getProperty("webui.feed.podcast.sourceuri", defaultExternalMedia);
 
     // metadata field for Item dc:creator field in entry's DCModule (no default)
-    private static String dcCreatorField = ConfigurationManager.getProperty("webui.feed.item.dc.creator");
+    protected String dcCreatorField = configurationService.getProperty("webui.feed.item.dc.creator");
 
     // metadata field for Item dc:date field in entry's DCModule (no default)
-    private static String dcDateField = ConfigurationManager.getProperty("webui.feed.item.dc.date");
+    protected String dcDateField = configurationService.getProperty("webui.feed.item.dc.date");
 
     // metadata field for Item dc:author field in entry's DCModule (no default)
-    private static String dcDescriptionField = ConfigurationManager.getProperty("webui.feed.item.dc.description");
+    protected String dcDescriptionField = configurationService.getProperty("webui.feed.item.dc.description");
 
     // List of available mimetypes that we'll add to podcast feed. Multiple values separated by commas
-    private static String podcastableMIMETypes = getDefaultedConfiguration("webui.feed.podcast.mimetypes", "audio/x-mpeg");
+    protected String[] podcastableMIMETypes =
+            configurationService.getArrayProperty("webui.feed.podcast.mimetypes", new String[]{"audio/x-mpeg"});
 
     // -------- Instance variables:
 
     // the feed object we are building
-    private SyndFeed feed = null;
+    protected SyndFeed feed = null;
 
     // memory of UI that called us, "xmlui" or "jspui"
     // affects Bitstream retrieval URL and I18N keys
-    private String uiType = null;
+    protected String uiType = null;
 
-    private HttpServletRequest request = null;
+    protected HttpServletRequest request = null;
+
+    protected CollectionService collectionService;
+    protected CommunityService communityService;
+    protected ItemService itemService;
 
     /**
      * Constructor.
@@ -137,33 +146,10 @@ public class SyndicationFeed
     {
         feed = new SyndFeedImpl();
         uiType = ui;
-    }
-
-    /**
-     * Strip out control characters, which are invalid XML.
-     */
-    private String stripControl(String value){
-        // strip out control characters
-        StringBuffer sb = new StringBuffer(value);
-        stripControl(sb);
-        return sb.toString();
-    }
-
-    /**
-      * Strip out control characters, which are invalid XML.
-      */
-    private void stripControl(StringBuffer sb){
-        // strip out control characters
-        for (int j=0; j < sb.length(); j++) {
-            if (Character.isISOControl(sb.charAt(j))
-                && sb.charAt(j) != '\t'
-                && sb.charAt(j) != '\r'
-                && sb.charAt(j) != '\n'
-               )
-             {
-                sb.setCharAt(j, '\ufffd');
-             }
-         }
+        ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
+        itemService = contentServiceFactory.getItemService();
+        collectionService = contentServiceFactory.getCollectionService();
+        communityService = contentServiceFactory.getCommunityService();
     }
 
     /**
@@ -179,9 +165,14 @@ public class SyndicationFeed
 
     /**
      * Fills in the feed and entry-level metadata from DSpace objects.
+     * @param request request
+     * @param context context
+     * @param dso DSpaceObject
+     * @param items array of objects
+     * @param labels label map
      */
-    public void populate(HttpServletRequest request, DSpaceObject dso,
-                         DSpaceObject items[], Map<String, String> labels)
+    public void populate(HttpServletRequest request, Context context, DSpaceObject dso,
+                         List<?extends DSpaceObject> items, Map<String, String> labels)
     {
         String logoURL = null;
         String objectURL = null;
@@ -203,8 +194,8 @@ public class SyndicationFeed
             if (dso.getType() == Constants.COLLECTION)
             {
                 Collection col = (Collection)dso;
-                defaultTitle = col.getMetadata("name");
-                feed.setDescription(col.getMetadata("short_description"));
+                defaultTitle = col.getName();
+                feed.setDescription(collectionService.getMetadata(col, "short_description"));
                 logo = col.getLogo();
                 String cols = ConfigurationManager.getProperty("webui.feed.podcast.collections");
                 if(cols != null && cols.length() > 1 && cols.contains(col.getHandle()) ) {
@@ -214,8 +205,8 @@ public class SyndicationFeed
             else if (dso.getType() == Constants.COMMUNITY)
             {
                 Community comm = (Community)dso;
-                defaultTitle = comm.getMetadata("name");
-                feed.setDescription(comm.getMetadata("short_description"));
+                defaultTitle = comm.getName();
+                feed.setDescription(communityService.getMetadata(comm, "short_description"));
                 logo = comm.getLogo();
                 String comms = ConfigurationManager.getProperty("webui.feed.podcast.communities");
                 if(comms != null && comms.length() > 1 && comms.contains(comm.getHandle()) ){
@@ -270,7 +261,7 @@ public class SyndicationFeed
                 entry.setUri(entryURL);
              
                 String title = getOneDC(item, titleField);
-                entry.setTitle(title == null ? localize(labels, MSG_UNTITLED) : stripControl(title));
+                entry.setTitle(title == null ? localize(labels, MSG_UNTITLED) : title);
              
                 // "published" date -- should be dc.date.issued
                 String pubDate = getOneDC(item, dateField);
@@ -292,8 +283,8 @@ public class SyndicationFeed
                         df = df.replaceAll("\\(date\\)", "");
                     }
              
-                    Metadatum dcv[] = item.getMetadataByMetadataString(df);
-                    if (dcv.length > 0)
+                    List<MetadataValue> dcv = itemService.getMetadataByMetadataString(item, df);
+                    if (dcv.size() > 0)
                     {
                         String fieldLabel = labels.get(MSG_METADATA + df);
                         if (fieldLabel != null && fieldLabel.length()>0)
@@ -301,7 +292,7 @@ public class SyndicationFeed
                             db.append(fieldLabel).append(": ");
                         }
                         boolean first = true;
-                        for (Metadatum v : dcv)
+                        for (MetadataValue v : dcv)
                         {
                             if (first)
                             {
@@ -311,7 +302,7 @@ public class SyndicationFeed
                             {
                                 db.append("; ");
                             }
-                            db.append(isDate ? new DCDate(v.value).toString() : v.value);
+                            db.append(isDate ? new DCDate(v.getValue()).toString() : v.getValue());
                         }
                         db.append("\n");
                     }
@@ -320,20 +311,19 @@ public class SyndicationFeed
                 {
                     SyndContent desc = new SyndContentImpl();
                     desc.setType("text/plain");
-                    stripControl(db);
                     desc.setValue(db.toString());
                     entry.setDescription(desc);
                 }
 
                 // This gets the authors into an ATOM feed
-                Metadatum authors[] = item.getMetadataByMetadataString(authorField);
-                if (authors.length > 0)
+                List<MetadataValue> authors = itemService.getMetadataByMetadataString(item, authorField);
+                if (authors.size() > 0)
                 {
                     List<SyndPerson> creators = new ArrayList<SyndPerson>();
-                    for (Metadatum author : authors)
+                    for (MetadataValue author : authors)
                     {
                         SyndPerson sp = new SyndPersonImpl();
-                        sp.setName(stripControl(author.value));
+                        sp.setName(author.getValue());
                         creators.add(sp);
                     }
                     entry.setAuthors(creators);
@@ -346,40 +336,39 @@ public class SyndicationFeed
                     DCModule dc = new DCModuleImpl();
                     if (dcCreatorField != null)
                     {
-                        Metadatum dcAuthors[] = item.getMetadataByMetadataString(dcCreatorField);
-                        if (dcAuthors.length > 0)
+                        List<MetadataValue> dcAuthors = itemService.getMetadataByMetadataString(item, dcCreatorField);
+                        if (dcAuthors.size() > 0)
                         {
                             List<String> creators = new ArrayList<String>();
-                            for (Metadatum author : dcAuthors)
+                            for (MetadataValue author : dcAuthors)
                             {
-                                creators.add(stripControl(author.value));
+                                creators.add(author.getValue());
                             }
                             dc.setCreators(creators);
                         }
                     }
                     if (dcDateField != null && !hasDate)
                     {
-                        Metadatum v[] = item.getMetadataByMetadataString(dcDateField);
-                        if (v.length > 0)
+                        List<MetadataValue> v = itemService.getMetadataByMetadataString(item, dcDateField);
+                        if (v.size() > 0)
                         {
-                            dc.setDate((new DCDate(v[0].value)).toDate());
+                            dc.setDate((new DCDate(v.get(0).getValue())).toDate());
                         }
                     }
                     if (dcDescriptionField != null)
                     {
-                        Metadatum v[] = item.getMetadataByMetadataString(dcDescriptionField);
-                        if (v.length > 0)
+                        List<MetadataValue> v = itemService.getMetadataByMetadataString(item, dcDescriptionField);
+                        if (v.size() > 0)
                         {
                             StringBuffer descs = new StringBuffer();
-                            for (Metadatum d : v)
+                            for (MetadataValue d : v)
                             {
                                 if (descs.length() > 0)
                                 {
                                     descs.append("\n\n");
                                 }
-                                descs.append(d.value);
+                                descs.append(d.getValue());
                             }
-                            stripControl(descs);
                             dc.setDescription(descs.toString());
                         }
                     }
@@ -392,16 +381,16 @@ public class SyndicationFeed
                     // Add enclosure(s)
                     List<SyndEnclosure> enclosures = new ArrayList();
                     try {
-                        Bundle[] bunds = item.getBundles("ORIGINAL");
-                        if (bunds[0] != null) {
-                            Bitstream[] bits = bunds[0].getBitstreams();
-                            for (int i = 0; (i < bits.length); i++) {
-                                String mime = bits[i].getFormat().getMIMEType();
-                                if(podcastableMIMETypes.contains(mime)) {
+                        List<Bundle> bunds = itemService.getBundles(item, "ORIGINAL");
+                        if (bunds.get(0) != null) {
+                            List<Bitstream> bits = bunds.get(0).getBitstreams();
+                            for (Bitstream bit : bits) {
+                                String mime = bit.getFormat(context).getMIMEType();
+                                if (ArrayUtils.contains(podcastableMIMETypes,mime)) {
                                     SyndEnclosure enc = new SyndEnclosureImpl();
-                                    enc.setType(bits[i].getFormat().getMIMEType());
-                                    enc.setLength(bits[i].getSize());
-                                    enc.setUrl(urlOfBitstream(request, bits[i]));
+                                    enc.setType(bit.getFormat(context).getMIMEType());
+                                    enc.setLength(bit.getSize());
+                                    enc.setUrl(urlOfBitstream(request, bit));
                                     enclosures.add(enc);
                                 } else {
                                     continue;
@@ -410,15 +399,14 @@ public class SyndicationFeed
                         }
                         //Also try to add an external value from dc.identifier.other
                         // We are assuming that if this is set, then it is a media file
-                        Metadatum[] externalMedia = item.getMetadataByMetadataString(externalSourceField);
-                        if(externalMedia.length > 0)
+                        List<MetadataValue> externalMedia = itemService.getMetadataByMetadataString(item, externalSourceField);
+                        if(externalMedia.size() > 0)
                         {
-                            for(int i = 0; i< externalMedia.length; i++)
-                            {
+                            for (MetadataValue anExternalMedia : externalMedia) {
                                 SyndEnclosure enc = new SyndEnclosureImpl();
                                 enc.setType("audio/x-mpeg");        //We can't determine MIME of external file, so just picking one.
                                 enc.setLength(1);
-                                enc.setUrl(externalMedia[i].value);
+                                enc.setUrl(anExternalMedia.getValue());
                                 enclosures.add(enc);
                             }
                         }
@@ -467,6 +455,7 @@ public class SyndicationFeed
      * Sets the feed type for XML delivery, e.g. "rss_1.0", "atom_1.0"
      * Must match one of ROME's configured generators, see rome.properties
      * (currently rss_1.0, rss_2.0, atom_1.0, atom_0.3)
+     * @param feedType feed type
      */
     public void setType(String feedType)
     {
@@ -480,6 +469,7 @@ public class SyndicationFeed
 
     /**
      * @return the feed we built as DOM Document
+     * @throws FeedException if feed error
      */
     public Document outputW3CDom()
         throws FeedException
@@ -498,6 +488,7 @@ public class SyndicationFeed
 
     /**
      * @return the feed we built as serialized XML string
+     * @throws FeedException if feed error
      */
     public String outputString()
         throws FeedException
@@ -508,6 +499,9 @@ public class SyndicationFeed
 
     /**
      * send the output to designated Writer
+     * @param writer Writer
+     * @throws FeedException if feed error
+     * @throws IOException if IO error
      */
     public void output(java.io.Writer writer)
         throws FeedException, IOException
@@ -518,6 +512,7 @@ public class SyndicationFeed
 
     /**
      * Add a ROME plugin module (e.g. for OpenSearch) at the feed level.
+     * @param m module
      */
     public void addModule(Module m)
     {
@@ -525,14 +520,14 @@ public class SyndicationFeed
     }
 
     // utility to get config property with default value when not set.
-    private static String getDefaultedConfiguration(String key, String dfl)
+    protected static String getDefaultedConfiguration(String key, String dfl)
     {
         String result = ConfigurationManager.getProperty(key);
         return (result == null) ? dfl : result;
     }
 
     // returns absolute URL to download content of bitstream (which might not belong to any Item)
-    private String urlOfBitstream(HttpServletRequest request, Bitstream logo)
+    protected String urlOfBitstream(HttpServletRequest request, Bitstream logo)
     {
         String name = logo.getName();
         return resolveURL(request,null) +
@@ -540,18 +535,18 @@ public class SyndicationFeed
                  logo.getID()+"/"+(name == null?"":name);
     }
 
+    protected String baseURL = null;  // cache the result for null
     /**
      * Return a url to the DSpace object, either use the official
      * handle for the item or build a url based upon the current server.
      *
      * If the dspaceobject is null then a local url to the repository is generated.
      *
+     * @param request current servlet request
      * @param dso The object to reference, null if to the repository.
-     * @return
+     * @return URL
      */
-    private String baseURL = null;  // cache the result for null
-
-    private String resolveURL(HttpServletRequest request, DSpaceObject dso)
+    protected String resolveURL(HttpServletRequest request, DSpaceObject dso)
     {
         // If no object given then just link to the whole repository,
         // since no offical handle exists so we have to use local resolution.
@@ -583,21 +578,21 @@ public class SyndicationFeed
         // link to the Handle server or other persistent URL source
         else
         {
-            return HandleManager.getCanonicalForm(dso.getHandle());
+            return HandleServiceFactory.getInstance().getHandleService().getCanonicalForm(dso.getHandle());
         }
     }
 
     // retrieve text for localization key, or mark untranslated
-    private String localize(Map<String, String> labels, String s)
+    protected String localize(Map<String, String> labels, String s)
     {
         return labels.containsKey(s) ? labels.get(s) : ("Untranslated:"+s);
     }
 
     // spoonful of syntactic sugar when we only need first value
-    private String getOneDC(Item item, String field)
+    protected String getOneDC(Item item, String field)
     {
-        Metadatum dcv[] = item.getMetadataByMetadataString(field);
-        return (dcv.length > 0) ? dcv[0].value : null;
+        List<MetadataValue> dcv = itemService.getMetadataByMetadataString(item, field);
+        return (dcv.size() > 0) ? dcv.get(0).getValue() : null;
     }
 }
 

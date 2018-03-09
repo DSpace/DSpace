@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!--
+         NOTE: If you are looking for the Hibernate database connection info,
+         it is initialized via the beans in
+         [dspace.dir]/config/spring/api/core-hibernate.xml
+        -->
+
+        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.SingleLineSqlCommandExtractor</property>
+        <property name="hibernate.connection.autocommit">false</property>
+        <property name="hibernate.jdbc.batch_size">20</property>
+        <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
+
+        <!--Debug property that can be used to display the sql-->
+        <property name="show_sql">false</property>
+
+        <!--Second level cache configuration-->
+        <property name="hibernate.cache.use_query_cache">true</property>
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+        <property name="hibernate.cache.use_structured_entries">true</property>
+        <property name="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</property>
+        <!-- Set in config/spring/api/core-hibernate.xml -->
+        <!--<property name="net.sf.ehcache.configurationResourceName">file:${dspace.dir}/config/hibernate-ehcache-config.xml</property>-->
+
+
+        <!-- Entities to be loaded by hibernate -->
+        <mapping class="org.dspace.app.util.WebApp"/>
+
+        <mapping class="org.dspace.authorize.ResourcePolicy"/>
+
+        <mapping class="org.dspace.checker.ChecksumHistory"/>
+        <mapping class="org.dspace.checker.ChecksumResult"/>
+        <mapping class="org.dspace.checker.MostRecentChecksum"/>
+
+        <mapping class="org.dspace.content.DSpaceObject"/>
+        <mapping class="org.dspace.content.Bitstream"/>
+        <mapping class="org.dspace.content.BitstreamFormat"/>
+        <mapping class="org.dspace.content.Bundle"/>
+        <mapping class="org.dspace.content.Collection"/>
+        <mapping class="org.dspace.content.Community"/>
+        <mapping class="org.dspace.content.Item"/>
+        <mapping class="org.dspace.content.MetadataField"/>
+        <mapping class="org.dspace.content.MetadataSchema"/>
+        <mapping class="org.dspace.content.MetadataValue"/>
+        <mapping class="org.dspace.content.Site"/>
+        <mapping class="org.dspace.content.WorkspaceItem"/>
+
+        <mapping class="org.dspace.eperson.EPerson"/>
+        <mapping class="org.dspace.eperson.Group"/>
+        <mapping class="org.dspace.eperson.Group2GroupCache"/>
+        <mapping class="org.dspace.eperson.RegistrationData"/>
+        <mapping class="org.dspace.eperson.Subscription"/>
+
+        <mapping class="org.dspace.handle.Handle"/>
+
+        <mapping class="org.dspace.harvest.HarvestedCollection"/>
+        <mapping class="org.dspace.harvest.HarvestedItem"/>
+
+        <mapping class="org.dspace.identifier.DOI"/>
+
+        <mapping class="org.dspace.versioning.Version"/>
+        <mapping class="org.dspace.versioning.VersionHistory"/>
+
+        <mapping class="org.dspace.app.requestitem.RequestItem"/>
+
+        <!--Basic workflow services, comment or remove when switching to the configurable workflow -->
+        <mapping class="org.dspace.workflowbasic.BasicWorkflowItem"/>
+        <mapping class="org.dspace.workflowbasic.TaskListItem"/>
+
+        <!--Configurable workflow services, uncomment the xml workflow classes below to enable the configurable workflow-->
+        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.ClaimedTask"/>
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.CollectionRole"/>
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.InProgressUser"/>
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.PoolTask"/>
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>-->
+
+    </session-factory>
+</hibernate-configuration>

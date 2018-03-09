@@ -14,7 +14,6 @@
 			<map:transformer name="StatisticsTransformer" src="org.dspace.app.xmlui.aspect.statistics.StatisticsTransformer"/>
 			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.statistics.Navigation"/>
             <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
-            <map:transformer name="StatisticsSearchResultTransformer" src="org.dspace.app.xmlui.aspect.statistics.StatisticsSearchResultTransformer"/>
             <map:transformer name="StatisticsSearchTransformer" src="org.dspace.app.xmlui.aspect.statistics.StatisticsSearchTransformer"/>
             <map:transformer name="StatisticsWorkflowTransformer" src="org.dspace.app.xmlui.aspect.statistics.StatisticsWorkflowTransformer"/>
         </map:transformers>
@@ -183,35 +182,9 @@
                 </map:match>
             </map:match>
 
-            <map:match pattern="search">
-                <map:transform type="IncludePageMeta">
-                    <map:parameter name="javascript.static.statistics#1" value="loadJQuery.js"/>
-                    <map:parameter name="javascript.static.statistics#2" value="static/js/search-results.js"/>
-                </map:transform>
-                <map:transform type="StatisticsSearchResultTransformer">
-                    <map:parameter name="advanced-search" value="false"/>
-                </map:transform>
-            </map:match>
-
-            <map:match pattern="simple-search">
-                <map:transform type="IncludePageMeta">
-                    <map:parameter name="javascript.static.statistics#1" value="loadJQuery.js"/>
-                    <map:parameter name="javascript.static.statistics#2" value="static/js/search-results.js"/>
-                </map:transform>
-                <map:transform type="StatisticsSearchResultTransformer">
-                    <map:parameter name="advanced-search" value="false"/>
-                </map:transform>
-            </map:match>
-
-            <map:match pattern="advanced-search">
-                <map:transform type="IncludePageMeta">
-                    <map:parameter name="javascript.static.statistics#1" value="loadJQuery.js"/>
-                    <map:parameter name="javascript.static.statistics#2" value="static/js/search-results.js"/>
-                </map:transform>
-                <map:transform type="StatisticsSearchResultTransformer">
-                    <map:parameter name="advanced-search" value="true"/>
-                </map:transform>
-            </map:match>
+            <!-- The legacy Lucene search index has been removed in DSpace 6.0, so mappings
+                 for "handle/*/*/search", "handle/*/*/simple-search", and "handle/*/*/advanced-search"
+                 have been removed -->
 
             <map:match pattern="discover">
                 <map:transform type="IncludePageMeta">
@@ -242,38 +215,9 @@
                 <map:match type="HandleAuthorizedMatcher" pattern="READ">
                     <map:match type="HandleTypeMatcher" pattern="community,collection">
 
-                        <!-- Simple search -->
-                        <map:match pattern="handle/*/*/search">
-                            <map:transform type="IncludePageMeta">
-                                <map:parameter name="javascript.static.statistics#1" value="loadJQuery.js"/>
-                                <map:parameter name="javascript.static.statistics#2" value="static/js/search-results.js"/>
-                            </map:transform>
-                            <map:transform type="StatisticsSearchResultTransformer">
-                                <map:parameter name="advanced-search" value="false"/>
-                            </map:transform>
-                        </map:match>
-
-                        <!-- Simple search again, but this time they said it -->
-                        <map:match pattern="handle/*/*/simple-search">
-                            <map:transform type="IncludePageMeta">
-                                <map:parameter name="javascript.static.statistics#1" value="loadJQuery.js"/>
-                                <map:parameter name="javascript.static.statistics#2" value="static/js/search-results.js"/>
-                            </map:transform>
-                            <map:transform type="StatisticsSearchResultTransformer">
-                                <map:parameter name="advanced-search" value="false"/>
-                            </map:transform>
-                        </map:match>
-
-                        <!-- Advanced search -->
-                        <map:match pattern="handle/*/*/advanced-search">
-                            <map:transform type="IncludePageMeta">
-                                <map:parameter name="javascript.static.statistics#1" value="loadJQuery.js"/>
-                                <map:parameter name="javascript.static.statistics#2" value="static/js/search-results.js"/>
-                            </map:transform>
-                            <map:transform type="StatisticsSearchResultTransformer">
-                                <map:parameter name="advanced-search" value="true"/>
-                            </map:transform>
-                        </map:match>
+                        <!-- The legacy Lucene search index has been removed in DSpace 6.0, so mappings
+                             for "handle/*/*/search", "handle/*/*/simple-search", and "handle/*/*/advanced-search"
+                             have been removed -->
 
                         <!--Optional discovery statistics-->
                         <map:match pattern="handle/*/*/discover">

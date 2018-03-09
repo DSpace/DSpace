@@ -7,26 +7,24 @@
  */
 package org.dspace.app.webui.servlet.admin;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Servlet for editing groups
@@ -36,6 +34,13 @@ import org.dspace.eperson.Group;
  */
 public class GroupEditServlet extends DSpaceServlet
 {
+	private final transient GroupService groupService
+             = EPersonServiceFactory.getInstance().getGroupService();
+
+	private final transient EPersonService personService
+             = EPersonServiceFactory.getInstance().getEPersonService();
+	
+    @Override
     protected void doDSGet(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -43,24 +48,25 @@ public class GroupEditServlet extends DSpaceServlet
         doDSPost(c, request, response);
     }
 
+    @Override
     protected void doDSPost(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
         // Find out if there's a group parameter
-        int groupID = UIUtil.getIntParameter(request, "group_id");
+        UUID groupID = UIUtil.getUUIDParameter(request, "group_id");
         Group group = null;
 
-        if (groupID >= 0)
+        if (groupID != null)
         {
-            group = Group.find(c, groupID);
+            group = groupService.find(c, groupID);
         }
 
         // group is set
         if (group != null)
         {
             // is this user authorized to edit this group?
-            AuthorizeManager.authorizeAction(c, group, Constants.ADD);
+            authorizeService.authorizeAction(c, group, Constants.ADD);
 
             boolean submit_edit = (request.getParameter("submit_edit") != null);
             boolean submit_group_update = (request.getParameter("submit_group_update") != null);
@@ -87,61 +93,60 @@ public class GroupEditServlet extends DSpaceServlet
 
                 if (!newName.equals(group.getName()))
                 {
-                    group.setName(newName);
-                    group.update();
+                    groupService.setName(group, newName);
+                    groupService.update(c, group);
                 }
 
-                int[] eperson_ids = UIUtil.getIntParameters(request,
+                List<UUID> eperson_ids = UIUtil.getUUIDParameters(request,
                         "eperson_id");
-                int[] group_ids = UIUtil.getIntParameters(request, "group_ids");
+                List<UUID> group_ids = UIUtil.getUUIDParameters(request, "group_ids");
 
                 // now get members, and add new ones and remove missing ones
-                EPerson[] members = group.getMembers();
-                Group[] membergroups = group.getMemberGroups();
+                List<EPerson> members = group.getMembers();
+                List<UUID> memberIdentifiers = new ArrayList<>();
+                // Store all the identifiers of our current members
+                for (EPerson member : members)
+                {
+                    memberIdentifiers.add(member.getID());
+                }
+
+                List<Group> membergroups = group.getMemberGroups();
 
                 if (eperson_ids != null)
                 {
                     // some epeople were listed, now make group's epeople match
                     // given epeople
-                    Set memberSet = new HashSet();
-                    Set epersonIDSet = new HashSet();
+                    Set<UUID> memberSet = new HashSet<>();
+                    Set<UUID> epersonIDSet = new HashSet<>();
 
                     // add all members to a set
-                    for (int x = 0; x < members.length; x++)
+                    for (EPerson m :  members)
                     {
-                        Integer epersonID = Integer.valueOf(members[x].getID());
-                        memberSet.add(epersonID);
+                        memberSet.add(m.getID());
                     }
 
                     // now all eperson_ids are put in a set
-                    for (int x = 0; x < eperson_ids.length; x++)
+                    for (UUID e : eperson_ids)
                     {
-                        epersonIDSet.add(Integer.valueOf(eperson_ids[x]));
+                        epersonIDSet.add(e);
                     }
 
                     // process eperson_ids, adding those to group not already
                     // members
-                    Iterator i = epersonIDSet.iterator();
-
-                    while (i.hasNext())
+                    for (UUID uid : epersonIDSet)
                     {
-                        Integer currentID = (Integer) i.next();
-
-                        if (!memberSet.contains(currentID))
+                        if (!memberSet.contains(uid))
                         {
-                            group.addMember(EPerson.find(c, currentID
-                                    .intValue()));
+                            groupService.addMember(c, group, personService.find(c, uid));
                         }
                     }
 
                     // process members, removing any that aren't in eperson_ids
-                    for (int x = 0; x < members.length; x++)
+                    for (UUID personId : memberIdentifiers)
                     {
-                        EPerson e = members[x];
-
-                        if (!epersonIDSet.contains(Integer.valueOf(e.getID())))
+                        if (!epersonIDSet.contains(personId))
                         {
-                            group.removeMember(e);
+                            groupService.removeMember(c, group, personService.find(c, personId));
                         }
                     }
                 }
@@ -149,9 +154,9 @@ public class GroupEditServlet extends DSpaceServlet
                 {
                     // no members found (ids == null), remove them all!
 
-                    for (int y = 0; y < members.length; y++)
+                    for (UUID personId : memberIdentifiers)
                     {
-                        group.removeMember(members[y]);
+                        groupService.removeMember(c, group, personService.find(c, personId));
                     }
                 }
 
@@ -159,46 +164,38 @@ public class GroupEditServlet extends DSpaceServlet
                 {
                     // some groups were listed, now make group's member groups
                     // match given group IDs
-                    Set memberSet = new HashSet();
-                    Set groupIDSet = new HashSet();
+                    Set<UUID> memberSet = new HashSet<>();
+                    Set<UUID> groupIDSet = new HashSet<>();
 
                     // add all members to a set
-                    for (int x = 0; x < membergroups.length; x++)
+                    for (Group g : membergroups)
                     {
-                        Integer myID = Integer.valueOf(membergroups[x].getID());
-                        memberSet.add(myID);
+                        memberSet.add(g.getID());
                     }
 
                     // now all eperson_ids are put in a set
-                    for (int x = 0; x < group_ids.length; x++)
+                    for (UUID uid :  group_ids)
                     {
-                        groupIDSet.add(Integer.valueOf(group_ids[x]));
+                        groupIDSet.add(uid);
                     }
 
                     // process group_ids, adding those to group not already
                     // members
-                    Iterator i = groupIDSet.iterator();
-
-                    while (i.hasNext())
+                    for (UUID guid : groupIDSet)
                     {
-                        Integer currentID = (Integer) i.next();
-
-                        if (!memberSet.contains(currentID))
+                        if (!memberSet.contains(guid))
                         {
-                            group
-                                    .addMember(Group.find(c, currentID
-                                            .intValue()));
+                            groupService
+                                    .addMember(c, group, groupService.find(c, guid));
                         }
                     }
 
                     // process members, removing any that aren't in eperson_ids
-                    for (int x = 0; x < membergroups.length; x++)
+                    for (Group g : membergroups)
                     {
-                        Group g = membergroups[x];
-
-                        if (!groupIDSet.contains(Integer.valueOf(g.getID())))
+                        if (!groupIDSet.contains(g.getID()))
                         {
-                            group.removeMember(g);
+                            groupService.removeMember(c, group, g);
                         }
                     }
 
@@ -206,13 +203,13 @@ public class GroupEditServlet extends DSpaceServlet
                 else
                 {
                     // no members found (ids == null), remove them all!
-                    for (int y = 0; y < membergroups.length; y++)
+                    for (Group g : membergroups)
                     {
-                        group.removeMember(membergroups[y]);
+                        groupService.removeMember(c, group, g);
                     }
                 }
 
-                group.update();
+                groupService.update(c, group);
 
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
@@ -230,10 +227,10 @@ public class GroupEditServlet extends DSpaceServlet
             else if (submit_confirm_delete)
             {
                 // phony authorize, only admins can do this
-                AuthorizeManager.authorizeAction(c, group, Constants.WRITE);
+                authorizeService.authorizeAction(c, group, Constants.WRITE);
 
                 // delete group, return to group-list.jsp
-                group.delete();
+                groupService.delete(c, group);
 
                 showMainPage(c, request, response);
             }
@@ -261,10 +258,10 @@ public class GroupEditServlet extends DSpaceServlet
 
             if (button.equals("submit_add"))
             {
-                group = Group.create(c);
+                group = groupService.create(c);
 
-                group.setName("new group" + group.getID());
-                group.update();
+                groupService.setName(group, "new group" + group.getID());
+                groupService.update(c, group);
 
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
@@ -285,12 +282,31 @@ public class GroupEditServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        Group[] groups = Group.findAll(c, Group.NAME);
-
-        // if( groups == null ) { System.out.println("groups are null"); }
-        // else System.out.println("# of groups: " + groups.length);
-        request.setAttribute("groups", groups);
-
+        List<Group> groups = new ArrayList<Group>();
+        boolean isAdmin = authorizeService.isAdmin(c);
+        boolean isCommunityAdmin = authorizeService.isCommunityAdmin(c);
+        boolean isCollectionAdmin = authorizeService.isCollectionAdmin(c);
+        
+        // In case the user is a community or collection admin, only the groups
+        // the user is allowed to change should listed
+        if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+        {
+            for(Group group: groups)
+            {
+                if(authorizeService.authorizeActionBoolean(c, group, Constants.WRITE) ||
+                   authorizeService.authorizeActionBoolean(c, group, Constants.ADD))
+                {
+                    groups.add(group);
+                }
+            }
+            request.setAttribute("groups", groups);
+        }
+        // All groups are shown to the System admin
+        else
+        {
+            groups = groupService.findAll(c, GroupService.NAME);
+            request.setAttribute("groups", groups);
+        }
         JSPManager.showJSP(request, response, "/tools/group-list.jsp");
         c.complete();
     }

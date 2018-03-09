@@ -13,6 +13,7 @@ import gr.ekt.bte.core.MutableRecord;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.core.Value;
+import org.springframework.beans.factory.InitializingBean;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,10 +27,12 @@ import java.util.MissingResourceException;
  *
  * @author Keiji Suzuki
  */
-public class LanguageCodeModifier extends AbstractModifier
+public class LanguageCodeModifier extends AbstractModifier implements InitializingBean
 {
-    private static Map<String, String> lang3to2 = null;
-    static
+    protected static Map<String, String> lang3to2 = null;
+
+    @Override
+    public void afterPropertiesSet() throws Exception
     {
         lang3to2 = new HashMap<String, String>();
         for (Locale locale : Locale.getAvailableLocales())
@@ -75,13 +78,13 @@ public class LanguageCodeModifier extends AbstractModifier
     /**
      * Covert ISO 639-2 alpha-3 code to ISO 639-1 alpha-2 code
      *
-     * @param lang
-     *            3char language code
+     * @param lang3
+     *            ISO 639-1 alpha-3 language code
      * 
-     * @return String 2char language code ("other" unless code has 2 char code)
+     * @return String ISO 639-1 alpha-2 language code ("other" if code is not alpha-2)
      * 
      */
-    private String getLang2(String lang3) 
+    protected String getLang2(String lang3)
     {
         return lang3to2.containsKey(lang3) ? lang3to2.get(lang3) : "other"; 
     }

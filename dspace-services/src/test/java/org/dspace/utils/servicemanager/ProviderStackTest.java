@@ -69,10 +69,16 @@ public class ProviderStackTest {
             public boolean isServiceExists(String name) {
                 return false;
             }
-            public void pushConfig(Map<String, String> settings) {
+            public void pushConfig(Map<String, Object> settings) {
             }
             public void registerService(String name, Object service) {
             }
+
+            @Override
+            public void registerServiceNoAutowire(String name, Object service) {
+
+            }
+
             public <T> T registerServiceClass(String name, Class<T> type) {
                 return null;
             }

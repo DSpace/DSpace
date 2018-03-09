@@ -7,18 +7,27 @@
  */
 package org.dspace.core;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Locale;
 import mockit.NonStrictExpectations;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.core.exception.DatabaseSchemaValidationException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.junit.*;
-import static org.junit.Assert.* ;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
+import org.junit.Test;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+
 import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * Perform some basic unit tests for Context Class
@@ -26,16 +35,54 @@ import static org.hamcrest.CoreMatchers.*;
  */
 public class ContextTest extends AbstractUnitTest
 {
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
     /**
      * Test of getDBConnection method, of class Context.
      */
     @Test
     public void testGetDBConnection() throws SQLException
     {
-        Connection connection = context.getDBConnection();
+        DBConnection connection = context.getDBConnection();
         
         assertThat("testGetDBConnection 0", connection, notNullValue());
-        assertThat("testGetDBConnection 1", connection.isClosed(), equalTo(false));
+        assertThat("testGetDBConnection 1", connection.isSessionAlive(), equalTo(true));
+    }
+
+    /**
+     * Test of getDBConnection method, of class Context.
+     */
+    @Test
+    public void testSchemaValidation() throws SQLException
+    {
+        try {
+            //Stop the current kernel and database
+            destroy();
+            destroyKernel();
+
+            //Create a new Kernel but do not init the database. This should trigger missing table validation errors
+            initKernel();
+            init();
+
+            //If we get here without exception, the validation did not happen
+            fail();
+
+        } catch(DatabaseSchemaValidationException ex) {
+            assertTrue(StringUtils.isNotBlank(ex.getMessage()));
+            assertTrue(StringUtils.contains(ex.getMessage(), "Missing table"));
+
+        } finally {
+
+            //restore correct state
+            destroy();
+            destroyKernel();
+
+            initKernel();
+            initDatabase();
+            init();
+        }
     }
 
     /**
@@ -44,21 +91,21 @@ public class ContextTest extends AbstractUnitTest
     @Test
     public void testSetCurrentUser() throws SQLException, AuthorizeException
     {
-        new NonStrictExpectations(AuthorizeManager.class)
+        new NonStrictExpectations(authorizeService.getClass())
         {{
             // Allow Admin permissions - needed to create a new EPerson
-            AuthorizeManager.isAdmin((Context) any); result = true;
+                authorizeService.isAdmin((Context) any); result = true;
         }};
         
         EPerson oldUser = context.getCurrentUser();
         
         // Create a dummy EPerson to set as current user
-        EPerson newUser = EPerson.create(context);
-        newUser.setFirstName("Jane");
-        newUser.setLastName("Doe");
+        EPerson newUser = ePersonService.create(context);
+        newUser.setFirstName(context, "Jane");
+        newUser.setLastName(context, "Doe");
         newUser.setEmail("jane@email.com");
         newUser.setCanLogIn(true);
-        newUser.setLanguage(I18nUtil.getDefaultLocale().getLanguage());
+        newUser.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
         
         context.setCurrentUser(newUser);
         
@@ -191,7 +238,7 @@ public class ContextTest extends AbstractUnitTest
         
         // By default, we should have a new DB connection, so let's make sure it is there
         assertThat("testComplete 0", instance.getDBConnection(), notNullValue());
-        assertThat("testComplete 1", instance.getDBConnection().isClosed(), equalTo(false));
+        assertThat("testComplete 1", instance.getDBConnection().isSessionAlive(), equalTo(true));
         assertThat("testComplete 2", instance.isValid(), equalTo(true));
         
         // Now, call complete(). This should set DB connection to null & invalidate context
@@ -223,106 +270,28 @@ public class ContextTest extends AbstractUnitTest
     }
 
     /**
-     * Test of commit method, of class Context.
-     */
-    @Test
-    public void testCommit() throws Exception 
-    {
-        new NonStrictExpectations(AuthorizeManager.class)
-        {{
-            // Allow Admin permissions - needed to create a new EPerson
-            AuthorizeManager.isAdmin((Context) any); result = true;
-        }};
-        
-        // Create a new EPerson & commit it
-        String createdEmail = "jimmy@email.com";
-        EPerson newUser = EPerson.create(context);
-        newUser.setFirstName("Jimmy");
-        newUser.setLastName("Doe");
-        newUser.setEmail(createdEmail);
-        newUser.setCanLogIn(true);
-        newUser.setLanguage(I18nUtil.getDefaultLocale().getLanguage());
-        // Ensure EPerson is committed
-        newUser.update();
-        context.commit();
-        
-        //Now, open a new context, and see if this eperson can be found!
-        Context newInstance = new Context();
-        EPerson found = EPerson.findByEmail(newInstance, createdEmail);
-        assertThat("testCommit 0", found, notNullValue());
-
-        // Cleanup our new context
-        cleanupContext(newInstance);
-    }
-    
-    /**
-     * Test of commit method, of class Context.
-     */
-    @Test(expected=IllegalStateException.class)
-    public void testCommitReadOnlyContext() throws Exception
-    {
-        // Create a read-only Context
-        Context instance = new Context(Context.READ_ONLY);
-
-        try
-        {
-            // Attempt to commit to it - should throw an exception
-            instance.commit();
-        }
-        finally
-        {
-            // Cleanup our context
-            cleanupContext(instance);
-        }
-    }
-    
-    /**
-     * Test of commit method, of class Context.
-     */
-    @Test(expected=IllegalStateException.class)
-    public void testCommitInvalidContext() throws Exception
-    {
-        // Create a new Context
-        Context instance = new Context();
-
-        // Close context (invalidating it)
-        instance.abort();
-
-        try
-        {
-            // Attempt to commit to it - should throw an exception
-            instance.commit();
-        }
-        finally
-        {
-            // Cleanup our context
-            cleanupContext(instance);
-        }
-    }
-
-    /**
      * Test of abort method, of class Context.
      */
     @Test
     public void testAbort() throws SQLException, AuthorizeException
     {
-        new NonStrictExpectations(AuthorizeManager.class)
+        new NonStrictExpectations(authorizeService.getClass())
         {{
             // Allow Admin permissions - needed to create a new EPerson
-            AuthorizeManager.isAdmin((Context) any); result = true;
+            authorizeService.isAdmin((Context) any); result = true;
         }};
-        
+
         // To test abort() we need a new Context object
         Context instance = new Context();
         
         // Create a new EPerson (DO NOT COMMIT IT)
         String createdEmail = "susie@email.com";
-        EPerson newUser = EPerson.create(instance);
-        newUser.setFirstName("Susan");
-        newUser.setLastName("Doe");
+        EPerson newUser = ePersonService.create(instance);
+        newUser.setFirstName(context, "Susan");
+        newUser.setLastName(context, "Doe");
         newUser.setEmail(createdEmail);
         newUser.setCanLogIn(true);
-        newUser.setLanguage(I18nUtil.getDefaultLocale().getLanguage());
+        newUser.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
         
         // Abort our context
         instance.abort();
@@ -331,7 +300,7 @@ public class ContextTest extends AbstractUnitTest
         
         // Open a new context, let's make sure that EPerson isn't there
         Context newInstance = new Context();
-        EPerson found = EPerson.findByEmail(newInstance, createdEmail);
+        EPerson found = ePersonService.findByEmail(newInstance, createdEmail);
         assertThat("testAbort 1", found, nullValue());
 
         // Cleanup our contexts
@@ -375,126 +344,35 @@ public class ContextTest extends AbstractUnitTest
         assertThat("testIsReadOnly 0", context.isReadOnly(), equalTo(false));
         
         // Create a new read-only context
-        Context instance = new Context(Context.READ_ONLY);
+        Context instance = new Context(Context.Mode.READ_ONLY);
         assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
 
-        // Cleanup our context
-        cleanupContext(instance);
-    }
-
-    /**
-     * Test of fromCache method, of class Context.
-     */
-    @Test
-    public void testFromCache() throws SQLException, AuthorizeException
-    {
-        new NonStrictExpectations(AuthorizeManager.class)
-        {{
-            // Allow Admin permissions - needed to create a new EPerson
-            AuthorizeManager.isAdmin((Context) any); result = true;
-        }};
-        
-        // To test caching we need a new Context object
-        Context instance = new Context();
-        
-        // Create a new Eperson object
-        EPerson newEperson = EPerson.create(instance);
-        newEperson.setFirstName("Sam");
-        newEperson.setLastName("Smith");
-        newEperson.setEmail("sammy@smith.com");
-        newEperson.setCanLogIn(true);
-        newEperson.setLanguage(I18nUtil.getDefaultLocale().getLanguage());
-        
-        // Cache the object
-        instance.cache(newEperson, newEperson.getID());
-        
-        // Now, pull the object out of the cache
-        EPerson fromCache = (EPerson) instance.fromCache(EPerson.class, newEperson.getID());
-        assertThat("testFromCache 0", fromCache, notNullValue());
-        assertThat("testFromCache 1", fromCache, equalTo(newEperson));
+        //When in read-only, we only support abort().
+        instance.abort();
 
         // Cleanup our context
         cleanupContext(instance);
     }
 
     /**
-     * Test of cache method, of class Context.
+     * Test that commit cannot be called when the context is in read-only mode
      */
     @Test
-    public void testCache() throws SQLException
+    public void testIsReadOnlyCommit() throws SQLException
     {
-        // To test caching we need a new Context object
-        Context instance = new Context();
-        
-        // Create a simple object to cache
-        String cacheMe = "Look for me in your local cache!";
-        int cacheMeID = 9999999;
-        
-        // Cache the object
-        instance.cache(cacheMe, cacheMeID);
-        
-        // Now, can we get it back?
-        String fromCache = (String) instance.fromCache(String.class, cacheMeID);
-        assertThat("testCache 0", fromCache, notNullValue());
-        assertThat("testCache 1", fromCache, equalTo(cacheMe));
+        // Create a new read-only context
+        Context instance = new Context(Context.Mode.READ_ONLY);
+        assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
 
-        // Cleanup our context
-        cleanupContext(instance);
-    }
+        try {
+            //When in read-only, calling commit() should result in an error
+            instance.commit();
+            fail();
+        } catch (Exception ex) {
+            assertTrue(ex instanceof UnsupportedOperationException);
+        }
 
-    /**
-     * Test of removeCached method, of class Context.
-     */
-    @Test
-    public void testRemoveCached() throws SQLException
-    {
-        // To test caching we need a new Context object
-        Context instance = new Context();
-        
-        // Create a simple object to cache
-        String cacheMe = "Look for me in your local cache!";
-        int cacheMeID = 9999999;
-        
-        // Cache the object
-        instance.cache(cacheMe, cacheMeID);
-        
-        // Can we get it back?
-        String fromCache = (String) instance.fromCache(String.class, cacheMeID);
-        assertThat("testRemoveCache 0", fromCache, notNullValue());
-        assertThat("testRemoveCache 1", fromCache, equalTo(cacheMe));
-        
-        // Now, can we remove it?
-        instance.removeCached(cacheMe, cacheMeID);
-        assertThat("testRemoveCache 3", instance.fromCache(String.class, cacheMeID), nullValue());
-
-        // Cleanup our context
-        cleanupContext(instance);
-    }
-
-    /**
-     * Test of clearCache method, of class Context.
-     */
-    @Test
-    public void testClearCache() throws SQLException
-    {
-        // To test caching we need a new Context object
-        Context instance = new Context();
-        
-        // Create a simple object to cache
-        String cacheMe = "Look for me in your local cache!";
-        int cacheMeID = 9999999;
-        
-        // Cache the object
-        instance.cache(cacheMe, cacheMeID);
-        
-         // Ensure cache is non-empty
-        assertThat("testClearCache 0", instance.getCacheSize(), equalTo(1));
-        
-        // Clear our cache
-        instance.clearCache();
-        
-        // Ensure cache is empty
-        assertThat("testClearCache 1", instance.getCacheSize(), equalTo(0));
+        instance.abort();
 
         // Cleanup our context
         cleanupContext(instance);
@@ -518,12 +396,14 @@ public class ContextTest extends AbstractUnitTest
         Context instance = new Context();
         
         // Pass in random integers (need not be valid group IDs)
-        instance.setSpecialGroup(10000);
-        instance.setSpecialGroup(10001);
+        UUID groupID1 = UUID.randomUUID();
+        UUID groupID2 = UUID.randomUUID();
+        instance.setSpecialGroup(groupID1);
+        instance.setSpecialGroup(groupID2);
         
-        assertThat("testSetSpecialGroup 0", instance.inSpecialGroup(10000), equalTo(true));
-        assertThat("testSetSpecialGroup 1", instance.inSpecialGroup(10001), equalTo(true));
-        assertThat("testSetSpecialGroup 2", instance.inSpecialGroup(20000), equalTo(false));
+        assertThat("testSetSpecialGroup 0", instance.inSpecialGroup(groupID1), equalTo(true));
+        assertThat("testSetSpecialGroup 1", instance.inSpecialGroup(groupID2), equalTo(true));
+        assertThat("testSetSpecialGroup 2", instance.inSpecialGroup(UUID.randomUUID()), equalTo(false));
 
         // Cleanup our context
         cleanupContext(instance);
@@ -543,30 +423,30 @@ public class ContextTest extends AbstractUnitTest
     @Test
     public void testGetSpecialGroups() throws SQLException, AuthorizeException
     {
-        new NonStrictExpectations(AuthorizeManager.class)
+        new NonStrictExpectations(authorizeService.getClass())
         {{
             // Allow Admin permissions - needed to create a new Group
-            AuthorizeManager.isAdmin((Context) any); result = true;
+            authorizeService.isAdmin((Context) any); result = true;
         }};
         
         // To test special groups we need a new Context object
         Context instance = new Context();
         
         // Create a new group & add it as a special group
-        Group group = Group.create(instance);
-        int groupID = group.getID();
+        Group group = groupService.create(instance);
+        UUID groupID = group.getID();
         instance.setSpecialGroup(groupID);
         
         // Also add Administrator group as a special group
-        Group adminGroup = Group.find(instance, Group.ADMIN_ID);
-        int adminGroupID = adminGroup.getID();
+        Group adminGroup = groupService.findByName(instance, Group.ADMIN);
+        UUID adminGroupID = adminGroup.getID();
         instance.setSpecialGroup(adminGroupID);
         
         // Now get our special groups
-        Group[] specialGroups = instance.getSpecialGroups();
-        assertThat("testGetSpecialGroup 0", specialGroups.length, equalTo(2));
-        assertThat("testGetSpecialGroup 1", specialGroups[0], equalTo(group));
-        assertThat("testGetSpecialGroup 1", specialGroups[1], equalTo(adminGroup));
+        List<Group> specialGroups = instance.getSpecialGroups();
+        assertThat("testGetSpecialGroup 0", specialGroups.size(), equalTo(2));
+        assertThat("testGetSpecialGroup 1", specialGroups.get(0), equalTo(group));
+        assertThat("testGetSpecialGroup 1", specialGroups.get(1), equalTo(adminGroup));
 
         // Cleanup our context
         cleanupContext(instance);

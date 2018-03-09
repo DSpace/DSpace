@@ -26,7 +26,7 @@
 
 <!--
     These templates are devoted to rendering the search results for discovery.
-    Since discovery used hit highlighting seperate templates are required !
+    Since discovery uses hit highlighting, separate templates are required !
 -->
 
 
@@ -443,9 +443,14 @@
                     }
                 </xsl:text>
                 <xsl:for-each select="dri:option">
-                    <xsl:text>window.DSpace.i18n.discovery.</xsl:text><xsl:value-of select="$filter_name"/>
-                    <xsl:text>.</xsl:text><xsl:value-of select="@returnValue"/><xsl:text>='</xsl:text><xsl:copy-of select="./*"/><xsl:text>';</xsl:text>
-                </xsl:for-each>
+                    <xsl:text>window.DSpace.i18n.discovery.</xsl:text>
+                    <xsl:value-of select="$filter_name"/>
+                    <xsl:text>['</xsl:text>
+                    <xsl:value-of select="@returnValue"/>
+                    <xsl:text>']='</xsl:text>
+                    <xsl:copy-of select="./*"/>
+                    <xsl:text>';</xsl:text>
+                 </xsl:for-each>
             </xsl:for-each>
         </script>
     </xsl:template>

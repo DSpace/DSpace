@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  *   This abstract subclass for metadata actions
  *   maintains a collection for the target metadata fields
- *   expressed as a string in the compound notation ( <schema>.<element>.<qualifier> )
+ *   expressed as a string in the compound notation ( {@code <schema>.<element>.<qualifier>} )
  *   on which to apply the action when the method execute is called.
  * 
  *   Implemented as a Set to avoid problems with duplicates
@@ -36,7 +36,7 @@ public abstract class UpdateMetadataAction implements UpdateAction {
 	/**
 	 *   Set target fields
 	 *   
-	 * @param targetFields
+	 * @param targetFields Set of target fields to update
 	 */
 	public void addTargetFields(Set<String> targetFields) {
 		for (String tf : targetFields)
@@ -48,7 +48,7 @@ public abstract class UpdateMetadataAction implements UpdateAction {
 
 	/**
 	 *    Add array of target fields to update
-	 * @param targetFields
+	 * @param targetFields array of target fields to update
 	 */
 	public void addTargetFields(String[] targetFields) {
 		for (String tf : targetFields)
@@ -61,7 +61,7 @@ public abstract class UpdateMetadataAction implements UpdateAction {
 	/**
 	 *   Add single field to update
 	 * 
-	 * @param targetField
+	 * @param targetField target field to update
 	 */
 	public void addTargetField(String targetField) {
 			this.targetFields.add(targetField);

@@ -33,13 +33,14 @@ public class Options extends AbstractWingElement implements
     private boolean merged = false;
 
     /** The lists contained in this Options element */
-    private java.util.List<AbstractWingElement> contents = new ArrayList<AbstractWingElement>();
+    private java.util.List<AbstractWingElement> contents = new ArrayList<>();
 
     /**
      * Generate a new Options framework element.
      * 
      * @param context
      *            (Required) The context this element is contained in.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Options(WingContext context) throws WingException
     {
@@ -48,7 +49,7 @@ public class Options extends AbstractWingElement implements
 
     /**
      * Add a new sublist to this item. Note that an item may contain either
-     * characters (with formating & fields) or lists but not both.
+     * characters (with formating and fields) or lists but not both.
      * 
      * @param name
      *            (Required) a local identifier used to differentiate the
@@ -56,11 +57,12 @@ public class Options extends AbstractWingElement implements
      * 
      * @param type
      *            (May be null) determines the list type. If this is blank the
-     *            list type is infered from the context and use.
+     *            list type is inferred from the context and use.
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return A new sub list.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public List addList(String name, String type, String rend)
             throws WingException
@@ -72,12 +74,13 @@ public class Options extends AbstractWingElement implements
 
     /**
      * Add a new sublist to this item. Note that an item may contain either
-     * characters (with formating & fields) or lists but not both.
+     * characters (with formating and fields) or lists but not both.
      * 
      * @param name
      *            (Required) a local identifier used to differentiate the
      *            element from its siblings.
      * @return A new sub list.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public List addList(String name) throws WingException
     {
@@ -98,6 +101,7 @@ public class Options extends AbstractWingElement implements
      *            The element's attributes
      * @return Return true if this SAX Event an options element?
      */
+    @Override
     public boolean mergeEqual(String namespace, String localName, String qName,
             Attributes attributes)
     {
@@ -106,11 +110,7 @@ public class Options extends AbstractWingElement implements
         {
             return false;
         }
-        if (!E_OPTIONS.equals(localName))
-        {
-            return false;
-        }
-        return true;
+        return E_OPTIONS.equals(localName);
     }
 
     /**
@@ -126,6 +126,7 @@ public class Options extends AbstractWingElement implements
      *            The element's attributes
      * @return Return the sublist
      */
+    @Override
     public WingMergeableElement mergeChild(String namespace, String localName,
             String qName, Attributes attributes) throws SAXException,
             WingException
@@ -152,6 +153,7 @@ public class Options extends AbstractWingElement implements
      * 
      * @return The attributes for this merged element
      */
+    @Override
     public Attributes merge(Attributes attributes) throws SAXException,
             WingException
     {
@@ -173,7 +175,7 @@ public class Options extends AbstractWingElement implements
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
      */
-
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
             NamespaceSupport namespaces) throws SAXException
     {
@@ -196,6 +198,7 @@ public class Options extends AbstractWingElement implements
     /**
      * dispose
      */
+    @Override
     public void dispose()
     {
         for (AbstractWingElement content : contents)

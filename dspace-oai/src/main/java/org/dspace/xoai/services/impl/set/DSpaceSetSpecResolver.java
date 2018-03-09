@@ -14,8 +14,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.xoai.exceptions.InvalidSetSpecException;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.context.ContextService;
-import org.dspace.xoai.services.api.database.HandleResolver;
-import org.dspace.xoai.services.api.database.HandleResolverException;
+import org.dspace.xoai.services.api.HandleResolver;
+import org.dspace.xoai.services.api.HandleResolverException;
 import org.dspace.xoai.services.api.set.SetSpecResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -83,9 +83,7 @@ public class MediaRange
             throws IllegalArgumentException, IllegalStateException
     {
         Pattern mediaRangePattern = Pattern.compile("^" + mediaRangeRegex + "$");
-        Pattern nonQualityParamPattern = Pattern.compile(nonQualityParam);
-        Pattern qualityParamPattern = Pattern.compile(qualityParam);
-        
+
         Matcher rangeMatcher = mediaRangePattern.matcher(mediarange.trim());
         if (!rangeMatcher.matches())
         {

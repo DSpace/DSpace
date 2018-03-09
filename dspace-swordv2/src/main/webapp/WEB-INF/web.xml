@@ -14,20 +14,12 @@
 
 	<display-name>DSpace SWORD 2.0 Server</display-name>
 
-	<context-param>
-		<param-name>dspace-config</param-name>
-		<param-value>${dspace.dir}/config/dspace.cfg</param-value>
-		<description>
-			The location of the main DSpace configuration file
-		</description>
-    </context-param>
-
-    <!-- new ConfigurationService initialization for dspace.dir -->
+    <!-- ConfigurationService initialization for dspace.dir -->
     <context-param>
         <param-name>dspace.dir</param-name>
         <param-value>${dspace.dir}</param-value>
         <description>
-            The location of the main DSpace directory
+            The location of the DSpace home directory
         </description>
     </context-param>
 
@@ -107,12 +99,12 @@
         -->
 	<listener>
 		<listener-class>
-			org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
+			org.dspace.app.util.DSpaceContextListener
 		</listener-class>
 	</listener>
 	<listener>
 		<listener-class>
-			org.dspace.app.util.DSpaceContextListener
+			org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
 		</listener-class>
 	</listener>
 

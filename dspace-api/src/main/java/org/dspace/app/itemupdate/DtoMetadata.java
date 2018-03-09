@@ -16,7 +16,7 @@ import org.dspace.content.Item;
  *   
  *   Adds some utility methods
  *   
- *   Really not at all general enough but supports Dublin Core and the compound form notation <schema>.<element>[.<qualifier>]
+ *   Really not at all general enough but supports Dublin Core and the compound form notation {@code <schema>.<element>[.<qualifier>]}
  *   
  *   Does not support wildcard for qualifier
  * 
@@ -30,7 +30,7 @@ class DtoMetadata
 	final String language;
 	final String value;
 	
-	private DtoMetadata(String schema, String element, String qualifier, String language, String value) 
+	protected DtoMetadata(String schema, String element, String qualifier, String language, String value)
 	{
 		this.schema = schema;
 		this.element = element;
@@ -47,8 +47,9 @@ class DtoMetadata
 	 * @param element    not null, not empty
 	 * @param qualifier  null; don't allow empty string or * indicating 'any'
 	 * @param language   null or empty
-	 * @param value      
+	 * @param value      value
 	 * @return DtoMetadata object
+         * @throws IllegalArgumentException if arg error
 	 */
 	public static DtoMetadata create(String schema,
 			    String element,
@@ -70,7 +71,9 @@ class DtoMetadata
 	 * 
 	 * @param compoundForm   of the form <schema>.<element>[.<qualifier>]
 	 * @param language   null or empty
-	 * @param value      
+	 * @param value      value
+         * @throws ParseException if parse error
+         * @throws IllegalArgumentException if arg error
 	 */
 	public static DtoMetadata create(String compoundForm, String language, String value)
 	throws ParseException, IllegalArgumentException  
