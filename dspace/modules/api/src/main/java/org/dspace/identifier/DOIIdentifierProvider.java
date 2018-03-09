@@ -294,11 +294,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     }
                 } else {
                     previousDOI = getVersionedDataPackageDOIString(previousDOI,1);
-                    DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
-                    Set<DryadDataFile> dryadDataFiles = dryadDataPackage.getDataFiles(context);
-                    for (DryadDataFile dryadDataFile : dryadDataFiles) {
-                        mintDOIAtVersion(context, dryadDataFile.getDryadDOI(), dryadDataFile.getItem(), 1);
-                    }
                 }
                 updateItemDOIMetadata(previousItem, previousDOI);
                 DOI firstDOI = new DOI(previousDOI, previousItem);
@@ -306,6 +301,13 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     mint(firstDOI, myBlackoutURL, true, createListMetadata(previousItem));
                 } else {
                     mint(firstDOI, true, createListMetadata(previousItem));
+                }
+            }
+            if (getCollection(context, item).equals(myDataPkgColl)) {
+                DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
+                Set<DryadDataFile> dryadDataFiles = dryadDataPackage.getDataFiles(context);
+                for (DryadDataFile dryadDataFile : dryadDataFiles) {
+                    mintDOIAtVersion(context, dryadDataFile.getDryadDOI(), dryadDataFile.getItem(), 1);
                 }
             }
             return getDOI(getDoiValue(item), item);
