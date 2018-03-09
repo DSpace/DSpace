@@ -584,9 +584,8 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     @Test
     public void testInheritCollectionDefaultPolicies() throws AuthorizeException, SQLException {
         //TODO: we would need a method to get policies from collection, probably better!
-        List<ResourcePolicy> defaultCollectionPolicies = authorizeService.getPoliciesActionFilter(context, collection,
-                                                                                                  Constants
-                                                                                                      .DEFAULT_BITSTREAM_READ);
+        List<ResourcePolicy> defaultCollectionPolicies =
+            authorizeService.getPoliciesActionFilter(context, collection, Constants.DEFAULT_BITSTREAM_READ);
         Iterator<ResourcePolicy> it = defaultCollectionPolicies.iterator();
 
         bundleService.inheritCollectionDefaultPolicies(context, b, collection);

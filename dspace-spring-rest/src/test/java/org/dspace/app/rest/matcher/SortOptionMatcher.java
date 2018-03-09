@@ -15,6 +15,8 @@ import org.hamcrest.Matcher;
 
 public class SortOptionMatcher {
 
+    private SortOptionMatcher() { }
+
     public static Matcher<? super Object> titleSortOption() {
         return allOf(
             hasJsonPath("$.name", is("dc.title"))

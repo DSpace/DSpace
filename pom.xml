@@ -179,6 +179,7 @@
                     </executions>
                 </plugin>
                 <!-- Used to validate all code style rules in source code via the Checkstyle config in checkstyle.xml -->
+                <!-- Can be skipped by passing -Dcheckstyle.skip=true to Maven. -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
@@ -186,8 +187,8 @@
                     <executions>
                         <execution>
                             <id>verify-style</id>
-                            <!-- Bind to process-classes so it runs after compile, but before package -->
-                            <phase>process-classes</phase>
+                            <!-- Bind to verify so it runs after package & unit tests, but before install -->
+                            <phase>verify</phase>
                             <goals>
                                 <goal>check</goal>
                             </goals>
@@ -198,8 +199,11 @@
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <logViolationsToConsole>true</logViolationsToConsole>
                         <failOnViolation>true</failOnViolation>
-                        <!-- TODO: Enable checks on tests too. Currently, they are excluded by default -->
-                        <!--<includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+                        <!-- Enable checks on all test source files -->
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <!-- Define our suppressions file location, and the key used to pass it to checkstyle.xml-->
+                        <suppressionsLocation>${root.basedir}/checkstyle-suppressions.xml</suppressionsLocation>
+                        <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
                     </configuration>
                     <dependencies>
                         <!-- Override dependencies to use latest version of checkstyle -->

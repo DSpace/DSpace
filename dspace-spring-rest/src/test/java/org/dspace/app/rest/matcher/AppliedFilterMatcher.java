@@ -15,6 +15,8 @@ import org.hamcrest.Matcher;
 
 public class AppliedFilterMatcher {
 
+    private AppliedFilterMatcher() { }
+
     public static Matcher<? super Object> appliedFilterEntry(String filter, String operator, String value,
                                                              String label) {
         return allOf(

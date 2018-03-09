@@ -13,6 +13,12 @@ package org.dspace.core;
  * @author mwood
  */
 public class CoreHelpers {
+
+    /**
+     * Default constructor
+     */
+    private CoreHelpers() { }
+
     /**
      * Expose a Context's DBConnection.
      *

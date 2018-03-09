@@ -17,6 +17,7 @@ import org.hamcrest.Matcher;
 
 public class SearchResultMatcher {
 
+    private SearchResultMatcher() { }
 
     public static Matcher<? super Object> match(String type, String typePlural) {
         return allOf(

@@ -17,6 +17,8 @@ import org.hamcrest.Matcher;
 
 public class SiteMatcher {
 
+    private SiteMatcher() { }
+
     public static Matcher<? super Object> matchEntry(Site site) {
         return allOf(
             hasJsonPath("$.uuid", is(site.getID().toString())),

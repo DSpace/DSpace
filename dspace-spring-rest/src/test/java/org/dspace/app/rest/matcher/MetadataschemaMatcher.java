@@ -17,6 +17,8 @@ import org.hamcrest.Matchers;
 
 public class MetadataschemaMatcher {
 
+    private MetadataschemaMatcher() { }
+
     public static Matcher<? super Object> matchEntry() {
         return allOf(
             hasJsonPath("$.prefix", Matchers.not(Matchers.empty())),
