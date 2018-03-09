@@ -7,6 +7,10 @@
  */
 package org.dspace.ctask.general;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -15,10 +19,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Philip Vissenaekens (philip at atmire dot com)
@@ -44,7 +44,7 @@ public class ClearEmptyItemMetadata extends AbstractCurationTask {
                     }
                 }
 
-                if(CollectionUtils.isNotEmpty(metadataValuesToRemove)) {
+                if (CollectionUtils.isNotEmpty(metadataValuesToRemove)) {
                     itemService.removeMetadataValues(Curator.curationContext(), item, metadataValuesToRemove);
                     itemService.update(Curator.curationContext(), item);
                 }
