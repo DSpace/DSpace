@@ -807,83 +807,12 @@
     <lst name="defaults">
      <str name="defType">dismax</str>
      <str name="echoParams">explicit</str>
-     <float name="tie">0.01</float>
-     <str name="qf">
-       	dc.title^0.9
-       	dc.title.alternative^0.9  
-       	dc.title.subtitle^0.8 
-       	sedici.creator.person^0.5 
-       	sedici.creator.corporate^0.5 
-       	dc.description.abstract^0.3 
-       	dc.coverage.spatial^0.2 
-       	dc.coverage.temporal^0.2 
-       	sedici.subject.materias^0.08
-       	sedici.subject.keywords^0.08 
-       	sedici.subject.lcsh^0.05
-       	sedici.subject.decs^0.05
-       	sedici.subject.eurovoc^0.05
-       	sedici.subject.acmcss98^0.05
-       	sedici.subject.descriptores^0.05
-       	sedici.subject.other^0.05
-       	sedici.contributor.colaborator^0.1
-       	sedici.contributor.editor^0.1
-       	sedici.contributor.translator^0.1
-       	sedici.contributor.compiler^0.1
-       	sedici.contributor.director^0.1
-       	sedici.contributor.codirector^0.1
-       	sedici.contributor.juror^0.1
-       	dc.relation.isPartOf^0.1
-       	sedici.relation.event^0.1
-       	sedici.relation.dossier^0.1
-       	sedici.identifier.handle^0.01
-       	sedici.identifier.issn^0.01
-       	sedici.identifier.isbn^0.01
-       	sedici.identifier.uri^0.01
-       	sedici.identifier.other^0.01
-       	text^0.001
-     </str>
-     <str name="pf">
-       	dc.title^0.9
-       	dc.title.alternative^0.9  
-       	dc.title.subtitle^0.8 
-       	sedici.creator.person^0.5 
-       	sedici.creator.corporate^0.5 
-       	dc.description.abstract^0.5 
-       	dc.coverage.spatial^0.2 
-       	dc.coverage.temporal^0.2 
-       	sedici.subject.materias^0.1
-       	sedici.subject.keywords^0.1 
-       	sedici.subject.lcsh^0.1
-       	sedici.subject.decs^0.1
-       	sedici.subject.eurovoc^0.1
-       	sedici.subject.acmcss98^0.1
-       	sedici.subject.descriptores^0.1
-       	sedici.subject.other^0.1
-       	sedici.contributor.colaborator^0.1
-       	sedici.contributor.editor^0.1
-       	sedici.contributor.translator^0.1
-       	sedici.contributor.compiler^0.1
-       	sedici.contributor.director^0.1
-       	sedici.contributor.codirector^0.1
-       	sedici.contributor.juror^0.1
-       	dc.relation.isPartOf^0.1
-       	sedici.relation.event^0.1
-       	sedici.relation.dossier^0.1
-       	text^0.001
-     </str>
+     
      <!--
      <str name="bf">
         popularity^0.5 recip(price,1,1000,1000)^0.3
      </str>
      -->
-     <str name="fl">
-        *,score
-     </str>
-     <str name="mm">
-        1&lt;75%
-     </str>
-     <int name="ps">100</int>
-     <str name="q.alt">*:*</str>
      <!-- example highlighter config, enable per-query with hl=true 
      <str name="hl.fl">text features name</str>
      -->
@@ -915,6 +844,80 @@
        <str name="echoParams">explicit</str>
        <int name="rows">10</int>
        <str name="df">search_text</str>
+       <str name="q.alt">*:*</str>
+       <str name="q.op">OR</str>
+       <str name="defType">edismax</str>
+       <float name="tie">0.01</float>
+		<str name="qf">
+		  	dc.title^0.9
+		  	dc.title.alternative^0.9  
+		  	dc.title.subtitle^0.8 
+		  	sedici.creator.person^0.5 
+		  	sedici.creator.corporate^0.5 
+		  	dc.description.abstract^0.3 
+		  	dc.coverage.spatial^0.2 
+		  	dc.coverage.temporal^0.2 
+		  	sedici.subject.materias^0.08
+		  	sedici.subject.keywords^0.08 
+		  	sedici.subject.lcsh^0.05
+		  	sedici.subject.decs^0.05
+		  	sedici.subject.eurovoc^0.05
+		  	sedici.subject.acmcss98^0.05
+		  	sedici.subject.descriptores^0.05
+		  	sedici.subject.other^0.05
+		  	sedici.contributor.colaborator^0.1
+		  	sedici.contributor.editor^0.1
+		  	sedici.contributor.translator^0.1
+		  	sedici.contributor.compiler^0.1
+		  	sedici.contributor.director^0.1
+		  	sedici.contributor.codirector^0.1
+		  	sedici.contributor.juror^0.1
+		  	dc.relation.isPartOf^0.1
+		  	sedici.relation.event^0.1
+		  	sedici.relation.dossier^0.1
+		  	sedici.identifier.handle^0.01
+		  	sedici.identifier.issn^0.01
+		  	sedici.identifier.isbn^0.01
+		  	sedici.identifier.uri^0.01
+		  	sedici.identifier.other^0.01
+		  	search_text^0.001
+		</str>
+		<str name="pf">
+		  	dc.title^0.9
+		  	dc.title.alternative^0.9  
+		  	dc.title.subtitle^0.8 
+		  	sedici.creator.person^0.5 
+		  	sedici.creator.corporate^0.5 
+		  	dc.description.abstract^0.5 
+		  	dc.coverage.spatial^0.2 
+		  	dc.coverage.temporal^0.2 
+		  	sedici.subject.materias^0.1
+		  	sedici.subject.keywords^0.1 
+		  	sedici.subject.lcsh^0.1
+		  	sedici.subject.decs^0.1
+		  	sedici.subject.eurovoc^0.1
+		  	sedici.subject.acmcss98^0.1
+		  	sedici.subject.descriptores^0.1
+		  	sedici.subject.other^0.1
+		  	sedici.contributor.colaborator^0.1
+		  	sedici.contributor.editor^0.1
+		  	sedici.contributor.translator^0.1
+		  	sedici.contributor.compiler^0.1
+		  	sedici.contributor.director^0.1
+		  	sedici.contributor.codirector^0.1
+		  	sedici.contributor.juror^0.1
+		  	dc.relation.isPartOf^0.1
+		  	sedici.relation.event^0.1
+		  	sedici.relation.dossier^0.1
+		  	search_text^0.001
+		</str>
+		<str name="fl">
+		   *,score
+		</str>
+		<str name="mm">
+		   1&lt;75%
+		</str>
+		<int name="ps">100</int>
      </lst>
       <arr name="last-components">
           <str>spellcheck</str>
