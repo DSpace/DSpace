@@ -220,7 +220,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
 
     public String getCoverImage() {
         String coverImagePath = getConceptMetadataValue(metadataProperties.getProperty(COVER_IMAGE));
-        if (coverImagePath != null) {
+        if (!"".equals(coverImagePath)) {
             File coverImageFile = new File(coverImagePath);
             return "https://s3.amazonaws.com/dryad-web-assets/coverimages/" + coverImageFile.getName();
         }
