@@ -64,10 +64,10 @@ public class DryadReviewAction extends ProcessingAction {
             }
 
         // Add note to item's metadata as a DC field - DF
-        Item myitem = wi.getItem();
+        // Item myitem = wf.getItem();
         provDescription = "Item placed in review" + " on " + now + " (GMT) ";
-        myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
-        myitem.update();
+        wf.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        wf.getItem().update();
         // end DF
 
             sendEmailToJournalNotifyOnReview(c, wf, mailsSent, uuid);
