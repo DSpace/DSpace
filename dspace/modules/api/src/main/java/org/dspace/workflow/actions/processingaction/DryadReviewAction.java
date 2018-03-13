@@ -40,7 +40,6 @@ public class DryadReviewAction extends ProcessingAction {
         //When we activate this step we need to add a special key to the metadata
         UUID uuid = UUID.randomUUID();
         //Next add our unique key to our workflowitem
-        wf.getItem().addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "reviewerKey", null, uuid.toString());
         try{
             wf.getItem().update();
         } catch (AuthorizeException e)
@@ -63,6 +62,13 @@ public class DryadReviewAction extends ProcessingAction {
                     }
                 }
             }
+
+        // Add note to item's metadata as a DC field - DF
+        Item myitem = wi.getItem();
+        provDescription = "Item placed in review" + " on " + now + " (GMT) ";
+        myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        myitem.update();
+        // end DF
 
             sendEmailToJournalNotifyOnReview(c, wf, mailsSent, uuid);
 
