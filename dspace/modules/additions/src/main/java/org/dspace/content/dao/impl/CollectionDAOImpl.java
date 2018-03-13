@@ -7,6 +7,9 @@
  */
 package org.dspace.content.dao.impl;
 
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -24,8 +27,11 @@ import org.hibernate.transform.BasicTransformerAdapter;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Collection object.
@@ -192,4 +198,65 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         });
         return ((List<Map.Entry<Collection, Long>>)query.list());
     }
+
+    // Begin UMD Customization
+    // Methods to support searching of collections by text_value metadata field
+    // Used in EditETDDepartmentsForm.java
+    // Adapted from EPersonDAOImpl.java
+    protected Query getSearchQuery(Context context, String queryString, String queryParam, List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField) throws SQLException {
+
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append(queryString);
+        Set<MetadataField> metadataFieldsToJoin = new LinkedHashSet<>();
+        metadataFieldsToJoin.addAll(queryFields);
+        metadataFieldsToJoin.addAll(sortFields);
+
+        if(!CollectionUtils.isEmpty(metadataFieldsToJoin)) {
+            addMetadataLeftJoin(queryBuilder, Collection.class.getSimpleName().toLowerCase(), metadataFieldsToJoin);
+        }
+        if(queryParam != null) {
+            addMetadataValueWhereQuery(queryBuilder, queryFields, "like", Collection.class.getSimpleName().toLowerCase() + ".text_value like :queryParam");
+        }
+        if(!CollectionUtils.isEmpty(sortFields)) {
+            addMetadataSortQuery(queryBuilder, sortFields, Collections.singletonList(sortField));
+        }
+
+        Query query = createQuery(context, queryBuilder.toString());
+        if(StringUtils.isNotBlank(queryParam)) {
+            query.setParameter("queryParam", "%"+queryParam.toLowerCase()+"%");
+        }
+        for (MetadataField metadataField : metadataFieldsToJoin) {
+            query.setParameter(metadataField.toString(), metadataField.getID());
+        }
+
+        return query;
+    }
+
+    @Override
+    public List<Collection> search(Context context, String query, List<MetadataField> queryFields, List<MetadataField> sortFields, int offset, int limit) throws SQLException
+    {
+        String queryString = "SELECT " + Collection.class.getSimpleName().toLowerCase() + " FROM Collection as " + Collection.class.getSimpleName().toLowerCase() + " ";
+        if(query != null) query= "%"+query.toLowerCase()+"%";
+        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, sortFields, null);
+
+        if(0 <= offset)
+        {
+            hibernateQuery.setFirstResult(offset);
+        }
+        if(0 <= limit)
+        {
+            hibernateQuery.setMaxResults(limit);
+        }
+        return list(hibernateQuery);
+    }
+
+    @Override
+    public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException
+    {
+        String queryString = "SELECT count(*) FROM Collection as " + Collection.class.getSimpleName().toLowerCase();
+        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, ListUtils.EMPTY_LIST, null);
+
+        return count(hibernateQuery);
+    }
+    // End UMD Customization
 }

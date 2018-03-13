@@ -925,4 +925,41 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException {
         return collectionDAO.getCollectionsWithBitstreamSizesTotal(context);
     }
+
+    // Begin UMD Customization
+    // Methods to support searching of collections by text_value metadata field
+    // Used in EditETDDepartmentsForm.java
+    // Adapted from EPersonServiceImpl.java
+    @Override
+    public List<Collection> search(Context context, String query) throws SQLException {
+        return search(context, query, -1, -1);
+    }
+
+    @Override
+    public List<Collection> search(Context context, String query, int offset, int limit) throws SQLException {
+        try {
+            List<Collection> collections = new ArrayList<>();
+            Collection collection = find(context, UUID.fromString(query));
+            if(collection != null)
+            {
+              collections.add(collection);
+            }
+            return collections;
+        } catch(IllegalArgumentException e) {
+            MetadataField textValueField = metadataFieldService.findByElement(context, "collection", "text_value", null);
+            if (StringUtils.isBlank(query))
+            {
+                query = null;
+            }
+            return collectionDAO.search(context, query, Arrays.asList(textValueField), Arrays.asList(textValueField), offset, limit);
+        }
+    }
+
+    @Override
+    public int searchResultCount(Context context, String query) throws SQLException {
+        MetadataField textValueField = metadataFieldService.findByElement(context, "collection", "firstname", null);
+        if(StringUtils.isBlank(query)) query = null;
+        return collectionDAO.searchResultCount(context, query, Arrays.asList(textValueField));
+    }
+    // End UMD Customization
 }

@@ -341,4 +341,55 @@ public interface CollectionService extends DSpaceObjectService<Collection>, DSpa
      * @throws SQLException if database error
      */
     List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
+
+    // Begin UMD Customization
+    // Methods to support searching of collections by text_value metadata field
+    // Used in EditETDDepartmentsForm.java
+    // Adapted from EPersonService.java
+       /**
+     * Find the collections that match the search query on text_value.
+     *
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     *
+     * @return array of Collection objects
+     */
+    public List<Collection> search(Context context, String query)
+            throws SQLException;
+
+
+    /**
+     * Find the collections that match the search query on text_value.
+     * This method also allows offsets and limits for pagination purposes.
+     *
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     * @param offset
+     *            Inclusive offset
+     * @param limit
+     *            Maximum number of matches returned
+     *
+     * @return array of Collection objects
+     */
+    public List<Collection> search(Context context, String query, int offset, int limit)
+            throws SQLException;
+
+    /**
+     * Returns the total number of epeople returned by a specific query, without the overhead
+     * of creating the Collection objects to store the results.
+     *
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     *
+     * @return the number of collections matching the query
+     */
+    public int searchResultCount(Context context, String query)
+            throws SQLException;
+    // End UMD Customization
 }

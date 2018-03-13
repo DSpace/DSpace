@@ -44,4 +44,13 @@ public interface CollectionDAO extends DSpaceObjectLegacySupportDAO<Collection> 
     int countRows(Context context) throws SQLException;
 
     List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
+
+    // Begin UMD Customization
+    // Methods to support searching of collections by text_value metadata field
+    // Used in EditETDDepartmentsForm.java
+    // Adapted from EPersonDAO.java
+    public List<Collection> search(Context context, String query, List<MetadataField> queryFields, List<MetadataField> sortFields, int offset, int limit) throws SQLException;
+
+    public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException;
+    // End UMD Customization
 }
