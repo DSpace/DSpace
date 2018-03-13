@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.browse.BrowseException;
@@ -44,8 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndexPlugin {
 
-    private static final Logger log = Logger
-        .getLogger(SolrServiceMetadataBrowseIndexingPlugin.class);
+    private static final Logger log = LogManager.getLogger(SolrServiceMetadataBrowseIndexingPlugin.class);
 
     @Autowired(required = true)
     protected ItemService itemService;
