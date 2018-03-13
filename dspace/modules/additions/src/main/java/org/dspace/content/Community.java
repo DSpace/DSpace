@@ -271,4 +271,10 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         }
         return communityService;
     }
+
+    // Begin UMD Customization
+    // Customization to support finding top level community by CommunityGroup
+    // Used in EditCommunityMetadataForm.java, FlowContainerUtils.java, CommunityGroup.java
+    public static final String GROUP_ID_FIELD = "group_id";
+    // End UMD Customization
 }

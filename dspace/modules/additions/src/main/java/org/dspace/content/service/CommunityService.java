@@ -11,6 +11,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.CommunityGroup;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
@@ -309,4 +310,54 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
     public List<Community> findAuthorizedGroupMapped(Context context, List<Integer> actions) throws SQLException;
 
     int countTotal(Context context) throws SQLException;
+
+    // Begin UMD Customization
+    // Customization to support getting/setting int metadata value, finding top level community by CommunityGroup
+    // Used in EditCommunityMetadataForm.java, FlowContainerUtils.java, CommunityGroup.java
+    /**
+     * Get the value of a metadata field
+     *
+     * @param community community
+     * @param field
+     *            the name of the metadata field to get
+     *
+     * @return the value of the metadata field
+     *
+     * @exception NumberFormatException
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     */
+    public int getIntMetadata(Community community, String field) throws NumberFormatException;
+
+
+    /**
+     * Set a metadata value
+     *
+     * @param context context
+     * @param community community
+     * @param field
+     *            the name of the metadata field to get
+     * @param value
+     *            value to set the field to
+     *
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     * @exception java.util.MissingResourceException
+     * @throws SQLException if database error
+     */
+    public void setMetadata(Context context, Community community, String field, Integer value) throws MissingResourceException, SQLException;
+
+    /**
+     * Get a list of all top-level communities for the CommunityGroup. These are
+     * alphabetically sorted by community name. A top-level community is one
+     * without a parent community.
+     *
+     * @param context
+     *            DSpace context object
+     *
+     * @return the top-level communities for the CommunityGroup
+     * @throws SQLException if database error
+     */
+    public List<Community> findByCommunityGroupTop(Context context, CommunityGroup group) throws SQLException;
+    // End UMD Customization
 }
