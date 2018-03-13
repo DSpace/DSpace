@@ -7,7 +7,8 @@
  */
 package org.dspace.servicemanager.example;
 
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.dspace.services.model.Event;
 import org.dspace.services.model.EventListener;
 
@@ -23,8 +24,8 @@ public final class EventListenerExample implements EventListener {
     /**
      * log4j category
      */
-    private static Logger log = Logger
-        .getLogger(EventListenerExample.class);
+    private static Logger log = LogManager.getLogger(EventListenerExample.class);
+    
 
     /**
      * @return null
