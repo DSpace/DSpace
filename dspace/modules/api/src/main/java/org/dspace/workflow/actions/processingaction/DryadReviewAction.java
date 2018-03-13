@@ -94,6 +94,7 @@ public class DryadReviewAction extends ProcessingAction {
 
         // Add note to item's metadata as a DC field - DF
         // Item myitem = wf.getItem();
+        String provDescription = "";
         provDescription = "Item placed in review" + " on " + now + " (GMT) ";
         wf.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
         wf.getItem().update();
