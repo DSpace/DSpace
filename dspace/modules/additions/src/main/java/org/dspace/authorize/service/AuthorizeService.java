@@ -477,4 +477,30 @@ public interface AuthorizeService {
 	void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction)
 			throws SQLException, AuthorizeException;
 
+  // Begin UMD Customization
+  // Methods to support retriveing ETD embargo and checking validity of ETD embargo
+  // Used in ItemAdapter.java, BitstreamReader.java
+  /**
+   * Return the ETDEmbargo policy for an object
+   *
+   * @param c current context
+   * @param o object to retrieve policies for
+   * @return List of {@code ResourcePolicy} objects
+   * @throws SQLException if database error
+   */
+  public ResourcePolicy getETDEmbargo(Context c, DSpaceObject o) throws SQLException;
+
+  /**
+     * Check to see if there is a valid ETDEmbargo for an object
+     *
+     * @param c current context
+     * @param o current DSpace Object, if <code>null</code> the call will be
+     *         equivalent to a call to the <code>isAdmin(Context c)</code>
+     *         method
+     * @return {@code true} if there is a valid ETDEmbargo on the
+     *         given DSpace object
+     * @throws SQLException if database error
+     */
+    public boolean isETDEmbargo(Context c, DSpaceObject o) throws SQLException;
+    // End UMD Customization
 }

@@ -831,4 +831,40 @@ public class AuthorizeServiceImpl implements AuthorizeService
         return policy;
     }
 
+    // Begin UMD Customization
+    // Methods to support retriveing ETD embargo and checking validity of ETD embargo
+    // Used in ItemAdapter.java, BitstreamReader.java
+    @Override
+    public ResourcePolicy getETDEmbargo(Context context, DSpaceObject object) throws SQLException {
+         
+      List lPolicies = getPolicies(context, object);
+  
+      for (Iterator iPolicies = lPolicies.iterator(); iPolicies.hasNext(); ) {
+          ResourcePolicy policy = (ResourcePolicy)iPolicies.next();
+  
+          Group group = policy.getGroup();
+          if (group != null) {
+
+              if (group.getName().equals("ETD Embargo")) {
+
+                  return policy;
+              }
+          }
+      }
+      return null;
+    }
+  
+    @Override
+    public boolean isETDEmbargo(Context context, DSpaceObject object) throws SQLException {
+  
+         ResourcePolicy policy = getETDEmbargo(context, object);
+  
+         if (policy != null && resourcePolicyService.isDateValid(policy)) {
+           return true;
+         } else {
+           return false;
+         }
+    }
+    // End UMD Customization
+
 }
