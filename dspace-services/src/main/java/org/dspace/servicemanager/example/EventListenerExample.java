@@ -7,8 +7,8 @@
  */
 package org.dspace.servicemanager.example;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.model.Event;
 import org.dspace.services.model.EventListener;
 
