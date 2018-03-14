@@ -15,35 +15,7 @@ import org.dspace.JournalUtils;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
 
-// DF
-import java.util.*;
-/**
-import org.apache.log4j.Logger;
-import org.datadryad.api.DryadDataPackage;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.Group;
-import org.dspace.handle.HandleManager;
-import org.dspace.identifier.IdentifierService;
-import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.utils.DSpace;
-import org.dspace.workflow.actions.Action;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
- */
+// import java.util.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -94,15 +66,11 @@ public class DryadReviewAction extends ProcessingAction {
                 }
             }
 
-        // Add note to item's metadata as a DC field - DF
-        // Item myitem = wf.getItem();
-        String provDescription = "";
-        String now = DCDate.getCurrent().toString();
-        // provDescription = "Item placed in review" + " on ";
-        provDescription = "Item placed in review" + " on " + now + " (GMT) ";
-        wf.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
-        //wf.getItem().update();
-        // end DF
+            // Add note indicating item has been placed in review to the item's provenance metadata field
+            String provDescription = "";
+            String now = DCDate.getCurrent().toString();
+            provDescription = "Item placed in review" + " on " + now + " (GMT) ";
+            wf.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
 
             sendEmailToJournalNotifyOnReview(c, wf, mailsSent, uuid);
 
