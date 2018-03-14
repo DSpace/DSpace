@@ -292,6 +292,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                             }
                         }
                     }
+                    addNewDOItoItem(getCanonicalDOIString(oldDOIstring), item, true, collection);
                 } else {
                     previousDOI = getVersionedDataPackageDOIString(previousDOI,1);
                 }
