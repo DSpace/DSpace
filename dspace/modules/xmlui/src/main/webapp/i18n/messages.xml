@@ -2934,7 +2934,6 @@
 	<message key="xmlui.submit.publication.describe.form.help">Publication metadata</message>
 
 	<message key="xmlui.submit.dataset.describe.head">Add and describe data file</message>
-
 	<message key="xmlui.submit.dataset.describe.trail">
         <div>
             <ul class="navigation-link">
