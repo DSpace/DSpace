@@ -15,8 +15,8 @@ import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
 
 // DF
-import java.util.*;
 /**
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
@@ -43,8 +43,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
  */
-// DF
-
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
