@@ -69,7 +69,7 @@ public class DryadReviewAction extends ProcessingAction {
             // Add note indicating item has been placed in review to the item's provenance metadata field
             String provDescription = "";
             String now = DCDate.getCurrent().toString();
-            provDescription = "Item placed in review" + " on " + now + " (GMT) ";
+            provDescription = "Data package moved to review" + " on " + now + " (GMT) ";
             wf.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
 
             sendEmailToJournalNotifyOnReview(c, wf, mailsSent, uuid);
