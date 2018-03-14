@@ -20,9 +20,7 @@
          user.dir - User's current working directory
          java.io.tmpdir - Default temp file path -->
 
-    <!-- WARNING: If you are running multiple DSpace instances on the same server, make sure to start
-         each DSpace instance with another value for java.io.tmpdir !!! -->
-    <diskStore path="java.io.tmpdir/DSpaceHibernateCache"/>
+    <diskStore path="java.io.tmpdir"/>
 
     <!--
     Cache configuration
