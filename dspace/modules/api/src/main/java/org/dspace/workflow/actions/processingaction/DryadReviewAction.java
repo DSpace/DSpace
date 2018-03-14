@@ -99,8 +99,8 @@ public class DryadReviewAction extends ProcessingAction {
         // String now = DCDate.getCurrent().toString();
         provDescription = "Item placed in review" + " on ";
         // provDescription = "Item placed in review" + " on " + now + " (GMT) ";
-        // wf.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
-        // wf.getItem().update();
+        wf.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        wf.getItem().update();
         // end DF
 
             sendEmailToJournalNotifyOnReview(c, wf, mailsSent, uuid);
