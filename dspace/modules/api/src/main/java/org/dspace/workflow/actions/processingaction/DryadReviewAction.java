@@ -15,6 +15,7 @@ import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
 
 // DF
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
@@ -95,7 +96,7 @@ public class DryadReviewAction extends ProcessingAction {
         // Add note to item's metadata as a DC field - DF
         // Item myitem = wf.getItem();
         String provDescription = "";
-        provDescription = "Item placed in review" + " on ";
+        provDescription = "Item placed in review" + " on " + now + " (GMT) ";
         // provDescription = "Item placed in review" + " on " + now + " (GMT) ";
         // wf.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
         // wf.getItem().update();
