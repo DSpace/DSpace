@@ -89,3 +89,10 @@ fieldset.catdiv div {
 .toobig::before {
 	content: "*";
 }
+#exlimit {
+  font-style: italic;
+}
+
+.red {
+  color: red;
+}

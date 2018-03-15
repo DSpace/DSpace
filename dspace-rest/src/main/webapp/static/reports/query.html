@@ -81,11 +81,21 @@
         <button class="query-button" disabled="disabled" class="activate">Run Item Query</button>
       </div>
     </div>
+    <h3>Bitstream data to return</h3>
+    <div id="queries-bit">
+      <div id="show-fields-bits"></div>
+      <button class="query-button" disabled="disabled" class="activate" id="refresh-fields-bit">Refresh Items</button>
+    </div>
     <h3>Item Results</h3>
     <div id='itemdiv'>
       <h3></h3>  
       <div><a class="this-search" href="#">URL to current search</a></div>
-      <div><button id="prev">Prev Page</button><button id="next">Next Page</button><button id="export">Export for Metadata Update</button></div>
+      <div>
+        <button id="prev">Prev Page</button>
+        <button id="next">Next Page</button>
+        <button id="export">Export for Metadata Update</button>
+        <span id="exlimit">Export will export one page of results, increase result limits as needed</span>
+        </div>
       <table id="itemtable" class="sortable">
       </table>
     </div>

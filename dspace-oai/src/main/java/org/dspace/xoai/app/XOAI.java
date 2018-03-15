@@ -265,7 +265,8 @@ public class XOAI {
         doc.addField("item.compile", out.toString());
 
         if (verbose) {
-            println("Item with handle " + handle + " indexed");
+            println(String.format("Item %s with handle %s indexed",
+                    item.getID().toString(), handle));
         }
 
         return doc;

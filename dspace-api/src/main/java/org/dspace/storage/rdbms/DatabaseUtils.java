@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
@@ -543,6 +542,9 @@ public class DatabaseUtils
     {
         // Get our configured dataSource
         DataSource dataSource = getDataSource();
+        if (null == dataSource) {
+            throw new SQLException("The DataSource is a null reference -- cannot continue.");
+        }
 
         try(Connection connection = dataSource.getConnection())
         {
@@ -596,9 +598,14 @@ public class DatabaseUtils
      * @throws SQLException if database error
      *      If database cannot be upgraded.
      */
-    protected static synchronized void updateDatabase(DataSource datasource, Connection connection, String targetVersion, boolean outOfOrder)
+    protected static synchronized void updateDatabase(DataSource datasource,
+            Connection connection, String targetVersion, boolean outOfOrder)
             throws SQLException
     {
+        if (null == datasource) {
+            throw new SQLException("The datasource is a null reference -- cannot continue.");
+        }
+
         try
         {
             // Setup Flyway API against our database
@@ -1374,6 +1381,7 @@ public class DatabaseUtils
     /**
      * Get a reference to the configured DataSource (which can be used to
      * initialize the database using Flyway).
+     * The DataSource is configured via our ServiceManager (i.e. via Spring).
      * <P>
      * This is NOT public, as we discourage direct connections to the database
      * which bypass Hibernate. Only Flyway should be allowed a direct connection.
@@ -1381,8 +1389,13 @@ public class DatabaseUtils
      */
     protected static DataSource getDataSource()
     {
-        // DataSource is configured via our ServiceManager (i.e. via Spring).
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("dataSource", BasicDataSource.class);
+        DataSource dataSource = DSpaceServicesFactory.getInstance()
+                .getServiceManager()
+                .getServiceByName("dataSource", DataSource.class);
+        if (null == dataSource) {
+            log.error("The service manager could not find the DataSource.");
+        }
+        return dataSource;
     }
 
     /**
