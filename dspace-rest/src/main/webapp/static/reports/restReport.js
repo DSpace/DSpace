@@ -102,6 +102,7 @@ var Report = function() {
         itemsTitle += " (" + (offset+1) + " - " + last + suff + ")";
         $("#prev,#next").attr("disabled",true);
         $("#itemdiv h3").text(itemsTitle);
+    $("#exlimit").removeClass("red");
         if (offset > 0) $("#prev").attr("disabled", false);
         $("#prev").off("click").on("click", funcdec);
         //in case of filters, always allow next
@@ -110,9 +111,11 @@ var Report = function() {
             $("#next").attr("disabled", false);                
         } else if (offset + limit  < total) {
             $("#next").attr("disabled", false);            
+      $("#exlimit").addClass("red");
         } else if (limit == total) {
             //total may only be accurate to one page
             $("#next").attr("disabled", false);            
+      $("#exlimit").addClass("red");
         }
         $("#next").off("click").on("click", funcinc);
     }
@@ -126,6 +129,11 @@ var Report = function() {
         this.myMetadataFields.load();        
     }
     
+  this.initBitstreamFields = function() {
+    this.myBitstreamFields = new BitstreamFields(self);
+    this.myBitstreamFields.load();    
+  }
+  
     this.baseInit = function() {
         this.myReportParameters = new ReportParameters(
                 this.getDefaultParameters(),
@@ -134,10 +142,12 @@ var Report = function() {
         this.spinner.spin($("h1")[0]);
         this.myFilters = new Filters(this.myReportParameters.params["filters"]);
         this.initMetadataFields();
+        this.initBitstreamFields();
+        this.getActiveTab = function(){return 1;}
         $("#metadatadiv").accordion({
             heightStyle: "content",
             collapsible: true,
-            active: $("#metadatadiv > h3").length - 2
+            active: self.getActiveTab()
         });
         $("#export").click(function(){
             self.export($("#itemtable tr"));
@@ -149,14 +159,19 @@ var Report = function() {
         this.myAuth.init();
     }
 
-    this.export = function(rows) {
-        var itemdata = "data:text/csv;charset=utf-8,";
+    this.makeCsv = function(rows) {
+        var itemdata = "";
         rows.each(function(rownum, row){
             itemdata += (rownum == 0) ? "" : "\r\n";
             $(row).find("td,th").each(function(colnum, col){
                 itemdata += self.exportCol(colnum, col);
             });
         });
+        return itemdata;
+    }
+  
+    this.export = function(rows) {
+    var itemdata = "data:text/csv;charset=utf-8," + this.makeCsv(rows);
         var encodedUri = encodeURI(itemdata);
         window.open(encodedUri);        
     }
@@ -175,7 +190,7 @@ var Report = function() {
             if ($(node).is("hr")) {
                 data += "||";
             } else {
-                data += $(node).text().replace(/\n/g," ").replace(/"/g,"\"\"");
+                data += $(node).text().replace(/\n/g," ").replace(/"/g,"\"\"").replace(/\s/g," ");
                 if ($(node).is("div:not(:last-child)")) {
                     data += "||";
                 }
@@ -443,7 +458,6 @@ var MetadataFields = function(report) {
     }
 
     this.drawShowFields = function(pfields) {
-        if (pfields == null) return;
         var self = this;
         var sel = $("<select name='show_fields'/>").attr("multiple","true").attr("size","8").appendTo("#show-fields");
         $.each(this.metadataSchemas, function(index, schema){
@@ -465,6 +479,131 @@ var MetadataFields = function(report) {
     }
     
     this.initQueries = function(){};
+}
+
+var BitstreamFields = function(report) {
+  var self = this;
+  this.isOriginal = function(bit){
+    return bit.bundleName === "ORIGINAL";
+  }
+  this.map = [
+    {
+      key: "original-file-names", 
+      name: "Original File Names", 
+      ftest: self.isOriginal,
+      fval: function(bit) {
+        return bit.name;
+      }
+    },
+    {
+      key: "mime-type", 
+      name: "Mime Type",
+      ftest: self.isOriginal,
+      fval: function(bit) {
+        return bit.mimeType;
+      }
+    },
+    {
+      key: "bitstream-format", 
+      name: "Bitstream Format",
+      ftest: self.isOriginal,
+      fval: function(bit) {
+        return bit.format;
+      }
+    },
+    {
+      key: "bitstream-description", 
+      name: "Bitstream Description",
+      ftest: self.isOriginal,
+      fval: function(bit) {
+        return bit.description;
+      }
+    },
+    {
+      key: "bitstream-size", 
+      name: "Bitstream Size",
+      ftest: self.isOriginal,
+      fval: function(bit) {
+        return Number(bit.sizeBytes);
+      }
+    },
+    {
+      key: "bitstream-checksum", 
+      name: "MD5 Checksum",
+      ftest: self.isOriginal,
+      fval: function(bit) {
+        if (bit.checkSum.checkSumAlgorithm === "MD5") {
+          return bit.checkSum.value;          
+        }
+        return "";
+      }
+    },
+  ];
+  
+  this.load = function(){
+    self.initFields(report);
+  }
+
+  this.initFields = function(report) {
+    var params = report.myReportParameters.params;
+    self.drawShowFieldsBits(params["show_fields_bits[]"]);
+  };
+  
+  this.hasBitstreamFields = function() {
+    return self.getShowFieldsBits() != null;
+  }
+  this.getShowFieldsBits = function(){
+    var val = $("#show-fields-bits select").val();
+    return val == null ? Array() : val;
+  }
+  
+  this.drawShowFieldsBits = function(pfieldsBits) {
+    var sel = $("<select name='show_fields_bits'/>");
+    sel.attr("multiple","true").attr("size","8").appendTo("#show-fields-bits");
+    for(var i=0; i<this.map.length; i++) {
+      var opt = report.myHtmlUtil.addOpt(sel, this.map[i].name, this.map[i].key);
+      if (pfieldsBits != null) {
+        opt.attr("selected", pfieldsBits[this.map[i].key] != undefined ? "Y" : null);        
+      }
+      sel.append(opt);      
+    }
+  }
+  
+  
+  this.getKeyText = function(key, item, bitfields) {
+    var ret = [];
+    if (bitfields == null || item.bitstreams == null) {
+      return ret;
+    }
+    if (!bitfields.includes(key)) {
+      return ret;
+    }
+    var mapval = null;
+    for(var i=0; i<this.map.length; i++) {
+      if (this.map[i].key === key) {
+        mapval = this.map[i];
+        break;
+      }
+    }
+    if (mapval == null) {
+      return ret;
+    }
+    
+    $.each(item.bitstreams, function(colindex, bitstream) {
+      if (mapval.ftest(bitstream)) {
+        var val = mapval.fval(bitstream);
+        if (val != null) {
+          if (isNaN(val) || ret.length == 0) {
+            ret.push(val);            
+          } else {
+            ret[0] += val;
+          }
+          
+        }
+      }
+    });         
+    return ret;
+  }
 }
 
 var HtmlUtil = function() {
@@ -542,7 +681,6 @@ var HtmlUtil = function() {
 
 var CommunitySelector = function(report, parent, paramCollSel) {
     var self = this;
-    $("#collSel,#collSel option").remove();
     var collSel = $("<select/>").attr("id","collSel").attr("name","collSel").attr("multiple", true).attr("size",15);
     parent.append(collSel);
     report.myHtmlUtil.addOpt(collSel, "Whole Repository", "");
