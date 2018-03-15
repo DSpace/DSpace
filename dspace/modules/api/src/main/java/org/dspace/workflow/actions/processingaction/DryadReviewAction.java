@@ -2,6 +2,7 @@ package org.dspace.workflow.actions.processingaction;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
@@ -13,6 +14,8 @@ import org.dspace.handle.HandleManager;
 import org.dspace.JournalUtils;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
+
+// import java.util.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +43,6 @@ public class DryadReviewAction extends ProcessingAction {
         //When we activate this step we need to add a special key to the metadata
         UUID uuid = UUID.randomUUID();
         //Next add our unique key to our workflowitem
-        wf.getItem().addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "reviewerKey", null, uuid.toString());
         try{
             wf.getItem().update();
         } catch (AuthorizeException e)
@@ -63,6 +65,12 @@ public class DryadReviewAction extends ProcessingAction {
                     }
                 }
             }
+
+            // Add note indicating item has been placed in review to the item's provenance metadata field
+            String provDescription = "";
+            String now = DCDate.getCurrent().toString();
+            provDescription = "Data package moved to review" + " on " + now + " (GMT) ";
+            wf.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
 
             sendEmailToJournalNotifyOnReview(c, wf, mailsSent, uuid);
 
