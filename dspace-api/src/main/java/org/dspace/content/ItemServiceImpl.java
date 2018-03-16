@@ -245,6 +245,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
+        throws SQLException {
+        return itemDAO.findAllByCollection(context, collection, limit, offset);
+    }
+
+    @Override
     public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
         throws SQLException {
         return itemDAO.findAll(context, true, true, true, since);
@@ -1162,12 +1168,28 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
+    public int countAllItems(Context context, Collection collection) throws SQLException {
+        return itemDAO.countItems(context, collection, true, false) + itemDAO.countItems(context, collection,
+            false, true);
+    }
+
+    @Override
     public int countItems(Context context, Community community) throws SQLException {
         // First we need a list of all collections under this community in the hierarchy
         List<Collection> collections = communityService.getAllCollections(context, community);
 
         // Now, lets count unique items across that list of collections
         return itemDAO.countItems(context, collections, true, false);
+    }
+
+    @Override
+    public int countAllItems(Context context, Community community) throws SQLException {
+        // First we need a list of all collections under this community in the hierarchy
+        List<Collection> collections = communityService.getAllCollections(context, community);
+
+        // Now, lets count unique items across that list of collections
+        return itemDAO.countItems(context, collections, true, false) + itemDAO.countItems(context, collections,
+            false, true);
     }
 
     @Override
