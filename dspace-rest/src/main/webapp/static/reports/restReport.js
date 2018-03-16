@@ -16,8 +16,11 @@ var Report = function() {
     //this.ROOTPATH = "/jspui/handle/"
     //this.ROOTPATH = "/handle/"
     
-    //disable this setting if Password Authentication is not supported
+    //Indicate if Password Authentication is supported
     this.makeAuthLink = function(){return false;};
+
+    //Indicate if Shibboleth Authentication is supported
+    this.makeShibLink = function(){return false;};
 
     //Override this to return obj.id for DSpace 5 versions
     this.getId = function(obj) {
@@ -240,6 +243,15 @@ var Auth = function(report) {
             }
         });        
     }
+
+    this.verifyShibLogin = function() {
+        var self = this;
+        $.ajax({
+            url: "/rest/shibboleth-login", 
+            success: self.authStat
+        });
+    }
+  
     this.authStat = function() {
         var self = this;
         $.ajax({
@@ -249,20 +261,27 @@ var Auth = function(report) {
                 alert("Error in /rest/status "+ status+ " " + errorThrown);
             },
             success: function(data) {
-              var user = "";
-              if (data.email != undefined) {
-                user = data.email;                  
-              } else {
-                user = "You are not logged in.  Some items may be excluded from reports.";
-              }
-              var anchor = $("<a/>").text(user);
-              if (self.report.makeAuthLink()) {
-                  anchor.attr("href","javascript:window.open('authenticate.html','Authenticate (Password Auth Only)','height=200,width=500')");
-              }
-              $("#currentUser").empty().append("<b>Current User: </b>").append(anchor);
-            }
+                var user = "";
+                if (data.email != undefined) {
+                    user = data.email;                  
+                } else {
+                    user = "You are not logged in.  Some items may be excluded from reports.";
+                }
+                var anchor = $("<a/>").text(user);
+                if (self.report.makeShibLink()) {
+                    anchor.attr("href","/Shibboleth.sso/Login?target="+document.location);
+                }
+                if (self.report.makeAuthLink()) {
+                    anchor.attr("href","javascript:window.open('authenticate.html','Authenticate (Password Auth Only)','height=200,width=500')");
+                }
+                $("#currentUser").empty().append("<b>Current User: </b>").append(anchor);
+                if (data.email == undefined && self.report.makeShibLink()) {
+                    self.verifyShibLogin();
+                }
+            } 
         });     
     }
+  
     this.logout = function() {
         var self = this;
         $.ajax({
