@@ -14,6 +14,11 @@ var QueryReport = function() {
       return "[en]";
     }
     
+    //Indicate if Password Authentication is supported
+    //this.makeAuthLink = function(){return true;};
+    //Indicate if Shibboleth Authentication is supported
+    //this.makeShibLink = function(){return true;};
+
     this.getDefaultParameters = function(){
         return {
             "collSel[]"     : [],
