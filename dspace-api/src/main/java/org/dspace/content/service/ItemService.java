@@ -592,7 +592,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     public int countAllItems(Context context, Community community) throws SQLException;
- 
+
     /**
      * counts all items
      *

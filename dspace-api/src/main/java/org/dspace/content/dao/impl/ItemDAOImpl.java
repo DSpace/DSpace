@@ -259,7 +259,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         if (limit != null) {
             query.setMaxResults(limit);
         }
- 
+
         return iterate(query);
     }
 
