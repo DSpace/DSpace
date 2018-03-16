@@ -9,15 +9,17 @@ package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 
 import java.sql.SQLException;
 import java.util.List;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.dspace.content.Collection;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole_;
 import org.dspace.xmlworkflow.storedcomponents.dao.CollectionRoleDAO;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the CollectionRole object.
@@ -33,23 +35,27 @@ public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> 
 
     @Override
     public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException {
-        Criteria criteria = createCriteria(context, CollectionRole.class);
-        criteria.add(Restrictions.eq("collection", collection));
-
-        return list(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CollectionRole.class);
+        Root<CollectionRole> collectionRoleRoot = criteriaQuery.from(CollectionRole.class);
+        criteriaQuery.select(collectionRoleRoot);
+        criteriaQuery.where(criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.collection), collection));
+        return list(context, criteriaQuery, false, CollectionRole.class, -1, -1);
     }
 
     @Override
-    public CollectionRole findByCollectionAndRole(Context context, Collection collection, String role)
-        throws SQLException {
-        Criteria criteria = createCriteria(context, CollectionRole.class);
-        criteria.add(Restrictions.and(
-            Restrictions.eq("collection", collection),
-            Restrictions.eq("roleId", role)
-                     )
+    public CollectionRole findByCollectionAndRole(Context context, Collection collection, String role) throws
+        SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CollectionRole.class);
+        Root<CollectionRole> collectionRoleRoot = criteriaQuery.from(CollectionRole.class);
+        criteriaQuery.select(collectionRoleRoot);
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_
+                .collection), collection),
+            criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.roleId), role)
+            )
         );
-
-        return uniqueResult(criteria);
+        return uniqueResult(context, criteriaQuery, false, CollectionRole.class, -1, -1);
 
     }
 

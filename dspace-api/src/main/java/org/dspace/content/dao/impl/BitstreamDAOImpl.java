@@ -8,10 +8,17 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bitstream_;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -19,9 +26,6 @@ import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Bitstream object.
@@ -38,22 +42,27 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException {
-        Criteria criteria = createCriteria(context, Bitstream.class);
-        criteria.add(Restrictions.eq("deleted", true));
-
-        return list(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Bitstream.class);
+        Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
+        criteriaQuery.select(bitstreamRoot);
+        criteriaQuery.where(criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.deleted), true));
+        return list(context, criteriaQuery, false, Bitstream.class, -1, -1);
 
     }
 
     @Override
     public List<Bitstream> findDuplicateInternalIdentifier(Context context, Bitstream bitstream) throws SQLException {
-        Criteria criteria = createCriteria(context, Bitstream.class);
-        criteria.add(Restrictions.and(
-            Restrictions.eq("internalId", bitstream.getInternalId()),
-            Restrictions.not(Restrictions.eq("id", bitstream.getID()))
-        ));
-
-        return list(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Bitstream.class);
+        Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
+        criteriaQuery.select(bitstreamRoot);
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.internalId),
+            bitstream.getInternalId()),
+            criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.id), bitstream.getID())
+            )
+        );
+        return list(context, criteriaQuery, false, Bitstream.class, -1, -1);
     }
 
     @Override
@@ -68,10 +77,9 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 //                    + "where not exists( select 'x' from most_recent_checksum "
 //                    + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )"
 
-        Query query = createQuery(context,
-                                  "select b from Bitstream b where b not in (select c.bitstream from " +
-                                      "MostRecentChecksum c)");
-        return query.list();
+        Query query = createQuery(context, "select b from Bitstream b where b not in (select c.bitstream from " +
+            "MostRecentChecksum c)");
+        return query.getResultList();
     }
 
     @Override
@@ -122,9 +130,14 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException {
-        Criteria criteria = createCriteria(context, Bitstream.class);
-        criteria.add(Restrictions.eq("storeNumber", storeNumber));
-        return countLong(criteria);
+
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+
+        Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
+        criteriaQuery.where(criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.storeNumber), storeNumber));
+        return countLong(context, criteriaQuery, criteriaBuilder, bitstreamRoot);
     }
 
     @Override
@@ -139,10 +152,9 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public int countWithNoPolicy(Context context) throws SQLException {
-        Query query = createQuery(context,
-                                  "SELECT count(bit.id) from Bitstream bit where bit.deleted<>true and bit.id not in" +
-                                      " (select res.dSpaceObject from ResourcePolicy res where res.resourceTypeId = " +
-                                      ":typeId )");
+        Query query = createQuery(context, "SELECT count(bit.id) from Bitstream bit where bit.deleted<>true and bit" +
+            ".id not in" +
+            " (select res.dSpaceObject from ResourcePolicy res where res.resourceTypeId = :typeId )");
         query.setParameter("typeId", Constants.BITSTREAM);
         return count(query);
     }
@@ -158,9 +170,9 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException {
-        Query query = createQuery(context, "select b FROM Bitstream b");
-        query.setFirstResult(offset);
-        query.setMaxResults(limit);
-        return iterate(query);
+        Map<String, Object> map = new HashMap<>();
+//        map.put("sizeBytes", 12);
+        return findByX(context, Bitstream.class, map, true, limit, offset).iterator();
+
     }
 }

@@ -10,14 +10,15 @@ package org.dspace.core;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 
 /**
  * Hibernate implementation used by DSpaceObject Database Access Objects.
@@ -44,9 +45,11 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @throws SQLException
      */
     public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException {
-        Criteria criteria = createCriteria(context, clazz);
-        criteria.add(Restrictions.eq("legacyId", legacyId));
-        return uniqueResult(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, clazz);
+        Root<T> root = criteriaQuery.from(clazz);
+        criteriaQuery.where(criteriaBuilder.equal(root.get("legacyId"), legacyId));
+        return uniqueResult(context, criteriaQuery, false, clazz, -1, -1);
     }
 
     /**
@@ -58,12 +61,12 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @param tableIdentifier name of the table to be joined.
      * @param metadataFields  names of the desired fields.
      */
-    protected void addMetadataLeftJoin(StringBuilder query, String tableIdentifier,
-                                       Collection<MetadataField> metadataFields) {
+    protected void addMetadataLeftJoin(StringBuilder query, String tableIdentifier, Collection<MetadataField>
+        metadataFields) {
         for (MetadataField metadataField : metadataFields) {
             query.append(" left join ").append(tableIdentifier).append(".metadata ").append(metadataField.toString());
             query.append(" WITH ").append(metadataField.toString()).append(".metadataField.id").append(" = :")
-                 .append(metadataField.toString());
+                .append(metadataField.toString());
         }
     }
 
@@ -77,8 +80,8 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @param operator        can either be "=" or "like"
      * @param additionalWhere additional where query
      */
-    protected void addMetadataValueWhereQuery(StringBuilder query, List<MetadataField> metadataFields, String operator,
-                                              String additionalWhere) {
+    protected void addMetadataValueWhereQuery(StringBuilder query, List<MetadataField> metadataFields, String
+        operator, String additionalWhere) {
         if (CollectionUtils.isNotEmpty(metadataFields) || StringUtils.isNotBlank(additionalWhere)) {
             //Add the where query on metadata
             query.append(" WHERE ");
@@ -87,7 +90,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
                 if (StringUtils.isNotBlank(operator)) {
                     query.append(" (");
                     query.append("lower(STR(" + metadataField.toString()).append(".value)) ").append(operator)
-                         .append(" lower(:queryParam)");
+                        .append(" lower(:queryParam)");
                     query.append(")");
                     if (i < metadataFields.size() - 1) {
                         query.append(" OR ");
@@ -113,8 +116,8 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @param metadataSortFields fields on which to sort -- use this OR columnSortFields.
      * @param columnSortFields   columns on which to sort -- use this OR metadataSortFields.
      */
-    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields,
-                                        List<String> columnSortFields) {
+    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields, List<String>
+        columnSortFields) {
         addMetadataSortQuery(query, metadataSortFields, columnSortFields, ListUtils.EMPTY_LIST);
     }
 
@@ -126,8 +129,8 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @param columnSortFields   columns on which to sort -- use this OR metadataSortFields.
      * @param direction          ASC or DESC for each field.  Unspecified fields will be ASC.
      */
-    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields,
-                                        List<String> columnSortFields, List<String> direction) {
+    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields, List<String>
+        columnSortFields, List<String> direction) {
 
         if (CollectionUtils.isNotEmpty(metadataSortFields)) {
             query.append(" ORDER BY ");

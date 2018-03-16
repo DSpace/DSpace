@@ -9,22 +9,24 @@ package org.dspace.checker.dao.impl;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import org.dspace.checker.ChecksumHistory;
+import org.dspace.checker.ChecksumHistory_;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.MostRecentChecksum;
+import org.dspace.checker.MostRecentChecksum_;
 import org.dspace.checker.dao.MostRecentChecksumDAO;
 import org.dspace.content.Bitstream;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the MostRecentChecksum object.
@@ -33,8 +35,8 @@ import org.hibernate.criterion.Restrictions;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentChecksum>
-    implements MostRecentChecksumDAO {
+public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentChecksum> implements
+    MostRecentChecksumDAO {
     protected MostRecentChecksumDAOImpl() {
         super();
     }
@@ -53,24 +55,33 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 //                    + "and most_recent_checksum.last_process_start_date < ? "
 //                    + "order by most_recent_checksum.bitstream_id
 
-        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-        criteria.add(
-            Restrictions.and(
-                Restrictions.eq("toBeProcessed", false),
-                Restrictions.le("processStartDate", startDate),
-                Restrictions.gt("processStartDate", endDate)
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
+        Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
+        criteriaQuery.select(mostRecentChecksumRoot);
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(mostRecentChecksumRoot.get(MostRecentChecksum_
+                .toBeProcessed), false),
+            criteriaBuilder.lessThanOrEqualTo(mostRecentChecksumRoot.<Date>get(MostRecentChecksum_.processStartDate),
+                startDate),
+            criteriaBuilder.greaterThan(mostRecentChecksumRoot.<Date>get(MostRecentChecksum_.processStartDate), endDate)
             )
         );
-        criteria.addOrder(Order.asc("bitstream.id"));
-        return list(criteria);
+        List<Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream)));
+        criteriaQuery.orderBy(orderList);
+        return list(context, criteriaQuery, false, MostRecentChecksum.class, -1, -1);
     }
 
 
     @Override
     public MostRecentChecksum findByBitstream(Context context, Bitstream bitstream) throws SQLException {
-        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-        criteria.add(Restrictions.eq("bitstream", bitstream));
-        return singleResult(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
+        Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
+        criteriaQuery.select(mostRecentChecksumRoot);
+        criteriaQuery.where(criteriaBuilder.equal(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream),
+            bitstream));
+        return singleResult(context, criteriaQuery);
     }
 
 
@@ -85,16 +96,20 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 //                    + "and most_recent_checksum.last_process_start_date >= ? "
 //                    + "and most_recent_checksum.last_process_start_date < ? "
 //                    + "order by bitstream_id";
-        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-        criteria.add(
-            Restrictions.and(
-                Restrictions.eq("checksumResult.resultCode", resultCode),
-                Restrictions.le("processStartDate", startDate),
-                Restrictions.gt("processStartDate", endDate)
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
+        Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
+        criteriaQuery.select(mostRecentChecksumRoot);
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(mostRecentChecksumRoot.get("checksumResult" +
+                ".resultCode"), resultCode),
+            criteriaBuilder.lessThanOrEqualTo(mostRecentChecksumRoot.<Date>get("processStartDate"), startDate),
+            criteriaBuilder.greaterThan(mostRecentChecksumRoot.<Date>get("processStartDate"), endDate)
             )
         );
-        criteria.addOrder(Order.asc("bitstream.id"));
-        return list(criteria);
+        List<Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream)));
+        criteriaQuery.orderBy(orderList);
+        return list(context, criteriaQuery, false, MostRecentChecksum.class, -1, -1);
 
     }
 
@@ -112,11 +127,18 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         //        + "from most_recent_checksum " + "where to_be_processed = true "
         //        + "order by date_trunc('milliseconds', last_process_end_date), "
         //        + "bitstream_id " + "ASC LIMIT 1";
-        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-        criteria.add(Restrictions.eq("toBeProcessed", true));
-        criteria.addOrder(Order.asc("processEndDate")).addOrder(Order.asc("bitstream.id"));
-        criteria.setMaxResults(1);
-        return singleResult(criteria);
+
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
+        Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
+        criteriaQuery.select(mostRecentChecksumRoot);
+        criteriaQuery.where(criteriaBuilder.equal(mostRecentChecksumRoot.get(MostRecentChecksum_.toBeProcessed), true));
+        List<Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream)));
+        orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.processEndDate)));
+        criteriaQuery.orderBy(orderList);
+        return singleResult(context, criteriaQuery);
     }
 
     @Override
@@ -127,23 +149,40 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 //                + "and last_process_start_date < ? "
 //                + "order by date_trunc('milliseconds', last_process_end_date), "
 //                + "bitstream_id " + "ASC LIMIT 1";
-        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-        criteria.add(
-            Restrictions.and(
-                Restrictions.eq("toBeProcessed", true),
-                Restrictions.lt("processStartDate", lessThanDate)
-            ));
-        criteria.addOrder(Order.asc("processEndDate")).addOrder(Order.asc("bitstream.id"));
-        criteria.setMaxResults(1);
-        return singleResult(criteria);
+
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
+        Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
+        criteriaQuery.select(mostRecentChecksumRoot);
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(mostRecentChecksumRoot.get(MostRecentChecksum_
+                .toBeProcessed), true),
+            criteriaBuilder.lessThan(mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), lessThanDate)
+            )
+        );
+
+        List<Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.processEndDate)));
+        orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream)));
+        criteriaQuery.orderBy(orderList);
+
+        return singleResult(context, criteriaQuery);
     }
 
     @Override
     public List<MostRecentChecksum> findNotInHistory(Context context) throws SQLException {
-        Criteria criteria = createCriteria(context, MostRecentChecksum.class);
-        DetachedCriteria subCriteria = DetachedCriteria.forClass(ChecksumHistory.class);
-        subCriteria.setProjection(Projections.property("bitstream.id"));
-        criteria.add(Property.forName("bitstreamId").notIn(subCriteria));
-        return list(criteria);
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
+        Root<MostRecentChecksum> checksumRoot = criteriaQuery.from(MostRecentChecksum.class);
+
+        Subquery<Bitstream> subQuery = criteriaQuery.subquery(Bitstream.class);
+        Root<ChecksumHistory> historyRoot = subQuery.from(ChecksumHistory.class);
+        subQuery.select(historyRoot.get(ChecksumHistory_.bitstream));
+
+        criteriaQuery.where(
+            criteriaBuilder.not(checksumRoot.get(MostRecentChecksum_.bitstream).in(subQuery)));
+
+        return list(context, criteriaQuery, false, MostRecentChecksum.class, -1, -1);
     }
 }
