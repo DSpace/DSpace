@@ -312,8 +312,9 @@ public class Email {
         ctx.put("config", new UnmodifiableConfigurationService(config));
         ctx.put("params", Collections.unmodifiableList(arguments));
 
-        if (null == template) { // No template, so look for a String of content.
-            if (null == content) { // SNH -- see constructor.
+        if (null == template) {
+            // No template, so look for a String of content.
+            if (null == content) { // SNH -- see constructor
                 // No template and no content -- PANIC!!!
                 LOG.error("Email has no body");
                 template = new Template();
@@ -340,6 +341,8 @@ public class Email {
                 if (null != subject) {
                     subject = headerValue;
                 }
+            } else if ("charset".equalsIgnoreCase(headerName)) {
+                charset = headerValue;
             } else {
                 message.setHeader(headerName, headerValue);
             }
@@ -419,12 +422,14 @@ public class Email {
     }
 
     /**
-     * Get the plain-text template for an email message. The message is suitable for
-     * inserting values using {@link java.text.MessageFormat}.
+     * Get the plain-text template for an email message. The message is suitable
+     * for inserting values using Apache Velocity.
      *
-     * @param emailFile full name for the email template, for example "/dspace/config/emails/register".
-     * @return the email object, with the content and subject filled out from
-     * the template
+     * @param emailFile
+     *            full name for the email template, for example "/dspace/config/emails/register".
+     *
+     * @return the email object, configured with subject and body.
+     *
      * @throws IOException if IO error
      *                     if the template couldn't be found, or there was some other
      *                     error reading the template
@@ -432,54 +437,26 @@ public class Email {
     public static Email getEmail(String emailFile)
         throws IOException {
         String charset = null;
-        String subject = "";
         StringBuilder contentBuffer = new StringBuilder();
-        InputStream is = null;
-        InputStreamReader ir = null;
-        BufferedReader reader = null;
-        try {
-            is = new FileInputStream(emailFile);
-            ir = new InputStreamReader(is, "UTF-8");
-            reader = new BufferedReader(ir);
+        try (
+            InputStream is = new FileInputStream(emailFile);
+            InputStreamReader ir = new InputStreamReader(is, "UTF-8");
+            BufferedReader reader = new BufferedReader(ir);
+            ) {
             boolean more = true;
             while (more) {
                 String line = reader.readLine();
                 if (line == null) {
                     more = false;
-                } else if (line.toLowerCase().startsWith("subject:")) {
-                    subject = line.substring(8).trim();
-                } else if (line.toLowerCase().startsWith("charset:")) {
-                    charset = line.substring(8).trim();
-                } else if (!line.startsWith("#")) {
+                }
+                else
+                {
                     contentBuffer.append(line);
                     contentBuffer.append("\n");
                 }
             }
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ioe) {
-                    // ignore
-                }
-            }
-            if (ir != null) {
-                try {
-                    ir.close();
-                } catch (IOException ioe) {
-                    // ignore
-                }
-            }
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException ioe) {
-                    // ignore
-                }
-            }
         }
         Email email = new Email();
-        email.setSubject(subject);
         email.setContent(contentBuffer.toString());
         if (charset != null) {
             email.setCharset(charset);
@@ -498,7 +475,7 @@ public class Email {
 
     /**
      * Associate the message with an external Velocity
-     * {@link org.apache.velocity.Template}.  You should also supply a subject
+     * {@link org.apache.velocity.Template}.  You may also supply a subject
      * using {@link #setSubject(java.lang.String)}.
      *
      * @param templateName simple name to be looked up in the Velocity template
