@@ -448,9 +448,7 @@ public class Email {
                 String line = reader.readLine();
                 if (line == null) {
                     more = false;
-                }
-                else
-                {
+                } else {
                     contentBuffer.append(line);
                     contentBuffer.append("\n");
                 }
