@@ -48,7 +48,6 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -70,26 +69,23 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * <code>dspace-dir/config/emails/</code> (which also includes the subject.)
  * <code>arg0</code> and <code>arg1</code> are arguments to fill out the
  * message with.
- * </p>
- * <p>
- * Emails are formatted using <code>java.text.MessageFormat.</code>
- * Additionally, comment lines (starting with '#') are stripped, and if a line
- * starts with "Subject:" the text on the right of the colon is used for the
- * subject line. For example:
+ * <P>
+ * Emails are formatted using Apache Velocity.  Headers such as Subject may be
+ * supplied by the template, by defining them using #set().  Example:
  * </p>
  *
  * <pre>
  *
- *     # This is a comment line which is stripped
- *     #
- *     # Parameters:   {0}  is a person's name
- *     #               {1}  is the name of a submission
- *     #
- *     Subject: Example e-mail
+ *     ## This is a comment line which is stripped
+ *     ##
+ *     ## Parameters:   {0}  is a person's name
+ *     ##               {1}  is the name of a submission
+ *     ##
+ *     #set($subject = 'Example e-mail')
  *
- *     Dear {0},
+ *     Dear ${params[0]},
  *
- *     Thank you for sending us your submission &quot;{1}&quot;.
+ *     Thank you for sending us your submission &quot;${params[1]}&quot;.
  *
  * </pre>
  *
@@ -106,11 +102,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  *     Thank you for sending us your submission &quot;On the Testing of DSpace&quot;.
  *
  * </pre>
- *
- * <p>
- * Note that parameters like <code>{0}</code> cannot be placed in the subject
- * of the e-mail; they won't get filled out.
- * </p>
  *
  * @author Robert Tansley
  * @author Jim Downing - added attachment handling code
@@ -155,8 +146,6 @@ public class Email {
     /** Velocity template settings. */
     private static final Properties VELOCITY_PROPERTIES = new Properties();
     static {
-        VELOCITY_PROPERTIES.put("runtime.log.logsystem.class",
-                Log4JLogChute.class.getCanonicalName());
         VELOCITY_PROPERTIES.put("resource.loader", "classpath");
         VELOCITY_PROPERTIES.put("classpath.resource.loader.description",
                 "Velocity Classpath Resource Loader");
@@ -275,7 +264,15 @@ public class Email {
     }
 
     /**
-     * Sends the email.
+     * Sends the email.  If the template defines a Velocity context property
+     * named among the values of DSpace configuration property
+     * {@code mail.message.headers} then that name and its value will be added
+     * to the message's headers.
+     *
+     * <p>"subject" is treated specially:  if {@link setSubject()} has not been called,
+     * the value of any "subject" property will be used as if setSubject had
+     * been called with that value.  Thus a template may define its subject, but
+     * the caller may override it.
      *
      * @throws MessagingException if there was a problem sending the mail.
      * @throws IOException        if IO error
@@ -307,7 +304,7 @@ public class Email {
                 i.next()));
         }
 
-        // Format the mail message
+        // Format the mail message body
         VelocityEngine templateEngine = new VelocityEngine();
         templateEngine.init(VELOCITY_PROPERTIES);
 
@@ -331,9 +328,22 @@ public class Email {
         template.merge(ctx, writer);
         String fullMessage = writer.toString();
 
+        // Set some message header fields
         Date date = new Date();
         message.setSentDate(date);
         message.setFrom(new InternetAddress(from));
+
+        // Get headers defined by the template.
+        for (String headerName : config.getArrayProperty("mail.message.headers")) {
+            String headerValue = (String) ctx.get(headerName);
+            if ("subject".equalsIgnoreCase(headerName)) {
+                if (null != subject) {
+                    subject = headerValue;
+                }
+            } else {
+                message.setHeader(headerName, headerValue);
+            }
+        }
 
         // Set the subject of the email (may contain parameters)
         String fullSubject = MessageFormat.format(subject, arguments.toArray());
