@@ -146,6 +146,7 @@ public class Email {
     private static final Logger LOG = LogManager.getLogger();
 
     /** Velocity template settings. */
+    private static final String RESOURCE_REPOSITORY_NAME = "Email";
     private static final Properties VELOCITY_PROPERTIES = new Properties();
     static {
         VELOCITY_PROPERTIES.put(Velocity.RESOURCE_LOADER, "string");
@@ -153,6 +154,10 @@ public class Email {
                 "Velocity StringResource loader");
         VELOCITY_PROPERTIES.put("string.resource.loader.class",
                 StringResourceLoader.class.getName());
+        VELOCITY_PROPERTIES.put("string.resource.loader.repository.name",
+                RESOURCE_REPOSITORY_NAME);
+        VELOCITY_PROPERTIES.put("string.resource.loader.repository.static",
+                "false");
     }
 
     /** Velocity template for a message body */
@@ -171,8 +176,6 @@ public class Email {
         content = "";
         replyTo = null;
         charset = null;
-
-        Velocity.init(VELOCITY_PROPERTIES);
     }
 
     /**
@@ -313,24 +316,25 @@ public class Email {
         VelocityEngine templateEngine = new VelocityEngine();
         templateEngine.init(VELOCITY_PROPERTIES);
 
-        org.apache.velocity.context.Context ctx = new VelocityContext();
-        ctx.put("config", new UnmodifiableConfigurationService(config));
-        ctx.put("params", Collections.unmodifiableList(arguments));
+        VelocityContext vctx = new VelocityContext();
+        vctx.put("config", new UnmodifiableConfigurationService(config));
+        vctx.put("params", Collections.unmodifiableList(arguments));
 
         if (null == template) {
             // No template, so look for a String of content.
-            StringResourceRepository repo = StringResourceLoader.getRepository();
+            StringResourceRepository repo = (StringResourceRepository)
+                    templateEngine.getApplicationAttribute(RESOURCE_REPOSITORY_NAME);
             repo.putStringResource(contentName, content);
             if (null == content) { // SNH -- see constructor
                 // No template and no content -- PANIC!!!
                 throw new MessagingException("Email has no body");
             } else {   // Turn content into a template.
-                template = Velocity.getTemplate(contentName);
+                template = templateEngine.getTemplate(contentName);
             }
         }
 
         StringWriter writer = new StringWriter();
-        template.merge(ctx, writer);
+        template.merge(vctx, writer);
         String fullMessage = writer.toString();
 
         // Set some message header fields
@@ -340,7 +344,7 @@ public class Email {
 
         // Get headers defined by the template.
         for (String headerName : config.getArrayProperty("mail.message.headers")) {
-            String headerValue = (String) ctx.get(headerName);
+            String headerValue = (String) vctx.get(headerName);
             if ("subject".equalsIgnoreCase(headerName)) {
                 if (null != subject) {
                     subject = headerValue;
@@ -370,10 +374,13 @@ public class Email {
             }
         } else {
             Multipart multipart = new MimeMultipart();
+
             // create the first part of the email
             BodyPart messageBodyPart = new MimeBodyPart();
             messageBodyPart.setText(fullMessage);
             multipart.addBodyPart(messageBodyPart);
+
+            // Add file attachments
             for (FileAttachment attachment : attachments) {
                 // add the file
                 messageBodyPart = new MimeBodyPart();
@@ -382,7 +389,8 @@ public class Email {
                 messageBodyPart.setFileName(attachment.name);
                 multipart.addBodyPart(messageBodyPart);
             }
-            message.setContent(multipart);
+
+            // Add stream attachments
             for (InputStreamAttachment attachment : moreAttachments) {
                 // add the stream
                 messageBodyPart = new MimeBodyPart();
@@ -391,6 +399,7 @@ public class Email {
                 messageBodyPart.setFileName(attachment.name);
                 multipart.addBodyPart(messageBodyPart);
             }
+
             message.setContent(multipart);
         }
 
@@ -474,18 +483,6 @@ public class Email {
      * Note that everything is stored and the run in send() so that only send()
      * throws a MessagingException.
      */
-
-    /**
-     * Associate the message with an external Velocity
-     * {@link org.apache.velocity.Template}.  You may also supply a subject
-     * using {@link #setSubject(java.lang.String)}.
-     *
-     * @param templateName simple name to be looked up in the Velocity template
-     *                      resources.
-     */
-    public void setTemplate(String templateName) {
-        template = Velocity.getTemplate(templateName);
-    }
 
     /**
      * Test method to send an email to check email server settings
