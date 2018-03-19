@@ -21,6 +21,7 @@ var Report = function() {
 
     //Indicate if Shibboleth Authentication is supported
     this.makeShibLink = function(){return false;};
+    this.shibPath = "/Shibboleth.sso/Login";
 
     //Override this to return obj.id for DSpace 5 versions
     this.getId = function(obj) {
@@ -269,7 +270,7 @@ var Auth = function(report) {
                 }
                 var anchor = $("<a/>").text(user);
                 if (self.report.makeShibLink()) {
-                    anchor.attr("href","/Shibboleth.sso/Login?target="+document.location);
+                    anchor.attr("href", self.report.shibPath + "?target="+document.location);
                 }
                 if (self.report.makeAuthLink()) {
                     anchor.attr("href","javascript:window.open('authenticate.html','Authenticate (Password Auth Only)','height=200,width=500')");
