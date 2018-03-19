@@ -48,7 +48,8 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
+import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -112,6 +113,7 @@ public class Email {
      * The content of the message
      */
     private String content;
+    private String contentName;
 
     /**
      * The subject of the message
@@ -146,12 +148,11 @@ public class Email {
     /** Velocity template settings. */
     private static final Properties VELOCITY_PROPERTIES = new Properties();
     static {
-        VELOCITY_PROPERTIES.put("resource.loader", "classpath");
-        VELOCITY_PROPERTIES.put("classpath.resource.loader.description",
-                "Velocity Classpath Resource Loader");
-        VELOCITY_PROPERTIES.put("classpath.resource.loader.class",
-                ClasspathResourceLoader.class.getCanonicalName());
-        VELOCITY_PROPERTIES.put("classpath.resource.loader.cache", "true");
+        VELOCITY_PROPERTIES.put(Velocity.RESOURCE_LOADER, "string");
+        VELOCITY_PROPERTIES.put("string.resource.loader.description",
+                "Velocity StringResource loader");
+        VELOCITY_PROPERTIES.put("string.resource.loader.class",
+                StringResourceLoader.class.getName());
     }
 
     /** Velocity template for a message body */
@@ -170,6 +171,8 @@ public class Email {
         content = "";
         replyTo = null;
         charset = null;
+
+        Velocity.init(VELOCITY_PROPERTIES);
     }
 
     /**
@@ -186,10 +189,12 @@ public class Email {
      * formatting - <code>addArgument</code> will start over. Comments and any
      * "Subject:" line must be stripped.
      *
+     * @param name a name for this message body
      * @param cnt the content of the message
      */
-    public void setContent(String cnt) {
+    public void setContent(String name, String cnt) {
         content = cnt;
+        contentName = name;
         arguments.clear();
     }
 
@@ -314,14 +319,13 @@ public class Email {
 
         if (null == template) {
             // No template, so look for a String of content.
+            StringResourceRepository repo = StringResourceLoader.getRepository();
+            repo.putStringResource(contentName, content);
             if (null == content) { // SNH -- see constructor
                 // No template and no content -- PANIC!!!
-                LOG.error("Email has no body");
-                template = new Template();
-                template.setData("No content.");
+                throw new MessagingException("Email has no body");
             } else {   // Turn content into a template.
-                template = new Template();
-                template.setData(content);
+                template = Velocity.getTemplate(contentName);
             }
         }
 
@@ -397,7 +401,7 @@ public class Email {
         }
 
         if (disabled) {
-            StringBuffer text = new StringBuffer(
+            StringBuilder text = new StringBuilder(
                 "Message not sent due to mail.server.disabled:\n");
 
             Enumeration<String> headers = message.getAllHeaderLines();
@@ -415,7 +419,7 @@ public class Email {
 
             text.append('\n').append(fullMessage);
 
-            LOG.info(text);
+            LOG.info(text.toString());
         } else {
             Transport.send(message);
         }
@@ -455,7 +459,7 @@ public class Email {
             }
         }
         Email email = new Email();
-        email.setContent(contentBuffer.toString());
+        email.setContent(emailFile, contentBuffer.toString());
         if (charset != null) {
             email.setCharset(charset);
         }
