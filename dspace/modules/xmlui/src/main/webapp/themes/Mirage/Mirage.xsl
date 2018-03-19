@@ -1377,4 +1377,19 @@ parameter that is being used (see variable defined above) -->
         </a>
     </xsl:template>
 
+    <xsl:template match="//dri:*[contains(@id,'change_email')]">
+        <xsl:call-template name="change-email-request">
+            <xsl:with-param name="old_email" select="@rend"/>
+        </xsl:call-template>
+    </xsl:template>
+    <xsl:template match="//dri:xref[@target='/forgot']">
+        <a>
+            <xsl:attribute name="href">/forgot</xsl:attribute>
+            <xsl:attribute name="class">ds-form-label</xsl:attribute>
+            <i18n:text>
+            <xsl:value-of select="*"/>
+            </i18n:text>
+        </a>
+    </xsl:template>
+
 </xsl:stylesheet>

@@ -1967,6 +1967,9 @@ span.ds-form-label,label.ds-form-label {
     vertical-align: middle;
     overflow: hidden;
 }
+a.ds-form-label{
+    padding: 5px 20px 5px 10px;
+}
 /* Help, error, & in-line labels */
 label.ds-composite-component {
     display: block;
