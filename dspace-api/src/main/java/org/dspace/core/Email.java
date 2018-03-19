@@ -234,14 +234,14 @@ public class Email {
 
     public void addAttachment(InputStream is, String name, String mimetype) {
         if (null == mimetype) {
-            log.error("Null MIME type replaced with '" + DEFAULT_ATTACHMENT_TYPE
+            LOG.error("Null MIME type replaced with '" + DEFAULT_ATTACHMENT_TYPE
                     + "' for attachment '" + name + "'");
             mimetype = DEFAULT_ATTACHMENT_TYPE;
         } else {
             try {
                 new ContentType(mimetype); // Just try to parse it.
             } catch (ParseException ex) {
-                log.error("Bad MIME type '" + mimetype
+                LOG.error("Bad MIME type '" + mimetype
                         + "' replaced with '" + DEFAULT_ATTACHMENT_TYPE
                         + "' for attachment '" + name + "'", ex);
                 mimetype = DEFAULT_ATTACHMENT_TYPE;
