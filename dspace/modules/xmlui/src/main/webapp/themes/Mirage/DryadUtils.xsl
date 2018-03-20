@@ -449,4 +449,24 @@ on names with last name first (comma delimited). -->
         </xsl:for-each>
     </xsl:template>
 
+    <xsl:template name="change-email-request">
+        <xsl:param name="old_email"/>
+        <a>
+            <xsl:attribute name="class">ds-form-label</xsl:attribute>
+            <xsl:choose>
+                <xsl:when test="string-length($old_email)>0">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="concat('mailto:help@datadryad.org?subject=Please+change+my+email+address (', $old_email, ')')"/>
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="href">
+                        <xsl:text>mailto:help@datadryad.org?subject=Please+change+my+email+address</xsl:text>
+                    </xsl:attribute>
+                </xsl:otherwise>
+            </xsl:choose>
+            Update your email address
+        </a>
+    </xsl:template>
+
 </xsl:stylesheet>

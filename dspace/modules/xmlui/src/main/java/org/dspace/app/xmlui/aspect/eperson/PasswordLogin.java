@@ -311,9 +311,9 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
           // Removing ORCID link until the oauth registration works.
         p.addXref("/oauth-login","Oauth login");
         */
-                p.addXref("/forgot", T_forgot_link);
-                EventLogger.log(context, "login-form", "previous-email=" + (previousEmail != null ? previousEmail : ""));
-
+		p.addXref("/forgot", T_forgot_link);
+        EventLogger.log(context, "login-form", "previous-email=" + (previousEmail != null ? previousEmail : ""));
+		login.addPara().addText("change_email", this.email);
 	}
 
 	// HttpServletRequest  httpRequest  = (HttpServletRequest)  objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);

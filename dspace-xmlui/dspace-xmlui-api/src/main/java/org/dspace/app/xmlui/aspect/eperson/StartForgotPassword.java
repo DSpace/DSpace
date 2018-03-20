@@ -138,7 +138,8 @@ public class StartForgotPassword extends AbstractDSpaceTransformer
        Item submit = form.addItem();
        submit.addButton("submit").setValue(T_submit);
        
-       forgot.addHidden("eperson-continue").setValue(knot.getId()); 
+       forgot.addHidden("eperson-continue").setValue(knot.getId());
+       forgot.addPara().addText("change_email", this.email);
    }
    
    /**

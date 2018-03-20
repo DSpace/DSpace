@@ -343,6 +343,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        // Email
        identity.addLabel(T_email_address);
        identity.addItem(email);
+       identity.addItem("change_email", this.email);
 
        // First name
        Text firstName = identity.addItem().addText("first_name");
