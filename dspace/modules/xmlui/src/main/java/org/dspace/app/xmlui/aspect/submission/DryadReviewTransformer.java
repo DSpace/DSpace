@@ -109,14 +109,17 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         // Check if the item is actually in review
         // taskowner has step_id=reviewStep, action_id=reviewAction, owner_id=submitter's eperson ID
         try {
-            List<ClaimedTask> tasks = ClaimedTask.findByWorkflowId(context, wfItem.getID());
+            // get DOI for the package this is associated with
+            String packageDOI = DOIIdentifierProvider.getDataPackageDOIString(DOIIdentifierProvider.getDoiValue(wfItem.getItem()));
+            WorkflowItem wfPackage = WorkflowItem.findByDOI(context, packageDOI);
+            List<ClaimedTask> tasks = ClaimedTask.findByWorkflowId(context, wfPackage.getID());
             // find a task with reviewStep
             for(ClaimedTask task : tasks) {
                 if(task.getStepID().equals("reviewStep")) {
                     currentlyInReview = true;
                 }
             }
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             log.error("Exception checking for claimed task with reviewStep", ex);
             return;
         }
