@@ -1,6 +1,8 @@
 package org.dspace.identifier;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataFile;
+import org.datadryad.api.DryadDataPackage;
 import org.dspace.app.util.NoidGenerator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
@@ -144,11 +146,14 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         try{
             Item item = (Item) dso;
             String collection = getCollection(context, item);
-            String doiString = getDoiValue((Item) dso);
-            addNewDOItoItem(getCanonicalDOIString(doiString), item, true, collection);
+            // if this is a package, fix canonical: package will fix its own files
+            if (myDataPkgColl.equals(collection)) {
+                String doiString = getDoiValue((Item) dso);
+                addNewDOItoItem(getCanonicalDOIString(doiString), item, true, collection);
 
-            // if 1st version mint .1
-            mintDOIAtVersion(context, doiString, item, 1);
+                // if 1st version mint .1
+                mintDOIAtVersion(context, doiString, item, 1);
+            }
 
         }catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to addNewDOItoItem doi", "Item id: " + dso.getID()), e);
@@ -287,6 +292,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                             }
                         }
                     }
+                    addNewDOItoItem(getCanonicalDOIString(oldDOIstring), item, true, collection);
                 } else {
                     previousDOI = getVersionedDataPackageDOIString(previousDOI,1);
                 }
@@ -296,6 +302,13 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     mint(firstDOI, myBlackoutURL, true, createListMetadata(previousItem));
                 } else {
                     mint(firstDOI, true, createListMetadata(previousItem));
+                }
+            }
+            if (getCollection(context, item).equals(myDataPkgColl)) {
+                DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
+                Set<DryadDataFile> dryadDataFiles = dryadDataPackage.getDataFiles(context);
+                for (DryadDataFile dryadDataFile : dryadDataFiles) {
+                    mintDOIAtVersion(context, dryadDataFile.getDryadDOI(), dryadDataFile.getItem(), 1);
                 }
             }
             return getDOI(getDoiValue(item), item);
@@ -728,10 +741,12 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         dataPackage.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null);
 
         for(DCValue value : doiVals){
-            if(!value.value.equals(idOld))
+            if(getCanonicalDOIString(value.value).equals(getCanonicalDOIString(idOld))) {
+                dataPackage.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null, idNew);
+            } else {
                 dataPackage.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null, value.value);
+            }
         }
-        dataPackage.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null, idNew);
         dataPackage.update();
     }
 
