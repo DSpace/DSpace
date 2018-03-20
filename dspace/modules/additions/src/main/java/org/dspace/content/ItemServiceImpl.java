@@ -868,6 +868,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public boolean hasUploadedFiles(Item item) throws SQLException {
         List<Bundle> bundles = getBundles(item, "ORIGINAL");
+        // Begin UMD Customization
+        // FIX - when only PRESERVATION bundle bitstreams have been uploaded, 
+        // hasUploadedFiles returns false and an error is displayed to the user
+        bundles.addAll(getBundles(item, "PRESERVATION"));
+        // End UMD Customization
         for (Bundle bundle : bundles) {
             if (CollectionUtils.isNotEmpty(bundle.getBitstreams())) {
                 return true;
