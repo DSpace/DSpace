@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringWriter;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -356,12 +355,11 @@ public class Email {
             }
         }
 
-        // Set the subject of the email (may contain parameters)
-        String fullSubject = MessageFormat.format(subject, arguments.toArray());
+        // Set the subject of the email.
         if (charset != null) {
-            message.setSubject(fullSubject, charset);
+            message.setSubject(subject, charset);
         } else {
-            message.setSubject(fullSubject);
+            message.setSubject(subject);
         }
 
         // Add attachments
@@ -490,21 +488,30 @@ public class Email {
      * @param args the command line arguments given
      */
     public static void main(String[] args) {
-        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+        ConfigurationService config
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
         String to = config.getProperty("mail.admin");
         String subject = "DSpace test email";
         String server = config.getProperty("mail.server");
         String url = config.getProperty("dspace.url");
-        Email e = new Email();
-        e.setSubject(subject);
-        e.addRecipient(to);
-        e.content = "This is a test email sent from DSpace: " + url;
-        System.out.println("\nAbout to send test email:");
-        System.out.println(" - To: " + to);
-        System.out.println(" - Subject: " + subject);
-        System.out.println(" - Server: " + server);
-        boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
+        Email message;
         try {
+            if (args.length <= 0) {
+                message = new Email();
+                message.content = "This is a test email sent from DSpace: " + url;
+            } else {
+                message = Email.getEmail(args[0]);
+                for (int i = 1; i < args.length; i++) {
+                    message.addArgument(args[i]);
+                }
+            }
+            message.setSubject(subject);
+            message.addRecipient(to);
+            System.out.println("\nAbout to send test email:");
+            System.out.println(" - To: " + to);
+            System.out.println(" - Subject: " + subject);
+            System.out.println(" - Server: " + server);
+            boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
             if (disabled) {
                 System.err.println("\nError sending email:");
                 System.err.println(" - Error: cannot test email because mail.server.disabled is set to true");
@@ -513,10 +520,10 @@ public class Email {
                 System.exit(1);
                 return;
             }
-            e.send();
-        } catch (MessagingException | IOException me) {
+            message.send();
+        } catch (MessagingException | IOException ex) {
             System.err.println("\nError sending email:");
-            System.err.println(" - Error: " + me);
+            System.err.format(" - Error: %s%n", ex);
             System.err.println("\nPlease see the DSpace documentation for assistance.\n");
             System.err.println("\n");
             System.exit(1);
@@ -598,9 +605,10 @@ public class Email {
     }
 
     /**
-     * Wrap ConfigurationService to prevent templates from modifying the configuration.
+     * Wrap ConfigurationService to prevent templates from modifying
+     * the configuration.
      */
-    private class UnmodifiableConfigurationService {
+    public class UnmodifiableConfigurationService {
         private final ConfigurationService configurationService;
 
         /**
