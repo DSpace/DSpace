@@ -59,6 +59,10 @@ public class DryadDataPackage extends DryadObject {
     private static final String MANUSCRIPT_NUMBER_ELEMENT = "identifier";
     private static final String MANUSCRIPT_NUMBER_QUALIFIER = "manuscriptNumber";
 
+    private static final String FORMER_MANUSCRIPT_NUMBER_SCHEMA = "dryad";
+    private static final String FORMER_MANUSCRIPT_NUMBER_ELEMENT = "formerManuscriptNumber";
+    private static final String FORMER_MANUSCRIPT_NUMBER_QUALIFIER = null;
+
     private static final String BLACKOUT_UNTIL_SCHEMA = "dc";
     private static final String BLACKOUT_UNTIL_ELEMENT = "date";
     private static final String BLACKOUT_UNTIL_QUALIFIER = "blackoutUntil";
@@ -476,6 +480,13 @@ public class DryadDataPackage extends DryadObject {
         addSingleMetadataValue(Boolean.TRUE, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
     }
 
+    public String getFormerManuscriptNumber() throws SQLException {
+        return getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
+    }
+
+    public void setFormerManuscriptNumber(String manuscriptNumber) throws SQLException {
+        addSingleMetadataValue(Boolean.TRUE, FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
+    }
     public void setBlackoutUntilDate(Date blackoutUntilDate) throws SQLException {
         String dateString = null;
         if(blackoutUntilDate != null)  {

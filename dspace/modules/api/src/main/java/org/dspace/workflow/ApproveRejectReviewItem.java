@@ -349,6 +349,8 @@ public class ApproveRejectReviewItem {
         if (manuscript != null) {
             // clear publication DOI
             dataPackage.setPublicationDOI(null);
+            // If there is a manuscript number, move it to former msid
+            dataPackage.setFormerManuscriptNumber(dataPackage.getManuscriptNumber());
             // clear Manuscript ID
             dataPackage.setManuscriptNumber(null);
             // disjoin keywords
