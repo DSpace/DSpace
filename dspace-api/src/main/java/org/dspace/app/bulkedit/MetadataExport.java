@@ -134,7 +134,7 @@ public class MetadataExport {
         }
         if (result == null) {
             return items;
-        } 
+        }
         return Iterators.concat(result, items);
     }
 
