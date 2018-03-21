@@ -292,7 +292,6 @@
         </profile>
     </profiles>
 
-
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -309,9 +308,20 @@
             <artifactId>hibernate-ehcache</artifactId>
         </dependency>
         <dependency>
+           <groupId>org.hibernate</groupId>
+           <artifactId>hibernate-validator-cdi</artifactId>
+           <version>${hibernate-validator.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.1-b10</version>
+        </dependency>
+
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
