@@ -122,22 +122,20 @@ public class MetadataExport {
                 System.out.print(" ");
             }
             Iterator<Item> items = buildFromCommunity(context, subCommunity, indent + 1);
-            if (items != null) {
-                result = addItemsToResult(result, items);
-            }
+            result = addItemsToResult(result, items);
         }
 
         return result;
     }
 
     private Iterator<Item> addItemsToResult(Iterator<Item> result, Iterator<Item> items) {
-        if (result == null) {
-            result = items;
-        } else {
-            result = Iterators.concat(result, items);
+        if (items == null) {
+            return result;
         }
-
-        return result;
+        if (result == null) {
+            return items;
+        } 
+        return Iterators.concat(result, items);
     }
 
     /**
