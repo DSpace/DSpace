@@ -77,7 +77,7 @@ public class PDFBoxThumbnail extends MediaFilter implements SelfRegisterInputFor
 
     @Override
     public String[] getInputMIMETypes() {
-        return ImageIO.getReaderMIMETypes();
+        return new String[]{"Adobe PDF"};
     }
 
     @Override
