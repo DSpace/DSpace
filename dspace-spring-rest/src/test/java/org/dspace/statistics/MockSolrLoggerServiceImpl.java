@@ -7,6 +7,9 @@
  */
 package org.dspace.statistics;
 
+import java.io.File;
+
+import com.maxmind.geoip2.DatabaseReader;
 import org.dspace.services.ConfigurationService;
 import org.dspace.solr.MockSolrServer;
 import org.springframework.beans.factory.DisposableBean;
@@ -27,10 +30,11 @@ public class MockSolrLoggerServiceImpl extends SolrLoggerServiceImpl implements 
     public void afterPropertiesSet() throws Exception {
         mockSolrServer = new MockSolrServer("statistics");
         solr = mockSolrServer.getSolrServer();
-        locationService = new MockLookupService();
+        locationService = new DatabaseReader.Builder(new File(".")).build();
         useProxies = configurationService.getBooleanProperty("useProxies");
     }
 
+    @Override
     public void destroy() throws Exception {
         mockSolrServer.destroy();
     }
