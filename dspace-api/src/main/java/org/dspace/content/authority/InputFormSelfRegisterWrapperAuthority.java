@@ -32,7 +32,8 @@ import org.dspace.content.Collection;
  */
 public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(InputFormSelfRegisterWrapperAuthority.class);
+    private static Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(InputFormSelfRegisterWrapperAuthority.class);
 
     private Map<String, ChoiceAuthority> delegates = new HashMap<String, ChoiceAuthority>();
 
