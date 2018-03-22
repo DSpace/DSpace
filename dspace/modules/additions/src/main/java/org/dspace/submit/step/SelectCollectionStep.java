@@ -9,6 +9,8 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -86,39 +88,54 @@ public class SelectCollectionStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        // First we find the collection which was selected
-        UUID id = Util.getUUIDParameter(request, "collection");
+        // Begin UMD Customization
+        // Modify the default logic to support mapping an item to multiple collections
+
+        // Get all selected collections
+        List<UUID> collection_ids = Util.getUUIDParameters(request, "mapcollections");
 
         // if the user didn't select a collection,
         // send him/her back to "select a collection" page
-        if (id == null)
+        if (collection_ids == null)
         {
             return STATUS_NO_COLLECTION;
         }
 
-        // try to load the collection
-        Collection col = collectionService.find(context, id);
+        List<Collection> collections = new ArrayList<Collection>();
 
-        // Show an error if the collection is invalid
-        if (col == null)
-        {
-            return STATUS_INVALID_COLLECTION;
+        // for each selected collection id
+        for (UUID id : collection_ids) {
+            // try to load the collection
+            Collection col = collectionService.find(context, id);
+
+            // Show an error if the collection is invalid
+            if (col == null)
+            {
+                return STATUS_INVALID_COLLECTION;
+            }
+
+            collections.add(col);
         }
-        else
-        {
-            // create our new Workspace Item
-            WorkspaceItem wi = workspaceItemService.create(context, col, true);
 
-            // update Submission Information with this Workspace Item
-            subInfo.setSubmissionItem(wi);
+        Collection first_collection = collections.remove(0);
 
-            // commit changes to database
-            context.dispatchEvents();
+        // create our new Workspace Item
+        WorkspaceItem wi = workspaceItemService.create(context, first_collection, true);
 
-            // need to reload current submission process config,
-            // since it is based on the Collection selected
-            subInfo.reloadSubmissionConfig(request);
+        for (Collection collection : collections) {
+            wi.addMapCollection(collection);
         }
+
+        // update Submission Information with this Workspace Item
+        subInfo.setSubmissionItem(wi);
+
+        // commit changes to database
+        context.dispatchEvents();
+
+        // need to reload current submission process config,
+        // since it is based on the Collection selected
+        subInfo.reloadSubmissionConfig(request);
+        // End UMD Customization
 
         // no errors occurred
         return STATUS_COMPLETE;
