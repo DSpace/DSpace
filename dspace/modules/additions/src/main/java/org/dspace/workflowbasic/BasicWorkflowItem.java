@@ -16,6 +16,9 @@ import org.dspace.workflow.WorkflowItem;
 
 import javax.persistence.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Class representing an item going through the workflow process in DSpace
@@ -44,6 +47,15 @@ public class BasicWorkflowItem implements WorkflowItem
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
     private Collection collection;
+
+    // Begin UMD Customization
+    // To support mapping multiple collection
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "collection2workflowitem", 
+               joinColumns = { @JoinColumn(name = "workflow_id") },
+               inverseJoinColumns = { @JoinColumn(name = "collection_id") })
+    private Set<Collection> mappedCollections;
+    // End UMD Customization
 
     /** EPerson owning the current state */
     @ManyToOne(fetch = FetchType.LAZY)
@@ -187,4 +199,22 @@ public class BasicWorkflowItem implements WorkflowItem
     {
         this.publishedBefore = b;
     }
+
+    // Begin UMD Customization
+    @Override
+    public List<Collection> getMappedCollections()
+    {
+        return new ArrayList<>(mappedCollections);
+    }
+
+    @Override
+    public void addMappedCollections(List<Collection> collection) {
+      this.mappedCollections.addAll(collection);
+    }
+
+    @Override
+    public void removeMappedCollections() {
+      this.mappedCollections.clear();
+    }
+    // End UMD Customization
 }

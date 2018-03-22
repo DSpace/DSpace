@@ -130,6 +130,11 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
         taskListItemService.deleteByWorkflowItem(context, workflowItem);
 
         // FIXME - auth?
+        
+        // Begin UMD Customization
+        workflowItem.removeMappedCollections();
+        // End UMD Customization
+
         workflowItemDAO.delete(context, workflowItem);
     }
 
