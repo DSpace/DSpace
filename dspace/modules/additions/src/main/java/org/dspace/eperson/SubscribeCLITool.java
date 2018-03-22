@@ -119,6 +119,13 @@ public class SubscribeCLITool {
     public static void sendEmail(Context context, EPerson eperson,
                                  List<Collection> collections, boolean test) throws IOException, MessagingException,
             SQLException {
+
+        // Begin UMD Customization
+        if (isEPersonRestricted(eperson)) {
+            return;
+        }
+        // End UMD Customization
+
         // Get a resource bundle according to the eperson language preferences
         Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
         ResourceBundle labels = ResourceBundle.getBundle("Messages", supportedLocale);
@@ -390,4 +397,23 @@ public class SubscribeCLITool {
 
         return filteredList;
     }
+
+    // Begin UMD Customization
+    // If the eperson email is listed in the "eperson.subscription.limiteperson"
+    // return true
+    private static boolean isEPersonRestricted(EPerson eperson) {
+        // Check for restricted eperson list
+        String epersonLimit = ConfigurationManager
+                .getProperty("eperson.subscription.limiteperson");
+        if (!(epersonLimit == null || epersonLimit.equals("")))
+        {
+            List l = Arrays.asList(epersonLimit.split(" *, *"));
+            if (!l.contains(eperson.getEmail()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    // End UMD Customization
 }
