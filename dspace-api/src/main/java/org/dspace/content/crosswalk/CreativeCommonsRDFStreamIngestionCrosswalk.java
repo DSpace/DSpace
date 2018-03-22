@@ -38,7 +38,8 @@ public class CreativeCommonsRDFStreamIngestionCrosswalk
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsRDFStreamIngestionCrosswalk.class);
+    private static Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsRDFStreamIngestionCrosswalk.class);
 
     protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance()
                                                                                    .getCreativeCommonsService();

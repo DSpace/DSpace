@@ -28,7 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author kevinvandevelde at atmire.com
  */
 public class MostRecentChecksumServiceImpl implements MostRecentChecksumService {
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MostRecentChecksumServiceImpl.class);
+    private static final Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(MostRecentChecksumServiceImpl.class);
 
     @Autowired(required = true)
     protected MostRecentChecksumDAO mostRecentChecksumDAO;

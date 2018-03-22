@@ -57,7 +57,8 @@ public class SimpleDSORelationsConverterPlugin
     public static final String SIMPLE_RELATIONS_ITEM2BITSTREAM_KEY = "rdf.simplerelations.item2bitstream";
 
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SimpleDSORelationsConverterPlugin.class);
+    private static final Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(SimpleDSORelationsConverterPlugin.class);
 
     @Autowired(required = true)
     protected BitstreamService bitstreamService;

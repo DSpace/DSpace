@@ -42,7 +42,8 @@ public class CreativeCommonsTextStreamDisseminationCrosswalk
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsTextStreamDisseminationCrosswalk.class);
+    private static Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsTextStreamDisseminationCrosswalk.class);
 
     @Override
     public boolean canDisseminate(Context context, DSpaceObject dso) {

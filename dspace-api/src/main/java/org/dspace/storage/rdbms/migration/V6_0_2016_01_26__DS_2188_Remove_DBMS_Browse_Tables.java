@@ -27,7 +27,8 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables implements JdbcM
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables.class);
+    private static final Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables.class);
 
     /* The checksum to report for this migration (when successful) */
     private int checksum = -1;
