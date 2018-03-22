@@ -22,6 +22,7 @@ import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.Value;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
@@ -49,8 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 
-    private static Logger log = Logger
-        .getLogger(DSpaceWorkspaceItemOutputGenerator.class);
+    private static Logger log = LogManager.getLogger(DSpaceWorkspaceItemOutputGenerator.class);
 
     protected Context context;
 

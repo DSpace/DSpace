@@ -23,8 +23,7 @@ public class LoggerUsageEventListener extends AbstractUsageEventListener {
     /**
      * log4j category
      */
-    private static Logger log = Logger
-        .getLogger(LoggerUsageEventListener.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(LoggerUsageEventListener.class);
 
     @Override
     public void receiveEvent(Event event) {

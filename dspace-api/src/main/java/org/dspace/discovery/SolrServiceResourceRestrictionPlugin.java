@@ -39,7 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlugin, SolrServiceSearchPlugin {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrServiceResourceRestrictionPlugin.class);
+    private static final Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(SolrServiceResourceRestrictionPlugin.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;

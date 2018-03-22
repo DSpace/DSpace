@@ -43,7 +43,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
+    private static Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
 
     /**
      * Prefix registered to no one
