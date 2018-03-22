@@ -179,6 +179,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected CitationDocumentService citationDocumentService = DisseminateServiceFactory.getInstance().getCitationDocumentService();
 
+    private boolean hasNotBeenModified = false;
 
     /**
      * Set up the bitstream reader.
@@ -270,6 +271,15 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             if (item != null) {
                 itemLastModified = item.getLastModified();
             }
+            
+            // When spider is requesting file and has not been modified, do not retrieve bitstream
+            if (isSpider) {
+                // Check for if-modified-since header -- ONLY if not authenticated
+                long modSince = request.getDateHeader("If-Modified-Since");
+                if (modSince != -1 && itemLastModified != null && itemLastModified.getTime() < modSince) {
+                    this.hasNotBeenModified = true;
+                }
+            }
 
             // if initial search was by sequence number and found nothing,
             // then try to find bitstream by name (assuming we have a file name)
@@ -353,6 +363,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         return;
                 	}
                 }
+            }
+            
+            if (this.hasNotBeenModified) {
+                //all parts below this section should not be verified
+                return;
             }
 
             // Success, bitstream found and the user has access to read it.
@@ -598,8 +613,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     public void generate() throws IOException, SAXException,
             ProcessingException
     {
-        if (this.bitstreamInputStream == null)
-        {
+        if (this.hasNotBeenModified && this.bitstreamInputStream == null) {
+            response.setDateHeader("Last-Modified", itemLastModified.getTime());
+        } else if (this.bitstreamInputStream == null) {
             return;
         }
         
@@ -609,8 +625,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         if (isSpider)
         {
             // Check for if-modified-since header -- ONLY if not authenticated
-            long modSince = request.getDateHeader("If-Modified-Since");
-            if (modSince != -1 && itemLastModified != null && itemLastModified.getTime() < modSince)
+            if (hasNotBeenModified)
             {
                 // Item has not been modified since requested date,
                 // hence bitstream has not been, either; return 304
@@ -792,6 +807,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         this.bitstreamName = null;
         this.itemLastModified = null;
         this.tempFile = null;
+        this.hasNotBeenModified=false;
         super.recycle();
     }
 
