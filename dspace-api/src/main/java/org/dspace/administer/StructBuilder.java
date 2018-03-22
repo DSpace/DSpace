@@ -94,11 +94,11 @@ public class StructBuilder {
      */
     private static final Map<String, String> communityMap = new HashMap<>();
 
-    protected static CommunityService communityService
+    protected static final CommunityService communityService
             = ContentServiceFactory.getInstance().getCommunityService();
-    protected static CollectionService collectionService
+    protected static final CollectionService collectionService
             = ContentServiceFactory.getInstance().getCollectionService();
-    protected static EPersonService ePersonService
+    protected static final EPersonService ePersonService
             = EPersonServiceFactory.getInstance().getEPersonService();
 
     /**
@@ -282,8 +282,7 @@ public class StructBuilder {
         try (BufferedWriter out = new BufferedWriter(new FileWriter(output))) {
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             outputter.output(xmlOutput, out);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.printf("Unable to write to output file %s:  %s%n",
                     output, e.getMessage());
             System.exit(1);
