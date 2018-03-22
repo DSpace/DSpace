@@ -10,6 +10,7 @@ package org.dspace.content;
 import org.dspace.eperson.EPerson;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Interface for manipulating in-progress submissions, without having to know at
@@ -99,4 +100,26 @@ public interface InProgressSubmission
      *            <code>true</code> if it has been published before
      */
     void setPublishedBefore(boolean b);
+
+    // Begin UMD Customization
+    /**
+     * Map the given collections to the InProgressSubmission item.
+     * 
+     * @param collections
+     *           Collections to be mapped to the InProgressSubmission item
+     */
+    void addMappedCollections(List<Collection> collections);
+
+    /**
+     * Remove all mapped collections from InProgressSubmission item.
+     */
+    void removeMappedCollections();
+
+    /**
+     * Return all mapped collections for the InProgressSubmission item.
+     * 
+     * @return  Collections mapped to the InProgressSubmission item
+     */
+    List<Collection> getMappedCollections();
+    // End UMD Customization
 }
