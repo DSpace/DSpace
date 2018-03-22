@@ -165,15 +165,17 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
                 if (!publishedBefore)
                 {
-                    List<MetadataValue> dateIssued = itemService
-                            .getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+                    // Begin UMD Customization
+                    // Date issued should not be considered
+                    // List<MetadataValue> dateIssued = itemService
+                    //      .getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
                     List<MetadataValue> citation = itemService
                             .getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "citation", Item.ANY);
                     List<MetadataValue> publisher = itemService
                             .getMetadata(item, MetadataSchema.DC_SCHEMA, "publisher", null, Item.ANY);
 
-                    willRemoveDate = (dateIssued.size() > 0)
-                            || (citation.size() > 0) || (publisher.size() > 0);
+                    willRemoveDate = (citation.size() > 0) || (publisher.size() > 0);
+                    // End UMD Customization
                 }
 
                 if (!multipleFiles)
@@ -302,7 +304,10 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
         if (!publishedBefore && subInfo.getSubmissionItem().isPublishedBefore())
         {
-            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+            // Begin UMD Customization
+            // Date issued should not be cleared even if publishedBefore
+            //itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+            // End UMD Customization
             itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "citation", Item.ANY);
             itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "publisher", null, Item.ANY);
         }
