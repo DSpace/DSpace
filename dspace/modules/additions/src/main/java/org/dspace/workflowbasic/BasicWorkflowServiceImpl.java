@@ -43,11 +43,14 @@ import org.dspace.workflowbasic.service.TaskListItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.mail.MessagingException;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -248,6 +251,12 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         wfi.setMultipleFiles(wsi.hasMultipleFiles());
         wfi.setMultipleTitles(wsi.hasMultipleTitles());
         wfi.setPublishedBefore(wsi.isPublishedBefore());
+
+        // Begin UMD customization
+        // Add mappedCollections from workspaceitem to workflowitem
+        List<Collection> collections = wsi.getMappedCollections();
+        wfi.addMappedCollections(collections);
+        // End UMD customization
 
         // remove the WorkspaceItem
         workspaceItemService.deleteWrapper(context, wsi);
@@ -808,7 +817,19 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
             EPerson ep = item.getSubmitter();
             // Get the Locale
             Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
+
+            // Begin UMD Customization
+            // Use "libraryaward_submit_archive" email template when it 
+            // belongs to libraryaward collection. See LIBDRUM-60.
+            String emailName = "submit_archive";
+            
+            Collection la = (Collection) handleService.resolveToObject(context, "1903/11324");
+            if (la != null && itemService.isOwningCollection(item, la)) {
+                emailName = "libraryaward_submit_archive";
+            }
+            
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, emailName));
+            // End UMD customization
 
             // Get the item handle to email to user
             String handle = handleService.findHandle(context, item);
@@ -862,6 +883,12 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
         // FIXME: Provenance statement?
         // Create the new workspace item row
         WorkspaceItem workspaceItem = workspaceItemService.create(c, wfi);
+
+        // Begin UMD customization
+        // Add mappedCollections from workflowitem to workspaceitem.
+        List<Collection> collections = wfi.getMappedCollections();
+        workspaceItem.addMappedCollections(collections);
+        // End UMD customization
 
         workspaceItem.setMultipleFiles(wfi.hasMultipleFiles());
         workspaceItem.setMultipleTitles(wfi.hasMultipleTitles());
@@ -1025,7 +1052,25 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
                     Locale supportedLocale = I18nUtil.getEPersonLocale(anEpa);
                     Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
                     email.addArgument(title);
-                    email.addArgument(coll.getName());
+                    
+                    // Begin UMD customization
+                    // Include the mapped collection names in the email
+                    StringBuffer sb = new StringBuffer();
+                    sb.append(coll.getName());
+                    List<Collection> collections = wi.getMappedCollections();
+                    if (!collections.isEmpty()) {
+                        sb.append(" (");
+                        for (Iterator<Collection> iterator = collections.iterator(); iterator.hasNext();) {
+                          sb.append(iterator.next().getName());
+                          if (iterator.hasNext()) {
+                            sb.append(", ");
+                          }
+                        }
+                        sb.append(")");
+                    }
+                    email.addArgument(sb.toString());
+                    // End UMD customization
+
                     email.addArgument(submitter);
 
                     ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
@@ -1084,7 +1129,18 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
             // Get rejector's name
             String rejector = getEPersonName(e);
             Locale supportedLocale = I18nUtil.getEPersonLocale(e);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
+
+            // Begin UMD Customization
+            // Use "libraryaward_submit_reject" email template when the item 
+            // belongs to libraryaward collection. See LIBDRUM-60.
+             String emailName = "submit_reject";
+            
+             if (coll.getHandle().equals("1903/11324")) {
+                 emailName = "libraryaward_submit_reject";
+             }
+ 
+             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, emailName));
+            // End UMD customization
 
             email.addRecipient(workflowItem.getSubmitter().getEmail());
             email.addArgument(title);
