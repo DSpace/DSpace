@@ -16,6 +16,7 @@ import org.dspace.workflow.WorkflowItem;
 
 import javax.persistence.*;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Class representing an item going through the workflow process in DSpace
@@ -134,5 +135,30 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> 
     {
         this.publishedBefore = b;
     }
+
+    // Begin UMD Customization
+    // Stub implementation for InProgressSubmission interface compliance.
+    /**
+     * Unimplemented stub
+     */
+    @Override
+    public void addMappedCollections(List<Collection> collections) {
+    }
+
+    /**
+     * Unimplemented stub
+     */
+    @Override
+    public List<Collection> getMappedCollections() {
+        return null;
+    }
+
+    /**
+     * Unimplemented stub
+     */
+    @Override
+    public void removeMappedCollections() {
+    }
+    // End UMD Customization
 
 }
