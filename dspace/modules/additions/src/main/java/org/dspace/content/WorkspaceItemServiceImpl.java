@@ -213,6 +213,10 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         // to workspaceitem ID
         workspaceItem.getSupervisorGroups().clear();
 
+        // Begin UMD Customization
+        workspaceItem.removeMappedCollections();
+        // End UMD Customization
+
         // Need to delete the workspaceitem row first since it refers
         // to item ID
         workspaceItemDAO.delete(context, workspaceItem);
@@ -242,6 +246,10 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                         + "collection_id=" + workspaceItem.getCollection().getID()));
 
         //        deleteSubmitPermissions();
+
+        // Begin UMD Customization
+        workspaceItem.removeMappedCollections();
+        // End UMD Customization
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID

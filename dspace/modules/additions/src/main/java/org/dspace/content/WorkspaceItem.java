@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Class representing an item in the process of being submitted by a user
@@ -48,6 +49,15 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
     private Collection collection;
+
+    // Begin UMD Customization
+    // To support mapping multiple collection
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "collection2workspaceitem", 
+               joinColumns = { @JoinColumn(name = "workspace_item_id") },
+               inverseJoinColumns = { @JoinColumn(name = "collection_id") })
+    private Set<Collection> mappedCollections;
+    // End UMD Customization
 
     @Column(name = "multiple_titles")
     private boolean multipleTitles = false;
@@ -247,4 +257,22 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     {
         supervisorGroups.add(group);
     }
+
+    // Begin UMD Customization
+    @Override
+    public List<Collection> getMappedCollections()
+    {
+        return new ArrayList<>(mappedCollections);
+    }
+
+    @Override
+    public void addMappedCollections(List<Collection> collection) {
+      this.mappedCollections.addAll(collection);
+    }
+
+    @Override
+    public void removeMappedCollections() {
+      this.mappedCollections.clear();
+    }
+    // End UMD Customization
 }
