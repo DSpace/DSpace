@@ -39,6 +39,8 @@ public class CrisMetricsUpdateListener implements SolrEventListener
     
     private static final int cacheValidity = 24*60*60000;
 
+    private static final Map<String, PopulateRanksThread> underRebuild = new HashMap<String, PopulateRanksThread>();
+    
     private static final Map<String, Map<String, Map<Integer, Double>>> metrics = new HashMap<String, Map<String, Map<Integer, Double>>>();
 
     private static final Map<String, Map<String, Map<Integer, ExtraInfo>>> extraInfo = new HashMap<String, Map<String, Map<Integer, ExtraInfo>>>();
@@ -81,6 +83,10 @@ public class CrisMetricsUpdateListener implements SolrEventListener
 
     public static Double getMetric(String coreName, String metric, int docId)
     {
+    	final Thread underRebuildThread = underRebuild.get(coreName);
+		if (underRebuildThread != null) {
+    		return null;
+    	}
     	Map<String, Map<Integer, Double>> m = metrics.get(coreName);
         if (m != null && m.containsKey(metric))
         {
@@ -95,6 +101,10 @@ public class CrisMetricsUpdateListener implements SolrEventListener
 
     public static ExtraInfo getRemark(String coreName, String metric, int docId)
     {
+    	final Thread underRebuildThread = underRebuild.get(coreName);
+		if (underRebuildThread != null) {
+    		return null;
+    	}
     	Map<String, Map<Integer, ExtraInfo>> ei = extraInfo.get(coreName);
         if (ei != null && ei.containsKey(metric))
         {
@@ -107,125 +117,7 @@ public class CrisMetricsUpdateListener implements SolrEventListener
         return null;
     }
     
-    private static synchronized void populateRanks(SolrIndexSearcher searcher)
-            throws IOException
-    {	
-    	Date start = new Date();
-        Map<String, Map<Integer, Double>> metricsCopy = new HashMap<String, Map<Integer, Double>>();
-        Map<String, Map<Integer, ExtraInfo>> metricsRemarksCopy = new HashMap<String, Map<Integer, ExtraInfo>>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        
-        try
-        {
-            ScoreDoc[] hits = searcher.search(
-            		new MatchAllDocsQuery(),
-            		Integer.MAX_VALUE
-            		).scoreDocs;
-
-            Map<String, Integer> searchIDCache = new HashMap<String, Integer>(hits.length);
-            Set<String> fields = new HashSet<String>();
-            fields.add("search.uniqueid");
-            Date startSearch = new Date();
-            for (ScoreDoc doc : hits) {
-                // find Lucene docId for uid
-            	searchIDCache.put(searcher.doc(doc.doc, fields).getValues("search.uniqueid")[0], doc.doc);
-            }
-            Date endSearch = new Date();            
-            long searcherTime = endSearch.getTime() - startSearch.getTime();
-            Map<String, String> dbprops = getDBProps(searcher.getCore());
-            
-            Date startQuery = new Date();
-            conn = DriverManager.getConnection(dbprops.get("database.url"),
-                    dbprops.get("database.username"),
-                    dbprops.get("database.password"));
-            ps = conn.prepareStatement(
-                    "select resourceid, resourcetypeid, metrictype, remark, metriccount,timestampcreated from cris_metrics where last = true");
-            rs = ps.executeQuery();
-            log.debug("QUERY TIME:" + (new Date().getTime()-startQuery.getTime()));
-            
-            while (rs.next())
-            {
-                int resourceId = rs.getInt(1);
-                int resourceTypeId = rs.getInt(2);
-                double count = rs.getDouble(5);
-                String type = rs.getString(3);
-                String remark = rs.getString(4);
-                Date acqTime = rs.getDate(6);
-                Integer docId = searchIDCache.get(resourceTypeId+"-"+resourceId);
-                if (docId != null) {
-	                String key = "crismetrics_" + type.toLowerCase();
-	                Map<Integer, Double> tmpSubMap;
-	                Map<Integer, ExtraInfo> tmpSubRemarkMap;
-	                boolean add = false;
-	                if(metricsCopy.containsKey(key)) {
-	                    tmpSubMap = metricsCopy.get(key);
-	                    tmpSubRemarkMap = metricsRemarksCopy.get(key);
-	                }
-	                else {
-	                	add = true;
-	                	tmpSubMap = new HashMap<Integer, Double>();
-		                tmpSubRemarkMap = new HashMap<Integer, ExtraInfo>();
-	                }
-                
-                    tmpSubMap.put(docId, count);
-                    tmpSubRemarkMap.put(docId, new ExtraInfo(remark, acqTime));
-	
-	                if(add) {
-	                    metricsCopy.put(key, tmpSubMap);
-	                    metricsRemarksCopy.put(key, tmpSubRemarkMap);
-	                }
-                }
-            }
-            Date end = new Date();
-            log.debug("SEARCH TIME: "+searcherTime);
-            log.debug("RENEW CACHE TIME: "+(end.getTime()-start.getTime()));
-        }
-        catch (Exception e)
-        {
-        	e.printStackTrace();
-            throw new IOException(e);
-        }
-        finally
-        {
-            if (conn != null)
-            {
-                try
-                {
-                    conn.close();
-                }
-                catch (SQLException e)
-                {
-                    /* NOOP */
-                	e.printStackTrace();
-                }
-            }
-        }
-        
-        String coreName = searcher.getCore().getName();
-        Map<String, Map<Integer, Double>> m = metrics.get(coreName); 
-        Map<String, Map<Integer, ExtraInfo>> ei = extraInfo.get(coreName);
-        
-        if (ei != null) {
-        	ei.clear();
-        }
-        else {
-        	ei = new HashMap<String, Map<Integer, ExtraInfo>>();
-        	extraInfo.put(coreName, ei);
-        }
-        if (m != null) {
-        	m.clear();
-        }
-        else {
-        	m = new HashMap<String, Map<Integer, Double>>();
-        	metrics.put(coreName, m);
-        }
-        ei.putAll(metricsRemarksCopy);
-        m.putAll(metricsCopy);
-    }
-
-	private static Map<String, String> getDBProps(SolrCore core) {
+    private static Map<String, String> getDBProps(SolrCore core) {
 		Map<String, String> dbprops = new HashMap<String, String>();
 
 		try {
@@ -248,9 +140,17 @@ public class CrisMetricsUpdateListener implements SolrEventListener
 	public static void renewCache(SolrIndexSearcher newSearcher) throws IOException
     {
 		String coreName = newSearcher.getCore().getName();
-    	cacheVersion.put(coreName, newSearcher.getOpenTime());
-        cacheAcquisition.put(coreName, new Date());
-        populateRanks(newSearcher);
+		PopulateRanksThread underRebuildThread = null;
+		synchronized (CrisMetricsUpdateListener.class) {
+			underRebuildThread = underRebuild.get(coreName);
+			if (underRebuildThread != null) {
+				log.debug("rank chache already under rebuild... restart");
+				underRebuildThread.stopGraceful();
+			}
+		}
+		underRebuildThread = new PopulateRanksThread(newSearcher);
+		underRebuildThread.start();
+    	underRebuild.put(coreName, underRebuildThread);
     }
 
     public static Map<String, Map<Integer, Double>> getMetrics(String coreName)
@@ -270,5 +170,156 @@ public class CrisMetricsUpdateListener implements SolrEventListener
 		Date now = new Date();
 		return ca == null || (now.getTime() - ca.getTime() > cacheValidity)
 				|| cv.longValue() != searcher.getOpenTime();
+	}
+
+	public static class PopulateRanksThread extends Thread {
+		private boolean stop = false;
+		
+		private SolrIndexSearcher newSearcher;
+		
+		public PopulateRanksThread(SolrIndexSearcher newSearcher) {
+			this.newSearcher = newSearcher;
+		}
+		
+		public void stopGraceful() {
+			this.stop = true;
+		}
+
+		@Override
+		public void run() {
+			String coreName = newSearcher.getCore().getName();
+			try {
+				log.debug("Building the rank chache...");
+	    		cacheVersion.put(coreName, newSearcher.getOpenTime());
+	            cacheAcquisition.put(coreName, new Date());
+				populateRanks(coreName, newSearcher);
+			} catch (IOException e) {
+				log.error(e.getMessage(), e);
+			} finally {
+				underRebuild.put(coreName, null);
+			}
+		}
+
+		private void populateRanks(String coreName, SolrIndexSearcher searcher)
+		        throws IOException
+		{	
+			Integer numDocs = (Integer) searcher.getStatistics().get("numDocs");
+			Date start = new Date();
+		    Map<String, Map<Integer, Double>> metricsCopy = new HashMap<String, Map<Integer, Double>>(numDocs);
+		    Map<String, Map<Integer, ExtraInfo>> metricsRemarksCopy = new HashMap<String, Map<Integer, ExtraInfo>>(numDocs);
+		    Connection conn = null;
+		    PreparedStatement ps = null;
+		    ResultSet rs = null;
+		    
+		    try
+		    {
+		        ScoreDoc[] hits = searcher.search(
+		        		new MatchAllDocsQuery(),
+		        		Integer.MAX_VALUE
+		        		).scoreDocs;
+		
+		        Map<String, Integer> searchIDCache = new HashMap<String, Integer>(hits.length);
+		        Set<String> fields = new HashSet<String>();
+		        fields.add("search.uniqueid");
+		        Date startSearch = new Date();
+		        for (ScoreDoc doc : hits) {
+		        	if (stop) {
+		        		return;
+		        	}
+		            // find Lucene docId for uid
+		        	searchIDCache.put(searcher.doc(doc.doc, fields).getValues("search.uniqueid")[0], doc.doc);
+		        }
+		        Date endSearch = new Date();            
+		        long searcherTime = endSearch.getTime() - startSearch.getTime();
+		        Map<String, String> dbprops = getDBProps(searcher.getCore());
+		        
+		        Date startQuery = new Date();
+		        conn = DriverManager.getConnection(dbprops.get("database.url"),
+		                dbprops.get("database.username"),
+		                dbprops.get("database.password"));
+		        ps = conn.prepareStatement(
+		                "select resourceid, resourcetypeid, metrictype, remark, metriccount,timestampcreated from cris_metrics where last = true");
+		        rs = ps.executeQuery();
+		        log.debug("QUERY TIME:" + (new Date().getTime()-startQuery.getTime()));
+		        
+		        while (rs.next())
+		        {
+		        	if (stop) {
+		        		return;
+		        	}
+		            Integer resourceId = (Integer)rs.getObject(1);
+		            int resourceTypeId = rs.getInt(2);
+		            double count = rs.getDouble(5);
+		            String type = rs.getString(3);
+		            String remark = rs.getString(4);
+		            Date acqTime = rs.getDate(6);
+		            Integer docId = searchIDCache.get(resourceTypeId+"-"+resourceId);
+		            if (docId != null) {
+		                String key = new StringBuffer("crismetrics_").append(type.toLowerCase()).toString();
+		                Map<Integer, Double> tmpSubMap;
+		                Map<Integer, ExtraInfo> tmpSubRemarkMap;
+		                boolean add = false;
+		                if(metricsCopy.containsKey(key)) {
+		                    tmpSubMap = metricsCopy.get(key);
+		                    tmpSubRemarkMap = metricsRemarksCopy.get(key);
+		                }
+		                else {
+		                	add = true;
+		                	tmpSubMap = new HashMap<Integer, Double>();
+			                tmpSubRemarkMap = new HashMap<Integer, ExtraInfo>();
+		                }
+		            
+		                tmpSubMap.put(docId, count);
+		                tmpSubRemarkMap.put(docId, new ExtraInfo(remark, acqTime));
+		
+		                if(add) {
+		                    metricsCopy.put(key, tmpSubMap);
+		                    metricsRemarksCopy.put(key, tmpSubRemarkMap);
+		                }
+		            }
+		        }
+		        Date end = new Date();
+		        log.debug("SEARCH TIME: "+searcherTime);
+		        log.debug("RENEW CACHE TIME: "+(end.getTime()-start.getTime()));
+		    }
+		    catch (Exception e)
+		    {
+		    	e.printStackTrace();
+		        throw new IOException(e);
+		    }
+		    finally
+		    {
+		        if (conn != null)
+		        {
+		            try
+		            {
+		                conn.close();
+		            }
+		            catch (SQLException e)
+		            {
+		                /* NOOP */
+		            	e.printStackTrace();
+		            }
+		        }
+		    }
+		    
+		    Map<String, Map<Integer, Double>> m = metrics.get(coreName); 
+		    Map<String, Map<Integer, ExtraInfo>> ei = extraInfo.get(coreName);
+		    
+		    if (ei != null) {
+		    	ei.clear();
+		    }
+		
+		    ei = metricsRemarksCopy;
+		    extraInfo.put(coreName, ei);
+		
+		    if (m != null) {
+		    	m.clear();
+		    }
+		    
+		    m = metricsCopy;
+		    metrics.put(coreName, m);
+		}
+
 	}
 }

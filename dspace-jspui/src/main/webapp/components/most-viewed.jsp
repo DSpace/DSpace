@@ -18,6 +18,12 @@
 	   		<div class="list-groups">
 <% for(MostViewedItem mvi : mostViewedItem.getItems()){
 		IGlobalSearchResult item = mvi.getItem();
+		if ( mvi.getVisits()==null ) {
+			%>
+				<fmt:message key="jsp.components.most-viewed.data-loading"/>
+			<%
+			break;
+		}
 %>
 		<dspace:discovery-artifact style="global" artifact="<%= item %>" view="<%= mostViewedItem.getConfiguration() %>">
 		<span class="badge" data-toggle="tooltip" data-placement="right" title="<fmt:message key="jsp.components.most-viewed.badge-tooltip"/>"><fmt:formatNumber value="<%= (mvi==null || mvi.getVisits()==null)?0.0:mvi.getVisits() %>" type="NUMBER" maxFractionDigits="0" /></span> ##artifact-item##
