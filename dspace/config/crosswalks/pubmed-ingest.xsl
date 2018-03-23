@@ -31,6 +31,11 @@
             <!-- Journal Name -->
             <xsl:if test="MedlineCitation/Article/Journal/Title">
                 <dim:field mdschema="prism" element="publicationName">
+                    <xsl:if test="MedlineCitation/Article/Journal/ISSN">
+                        <xsl:attribute name="authority">
+                            <xsl:value-of select="MedlineCitation/Article/Journal/ISSN"/>
+                        </xsl:attribute>
+                    </xsl:if>
                     <xsl:value-of select="MedlineCitation/Article/Journal/Title"/>
                 </dim:field>
             </xsl:if>
