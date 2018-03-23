@@ -258,6 +258,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 try {
                     // if we still haven't found a matching journal concept, make a new, temporary one.
                     journalConcept = JournalUtils.createJournalConcept(journal);
+                    // if we got this from a crosswalk, it might already have an ISSN: that's helpful!
+                    if (journalConcept != null && !"".equals(issn)) {
+                        journalConcept.setISSN(issn);
+                    }
                 } catch (Exception e) {
                     // this should not happen because we've already checked to see if a matching concept existed.
                     log.error("couldn't create a concept");
