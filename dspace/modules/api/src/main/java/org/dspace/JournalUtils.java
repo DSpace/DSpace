@@ -187,8 +187,10 @@ public class JournalUtils {
                     break;
                 }
             }
-            if (!"".equals(journalConcept.getISSN())) {
-                journalConceptHashMapByISSN.put(journalConcept.getISSN(), journalConcept);
+            if (journalConcept.getISSNs().size() > 0) {
+                for (String issn : journalConcept.getISSNs()) {
+                    journalConceptHashMapByISSN.put(issn, journalConcept);
+                }
             }
 
             for (DryadJournalConcept concept : recentlyIntegratedJournals) {
