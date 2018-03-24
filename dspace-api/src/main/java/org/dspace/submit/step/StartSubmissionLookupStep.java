@@ -13,7 +13,10 @@ import gr.ekt.bte.core.TransformationSpec;
 import gr.ekt.bte.exceptions.BadTransformationSpec;
 import gr.ekt.bte.exceptions.MalformedSourceException;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -30,8 +33,14 @@ import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.FormatIdentifier;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.submit.AbstractProcessingStep;
@@ -127,6 +136,9 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
         String uuidSubmission = request.getParameter("suuid");
         String uuidLookup = request.getParameter("iuuid");
         String fuuidLookup = request.getParameter("fuuid");
+        String fPath = request.getParameter("filePath");
+        String fName = StringUtils.isNotBlank(request.getParameter("filename") )? request.getParameter("filename"): StringUtils.substringAfterLast(fPath, FileSystems.getDefault().getSeparator());
+        
         String uuid_batch = request.getParameter("iuuid_batch");
         
         boolean forceEmpty = Util.getBoolParameter(request, "forceEmpty");
@@ -287,7 +299,25 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             if (result != null && result.size() > 0)
             {
                 // update Submission Information with this Workspace Item
-                subInfo.setSubmissionItem(result.iterator().next());
+            	WorkspaceItem wsi= result.get(0);
+            	if(StringUtils.isNotBlank(fPath) && result.size() == 1){
+            		File file = File.createTempFile("submission-lookup", uuid_batch);
+            		if(file.exists()){
+            			Item item = wsi.getItem();
+            			Bitstream bit = item.createSingleBitstream(new FileInputStream(fPath),Constants.DEFAULT_BUNDLE_NAME);
+            			bit.setName(fName);
+            			bit.setSource(fPath);
+            			bit.setFormat(FormatIdentifier.guessFormat(context, bit));
+            			bit.update();            			
+            			item.update();
+                        // save this bitstream to the submission info, as the bitstream we're currently working with
+            			subInfo.setBitstream(bit);
+            			// delete 
+            			file.delete();
+            			
+            		}
+            	}
+                subInfo.setSubmissionItem(wsi);
             }
 
             // commit changes to database

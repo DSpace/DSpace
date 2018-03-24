@@ -8,8 +8,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.dspace.core.I18nUtil;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 
-import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.model.IPropertiesDefinition;
 
 public final class PropertyDefintionI18NWrapper implements MethodInterceptor {
 	private Locale locale = null;
@@ -30,7 +29,7 @@ public final class PropertyDefintionI18NWrapper implements MethodInterceptor {
 			if (invocation.getMethod().getName().equals("getLabel")) {
 				return getLabel(invocation);
 			} else if (invocation.getMethod().getName().equals("getReal")) {
-				return getWrapper((PropertiesDefinition) invocation.proceed(), localeString);
+				return getWrapper((IPropertiesDefinition) invocation.proceed(), localeString);
 			}
 		}
 		return invocation.proceed();
@@ -44,19 +43,12 @@ public final class PropertyDefintionI18NWrapper implements MethodInterceptor {
 		}
 	}
 
-	public static ADecoratorPropertiesDefinition getWrapper(ADecoratorPropertiesDefinition pd, String locale) {
-		AspectJProxyFactory pf = new AspectJProxyFactory(pd);
-		pf.setProxyTargetClass(true);
-		pf.addAdvice(
-				new PropertyDefintionI18NWrapper(pd.getAnagraficaHolderClass().getSimpleName(), pd.getShortName(), locale));
-		return pf.getProxy();
-	}
-
-	public static PropertiesDefinition getWrapper(PropertiesDefinition pd, String locale) {
-		AspectJProxyFactory pf = new AspectJProxyFactory(pd);
-		pf.setProxyTargetClass(true);
-		pf.addAdvice(
-				new PropertyDefintionI18NWrapper(pd.getAnagraficaHolderClass().getSimpleName(), pd.getShortName(), locale));
-		return pf.getProxy();
-	}
+    public static IPropertiesDefinition getWrapper(IPropertiesDefinition pd, String locale) {
+        AspectJProxyFactory pf = new AspectJProxyFactory(pd);
+        pf.setProxyTargetClass(true);
+        pf.addAdvice(
+                new PropertyDefintionI18NWrapper(pd.getAnagraficaHolderClass().getSimpleName(), pd.getShortName(), locale));
+        return pf.getProxy();
+    }	
+	
 }

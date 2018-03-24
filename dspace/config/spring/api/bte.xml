@@ -17,7 +17,8 @@
 			    <!-- Specify here any data loaders that you want to have access to in the command line batch import.
 			    	Key is the name that you need to specify in the "-i" option in the command line script when "-b"
 			    	option is used (which means BTE Batch import) -->
-			    <!-- <entry key="pubmedEuropeXML" value-ref="pubmedEuropeFileDataLoader"/> -->
+			    <!-- <entry key="pubmedEuropeXML" value-ref="pubmedEuropeFileDataLoader"/> 
+			    <entry key="pdf" value-ref="grobidDataLoader" />-->
 				<entry key="pubmedXML" value-ref="pubmedFileDataLoader" />
 				<entry key="crossrefXML" value-ref="crossRefFileDataLoader" />
 				<entry key="arxivXML" value-ref="arXivFileDataLoader" />
@@ -28,6 +29,7 @@
 				<entry key="csv" value-ref="csvDataLoader" />
 				<entry key="tsv" value-ref="tsvDataLoader" />
 				<entry key="oai" value-ref="oaipmhDataLoader" />
+
 			</map>
 		</property>
 		
@@ -129,6 +131,7 @@
 	            <entry key="endnote" value-ref="endnoteDataLoader"/>
 	            <entry key="csv" value-ref="csvDataLoader"/>
 	            <entry key="tsv" value-ref="tsvDataLoader"/>
+	            <!-- <entry key="pdf" value-ref="grobidDataLoader" /> -->
 			</map>
 	    </property>
 	</bean>
@@ -476,7 +479,25 @@
 		<property name="serverAddress"
 			value="http://ebooks.serrelib.gr/serrelib-oai/request" />
 	</bean>
-
+	
+	<!--  GROBID Data Loader  -->
+	<bean id="grobidDataLoader" class="org.dspace.submit.extraction.GrobidFileDataLoader">
+		<property name="fieldMap">
+			<map>
+				<entry key="analytictitle" value="title" />
+				<entry key="analyticname" value="authors" />
+				<entry key="monogrtitle" value="journal" />
+				<entry key="publicationstmtdatepublished" value="issued" />
+				<entry key="issn" value="jissn" />
+				<entry key="eissn" value="eissn" />
+				<entry key="isbn" value="pisbn" />
+				<entry key="doi" value="doi" />
+				<entry key="profiledescsabstractparagraph" value="abstract" />
+				<entry key="profiledescskeywordsterm" value="allkeywords" />
+			</map>
+		</property>
+	</bean>    
+	
 	<!-- PubMed -->
 	<bean id="pubmedOnlineDataLoader" class="org.dspace.submit.lookup.PubmedOnlineDataLoader">
 		<property name="searchProvider" value="false" />

@@ -279,11 +279,16 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
                         {
                             FileDataLoader fdl = (FileDataLoader) dataLoader;
                             fdl.setFilename(file.getAbsolutePath());
-
-                            RecordSet citationRecord = dataLoader.getRecords();
-                            for (Record rr : citationRecord.getRecords())
-                            {
-                                compare(rr, record);
+                            try{
+	                            RecordSet citationRecord = dataLoader.getRecords();
+	                            for (Record rr : citationRecord.getRecords())
+	                            {
+	                                compare(rr, record);
+	                            }
+                            }catch(Exception e){
+                            	
+                            }catch(org.jbibtex.TokenMgrError t){
+                            	
                             }
 
                         }

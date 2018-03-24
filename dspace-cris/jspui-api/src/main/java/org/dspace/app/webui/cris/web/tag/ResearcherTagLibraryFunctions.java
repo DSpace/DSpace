@@ -7,22 +7,6 @@
  */
 package org.dspace.app.webui.cris.web.tag;
 
-import it.cilea.osd.jdyna.components.IBeanSubComponent;
-import it.cilea.osd.jdyna.components.IComponent;
-import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
-import it.cilea.osd.jdyna.model.ADecoratorTypeDefinition;
-import it.cilea.osd.jdyna.model.ANestedObject;
-import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
-import it.cilea.osd.jdyna.model.ATypeNestedObject;
-import it.cilea.osd.jdyna.model.AWidget;
-import it.cilea.osd.jdyna.model.AccessLevelConstants;
-import it.cilea.osd.jdyna.model.AnagraficaSupport;
-import it.cilea.osd.jdyna.model.Containable;
-import it.cilea.osd.jdyna.model.IContainable;
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
-import it.cilea.osd.jdyna.model.Property;
-import it.cilea.osd.jdyna.web.Box;
-
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -68,6 +52,23 @@ import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.cris.dto.AllMonthsStatsDTO;
 import org.dspace.core.ConfigurationManager;
+
+import it.cilea.osd.jdyna.components.IBeanSubComponent;
+import it.cilea.osd.jdyna.components.IComponent;
+import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ADecoratorTypeDefinition;
+import it.cilea.osd.jdyna.model.ANestedObject;
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
+import it.cilea.osd.jdyna.model.AWidget;
+import it.cilea.osd.jdyna.model.AccessLevelConstants;
+import it.cilea.osd.jdyna.model.AnagraficaSupport;
+import it.cilea.osd.jdyna.model.Containable;
+import it.cilea.osd.jdyna.model.IContainable;
+import it.cilea.osd.jdyna.model.IPropertiesDefinition;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.model.Property;
+import it.cilea.osd.jdyna.web.Box;
 
 public class ResearcherTagLibraryFunctions
 {
@@ -900,13 +901,21 @@ public class ResearcherTagLibraryFunctions
         return null;
     }
     
-    public static Object getPropertyDefinitionI18N(Object pd, String locale) {
-    	if (pd instanceof PropertiesDefinition) {
-    		return PropertyDefintionI18NWrapper.getWrapper((PropertiesDefinition) pd, locale);
-    	}
-    	else if (pd instanceof ADecoratorPropertiesDefinition) {
-    		return PropertyDefintionI18NWrapper.getWrapper((ADecoratorPropertiesDefinition) pd, locale);
-    	} 
-    	return pd;
+    public static Object getPropertyDefinitionI18N(
+            Object pd, String locale)
+    {
+
+        IContainable ipd = (IContainable) pd;
+        String shortname = ipd.getShortName() + "_" + locale;
+        IContainable pdLocalized = applicationService
+                .findContainableByDecorable(ipd.getClass(), shortname);
+
+        if (pdLocalized != null)
+        {
+            return (IPropertiesDefinition) PropertyDefintionI18NWrapper
+                    .getWrapper((IPropertiesDefinition) pdLocalized, locale);
+        }
+        return (IPropertiesDefinition) PropertyDefintionI18NWrapper
+                .getWrapper((IPropertiesDefinition) ipd, locale);
     }
 }

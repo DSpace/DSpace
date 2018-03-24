@@ -185,7 +185,9 @@ void generateCollectionTree(javax.servlet.jsp.JspWriter out, CollectionsTree tre
 					<input type="hidden" id="suuid" name="suuid" value="<%= uuid %>"/>
 					<input type="hidden" id="collectionid" name="collectionid" value=""/>
 					<input type="hidden" id="iuuid_batch" name="iuuid_batch" value=""/>
-					<input type="hidden" id="colid_batch" name="colid_batch" value=""/>					
+					<input type="hidden" id="colid_batch" name="colid_batch" value=""/>
+					<input type="hidden" id="filePath" name="filePath" value=""/>
+					<input type="hidden" id="filename" name="filename" value=""/>					
 				</form>
 			</div>
 	      </div>
@@ -310,6 +312,7 @@ void generateCollectionTree(javax.servlet.jsp.JspWriter out, CollectionsTree tre
 		<input type="hidden" id="iuuid-loader" name="iuuid" value=""/>
 		<input type="hidden" id="fuuid-loader" name="fuuid" value=""/>
 		<input type="hidden" id="collectionid-loader" name="collectionid" value=""/>
+		
 	<p class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.byfile.hints"/></p>
 	
 	<div class="form-group">
@@ -382,6 +385,7 @@ void generateCollectionTree(javax.servlet.jsp.JspWriter out, CollectionsTree tre
 			<input type="hidden" id="suuid" name="suuid" value="<%= uuid %>"/>
 			<input type="hidden" id="collectionid" name="collectionid" value=""/>
 			<input type="hidden" id="iuuid_batch" name="iuuid_batch" value=""/>
+			<input type="hidden" id="filePath" name="filePath" value=""/>
 		</form>
 		<input type="checkbox" id="checkallresults" name="checkallresults"><fmt:message key="jsp.submit.start-lookup-submission.js.checkallresults"/>
 		<h4 id="no-record" class="label label-warning" style="display:none"><fmt:message key="jsp.submit.start-lookup-submission.norecordselected" /></h4>

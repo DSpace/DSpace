@@ -128,6 +128,8 @@ public class ResearcherPageDetailsController
 
         Context context = UIUtil.obtainContext(request);
         EPerson currUser = context.getCurrentUser();
+        
+        model.put("selfClaimRP", new Boolean(false));
         if(currUser != null) {
             model.put("isLoggedIn", new Boolean(true));
             ResearcherPage rp = ((ApplicationService) applicationService).getResearcherPageByEPersonId(currUser.getID());
@@ -138,6 +140,17 @@ public class ResearcherPageDetailsController
             }else
             {
             	model.put("userHasRP", new Boolean(false));
+                String nameGroupSelfClaim = ConfigurationManager.getProperty("cris",
+                        "rp.claim.group.name");
+                if (StringUtils.isNotBlank(nameGroupSelfClaim))
+                {
+                    Group selfClaimGroup = Group.findByName(context,
+                            nameGroupSelfClaim);
+                    if (Group.isMember(context, selfClaimGroup.getID()))
+                    {
+                        model.put("selfClaimRP", new Boolean(true));
+                    }
+                }
             }
         }
         else {
