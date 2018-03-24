@@ -10,15 +10,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SubmissionInfo;
-import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.workflow.WorkflowManager;
+import org.dspace.submit.AbstractProcessingStep;
 
 /**
  * This is the class which defines what happens once a submission completes!
@@ -43,6 +43,8 @@ public class LibraryAwardCompleteStep extends AbstractProcessingStep
     private static Logger log = Logger.getLogger(LibraryAwardCompleteStep.class);
 
     private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    
+    private final static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -75,10 +77,10 @@ public class LibraryAwardCompleteStep extends AbstractProcessingStep
     	Item item = subInfo.getSubmissionItem().getItem();
     	
     	// add dc.date.issued
-    	item.clearMetadata("dc", "date", "issued", null);
-    	item.addMetadata("dc", "date", "issued", null, df.format(new Date()));
+      itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+      itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY, df.format(new Date()));
 
-    	item.update();
+    	itemService.update(context, item);
     	
         // The Submission is COMPLETE!!
         log.debug(LogManager.getHeader(context, "la_complete",

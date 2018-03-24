@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.dspace.app.mediafilter.MediaFilter;
+import org.dspace.content.Item;
 
 import edu.umd.lib.util.StreamThread;
 
@@ -81,7 +82,8 @@ public class PostscriptFilter extends MediaFilter {
    * @return InputStream the resulting input stream
    */
 
-  public InputStream getDestinationStream(InputStream source) throws Exception {
+  @Override
+  public InputStream getDestinationStream(Item item, InputStream source, boolean verbose) throws Exception {
     // Start the process
     Process p = Runtime.getRuntime().exec(new String[]{"/usr/local/bin/ps2pdf","-","-"});
        
