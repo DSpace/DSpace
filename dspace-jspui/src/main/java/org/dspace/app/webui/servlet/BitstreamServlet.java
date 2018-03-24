@@ -200,7 +200,16 @@ public class BitstreamServlet extends DSpaceServlet
                     .getTime());
 
             // Check for if-modified-since header
-            long modSince = request.getDateHeader("If-Modified-Since");
+            long modSince = -1;
+            try {
+            	modSince = request.getDateHeader("If-Modified-Since");
+            }
+            catch (IllegalArgumentException ex) {
+            	// ignore the exception, the header is invalid 
+            	// we proceed as it was not supplied/supported
+            	// we have some bad web client that provide unvalid values 
+            	// no need to fill our log with such exceptions
+            }
 
             if (modSince != -1 && item.getLastModified().getTime() < modSince)
             {
