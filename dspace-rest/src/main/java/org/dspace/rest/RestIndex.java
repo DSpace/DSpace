@@ -93,13 +93,16 @@ public class RestIndex {
                   		"<li>GET /items/{item id} - Return the specified item.</li>" +
                   		"<li>GET /items/{item id}/metadata - Return metadata of the specified item.</li>" +
                   		"<li>GET /items/{item id}/bitstreams - Return bitstreams of the specified item.</li>" +
+                  		"<li>GET /items/{item id}/policy - Return policies of the specified item.</li>" +
                   		"<li>POST /items/find-by-metadata-field - Find items by the specified metadata value.</li>" +
                   		"<li>POST /items/{item id}/metadata - Add metadata to the specified item.</li>" +
                   		"<li>POST /items/{item id}/bitstreams - Add a bitstream to the specified item.</li>" +
+                  		"<li>POST /items/{item id}/policy - Add a policy to the specified item.</li>" +
                   		"<li>PUT /items/{item id}/metadata - Update metadata in the specified item.</li>" +
                   		"<li>DELETE /items/{item id} - Delete the specified item.</li>" +
                   		"<li>DELETE /items/{item id}/metadata - Clear metadata of the specified item.</li>" +
                   		"<li>DELETE /items/{item id}/bitstreams/{bitstream id} - Delete the specified bitstream of the specified item.</li>" +
+                  		"<li>DELETE /items/{item_id}/policy/{policy_id} - Delete the specified item policy.</li>" +
                   	"</ul>" +
                   	"<h2>Bitstreams</h2>" +
                   	"<ul>" +
