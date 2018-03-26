@@ -226,9 +226,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         item.clearMetadata("prism.publicationName");
         item.update();
 
-        String issn = journalMDV[0].authority;
+        String issn = "";
         // see if there's an ISSN stashed in the authority attribute
-        if (!"".equals(issn)) {
+        if (journalMDV.length > 0 && !"".equals(journalMDV[0].authority)) {
+            issn = journalMDV[0].authority;
             journalConcept = JournalUtils.getJournalConceptByISSN(issn);
         }
 
