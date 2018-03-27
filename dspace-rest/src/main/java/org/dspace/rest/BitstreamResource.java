@@ -43,6 +43,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.rest.common.Bitstream;
@@ -54,6 +56,9 @@ import org.dspace.usage.UsageEvent;
 
 /**
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
+ * @author James Creel (jcreel@library.tamu.edu)
+ * @author Jeremy Huff (huff@library.tamu.edu)
+ * @author Miika Nurminen (University of Jyväskylä)
  */
 // Every DSpace class used without namespace is from package
 // org.dspace.rest.common.*. Otherwise namespace is defined.
@@ -413,13 +418,13 @@ public class BitstreamResource extends Resource
     }
 
     /**
-     * Update bitstream metadata. Replaces everything on targeted bitstream.
+     * Update bitstream metadata. Replaces format, sequenceId, bundle, and policies on targeted bitstream.
      * May throw WebApplicationException caused by two exceptions:
      * SQLException, if there was a problem with the database. AuthorizeException if
      * there was a problem with the authorization to edit bitstream metadata.
      *
      * @param bitstreamId
-     *            Id of bistream to be updated.
+     *            Id of bitstream to be updated.
      * @param bitstream
      *            Bitstream with will be placed. It must have filled user
      *            credentials.
@@ -474,6 +479,36 @@ public class BitstreamResource extends Resource
                 dspaceBitstream.setSequenceID(sequenceId);
             }
 
+            if(bitstream.getBundleName() != null)
+            {
+                //find the bundle with the desired name or create it if necessary
+                Item parentItem = (Item) bitstreamService.getParentObject(context, dspaceBitstream);
+                Bundle namedBundle = null;
+                for (Bundle existingBundle : parentItem.getBundles()) {
+                    if (existingBundle.getName().equals(bitstream.getBundleName())) {
+                        namedBundle = existingBundle;
+                        break;
+                    } else {
+                        namedBundle = bundleService.create(context, parentItem, bitstream.getBundleName());
+                    }
+                }
+
+                if (namedBundle != null) 
+                {
+                    log.trace("Placing bitstream in bundle " + bitstream.getBundleName());
+
+                    //remove the bitstream from its current bundles
+                    List<Bundle> bundles = dspaceBitstream.getBundles();
+                    for (Bundle bundle : bundles) 
+                    {
+                        bundle.removeBitstream(dspaceBitstream);
+                    }
+
+                    //put the bitstream in the named bundle
+                    bundleService.addBitstream(context, namedBundle, dspaceBitstream);
+                }
+            }
+
             bitstreamService.update(context, dspaceBitstream);
 
             if (bitstream.getPolicies() != null)
@@ -484,7 +519,8 @@ public class BitstreamResource extends Resource
                 authorizeService.removeAllPolicies(context,dspaceBitstream);
 
                 // Add all new bitstream policies
-                for (ResourcePolicy policy : bitstream.getPolicies()) {
+                for (ResourcePolicy policy : bitstream.getPolicies()) 
+                {
                     addPolicyToBitstream(context, policy, dspaceBitstream);
                 }
             }
