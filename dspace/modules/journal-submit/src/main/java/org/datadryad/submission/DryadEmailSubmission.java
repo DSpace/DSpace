@@ -213,11 +213,11 @@ public class DryadEmailSubmission extends HttpServlet {
             dryadGmailService = new DryadGmailService();
         }
 
-        LOGGER.debug("scheduling email harvesting");
-        myEmailHarvester = new Timer();
-        // schedule email harvesting to happen once an hour
-        int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("submit.journal.email.timer"));
-        myEmailHarvester.schedule(new DryadEmailSubmissionHarvester(), 0, 1000 * timerInterval);
+//        LOGGER.debug("scheduling email harvesting");
+//        myEmailHarvester = new Timer();
+//        // schedule email harvesting to happen once an hour
+//        int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("submit.journal.email.timer"));
+//        myEmailHarvester.schedule(new DryadEmailSubmissionHarvester(), 0, 1000 * timerInterval);
     }
 
     private void processMimeMessage (MimeMessage mime) throws Exception {
