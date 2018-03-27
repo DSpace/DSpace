@@ -366,7 +366,7 @@ public class DryadEmailSubmission extends HttpServlet {
                         LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
                     }
 
-                    ApproveRejectReviewItem.reviewManuscript(manuscript);
+                    ApproveRejectReviewItem.processWorkflowItemsUsingManuscript(manuscript);
                 }
             } catch (StorageException e) {
                 LOGGER.error("failed to write ms " + manuscript.getManuscriptId());

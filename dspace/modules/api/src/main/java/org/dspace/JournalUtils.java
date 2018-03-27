@@ -405,8 +405,24 @@ public class JournalUtils {
         return null;
     }
 
+    public static boolean manuscriptIsKnownFormerManuscriptNumber(Item item, Manuscript manuscript) {
+        if (manuscript.getManuscriptId() == null) {
+            return false;
+        }
+        // is this manuscript one of this package's former msids?
+        DCValue[] formerMSIDs = item.getMetadata("dryad.formerManuscriptNumber");
+        if (formerMSIDs != null && formerMSIDs.length > 0) {
+            for (DCValue formerMSID : formerMSIDs) {
+                if (formerMSID.value.equalsIgnoreCase(manuscript.getManuscriptId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     // NOTE: identifier can be either journalCode or ISSN
-    public static List<Manuscript> getManuscriptsMatchingID(DryadJournalConcept journalConcept, String manuscriptId) {
+    private static List<Manuscript> getManuscriptsMatchingID(DryadJournalConcept journalConcept, String manuscriptId) {
         ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
         try {
             StoragePath storagePath = StoragePath.createManuscriptPath(journalConcept.getISSN(), getCanonicalManuscriptID(manuscriptId, journalConcept));
