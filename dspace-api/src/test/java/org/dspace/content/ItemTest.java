@@ -230,7 +230,7 @@ public class ItemTest extends AbstractDSpaceObjectTest
 
         // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),1));
-        assertThat("testFindInArchiveOrWithdrawnDiscoverableModifiedSince 0", all, notNullValue());
+        assertThat("Returned list should not be null", all, notNullValue());
 
         boolean added = false;
         while(all.hasNext()) {
@@ -241,11 +241,11 @@ public class ItemTest extends AbstractDSpaceObjectTest
         }
 
         // Test 1: we should NOT find our item in this list
-        assertFalse("testFindInArchiveOrWithdrawnDiscoverableModifiedSince 1", added);
+        assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
 
         // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),-1));
-        assertThat("testFindInArchiveOrWithdrawnDiscoverableModifiedSince 2", all, notNullValue());
+        assertThat("Returned list should not be null", all, notNullValue());
 
         added = false;
         while(all.hasNext()) {
@@ -255,7 +255,7 @@ public class ItemTest extends AbstractDSpaceObjectTest
             }
         }
         // Test 3: we should find our item in this list
-        assertTrue("testFindInArchiveOrWithdrawnDiscoverableModifiedSince 3", added);
+        assertTrue("List should contain item when passing a date older than item last-modified date", added);
 
         // Repeat Tests 2, 3 with withdrawn = false and archived = true as this should result in same behaviour
         it.setWithdrawn(false);
@@ -263,7 +263,7 @@ public class ItemTest extends AbstractDSpaceObjectTest
 
         // Test 4: Using a past 'modified since' date, we should get a non-null list containing our item
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),-1));
-        assertThat("testFindInArchiveOrWithdrawnDiscoverableModifiedSince 4", all, notNullValue());
+        assertThat("Returned list should not be null", all, notNullValue());
 
         added = false;
         while(all.hasNext()) {
@@ -273,7 +273,23 @@ public class ItemTest extends AbstractDSpaceObjectTest
             }
         }
         // Test 5: We should find our item in this list
-        assertTrue("testFindInArchiveOrWithdrawnDiscoverableModifiedSince 5", added);
+        assertTrue("List should contain item when passing a date older than item last-modified date", added);
+
+        // Test 6: Make sure non-discoverable items are not returned, regardless of archived/withdrawn state
+        it.setDiscoverable(false);
+        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),-1));
+        assertThat("Returned list should not be null", all, notNullValue());
+
+        added = false;
+        while(all.hasNext()) {
+            Item tmp = all.next();
+            if(tmp.equals(it)) {
+                added = true;
+            }
+        }
+        // Test 7: We should not find our item in this list
+        assertFalse("List should not contain non-discoverable items", added);
+
     }
 
     /**
@@ -288,7 +304,7 @@ public class ItemTest extends AbstractDSpaceObjectTest
 
         // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),1));
-        assertThat("testFindInArchiveOrWithdrawnNonDiscoverableModifiedSince 0", all, notNullValue());
+        assertThat("Returned list should not be null", all, notNullValue());
 
         boolean added = false;
         while(all.hasNext()) {
@@ -299,11 +315,11 @@ public class ItemTest extends AbstractDSpaceObjectTest
         }
 
         // Test 1: We should NOT find our item in this list
-        assertFalse("testFindInArchiveOrWithdrawnNonDiscoverableModifiedSince 1", added);
+        assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
 
         // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
         all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),-1));
-        assertThat("testFindInArchiveOrWithdrawnNonDiscoverableModifiedSince 2", all, notNullValue());
+        assertThat("Returned list should not be null", all, notNullValue());
 
         added = false;
         while(all.hasNext()) {
@@ -313,14 +329,14 @@ public class ItemTest extends AbstractDSpaceObjectTest
             }
         }
         // Test 3: We should find our item in this list
-        assertTrue("testFindInArchiveOrWithdrawnNonDiscoverableModifiedSince 3", added);
+        assertTrue("List should contain item when passing a date older than item last-modified date", added);
 
         // Repeat Tests 2, 3 with discoverable = true
         it.setDiscoverable(true);
 
         // Test 4: Now we should still get a non-null list with NO items since item is discoverable
         all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,DateUtils.addDays(it.getLastModified(),-1));
-        assertThat("testFindInArchiveOrWithdrawnNonDiscoverableModifiedSince 4", all, notNullValue());
+        assertThat("Returned list should not be null", all, notNullValue());
 
         added = false;
         while(all.hasNext()) {
@@ -330,7 +346,7 @@ public class ItemTest extends AbstractDSpaceObjectTest
             }
         }
         // Test 5: We should NOT find our item in this list
-        assertFalse("testFindInArchiveOrWithdrawnNonDiscoverableModifiedSince 5", added);
+        assertFalse("List should not contain discoverable items", added);
     }
 
     /**
