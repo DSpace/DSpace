@@ -1,5 +1,6 @@
 package org.dspace.app.xmlui.aspect.submission.submit;
 
+import org.datadryad.api.DryadDataFile;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.utils.UIException;
@@ -282,6 +283,12 @@ public class OverviewStep extends AbstractStep {
             datasetTitle = "Untitled";
 
         dataItem.addXref(HandleManager.resolveToURL(context, dataset.getHandle()), datasetTitle);
+        DryadDataFile dryadDataFile = new DryadDataFile(dataset);
+        Bitstream readme = dryadDataFile.getREADME();
+        if (readme != null) {
+            dataItem.addContent(" *includes README ");
+        }
+
 
         Button editButton = dataItem.addButton("submit_edit_dataset_" + wsDataset.getID());
         //To determine which name our button is getting check if we are through submission with this

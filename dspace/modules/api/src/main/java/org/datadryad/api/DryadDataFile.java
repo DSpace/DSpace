@@ -236,7 +236,26 @@ public class DryadDataFile extends DryadObject {
         return result;
     }
 
-    
+    public Bitstream getREADME() {
+        Item item = getItem();
+
+        try {
+            Bundle[] bundles = item.getBundles();
+
+            if (bundles.length > 0) {
+                Bitstream[] bitstreams = bundles[0].getBitstreams();
+                for (Bitstream bitstream : bitstreams) {
+                    if (bitstream.getName().toLowerCase().contains("readme")) {
+                        return bitstream;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("couldn't get bundles for item " + item.getID());
+        }
+        return null;
+    }
+
     public Long getTotalStorageSize() throws SQLException {
         // bundles and bitstreams
         Long size = 0L;
