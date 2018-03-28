@@ -276,8 +276,7 @@ public class XOAI {
             while (iterator.hasNext()) {
                 try {
                     Item item = iterator.next();
-                    System.out.println("indexing item " + item.getID());
-
+                    
                     server.add(this.index(item));
                     context.uncacheEntity(item);
 
@@ -436,19 +435,18 @@ public class XOAI {
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
             if (policy.getGroup().getName().equals("Anonymous")) {
-                System.out.println("found anonymous READ for item " + item.getID());
+                
                 if (policy.getStartDate() != null && policy.getStartDate().after(new Date())) {
-                    System.out.println("policy has start date after current date: " + policy.getStartDate());
+                    
                     return true;
                 }
                 if (policy.getEndDate() != null && policy.getEndDate().after(new Date())) {
-                    System.out.println("policy has end date after current date: " + policy.getEndDate());
+                    
                     return true;
                 }
             }
         }
-        System.out.println("all policies processed for item " + item.getID()
-                + "; based on current information, item will not change visibility in the future.");
+        
         return false;
     }
 
