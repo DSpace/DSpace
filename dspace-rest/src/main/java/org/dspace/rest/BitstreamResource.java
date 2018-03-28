@@ -45,6 +45,8 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.rest.common.Bitstream;
@@ -418,7 +420,8 @@ public class BitstreamResource extends Resource
     }
 
     /**
-     * Update bitstream metadata. Replaces format, sequenceId, bundle, and policies on targeted bitstream.
+     * Update bitstream metadata. Replaces (if non-null parameter) format, sequenceId, 
+     * bundle, and policies on targeted bitstream.
      * May throw WebApplicationException caused by two exceptions:
      * SQLException, if there was a problem with the database. AuthorizeException if
      * there was a problem with the authorization to edit bitstream metadata.
@@ -461,53 +464,69 @@ public class BitstreamResource extends Resource
 
             log.trace("Updating bitstream metadata.");
 
-            dspaceBitstream.setDescription(context, bitstream.getDescription());
-            if (getMimeType(bitstream.getName()) == null)
+            if (bitstream.getDescription() != null)
             {
-                BitstreamFormat unknownFormat = bitstreamFormatService.findUnknown(context);
-                bitstreamService.setFormat(context, dspaceBitstream, unknownFormat);
+                dspaceBitstream.setDescription(context, bitstream.getDescription());
             }
-            else
+            if (bitstream.getName() != null) 
             {
-                BitstreamFormat guessedFormat = bitstreamFormatService.findByMIMEType(context, getMimeType(bitstream.getName()));
-                bitstreamService.setFormat(context, dspaceBitstream, guessedFormat);
+                if (getMimeType(bitstream.getName()) == null)
+                {
+                    BitstreamFormat unknownFormat = bitstreamFormatService.findUnknown(context);
+                    bitstreamService.setFormat(context, dspaceBitstream, unknownFormat);
+                }
+                else
+                {
+                    BitstreamFormat guessedFormat = bitstreamFormatService.findByMIMEType(context, getMimeType(bitstream.getName()));
+                    bitstreamService.setFormat(context, dspaceBitstream, guessedFormat);
+                }
+                dspaceBitstream.setName(context, bitstream.getName());
             }
-            dspaceBitstream.setName(context, bitstream.getName());
+
             Integer sequenceId = bitstream.getSequenceId();
             if (sequenceId != null && sequenceId.intValue() != -1)
             {
                 dspaceBitstream.setSequenceID(sequenceId);
             }
 
-            if(bitstream.getBundleName() != null)
+            if (bitstream.getBundleName() != null)
             {
+                DSpaceObject parentItem = bitstreamService.getParentObject(context, dspaceBitstream);
+                // A logo bitstream might not have a bundle...
+                if (parentItem.getType() != Constants.ITEM) 
+                { 
+                    log.error("Can't set bundle for bitstream(id=" + bitstreamId + "), parent is not ITEM.");
+                    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+                }
+
                 //find the bundle with the desired name or create it if necessary
-                Item parentItem = (Item) bitstreamService.getParentObject(context, dspaceBitstream);
                 Bundle namedBundle = null;
-                for (Bundle existingBundle : parentItem.getBundles()) {
-                    if (existingBundle.getName().equals(bitstream.getBundleName())) {
+                List<Bundle> itemBundles = ((Item)parentItem).getBundles();
+                for (Bundle existingBundle : itemBundles) {
+                    if (existingBundle.getName().equals(bitstream.getBundleName()))
+                    {
                         namedBundle = existingBundle;
                         break;
-                    } else {
-                        namedBundle = bundleService.create(context, parentItem, bitstream.getBundleName());
                     }
                 }
-
-                if (namedBundle != null) 
+                if (namedBundle == null)
                 {
-                    log.trace("Placing bitstream in bundle " + bitstream.getBundleName());
-
-                    //remove the bitstream from its current bundles
-                    List<Bundle> bundles = dspaceBitstream.getBundles();
-                    for (Bundle bundle : bundles) 
-                    {
-                        bundle.removeBitstream(dspaceBitstream);
-                    }
-
-                    //put the bitstream in the named bundle
-                    bundleService.addBitstream(context, namedBundle, dspaceBitstream);
+                    namedBundle = bundleService.create(context, (Item)parentItem, bitstream.getBundleName());
                 }
+
+                log.trace("Placing bitstream in bundle " + bitstream.getBundleName());
+
+                //remove the bitstream from its current bundles
+                List<Bundle> bundles = dspaceBitstream.getBundles();
+                for (Bundle bundle : bundles) 
+                {
+                    bundle.removeBitstream(dspaceBitstream);
+                }
+
+                //put the bitstream in the named bundle
+                bundleService.addBitstream(context, namedBundle, dspaceBitstream);
             }
+
 
             bitstreamService.update(context, dspaceBitstream);
 
@@ -526,7 +545,6 @@ public class BitstreamResource extends Resource
             }
 
             context.complete();
-
         }
         catch (SQLException e)
         {
