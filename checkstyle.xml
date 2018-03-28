@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC
+        "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://checkstyle.sourceforge.net/dtds/configuration_1_3.dtd">
+<!--
+DSpace CodeStyle Requirements
+
+  1. 4-space indents for Java, and 2-space indents for XML. NO TABS ALLOWED.
+  2. K&R style braces required. Braces required on all blocks.
+  3. Do not use wildcard imports (e.g. import java.util.*). Duplicated or unused imports also not allowed.
+  4. Javadocs should exist for all public classes and methods. (Methods rule is unenforced at this time.) Keep it short and to the point
+  5. Maximum line length is 120 characters (except for long URLs, packages or imports)
+  6. No trailing spaces allowed (except in comments)
+  7. Tokens should be surrounded by whitespace (see http://checkstyle.sourceforge.net/config_whitespace.html#WhitespaceAround)
+  8. Each source file must include our license header (validated separately by license-maven-plugin, see pom.xml)
+
+For more information on CheckStyle configurations below, see: http://checkstyle.sourceforge.net/checks.html
+-->
+<module name="Checker">
+    <!-- Configure checker to use UTF-8 encoding -->
+    <property name="charset" value="UTF-8"/>
+    <!-- Configure checker to run on files with these extensions -->
+    <property name="fileExtensions" value="java, properties, cfg, xml"/>
+
+    <!-- Suppression configurations in checkstyle-suppressions.xml in same directory -->
+    <module name="SuppressionFilter">
+        <property name="file" value="${checkstyle.suppressions.file}" default="checkstyle-suppressions.xml"/>
+    </module>
+
+    <!-- No tab characters ('\t') allowed in the source code -->
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+        <property name="fileExtensions" value="java, properties, cfg, css, js, xml"/>
+    </module>
+
+    <!-- No Trailing Whitespace, except on lines that only have an asterisk (e.g. Javadoc comments) -->
+    <module name="RegexpSingleline">
+        <property name="format" value="(?&lt;!\*)\s+$|\*\s\s+$"/>
+        <property name="message" value="Line has trailing whitespace"/>
+        <property name="fileExtensions" value="java, properties, cfg, css, js, xml"/>
+    </module>
+
+    <!-- Allow individual lines of code to be excluded from these rules, if they are annotated
+         with @SuppressWarnings. See also SuppressWarningsHolder below -->
+    <module name="SuppressWarningsFilter" />
+
+    <!-- Check individual Java source files for specific rules -->
+    <module name="TreeWalker">
+        <!-- Maximum line length is 120 characters -->
+        <module name="LineLength">
+            <property name="max" value="120"/>
+            <!-- Only exceptions for packages, imports, URLs, and JavaDoc {@link} tags -->
+            <property name="ignorePattern" value="^package.*|^import.*|http://|https://|@link"/>
+        </module>
+
+        <!-- Highlight any TODO or FIXME comments in info messages -->
+        <module name="TodoComment">
+            <property name="severity" value="info"/>
+            <property name="format" value="(TODO)|(FIXME)"/>
+        </module>
+
+        <!-- Do not report errors on any lines annotated with @SuppressWarnings -->
+        <module name="SuppressWarningsHolder"/>
+
+        <!-- ##### Import statement requirements ##### -->
+        <!-- Star imports (e.g. import java.util.*) are NOT ALLOWED -->
+        <module name="AvoidStarImport"/>
+        <!-- Redundant import statements are NOT ALLOWED -->
+        <module name="RedundantImport"/>
+        <!-- Unused import statements are NOT ALLOWED -->
+        <module name="UnusedImports"/>
+        <!-- Ensure imports appear alphabetically and grouped -->
+        <module name="CustomImportOrder">
+            <property name="sortImportsInGroupAlphabetically" value="true"/>
+            <property name="separateLineBetweenGroups" value="true"/>
+            <property name="customImportOrderRules" value="STATIC###STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE"/>
+        </module>
+
+        <!-- ##### Javadocs requirements ##### -->
+        <!-- Requirements for Javadocs for classes/interfaces -->
+        <module name="JavadocType">
+            <!-- All public classes/interfaces MUST HAVE Javadocs -->
+            <property name="scope" value="public"/>
+            <!-- Add an exception for anonymous inner classes -->
+            <property name="excludeScope" value="anoninner"/>
+            <!-- Ignore errors related to unknown tags -->
+            <property name="allowUnknownTags" value="true"/>
+            <!-- Allow params tags to be optional -->
+            <property name="allowMissingParamTags" value="false"/>
+        </module>
+        <!-- Requirements for Javadocs for methods -->
+        <module name="JavadocMethod">
+            <!-- All public methods MUST HAVE Javadocs -->
+            <!-- <property name="scope" value="public"/> -->
+            <!-- TODO: Above rule has been disabled because of large amount of missing public method Javadocs -->
+            <property name="scope" value="nothing"/>
+            <!-- Allow RuntimeExceptions to be undeclared -->
+            <property name="allowUndeclaredRTE" value="true"/>
+            <!-- Allow params, throws and return tags to be optional -->
+            <property name="allowMissingParamTags" value="true"/>
+            <property name="allowMissingThrowsTags" value="true"/>
+            <property name="allowMissingReturnTag" value="true"/>
+        </module>
+
+        <!-- ##### Requirements for K&R Style braces ##### -->
+        <!-- Code blocks MUST HAVE braces, even single line statements (if, while, etc) -->
+        <module name="NeedBraces"/>
+        <!-- Left braces should be at the end of current line (default value)-->
+        <module name="LeftCurly"/>
+        <!-- Right braces should be on start of a new line (default value) -->
+        <module name="RightCurly"/>
+
+        <!-- ##### Indentation / Whitespace requirements ##### -->
+        <!-- Require 4-space indentation (default value) -->
+        <module name="Indentation"/>
+        <!-- Whitespace should exist around all major tokens -->
+        <module name="WhitespaceAround">
+            <!-- However, make an exception for empty constructors, methods, types, etc. -->
+            <property name="allowEmptyConstructors" value="true"/>
+            <property name="allowEmptyMethods" value="true"/>
+            <property name="allowEmptyTypes" value="true"/>
+            <property name="allowEmptyLoops" value="true"/>
+        </module>
+        <!-- Validate whitespace around Generics (angle brackets) per typical conventions
+             http://checkstyle.sourceforge.net/config_whitespace.html#GenericWhitespace -->
+        <module name="GenericWhitespace"/>
+
+        <!-- ##### Requirements for "switch" statements ##### -->
+        <!-- "switch" statements MUST have a "default" clause -->
+        <module name="MissingSwitchDefault"/>
+        <!-- "case" clauses in switch statements MUST include break, return, throw or continue -->
+        <module name="FallThrough"/>
+
+        <!-- ##### Other / Miscellaneous requirements ##### -->
+        <!-- Require utility classes do not have a public constructor -->
+        <module name="HideUtilityClassConstructor"/>
+        <!-- Require each variable declaration is its own statement on its own line -->
+        <module name="MultipleVariableDeclarations"/>
+        <!-- Each line of code can only include one statement -->
+        <module name="OneStatementPerLine"/>
+        <!-- Require that "catch" statements are not empty (must at least contain a comment) -->
+        <module name="EmptyCatchBlock"/>
+    </module>
+</module>

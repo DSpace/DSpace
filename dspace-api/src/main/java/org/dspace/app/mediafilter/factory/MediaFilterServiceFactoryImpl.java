@@ -11,7 +11,8 @@ import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the mediafilter package, use MediaFilterServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the mediafilter package, use MediaFilterServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

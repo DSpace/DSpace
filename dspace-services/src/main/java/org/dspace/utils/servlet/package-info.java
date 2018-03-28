@@ -5,8 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
+
 /**
- * Connect a servlet container with the DSpace Services framework, in a 
+ * Connect a servlet container with the DSpace Services framework, in a
  * web application context.
  */
 

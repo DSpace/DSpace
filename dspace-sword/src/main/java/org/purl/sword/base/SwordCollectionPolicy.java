@@ -8,27 +8,22 @@
 package org.purl.sword.base;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
-public class SwordCollectionPolicy extends BasicStringContentElement
-{
+public class SwordCollectionPolicy extends BasicStringContentElement {
     private static final XmlName XML_NAME =
-            new XmlName(Namespaces.PREFIX_SWORD, "collectionPolicy", Namespaces.NS_SWORD);
+        new XmlName(Namespaces.PREFIX_SWORD, "collectionPolicy", Namespaces.NS_SWORD);
 
-    public SwordCollectionPolicy()
-    {
+    public SwordCollectionPolicy() {
         super(XML_NAME);
     }
 
-    public SwordCollectionPolicy(String version)
-    {
+    public SwordCollectionPolicy(String version) {
         this();
-        setContent(version); 
+        setContent(version);
     }
 
-    public static XmlName elementName()
-    {
+    public static XmlName elementName() {
         return XML_NAME;
     }
 }

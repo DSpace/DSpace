@@ -11,19 +11,17 @@ package org.dspace.servicemanager.config;
  * A test bean which we will configure to load its one property via ConfigurationService.
  * <P>
  * See 'spring-test-beans.xml' and DSpaceConfigurationFactoryBeanTest.
+ *
  * @author Tim Donohue
  */
-public class TestDynamicPropertyBean
-{
+public class TestDynamicPropertyBean {
     private String value;
 
-    public void setProperty(String value)
-    {
+    public void setProperty(String value) {
         this.value = value;
     }
 
-    public String getProperty()
-    {
+    public String getProperty() {
         return this.value;
     }
 }

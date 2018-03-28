@@ -23,43 +23,36 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
     public static final String FILTER_TYPE_FACET = "facet";
 
 
-    public int getFacetLimit()
-    {
-        if(facetLimit == -1){
+    public int getFacetLimit() {
+        if (facetLimit == -1) {
             return DEFAULT_FACET_LIMIT;
-        }else{
+        } else {
             return facetLimit;
         }
     }
 
-    public void setFacetLimit(int facetLimit)
-    {
+    public void setFacetLimit(int facetLimit) {
         this.facetLimit = facetLimit;
     }
 
-    public DiscoveryConfigurationParameters.SORT getSortOrderFilterPage()
-    {
+    public DiscoveryConfigurationParameters.SORT getSortOrderFilterPage() {
         return sortOrderFilterPage;
     }
 
-    public void setSortOrderFilterPage(DiscoveryConfigurationParameters.SORT sortOrderFilterPage)
-    {
+    public void setSortOrderFilterPage(DiscoveryConfigurationParameters.SORT sortOrderFilterPage) {
         this.sortOrderFilterPage = sortOrderFilterPage;
     }
 
-    public DiscoveryConfigurationParameters.SORT getSortOrderSidebar()
-    {
+    public DiscoveryConfigurationParameters.SORT getSortOrderSidebar() {
         return sortOrderSidebar;
     }
 
-    public void setSortOrderSidebar(DiscoveryConfigurationParameters.SORT sortOrderSidebar)
-    {
+    public void setSortOrderSidebar(DiscoveryConfigurationParameters.SORT sortOrderSidebar) {
         this.sortOrderSidebar = sortOrderSidebar;
     }
 
     @Override
-    public String getFilterType()
-    {
+    public String getFilterType() {
         return FILTER_TYPE_FACET;
     }
 }

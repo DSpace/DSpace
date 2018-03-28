@@ -7,6 +7,9 @@
  */
 package org.dspace.versioning.dao.impl;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -17,9 +20,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Version object.
@@ -32,10 +32,8 @@ import java.util.List;
  * @author kevinvandevelde at atmire.com
  * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  */
-public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements VersionDAO
-{
-    protected VersionDAOImpl()
-    {
+public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements VersionDAO {
+    protected VersionDAOImpl() {
         super();
     }
 
@@ -48,19 +46,18 @@ public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements Ver
 
     @Override
     public int getNextVersionNumber(Context c, VersionHistory vh) throws SQLException {
-        Query q = this.createQuery(c, 
-                "SELECT (COALESCE(MAX(versionNumber), 0) + 1) "
-                        + "FROM Version WHERE versionHistory.id = :historyId");
+        Query q = this.createQuery(c,
+                                   "SELECT (COALESCE(MAX(versionNumber), 0) + 1) "
+                                       + "FROM Version WHERE versionHistory.id = :historyId");
         q.setParameter("historyId", vh.getID());
 
         int next = (Integer) q.uniqueResult();
         return next;
     }
-    
+
     @Override
     public List<Version> findVersionsWithItems(Context context, VersionHistory versionHistory)
-            throws SQLException
-    {
+        throws SQLException {
         Criteria criteria = createCriteria(context, Version.class);
         criteria.add(Restrictions.eq("versionHistory", versionHistory));
         criteria.add(Restrictions.and(Restrictions.isNotNull("item")));

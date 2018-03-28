@@ -10,24 +10,11 @@ package org.dspace.content.authority;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.ArrayList;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.SAXParser;
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.dspace.content.Collection;
-import org.xml.sax.XMLReader;
-import org.xml.sax.InputSource;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
-import org.apache.log4j.Logger;
-
-import org.dspace.core.ConfigurationManager;
-import org.dspace.content.DCPersonName;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -35,6 +22,16 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.log4j.Logger;
+import org.dspace.content.Collection;
+import org.dspace.content.DCPersonName;
+import org.dspace.core.ConfigurationManager;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Sample personal name authority based on Library of Congress Name Authority
@@ -52,15 +49,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
  *
  * Reads these DSpace Config properties:
  *
- *      lcname.url = http://alcme.oclc.org/srw/search/lcnaf
+ * lcname.url = http://alcme.oclc.org/srw/search/lcnaf
  *
- *  TODO: make # of results to ask for (and return) configurable.
+ * TODO: make # of results to ask for (and return) configurable.
  *
  * @author Larry Stone
  * @version $Revision $
  */
-public class LCNameAuthority implements ChoiceAuthority
-{
+public class LCNameAuthority implements ChoiceAuthority {
     private static final Logger log = Logger.getLogger(LCNameAuthority.class);
 
     // get these from configuration
@@ -73,15 +69,12 @@ public class LCNameAuthority implements ChoiceAuthority
     protected static final String NS_MX = "http://www.loc.gov/MARC21/slim";
 
     // constructor does static init too..
-    public LCNameAuthority()
-    {
-        if (url == null)
-        {
+    public LCNameAuthority() {
+        if (url == null) {
             url = ConfigurationManager.getProperty("lcname.url");
 
             // sanity check
-            if (url == null)
-            {
+            if (url == null) {
                 throw new IllegalStateException("Missing DSpace configuration keys for LCName Query");
             }
         }
@@ -89,8 +82,7 @@ public class LCNameAuthority implements ChoiceAuthority
 
     // punt!  this is a poor implementation..
     @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale)
-    {
+    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
         return getMatches(field, text, collection, 0, 2, locale);
     }
 
@@ -99,22 +91,19 @@ public class LCNameAuthority implements ChoiceAuthority
      * Value is assumed to be in "Lastname, Firstname" format.
      */
     @Override
-    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale)
-    {
+    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
         Choices result = queryPerson(text, start, limit);
-        if (result == null)
-        {
+        if (result == null) {
             result = new Choices(true);
         }
-        
+
         return result;
     }
 
     // punt; supposed to get the canonical display form of a metadata authority key
     // XXX FIXME implement this with a query on the authority key, cache results
     @Override
-    public String getLabel(String field, String key, String locale)
-    {
+    public String getLabel(String field, String key, String locale) {
         return key;
     }
 
@@ -122,11 +111,9 @@ public class LCNameAuthority implements ChoiceAuthority
      * Guts of the implementation, returns a complete Choices result, or
      * null for a failure.
      */
-    private Choices queryPerson(String text, int start, int limit)
-    {
+    private Choices queryPerson(String text, int start, int limit) {
         // punt if there is no query text
-        if (text == null || text.trim().length() == 0)
-        {
+        if (text == null || text.trim().length() == 0) {
             return new Choices(true);
         }
 
@@ -134,12 +121,11 @@ public class LCNameAuthority implements ChoiceAuthority
         DCPersonName pn = new DCPersonName(text);
         StringBuilder query = new StringBuilder();
         query.append("local.FirstName = \"").append(pn.getFirstNames()).
-          append("\" and local.FamilyName = \"").append(pn.getLastName()).
-          append("\"");
+            append("\" and local.FamilyName = \"").append(pn.getLastName()).
+                 append("\"");
 
         // XXX arbitrary default limit - should be configurable?
-        if (limit == 0)
-        {
+        if (limit == 0) {
             limit = 50;
         }
 
@@ -151,7 +137,7 @@ public class LCNameAuthority implements ChoiceAuthority
             builder.addParameter("recordSchema", "info:srw/schema/1/marcxml-v1.1");
             builder.addParameter("query", query.toString());
             builder.addParameter("maximumRecords", String.valueOf(limit));
-            builder.addParameter("startRecord", String.valueOf(start+1));
+            builder.addParameter("startRecord", String.valueOf(start + 1));
             sruUri = builder.build();
         } catch (URISyntaxException e) {
             log.error("SRU query failed: ", e);
@@ -162,12 +148,10 @@ public class LCNameAuthority implements ChoiceAuthority
         log.debug("Trying SRU query, URL=" + sruUri);
 
         // 2. web request
-        try
-        {
+        try {
             HttpClient hc = new DefaultHttpClient();
             HttpResponse response = hc.execute(get);
-            if (response.getStatusLine().getStatusCode() == 200)
-            {
+            if (response.getStatusLine().getStatusCode() == 200) {
                 SAXParserFactory spf = SAXParserFactory.newInstance();
                 SAXParser sp = spf.newSAXParser();
                 XMLReader xr = sp.getXMLReader();
@@ -182,52 +166,38 @@ public class LCNameAuthority implements ChoiceAuthority
                 xr.parse(new InputSource(responseBody.getContent()));
 
                 // this probably just means more results available..
-                if (handler.hits != handler.result.size())
-                {
+                if (handler.hits != handler.result.size()) {
                     log.warn("Discrepency in results, result.length=" + handler.result.size() +
-                            ", yet expected results=" + handler.hits);
+                                 ", yet expected results=" + handler.hits);
                 }
                 boolean more = handler.hits > (start + handler.result.size());
 
                 // XXX add non-auth option; perhaps the UI should do this?
                 // XXX it's really a policy matter if they allow unauth result.
-                   // XXX good, stop it.
+                // XXX good, stop it.
                 // handler.result.add(new Choice("", text, "Non-Authority: \""+text+"\""));
 
                 int confidence;
-                if (handler.hits == 0)
-                {
+                if (handler.hits == 0) {
                     confidence = Choices.CF_NOTFOUND;
-                }
-                else if (handler.hits == 1)
-                {
+                } else if (handler.hits == 1) {
                     confidence = Choices.CF_UNCERTAIN;
-                }
-                else
-                {
+                } else {
                     confidence = Choices.CF_AMBIGUOUS;
                 }
                 return new Choices(handler.result.toArray(new Choice[handler.result.size()]),
                                    start, handler.hits, confidence, more);
             }
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             log.error("SRU query failed: ", e);
             return new Choices(true);
-        }
-        catch (ParserConfigurationException  e)
-        {
+        } catch (ParserConfigurationException e) {
             log.warn("Failed parsing SRU result: ", e);
             return new Choices(true);
-        }
-        catch (SAXException  e)
-        {
+        } catch (SAXException e) {
             log.warn("Failed parsing SRU result: ", e);
             return new Choices(true);
-        }
-        finally
-        {
+        } finally {
             get.releaseConnection();
         }
         return new Choices(true);
@@ -241,8 +211,7 @@ public class LCNameAuthority implements ChoiceAuthority
      * Should probably read other 100 subfields to build a more detailed label.
      */
     private static class SRUHandler
-        extends DefaultHandler
-    {
+        extends DefaultHandler {
         private List<Choice> result = new ArrayList<Choice>();
         private int hits = -1;
         private String textValue = null;
@@ -258,17 +227,12 @@ public class LCNameAuthority implements ChoiceAuthority
         // options of a real object system like CLOS?)
         @Override
         public void characters(char[] ch, int start, int length)
-            throws SAXException
-        {
+            throws SAXException {
             String newValue = new String(ch, start, length);
-            if (newValue.length() > 0)
-            {
-                if (textValue == null)
-                {
+            if (newValue.length() > 0) {
+                if (textValue == null) {
                     textValue = newValue;
-                }
-                else
-                {
+                } else {
                     textValue += newValue;
                 }
             }
@@ -276,62 +240,44 @@ public class LCNameAuthority implements ChoiceAuthority
 
         @Override
         public void endElement(String namespaceURI, String localName,
-                                 String qName)
-            throws SAXException
-        {
+                               String qName)
+            throws SAXException {
             if (localName.equals("numberOfRecords") &&
-                     namespaceURI.equals(NS_SRU))
-            {
+                namespaceURI.equals(NS_SRU)) {
                 hits = Integer.parseInt(textValue.trim());
-                if (hits > 0)
-                {
+                if (hits > 0) {
                     name = null;
                     lccn = null;
-                    log.debug("Expecting "+hits+" records in results.");
+                    log.debug("Expecting " + hits + " records in results.");
                 }
-            }
-
-            // after record get next hit ready
-            else if (localName.equals("record") &&
-                     namespaceURI.equals(NS_SRU))
-            {
-                if (name != null && lccn != null)
-                {
+            } else if (localName.equals("record") &&
+                namespaceURI.equals(NS_SRU)) {
+                // after record get next hit ready
+                if (name != null && lccn != null) {
                     // HACK: many LC name entries end with ',' ...trim it.
-                    if (name.endsWith(","))
-                    {
+                    if (name.endsWith(",")) {
                         name = name.substring(0, name.length() - 1);
                     }
 
                     // XXX DEBUG
                     // log.debug("Got result, name="+name+", lccn="+lccn);
                     result.add(new Choice(lccn, name, name));
-                }
-                else
-                {
+                } else {
                     log.warn("Got anomalous result, at least one of these null: lccn=" + lccn + ", name=" + name);
                 }
                 name = null;
                 lccn = null;
-            }
-
-            else if (localName.equals("subfield") && namespaceURI.equals(NS_MX))
-            {
-                if (lastTag != null && lastCode != null)
-                {
-                    if (lastTag.equals("010") && lastCode.equals("a"))
-                    {
+            } else if (localName.equals("subfield") && namespaceURI.equals(NS_MX)) {
+                if (lastTag != null && lastCode != null) {
+                    if (lastTag.equals("010") && lastCode.equals("a")) {
                         // 010.a is lccn, "authority code"
                         lccn = textValue;
-                    }
-                    else if (lastTag.equals("100") && lastCode.equals("a"))
-                    {
+                    } else if (lastTag.equals("100") && lastCode.equals("a")) {
                         // 100.a is the personal name
                         name = textValue;
                     }
 
-                    if (lastTag.equals("100") && lastCode.equals("d") && (name != null))
-                    {
+                    if (lastTag.equals("100") && lastCode.equals("d") && (name != null)) {
                         name = name + "  " + textValue;
                     }
                 }
@@ -342,25 +288,19 @@ public class LCNameAuthority implements ChoiceAuthority
         @Override
         public void startElement(String namespaceURI, String localName,
                                  String qName, Attributes atts)
-            throws SAXException
-        {
+            throws SAXException {
             textValue = null;
 
             if (localName.equals("datafield") &&
-                     namespaceURI.equals(NS_MX))
-            {
+                namespaceURI.equals(NS_MX)) {
                 lastTag = atts.getValue("tag");
-                if (lastTag == null)
-                {
+                if (lastTag == null) {
                     log.warn("MARC datafield without tag attribute!");
                 }
-            }
-            else if (localName.equals("subfield") &&
-                     namespaceURI.equals(NS_MX))
-            {
+            } else if (localName.equals("subfield") &&
+                namespaceURI.equals(NS_MX)) {
                 lastCode = atts.getValue("code");
-                if (lastCode == null)
-                {
+                if (lastCode == null) {
                     log.warn("MARC subfield without code attribute!");
                 }
             }
@@ -368,15 +308,13 @@ public class LCNameAuthority implements ChoiceAuthority
 
         @Override
         public void error(SAXParseException exception)
-            throws SAXException
-        {
+            throws SAXException {
             throw new SAXException(exception);
         }
 
         @Override
         public void fatalError(SAXParseException exception)
-            throws SAXException
-        {
+            throws SAXException {
             throw new SAXException(exception);
         }
     }

@@ -7,7 +7,10 @@
  */
 package org.dspace.services.caching;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -25,7 +28,7 @@ import org.junit.Test;
 
 /**
  * Testing the caching service
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class CachingServiceTest extends DSpaceAbstractKernelTest {
@@ -65,7 +68,8 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.caching.CachingServiceImpl#instantiateEhCache(java.lang.String, org.dspace.services.model.CacheConfig)}.
+     * Test method for
+     * {@link org.dspace.services.caching.CachingServiceImpl#instantiateEhCache(java.lang.String, org.dspace.services.model.CacheConfig)}.
      */
     @Test
     public void testInstantiateEhCache() {
@@ -80,13 +84,14 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         EhcacheCache cache2 = cachingService.instantiateEhCache("aaronz-eh", null);
         assertNotNull(cache2);
         assertEquals(cache2, cache);
-        
+
         //trash the references
         cache = cache2 = null;
     }
 
     /**
-     * Test method for {@link org.dspace.services.caching.CachingServiceImpl#instantiateMapCache(java.lang.String, org.dspace.services.model.CacheConfig)}.
+     * Test method for
+     * {@link org.dspace.services.caching.CachingServiceImpl#instantiateMapCache(java.lang.String, org.dspace.services.model.CacheConfig)}.
      */
     @Test
     public void testInstantiateMapCache() {
@@ -105,13 +110,14 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         assertEquals(cache2, cache);
 
         requestService.endRequest(null);
-        
+
         //trash the references
         cache = cache2 = null;
     }
 
     /**
-     * Test method for {@link org.dspace.services.caching.CachingServiceImpl#getCache(java.lang.String, org.dspace.services.model.CacheConfig)}.
+     * Test method for
+     * {@link org.dspace.services.caching.CachingServiceImpl#getCache(java.lang.String, org.dspace.services.model.CacheConfig)}.
      */
     @Test
     public void testGetCache() {
@@ -146,7 +152,7 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         Cache c2 = cachingService.getCache("org.dspace.aztest", null);
         assertNotNull(c2);
         assertEquals(c1, c2);
-        
+
         //trash the references
         cache = sampleCache = c1 = rc1 = c2 = null;
 
@@ -170,12 +176,12 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         Cache c1 = cachingService.getCache("org.dspace.timtest.newcache", null);
         assertNotNull(c1);
 
-        // Test that new cache was created and total caches increases by one 
+        // Test that new cache was created and total caches increases by one
         caches = cachingService.getCaches();
         assertNotNull(caches);
-        assertEquals(curSize+1, caches.size());
+        assertEquals(curSize + 1, caches.size());
         assertTrue(caches.contains(c1));
-        
+
         //trash the references
         memCache = c1 = null;
     }
@@ -213,7 +219,7 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
 
         assertEquals(null, c1.get("AZ"));
         assertEquals(0, c1.size());
-        
+
         c1 = null;
     }
 
@@ -244,7 +250,7 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
         Cache cb = cachingService.getCache("org.dspace.aztest", null);
         assertNotNull(cb);
         assertNotSame(ca, cb);
-        
+
         //trash the references
         cache = c2 = ca = cb = null;
     }

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-api</artifactId>
@@ -205,14 +206,15 @@
                         <executions>
                             <execution>
                                 <id>setproperty</id>
-                                <phase>generate-test-resources</phase> <!-- XXX I think this should be 'initialize' - MHW -->
+                                <phase>generate-test-resources
+                                </phase> <!-- XXX I think this should be 'initialize' - MHW -->
                                 <goals>
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
                                     <source>
-                                    project.properties['agnostic.build.dir']=project.build.directory.replace(File.separator,'/');
-                                    println("Initializing Maven property 'agnostic.build.dir' to: " + project.properties['agnostic.build.dir']);
+                                        project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/');
+                                        println("Initializing Maven property 'agnostic.build.dir' to: " + project.properties['agnostic.build.dir']);
                                     </source>
                                 </configuration>
                             </execution>
@@ -239,38 +241,37 @@
                         <artifactId>xml-maven-plugin</artifactId>
                         <version>1.0.1</version>
                         <executions>
-                          <execution>
-                            <id>validate-ALL-xml-and-xsl</id>
-                            <phase>process-test-resources</phase>
-                            <goals>
-                              <goal>validate</goal>
-                            </goals>
-                          </execution>
+                            <execution>
+                                <id>validate-ALL-xml-and-xsl</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>validate</goal>
+                                </goals>
+                            </execution>
                         </executions>
                         <configuration>
-                          <validationSets>
-                            <!-- validate ALL XML and XSL config files in the testing folder -->
-                             <validationSet>
-                                 <dir>${agnostic.build.dir}/testing</dir>
-                                 <includes>
-                                     <include>**/*.xml</include>
-                                     <include>**/*.xsl</include>
-                                     <include>**/*.xconf</include>
-                                 </includes>
-                             </validationSet>
-                             <!-- validate ALL XML and XSL files throughout the project -->
-                             <validationSet>
-                                <dir>${root.basedir}</dir>
-                                 <includes>
-                                     <include>**/*.xml</include>
-                                     <include>**/*.xsl</include>
-                                     <include>**/*.xmap</include>
-                                 </includes>
-                              </validationSet>
-                          </validationSets>
+                            <validationSets>
+                                <!-- validate ALL XML and XSL config files in the testing folder -->
+                                <validationSet>
+                                    <dir>${agnostic.build.dir}/testing</dir>
+                                    <includes>
+                                        <include>**/*.xml</include>
+                                        <include>**/*.xsl</include>
+                                        <include>**/*.xconf</include>
+                                    </includes>
+                                </validationSet>
+                                <!-- validate ALL XML and XSL files throughout the project -->
+                                <validationSet>
+                                    <dir>${root.basedir}</dir>
+                                    <includes>
+                                        <include>**/*.xml</include>
+                                        <include>**/*.xsl</include>
+                                        <include>**/*.xmap</include>
+                                    </includes>
+                                </validationSet>
+                            </validationSets>
                         </configuration>
                     </plugin>
-
 
 
                     <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
@@ -291,7 +292,6 @@
         </profile>
     </profiles>
 
-
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -304,13 +304,24 @@
             </exclusions>
         </dependency>
         <dependency>
-        	<groupId>org.hibernate</groupId>
-        	<artifactId>hibernate-ehcache</artifactId>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-ehcache</artifactId>
+        </dependency>
+        <dependency>
+           <groupId>org.hibernate</groupId>
+           <artifactId>hibernate-validator-cdi</artifactId>
+           <version>${hibernate-validator.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.1-b10</version>
+        </dependency>
+
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
@@ -353,6 +364,10 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -415,8 +430,8 @@
             <artifactId>pdfbox</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.apache.pdfbox</groupId>
-           <artifactId>fontbox</artifactId>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>fontbox</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -497,15 +512,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.databene</groupId>
-            <artifactId>contiperf</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.rometools</groupId>
             <artifactId>rome-modules</artifactId>
@@ -584,9 +595,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-            <version>1.4.0</version>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>4.10.4</version>
         </dependency>
 
         <dependency>
@@ -672,7 +683,6 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.9.2</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -697,7 +707,7 @@
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>2.22.1</version>
+            <version>${jersey.version}</version>
         </dependency>
         <!-- S3 -->
         <dependency>
@@ -719,17 +729,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.7.0</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.7.0</version>
+            <version>${jackson.version}</version>
         </dependency>
     </dependencies>
 

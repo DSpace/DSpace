@@ -16,27 +16,25 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.dspace.core.ConfigurationManager;
 
 /**
- * 
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
-public class DSpaceSolrServer
-{
+public class DSpaceSolrServer {
     private static Logger log = LogManager.getLogger(DSpaceSolrServer.class);
 
     private static SolrServer _server = null;
 
-    public static SolrServer getServer() throws SolrServerException
-    {
-        if (_server == null)
-        {
-            try
-            {
+    /**
+     * Default constructor
+     */
+    private DSpaceSolrServer() { }
+
+    public static SolrServer getServer() throws SolrServerException {
+        if (_server == null) {
+            try {
                 _server = new HttpSolrServer(
-                        ConfigurationManager.getProperty("oai", "solr.url"));
+                    ConfigurationManager.getProperty("oai", "solr.url"));
                 log.debug("Solr Server Initialized");
-            }            
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         }

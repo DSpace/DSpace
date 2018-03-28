@@ -7,9 +7,9 @@
  */
 package org.dspace.discovery.configuration;
 
-import org.springframework.beans.factory.annotation.Required;
-
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -44,23 +44,20 @@ public class DiscoverySearchFilter {
     }
 
     public void setType(String type) throws DiscoveryConfigurationException {
-        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_TEXT))
-        {
+        if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_TEXT)) {
             this.type = DiscoveryConfigurationParameters.TYPE_TEXT;
-        } else
-        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_DATE))
-        {
+        } else if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_DATE)) {
             this.type = DiscoveryConfigurationParameters.TYPE_DATE;
-        } else
-        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL))
-        {
-            throw new DiscoveryConfigurationException("The " + type + " can't be used with a default side bar facet use the \"HierarchicalSidebarFacetConfiguration\" class instead.");
-        }else{
+        } else if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)) {
+            throw new DiscoveryConfigurationException(
+                "The " + type + " can't be used with a default side bar facet use the " +
+                    "\"HierarchicalSidebarFacetConfiguration\" class instead.");
+        } else {
             this.type = type;
         }
     }
 
-    public String getFilterType(){
+    public String getFilterType() {
         return FILTER_TYPE_DEFAULT;
     }
 

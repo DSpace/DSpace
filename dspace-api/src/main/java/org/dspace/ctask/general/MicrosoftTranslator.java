@@ -10,6 +10,7 @@ package org.dspace.ctask.general;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -22,15 +23,14 @@ import org.dspace.core.ConfigurationManager;
  * MicrosoftTranslator translates metadata fields using Microsoft Translation API v2
  *
  * Requirements: A valid Bing App ID/Key
- *               More information: http://www.bing.com/developers
+ * More information: http://www.bing.com/developers
  *
- *               This key, and other custom configuration, goes in [dspace]/modules/translator.cfg
+ * This key, and other custom configuration, goes in [dspace]/modules/translator.cfg
  *
  * @author Kim Shepherd
  */
 
-public class MicrosoftTranslator extends AbstractTranslator
-{
+public class MicrosoftTranslator extends AbstractTranslator {
 
     protected final String PLUGIN_PREFIX = "translator";
 
@@ -41,7 +41,7 @@ public class MicrosoftTranslator extends AbstractTranslator
 
     @Override
     protected void initApi() {
-        apiKey =  ConfigurationManager.getProperty(PLUGIN_PREFIX, "api.key.microsoft");
+        apiKey = ConfigurationManager.getProperty(PLUGIN_PREFIX, "api.key.microsoft");
     }
 
     @Override
@@ -61,10 +61,11 @@ public class MicrosoftTranslator extends AbstractTranslator
         HttpResponse httpResponse = client.execute(hm);
         log.debug("Response code from API call is " + httpResponse);
 
-        if(httpResponse.getStatusLine().getStatusCode() == 200) {
+        if (httpResponse.getStatusLine().getStatusCode() == 200) {
             String response = IOUtils.toString(httpResponse.getEntity().getContent(), StandardCharsets.ISO_8859_1);
-            response = response.replaceAll("<string xmlns=\"http://schemas.microsoft.com/2003/10/Serialization/\">","");
-            response = response.replaceAll("</string>","");
+            response = response
+                .replaceAll("<string xmlns=\"http://schemas.microsoft.com/2003/10/Serialization/\">", "");
+            response = response.replaceAll("</string>", "");
             translatedText = response;
         }
 

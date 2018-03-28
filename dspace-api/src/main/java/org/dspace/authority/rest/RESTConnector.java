@@ -7,19 +7,18 @@
  */
 package org.dspace.authority.rest;
 
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.dspace.authority.util.XMLUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-
 import java.io.InputStream;
 import java.util.Scanner;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.log4j.Logger;
+import org.dspace.authority.util.XMLUtils;
+import org.w3c.dom.Document;
+
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -61,7 +60,7 @@ public class RESTConnector {
     }
 
     protected void getGotError(Exception e, String fullPath) {
-        log.error("Error in rest connector for path: "+fullPath, e);
+        log.error("Error in rest connector for path: " + fullPath, e);
     }
 
     public static String trimSlashes(String path) {

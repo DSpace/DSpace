@@ -14,7 +14,6 @@ import java.util.List;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.Status;
-
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
 import org.dspace.services.model.CacheConfig.CacheScope;
@@ -22,12 +21,13 @@ import org.dspace.services.model.CacheConfig.CacheScope;
 
 /**
  * The ehcache implementation of the Cache object.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class EhcacheCache implements Cache {
 
     protected Ehcache cache;
+
     public Ehcache getCache() {
         return cache;
     }
@@ -40,7 +40,8 @@ public final class EhcacheCache implements Cache {
             throw new NullPointerException("Cache must be set and cannot be null");
         } else {
             if (cache.getStatus() != Status.STATUS_ALIVE) {
-                throw new IllegalArgumentException("Cache ("+cache.getName()+") must already be initialized and alive");
+                throw new IllegalArgumentException(
+                    "Cache (" + cache.getName() + ") must already be initialized and alive");
             }
         }
         this.cache = cache;
@@ -152,6 +153,7 @@ public final class EhcacheCache implements Cache {
 
     /**
      * Retrieve a payload from the cache for this key if one can be found.
+     *
      * @param key the key for this cache element
      * @return the payload or null if none found
      */
@@ -203,7 +205,7 @@ public final class EhcacheCache implements Cache {
 
     @Override
     public String toString() {
-        return "EhCache:name="+getName()+":Scope="+cacheConfig.getCacheScope()+":size="+size();
+        return "EhCache:name=" + getName() + ":Scope=" + cacheConfig.getCacheScope() + ":size=" + size();
     }
 
 }

@@ -184,17 +184,17 @@
     The defaultCache has an implicit name "default" which is a reserved cache name.
     -->
     <defaultCache
-         maxElementsInMemory="3000"
-         eternal="false"
-         timeToIdleSeconds="600"
-         timeToLiveSeconds="1200"
-         overflowToDisk="true"
-         diskSpoolBufferSizeMB="30"
-         maxElementsOnDisk="10000"
-         diskPersistent="false"
-         diskExpiryThreadIntervalSeconds="120"
-         memoryStoreEvictionPolicy="LRU">
-     </defaultCache>
+            maxElementsInMemory="3000"
+            eternal="false"
+            timeToIdleSeconds="600"
+            timeToLiveSeconds="1200"
+            overflowToDisk="true"
+            diskSpoolBufferSizeMB="30"
+            maxElementsOnDisk="10000"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU">
+    </defaultCache>
 
 
     <!--Predefined caches.  Add your cache configuration settings here.
@@ -222,183 +222,183 @@
 
     <!-- CACHES FOR TESTING -->
     <cache name="org.dspace.caching.MemOnly"
-         maxElementsInMemory="10000"
-         eternal="false"
-         timeToIdleSeconds="600"
-         timeToLiveSeconds="1200"
-         overflowToDisk="false"
-         diskSpoolBufferSizeMB="0"
-         maxElementsOnDisk="0"
-         diskPersistent="false"
-         diskExpiryThreadIntervalSeconds="120"
-         memoryStoreEvictionPolicy="LRU">
-     </cache>
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="1200"
+           overflowToDisk="false"
+           diskSpoolBufferSizeMB="0"
+           maxElementsOnDisk="0"
+           diskPersistent="false"
+           diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="LRU">
+    </cache>
 
     <cache name="org.dspace.caching.DiskOnly"
-         maxElementsInMemory="1"
-         eternal="false"
-         timeToIdleSeconds="600"
-         timeToLiveSeconds="1200"
-         overflowToDisk="true"
-         diskSpoolBufferSizeMB="30"
-         maxElementsOnDisk="10000"
-         diskPersistent="false"
-         diskExpiryThreadIntervalSeconds="120"
-         memoryStoreEvictionPolicy="LRU">
-     </cache>
+           maxElementsInMemory="1"
+           eternal="false"
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="1200"
+           overflowToDisk="true"
+           diskSpoolBufferSizeMB="30"
+           maxElementsOnDisk="10000"
+           diskPersistent="false"
+           diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="LRU">
+    </cache>
 
-<!-- 
-    <cache name="org.dspace.caching.Distributed"
-         maxElementsInMemory="10"
-         eternal="false"
-         timeToIdleSeconds="10"
-         timeToLiveSeconds="30"
-         overflowToDisk="false"
-         memoryStoreEvictionPolicy="LRU">
-         <cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory" 
-            properties="replicateAsynchronously=true, 
-               replicatePuts=true, 
-               replicateUpdates=true, 
-               replicateUpdatesViaCopy=false, 
-               replicateRemovals=true "/>
-     </cache>
+    <!--
+        <cache name="org.dspace.caching.Distributed"
+             maxElementsInMemory="10"
+             eternal="false"
+             timeToIdleSeconds="10"
+             timeToLiveSeconds="30"
+             overflowToDisk="false"
+             memoryStoreEvictionPolicy="LRU">
+             <cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+                properties="replicateAsynchronously=true,
+                   replicatePuts=true,
+                   replicateUpdates=true,
+                   replicateUpdatesViaCopy=false,
+                   replicateRemovals=true "/>
+         </cache>
 
-    <cache name="org.dspace.caching.DistributedDisk"
-         maxElementsInMemory="5"
-         eternal="false"
-         timeToIdleSeconds="10"
-         timeToLiveSeconds="30"
-         overflowToDisk="true"
-         diskSpoolBufferSizeMB="30"
-         maxElementsOnDisk="10"
-         diskPersistent="false"
-         diskExpiryThreadIntervalSeconds="120"
-         memoryStoreEvictionPolicy="LRU">
-         <cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory" 
-            properties="replicateAsynchronously=true, 
-               replicatePuts=true, 
-               replicateUpdates=true, 
-               replicateUpdatesViaCopy=false, 
-               replicateRemovals=true "/>
-     </cache>
--->
+        <cache name="org.dspace.caching.DistributedDisk"
+             maxElementsInMemory="5"
+             eternal="false"
+             timeToIdleSeconds="10"
+             timeToLiveSeconds="30"
+             overflowToDisk="true"
+             diskSpoolBufferSizeMB="30"
+             maxElementsOnDisk="10"
+             diskPersistent="false"
+             diskExpiryThreadIntervalSeconds="120"
+             memoryStoreEvictionPolicy="LRU">
+             <cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+                properties="replicateAsynchronously=true,
+                   replicatePuts=true,
+                   replicateUpdates=true,
+                   replicateUpdatesViaCopy=false,
+                   replicateRemovals=true "/>
+         </cache>
+    -->
 
-   <!-- Place configuration for your caches following -->
+    <!-- Place configuration for your caches following -->
 
-   <!-- this cache tracks the timestamps of the most recent updates to particular tables. 
-     It is important that the cache timeout of the underlying cache implementation be set to a 
-     higher value than the timeouts of any of the query caches. In fact, it is recommended that 
-     the the underlying cache not be configured for expiry at all. -->
-<!--   <cache name="org.hibernate.cache.UpdateTimestampsCache"-->
-<!--      maxElementsInMemory="6000"-->
-<!--      eternal="true"-->
-<!--      overflowToDisk="false" />-->
+    <!-- this cache tracks the timestamps of the most recent updates to particular tables.
+      It is important that the cache timeout of the underlying cache implementation be set to a
+      higher value than the timeouts of any of the query caches. In fact, it is recommended that
+      the the underlying cache not be configured for expiry at all. -->
+    <!--   <cache name="org.hibernate.cache.UpdateTimestampsCache"-->
+    <!--      maxElementsInMemory="6000"-->
+    <!--      eternal="true"-->
+    <!--      overflowToDisk="false" />-->
 
     <!-- this cache stores the actual objects pulled out of the DB by hibernate -->
-<!--    <cache name="org.hibernate.cache.StandardQueryCache"-->
-<!--      maxElementsInMemory="12000"-->
-<!--      eternal="false"-->
-<!--      timeToIdleSeconds="600"-->
-<!--      timeToLiveSeconds="1200"-->
-<!--      overflowToDisk="false" />-->
+    <!--    <cache name="org.hibernate.cache.StandardQueryCache"-->
+    <!--      maxElementsInMemory="12000"-->
+    <!--      eternal="false"-->
+    <!--      timeToIdleSeconds="600"-->
+    <!--      timeToLiveSeconds="1200"-->
+    <!--      overflowToDisk="false" />-->
 
 
-<!-- DISTRIBUTED CACHING
+    <!-- DISTRIBUTED CACHING
 
-    Add cacheEventListenerFactory to the cache
-    ==========================================
-         <cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory" 
-            properties="replicateAsynchronously=true, 
-               replicatePuts=true, 
-               replicateUpdates=true, 
-               replicateUpdatesViaCopy=false, 
-               replicateRemovals=true "/>
-    
-    For Example:
-    ============
-    <cache name="org.dspace.authz.api.SecurityService.cache"
-         maxElementsInMemory="20000"
-         eternal="false"
-         timeToIdleSeconds="1800"
-         timeToLiveSeconds="2400"
-         overflowToDisk="true"
-         diskSpoolBufferSizeMB="30"
-         maxElementsOnDisk="100000"
-         diskPersistent="true"
-         diskExpiryThreadIntervalSeconds="120">
-         <cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory" 
-            properties="replicateAsynchronously=true, 
-               replicatePuts=true, 
-               replicateUpdates=true, 
-               replicateUpdatesViaCopy=false, 
-               replicateRemovals=true "/>
-   </cache>
+        Add cacheEventListenerFactory to the cache
+        ==========================================
+             <cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+                properties="replicateAsynchronously=true,
+                   replicatePuts=true,
+                   replicateUpdates=true,
+                   replicateUpdatesViaCopy=false,
+                   replicateRemovals=true "/>
+
+        For Example:
+        ============
+        <cache name="org.dspace.authz.api.SecurityService.cache"
+             maxElementsInMemory="20000"
+             eternal="false"
+             timeToIdleSeconds="1800"
+             timeToLiveSeconds="2400"
+             overflowToDisk="true"
+             diskSpoolBufferSizeMB="30"
+             maxElementsOnDisk="100000"
+             diskPersistent="true"
+             diskExpiryThreadIntervalSeconds="120">
+             <cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+                properties="replicateAsynchronously=true,
+                   replicatePuts=true,
+                   replicateUpdates=true,
+                   replicateUpdatesViaCopy=false,
+                   replicateRemovals=true "/>
+       </cache>
 
 
-    CacheManagerPeerProvider
-    ========================
-    (Enable for distributed operation)
+        CacheManagerPeerProvider
+        ========================
+        (Enable for distributed operation)
 
-    Specifies a CacheManagerPeerProviderFactory which will be used to create a
-    CacheManagerPeerProvider, which discovers other CacheManagers in the cluster.
+        Specifies a CacheManagerPeerProviderFactory which will be used to create a
+        CacheManagerPeerProvider, which discovers other CacheManagers in the cluster.
 
-    The attributes of cacheManagerPeerProviderFactory are:
-    * class - a fully qualified factory class name
-    * properties - comma separated properties having meaning only to the factory.
+        The attributes of cacheManagerPeerProviderFactory are:
+        * class - a fully qualified factory class name
+        * properties - comma separated properties having meaning only to the factory.
 
-    Ehcache comes with a built-in RMI-based distribution system with two means of discovery of
-    CacheManager peers participating in the cluster:
-    * automatic, using a multicast group. This one automatically discovers peers and detects
-      changes such as peers entering and leaving the group
-    * manual, using manual rmiURL configuration. A hardcoded list of peers is provided at
-      configuration time.
+        Ehcache comes with a built-in RMI-based distribution system with two means of discovery of
+        CacheManager peers participating in the cluster:
+        * automatic, using a multicast group. This one automatically discovers peers and detects
+          changes such as peers entering and leaving the group
+        * manual, using manual rmiURL configuration. A hardcoded list of peers is provided at
+          configuration time.
 
-    Configuring Automatic Discovery:
-    Automatic discovery is configured as per the following example:
-    <cacheManagerPeerProviderFactory
-                        class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
-                        properties="peerDiscovery=automatic, multicastGroupAddress=230.0.0.1,
-                                    multicastGroupPort=4446, timeToLive=32"/>
+        Configuring Automatic Discovery:
+        Automatic discovery is configured as per the following example:
+        <cacheManagerPeerProviderFactory
+                            class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+                            properties="peerDiscovery=automatic, multicastGroupAddress=230.0.0.1,
+                                        multicastGroupPort=4446, timeToLive=32"/>
 
-    Valid properties are:
-    * peerDiscovery (mandatory) - specify "automatic"
-    * multicastGroupAddress (mandatory) - specify a valid multicast group address
-    * multicastGroupPort (mandatory) - specify a dedicated port for the multicast heartbeat
-      traffic
-    * timeToLive - specify a value between 0 and 255 which determines how far the packets will propagate.
-      By convention, the restrictions are:
-      0   - the same host
-      1   - the same subnet
-      32  - the same site
-      64  - the same region
-      128 - the same continent
-      255 - unrestricted
+        Valid properties are:
+        * peerDiscovery (mandatory) - specify "automatic"
+        * multicastGroupAddress (mandatory) - specify a valid multicast group address
+        * multicastGroupPort (mandatory) - specify a dedicated port for the multicast heartbeat
+          traffic
+        * timeToLive - specify a value between 0 and 255 which determines how far the packets will propagate.
+          By convention, the restrictions are:
+          0   - the same host
+          1   - the same subnet
+          32  - the same site
+          64  - the same region
+          128 - the same continent
+          255 - unrestricted
 
-    Configuring Manual Discovery:
-    Manual discovery is configured as per the following example:
-    <cacheManagerPeerProviderFactory class=
-                          "net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
-                          properties="peerDiscovery=manual,
-                          rmiUrls=//server1:40000/sampleCache1|//server2:40000/sampleCache1
-                          | //server1:40000/sampleCache2|//server2:40000/sampleCache2"
-                          propertySeparator="," />
+        Configuring Manual Discovery:
+        Manual discovery is configured as per the following example:
+        <cacheManagerPeerProviderFactory class=
+                              "net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+                              properties="peerDiscovery=manual,
+                              rmiUrls=//server1:40000/sampleCache1|//server2:40000/sampleCache1
+                              | //server1:40000/sampleCache2|//server2:40000/sampleCache2"
+                              propertySeparator="," />
 
-    Valid properties are:
-    * peerDiscovery (mandatory) - specify "manual"
-    * rmiUrls (mandatory) - specify a pipe separated list of rmiUrls, in the form
-                            //hostname:port
+        Valid properties are:
+        * peerDiscovery (mandatory) - specify "manual"
+        * rmiUrls (mandatory) - specify a pipe separated list of rmiUrls, in the form
+                                //hostname:port
 
-    The hostname is the hostname of the remote CacheManager peer. The port is the listening
-    port of the RMICacheManagerPeerListener of the remote CacheManager peer.
+        The hostname is the hostname of the remote CacheManager peer. The port is the listening
+        port of the RMICacheManagerPeerListener of the remote CacheManager peer.
 
-    <cacheManagerPeerProviderFactory
-            class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
-            properties="peerDiscovery=automatic,
-                        multicastGroupAddress=230.0.0.1,
-                        multicastGroupPort=4446, timeToLive=1"
-            propertySeparator=","
-            />
-    -->
+        <cacheManagerPeerProviderFactory
+                class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+                properties="peerDiscovery=automatic,
+                            multicastGroupAddress=230.0.0.1,
+                            multicastGroupPort=4446, timeToLive=1"
+                propertySeparator=","
+                />
+        -->
 
     <!--
     CacheManagerPeerListener
@@ -447,32 +447,32 @@
             class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory"/>
     -->
 
-   <!-- Sample Distributed cache settings -->
-   <!-- automatic discovery using tcp multicast 
-        For the multicast version, the IP address is no longer that of the server. 
-        Rather, you need to choose the address and port in a designated range that has been reserved for multicasting. 
-        It is as if the server and all potential clients are agreeing that messages will be left in a particular location. 
-        The available addresses for multicasting are in the range 224.0.0.0 through 239.255.255.255. 
-        You can check for the assigned addresses in this range (http://www.iana.org/assignments/multicast-addresses). 
-        Recommended default is to use the IP address 230.0.0.1 and the port 4446.
-   -->
+    <!-- Sample Distributed cache settings -->
+    <!-- automatic discovery using tcp multicast
+         For the multicast version, the IP address is no longer that of the server.
+         Rather, you need to choose the address and port in a designated range that has been reserved for multicasting.
+         It is as if the server and all potential clients are agreeing that messages will be left in a particular location.
+         The available addresses for multicasting are in the range 224.0.0.0 through 239.255.255.255.
+         You can check for the assigned addresses in this range (http://www.iana.org/assignments/multicast-addresses).
+         Recommended default is to use the IP address 230.0.0.1 and the port 4446.
+    -->
 
-   <!--
-   <cacheManagerPeerProviderFactory
-      class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
-      properties="peerDiscovery=automatic, 
-         multicastGroupAddress=230.0.0.1,
-         multicastGroupPort=4446, 
-         timeToLive=1" />
+    <!--
+    <cacheManagerPeerProviderFactory
+       class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+       properties="peerDiscovery=automatic,
+          multicastGroupAddress=230.0.0.1,
+          multicastGroupPort=4446,
+          timeToLive=1" />
 
-   -->
+    -->
 
-   <!-- manual discovery (you must customize this to include every node in the cluster) -->
-<!--   <cacheManagerPeerProviderFactory
-      class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
-      properties="peerDiscovery=manual,
-      rmiUrls=//server2:40001/sampleCache11|//server2:40001/sampleCache12" />
--->
+    <!-- manual discovery (you must customize this to include every node in the cluster) -->
+    <!--   <cacheManagerPeerProviderFactory
+          class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+          properties="peerDiscovery=manual,
+          rmiUrls=//server2:40001/sampleCache11|//server2:40001/sampleCache12" />
+    -->
 
     <!-- 
         A CacheManagerPeerListener listens for messages from peers to the current CacheManager.

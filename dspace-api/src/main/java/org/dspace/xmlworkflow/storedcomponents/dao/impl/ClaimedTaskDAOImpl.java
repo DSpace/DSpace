@@ -7,17 +7,17 @@
  */
 package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 
-import org.dspace.core.Context;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.ClaimedTaskDAO;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the ClaimedTask object.
@@ -26,10 +26,8 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implements ClaimedTaskDAO
-{
-    protected ClaimedTaskDAOImpl()
-    {
+public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implements ClaimedTaskDAO {
+    protected ClaimedTaskDAOImpl() {
         super();
     }
 
@@ -43,11 +41,12 @@ public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implem
     }
 
     @Override
-    public ClaimedTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson) throws SQLException {
+    public ClaimedTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+        throws SQLException {
         Criteria criteria = createCriteria(context, ClaimedTask.class);
         criteria.add(Restrictions.and(
-                Restrictions.eq("workflowItem", workflowItem),
-                Restrictions.eq("owner", ePerson)
+            Restrictions.eq("workflowItem", workflowItem),
+            Restrictions.eq("owner", ePerson)
         ));
 
         return uniqueResult(criteria);
@@ -62,36 +61,41 @@ public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implem
     }
 
     @Override
-    public List<ClaimedTask> findByWorkflowItemAndStepId(Context context, XmlWorkflowItem workflowItem, String stepID) throws SQLException {
+    public List<ClaimedTask> findByWorkflowItemAndStepId(Context context, XmlWorkflowItem workflowItem, String stepID)
+        throws SQLException {
         Criteria criteria = createCriteria(context, ClaimedTask.class);
         criteria.add(Restrictions.and(
-                Restrictions.eq("workflowItem", workflowItem),
-                Restrictions.eq("stepId", stepID)
+            Restrictions.eq("workflowItem", workflowItem),
+            Restrictions.eq("stepId", stepID)
         ));
 
         return list(criteria);
     }
 
     @Override
-    public ClaimedTask findByEPersonAndWorkflowItemAndStepIdAndActionId(Context context, EPerson ePerson, XmlWorkflowItem workflowItem, String stepID, String actionID) throws SQLException {
+    public ClaimedTask findByEPersonAndWorkflowItemAndStepIdAndActionId(Context context, EPerson ePerson,
+                                                                        XmlWorkflowItem workflowItem, String stepID,
+                                                                        String actionID) throws SQLException {
         Criteria criteria = createCriteria(context, ClaimedTask.class);
         criteria.add(Restrictions.and(
-                Restrictions.eq("workflowItem", workflowItem),
-                Restrictions.eq("owner", ePerson),
-                Restrictions.eq("stepId", stepID),
-                Restrictions.eq("actionId", actionID)
+            Restrictions.eq("workflowItem", workflowItem),
+            Restrictions.eq("owner", ePerson),
+            Restrictions.eq("stepId", stepID),
+            Restrictions.eq("actionId", actionID)
         ));
 
         return uniqueResult(criteria);
     }
 
     @Override
-    public List<ClaimedTask> findByWorkflowItemAndStepIdAndActionId(Context context, XmlWorkflowItem workflowItem, String stepID, String actionID) throws SQLException {
+    public List<ClaimedTask> findByWorkflowItemAndStepIdAndActionId(Context context, XmlWorkflowItem workflowItem,
+                                                                    String stepID, String actionID)
+        throws SQLException {
         Criteria criteria = createCriteria(context, ClaimedTask.class);
         criteria.add(Restrictions.and(
-                Restrictions.eq("workflowItem", workflowItem),
-                Restrictions.eq("stepId", stepID),
-                Restrictions.eq("actionId", actionID)
+            Restrictions.eq("workflowItem", workflowItem),
+            Restrictions.eq("stepId", stepID),
+            Restrictions.eq("actionId", actionID)
         ));
 
         return list(criteria);

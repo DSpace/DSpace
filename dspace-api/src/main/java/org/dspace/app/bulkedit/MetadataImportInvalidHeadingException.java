@@ -12,39 +12,51 @@ package org.dspace.app.bulkedit;
  *
  * @author Stuart Lewis
  */
-public class MetadataImportInvalidHeadingException extends Exception
-{
-    /** The type of error (schema or element) */
+public class MetadataImportInvalidHeadingException extends Exception {
+    /**
+     * The type of error (schema or element)
+     */
     private int type;
 
-    /** The bad heading */
+    /**
+     * The bad heading
+     */
     private String badHeading;
 
-    /** The column number */
+    /**
+     * The column number
+     */
     private int column;
 
-    /** Error with the schema */
+    /**
+     * Error with the schema
+     */
     public static final int SCHEMA = 0;
 
-    /** Error with the element */
+    /**
+     * Error with the element
+     */
     public static final int ELEMENT = 1;
 
-    /** Error with a missing header */
+    /**
+     * Error with a missing header
+     */
     public static final int MISSING = 98;
 
-    /** Error with the whole entry */
+    /**
+     * Error with the whole entry
+     */
     public static final int ENTRY = 99;
 
 
     /**
      * Instantiate a new MetadataImportInvalidHeadingException
      *
-     * @param message the error message
-     * @param theType the type of the error
+     * @param message   the error message
+     * @param theType   the type of the error
      * @param theColumn column number
      */
-    public MetadataImportInvalidHeadingException(String message, int theType, int theColumn)
-    {
+    public MetadataImportInvalidHeadingException(String message, int theType, int theColumn) {
         super(message);
         badHeading = message;
         type = theType;
@@ -54,10 +66,9 @@ public class MetadataImportInvalidHeadingException extends Exception
     /**
      * Get the type of the exception
      *
-     *  @return the type of the exception
+     * @return the type of the exception
      */
-    public String getType()
-    {
+    public String getType() {
         return "" + type;
     }
 
@@ -66,8 +77,7 @@ public class MetadataImportInvalidHeadingException extends Exception
      *
      * @return the invalid heading
      */
-    public String getBadHeader()
-    {
+    public String getBadHeader() {
         return badHeading;
     }
 
@@ -76,8 +86,7 @@ public class MetadataImportInvalidHeadingException extends Exception
      *
      * @return the invalid column number
      */
-    public int getColumn()
-    {
+    public int getColumn() {
         return column;
     }
 
@@ -87,19 +96,14 @@ public class MetadataImportInvalidHeadingException extends Exception
      * @return The exception message
      */
     @Override
-    public String getMessage()
-    {
-        if (type == SCHEMA)
-        {
+    public String getMessage() {
+        if (type == SCHEMA) {
             return "Unknown metadata schema in column " + column + ": " + badHeading;
-        } else if (type == ELEMENT)
-        {
+        } else if (type == ELEMENT) {
             return "Unknown metadata element in column " + column + ": " + badHeading;
-        } else if (type == MISSING)
-        {
+        } else if (type == MISSING) {
             return "Row with missing header: column " + column;
-        } else
-        {
+        } else {
             return "Bad metadata declaration in column" + column + ": " + badHeading;
         }
     }

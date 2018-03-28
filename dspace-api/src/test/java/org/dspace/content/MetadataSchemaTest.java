@@ -7,6 +7,17 @@
  */
 package org.dspace.content;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.sql.SQLException;
+import java.util.List;
+
 import mockit.NonStrictExpectations;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
@@ -16,20 +27,16 @@ import org.dspace.content.service.MetadataSchemaService;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.sql.SQLException;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
 /**
  * Unit Tests for class MetadataSchema
+ *
  * @author pvillega
  */
-public class MetadataSchemaTest extends AbstractUnitTest
-{
+public class MetadataSchemaTest extends AbstractUnitTest {
 
-    /** log4j category */
+    /**
+     * log4j category
+     */
     private static final Logger log = Logger.getLogger(MetadataSchemaTest.class);
 
     /**
@@ -37,7 +44,8 @@ public class MetadataSchemaTest extends AbstractUnitTest
      */
     private MetadataSchema ms;
 
-    protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
+                                                                                 .getMetadataSchemaService();
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -48,15 +56,11 @@ public class MetadataSchemaTest extends AbstractUnitTest
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
-        try
-        {
+        try {
             this.ms = metadataSchemaService.find(context, MetadataSchema.DC_SCHEMA);
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
@@ -66,24 +70,22 @@ public class MetadataSchemaTest extends AbstractUnitTest
      * Test of getNamespace method, of class MetadataSchema.
      */
     @Test
-    public void testGetNamespace() 
-    {
-        assertThat("testGetNamespace 0",ms.getNamespace(),notNullValue());
-        assertThat("testGetNamespace 1",ms.getNamespace(),not(equalTo("")));
+    public void testGetNamespace() {
+        assertThat("testGetNamespace 0", ms.getNamespace(), notNullValue());
+        assertThat("testGetNamespace 1", ms.getNamespace(), not(equalTo("")));
     }
 
     /**
      * Test of setNamespace method, of class MetadataSchema.
      */
     @Test
-    public void testSetNamespace()
-    {
+    public void testSetNamespace() {
         String oldnamespace = ms.getNamespace();
         String namespace = "new namespace";
         ms.setNamespace(namespace);
-        assertThat("testSetNamespace 0",ms.getNamespace(),notNullValue());
-        assertThat("testSetNamespace 1",ms.getNamespace(),not(equalTo("")));
-        assertThat("testSetNamespace 2",ms.getNamespace(),equalTo(namespace));
+        assertThat("testSetNamespace 0", ms.getNamespace(), notNullValue());
+        assertThat("testSetNamespace 1", ms.getNamespace(), not(equalTo("")));
+        assertThat("testSetNamespace 2", ms.getNamespace(), equalTo(namespace));
 
         //we restore the old namespace to avoid issues in other tests
         ms.setNamespace(oldnamespace);
@@ -93,24 +95,22 @@ public class MetadataSchemaTest extends AbstractUnitTest
      * Test of getName method, of class MetadataSchema.
      */
     @Test
-    public void testGetName() 
-    {
-        assertThat("testGetName 0",ms.getName(),notNullValue());
-        assertThat("testGetName 1",ms.getName(),not(equalTo("")));
+    public void testGetName() {
+        assertThat("testGetName 0", ms.getName(), notNullValue());
+        assertThat("testGetName 1", ms.getName(), not(equalTo("")));
     }
 
     /**
      * Test of setName method, of class MetadataSchema.
      */
     @Test
-    public void testSetName()
-    {
+    public void testSetName() {
         String oldname = ms.getName();
         String name = "new name";
         ms.setName(name);
-        assertThat("testSetName 0",ms.getName(),notNullValue());
-        assertThat("testSetName 1",ms.getName(),not(equalTo("")));
-        assertThat("testSetName 2",ms.getName(),equalTo(name));
+        assertThat("testSetName 0", ms.getName(), notNullValue());
+        assertThat("testSetName 1", ms.getName(), not(equalTo("")));
+        assertThat("testSetName 2", ms.getName(), equalTo(name));
 
         //we restore the old name to avoid issues in other tests
         ms.setName(oldname);
@@ -120,21 +120,20 @@ public class MetadataSchemaTest extends AbstractUnitTest
      * Test of getSchemaID method, of class MetadataSchema.
      */
     @Test
-    public void testGetSchemaID() throws SQLException
-    {
-        assertThat("testGetSchemaID 0",ms.getID(), equalTo(metadataSchemaService.find(context, MetadataSchema.DC_SCHEMA).getID()));
+    public void testGetSchemaID() throws SQLException {
+        assertThat("testGetSchemaID 0", ms.getID(),
+                   equalTo(metadataSchemaService.find(context, MetadataSchema.DC_SCHEMA).getID()));
     }
 
     /**
      * Test of create method, of class MetadataSchema.
      */
     @Test
-    public void testCreateAuth() throws Exception
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    public void testCreateAuth() throws Exception {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Allow full admin permissions
-                authorizeService.isAdmin(context); result = true;
+            authorizeService.isAdmin(context);
+            result = true;
         }};
 
         String namespace = "namespace";
@@ -142,19 +141,18 @@ public class MetadataSchemaTest extends AbstractUnitTest
         metadataSchemaService.create(context, name, namespace);
 
         MetadataSchema found = metadataSchemaService.findByNamespace(context, namespace);
-        assertThat("testCreateAuth 0",found, notNullValue());
+        assertThat("testCreateAuth 0", found, notNullValue());
     }
 
     /**
      * Test of create method, of class MetadataSchema.
      */
-    @Test(expected=AuthorizeException.class)
-    public void testCreateNoAuth() throws Exception
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    @Test(expected = AuthorizeException.class)
+    public void testCreateNoAuth() throws Exception {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Disallow full admin permissions
-                authorizeService.isAdmin(context); result = false;
+            authorizeService.isAdmin(context);
+            result = false;
         }};
 
         String namespace = "namespace";
@@ -166,13 +164,12 @@ public class MetadataSchemaTest extends AbstractUnitTest
     /**
      * Test of create method, of class MetadataSchema.
      */
-    @Test(expected=NonUniqueMetadataException.class)
-    public void testCreateRepeated() throws Exception
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    @Test(expected = NonUniqueMetadataException.class)
+    public void testCreateRepeated() throws Exception {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Allow full admin permissions
-            authorizeService.isAdmin(context); result = true;
+            authorizeService.isAdmin(context);
+            result = true;
         }};
 
         String namespace = ms.getNamespace();
@@ -185,24 +182,22 @@ public class MetadataSchemaTest extends AbstractUnitTest
      * Test of findByNamespace method, of class MetadataSchema.
      */
     @Test
-    public void testFindByNamespace() throws Exception
-    {
-        log.info(">>"+ms.getNamespace()+" "+ms.getName());
+    public void testFindByNamespace() throws Exception {
+        log.info(">>" + ms.getNamespace() + " " + ms.getName());
         MetadataSchema found = metadataSchemaService.findByNamespace(context, ms.getNamespace());
-        assertThat("testFindByNamespace 0",found, notNullValue());
-        assertThat("testFindByNamespace 1",found.getID(), equalTo(ms.getID()));
+        assertThat("testFindByNamespace 0", found, notNullValue());
+        assertThat("testFindByNamespace 1", found.getID(), equalTo(ms.getID()));
     }
 
     /**
      * Test of update method, of class MetadataSchema.
      */
     @Test
-    public void testUpdateAuth() throws Exception
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    public void testUpdateAuth() throws Exception {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Allow full admin permissions
-            authorizeService.isAdmin(context); result = true;
+            authorizeService.isAdmin(context);
+            result = true;
         }};
 
         String namespace = "namespace2";
@@ -212,20 +207,18 @@ public class MetadataSchemaTest extends AbstractUnitTest
         metadataSchemaService.update(context, metadataSchema);
 
         MetadataSchema found = metadataSchemaService.findByNamespace(context, namespace);
-        assertThat("testUpdateAuth 0",found.getID(), equalTo(metadataSchema.getID()));
+        assertThat("testUpdateAuth 0", found.getID(), equalTo(metadataSchema.getID()));
     }
 
     /**
      * Test of update method, of class MetadataSchema.
      */
-    @Test(expected=AuthorizeException.class)
-    public void testUpdateNoAuth() throws Exception
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    @Test(expected = AuthorizeException.class)
+    public void testUpdateNoAuth() throws Exception {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Disallow full admin permissions
             authorizeService.isAdmin(context);
-                result = false;
+            result = false;
         }};
 
         metadataSchemaService.update(context, ms);
@@ -235,13 +228,12 @@ public class MetadataSchemaTest extends AbstractUnitTest
     /**
      * Test of update method, of class MetadataSchema.
      */
-    @Test(expected=NonUniqueMetadataException.class)
-    public void testUpdateRepeated() throws Exception
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    @Test(expected = NonUniqueMetadataException.class)
+    public void testUpdateRepeated() throws Exception {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Allow full admin permissions
-            authorizeService.isAdmin(context); result = true;
+            authorizeService.isAdmin(context);
+            result = true;
         }};
 
         String namespace = ms.getNamespace();
@@ -258,12 +250,11 @@ public class MetadataSchemaTest extends AbstractUnitTest
      * Test of delete method, of class MetadataSchema.
      */
     @Test
-    public void testDeleteAuth() throws Exception
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    public void testDeleteAuth() throws Exception {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Allow full admin permissions
-            authorizeService.isAdmin(context); result = true;
+            authorizeService.isAdmin(context);
+            result = true;
         }};
 
         String namespace = "namespace3";
@@ -273,19 +264,18 @@ public class MetadataSchemaTest extends AbstractUnitTest
         metadataSchemaService.delete(context, m);
 
         MetadataSchema found = metadataSchemaService.findByNamespace(context, namespace);
-        assertThat("testDeleteAuth 0",found, nullValue());
+        assertThat("testDeleteAuth 0", found, nullValue());
     }
 
     /**
      * Test of delete method, of class MetadataSchema.
      */
-    @Test(expected=AuthorizeException.class)
-    public void testDeleteNoAuth() throws Exception
-    {
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
+    @Test(expected = AuthorizeException.class)
+    public void testDeleteNoAuth() throws Exception {
+        new NonStrictExpectations(authorizeService.getClass()) {{
             // Disallow full admin permissions
-            authorizeService.isAdmin(context); result = false;
+            authorizeService.isAdmin(context);
+            result = false;
         }};
 
         String namespace = "namespace3";
@@ -300,51 +290,46 @@ public class MetadataSchemaTest extends AbstractUnitTest
      * Test of findAll method, of class MetadataSchema.
      */
     @Test
-    public void testFindAll() throws Exception
-    {
+    public void testFindAll() throws Exception {
         List<MetadataSchema> found = metadataSchemaService.findAll(context);
-        assertThat("testFindAll 0",found, notNullValue());
-        assertTrue("testFindAll 1",found.size() >= 1);
+        assertThat("testFindAll 0", found, notNullValue());
+        assertTrue("testFindAll 1", found.size() >= 1);
 
         boolean added = false;
-        for(MetadataSchema msc: found)
-        {
-            if(msc.equals(ms))
-            {
+        for (MetadataSchema msc : found) {
+            if (msc.equals(ms)) {
                 added = true;
             }
         }
-        assertTrue("testFindAll 2",added);
+        assertTrue("testFindAll 2", added);
     }
 
     /**
      * Test of find method, of class MetadataSchema.
      */
     @Test
-    public void testFind_Context_int() throws Exception
-    {
+    public void testFind_Context_int() throws Exception {
         MetadataSchema found = metadataSchemaService.find(context, ms.getID());
-        assertThat("testFind_Context_int 0",found, notNullValue());
-        assertThat("testFind_Context_int 1",found.getID(), equalTo(ms.getID()));
-        assertThat("testFind_Context_int 2",found.getName(), equalTo(ms.getName()));
-        assertThat("testFind_Context_int 3",found.getNamespace(), equalTo(ms.getNamespace()));
+        assertThat("testFind_Context_int 0", found, notNullValue());
+        assertThat("testFind_Context_int 1", found.getID(), equalTo(ms.getID()));
+        assertThat("testFind_Context_int 2", found.getName(), equalTo(ms.getName()));
+        assertThat("testFind_Context_int 3", found.getNamespace(), equalTo(ms.getNamespace()));
     }
 
     /**
      * Test of find method, of class MetadataSchema.
      */
     @Test
-    public void testFind_Context_String() throws Exception
-    {
+    public void testFind_Context_String() throws Exception {
         String shortName = ms.getName();
         MetadataSchema found = metadataSchemaService.find(context, shortName);
-        assertThat("testFind_Context_String 0",found, notNullValue());
-        assertThat("testFind_Context_String 1",found.getID(), equalTo(ms.getID()));
-        assertThat("testFind_Context_String 2",found.getName(), equalTo(ms.getName()));
-        assertThat("testFind_Context_String 3",found.getNamespace(), equalTo(ms.getNamespace()));
+        assertThat("testFind_Context_String 0", found, notNullValue());
+        assertThat("testFind_Context_String 1", found.getID(), equalTo(ms.getID()));
+        assertThat("testFind_Context_String 2", found.getName(), equalTo(ms.getName()));
+        assertThat("testFind_Context_String 3", found.getNamespace(), equalTo(ms.getNamespace()));
 
         found = metadataSchemaService.find(context, null);
-        assertThat("testFind_Context_String 4",found, nullValue());
+        assertThat("testFind_Context_String 4", found, nullValue());
     }
 
 }

@@ -9,9 +9,9 @@ package org.dspace.core;
 
 import java.util.Enumeration;
 import java.util.Properties;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
-
 import org.apache.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -25,7 +25,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * Other configuration files are read from the <code>config</code> directory
  * of the DSpace installation directory.
  *
- *
  * @author Robert Tansley
  * @author Larry Stone - Interpolated values.
  * @author Mark Diggory - General Improvements to detection, logging and loading.
@@ -33,22 +32,22 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @version $Revision$
  * @deprecated Please use org.dspace.services.ConfigurationService. See examples below.
  */
-public class ConfigurationManager
-{
-    /** log4j category */
+public class ConfigurationManager {
+    /**
+     * log4j category
+     */
     private static final Logger log = Logger.getLogger(ConfigurationManager.class);
 
-    protected ConfigurationManager()
-    {
+    protected ConfigurationManager() {
 
     }
 
     /**
      * Identify if DSpace is properly configured
+     *
      * @return boolean true if configured, false otherwise
      */
-    public static boolean isConfigured()
-    {
+    public static boolean isConfigured() {
         return DSpaceServicesFactory.getInstance().getConfigurationService() != null;
     }
 
@@ -57,22 +56,20 @@ public class ConfigurationManager
      *
      * @return properties - all non-modular properties
      */
-    public static Properties getProperties()
-    {
+    public static Properties getProperties() {
         return DSpaceServicesFactory.getInstance().getConfigurationService().getProperties();
     }
 
     /**
      * Returns all properties for a given module
      *
-     * @param module
-     *        the name of the module
+     * @param module the name of the module
      * @return properties - all module's properties
      */
-    public static Properties getProperties(String module)
-    {
+    public static Properties getProperties(String module) {
         // Find subset of Configurations which have been prefixed with the module name
-        Configuration subset = DSpaceServicesFactory.getInstance().getConfigurationService().getConfiguration().subset(module);
+        Configuration subset = DSpaceServicesFactory.getInstance().getConfigurationService().getConfiguration()
+                                                    .subset(module);
 
         // Convert to a Properties object and return it
         return ConfigurationConverter.getProperties(subset);
@@ -81,33 +78,25 @@ public class ConfigurationManager
     /**
      * Get a configuration property
      *
-     * @param property
-     *            the name of the property
-     *
+     * @param property the name of the property
      * @return the value of the property, or <code>null</code> if the property
-     *         does not exist.
+     * does not exist.
      */
-    public static String getProperty(String property)
-    {
+    public static String getProperty(String property) {
         return DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(property);
     }
 
     /**
      * Get a module configuration property value.
      *
-     * @param module
-     *      the name of the module, or <code>null</code> for regular configuration
-     *      property
-     * @param property
-     *      the name (key) of the property
-     * @return
-     *      the value of the property, or <code>null</code> if the
-     *      property does not exist
+     * @param module   the name of the module, or <code>null</code> for regular configuration
+     *                 property
+     * @param property the name (key) of the property
+     * @return the value of the property, or <code>null</code> if the
+     * property does not exist
      */
-    public static String getProperty(String module, String property)
-    {
-        if (module == null)
-        {
+    public static String getProperty(String module, String property) {
+        if (module == null) {
             return getProperty(property);
         }
 
@@ -118,35 +107,26 @@ public class ConfigurationManager
     /**
      * Get a configuration property as an integer
      *
-     * @param property
-     *            the name of the property
-     *
+     * @param property the name of the property
      * @return the value of the property. <code>0</code> is returned if the
-     *         property does not exist. To differentiate between this case and
-     *         when the property actually is zero, use <code>getProperty</code>.
+     * property does not exist. To differentiate between this case and
+     * when the property actually is zero, use <code>getProperty</code>.
      */
-    public static int getIntProperty(String property)
-    {
+    public static int getIntProperty(String property) {
         return DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty(property);
     }
 
     /**
      * Get a module configuration property as an integer
      *
-     * @param module
-     *         the name of the module
-     *
-     * @param property
-     *            the name of the property
-     *
+     * @param module   the name of the module
+     * @param property the name of the property
      * @return the value of the property. <code>0</code> is returned if the
-     *         property does not exist. To differentiate between this case and
-     *         when the property actually is zero, use <code>getProperty</code>.
+     * property does not exist. To differentiate between this case and
+     * when the property actually is zero, use <code>getProperty</code>.
      */
-    public static int getIntProperty(String module, String property)
-    {
-        if (module == null)
-        {
+    public static int getIntProperty(String module, String property) {
+        if (module == null) {
             return getIntProperty(property);
         }
 
@@ -157,43 +137,30 @@ public class ConfigurationManager
     /**
      * Get a configuration property as an integer, with default
      *
-     * @param property
-     *            the name of the property
-     *
-     * @param defaultValue
-     *            value to return if property is not found or is not an Integer.
-     *
+     * @param property     the name of the property
+     * @param defaultValue value to return if property is not found or is not an Integer.
      * @return the value of the property. <code>default</code> is returned if
-     *         the property does not exist or is not an Integer. To differentiate between this case
-     *         and when the property actually is false, use
-     *         <code>getProperty</code>.
+     * the property does not exist or is not an Integer. To differentiate between this case
+     * and when the property actually is false, use
+     * <code>getProperty</code>.
      */
-    public static int getIntProperty(String property, int defaultValue)
-    {
+    public static int getIntProperty(String property, int defaultValue) {
         return DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty(property, defaultValue);
     }
 
     /**
      * Get a module configuration property as an integer, with default
      *
-     * @param module
-     *         the name of the module
-     *
-     * @param property
-     *            the name of the property
-     *
-     * @param defaultValue
-     *            value to return if property is not found or is not an Integer.
-     *
+     * @param module       the name of the module
+     * @param property     the name of the property
+     * @param defaultValue value to return if property is not found or is not an Integer.
      * @return the value of the property. <code>default</code> is returned if
-     *         the property does not exist or is not an Integer. To differentiate between this case
-     *         and when the property actually is false, use
-     *         <code>getProperty</code>.
+     * the property does not exist or is not an Integer. To differentiate between this case
+     * and when the property actually is false, use
+     * <code>getProperty</code>.
      */
-    public static int getIntProperty(String module, String property, int defaultValue)
-    {
-       if (module == null)
-        {
+    public static int getIntProperty(String module, String property, int defaultValue) {
+        if (module == null) {
             return getIntProperty(property, defaultValue);
         }
 
@@ -204,34 +171,26 @@ public class ConfigurationManager
     /**
      * Get a configuration property as a long
      *
-     * @param property
-     *            the name of the property
-     *
+     * @param property the name of the property
      * @return the value of the property. <code>0</code> is returned if the
-     *         property does not exist. To differentiate between this case and
-     *         when the property actually is zero, use <code>getProperty</code>.
+     * property does not exist. To differentiate between this case and
+     * when the property actually is zero, use <code>getProperty</code>.
      */
-    public static long getLongProperty(String property)
-    {
+    public static long getLongProperty(String property) {
         return DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(property);
     }
 
     /**
      * Get a module configuration property as a long
      *
-     * @param module
-     *         the name of the module
-     * @param property
-     *            the name of the property
-     *
+     * @param module   the name of the module
+     * @param property the name of the property
      * @return the value of the property. <code>0</code> is returned if the
-     *         property does not exist. To differentiate between this case and
-     *         when the property actually is zero, use <code>getProperty</code>.
+     * property does not exist. To differentiate between this case and
+     * when the property actually is zero, use <code>getProperty</code>.
      */
-    public static long getLongProperty(String module, String property)
-    {
-        if (module == null)
-        {
+    public static long getLongProperty(String module, String property) {
+        if (module == null) {
             return getLongProperty(property);
         }
 
@@ -239,46 +198,33 @@ public class ConfigurationManager
         return getLongProperty(module + "." + property);
     }
 
-   /**
+    /**
      * Get a configuration property as an long, with default
      *
-     *
-     * @param property
-     *            the name of the property
-     *
-     * @param defaultValue
-     *            value to return if property is not found or is not a Long.
-     *
+     * @param property     the name of the property
+     * @param defaultValue value to return if property is not found or is not a Long.
      * @return the value of the property. <code>default</code> is returned if
-     *         the property does not exist or is not an Integer. To differentiate between this case
-     *         and when the property actually is false, use
-     *         <code>getProperty</code>.
+     * the property does not exist or is not an Integer. To differentiate between this case
+     * and when the property actually is false, use
+     * <code>getProperty</code>.
      */
-    public static long getLongProperty(String property, int defaultValue)
-    {
+    public static long getLongProperty(String property, int defaultValue) {
         return DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(property, defaultValue);
     }
 
     /**
      * Get a configuration property as an long, with default
      *
-     * @param module  the module, or <code>null</code> for regular property
-     *
-     * @param property
-     *            the name of the property
-     *
-     * @param defaultValue
-     *            value to return if property is not found or is not a Long.
-     *
+     * @param module       the module, or <code>null</code> for regular property
+     * @param property     the name of the property
+     * @param defaultValue value to return if property is not found or is not a Long.
      * @return the value of the property. <code>default</code> is returned if
-     *         the property does not exist or is not an Integer. To differentiate between this case
-     *         and when the property actually is false, use
-     *         <code>getProperty</code>.
+     * the property does not exist or is not an Integer. To differentiate between this case
+     * and when the property actually is false, use
+     * <code>getProperty</code>.
      */
-    public static long getLongProperty(String module, String property, int defaultValue)
-    {
-        if (module == null)
-        {
+    public static long getLongProperty(String module, String property, int defaultValue) {
+        if (module == null) {
             return getLongProperty(property, defaultValue);
         }
 
@@ -291,16 +237,13 @@ public class ConfigurationManager
      * of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)
      *
-     * @param property
-     *            the name of the property
-     *
+     * @param property the name of the property
      * @return the value of the property. <code>false</code> is returned if
-     *         the property does not exist. To differentiate between this case
-     *         and when the property actually is false, use
-     *         <code>getProperty</code>.
+     * the property does not exist. To differentiate between this case
+     * and when the property actually is false, use
+     * <code>getProperty</code>.
      */
-    public static boolean getBooleanProperty(String property)
-    {
+    public static boolean getBooleanProperty(String property) {
         return DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(property);
     }
 
@@ -309,20 +252,15 @@ public class ConfigurationManager
      * the value of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)
      *
-     * @param module the module, or <code>null</code> for regular property
-     *
-     * @param property
-     *            the name of the property
-     *
+     * @param module   the module, or <code>null</code> for regular property
+     * @param property the name of the property
      * @return the value of the property. <code>false</code> is returned if
-     *         the property does not exist. To differentiate between this case
-     *         and when the property actually is false, use
-     *         <code>getProperty</code>.
+     * the property does not exist. To differentiate between this case
+     * and when the property actually is false, use
+     * <code>getProperty</code>.
      */
-    public static boolean getBooleanProperty(String module, String property)
-    {
-        if (module == null)
-        {
+    public static boolean getBooleanProperty(String module, String property) {
+        if (module == null) {
             return getBooleanProperty(property);
         }
 
@@ -330,25 +268,20 @@ public class ConfigurationManager
         return getBooleanProperty(module + "." + property);
     }
 
-   /**
+    /**
      * Get a configuration property as a boolean, with default.
      * True is indicated if the value
      * of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)
      *
-     * @param property
-     *            the name of the property
-     *
-     * @param defaultValue
-     *            value to return if property is not found.
-     *
+     * @param property     the name of the property
+     * @param defaultValue value to return if property is not found.
      * @return the value of the property. <code>default</code> is returned if
-     *         the property does not exist. To differentiate between this case
-     *         and when the property actually is false, use
-     *         <code>getProperty</code>.
+     * the property does not exist. To differentiate between this case
+     * and when the property actually is false, use
+     * <code>getProperty</code>.
      */
-    public static boolean getBooleanProperty(String property, boolean defaultValue)
-    {
+    public static boolean getBooleanProperty(String property, boolean defaultValue) {
         return DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(property, defaultValue);
     }
 
@@ -358,23 +291,16 @@ public class ConfigurationManager
      * of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)
      *
-     * @param module     module, or <code>null</code> for regular property
-     *
-     * @param property
-     *            the name of the property
-     *
-     * @param defaultValue
-     *            value to return if property is not found.
-     *
+     * @param module       module, or <code>null</code> for regular property
+     * @param property     the name of the property
+     * @param defaultValue value to return if property is not found.
      * @return the value of the property. <code>default</code> is returned if
-     *         the property does not exist. To differentiate between this case
-     *         and when the property actually is false, use
-     *         <code>getProperty</code>.
+     * the property does not exist. To differentiate between this case
+     * and when the property actually is false, use
+     * <code>getProperty</code>.
      */
-    public static boolean getBooleanProperty(String module, String property, boolean defaultValue)
-    {
-        if (module == null)
-        {
+    public static boolean getBooleanProperty(String module, String property, boolean defaultValue) {
+        if (module == null) {
             return getBooleanProperty(property, defaultValue);
         }
 
@@ -390,10 +316,10 @@ public class ConfigurationManager
      *
      * @return an enumeration of all the keys in the DSpace configuration
      */
-    public static Enumeration<?> propertyNames()
-    {
+    public static Enumeration<?> propertyNames() {
         // Get a list of all property keys, and convert into an Enumeration
-        return java.util.Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys());
+        return java.util.Collections
+            .enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys());
     }
 
     /**
@@ -401,15 +327,14 @@ public class ConfigurationManager
      * <P>
      * As ConfigurationManager is now deprecated, older code using this method
      * should consider using ConfigurationService.getPropertyKeys(String prefix) directly.
-     * 
-     * @param  module    module, or <code>null</code> for regular property
      *
+     * @param module module, or <code>null</code> for regular property
      * @return an enumeration of all the keys in the module configuration,
-     *         or <code>null</code> if the module does not exist.
+     * or <code>null</code> if the module does not exist.
      */
-    public static Enumeration<?> propertyNames(String module)
-    {
+    public static Enumeration<?> propertyNames(String module) {
         // Get property keys beginning with this prefix, and convert into an Enumeration
-        return java.util.Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys(module));
+        return java.util.Collections
+            .enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys(module));
     }
 }

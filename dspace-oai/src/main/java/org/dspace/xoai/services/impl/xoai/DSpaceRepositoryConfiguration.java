@@ -7,6 +7,14 @@
  */
 package org.dspace.xoai.services.impl.xoai;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+
 import com.lyncode.xoai.dataprovider.core.DeleteMethod;
 import com.lyncode.xoai.dataprovider.core.Granularity;
 import com.lyncode.xoai.dataprovider.services.api.RepositoryConfiguration;
@@ -15,26 +23,16 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
-import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.EarliestDateResolver;
+import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 /**
- * 
  * @author Lyncode Development Team (dspace at lyncode dot com)
  * @author Domingo Iglesias (diglesias at ub dot edu)
  */
-public class DSpaceRepositoryConfiguration implements RepositoryConfiguration
-{
+public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
     private static Logger log = LogManager.getLogger(DSpaceRepositoryConfiguration.class);
 
     private List<String> emails = null;
@@ -44,126 +42,120 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration
     private EarliestDateResolver dateResolver;
     private ConfigurationService configurationService;
 
-    public DSpaceRepositoryConfiguration(EarliestDateResolver dateResolver, ConfigurationService configurationService, Context context)
-    {
+    public DSpaceRepositoryConfiguration(EarliestDateResolver dateResolver, ConfigurationService configurationService,
+                                         Context context) {
         this.dateResolver = dateResolver;
         this.configurationService = configurationService;
         this.context = context;
     }
 
     @Override
-    public List<String> getAdminEmails()
-    {
-        if (emails == null)
-        {
+    public List<String> getAdminEmails() {
+        if (emails == null) {
             emails = new ArrayList<String>();
             String result = configurationService.getProperty("mail.admin");
-            if (result == null)
-            {
-                log.warn("{ OAI 2.0 :: DSpace } Not able to retrieve the mail.admin property from the configuration file");
-            }
-            else
+            if (result == null) {
+                log.warn(
+                    "{ OAI 2.0 :: DSpace } Not able to retrieve the mail.admin property from the configuration file");
+            } else {
                 emails.add(result);
+            }
         }
         return emails;
     }
 
     @Override
-    public String getBaseUrl()
-    {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        if (baseUrl == null)
-        {
+    public String getBaseUrl() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+            .getRequest();
+        if (baseUrl == null) {
             baseUrl = configurationService.getProperty("oai.url");
             if (baseUrl == null) {
-                log.warn("{ OAI 2.0 :: DSpace } Not able to retrieve the oai.url property from oai.cfg. Falling back to request address");
+                log.warn(
+                    "{ OAI 2.0 :: DSpace } Not able to retrieve the oai.url property from oai.cfg. Falling back to " +
+                        "request address");
                 baseUrl = request.getRequestURL().toString()
-                    .replace(request.getPathInfo(), "");    
+                                 .replace(request.getPathInfo(), "");
             }
         }
         return baseUrl + request.getPathInfo();
     }
 
     @Override
-    public DeleteMethod getDeleteMethod()
-    {
+    public DeleteMethod getDeleteMethod() {
         return DeleteMethod.TRANSIENT;
     }
 
     @Override
-    public Date getEarliestDate()
-    {
+    public Date getEarliestDate() {
         // Look at the database!
-        try
-        {
+        try {
             return dateResolver.getEarliestDate(context);
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             log.error(e.getMessage(), e);
-        }
-        catch (InvalidMetadataFieldException e)
-        {
+        } catch (InvalidMetadataFieldException e) {
             log.error(e.getMessage(), e);
         }
         return new Date();
     }
 
     @Override
-    public Granularity getGranularity()
-    {
+    public Granularity getGranularity() {
         return Granularity.Second;
     }
 
     @Override
-    public String getRepositoryName()
-    {
-        if (name == null)
-        {
+    public String getRepositoryName() {
+        if (name == null) {
             name = configurationService.getProperty("dspace.name");
-            if (name == null)
-            {
-                log.warn("{ OAI 2.0 :: DSpace } Not able to retrieve the dspace.name property from the configuration file");
+            if (name == null) {
+                log.warn(
+                    "{ OAI 2.0 :: DSpace } Not able to retrieve the dspace.name property from the configuration file");
                 name = "OAI Repository";
             }
         }
         return name;
     }
 
-	@Override
-	public List<String> getDescription() {
-		List<String> result = new ArrayList<String>();
-		String descriptionFile = configurationService.getProperty("oai", "description.file");
-		if (descriptionFile == null) {
-			// Try indexed
-			boolean stop = false;
-			List<String> descriptionFiles = new ArrayList<String>();
-			for (int i=0;!stop;i++) {
-				String tmp = configurationService.getProperty("oai", "description.file."+i);
-				if (tmp == null) stop = true;
-				else descriptionFiles.add(tmp);
-			}
-			
-			for (String path : descriptionFiles) {
-				try {
-				    File f = new File(path);
-				    if (f.exists())
-				        result.add(FileUtils.readFileToString(f));
-				} catch (IOException e) {
-					log.debug(e.getMessage(), e);
-				}
-			}
-			
-		} else {
-			try {
-			    File f = new File(descriptionFile);
-			    if (f.exists())
-			        result.add(FileUtils.readFileToString(f));
-			} catch (IOException e) {
-				log.debug(e.getMessage(), e);
-			}
-		}
-		return result;
-	}
+    @Override
+    public List<String> getDescription() {
+        List<String> result = new ArrayList<String>();
+        String descriptionFile = configurationService.getProperty("oai", "description.file");
+        if (descriptionFile == null) {
+            // Try indexed
+            boolean stop = false;
+            List<String> descriptionFiles = new ArrayList<String>();
+            for (int i = 0; !stop; i++) {
+                String tmp = configurationService.getProperty("oai", "description.file." + i);
+                if (tmp == null) {
+                    stop = true;
+                } else {
+                    descriptionFiles.add(tmp);
+                }
+            }
+
+            for (String path : descriptionFiles) {
+                try {
+                    File f = new File(path);
+                    if (f.exists()) {
+                        result.add(FileUtils.readFileToString(f));
+                    }
+                } catch (IOException e) {
+                    log.debug(e.getMessage(), e);
+                }
+            }
+
+        } else {
+            try {
+                File f = new File(descriptionFile);
+                if (f.exists()) {
+                    result.add(FileUtils.readFileToString(f));
+                }
+            } catch (IOException e) {
+                log.debug(e.getMessage(), e);
+            }
+        }
+        return result;
+    }
 
 }

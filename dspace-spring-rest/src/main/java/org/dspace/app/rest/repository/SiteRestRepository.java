@@ -26,59 +26,58 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the repository responsible to manage Item Rest object
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
 @Component(SiteRest.CATEGORY + "." + SiteRest.NAME)
 public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
 
-	@Autowired
-	SiteService sitesv;
+    @Autowired
+    SiteService sitesv;
 
-	@Autowired
-	SiteConverter converter;
-	
-	
-	public SiteRestRepository() {
-	}
+    @Autowired
+    SiteConverter converter;
 
-	@Override
-	public SiteRest findOne(Context context, UUID id) {
-		Site site = null;
-		try {
-			site = sitesv.find(context, id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (site == null) {
-			return null;
-		}
-		return converter.fromModel(site);
-	}
 
-	@Override
-	public Page<SiteRest> findAll(Context context, Pageable pageable) {
-		List<Site> sites = new ArrayList<Site>();
-		int total = 1;
-		try {
-			sites.add(sitesv.findSite(context));
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(converter);
-		return page;
-	}
-	
-	@Override
-	public Class<SiteRest> getDomainClass() {
-		return SiteRest.class;
-	}
-	
-	@Override
-	public SiteResource wrapResource(SiteRest site, String... rels) {
-		return new SiteResource(site, utils, rels);
-	}
+    public SiteRestRepository() {
+    }
+
+    @Override
+    public SiteRest findOne(Context context, UUID id) {
+        Site site = null;
+        try {
+            site = sitesv.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (site == null) {
+            return null;
+        }
+        return converter.fromModel(site);
+    }
+
+    @Override
+    public Page<SiteRest> findAll(Context context, Pageable pageable) {
+        List<Site> sites = new ArrayList<Site>();
+        int total = 1;
+        try {
+            sites.add(sitesv.findSite(context));
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(converter);
+        return page;
+    }
+
+    @Override
+    public Class<SiteRest> getDomainClass() {
+        return SiteRest.class;
+    }
+
+    @Override
+    public SiteResource wrapResource(SiteRest site, String... rels) {
+        return new SiteResource(site, utils, rels);
+    }
 
 }

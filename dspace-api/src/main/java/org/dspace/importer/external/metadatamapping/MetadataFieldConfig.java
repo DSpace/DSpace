@@ -21,26 +21,38 @@ public class MetadataFieldConfig {
 
     /**
      * Indicates whether some other object is "equal to" this one.
+     *
      * @param o the reference object with which to compare.
-     * @return  {@code true} if this object is the same as the obj
-     *          argument; {@code false} otherwise.
+     * @return {@code true} if this object is the same as the obj
+     * argument; {@code false} otherwise.
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         MetadataFieldConfig that = (MetadataFieldConfig) o;
 
-        if (!element.equals(that.element)) return false;
-        if (qualifier != null ? !qualifier.equals(that.qualifier) : that.qualifier != null) return false;
-        if (!schema.equals(that.schema)) return false;
+        if (!element.equals(that.element)) {
+            return false;
+        }
+        if (qualifier != null ? !qualifier.equals(that.qualifier) : that.qualifier != null) {
+            return false;
+        }
+        if (!schema.equals(that.schema)) {
+            return false;
+        }
 
         return true;
     }
 
     /**
      * Create the String representation of the MetadataFieldConfig
+     *
      * @return a string representation of the MetadataFieldConfig
      */
     @Override
@@ -58,7 +70,8 @@ public class MetadataFieldConfig {
      * Returns a hash code value for the object. This method is
      * supported for the benefit of hash tables such as those provided by
      * {@link java.util.HashMap}.
-     * @return  a hash code value for this object.
+     *
+     * @return a hash code value for this object.
      */
     @Override
     public int hashCode() {
@@ -72,6 +85,7 @@ public class MetadataFieldConfig {
     /**
      * Create a MetadataFieldConfig based on a given MetadatumDTO
      * This MetadatumDTO object contains the schema, element and qualifier needed to initialize the MetadataFieldConfig
+     *
      * @param value the DTO.
      */
     public MetadataFieldConfig(MetadatumDTO value) {
@@ -88,8 +102,9 @@ public class MetadataFieldConfig {
 
     /**
      * Create a MetadataFieldConfig using a schema,element and qualifier
-     * @param schema The schema to set to this object
-     * @param element The element to set to this object
+     *
+     * @param schema    The schema to set to this object
+     * @param element   The element to set to this object
      * @param qualifier The qualifier to set to this object
      */
     public MetadataFieldConfig(String schema, String element, String qualifier) {
@@ -101,24 +116,27 @@ public class MetadataFieldConfig {
     /**
      * Create a MetadataFieldConfig using a single value.
      * This value is split up into schema, element and qualifier, based on a dot(.)
+     *
      * @param full A string representing the schema.element.qualifier triplet
      */
     public MetadataFieldConfig(String full) {
-        String elements[]=full.split("\\.");
-        if(elements.length==2){
+        String elements[] = full.split("\\.");
+        if (elements.length == 2) {
             this.schema = elements[0];
-            this.element =elements[1];
-        } else if(elements.length==3){
+            this.element = elements[1];
+        } else if (elements.length == 3) {
             this.schema = elements[0];
-            this.element =elements[1];
+            this.element = elements[1];
             this.qualifier = elements[2];
         }
 
     }
+
     /**
      * Create a MetadataFieldConfig using a schema and element
      * qualifier will be set to <code>null</code>
-     * @param schema The schema to set to this object
+     *
+     * @param schema  The schema to set to this object
      * @param element The element to set to this object
      */
     public MetadataFieldConfig(String schema, String element) {
@@ -129,6 +147,7 @@ public class MetadataFieldConfig {
 
     /**
      * Set the schema to this MetadataFieldConfig
+     *
      * @param schema The schema to set to this object
      */
     public void setSchema(String schema) {
@@ -139,6 +158,7 @@ public class MetadataFieldConfig {
     /**
      * Return the schema set to this object.
      * <code>null</code> if nothing is set
+     *
      * @return The schema of this object
      */
     public String getSchema() {
@@ -148,15 +168,17 @@ public class MetadataFieldConfig {
 
     /**
      * Return a string representing the field of this object
+     *
      * @return The field that is set to this object, in the form of schema.element.qualifier
      */
     public String getField() {
-        return schema + "." + element + (qualifier==null?"":("." + qualifier));
+        return schema + "." + element + (qualifier == null ? "" : ("." + qualifier));
     }
 
     /**
      * Return the qualifier set to this object.
      * <code>null</code> if nothing is set
+     *
      * @return The qualifier of this object
      */
     public String getElement() {
@@ -165,6 +187,7 @@ public class MetadataFieldConfig {
 
     /**
      * Set the element to this MetadataFieldConfig
+     *
      * @param element The element to set to this object
      */
     public void setElement(String element) {
@@ -174,6 +197,7 @@ public class MetadataFieldConfig {
     /**
      * Return the qualifier set to this object.
      * <code>null</code> if nothing is set
+     *
      * @return The qualifier of this object
      */
     public String getQualifier() {
@@ -182,6 +206,7 @@ public class MetadataFieldConfig {
 
     /**
      * Set the qualifier to this MetadataFieldConfig
+     *
      * @param qualifier The qualifier to set to this object
      */
     public void setQualifier(String qualifier) {

@@ -8,29 +8,44 @@
 package org.dspace.app.rest.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.springframework.hateoas.Identifiable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Base class for any REST resource that need to be addressable
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
- * @param <T>
- *            the class of the resource identifier
+ * @param <T> the class of the resource identifier
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public abstract class BaseObjectRest<T extends Serializable> implements Identifiable<T>, RestModel {
-	@JsonIgnore
-	protected T id;
+public abstract class BaseObjectRest<T extends Serializable> implements Identifiable<T>, RestAddressableModel {
 
-	@Override
-	public T getId() {
-		return id;
-	}
+    protected T id;
 
-	public void setId(T id) {
-		this.id = id;
-	}
+    @JsonInclude(Include.NON_EMPTY)
+    private List<ErrorRest> errors;
+
+    @Override
+    public T getId() {
+        return id;
+    }
+
+    public void setId(T id) {
+        this.id = id;
+    }
+
+    public List<ErrorRest> getErrors() {
+        if (this.errors == null) {
+            this.errors = new ArrayList<ErrorRest>();
+        }
+        return errors;
+    }
+
+    public void setErrors(List<ErrorRest> errors) {
+        this.errors = errors;
+    }
+
 }

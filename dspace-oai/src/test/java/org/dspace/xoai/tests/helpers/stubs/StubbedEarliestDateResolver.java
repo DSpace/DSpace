@@ -7,17 +7,17 @@
  */
 package org.dspace.xoai.tests.helpers.stubs;
 
+import java.sql.SQLException;
+import java.util.Date;
+
 import org.dspace.core.Context;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.services.api.EarliestDateResolver;
 
-import java.sql.SQLException;
-import java.util.Date;
-
 public class StubbedEarliestDateResolver implements EarliestDateResolver {
     private Date date = new Date();
 
-    public StubbedEarliestDateResolver is (Date date) {
+    public StubbedEarliestDateResolver is(Date date) {
         this.date = date;
         return this;
     }

@@ -7,6 +7,15 @@
  */
 package org.dspace.eperson;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -29,9 +38,6 @@ import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.SQLException;
-import java.util.*;
-
 /**
  * Service implementation for the EPerson object.
  * This class is responsible for all business logic calls for the EPerson object and is autowired by spring.
@@ -41,7 +47,9 @@ import java.util.*;
  */
 public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> implements EPersonService {
 
-    /** log4j logger */
+    /**
+     * log4j logger
+     */
     private final Logger log = Logger.getLogger(EPersonServiceImpl.class);
 
     @Autowired(required = true)
@@ -54,8 +62,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Autowired(required = true)
     protected SubscribeService subscribeService;
 
-    protected EPersonServiceImpl()
-    {
+    protected EPersonServiceImpl() {
         super();
     }
 
@@ -66,12 +73,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public EPerson findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if(StringUtils.isNumeric(id))
-        {
+        if (StringUtils.isNumeric(id)) {
             return findByLegacyId(context, Integer.parseInt(id));
-        }
-        else
-        {
+        } else {
             return find(context, UUID.fromString(id));
         }
     }
@@ -83,8 +87,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public EPerson findByEmail(Context context, String email) throws SQLException {
-        if (email == null)
-        {
+        if (email == null) {
             return null;
         }
 
@@ -94,8 +97,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public EPerson findByNetid(Context context, String netId) throws SQLException {
-        if (netId == null)
-        {
+        if (netId == null) {
             return null;
         }
 
@@ -104,8 +106,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public List<EPerson> search(Context context, String query) throws SQLException {
-        if(StringUtils.isBlank(query))
-        {
+        if (StringUtils.isBlank(query)) {
             //If we don't have a query, just return everything.
             return findAll(context, EPerson.EMAIL);
         }
@@ -117,19 +118,18 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         try {
             List<EPerson> ePerson = new ArrayList<>();
             EPerson person = find(context, UUID.fromString(query));
-            if(person != null)
-            {
+            if (person != null) {
                 ePerson.add(person);
             }
             return ePerson;
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
             MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
-            if (StringUtils.isBlank(query))
-            {
+            if (StringUtils.isBlank(query)) {
                 query = null;
             }
-            return ePersonDAO.search(context, query, Arrays.asList(firstNameField, lastNameField), Arrays.asList(firstNameField, lastNameField), offset, limit);
+            return ePersonDAO.search(context, query, Arrays.asList(firstNameField, lastNameField),
+                                     Arrays.asList(firstNameField, lastNameField), offset, limit);
         }
     }
 
@@ -137,21 +137,22 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     public int searchResultCount(Context context, String query) throws SQLException {
         MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
         MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
-        if(StringUtils.isBlank(query)) query = null;
+        if (StringUtils.isBlank(query)) {
+            query = null;
+        }
         return ePersonDAO.searchResultCount(context, query, Arrays.asList(firstNameField, lastNameField));
     }
 
     @Override
     public List<EPerson> findAll(Context context, int sortField) throws SQLException {
-    	return findAll(context, sortField, -1, -1);
+        return findAll(context, sortField, -1, -1);
     }
-    
+
     @Override
     public List<EPerson> findAll(Context context, int sortField, int pageSize, int offset) throws SQLException {
         String sortColumn = null;
         MetadataField metadataFieldSort = null;
-        switch (sortField)
-        {
+        switch (sortField) {
             case EPerson.ID:
                 sortColumn = "eperson_id";
                 break;
@@ -176,20 +177,19 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Override
     public EPerson create(Context context) throws SQLException, AuthorizeException {
         // authorized?
-        if (!authorizeService.isAdmin(context))
-        {
+        if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                    "You must be an admin to create an EPerson");
+                "You must be an admin to create an EPerson");
         }
 
         // Create a table row
         EPerson e = ePersonDAO.create(context, new EPerson());
 
         log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
-                + e.getID()));
+            + e.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(),
-                null, getIdentifiers(context, e)));
+                                   null, getIdentifiers(context, e)));
 
         return e;
     }
@@ -197,10 +197,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Override
     public void delete(Context context, EPerson ePerson) throws SQLException, AuthorizeException {
         // authorized?
-        if (!authorizeService.isAdmin(context))
-        {
+        if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                    "You must be an admin to delete an EPerson");
+                "You must be an admin to delete an EPerson");
         }
 
         // check for presence of eperson in tables that
@@ -209,12 +208,12 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         // if eperson exists in tables that have constraints
         // on eperson, throw an exception
-        if (constraintList.size() > 0)
-        {
+        if (constraintList.size() > 0) {
             throw new AuthorizeException(new EPersonDeletionException(constraintList));
         }
 
-        context.addEvent(new Event(Event.DELETE, Constants.EPERSON, ePerson.getID(), ePerson.getEmail(), getIdentifiers(context, ePerson)));
+        context.addEvent(new Event(Event.DELETE, Constants.EPERSON, ePerson.getID(), ePerson.getEmail(),
+                                   getIdentifiers(context, ePerson)));
 
         // XXX FIXME: This sidesteps the object model code so it won't
         // generate  REMOVE events on the affected Groups.
@@ -235,7 +234,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         ePersonDAO.delete(context, ePerson);
 
         log.info(LogManager.getHeader(context, "delete_eperson",
-                "eperson_id=" + ePerson.getID()));
+                                      "eperson_id=" + ePerson.getID()));
     }
 
     @Override
@@ -253,14 +252,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public void setPasswordHash(EPerson ePerson, PasswordHash password) {
-        if (null == password)
-        {
+        if (null == password) {
             ePerson.setDigestAlgorithm(null);
             ePerson.setSalt(null);
             ePerson.setPassword(null);
-        }
-        else
-        {
+        } else {
             ePerson.setDigestAlgorithm(password.getAlgorithm());
             ePerson.setSalt(password.getSaltString());
             ePerson.setPassword(password.getHashString());
@@ -272,8 +268,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         PasswordHash hash = null;
         try {
             hash = new PasswordHash(ePerson.getDigestAlgorithm(),
-                    ePerson.getSalt(),
-                    ePerson.getPassword());
+                                    ePerson.getSalt(),
+                                    ePerson.getPassword());
         } catch (DecoderException ex) {
             log.error("Problem decoding stored salt or hash:  " + ex.getMessage());
         }
@@ -283,22 +279,19 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Override
     public boolean checkPassword(Context context, EPerson ePerson, String attempt) {
         PasswordHash myHash;
-        try
-        {
+        try {
             myHash = new PasswordHash(
-                    ePerson.getDigestAlgorithm(),
-                    ePerson.getSalt(),
-                    ePerson.getPassword());
-        } catch (DecoderException ex)
-        {
+                ePerson.getDigestAlgorithm(),
+                ePerson.getSalt(),
+                ePerson.getPassword());
+        } catch (DecoderException ex) {
             log.error(ex.getMessage());
             return false;
         }
         boolean answer = myHash.matches(attempt);
 
         // If using the old unsalted hash, and this password is correct, update to a new hash
-        if (answer && (null == ePerson.getDigestAlgorithm()))
-        {
+        if (answer && (null == ePerson.getDigestAlgorithm())) {
             log.info("Upgrading password hash for EPerson " + ePerson.getID());
             setPassword(ePerson, attempt);
             try {
@@ -319,9 +312,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         // Check authorisation - if you're not the eperson
         // see if the authorization system says you can
         if (!context.ignoreAuthorization()
-                && ((context.getCurrentUser() == null) || (ePerson.getID() != context
-                .getCurrentUser().getID())))
-        {
+            && ((context.getCurrentUser() == null) || (ePerson.getID() != context
+            .getCurrentUser().getID()))) {
             authorizeService.authorizeAction(context, ePerson, Constants.WRITE);
         }
 
@@ -330,29 +322,25 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         ePersonDAO.save(context, ePerson);
 
         log.info(LogManager.getHeader(context, "update_eperson",
-                "eperson_id=" + ePerson.getID()));
+                                      "eperson_id=" + ePerson.getID()));
 
-        if (ePerson.isModified())
-        {
+        if (ePerson.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.EPERSON,
-                    ePerson.getID(), null, getIdentifiers(context, ePerson)));
+                                       ePerson.getID(), null, getIdentifiers(context, ePerson)));
             ePerson.clearModified();
         }
-        if (ePerson.isMetadataModified())
-        {
+        if (ePerson.isMetadataModified()) {
             ePerson.clearDetails();
         }
     }
 
     @Override
-    public List<String> getDeleteConstraints(Context context, EPerson ePerson) throws SQLException
-    {
+    public List<String> getDeleteConstraints(Context context, EPerson ePerson) throws SQLException {
         List<String> tableList = new ArrayList<String>();
 
         // check for eperson in item table
         Iterator<Item> itemsBySubmitter = itemService.findBySubmitter(context, ePerson);
-        if (itemsBySubmitter.hasNext())
-        {
+        if (itemsBySubmitter.hasNext()) {
             tableList.add("item");
         }
 
@@ -368,10 +356,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Override
     public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException {
         //Make sure we at least have one group, if not don't even bother searching.
-        if(CollectionUtils.isNotEmpty(groups))
-        {
+        if (CollectionUtils.isNotEmpty(groups)) {
             return ePersonDAO.findByGroups(c, groups);
-        }else{
+        } else {
             return new ArrayList<>();
         }
     }
