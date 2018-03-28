@@ -269,8 +269,7 @@ public class JournalUtils {
                 if (manuscriptMatcher.find()) {
                     canonicalID = manuscriptMatcher.group(1);
                 } else {
-                    log.error("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalConcept.getFullName() + ": '" + journalConcept.getCanonicalManuscriptNumberPattern() + "'");
-                    throw new ParseException("'" + manuscriptId + "' does not match regex '" + journalConcept.getCanonicalManuscriptNumberPattern() + "'", 0);
+                    log.info("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalConcept.getFullName() + ": '" + journalConcept.getCanonicalManuscriptNumberPattern() + "'");
                 }
             } else {
                 // there is no regex specified, just use the manuscript.
