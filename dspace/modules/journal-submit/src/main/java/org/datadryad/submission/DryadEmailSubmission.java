@@ -42,10 +42,6 @@ public class DryadEmailSubmission extends HttpServlet {
     private static String PROPERTIES_PROPERTY = "dryad.properties.filename";
 
     private static String EMAIL_TEMPLATE = "journal_submit_error";
-
-    // Timer for scheduled harvesting of emails
-    private Timer myEmailHarvester;
-
     private static DryadGmailService dryadGmailService;
 
     /**
@@ -212,12 +208,6 @@ public class DryadEmailSubmission extends HttpServlet {
 
             dryadGmailService = new DryadGmailService();
         }
-
-//        LOGGER.debug("scheduling email harvesting");
-//        myEmailHarvester = new Timer();
-//        // schedule email harvesting to happen once an hour
-//        int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("submit.journal.email.timer"));
-//        myEmailHarvester.schedule(new DryadEmailSubmissionHarvester(), 0, 1000 * timerInterval);
     }
 
     private void processMimeMessage (MimeMessage mime) throws Exception {
@@ -419,12 +409,5 @@ public class DryadEmailSubmission extends HttpServlet {
             throws IOException {
         aResponse.setContentType("xml/application; charset=UTF-8");
         return aResponse.getWriter();
-    }
-
-    private class DryadEmailSubmissionHarvester extends TimerTask {
-        @Override
-        public void run() {
-            retrieveMail();
-        }
     }
 }
