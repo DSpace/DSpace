@@ -147,7 +147,7 @@ public class ResultSet {
                 indexTo = itemList.size();
             }
             log.debug("list from " + indexFrom + " to " + indexTo);
-            for (int i = indexFrom; i <= indexTo; i++) {
+            for (int i = indexFrom+1; i <= indexTo; i++) {
                 resultList.add(itemList.get(i));
             }
         }
