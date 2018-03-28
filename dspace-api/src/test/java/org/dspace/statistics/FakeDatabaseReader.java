@@ -7,6 +7,8 @@
  */
 package org.dspace.statistics;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,15 +25,28 @@ import com.maxmind.geoip2.record.Postal;
 import com.maxmind.geoip2.record.RepresentedCountry;
 import com.maxmind.geoip2.record.Subdivision;
 import com.maxmind.geoip2.record.Traits;
+import mockit.Deencapsulation;
 import mockit.Mock;
 import mockit.MockUp;
 
 /**
- * Mock service to mock the location Lookup Service used by the SOLR statistics logger
+ * Mock service to mock the location Lookup Service used by the SOLR statistics
+ * logger.
  */
-public class MockLookupService
+public class FakeDatabaseReader
         extends MockUp<DatabaseReader> {
-/*
+
+    FakeDatabaseReader() {
+    }
+
+    public FakeDatabaseReader(Object object) {
+    }
+
+    public FakeDatabaseReader $init(Builder builder) {
+        return this;
+    }
+
+    /*
     @Override
     public Location getLocation(String str) {
         Location location = new Location();
@@ -48,7 +63,7 @@ public class MockLookupService
 
         return location;
     }
-*/
+    */
 
     @Mock
     public CityResponse city(InetAddress address) {
@@ -79,5 +94,25 @@ public class MockLookupService
                 location, maxmind, postal, country, representedCountry,
                 subdivisions, traits);
         return response;
+    }
+
+    public static class Builder
+            extends MockUp<DatabaseReader.Builder> {
+
+        public Builder() {}
+
+        /**
+         * Fake constructor.
+         * @param file ignored.
+         */
+        @Mock
+        public void $init(File file) {
+        }
+
+        @Mock
+        public DatabaseReader build()
+                throws IOException {
+            return Deencapsulation.newUninitializedInstance(DatabaseReader.class);
+        }
     }
 }
