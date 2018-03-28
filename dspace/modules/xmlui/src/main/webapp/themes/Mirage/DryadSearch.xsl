@@ -153,13 +153,26 @@
                             <xsl:variable name="title" select="dim:field[@element='title'][1]"/>
                             <xsl:variable name="titleEndChar"
                                           select="substring($title, string-length($title), 1)"/>
-                            <xsl:value-of select="$title"/>
+                            <xsl:variable name="title-length" select="string-length(substring-before($title,' '))"/>
                             <xsl:choose>
-                                <xsl:when test="$titleEndChar != '.' and $titleEndChar != '?'">
-                                    <xsl:text>. </xsl:text>
+                                <xsl:when test="($title-length > 30)">
+                                    <xsl:value-of select="substring($title,1,30)"/>
+                                    <xsl:text>...</xsl:text>
+                                </xsl:when>
+                                <xsl:when test="($title-length = 0) and (string-length($title) > 30)">
+                                    <xsl:value-of select="substring($title,1,30)"/>
+                                    <xsl:text>...</xsl:text>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:text>&#160;</xsl:text>
+                                    <xsl:value-of select="$title"/>
+                                    <xsl:choose>
+                                        <xsl:when test="$titleEndChar != '.' and $titleEndChar != '?'">
+                                            <xsl:text>. </xsl:text>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:text>&#160;</xsl:text>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:when>
