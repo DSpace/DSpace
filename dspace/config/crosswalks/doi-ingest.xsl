@@ -60,6 +60,11 @@
             <!--Journal Name | prism:publicationName | doi_record/crossref/journal/journal_metadata/full_title | none-->
             <xsl:if test="crossref/journal/journal_metadata/full_title">
                 <dim:field mdschema="prism" element="publicationName">
+                    <xsl:if test="crossref/journal/journal_metadata/issn">
+                        <xsl:attribute name="authority">
+                            <xsl:value-of select="crossref/journal/journal_metadata/issn"/>
+                        </xsl:attribute>
+                    </xsl:if>
                     <xsl:value-of select="crossref/journal/journal_metadata/full_title"/>
                 </dim:field>
             </xsl:if>

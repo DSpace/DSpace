@@ -226,6 +226,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         item.clearMetadata("prism.publicationName");
         item.update();
 
+        String issn = "";
+        // see if there's an ISSN stashed in the authority attribute
+        if (journalMDV.length > 0 && !"".equals(journalMDV[0].authority)) {
+            issn = journalMDV[0].authority;
+            journalConcept = JournalUtils.getJournalConceptByISSN(issn);
+        }
+
         String journal = null;
         if (journalConcept == null) {
             // did the user enter a journal?
@@ -252,6 +259,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 try {
                     // if we still haven't found a matching journal concept, make a new, temporary one.
                     journalConcept = JournalUtils.createJournalConcept(journal);
+                    // if we got this from a crosswalk, it might already have an ISSN: that's helpful!
+                    if (journalConcept != null && !"".equals(issn)) {
+                        journalConcept.setISSN(issn);
+                    }
                 } catch (Exception e) {
                     // this should not happen because we've already checked to see if a matching concept existed.
                     log.error("couldn't create a concept");
