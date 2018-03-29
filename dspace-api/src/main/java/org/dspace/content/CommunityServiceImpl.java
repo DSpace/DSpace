@@ -257,7 +257,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         if (community.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(), null,
                                        getIdentifiers(context, community)));
-            community.setModified();
+            community.clearModified();
         }
         if (community.isMetadataModified()) {
             context.addEvent(
