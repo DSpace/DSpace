@@ -9,6 +9,7 @@ tags
 /bin/
 .project
 .classpath
+.checkstyle
 
 ## Ignore project files created by IntelliJ IDEA
 *.iml
@@ -41,4 +42,3 @@ nb-configuration.xml
 
 ##Ignore JRebel project configuration
 rebel.xml
-.checkstyle
