@@ -69,6 +69,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.EtdUnitService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -192,6 +193,8 @@ public class EtdLoader
     private final static ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
 
     private final static AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
+    protected static EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
 
     /***************************************************************** main */
     /**
@@ -783,7 +786,7 @@ public class EtdLoader
 
             log.debug("Found DISS_inst_contact: " + strDepartment);
 
-            EtdUnit etdunit = EtdUnit.findByName(context, strDepartment);
+            EtdUnit etdunit = etdunitService.findByName(context, strDepartment);
 
             if (etdunit == null)
             {

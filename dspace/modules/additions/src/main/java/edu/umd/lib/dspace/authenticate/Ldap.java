@@ -32,6 +32,7 @@ import org.dspace.eperson.Unit;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.UnitService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -62,7 +63,13 @@ public class Ldap {
 
   private final static EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-  private final static GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();    /**
+  private final static GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();   
+  
+  // Begin UMD Customization
+  private final static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();   
+  // End UMD Customization
+  
+  /**
   * Wild card for Dublin Core metadata qualifiers/languages
   */
  public static final String ANY = "*";
@@ -388,7 +395,7 @@ public class Ldap {
     for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
       String strUnit = (String) i.next();
 
-      Unit unit = Unit.findByName(context, strUnit);
+      Unit unit = unitService.findByName(context, strUnit);
 
       if (unit != null && (!unit.getFacultyOnly() || isFaculty())) {
         ret.addAll(Arrays.asList(unit.getGroups()));
