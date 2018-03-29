@@ -83,7 +83,7 @@ Common usage:
     </tstamp>
 
     <!-- Default location of GeoLiteCity.dat.gz to download. This may be overridden, if URL path changes. -->
-    <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" />
+    <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz" />
 
     <!-- Default location of lucene-core JAR to download (for update_solr_indexes). This may be overridden, if URL path changes. -->
     <!-- NOTE: this URL should have the version of the JAR replaced with "[version]" -->
@@ -899,9 +899,18 @@ Common usage:
         <echo>Downloading: ${geolite}</echo>
         <trycatch property="geolite.error">
             <try>
-                <get src="${geolite}" dest="${dspace.dir}/config/GeoLiteCity.dat.gz" verbose="true"/>
-                <gunzip src="${dspace.dir}/config/GeoLiteCity.dat.gz" dest="${dspace.dir}/config/GeoLiteCity.dat" />
-                <delete file="${dspace.dir}/config/GeoLiteCity.dat.gz" />
+                <get src="${geolite}"
+                     dest="${dspace.dir}/config/GeoLite2-City.tar.gz"
+                     verbose="true"/>
+                <untar src="${dspace.dir}/config/GeoLite2-City.tar.gz"
+                       dest="${dspace.dir}/config/"
+                       compression='gzip'>
+                    <patternset>
+                        <include name='**/GeoLite2-City.mmdb'/>
+                    </patternset>
+                    <mapper type='flatten'/>
+                </untar>
+                <delete file="${dspace.dir}/config/GeoLite2-City.tar.gz"/>
             </try>
             <catch>
                 <echo>
