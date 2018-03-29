@@ -27,12 +27,14 @@ import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.UnitService;
 import org.dspace.event.Event;
 import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -64,6 +66,11 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+    
+    // Begin UMD Customization
+    @Autowired(required = true)
+    protected UnitService unitService;
+    // End UMD Customization
 
     protected GroupServiceImpl()
     {
@@ -386,7 +393,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
-    public void delete(Context context, Group group) throws SQLException {
+    public void delete(Context context, Group group) throws SQLException, AuthorizeException, IOException {
         if (group.isPermanent())
         {
             log.error("Attempt to delete permanent Group $", group.getName());
@@ -412,6 +419,14 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             ePeople.remove();
             ePerson.getGroups().remove(group);
         }
+
+        // Begin UMD Customization
+        // Remove all references to units
+        List<Unit> units = unitService.findAllByGroup(context, group);
+        for (Unit unit : units) {
+          unitService.removeGroup(context, unit, group);
+        }
+        // End UMD Customization
 
         // empty out group2groupcache table (if we do it after we delete our object we get an issue with references)
         group2GroupCacheDAO.deleteAll(context);
