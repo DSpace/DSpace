@@ -53,7 +53,7 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Autowired(required = true)
     private SiteService siteService;
 
-
+    
     @Override
     public List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices() {
         return dSpaceObjectServices;
@@ -138,4 +138,24 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     public SiteService getSiteService() {
         return siteService;
     }
+
+    // Begin UMD Customization
+    // Add EtdUnitService to the factory
+    @Autowired(required = true)
+    private EtdUnitService etdunitService;
+
+    @Override
+    public EtdUnitService getEtdUnitService() {
+        return etdunitService;
+    }
+
+    // Add CommunityGroup to the factory
+    @Autowired(required = true)
+    private CommunityGroupService communityGroupService;
+
+    @Override
+    public CommunityGroupService getCommunityGroupService() {
+        return communityGroupService;
+    }
+    // End UMD Customization
 }

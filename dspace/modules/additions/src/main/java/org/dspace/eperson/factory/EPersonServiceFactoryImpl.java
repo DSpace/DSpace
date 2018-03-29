@@ -59,4 +59,15 @@ public class EPersonServiceFactoryImpl extends EPersonServiceFactory {
     public SupervisorService getSupervisorService() {
         return supervisorService;
     }
+
+    // Begin UMD Customization
+    // Add UnitService to the factory
+    @Autowired(required = true)
+    private UnitService unitService;
+
+    @Override
+    public UnitService getUnitService() {
+        return unitService;
+    }
+    // End UMD Customization
 }

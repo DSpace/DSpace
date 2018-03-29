@@ -102,4 +102,8 @@ public abstract class ContentServiceFactory {
         return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("contentServiceFactory", ContentServiceFactory.class);
     }
 
+    // Begin UMD Customization
+    public abstract EtdUnitService getEtdUnitService();
+    public abstract CommunityGroupService getCommunityGroupService();
+    // End UMD Customization
 }

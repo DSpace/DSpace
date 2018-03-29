@@ -28,8 +28,12 @@ public abstract class EPersonServiceFactory {
     public abstract SubscribeService getSubscribeService();
 
     public abstract SupervisorService getSupervisorService();
-
+    
     public static EPersonServiceFactory getInstance(){
         return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("ePersonServiceFactory", EPersonServiceFactory.class);
     }
+
+    // Begin UMD Customization
+    public abstract UnitService getUnitService();
+    // End UMD Customization
 }
