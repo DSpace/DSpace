@@ -121,11 +121,10 @@ public class SelectCollectionStep extends AbstractProcessingStep
 
         // create our new Workspace Item
         WorkspaceItem wi = workspaceItemService.create(context, first_collection, true);
-
-        for (Collection collection : collections) {
-            wi.addMapCollection(collection);
-        }
-
+        
+        // Map additoinal collections to the item.
+        wi.addMappedCollections(collections);
+        
         // update Submission Information with this Workspace Item
         subInfo.setSubmissionItem(wi);
 
