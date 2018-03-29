@@ -71,6 +71,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Autowired(required=true)
     protected HarvestedCollectionService harvestedCollectionService;
 
+    // Begin UMD Custmoization
+    @Autowired(required=true)
+    protected EtdUnitService etdunitService;
+    // End UMD Custmoization
+
 
     protected CollectionServiceImpl()
     {
@@ -802,6 +807,14 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             collection.removeCommunity(owningCommunity);
             owningCommunity.removeCollection(collection);
         }
+
+        // Begin UMD Customization
+        // Remove all etdunit references to this collection
+        List<EtdUnit> etdunits = etdunitService.findAllByCollection(context, collection);
+        for (EtdUnit etdunit : etdunits) {
+            etdunitService.removeCollection(context, etdunit, collection);
+        }
+        // End UMD Customization
 
         collectionDAO.delete(context, collection);
     }

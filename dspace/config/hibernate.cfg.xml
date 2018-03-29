@@ -80,5 +80,9 @@
         <mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>-->
 
+        <!-- Begin UMD Customization -->
+        <!-- Mappings for UMD entities -->
+        <mapping class="org.dspace.content.EtdUnit"/>
+        <!-- End UMD Customization -->
     </session-factory>
 </hibernate-configuration>
