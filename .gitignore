@@ -9,6 +9,7 @@ tags
 /bin/
 .project
 .classpath
+.checkstyle
 
 ## Ignore project files created by IntelliJ IDEA
 *.iml
