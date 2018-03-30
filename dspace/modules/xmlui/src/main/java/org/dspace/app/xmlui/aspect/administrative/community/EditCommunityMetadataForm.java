@@ -20,6 +20,7 @@ import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
+import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
@@ -27,7 +28,9 @@ import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Community;
+import org.dspace.content.CommunityGroup;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityGroupService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 
@@ -64,6 +67,12 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
     private static final Message T_submit_delete = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_delete");
     private static final Message T_submit_update = message("xmlui.general.update");
     private static final Message T_submit_return = message("xmlui.general.return");
+
+    // Begin UMD Customization
+    private static final Message T_label_group = message("xmlui.administrative.community.EditCommunityMetadataForm.label_group");
+    
+    protected CommunityGroupService communityGroupService = ContentServiceFactory.getInstance().getCommunityGroupService();
+    // End UMD Customization
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
@@ -108,7 +117,17 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    metadataList.addLabel(T_label_name);
 	    Text name = metadataList.addItem().addText("name");
 	    name.setSize(40);
-	    name.setValue(communityService.getMetadata(thisCommunity, "name"));
+      name.setValue(communityService.getMetadata(thisCommunity, "name"));
+      
+      // Begin UMD Customization
+      // Add a select (dropdown) to choose communitygroup
+      java.util.List<CommunityGroup> groups = communityGroupService.findAll();
+      metadataList.addLabel(T_label_group);
+      Select group = metadataList.addItem().addSelect("community_group");
+      for (CommunityGroup cGroup : groups) {
+        group.addOption(cGroup.getID(), cGroup.getShortName());
+      }
+      // End UMD Customization
 	    
 	    // short description
 	    metadataList.addLabel(T_label_short_description);

@@ -14,7 +14,9 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
+import org.dspace.content.CommunityGroup;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityGroupService;
 import org.dspace.content.service.CommunityService;
 
 import java.sql.SQLException;
@@ -45,78 +47,94 @@ public class CreateCommunityForm extends AbstractDSpaceTransformer
 	private static final Message T_label_logo = message("xmlui.administrative.community.EditCommunityMetadataForm.label_logo");
 
 	private static final Message T_submit_save = message("xmlui.administrative.community.CreateCommunityForm.submit_save");
-	private static final Message T_submit_cancel = message("xmlui.general.cancel");
-	
-	protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+  private static final Message T_submit_cancel = message("xmlui.general.cancel");
+  
+  // Begin UMD Customization
+  private static final Message T_label_group = message("xmlui.administrative.community.EditCommunityMetadataForm.label_group");
 
+	protected CommunityGroupService communityGroupService = ContentServiceFactory.getInstance().getCommunityGroupService();
+  // End UMD Customization
+
+	protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+  
 	public void addPageMeta(PageMeta pageMeta) throws WingException
-    {
-        pageMeta.addMetadata("title").addContent(T_title);
-        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrail().addContent(T_trail);
-    }
+  {
+    pageMeta.addMetadata("title").addContent(T_title);
+    pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+    pageMeta.addTrail().addContent(T_trail);
+  }
 	
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
 	{
-        Community parentCommunity = null;
-        String communityIDString = parameters.getParameter("communityID", null);
-
-        if(!StringUtils.isBlank(communityIDString)) {
-            UUID communityID = UUID.fromString(communityIDString);
-            parentCommunity = communityService.find(context, communityID);
-        }
-
-		// DIVISION: main
-	    Division main = body.addInteractiveDivision("create-community",contextPath+"/admin/community",Division.METHOD_MULTIPART,"primary administrative community");
-	    /* Whether the parent community is null is what determines if 
-		  we are creating a top-level community or a sub-community */
-	    if (parentCommunity != null)
-        {
-            main.setHead(T_main_head_sub.parameterize(communityService.getMetadata(parentCommunity, "name")));
-        }
-	    else
-        {
-            main.setHead(T_main_head_top);
-        }
-	        
-	    
-	    // The grand list of metadata options
-	    List metadataList = main.addList("metadataList", "form");
-	    
-	    // community name
-	    metadataList.addLabel(T_label_name);
-	    Text name = metadataList.addItem().addText("name");
-	    name.setSize(40);
-        name.setAutofocus("autofocus");
-	    
-	    // short description
-	    metadataList.addLabel(T_label_short_description);
-	    Text short_description = metadataList.addItem().addText("short_description");
-	    short_description.setSize(40);
-	    
-	    // introductory text
-	    metadataList.addLabel(T_label_introductory_text);
-	    TextArea introductory_text = metadataList.addItem().addTextArea("introductory_text");
-	    introductory_text.setSize(6, 40);
-	    
-	    // copyright text
-	    metadataList.addLabel(T_label_copyright_text);
-	    TextArea copyright_text = metadataList.addItem().addTextArea("copyright_text");
-	    copyright_text.setSize(6, 40);
-	    
-	    // legacy sidebar text; may or may not be used for news 
-	    metadataList.addLabel(T_label_side_bar_text);
-	    TextArea side_bar_text = metadataList.addItem().addTextArea("side_bar_text");
-	    side_bar_text.setSize(6, 40);
-	    
-	    // the row to upload a new logo 
-	    metadataList.addLabel(T_label_logo);
-	    metadataList.addItem().addFile("logo");
-
-	    Para buttonList = main.addPara();
-	    buttonList.addButton("submit_save").setValue(T_submit_save);
-	    buttonList.addButton("submit_cancel").setValue(T_submit_cancel);
-	    
-    	main.addHidden("administrative-continue").setValue(knot.getId());
+    Community parentCommunity = null;
+    String communityIDString = parameters.getParameter("communityID", null);
+    
+    if(!StringUtils.isBlank(communityIDString)) {
+      UUID communityID = UUID.fromString(communityIDString);
+      parentCommunity = communityService.find(context, communityID);
     }
+    
+		// DIVISION: main
+    Division main = body.addInteractiveDivision("create-community",contextPath+"/admin/community",Division.METHOD_MULTIPART,"primary administrative community");
+    /* Whether the parent community is null is what determines if 
+    we are creating a top-level community or a sub-community */
+    if (parentCommunity != null)
+    {
+      main.setHead(T_main_head_sub.parameterize(communityService.getMetadata(parentCommunity, "name")));
+    }
+    else
+    {
+      main.setHead(T_main_head_top);
+    }
+    
+    
+    // The grand list of metadata options
+    List metadataList = main.addList("metadataList", "form");
+    
+    // community name
+    metadataList.addLabel(T_label_name);
+    Text name = metadataList.addItem().addText("name");
+    name.setSize(40);
+    name.setAutofocus("autofocus");
+    
+    // Begin UMD Customization
+    // Add a select (dropdown) to choose communitygroup
+    java.util.List<CommunityGroup> groups = communityGroupService.findAll();
+    metadataList.addLabel(T_label_group);
+    Select group = metadataList.addItem().addSelect("community_group");
+    for (CommunityGroup cGroup : groups) {
+      group.addOption(cGroup.getID(), cGroup.getShortName());
+    }
+    // End UMD Customization
+    
+    // short description
+    metadataList.addLabel(T_label_short_description);
+    Text short_description = metadataList.addItem().addText("short_description");
+    short_description.setSize(40);
+    
+    // introductory text
+    metadataList.addLabel(T_label_introductory_text);
+    TextArea introductory_text = metadataList.addItem().addTextArea("introductory_text");
+    introductory_text.setSize(6, 40);
+    
+    // copyright text
+    metadataList.addLabel(T_label_copyright_text);
+    TextArea copyright_text = metadataList.addItem().addTextArea("copyright_text");
+    copyright_text.setSize(6, 40);
+    
+    // legacy sidebar text; may or may not be used for news 
+    metadataList.addLabel(T_label_side_bar_text);
+    TextArea side_bar_text = metadataList.addItem().addTextArea("side_bar_text");
+    side_bar_text.setSize(6, 40);
+    
+    // the row to upload a new logo 
+    metadataList.addLabel(T_label_logo);
+    metadataList.addItem().addFile("logo");
+    
+    Para buttonList = main.addPara();
+    buttonList.addButton("submit_save").setValue(T_submit_save);
+    buttonList.addButton("submit_cancel").setValue(T_submit_cancel);
+    
+    main.addHidden("administrative-continue").setValue(knot.getId());
+  }
 }
