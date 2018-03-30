@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.cocoon;
 import java.io.*;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Date;
 import java.util.Map;
@@ -172,6 +173,15 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
     /** TEMP file for citation PDF. We will save here, so we can delete the temp file when done.  */
     private File tempFile;
+
+    // Begin UMD Customization
+    public static final String EMBARGO_HEADER = "xmlui.BitstreamReader.embargo_header";
+
+    private static final String EMBARGO_UNTIL_MESSAGE = "xmlui.BitstreamReader.embargo_until_message";
+
+    private static final String EMBARGO_NOTAVAILABLE_MESSAGE ="xmlui.BitstreamReader.embargo_notavailable_message";
+    // End UMD Customization
+
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
@@ -347,6 +357,37 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         // Redirect
                         String redictURL = request.getContextPath() + "/login";
 
+                        // DRUM Customizations
+                        String responseMessage = AUTH_REQUIRED_MESSAGE;
+                        String responseHeader = AUTH_REQUIRED_HEADER;
+                        String responseCharecters = "";
+                        
+                        if (authorizeService.isETDEmbargo(context, bitstream))
+                        {
+                            responseHeader = EMBARGO_HEADER;
+                            redictURL = request.getContextPath()
+                                    + "/restricted-resource";
+                            Date date = authorizeService.getETDEmbargo(context, bitstream).getEndDate();
+                            if (date != null)
+                            {
+                                SimpleDateFormat sdf = new SimpleDateFormat(
+                                        "MMMM dd, yyyy");
+
+                                String dateUntil = sdf.format(date).toString();
+                                responseMessage = EMBARGO_UNTIL_MESSAGE;
+                                responseCharecters = dateUntil + ".";
+                            }
+                            else
+                            {
+                                responseMessage = EMBARGO_NOTAVAILABLE_MESSAGE;
+                            }
+
+                        }
+                        AuthenticationUtil.interruptRequest(objectModel,
+                                responseHeader, responseMessage,
+                                responseCharecters);
+                        // End DRUM Customizations
+                        
                         HttpServletResponse httpResponse = (HttpServletResponse)
                         objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                         httpResponse.sendRedirect(redictURL);
