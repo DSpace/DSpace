@@ -271,8 +271,7 @@ public class JournalUtils {
                 if (manuscriptMatcher.find()) {
                     canonicalID = manuscriptMatcher.group(1);
                 } else {
-                    log.error("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalConcept.getFullName() + ": '" + journalConcept.getCanonicalManuscriptNumberPattern() + "'");
-                    throw new ParseException("'" + manuscriptId + "' does not match regex '" + journalConcept.getCanonicalManuscriptNumberPattern() + "'", 0);
+                    log.info("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalConcept.getFullName() + ": '" + journalConcept.getCanonicalManuscriptNumberPattern() + "'");
                 }
             } else {
                 // there is no regex specified, just use the manuscript.
@@ -407,8 +406,24 @@ public class JournalUtils {
         return null;
     }
 
+    public static boolean manuscriptIsKnownFormerManuscriptNumber(Item item, Manuscript manuscript) {
+        if (manuscript.getManuscriptId() == null) {
+            return false;
+        }
+        // is this manuscript one of this package's former msids?
+        DCValue[] formerMSIDs = item.getMetadata("dryad.formerManuscriptNumber");
+        if (formerMSIDs != null && formerMSIDs.length > 0) {
+            for (DCValue formerMSID : formerMSIDs) {
+                if (formerMSID.value.equalsIgnoreCase(manuscript.getManuscriptId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     // NOTE: identifier can be either journalCode or ISSN
-    public static List<Manuscript> getManuscriptsMatchingID(DryadJournalConcept journalConcept, String manuscriptId) {
+    private static List<Manuscript> getManuscriptsMatchingID(DryadJournalConcept journalConcept, String manuscriptId) {
         ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
         try {
             StoragePath storagePath = StoragePath.createManuscriptPath(journalConcept.getISSN(), getCanonicalManuscriptID(manuscriptId, journalConcept));
@@ -519,37 +534,48 @@ public class JournalUtils {
         if (journalConcept.getISSN().isEmpty()) {
             throw new RESTModelException("journal concept " + journalConcept.getConceptID() + " doesn't have an ISSN");
         } else {
-            String crossRefURL = crossRefApiRoot + "journals/" + journalConcept.getISSN();
-            try {
-                URL url = new URL(crossRefURL.replaceAll("\\s+", ""));
-                ObjectMapper m = new ObjectMapper();
-                JsonNode rootNode = m.readTree(url.openStream());
-                JsonNode titleNode = rootNode.path("message").path("title");
-                if (titleNode != null) {
-                    if (!titleNode.textValue().equalsIgnoreCase(journalConcept.getFullName())) {
-                        log.debug("journal concept " + journalConcept.getFullName() + " (" + journalConcept.getConceptID() + ") lists ISSN " + journalConcept.getISSN() + ", but that belongs to a journal titled " + titleNode.textValue());
+            for (String issn : journalConcept.getISSNs()) {
+                String journalTitle = getCrossRefJournalForISSN(issn);
+                if (journalTitle != null) {
+                    if (!journalTitle.equalsIgnoreCase(journalConcept.getFullName())) {
+                        log.debug("journal concept " + journalConcept.getFullName() + " (" + journalConcept.getConceptID() + ") lists ISSN " + issn + ", but that belongs to a journal titled " + journalTitle);
                     }
                     return true;
                 } else {
                     throw new RESTModelException("journal concept " + journalConcept.getConceptID() + " has an invalid crossref ISSN");
                 }
-            } catch (Exception e) {
-                throw new RESTModelException("couldn't query crossref for journal concept " + journalConcept.getConceptID() + " with ISSN " + journalConcept.getISSN() + ": " + e.getMessage());
             }
+        }
+        return false;
+    }
+
+    public static String getCrossRefJournalForISSN(String issn) throws RESTModelException {
+        String crossRefURL = crossRefApiRoot + "journals/" + issn;
+        try {
+            URL url = new URL(crossRefURL.replaceAll("\\s+", ""));
+            ObjectMapper m = new ObjectMapper();
+            JsonNode rootNode = m.readTree(url.openStream());
+            JsonNode titleNode = rootNode.path("message").path("title");
+            if (titleNode != null) {
+                return titleNode.textValue();
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            throw new RESTModelException("couldn't query crossref for ISSN " + issn + ": " + e.getMessage());
         }
     }
 
     public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript, StringBuilder resultString) throws RESTModelException {
-        String crossRefURL = null;
+        ArrayList<String> crossRefURLs = new ArrayList<>();
         if (resultString == null) {
             resultString = new StringBuilder();
         }
+        StringBuilder queryString = new StringBuilder();
         String pubDOI = queryManuscript.getPublicationDOI();
         if (pubDOI != null && (!"".equals(StringUtils.stripToEmpty(pubDOI).replaceAll("null","")))) {
-            crossRefURL = crossRefApiRoot + "works/" + queryManuscript.getPublicationDOI();
+            crossRefURLs.add(crossRefApiRoot + "works/" + queryManuscript.getPublicationDOI());
         } else {
-            StringBuilder queryString = new StringBuilder();
-
             // make a query string of the authors' last names
             ArrayList<String> lastNames = new ArrayList<String>();
             for (Author a : queryManuscript.getAuthorList()) {
@@ -561,55 +587,59 @@ public class JournalUtils {
 
             // append the title to the query
             queryString.append(queryManuscript.getTitle().replaceAll("[^a-zA-Z\\s]", "").replaceAll("\\s+", " "));
-            crossRefURL = crossRefApiRoot + "journals/" + queryManuscript.getJournalISSN() + "/works?sort=score&order=desc&query=" + queryString.toString().replaceAll("\\s+", "+");
+            for (String issn : queryManuscript.getJournalConcept().getISSNs()) {
+                crossRefURLs.add(crossRefApiRoot + "journals/" + issn + "/works?sort=score&order=desc&query=" + queryString.toString().replaceAll("\\s+", "+"));
+            }
         }
 
-        Manuscript matchedManuscript = null;
-        try {
-            resultString.append("crossref url was " + crossRefURL + "\n");
-            URL url = new URL(crossRefURL.replaceAll("\\s+", ""));
-            ObjectMapper m = new ObjectMapper();
-            JsonNode rootNode = m.readTree(url.openStream());
-            JsonNode itemsNode = rootNode.path("message").path("items");
-            if (itemsNode != null && itemsNode.isArray()) {
-                JsonNode bestItem = itemsNode.get(0);
-                float score = bestItem.path("score").floatValue();
-                if (score > 3.0) {
-                    matchedManuscript = manuscriptFromCrossRefJSON(bestItem);
+        for (String crossRefURL : crossRefURLs) {
+            Manuscript currentMatch = null;
+            try {
+                resultString.append("crossref url was ").append(crossRefURL).append("\n");
+                URL url = new URL(crossRefURL.replaceAll("\\s+", ""));
+                ObjectMapper m = new ObjectMapper();
+                JsonNode rootNode = m.readTree(url.openStream());
+                JsonNode itemsNode = rootNode.path("message").path("items");
+                if (itemsNode != null && itemsNode.isArray()) {
+                    JsonNode bestItem = itemsNode.get(0);
+                    float score = bestItem.path("score").floatValue();
+                    if (score > 3.0) {
+                        currentMatch = manuscriptFromCrossRefJSON(bestItem);
+                    }
+                } else {
+                    itemsNode = rootNode.path("message");
+                    currentMatch = manuscriptFromCrossRefJSON(itemsNode);
                 }
-            } else {
-                itemsNode = rootNode.path("message");
-                matchedManuscript = manuscriptFromCrossRefJSON(itemsNode);
+            } catch (JsonParseException e) {
+                log.debug("Couldn't find JSON matching URL " + crossRefURL);
+            } catch (NullPointerException e) {
+                log.debug("No matches returned for URL " + crossRefURL);
+            } catch (FileNotFoundException e) {
+                log.debug("CrossRef does not have data for URL " + crossRefURL);
+            } catch (RESTModelException e) {
+                throw e;
+            } catch (Exception e) {
+                StringBuilder sb = new StringBuilder();
+                for (StackTraceElement element : e.getStackTrace()) {
+                    sb.append(element.toString());
+                    sb.append("\n");
+                }
+                String s = sb.toString();
+                log.error("Exception of type " + e.getClass().getName() + ", message is: " + e.getMessage() + ": url is " + crossRefURL + "\n" + s);
             }
-        } catch (JsonParseException e) {
-            log.debug("Couldn't find JSON matching URL " + crossRefURL);
-        } catch (NullPointerException e) {
-            log.debug("No matches returned for URL " + crossRefURL);
-        } catch (FileNotFoundException e) {
-            log.debug("CrossRef does not have data for URL " + crossRefURL);
-        } catch (RESTModelException e) {
-            throw e;
-        } catch (Exception e) {
-            StringBuilder sb = new StringBuilder();
-            for (StackTraceElement element : e.getStackTrace()) {
-                sb.append(element.toString());
-                sb.append("\n");
-            }
-            String s = sb.toString();
-            log.error("Exception of type " + e.getClass().getName()+ ", message is: " + e.getMessage() + ": url is " + crossRefURL + "\n" + s);
-        }
 
-        // sanity check:
-        if (matchedManuscript != null) {
-            if (!queryManuscript.getJournalISSN().equals(matchedManuscript.getJournalISSN())) {
-                throw new RESTModelException("publication DOI listed for item does not belong to the correct journal");
-            }
-            // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
-            if (!compareTitleToManuscript(queryManuscript.getTitle(), matchedManuscript, 0.5, resultString)) {
-                return null;
+            // sanity check:
+            if (currentMatch != null) {
+                if (!queryManuscript.getJournalISSN().equals(currentMatch.getJournalISSN())) {
+                    throw new RESTModelException("publication DOI listed for item does not belong to the correct journal");
+                }
+                // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
+                if (compareTitleToManuscript(queryManuscript.getTitle(), currentMatch, 0.5, resultString)) {
+                    return currentMatch;
+                }
             }
         }
-        return matchedManuscript;
+        return null;
     }
 
     public static boolean compareTitleToManuscript(String title, Manuscript matchedManuscript, double threshold, StringBuilder resultString) {
