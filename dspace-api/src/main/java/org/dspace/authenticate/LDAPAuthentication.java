@@ -431,15 +431,16 @@ public class LDAPAuthentication
             // Set up environment for creating initial context
             Hashtable<String, String> env = new Hashtable<>();
             env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-            if (StringUtils.isNotBlank(ldap_provider_url))
+            if (StringUtils.isNotBlank(ldap_provider_url)) {
                 env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
+            }
 
             LdapContext ctx = null;
             StartTlsResponse startTLSResponse = null;
 
             try {
                 ctx = new InitialLdapContext(env, null);
-                if(useStartTLS) {
+                if (useStartTLS) {
                     // Start TLS
                     startTLSResponse = (StartTlsResponse) ctx
                             .extendedOperation(new StartTlsRequest());
@@ -447,7 +448,7 @@ public class LDAPAuthentication
                     startTLSResponse.negotiate();
                 }
 
-                if(StringUtils.isNotBlank(adminUser)
+                if (StringUtils.isNotBlank(adminUser)
                         && StringUtils.isNotBlank(adminPassword)) {
                     // Use admin credentials for search// Authenticate
                     ctx.addToEnvironment(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
@@ -470,7 +471,7 @@ public class LDAPAuthentication
                     ctrls.setSearchScope(ldap_search_scope_value);
 
                     String searchName = "";
-                    if(useStartTLS) {
+                    if (useStartTLS) {
                         searchName = ldap_search_context;
                     } else {
                         searchName = ldap_provider_url + ldap_search_context;
@@ -530,51 +531,45 @@ public class LDAPAuthentication
          * fields for later use.
          *
          * @param atts
-         * @throws NamingException
+         * @throws NamingException passed through.
          */
         protected void harvestAttributes(Attributes atts)
-                throws NamingException
-        {
+                throws NamingException {
             String attlist[] = {ldap_email_field, ldap_givenname_field,
                                 ldap_surname_field, ldap_phone_field, ldap_group_field};
             Attribute att;
 
             if (attlist[0] != null) {
                 att = atts.get(attlist[0]);
-                if (att != null)
-                {
+                if (att != null) {
                     ldapEmail = (String) att.get();
                 }
             }
 
             if (attlist[1] != null) {
                 att = atts.get(attlist[1]);
-                if (att != null)
-                {
+                if (att != null) {
                     ldapGivenName = (String) att.get();
                 }
             }
 
             if (attlist[2] != null) {
                 att = atts.get(attlist[2]);
-                if (att != null)
-                {
+                if (att != null) {
                     ldapSurname = (String) att.get();
                 }
             }
 
             if (attlist[3] != null) {
                 att = atts.get(attlist[3]);
-                if (att != null)
-                {
+                if (att != null) {
                     ldapPhone = (String) att.get();
                 }
             }
 
             if (attlist[4] != null) {
                 att = atts.get(attlist[4]);
-                if (att != null)
-                {
+                if (att != null) {
                     ldapGroup = (String) att.get();
                 }
             }
@@ -595,12 +590,13 @@ public class LDAPAuthentication
                 Hashtable<String, String> env = new Hashtable<>();
                 env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
                         "com.sun.jndi.ldap.LdapCtxFactory");
-                if (StringUtils.isNotBlank(ldap_provider_url))
+                if (StringUtils.isNotBlank(ldap_provider_url)) {
                     env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
+                }
 
                 try {
                     Attributes userAttributes;
-                    if(useStartTLS) {
+                    if (useStartTLS) {
                         // Get an anonymously bound context
                         env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "none");
                         ctx = new InitialLdapContext(env, null);
