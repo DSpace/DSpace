@@ -11,6 +11,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.cocoon.BitstreamReader;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -28,6 +29,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 /**
@@ -128,13 +131,52 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
 
         Division unauthorized = null;
         boolean isWithdrawn = false;
-        
+
         if (dso == null) 
         {
             unauthorized = body.addDivision("unauthorized-resource", "primary");
-            unauthorized.setHead(T_head_resource);
-            unauthorized.addPara(T_para_resource);
-        } 
+
+            // Begin UMD Customization
+            // If there is an EMBARGO interrupted header, display the message from the session and clear session.
+            HttpSession session = request.getSession();
+            String interrruptedHeader = (String) session
+                    .getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
+            boolean isEmbargo = interrruptedHeader
+                    .equals(BitstreamReader.EMBARGO_HEADER);
+            if (isEmbargo)
+            {
+                unauthorized.setHead(message(interrruptedHeader));
+                String message = (String) session
+                        .getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_MESSAGE);
+                String characters = (String) session
+                        .getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_CHARACTERS);
+                Para para = unauthorized.addPara();
+                if (message != null)
+                {
+                    para.addContent(AbstractDSpaceTransformer.message(message));
+                }
+
+                if (characters != null)
+                {
+                    para.addContent(characters);
+                }
+
+                // Clear interrupted session values.
+                session.setAttribute(
+                        AuthenticationUtil.REQUEST_INTERRUPTED_HEADER, null);
+                session.setAttribute(
+                        AuthenticationUtil.REQUEST_INTERRUPTED_MESSAGE, null);
+                session.setAttribute(
+                        AuthenticationUtil.REQUEST_INTERRUPTED_CHARACTERS, null);
+            }
+            else
+            {
+                unauthorized.setHead(T_head_resource);
+                unauthorized.addPara(T_para_resource);
+            }
+            // End UMD Customization
+            
+        }
         else if (dso instanceof Community) 
         {
             Community community = (Community) dso;
