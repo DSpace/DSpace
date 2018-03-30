@@ -619,6 +619,15 @@ public class DescribeStep extends AbstractSubmissionStep
         }
         else if (dcValues.size() == 1)
         {
+            // Begin UMD Customization
+            // LIBDRUM-378 - Resolves null pointer error when none of the
+            // options are selected on the initial quesitons step.
+            if ("today".equals(dcValues.get(0).getValue()))
+            {
+                return;
+            }
+            // End UMD Customization
+          
             DCDate dcDate = new DCDate(dcValues.get(0).getValue());
 
             year.setValue(String.valueOf(dcDate.getYear()));
@@ -1158,14 +1167,17 @@ public class DescribeStep extends AbstractSubmissionStep
         org.dspace.app.xmlui.wing.element.Item item = form.addItem();
         Text text = item.addText(fieldName, "submit-text");
 
-        if (dcInput.getVocabulary() != null)
-        {
-            String vocabularyUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
-            vocabularyUrl += "/JSON/controlled-vocabulary?vocabularyIdentifier=" + dcInput.getVocabulary();
-            //Also hand down the field name so our summoning script knows the field the selected value is to end up in
-            vocabularyUrl += "&metadataFieldName=" + fieldName;
-            item.addXref("vocabulary:" + vocabularyUrl).addContent(T_vocabulary_link);
-        }
+        // Begin UMD Customization
+        // Remove subject categories link (vocabulary)
+        // if (dcInput.getVocabulary() != null)
+        // {
+        //   String vocabularyUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
+        //   vocabularyUrl += "/JSON/controlled-vocabulary?vocabularyIdentifier=" + dcInput.getVocabulary();
+        //   //Also hand down the field name so our summoning script knows the field the selected value is to end up in
+        //   vocabularyUrl += "&metadataFieldName=" + fieldName;
+        //   item.addXref("vocabulary:" + vocabularyUrl).addContent(T_vocabulary_link);
+        // }
+        // End UMD Customization
 
         // Setup the select field
         text.setLabel(dcInput.getLabel());
