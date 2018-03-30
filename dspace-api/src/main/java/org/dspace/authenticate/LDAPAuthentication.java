@@ -54,11 +54,13 @@ import org.dspace.eperson.service.GroupService;
  *  </li>
  *  <li>
  *   authentication against structured hierarchical LDAP trees of users.
- *   An initial bind is required using a user name and password in order to
- *   search the tree and find the DN of the user. A second bind is then required to
- *   check the credentials of the user by binding directly to their DN.
  *  </li>
  * </ul>
+ *
+ * <p>In hierarchial mode, an initial bind is required using a configured
+ * "administrative" user name and password in order to search the tree and find
+ * the DN of the user. A second bind is then required to check the credentials
+ * of the user by binding directly to that DN.
  *
  * <p>Administrative credentials may be left unconfigured.  If so, the application
  * resource file mechanism defined by JNDI will be used to seek default credentials
@@ -115,7 +117,8 @@ public class LDAPAuthentication
 
     /**
      * Cannot change LDAP password through DSpace, right?
-     * @throws SQLException if database error
+     *
+     * @throws SQLException if database error.
      */
     @Override
     public boolean allowSetPassword(Context context,
