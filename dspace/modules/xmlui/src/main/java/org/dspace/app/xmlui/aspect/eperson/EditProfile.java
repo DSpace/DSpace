@@ -260,6 +260,17 @@ public class EditProfile extends AbstractDSpaceTransformer
             defaultLanguage = eperson.getLanguage();
        }
        
+       // Begin UMD Customization
+       if (eperson != null)
+       {
+           if ((eperson.getNetid() != null)
+                   && (eperson.getNetid().equals("") == false))
+           {  
+               this.allowSetPassword = false;
+           }
+       }
+       // End UMD Customization
+
        String action = contextPath;
        if (registering)
        {
