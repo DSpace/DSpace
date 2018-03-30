@@ -595,7 +595,7 @@ public class JournalUtils {
         for (String crossRefURL : crossRefURLs) {
             Manuscript currentMatch = null;
             try {
-                resultString.append("crossref url was ").append(crossRefURL).append("\n");
+                resultString.append("\n\tcrossref url was ").append(crossRefURL).append("\n");
                 URL url = new URL(crossRefURL.replaceAll("\\s+", ""));
                 ObjectMapper m = new ObjectMapper();
                 JsonNode rootNode = m.readTree(url.openStream());
