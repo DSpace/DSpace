@@ -27,6 +27,8 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
@@ -52,6 +54,10 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     
     /** Cached validity object */
     private SourceValidity validity;
+
+    // Begin UMD Customization
+    private static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    // End UMD Customization
     
     /**
      * Generate the unique caching key.
@@ -199,6 +205,17 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         {
             home.setHead(name);
         }
+
+        // Begin UMD Customization
+        // Add handle display for Community/Collection
+        String handle = handleService.getCanonicalForm(collection.getHandle());
+        Division handleDiv = home.addDivision("handle", "citation-handle");
+        Message handleLabel = message("xmlui.ArtifactBrowser.CollectionViewer.cite_handle");
+        handleDiv.addPara("handle-label", "citation-handle-label").addContent(
+                handleLabel);
+        handleDiv.addPara("handle-value", "citation-handle-value").addContent(
+                handle);
+        // End UMD Customization
 
         // The search / browse box placeholder, this division will be populated either in the browse or discovery aspect
         {
