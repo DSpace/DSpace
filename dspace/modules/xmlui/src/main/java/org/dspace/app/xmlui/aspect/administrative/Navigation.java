@@ -95,6 +95,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     private static final Message T_my_account                       = message("xmlui.EPerson.Navigation.my_account");
 
+    // Begin UMD Customizations
+    private static final Message T_DRUM_customizations              = message("xmlui.administrative.Navigation.DRUM_customizations");
+    private static final Message T_DRUM_embargo_list                = message("xmlui.administrative.Navigation.embargo_list");
+    private static final Message T_DRUM_units                       = message("xmlui.administrative.Navigation.units");
+    private static final Message T_DRUM_ETD_departments             = message("xmlui.administrative.Navigation.ETD_departments");    
+    // End UMD Customizations
     /** Cached validity object */
 	private SourceValidity validity;
 	
@@ -324,7 +330,16 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
             admin.addItemXref(contextPath+"/statistics", T_statistics);
             admin.addItemXref(contextPath+ "/admin/curate", T_administrative_curation);
-        }
+
+            // Begin UMD Customizations
+            // Add the custom menu (ETD Departments, Embargo, Unit) to the right navigation.
+            List drum = admin.addList("drum");
+            drum.setHead(T_DRUM_customizations);
+            drum.addItemXref(contextPath + "/embargo-list", T_DRUM_embargo_list);
+            drum.addItemXref(contextPath + "/admin/etd_departments", T_DRUM_ETD_departments);
+            drum.addItemXref(contextPath + "/admin/units", T_DRUM_units);
+            // End UMD Customizations
+          }
     }
     
     
