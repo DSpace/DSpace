@@ -22,8 +22,10 @@ import org.dspace.statistics.SolrLogger;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-import com.maxmind.geoip.LookupService;
-import com.maxmind.geoip.Location;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.model.CityResponse;
+import java.io.File;
+import java.net.InetAddress;
 
 /**
  * Test class to generate random statistics data.
@@ -194,17 +196,17 @@ public class StatisticsDataGenerator {
 		solr.commit();
 
 		String prevIp = null;
-		String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
-		LookupService cl = new LookupService(dbfile,
-				LookupService.GEOIP_STANDARD);
+		String dbPath = ConfigurationManager.getProperty("usage-statistics", "dbfile");
+        File dbFile = new File(dbPath);
+		DatabaseReader cl = new DatabaseReader.Builder(dbFile).build();
 		int countryErrors = 0;
 		for (int i = 0; i < nrLogs; i++) {
 			String ip = "";
 			Date time;
 			String continent;
 			String countryCode;
-			float longitude;
-			float latitude;
+			double longitude;
+			double latitude;
 			String city;
 
 			// 1. Generate an ip for our user
@@ -219,9 +221,11 @@ public class StatisticsDataGenerator {
             ip = ipBuilder.toString();
             
 			// 2 Depending on our ip get all the location info
-			Location location;
+            InetAddress ipAddress;
+			CityResponse location;
 			try {
-				location = cl.getLocation(ip);
+                ipAddress = InetAddress.getByName(ip);
+				location = cl.city(ipAddress);
 			} catch (Exception e) {
 				location = null;
 			}
@@ -233,13 +237,14 @@ public class StatisticsDataGenerator {
                     continue;
                 }
 				ip = prevIp;
-				location = cl.getLocation(ip);
+                ipAddress = InetAddress.getByName(ip);
+				location = cl.city(ipAddress);
 			}
 
-			city = location.city;
-			countryCode = location.countryCode;
-			longitude = location.longitude;
-			latitude = location.latitude;
+			city = location.getCity().getName();
+			countryCode = location.getCountry().getIsoCode();
+			longitude = location.getLocation().getLongitude();
+			latitude = location.getLocation().getLatitude();
 			try {
 				continent = LocationUtils.getContinentCode(countryCode);
 			} catch (Exception e) {
