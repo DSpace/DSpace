@@ -19,7 +19,7 @@ public class RetryOpenUrlTracker {
     /* Command Line execution */
     public static void main(String[] args) throws SQLException {
         Context context = new Context();
-        context.setIgnoreAuthorization(true);
+        context.ignoreAuthorization();
 
         String usage = "com.atmire.statistics.export.RetryOpenUrlTracker [-a <URL>]] or nothing to retry all failed attempts.";
         Options options = new Options();
