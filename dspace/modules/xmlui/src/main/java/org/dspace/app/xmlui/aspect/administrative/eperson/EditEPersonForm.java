@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.UUID;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -31,11 +32,16 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+
+import edu.umd.lib.dspace.authenticate.Ldap;
+
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.Unit;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.UnitService;
 
 /**
  * Edit an existing EPerson, display all the eperson's metadata 
@@ -148,7 +154,11 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 
 	protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 	protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-	protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+  protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+  
+  // Begin UMD Customization
+	protected UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
+  // End UMD Customization
 
     	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -403,7 +413,84 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
             }
         }
         
-	    edit.addHidden("administrative-continue").setValue(knot.getId());
+      edit.addHidden("administrative-continue").setValue(knot.getId());
+      
+      // Begin UMD Customization
+      Ldap ldap = null;
+      try
+      {
+          ldap = new Ldap(context);
+          if (ldap.checkUid(eperson.getNetid()))
+          {
+              request.setAttribute("eperson.ldap", ldap);
+          }
+      }
+      catch (Exception ex)
+      {
+          // log.error("Error opening Ldap connection: " + ex.getMessage());
+      }
+      finally
+      {
+          if (ldap != null)
+              ldap.close();
+      }
+
+      // String email = eperson.getEmail();
+      // String firstName = eperson.getFirstName();
+      // String lastName = eperson.getLastName();
+      // String phone = eperson.getMetadata("phone");
+      // String netid = eperson.getNetid();
+      // String language = eperson.getMetadata("language");
+
+      if (admin && ldap != null)
+      {
+          List ldapInfo = edit.addList("eperson-ldap-info");
+          ldapInfo.setHead("UM Directory Information");
+          try
+          {
+              ldapInfo.addItem().addContent(
+                      "Name: " + ldap.getLastName() + ", "
+                              + ldap.getFirstName());
+              ldapInfo.addItem().addContent("Email: " + ldap.getEmail());
+              ldapInfo.addItem().addContent("Phone: " + ldap.getPhone());
+              ldapInfo.addItem().addContent("Faculty: " + ldap.isFaculty());
+              ldapInfo.addItem().addContent(
+                      "UM Appt: " + ldap.getAttributeAll("umappointment"));
+              for (Iterator i = ldap.getUnits().iterator(); i.hasNext();)
+              {
+                  String strUnit = (String) i.next();
+                  Unit unit = unitService.findByName(context, strUnit);
+                  if (unit == null)
+                  {
+                      ldapInfo.addItem().addContent("Unit: " + strUnit);
+                  }
+                  else
+                  {
+                      String target = (request.getContextPath()
+                              + "/admin/units?administrative-continue="
+                              + knot.getId() + "&submit_edit_unit&unitID=" + unit
+                              .getID());
+                      ldapInfo.addItemXref(target, "Unit: " + strUnit);
+                  }
+              }
+              for (Iterator i = ldap.getGroups().iterator(); i.hasNext();)
+              {
+                  Group group = (Group) i.next();
+                  String target = (request.getContextPath()
+                          + "/admin/groups?administrative-continue="
+                          + knot.getId() + "&submit_edit_group&groupID=" + group
+                          .getID());
+                  ldapInfo.addItemXref(target, "Group: " + group.getName());
+
+              }
+          }
+          catch (Exception e)
+          {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+          }
+      }
+      // End UMD Customization
 	}
 	
 	
