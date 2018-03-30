@@ -143,7 +143,10 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer
     {
         if (!isRedirect() && this.bodyEmpty)
         {
-            Division notFound = body.addDivision("page-not-found","primary");
+            // Begin UMD Customization
+            // Customization for LIBDRUM-363
+            Division notFound = body.addDivision("bad-request","primary");
+            // End UMD Customization
             
             notFound.setHead(T_head);
             

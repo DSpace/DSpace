@@ -651,7 +651,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
      * @throws SQLException
      * @throws UIException
      */
-    private BrowseParams getUserParams() throws SQLException, UIException, ResourceNotFoundException, IllegalArgumentException {
+    private BrowseParams getUserParams() throws SQLException, UIException, ResourceNotFoundException, IllegalArgumentException, BadRequestException {
 
         if (this.userParams != null)
         {
@@ -696,9 +696,15 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             }
 
             BrowseIndex bi = BrowseIndex.getBrowseIndex(type);
-            if (bi == null)
+            if (bi == null && type != null && !"".equals(type))
             {
+                //Not Found (404)
                 throw new ResourceNotFoundException("Browse index " + type + " not found");
+            }
+            else if(bi == null && type == null)
+            {
+                //Bad request (400)
+                throw new BadRequestException("The request is missing a mandatory parameter");
             }
             
             // If we don't have a sort column
@@ -827,7 +833,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
      * @throws SQLException
      * @throws UIException
      */
-    private BrowseInfo getBrowseInfo() throws SQLException, UIException
+    private BrowseInfo getBrowseInfo() throws SQLException, UIException, BadRequestException
     {
         if (this.browseInfo != null)
         {
