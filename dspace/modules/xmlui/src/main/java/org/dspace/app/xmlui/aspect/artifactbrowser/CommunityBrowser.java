@@ -37,10 +37,13 @@ import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.CommunityGroup;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityGroupService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
@@ -95,6 +98,16 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     
     /** cached validity object */
     private SourceValidity validity;
+
+    // Begin UMD Customization
+    public static final Message T_dept_head = message("xmlui.ArtifactBrowser.CommunityBrowser.dept_head");
+
+    public static final Message T_umd_head = message("xmlui.ArtifactBrowser.CommunityBrowser.umd_head");
+
+    protected CommunityGroupService communityGroupService = ContentServiceFactory.getInstance().getCommunityGroupService();
+
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    // End UMD Customization
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
@@ -245,34 +258,72 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         Context.Mode originalMode = context.getCurrentMode();
         context.setMode(Context.Mode.READ_ONLY);
 
-        TreeNode treeRoot = buildTree(communityService.findAllTop(context));
+        // Begin UMD Customization
+        // Display communities by the community group
+        CommunityGroup deptGroup = communityGroupService.find(CommunityGroup.FACULTY);
+        CommunityGroup umdGroup = communityGroupService.find(CommunityGroup.UM);
 
-        boolean full = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.community-list.render.full", true);
+        TreeNode deptRoot = null;
+        TreeNode umdRoot = null;
 
-        if (full)
+        if (deptGroup == null || umdGroup == null)
         {
-	        ReferenceSet referenceSet = division.addReferenceSet("community-browser",
-	                ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
-	        
-	        java.util.List<TreeNode> rootNodes = treeRoot.getChildrenOfType(Constants.COMMUNITY);
-	        
-	        for (TreeNode node : rootNodes)
-	        {
-	            buildReferenceSet(referenceSet,node);   
-	        }
+            log.error("Cannot initialize CommunityGroup! Community list display will not be rendered correctly!");
         }
         else
         {
-        	List list = division.addList("comunity-browser");
-        	
-        	java.util.List<TreeNode> rootNodes = treeRoot.getChildrenOfType(Constants.COMMUNITY);
- 	        
- 	        for (TreeNode node : rootNodes)
- 	        {
- 	            buildList(list,node);   
- 	        }
-        	
+            deptRoot = buildTreeCore(communityGroupService.getCommunities(context, deptGroup));
+            umdRoot = buildTreeCore(communityGroupService.getCommunities(context, umdGroup));
         }
+
+        boolean full = configurationService.getBooleanProperty("xmlui.community-list.render.full", true);
+
+        java.util.List<TreeNode> deptRootNodes = deptRoot.getChildrenOfType(Constants.COMMUNITY);
+        java.util.List<TreeNode> umdRootNodes = umdRoot.getChildrenOfType(Constants.COMMUNITY);
+
+        if (full)
+        {
+            Division deptDivision = division.addDivision("commuity-browser-dept");
+            deptDivision.setHead(T_dept_head);
+            ReferenceSet referenceSetDept = deptDivision.addReferenceSet(
+                    "community-browser-dept", ReferenceSet.TYPE_SUMMARY_LIST,
+                    null, "hierarchy");
+            Division umdDivision = division.addDivision("commuity-browser-umd");
+            umdDivision.setHead(T_umd_head);
+            ReferenceSet referenceSetUmd = umdDivision.addReferenceSet(
+                    "community-browser-umd", ReferenceSet.TYPE_SUMMARY_LIST,
+                    null, "hierarchy");
+
+            for (TreeNode node : deptRootNodes)
+            {
+                buildReferenceSet(referenceSetDept, node);
+            }
+            for (TreeNode node : umdRootNodes)
+            {
+                buildReferenceSet(referenceSetUmd, node);
+            }
+        }
+        else
+        {
+            Division deptDivision = division
+                    .addDivision("commuity-browser-dept");
+            deptDivision.setHead(T_dept_head);
+            List listDept = deptDivision.addList("community-browser-dept");
+            Division umdDivision = division.addDivision("commuity-browser-umd");
+            umdDivision.setHead(T_umd_head);
+            List listUmd = umdDivision.addList("community-browser-umd");
+
+            for (TreeNode node : deptRootNodes)
+            {
+                buildList(listDept, node);
+            }
+            for (TreeNode node : umdRootNodes)
+            {
+                buildList(listUmd, node);
+            }
+
+        }
+        // End UMD Customization
 
         context.setMode(originalMode);
     } 
@@ -381,6 +432,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         super.recycle();
     }
 
+    // Begin UMD Customization
+    // Extract build logic from buildTree to buildTreeCore so that it could be
+    // used by the customization code above without changing the root
     /**
      * construct a tree structure of communities and collections. The results 
      * of this hierarchy are cached so calling it multiple times is acceptable.
@@ -394,7 +448,14 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         {
             return root;
         }
-        
+
+        this.root = buildTreeCore(communities);
+
+        return root;
+    }
+
+    private TreeNode buildTreeCore(java.util.List<Community> communities) throws SQLException
+    {
         TreeNode newRoot = new TreeNode();
 
         // Setup for breadth-first traversal
@@ -433,9 +494,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
             }
         }
         
-        this.root = newRoot;
-        return root;
+        return newRoot;
     }
+    // End UMD Customization
 
     /**
      * Private class to represent the tree structure of communities and collections.
