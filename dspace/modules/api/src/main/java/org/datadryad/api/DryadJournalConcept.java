@@ -206,7 +206,14 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public List<String> getISSNs() {
-        return getConceptMetadataValues(metadataProperties.getProperty(ISSN));
+        List<String> results = new ArrayList<>();
+        List<String> issns = getConceptMetadataValues(metadataProperties.getProperty(ISSN));
+        for (String issn : issns) {
+            if (!"".equals(issn)) {
+                results.add(issn);
+            }
+        }
+        return results;
     }
 
     public String getISSN() {
