@@ -7,6 +7,7 @@
  */
 package org.dspace.app.xmlui.objectmanager;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.util.Util;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
@@ -24,6 +25,8 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
+import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.jdom.Element;
@@ -93,6 +96,10 @@ public class ItemAdapter extends AbstractAdapter
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected MetadataExposureService metadataExposureService = UtilServiceFactory.getInstance().getMetadataExposureService();
+
+    // Begin UMD Customization
+    protected SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+    // End UMD Customization
 
 
     /**
@@ -1084,6 +1091,38 @@ public class ItemAdapter extends AbstractAdapter
         String checksum = bitstream.getChecksum();
         long size = bitstream.getSize();
 
+        // Begin UMD Customization
+        // Customization for LIBDRUM-344, LIBDRUM-405 and LIBDRUM-460
+        // Get the view count of the bitstream
+        Long views = null;
+        try
+        {
+            views = solrLoggerService.queryTotal("id: " + bitstream.getID(),
+                    "type: " + Constants.BITSTREAM + " AND -isBot:true")
+                    .getCount();
+        }
+        catch (SolrServerException e1)
+        {
+            // Print stacktrace and continue
+            // (Download count will not display)
+            e1.printStackTrace();
+        }
+
+        // Check if bitstream has an embargo. If yes, display a 'Restricted
+        // Access' description with bitstream.
+        boolean flagEmbargo = false;
+        try
+        {
+            if (authorizeService.isETDEmbargo(context, bitstream))
+            {
+                flagEmbargo = true;
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        // End UMD Customization
         
 
         // ////////////////////////////////
@@ -1105,6 +1144,17 @@ public class ItemAdapter extends AbstractAdapter
         	attributes.put("CHECKSUMTYPE", checksumType);
         }
         attributes.put("SIZE", String.valueOf(size));
+
+        // Begin UMD Customization
+        // Customization for LIBDRUM-344, LIBDRUM-405 and LIBDRUM-460
+        // Set the view count and embargo values as attributes
+        if (views != null)
+        {
+            attributes.put("VIEWS", String.valueOf(views));
+        }
+        attributes.put("EMBARGO", String.valueOf(flagEmbargo));
+        // End UMD Customization
+
         startElement(METS,"file",attributes);
 
 
