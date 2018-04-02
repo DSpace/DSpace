@@ -215,7 +215,7 @@ public class MetadataRegistryResource extends Resource
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
-    	return getMetadataFieldQualified(schemaPrefix, element, "", expand, user_ip, user_agent, xforwardedfor, headers, request);
+    	return getMetadataFieldQualified(schemaPrefix, element, null, expand, user_ip, user_agent, xforwardedfor, headers, request);
     }
     
     /**
