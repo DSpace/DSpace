@@ -118,6 +118,12 @@
                     </div>
                     <xsl:call-template name="itemSummaryView-DIM-date"/>
                     <xsl:call-template name="itemSummaryView-DIM-authors"/>
+                    <!-- Begin UMD Customization -->
+                    <!-- Show additional metadata fields in the summary view -->
+                    <xsl:call-template name="itemSummaryView-DIM-citation"/>
+                    <xsl:call-template name="itemSummaryView-DIM-advisor"/>
+                    <xsl:call-template name="itemSummaryView-DIM-doi"/>
+                    <!-- End UMD Customization -->
                     <xsl:if test="$ds_item_view_toggle_url != ''">
                         <xsl:call-template name="itemSummaryView-show-full"/>
                     </xsl:if>
@@ -214,7 +220,14 @@
                     <xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
                         <xsl:choose>
                             <xsl:when test="node()">
-                                <xsl:copy-of select="node()"/>
+                                <!-- Begin UMD Customization -->
+                                <!-- Make URLS clickable -->
+                                <xsl:call-template name="hyperlink">
+                                    <xsl:with-param name="text">
+                                        <xsl:copy-of select="./node()"/>
+                                    </xsl:with-param>
+                                </xsl:call-template>
+                                <!-- Begin UMD Customization -->
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:text>&#160;</xsl:text>
@@ -392,6 +405,14 @@
                 <xsl:attribute name="href">
                     <xsl:value-of select="$href"/>
                 </xsl:attribute>
+                <!-- Begin UMD Customization -->
+                <!-- Open link in new tab, if Embargoed -->
+                <xsl:if test="@EMBARGO='true'">
+                    <xsl:attribute name="target">
+                        <xsl:value-of select="'_blank'"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <!-- End UMD Customization -->
                 <xsl:call-template name="getFileIcon">
                     <xsl:with-param name="mimetype">
                         <xsl:value-of select="substring-before($mimetype,'/')"/>
@@ -450,6 +471,20 @@
                 </xsl:choose>
                 <xsl:text>)</xsl:text>
             </a>
+
+            <!-- Begin UMD Customization -->
+            <!-- Show restricted message, if bitstream is under embargo -->
+            <br/>
+            <xsl:if test="@EMBARGO='true'">
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-restricted</i18n:text>
+                <br/>
+            </xsl:if>
+            <!-- Show download count of the bitsream -->
+            <i18n:text>xmlui.dri2xhtml.METS-1.0.item-number-downloads</i18n:text>
+            <xsl:value-of select="@VIEWS" />
+            <br/>
+            <br/>
+            <!-- End UMD Customization -->
         </div>
     </xsl:template>
 
@@ -660,8 +695,24 @@
             <xsl:attribute name="href">
                 <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
             </xsl:attribute>
+            <!-- Begin UMD Customization -->
+            <!-- Open link in new tab, if Embargoed -->
+            <xsl:if test="@EMBARGO='true'">
+                <xsl:attribute name="target">
+                    <xsl:value-of select="'_blank'"/>
+                </xsl:attribute>
+            </xsl:if>
+            <!-- End UMD Customization -->
             <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
         </a>
+        <!-- Begin UMD Customization -->
+        <!-- Show restricted message, if bitstream is under embargo -->
+        <br/>
+        <xsl:if test="@EMBARGO='true'">
+            <i18n:text>xmlui.dri2xhtml.METS-1.0.item-restricted</i18n:text>
+            <br/>
+        </xsl:if>
+        <!-- End UMD Customization -->
     </xsl:template>
 
     <xsl:template name="display-rights">
@@ -746,5 +797,104 @@
         <i18n:text i18n:key="{$mimetype-key}"><xsl:value-of select="$mimetype"/></i18n:text>
     </xsl:template>
 
+    <!-- Begin UMD Customization -->
+    <!-- Template to display citation metadata -->
+    <xsl:template name="itemSummaryView-DIM-citation">
+        <xsl:if test="dim:field[@element='identifier'][@qualifier='citation' and descendant::text()]">
+            <div class="simple-item-view-citation item-page-field-wrapper table">
+                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-citation</i18n:text></h5>
+                <xsl:choose>
+                    <xsl:when test="dim:field[@element='identifier'][@qualifier='citation']">
+                        <xsl:for-each select="dim:field[@element='identifier'][@qualifier='citation']">
+                            <div>
+                                <xsl:copy-of select="node()"/>
+                            </div>
+                        </xsl:for-each>
+                    </xsl:when>
+                </xsl:choose>
+            </div>
+        </xsl:if>
+    </xsl:template>
+    
+    <!-- Template to display advisor metadata -->
+    <xsl:template name="itemSummaryView-DIM-advisor">
+        <xsl:if test="dim:field[@element='contributor'][@qualifier='advisor' and descendant::text()]">
+            <div class="simple-item-view-advisor item-page-field-wrapper table">
+                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-advisor</i18n:text></h5>
+                <xsl:choose>
+                    <xsl:when test="dim:field[@element='contributor'][@qualifier='advisor']">
+                        <xsl:for-each select="dim:field[@element='contributor'][@qualifier='advisor']">
+                            <div>
+                                <xsl:copy-of select="node()"/>
+                            </div>
+                        </xsl:for-each>
+                    </xsl:when>
+                </xsl:choose>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
+    <!-- Template to display DOI metadata -->
+    <xsl:template name="itemSummaryView-DIM-doi">
+        <xsl:if test="dim:field[@element='identifier'][not(@qualifier)]">
+            <div class="simple-item-view-doi item-page-field-wrapper table">
+                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-doi</i18n:text></h5>
+                <xsl:choose>
+                    <xsl:when test="dim:field[@element='identifier'][not(@qualifier)]">
+                        <xsl:for-each select="dim:field[@element='identifier'][not(@qualifier)]">
+                            <div>
+                                <xsl:copy-of select="node()"/>
+                            </div>
+                        </xsl:for-each>
+                    </xsl:when>
+                </xsl:choose>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
+    <!-- Template to make urls rendered as clickable hyperlinks -->
+    <xsl:template name="hyperlink">
+		    <xsl:param name="text"/>
+		    <xsl:choose>
+			      <xsl:when test="(contains($text,'http://') or contains($text,'https://'))">
+                <xsl:choose>
+					          <xsl:when test="contains($text,' ')">
+                        <xsl:call-template name="hyperlinkword">
+                              <xsl:with-param name="text" select="substring-before($text,' ')"/>
+                        </xsl:call-template>
+                        <xsl:text> </xsl:text>
+                        <xsl:call-template name="hyperlink">
+                              <xsl:with-param name="text" select="substring-after($text,' ')"/>
+                        </xsl:call-template>
+                    </xsl:when>
+					          <xsl:otherwise>
+                        <xsl:call-template name="hyperlinkword">
+                            <xsl:with-param name="text" select="$text"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
+			      </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$text" />
+            </xsl:otherwise>
+		    </xsl:choose>
+	  </xsl:template>
+	
+    <!-- Supporting template for hyperlink template -->
+    <xsl:template name="hyperlinkword">
+        <xsl:param name="text"/>
+        <xsl:choose>
+            <xsl:when test="(contains($text,'http://') and string-length($text)>7)">
+                <a href="http://{normalize-space(substring-after($text, 'http://'))}">http://<xsl:value-of select="normalize-space(substring-after($text, 'http://'))" /></a>
+            </xsl:when>
+            <xsl:when test="(contains($text,'https://') and string-length($text)>8)">
+                <a href="https://{normalize-space(substring-after($text, 'https://'))}">https://<xsl:value-of select="normalize-space(substring-after($text, 'https://'))" /></a>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$text" />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <!-- End UMD Customization -->
 
 </xsl:stylesheet>
