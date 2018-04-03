@@ -6,6 +6,7 @@ package edu.umd.lib.dspace.app.xmlui.aspect.administrative.etd_departments;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -18,6 +19,8 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EtdUnit;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.EtdUnitService;
 
 /**
  * Present the user with a list of soon-to-be-deleted ETD Departments. If the
@@ -32,22 +35,18 @@ public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
     private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
     private static final Message T_etd_department_trail = message("xmlui.administrative.etd_departments.general.etd_department_trail");
-
     private static final Message T_title = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.title");
-
     private static final Message T_trail = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.trail");
-
     private static final Message T_head = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.head");
-
     private static final Message T_para = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.para");
-
     private static final Message T_column1 = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.column1");
-
     private static final Message T_column2 = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.column2");
-
+    
     private static final Message T_submit_confirm = message("xmlui.general.delete");
 
     private static final Message T_submit_cancel = message("xmlui.general.cancel");
+
+    private static EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -68,7 +67,7 @@ public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
         ArrayList<EtdUnit> etd_departments = new ArrayList<EtdUnit>();
         for (String id : idsString.split(","))
         {
-            EtdUnit etd_department = EtdUnit.find(context, Integer.valueOf(id));
+            EtdUnit etd_department = etdunitService.find(context, UUID.fromString(id));
             etd_departments.add(etd_department);
         }
 
@@ -88,7 +87,7 @@ public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
         for (EtdUnit etd_department : etd_departments)
         {
             Row row = table.addRow();
-            row.addCell().addContent(etd_department.getID());
+            row.addCell().addContent(etd_department.getID().toString());
             row.addCell().addContent(etd_department.getName());
         }
 
