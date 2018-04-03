@@ -153,12 +153,6 @@
            <artifactId>dspace-solr-solrj</artifactId>
            <version>1.4.0.1</version>
        </dependency>
-       <!---->
-       <!--<dependency>-->
-           <!--<groupId>org.apache.solr</groupId>-->
-           <!--<artifactId>solr-solrj</artifactId>-->
-           <!--<version>1.4.1</version>-->
-       <!--</dependency>-->
 
        <dependency>
            <groupId>org.dspace.modules</groupId>
@@ -170,16 +164,12 @@
 	        <artifactId>doi-service</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-        </dependency>
        <dependency>
-           <groupId>org.apache.httpcomponents</groupId>
-           <artifactId>httpclient</artifactId>
-           <version>4.3.4</version>
+	 <groupId>org.apache.httpcomponents</groupId>
+	 <artifactId>httpclient</artifactId>
+	 <version>4.5.3</version>
        </dependency>
+       
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -187,11 +177,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--dependency>
-            <groupId>org.dspace.modules</groupId>
-            <artifactId>versioning-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency-->
        <dependency>
            <groupId>org.glassfish.jersey.core</groupId>
            <artifactId>jersey-server</artifactId>

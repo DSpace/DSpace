@@ -559,11 +559,11 @@
             <artifactId>oclc-harvester2</artifactId>
             <version>0.1.12</version>
          </dependency>
-         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-         </dependency>
+	 <dependency>
+	   <groupId>org.apache.httpcomponents</groupId>
+	   <artifactId>httpclient</artifactId>
+	   <version>4.5.3</version>
+	 </dependency>
          <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
