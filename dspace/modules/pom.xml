@@ -21,6 +21,12 @@
         <license.skip>true</license.skip>
     </properties>
 
+    <!-- The 'additions' module must *always* be built, as it is included
+         as a dependency in most other modules in [src]/dspace/modules -->
+    <modules>
+        <module>additions</module>
+    </modules>
+
 
     <!-- 
          List of enabled DSpace "addon" / local customization Modules to build/install.
@@ -60,10 +66,9 @@
         	<!-- This profiles builds all modules including the modules that are not used in umd (jspui, sword,solr) -->
             <id>all-modules</id>
             <modules>
-            	<module>additions</module>
-              <module>atmire-statistics-exporter</module>
-                <module>lni</module>
-            	<module>jspui</module>
+                <module>additions</module>
+                <!-- <module>atmire-statistics-exporter</module> -->
+            	  <module>jspui</module>
                 <module>rest</module>
                 <module>sword</module>
                 <module>swordv2</module>
