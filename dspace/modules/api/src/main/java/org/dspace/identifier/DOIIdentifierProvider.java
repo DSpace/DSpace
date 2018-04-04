@@ -389,6 +389,8 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             Matcher doimatcher = Pattern.compile("doi:(.+)").matcher(itemDOI);
             if (doimatcher.find()) {
                 doi_url = "https://doi.org/" + doimatcher.group(1);
+            } else if (itemDOI.startsWith("http://doi.org") || itemDOI.startsWith("https://doi.org")) {
+                doi_url = itemDOI;
             } else {
                 doi_url = "https://doi.org/" + itemDOI;
             }
