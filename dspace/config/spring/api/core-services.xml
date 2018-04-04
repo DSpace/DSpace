@@ -106,6 +106,9 @@
     <bean class="org.dspace.workflowbasic.BasicWorkflowServiceImpl"/>
 
     <!-- Begin UMD Customization -->
+    <bean class="org.dspace.content.EtdUnitServiceImpl"/>
+    <bean class="org.dspace.content.CommunityGroupServiceImpl"/>
+    <bean class="org.dspace.eperson.UnitServiceImpl"/>
     <!-- IRUS Patch -->
     <bean class="com.atmire.statistics.export.OpenURLTrackerLoggerServiceImpl"/>
     <!-- End UMD Customization -->
