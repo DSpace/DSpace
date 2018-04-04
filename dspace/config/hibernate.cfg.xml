@@ -84,6 +84,9 @@
         <!-- Mappings for UMD entities -->
         <mapping class="org.dspace.content.EtdUnit"/>
         <mapping class="org.dspace.eperson.Unit"/>
+
+        <!-- IRUS Patch  -->
+        <mapping class="com.atmire.statistics.export.OpenURLTracker"/>
         <!-- End UMD Customization -->
     </session-factory>
 </hibernate-configuration>

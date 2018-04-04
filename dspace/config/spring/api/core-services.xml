@@ -105,6 +105,11 @@
     <bean class="org.dspace.workflowbasic.BasicWorkflowItemServiceImpl"/>
     <bean class="org.dspace.workflowbasic.BasicWorkflowServiceImpl"/>
 
+    <!-- Begin UMD Customization -->
+    <!-- IRUS Patch -->
+    <bean class="com.atmire.statistics.export.OpenURLTrackerLoggerServiceImpl"/>
+    <!-- End UMD Customization -->
+
     <!--Configurable workflow services, uncomment the xml workflow beans below to enable the configurable workflow-->
     <!--<bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>

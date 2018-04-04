@@ -29,10 +29,14 @@
  */
 package com.atmire.statistics.export;
 
+import com.atmire.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
+import com.atmire.statistics.export.service.OpenURLTrackerLoggerService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -54,6 +58,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -65,8 +70,7 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
     private static Logger log = Logger.getLogger(ExportUsageEventListener.class);
 
     /* The metadata field which is to be checked for */
-    private static Metadatum trackerType;
-
+    private static MetadataField trackerType;
 
     /* A list of values the type might have */
     private static List<String> trackerValues;
@@ -77,10 +81,10 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
     private static String trackerUrlVersion;
 
 
-    public void init() {
+    public void init(Context context) {
         try {
             if (trackerType == null) {
-                trackerType = resolveConfigPropertyToMetadataField("tracker.type-field");
+                trackerType = resolveConfigPropertyToMetadataField(context,"tracker.type-field");
 
                 String metadataValues = ConfigurationManager.getProperty("stats", "tracker.type-value");
                 if (metadataValues != null && 0 < metadataValues.trim().length()) {
@@ -120,28 +124,30 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
     public void receiveEvent(Event event) {
         if (event instanceof UsageEvent) {
             UsageEvent ue = (UsageEvent) event;
+            Context context= new Context();
             try {
                 //First of all check for a bitstream download event
                 if (ue.getObject() instanceof Bitstream) {
                     Bitstream bit = (Bitstream) ue.getObject();
                     //Check for an item
-                    if (0 < bit.getBundles().length) {
+                    if (0 < bit.getBundles().size()) {
                         if (!SpiderDetector.isSpider(ue.getRequest())) {
-                            Bundle bundle = bit.getBundles()[0];
+                            Bundle bundle = bit.getBundles().get(0);
                             if (bundle.getName() == null || !bundle.getName().equals("ORIGINAL"))
                                 return;
 
-                            if (0 < bundle.getItems().length) {
-                                Item item = bundle.getItems()[0];
-                                if(item.isArchived() && !item.canEdit()) {
+                            if (0 < bundle.getItems().size()) {
+                                Item item = bundle.getItems().get(0);
+
+                                if(item.isArchived() && !ContentServiceFactory.getInstance().getItemService().canEdit(context, item)) {
                                     //Check if we have a valid type of item !
-                                    init();
+                                    init(context);
                                     if (trackerType != null && trackerValues != null) {
-                                        Metadatum[] types = item.getMetadata(trackerType.schema, trackerType.element, trackerType.qualifier, Item.ANY);
-                                        if(types.length>0){
+                                        List<MetadataValue> metadataValueList = ContentServiceFactory.getInstance().getMetadataValueService().findByField(context, trackerType);
+                                        if(metadataValueList.size()>0){
                                             //Find out if we have a type that matches one of our values
-                                            for (Metadatum type : types) {
-                                                if (!trackerValues.contains(type.value.toLowerCase())) {
+                                            for (MetadataValue type : metadataValueList) {
+                                                if (!trackerValues.contains(type.getValue().toLowerCase())) {
                                                     //We have found a type so process this bitstream
                                                     processItem(ue.getContext(), item, bit, ue.getRequest());
                                                     break;
@@ -163,12 +169,9 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
                     }
                 }
             } catch (Exception e) {
-                int id;
-                try {
-                    id = ue.getObject().getID();
-                } catch (Exception e1) {
-                    id = -1;
-                }
+                UUID id;
+                id = ue.getObject().getID();
+
                 int type;
                 try {
                     type = ue.getObject().getType();
@@ -199,8 +202,7 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
         String clientUA = StringUtils.defaultIfBlank(request.getHeader("USER-AGENT"), "");
         String referer = StringUtils.defaultIfBlank(request.getHeader("referer"), "");
         String sessionID =  StringUtils.defaultIfBlank(request.getSession().getId(), "");
-        String mimeType = bitstream.getFormat().getMIMEType();
-
+        String mimeType = bitstream.getFormat(context).getMIMEType();
         //Start adding our data
         String data = "";
         data += URLEncoder.encode("url_ver", "UTF-8") + "=" + URLEncoder.encode(trackerUrlVersion, "UTF-8");
@@ -212,6 +214,7 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
         data += "&" + URLEncoder.encode("rfr_id", "UTF-8") + "=" + URLEncoder.encode(ConfigurationManager.getProperty("dspace.hostname"), "UTF-8");
         data += "&" + URLEncoder.encode("url_tim", "UTF-8") + "=" + URLEncoder.encode(new DCDate(new Date()).toString(), "UTF-8");
         data += "&" + URLEncoder.encode("svc.session", "UTF-8") + "=" + URLEncoder.encode(sessionID, "UTF-8");
+
         //only for jsp ui
         // http://demo.dspace.org/jspui/handle/10673/2235
         // http://demo.dspace.org/jspui/bitstream/10673/2235/1/Captura.JPG
@@ -303,7 +306,7 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
         }
     }
 
-    private static void tryReprocessFailed(OpenUrlTrackerLogger tracker) throws SQLException {
+    private static void tryReprocessFailed(Context context, OpenURLTracker tracker) throws SQLException {
         boolean success = false;
         URLConnection conn;
         try {
@@ -319,22 +322,33 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
             success = false;
         } finally {
             if (success) {
+                OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlTrackerLoggerService().remove(context, tracker);
                 // If the tracker was able to post successfully, we remove it from the database
-                tracker.delete();
-                log.info("Successfully posted " + tracker.getUrl() + " from " + tracker.getUploaddate());
+                log.info("Successfully posted " + tracker.getUrl() + " from " + tracker.getUploadDate());
             } else {
                 // Still no luck - write an error msg but keep the entry in the table for future executions
-                log.error("Failed attempt from " + tracker.getUrl() + " originating from " + tracker.getUploaddate());
+                log.error("Failed attempt from " + tracker.getUrl() + " originating from " + tracker.getUploadDate());
             }
         }
     }
 
-    public static void reprocessFailedQueue() throws SQLException {
+    public static void reprocessFailedQueue(Context context) throws SQLException {
         Context c = new Context();
-        OpenUrlTrackerLogger[] trackerLoggers = OpenUrlTrackerLogger.findAll(c);
-        for (OpenUrlTrackerLogger openUrlTrackerLogger : trackerLoggers) {
-            ExportUsageEventListener.tryReprocessFailed(openUrlTrackerLogger);
+        OpenURLTrackerLoggerServiceFactory instance = OpenURLTrackerLoggerServiceFactory.getInstance();
+        if(instance==null){
+           log.error("Error retrieving the \"OpenURLTrackerLoggerServiceFactory\" instance, aborting the processing");
+            return;
         }
+        OpenURLTrackerLoggerService openUrlTrackerLoggerService = instance.getOpenUrlTrackerLoggerService();
+        if(openUrlTrackerLoggerService==null){
+            log.error("Error retrieving the \"openUrlTrackerLoggerService\" instance, aborting the processing");
+            return;
+        }
+        List<OpenURLTracker> openURLTrackers = openUrlTrackerLoggerService.findAll(c);
+        for(OpenURLTracker openURLTracker : openURLTrackers){
+            ExportUsageEventListener.tryReprocessFailed(context, openURLTracker) ;
+        }
+
         try {
             c.abort();
         } catch (Exception ignored) {
@@ -344,21 +358,19 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
     public static void logfailed(Context context, String url) throws SQLException {
         Date now = new Date();
         if (url.equals("")) return;
-        OpenUrlTrackerLogger tracker = OpenUrlTrackerLogger.create(context);
-        tracker.setUploaddate(now);
+        OpenURLTrackerLoggerService service = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlTrackerLoggerService();
+        OpenURLTracker tracker = service.create(context);
+        tracker.setUploadDate(now);
         tracker.setUrl(url);
-        tracker.update();
+        // TODO service tracker update
     }
 
-    private static Metadatum resolveConfigPropertyToMetadataField(String fieldName) {
+    private static MetadataField resolveConfigPropertyToMetadataField(Context context, String fieldName) throws SQLException {
         String metadataField = ConfigurationManager.getProperty("stats", fieldName);
         if (metadataField != null && 0 < metadataField.trim().length()) {
             metadataField = metadataField.trim();
-            Metadatum dcVal = new Metadatum();
-            dcVal.schema = metadataField.split("\\.")[0];
-            dcVal.element = metadataField.split("\\.")[1];
-            dcVal.qualifier = metadataField.split("\\.").length == 2 ? null : metadataField.split("\\.")[2];
-            return dcVal;
+            MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+            return metadataFieldService.findByElement(context,metadataField.split("\\.")[0],metadataField.split("\\.")[1],metadataField.split("\\.").length == 2 ? null : metadataField.split("\\.")[2]);
         }
         return null;
     }

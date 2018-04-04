@@ -216,13 +216,13 @@
    </profiles>
 
    <dependencies>
-      <!-- Atmire Statistics Exporter Dependency -->
-      <dependency>
-          <groupId>com.atmire</groupId>
-          <artifactId>atmire-statistics-exporter-api</artifactId>
-          <version>1.0.0</version>
-          <type>jar</type>
-      </dependency>
+        <!-- Atmire Statistics Exporter Dependency -->
+        <dependency>
+            <groupId>com.atmire</groupId>
+            <artifactId>atmire-statistics-exporter-api</artifactId>
+            <version>1.0.0</version>
+            <type>jar</type>
+        </dependency>
 
         <dependency>
             <groupId>org.dspace.modules</groupId>

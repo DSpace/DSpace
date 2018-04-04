@@ -19,7 +19,8 @@ public class RetryOpenUrlTracker {
     /* Command Line execution */
     public static void main(String[] args) throws SQLException {
         Context context = new Context();
-        context.ignoreAuthorization();
+
+        context.turnOffAuthorisationSystem();
 
         String usage = "com.atmire.statistics.export.RetryOpenUrlTracker [-a <URL>]] or nothing to retry all failed attempts.";
         Options options = new Options();
@@ -51,9 +52,9 @@ public class RetryOpenUrlTracker {
             ExportUsageEventListener.logfailed(context, line.getOptionValue("a"));
             log.info("Created dummy entry in OpenUrlTracker with URL: " + line.getOptionValue("a"));
         } else {
-            ExportUsageEventListener.reprocessFailedQueue();
+            ExportUsageEventListener.reprocessFailedQueue(context);
         }
-
+        context.restoreAuthSystemState();
         try {
             context.complete();
         } catch (Exception ignored) {

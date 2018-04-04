@@ -16,7 +16,7 @@
 --   end if;
 -- end;
 
-CREATE SEQUENCE openurltracker_seq
+CREATE SEQUENCE openurltracker_seq;
 
 CREATE TABLE OpenUrlTracker
 (
