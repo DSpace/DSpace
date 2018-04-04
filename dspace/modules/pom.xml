@@ -65,13 +65,11 @@
             </modules>
         </profile>
         <profile>
-        	<!-- This profiles builds all modules including the modules that are not used in umd (jspui, sword,solr) -->
+        	<!-- This profiles builds all modules including the modules that are not used in umd (sword,solr) -->
             <id>all-modules</id>
             <modules>
                 <module>additions</module>
                 <module>atmire-statistics-exporter</module>
-                <!-- <module>atmire-statistics-exporter</module> -->
-            	  <module>jspui</module>
                 <module>rest</module>
                 <module>sword</module>
                 <module>swordv2</module>
@@ -85,12 +83,6 @@
             <id>dspace-xmlui</id>
             <modules>
                 <module>xmlui</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>dspace-jspui</id>
-            <modules>
-                <module>jspui</module>
             </modules>
         </profile>
         <profile>
