@@ -274,7 +274,7 @@ public abstract class AuthorityObject extends DSpaceObject {
         Context context = getContext();
         try {
             TableRowIterator tri = DatabaseManager.queryTable(context, this.getMetadataTable() ,
-                    "SELECT * FROM " + this.getMetadataTable() + " WHERE parent_id= ? ORDER BY field_id",
+                    "SELECT * FROM " + this.getMetadataTable() + " WHERE parent_id= ? ORDER BY field_id, place asc",
                     getID());
 
             if (tri != null) {

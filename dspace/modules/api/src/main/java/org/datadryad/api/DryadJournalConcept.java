@@ -17,6 +17,7 @@ import java.lang.*;
 import java.lang.Exception;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -204,12 +205,29 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         setConceptMetadataValue(metadataProperties.getProperty(METADATADIR), value);
     }
 
+    public List<String> getISSNs() {
+        List<String> results = new ArrayList<>();
+        List<String> issns = getConceptMetadataValues(metadataProperties.getProperty(ISSN));
+        for (String issn : issns) {
+            if (!"".equals(issn)) {
+                results.add(issn);
+            }
+        }
+        return results;
+    }
+
     public String getISSN() {
-        return getConceptMetadataValue(metadataProperties.getProperty(ISSN));
+        List<String> issns = getISSNs();
+        if (issns.size() > 0) {
+            return issns.get(0);
+        }
+        return "";
     }
 
     public void setISSN(String value) {
-        setConceptMetadataValue(metadataProperties.getProperty(ISSN), value);
+        if (!getISSNs().contains(value)) {
+            addConceptMetadataValue(metadataProperties.getProperty(ISSN), value);
+        }
     }
 
     @Override

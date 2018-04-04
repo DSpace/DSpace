@@ -7,6 +7,7 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.content.authority.AuthorityObject;
 import org.dspace.content.authority.Choices;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * User: lantian @ atmire . com
@@ -144,12 +146,17 @@ public class FlowAuthorityMetadataValueUtils {
         String value = request.getParameter("value");
         String language = request.getParameter("language");
 
+        AuthorityObject thisObject = AuthorityObject.find(context, type, id);
+        MetadataField thisField = MetadataField.find(Integer.parseInt(fieldID));
+        List<AuthorityMetadataValue> authorityMetadataValues = thisObject.getMetadata(thisField.getSchemaName(), thisField.getElement(), thisField.getQualifier());
+
         //add email to concept metadata
         AuthorityMetadataValue authorityMetadataValue = new AuthorityMetadataValue(tableName);
 
         authorityMetadataValue.setValue(value);
         authorityMetadataValue.setFieldId(Integer.parseInt(fieldID));
         authorityMetadataValue.setParentId(id);
+        authorityMetadataValue.setPlace(authorityMetadataValues.size()+1);
         authorityMetadataValue.create(context);
         context.addEvent(new Event(Event.MODIFY_METADATA, type, id, null));
         context.commit();
