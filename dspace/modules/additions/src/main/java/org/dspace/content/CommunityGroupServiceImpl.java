@@ -4,14 +4,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityGroupService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class CommunityGroupServiceImpl implements CommunityGroupService {
 
-    private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    @Autowired(required = true)
+    protected CommunityService communityService;
 
     @Override
     public CommunityGroup find(int id) {

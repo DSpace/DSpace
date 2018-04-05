@@ -126,7 +126,9 @@
             <description>How to compute the crosswalked value from the original.  Default is plain copy.</description>
             <map>
                 <entry key='_target'>
-                    <bean class='org.dspace.identifier.ezid.HandleToTarget'/>
+                    <bean class='org.dspace.identifier.ezid.HandleToTarget'>
+                        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+                    </bean>
                 </entry>
             </map>
         </property>

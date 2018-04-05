@@ -59,6 +59,8 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.XmlWorkflowItemDAOImpl"/>
     
     <!-- Begin UMD Customization -->
+    <bean class="org.dspace.content.dao.impl.EtdUnitDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.UnitDAOImpl"/>
     <!-- IRUS Patch -->
     <bean class="com.atmire.statistics.export.dao.impl.OpenURLTrackerDAOImpl"/>
     <!-- End UMD Customization -->

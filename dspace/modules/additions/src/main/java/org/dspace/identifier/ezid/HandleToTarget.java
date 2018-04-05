@@ -1,12 +1,13 @@
 package org.dspace.identifier.ezid;
 
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class HandleToTarget implements Transform
 {
 
-    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     @Override
     public String transform(String identifierURI) throws Exception
@@ -23,6 +24,11 @@ public class HandleToTarget implements Transform
         {
             throw new Exception();
         }
+    }
+
+    public void setConfigurationService(ConfigurationService configurationService)
+    {
+        this.configurationService = configurationService;
     }
 
 }
