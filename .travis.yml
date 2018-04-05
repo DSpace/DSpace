@@ -9,9 +9,12 @@ env:
 before_install:
   # Remove outdated settings.xml from Travis builds. Workaround for https://github.com/travis-ci/travis-ci/issues/4629
   - rm ~/.m2/settings.xml
-  # Install latest Node.js 0.10.x & print version info
-  - nvm install 0.10
+  # Install Node.js 6.5.0 & print version info
+  - nvm install 6.5.0
   - node --version
+  # Install npm 3.10.8 & print version info
+  - npm install -g npm@3.10.8
+  - npm --version
   # Install Bower
   - npm install -g bower
   # Install Grunt & print version info
@@ -20,10 +23,10 @@ before_install:
   # Print ruby version info (should be installed)
   - ruby -v
   # Install Sass & print version info
-  - gem install sass
+  - gem install sass -v 3.3.14
   - sass -v
   # Install Compass & print version info
-  - gem install compass
+  - gem install compass -v 1.0.1
   - compass version
 
 # Skip install stage, as we'll do it below
@@ -34,15 +37,16 @@ install: "echo 'Skipping install stage, dependencies will be downloaded during b
 # 2. Assemble DSpace
 script:
   # 1. [Install & Unit Test] Check source code licenses and run source code Unit Tests
-  #    (This explicitly skips building the 'dspace' assembly module, since we only want to do that ONCE.)
   #        license:check => Validate all source code license headers
   #        -Dmaven.test.skip=false => Enable DSpace Unit Tests
-  #        -P !dspace => SKIP full DSpace assembly (will do below)
+  #        -DskipITs=false         => Enable DSpace Integration Tests
+  #        -P !assembly            => Skip normal assembly (as it can be memory intensive)
   #        -B => Maven batch/non-interactive mode (recommended for CI)
   #        -V => Display Maven version info before build
-  - "mvn clean install license:check -Dmaven.test.skip=false -P !dspace -B -V"
+  #        -Dsurefire.rerunFailingTestsCount=2 => try again for flakey tests, and keep track of/report on number of retries
+  - "mvn clean install license:check -Dmaven.test.skip=false -DskipITs=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2"
   # 2. [Assemble DSpace] Ensure assembly process works (from [src]/dspace/), including Mirage 2
   #        -Dmirage2.on=true => Build Mirage2
   #        -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)
   #        -P !assembly => SKIP the actual building of [src]/dspace/dspace-installer (as it can be memory intensive)
-  - "cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V"
+  - "cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2"

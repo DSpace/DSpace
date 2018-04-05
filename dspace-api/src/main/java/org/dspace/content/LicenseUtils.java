@@ -15,7 +15,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.license.FormattableArgument;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -28,6 +33,11 @@ import org.dspace.eperson.EPerson;
  */
 public class LicenseUtils
 {
+    private static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    private static final BitstreamFormatService bitstreamFormat = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     /**
      * Return the text of the license that the user has granted/must grant
      * before for submit the item. The license text is build using the template
@@ -46,7 +56,6 @@ public class LicenseUtils
      * {x} any addition argument supplied wrapped in the
      * LicenseArgumentFormatter based on his type (map key)
      * 
-     * @see license.LicenseArgumentFormatter
      * @param locale
      * @param collection
      * @param item
@@ -84,7 +93,7 @@ public class LicenseUtils
             }
         }
 
-        String licenseTemplate = collection.getLicense();
+        String licenseTemplate = collectionService.getLicense(collection);
 
         return formatter.format(licenseTemplate, args).toString();
     }
@@ -115,9 +124,9 @@ public class LicenseUtils
      *            the item object of the license
      * @param licenseText
      *            the license the user granted
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     public static void grantLicense(Context context, Item item,
             String licenseText) throws SQLException, IOException,
@@ -131,17 +140,17 @@ public class LicenseUtils
         // Store text as a bitstream
         byte[] licenseBytes = licenseText.getBytes("UTF-8");
         ByteArrayInputStream bais = new ByteArrayInputStream(licenseBytes);
-        Bitstream b = item.createSingleBitstream(bais, "LICENSE");
+        Bitstream b = itemService.createSingleBitstream(context, bais, item, "LICENSE");
 
         // Now set the format and name of the bitstream
-        b.setName("license.txt");
-        b.setSource("Written by org.dspace.content.LicenseUtils");
+        b.setName(context, "license.txt");
+        b.setSource(context, "Written by org.dspace.content.LicenseUtils");
 
         // Find the License format
-        BitstreamFormat bf = BitstreamFormat.findByShortDescription(context,
+        BitstreamFormat bf = bitstreamFormat.findByShortDescription(context,
                 "License");
         b.setFormat(bf);
 
-        b.update();
+        bitstreamService.update(context, b);
     }
 }

@@ -23,10 +23,15 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.workflow.WorkflowException;
 
 /**
  * An abstract implementation of a DSpace Package Ingester, which
@@ -45,27 +50,20 @@ import org.dspace.handle.HandleManager;
  * <P>
  * All Package ingesters should either extend this abstract class
  * or implement <code>PackageIngester</code> to better suit their needs.
- * <P>
- * WARNING: If you choose to extend this Abstract class, you must DISABLE
- * plugin instance caching for your new class in dspace.cfg. This will ensure
- * the "pkgIngestedMap" and any other global instance variables are RESET
- * for each package ingest. To DISABLE plugin instance caching, just place
- * the following configuration in your dspace.cfg:
- * <code>
- * plugin.reusable.[full-class-name] = false
- * </code>
- * For more information see the org.dspace.core.PluginManager cacheMe() method,
- * which defaults to caching all plugin class instances.
  *
  * @author Tim Donohue
  * @see PackageIngester
- * @see PluginManager
+ * @see org.dspace.core.service.PluginService
  */
 public abstract class AbstractPackageIngester
         implements PackageIngester
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(AbstractPackageIngester.class);
+
+    protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     /** 
      * References to other packages -- these are the next packages to ingest recursively
@@ -116,14 +114,18 @@ public abstract class AbstractPackageIngester
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>ingestAll</code>
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws WorkflowException if workflow error
      */
     @Override
     public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
                                 PackageParameters params, String license)
-        throws PackageException, UnsupportedOperationException,
-               CrosswalkException, AuthorizeException,
-               SQLException, IOException
-    {
+            throws PackageException, UnsupportedOperationException,
+            CrosswalkException, AuthorizeException,
+            SQLException, IOException, WorkflowException {
         //If unset, make sure the Parameters specifies this is a recursive ingest
         if(!params.recursiveModeEnabled())
         {
@@ -205,12 +207,12 @@ public abstract class AbstractPackageIngester
                             String childHandle = getIngestedMap().get(childPkg);
                             if(childHandle!=null)
                             {
-                                Item childItem = (Item) HandleManager.resolveToObject(context, childHandle);
+                                Item childItem = (Item) handleService.resolveToObject(context, childHandle);
                                 // Ensure Item is mapped to Collection that referenced it
                                 Collection collection = (Collection) dso;
-                                if (childItem!=null && !childItem.isIn(collection))
+                                if (childItem!=null && !itemService.isIn(childItem, collection))
                                 {
-                                    collection.addItem(childItem);
+                                    collectionService.addItem(context, collection, childItem);
                                 }
                             }
                         }
@@ -257,14 +259,18 @@ public abstract class AbstractPackageIngester
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>replaceAll</code>
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws WorkflowException if workflow error
      */
     @Override
     public List<String> replaceAll(Context context, DSpaceObject dso,
                                 File pkgFile, PackageParameters params)
-        throws PackageException, UnsupportedOperationException,
-               CrosswalkException, AuthorizeException,
-               SQLException, IOException
-    {
+            throws PackageException, UnsupportedOperationException,
+            CrosswalkException, AuthorizeException,
+            SQLException, IOException, WorkflowException {
         //If unset, make sure the Parameters specifies this is a recursive replace
         if(!params.recursiveModeEnabled())
         {
@@ -329,12 +335,12 @@ public abstract class AbstractPackageIngester
                             String childHandle = getIngestedMap().get(childPkg);
                             if(childHandle!=null)
                             {
-                                Item childItem = (Item) HandleManager.resolveToObject(context, childHandle);
+                                Item childItem = (Item) handleService.resolveToObject(context, childHandle);
                                 // Ensure Item is mapped to Collection that referenced it
                                 Collection collection = (Collection) replacedDso;
-                                if (childItem!=null && !childItem.isIn(collection))
+                                if (childItem!=null && !itemService.isIn(childItem, collection))
                                 {
-                                    collection.addItem(childItem);
+                                    collectionService.addItem(context, collection, childItem);
                                 }
                             }
                         }

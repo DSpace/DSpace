@@ -7,25 +7,12 @@
  */
 package org.dspace.content.crosswalk;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -34,6 +21,13 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Configurable QDC Crosswalk
@@ -63,7 +57,7 @@ import org.jdom.input.SAXBuilder;
  * Since there is significant overhead in reading the properties file to
  * configure the crosswalk, and a crosswalk instance may be used any number
  * of times, we recommend caching one instance of the crosswalk for each
- * alias and simply reusing those instances. The PluginManager does
+ * alias and simply reusing those instances. The PluginService does
  * this by default.
  * <p>
  * Each named crosswalk has two other types of configuration lines:
@@ -120,6 +114,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
     private String schemaLocation = null;
 
     private static SAXBuilder builder = new SAXBuilder();
+
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+    private CrosswalkMetadataValidator metadataValidator = new CrosswalkMetadataValidator();
 
     /**
      * Fill in the plugin-name table from DSpace configuration entries
@@ -218,7 +216,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         if (myName == null)
         {
             throw new CrosswalkInternalException("Cannot determine plugin name, " +
-                    "You must use PluginManager to instantiate QDCCrosswalk so the instance knows its name.");
+                    "You must use PluginService to instantiate QDCCrosswalk so the instance knows its name.");
         }
 
         // grovel DSpace configuration for namespaces
@@ -307,6 +305,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         }
     }
 
+    @Override
     public Namespace[] getNamespaces()
     {
         try
@@ -319,6 +318,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
+    @Override
     public String getSchemaLocation()
     {
         try
@@ -333,8 +333,14 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
     /**
      * Returns object's metadata in MODS format, as XML structure node.
+     * @param context context
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    public List<Element> disseminateList(DSpaceObject dso)
+    @Override
+    public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -352,22 +358,26 @@ public class QDCCrosswalk extends SelfNamedPlugin
         Item item = (Item)dso;
         init();
 
-        Metadatum[] dc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        List<Element> result = new ArrayList<Element>(dc.length);
-        for (int i = 0; i < dc.length; i++)
+        List<MetadataValue> dc = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        List<Element> result = new ArrayList<Element>(dc.size());
+        for (int i = 0; i < dc.size(); i++)
         {
+            MetadataValue metadataValue = dc.get(i);
+            MetadataField metadataField = metadataValue.getMetadataField();
+            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+
             // Compose qualified DC name - schema.element[.qualifier]
             // e.g. "dc.title", "dc.subject.lcc", "lom.Classification.Keyword"
-            String qdc = dc[i].schema+"."+
-                         ((dc[i].qualifier == null) ? dc[i].element
-                            : (dc[i].element + "." + dc[i].qualifier));
+            String qdc = metadataSchema.getName()+"."+
+                         ((metadataField.getQualifier() == null) ? metadataField.getElement()
+                            : (metadataField.getElement() + "." + metadataField.getQualifier()));
 
             Element elt = qdc2element.get(qdc);
 
             // only complain about missing elements in the DC schema:
             if (elt == null)
             {
-                if (dc[i].schema.equals(MetadataSchema.DC_SCHEMA))
+                if (metadataField.getMetadataSchema().getName().equals(MetadataSchema.DC_SCHEMA))
                 {
                     log.warn("WARNING: " + myName + ": No QDC mapping for \"" + qdc + "\"");
                 }
@@ -375,14 +385,14 @@ public class QDCCrosswalk extends SelfNamedPlugin
             else
             {
                 Element qe = (Element)elt.clone();
-                qe.setText(dc[i].value);
+                qe.setText(metadataValue.getValue());
                 if (addSchema && schemaLocation != null)
                 {
                     qe.setAttribute("schemaLocation", schemaLocation, XSI_NS);
                 }
-                if (dc[i].language != null)
+                if (metadataValue.getLanguage() != null)
                 {
-                    qe.setAttribute("lang", dc[i].language, Namespace.XML_NAMESPACE);
+                    qe.setAttribute("lang", metadataValue.getLanguage(), Namespace.XML_NAMESPACE);
                 }
                 result.add(qe);
             }
@@ -390,7 +400,8 @@ public class QDCCrosswalk extends SelfNamedPlugin
         return result;
     }
 
-    public Element disseminateElement(DSpaceObject dso)
+    @Override
+    public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -404,12 +415,14 @@ public class QDCCrosswalk extends SelfNamedPlugin
         return root;
     }
 
+    @Override
     public boolean canDisseminate(DSpaceObject dso)
     {
         return true;
     }
 
-    public void ingest(Context context, DSpaceObject dso, Element root)
+    @Override
+    public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         init();
@@ -422,10 +435,11 @@ public class QDCCrosswalk extends SelfNamedPlugin
         {
             throw new MetadataValidationException("Wrong root element for Qualified DC: " + root.toString());
         }
-        ingest(context, dso, root.getChildren());
+        ingest(context, dso, root.getChildren(), createMissingMetadataFields);
     }
 
-    public void ingest(Context context, DSpaceObject dso, List<Element> ml)
+    @Override
+    public void ingest(Context context, DSpaceObject dso, List<Element> ml, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         init();
@@ -445,12 +459,21 @@ public class QDCCrosswalk extends SelfNamedPlugin
             // if the root element gets passed here, recurse:
             if ("qualifieddc".equals(me.getName()))
             {
-                ingest(context, dso, me.getChildren());
+                ingest(context, dso, me.getChildren(), createMissingMetadataFields);
             }
 
             else if (element2qdc.containsKey(key))
             {
                 String qdc[] = (element2qdc.get(key)).split("\\.");
+
+                MetadataField metadataField;
+                if (qdc.length == 3) {
+                    metadataField = metadataValidator.checkMetadata(context, qdc[0], qdc[1], qdc[2], createMissingMetadataFields);
+                } else if (qdc.length == 2) {
+                    metadataField = metadataValidator.checkMetadata(context, qdc[0], qdc[1], null, createMissingMetadataFields);
+                } else {
+                    throw new CrosswalkInternalException("Unrecognized format in QDC element identifier for key=\"" + key + "\", qdc=\"" + element2qdc.get(key) + "\"");
+                }
 
                 // get language - prefer xml:lang, accept lang.
                 String lang = me.getAttributeValue("lang", Namespace.XML_NAMESPACE);
@@ -459,18 +482,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
                     lang = me.getAttributeValue("lang");
                 }
 
-                if (qdc.length == 3)
-                {
-                    item.addMetadata(qdc[0], qdc[1], qdc[2], lang, me.getText());
-                }
-                else if (qdc.length == 2)
-                {
-                    item.addMetadata(qdc[0], qdc[1], null, lang, me.getText());
-                }
-                else
-                {
-                    throw new CrosswalkInternalException("Unrecognized format in QDC element identifier for key=\"" + key + "\", qdc=\"" + element2qdc.get(key) + "\"");
-                }
+                itemService.addMetadata(context, item, metadataField, lang, me.getText());
             }
             else
             {
@@ -479,6 +491,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         }
     }
 
+    @Override
     public boolean preferList()
     {
         return true;

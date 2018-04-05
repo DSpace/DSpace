@@ -18,15 +18,14 @@ import java.util.Set;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -57,16 +56,21 @@ public class OREDisseminationCrosswalk
         Namespace.getNamespace("dcterms", "http://purl.org/dc/terms/");
     private static final Namespace DS_NS =
     	Namespace.getNamespace("ds","http://www.dspace.org/objectModel/");
+    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
 
     private static final Namespace namespaces[] = { ATOM_NS, ORE_NS, ORE_ATOM, RDF_NS, DCTERMS_NS, DS_NS };
 
     
+    @Override
     public Namespace[] getNamespaces()
     {
         return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     /* There is (and currently can be) no XSD schema that validates Atom feeds, only RNG */ 
+    @Override
     public String getSchemaLocation()
     {
         return ATOM_NS.getURI() + " " + ATOM_RNG;
@@ -76,20 +80,20 @@ public class OREDisseminationCrosswalk
      * Disseminate an Atom-encoded ORE ReM mapped from a DSpace Item
      * @param item 
      * @return
-     * @throws CrosswalkException
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    private Element disseminateItem(Item item) throws CrosswalkException, IOException, SQLException, AuthorizeException 
+    private Element disseminateItem(Context context, Item item) throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
     	String oaiUrl = null;
-        String dsUrl = ConfigurationManager.getProperty("dspace.url");
+        String dsUrl = configurationService.getProperty("dspace.url");
         
-        String remSource = ConfigurationManager.getProperty("oai", "ore.authoritative.source");
+        String remSource = configurationService.getProperty("oai.ore.authoritative.source");
     	if (remSource == null || remSource.equalsIgnoreCase("oai"))
         {
-            oaiUrl = ConfigurationManager.getProperty("oai", "dspace.oai.url");
+            oaiUrl = configurationService.getProperty("oai.url");
         }
     	else if (remSource.equalsIgnoreCase("xmlui") || remSource.equalsIgnoreCase("manakin"))
         {
@@ -116,11 +120,11 @@ public class OREDisseminationCrosswalk
         aggregation.addContent(atomId);
         
         Element aggLink;
-        Metadatum[] uris = item.getMetadata(MetadataSchema.DC_SCHEMA,"identifier","uri",Item.ANY);
-        for (Metadatum uri : uris) {
+        List<MetadataValue> uris = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA,"identifier","uri",Item.ANY);
+        for (MetadataValue uri : uris) {
         	aggLink = new Element("link",ATOM_NS);
         	aggLink.setAttribute("rel", "alternate");
-        	aggLink.setAttribute("href", uri.value);
+        	aggLink.setAttribute("href", uri.getValue());
             aggregation.addContent(aggLink);
         }
         
@@ -141,7 +145,7 @@ public class OREDisseminationCrosswalk
         
         Element remCreator = new Element("source",ATOM_NS);
         Element remGenerator = new Element("generator",ATOM_NS);
-        remGenerator.addContent(ConfigurationManager.getProperty("dspace.name"));
+        remGenerator.addContent(configurationService.getProperty("dspace.name"));
         remGenerator.setAttribute("uri", oaiUrl);
         remCreator.addContent(remGenerator);
         
@@ -153,10 +157,10 @@ public class OREDisseminationCrosswalk
         
         // Information about the aggregation (item) itself 
         Element aggTitle = new Element("title",ATOM_NS);
-        Metadatum[] titles = item.getMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-        if (titles != null && titles.length>0)
+        List<MetadataValue> titles = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        if (titles != null && titles.size()>0)
         {
-            aggTitle.addContent(titles[0].value);
+            aggTitle.addContent(titles.get(0).getValue());
         }
         else
         {
@@ -166,11 +170,11 @@ public class OREDisseminationCrosswalk
         
         Element aggAuthor;
         Element aggAuthorName;
-        Metadatum[] authors = item.getMetadata(MetadataSchema.DC_SCHEMA,"contributor","author",Item.ANY);
-        for (Metadatum author : authors) {
+        List<MetadataValue> authors = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA,"contributor","author",Item.ANY);
+        for (MetadataValue author : authors) {
         	aggAuthor = new Element("author",ATOM_NS);
         	aggAuthorName = new Element("name",ATOM_NS);
-        	aggAuthorName.addContent(author.value);
+        	aggAuthorName.addContent(author.getValue());
         	aggAuthor.addContent(aggAuthorName);
         	aggregation.addContent(aggAuthor);
         }
@@ -213,8 +217,8 @@ public class OREDisseminationCrosswalk
         triples.addContent(rdfDescription);
         
         // Add a link and an oreatom metadata entry for each bitstream in the item
-        Bundle[] bundles = item.getBundles();
-        Bitstream[] bitstreams;
+        List<Bundle> bundles = item.getBundles();
+        List<Bitstream> bitstreams;
         for (Bundle bundle : bundles) 
         {
         	// Omit the special "ORE" bitstream
@@ -224,13 +228,13 @@ public class OREDisseminationCrosswalk
             }
         	
         	bitstreams = bundle.getBitstreams();
-        	for (Bitstream bs : bitstreams) 
+        	for (Bitstream bs : bitstreams)
         	{
-        		arLink = new Element("link",ATOM_NS);
+                arLink = new Element("link",ATOM_NS);
         		arLink.setAttribute("rel", ORE_NS.getURI()+"aggregates");
         		arLink.setAttribute("href",dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(bs.getName()) + "?sequence=" + bs.getSequenceID());
         		arLink.setAttribute("title",bs.getName());
-        		arLink.setAttribute("type",bs.getFormat().getMIMEType());
+        		arLink.setAttribute("type",bs.getFormat(context).getMIMEType());
         		arLink.setAttribute("length",Long.toString(bs.getSize()));
         		
         		aggregation.addContent(arLink);
@@ -295,10 +299,11 @@ public class OREDisseminationCrosswalk
         return aggregation;
     }
     
-    public Element disseminateElement(DSpaceObject dso)	throws CrosswalkException, IOException, SQLException, AuthorizeException 
+    @Override
+    public Element disseminateElement(Context context, DSpaceObject dso)	throws CrosswalkException, IOException, SQLException, AuthorizeException
 	{
     	switch(dso.getType()) {
-	    	case Constants.ITEM: return disseminateItem((Item)dso);
+	    	case Constants.ITEM: return disseminateItem(context, (Item)dso);
 	    	case Constants.COLLECTION: break;
 	    	case Constants.COMMUNITY: break;
 	    	default: throw new CrosswalkObjectNotSupported("ORE implementation unable to disseminate unknown DSpace object.");
@@ -346,19 +351,22 @@ public class OREDisseminationCrosswalk
     }
     
    
-    public List<Element> disseminateList(DSpaceObject dso) throws CrosswalkException, IOException, SQLException, AuthorizeException
+    @Override
+    public List<Element> disseminateList(Context context, DSpaceObject dso) throws CrosswalkException, IOException, SQLException, AuthorizeException
 	{
 	    List<Element> result = new ArrayList<Element>(1);
-	    result.add(disseminateElement(dso));
+	    result.add(disseminateElement(context, dso));
 	    return result;
 	}
 
     /* Only interested in disseminating items at this time */
+    @Override
     public boolean canDisseminate(DSpaceObject dso)
     {
     	return (dso.getType() == Constants.ITEM || dso.getType() == Constants.COLLECTION || dso.getType() == Constants.COMMUNITY);
     }
 
+    @Override
     public boolean preferList()
     {
         return false;

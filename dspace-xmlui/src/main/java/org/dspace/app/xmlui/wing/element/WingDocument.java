@@ -59,6 +59,7 @@ public class WingDocument extends AbstractWingElement implements
      * 
      * @param context
      *            (Required) The context this element is contained in.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public WingDocument(WingContext context) throws WingException
     {
@@ -75,6 +76,7 @@ public class WingDocument extends AbstractWingElement implements
      * associated with this document.
      * 
      * @return The Meta element
+     * @throws org.dspace.app.xmlui.wing.WingException never.
      */
     public Meta setMeta() throws WingException
     {
@@ -86,6 +88,7 @@ public class WingDocument extends AbstractWingElement implements
      * this document.
      * 
      * @return The Body element.
+     * @throws org.dspace.app.xmlui.wing.WingException never.
      */
     public Body setBody() throws WingException
     {
@@ -97,6 +100,7 @@ public class WingDocument extends AbstractWingElement implements
      * associated with this document.
      * 
      * @return The Options element.
+     * @throws org.dspace.app.xmlui.wing.WingException never.
      */
     public Options setOptions() throws WingException
     {
@@ -119,6 +123,7 @@ public class WingDocument extends AbstractWingElement implements
      *            The element's attributes
      * @return True if this WingElement is equivalent to the given SAX Event.
      */
+    @Override
     public boolean mergeEqual(String namespace, String localName, String qName,
             Attributes attributes) throws SAXException, WingException
     {
@@ -154,6 +159,7 @@ public class WingDocument extends AbstractWingElement implements
      *            The element's attributes
      * @return The child element
      */
+    @Override
     public WingMergeableElement mergeChild(String namespace, String localName,
             String qName, Attributes attributes) throws SAXException,
             WingException
@@ -187,6 +193,7 @@ public class WingDocument extends AbstractWingElement implements
      * 
      * @return The attributes for this merged element
      */
+    @Override
     public Attributes merge(Attributes attributes) throws SAXException,
             WingException
     {
@@ -206,8 +213,8 @@ public class WingDocument extends AbstractWingElement implements
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
-     * 
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
             NamespaceSupport namespaces)
             throws SAXException
@@ -241,6 +248,7 @@ public class WingDocument extends AbstractWingElement implements
     /**
      * dispose
      */
+    @Override
     public void dispose()
     {
         if (this.meta != null)

@@ -8,15 +8,12 @@
 package org.dspace.xmlworkflow.storedcomponents;
 
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.Group;
 
+import javax.persistence.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * Represents a workflow assignments database representation.
@@ -28,118 +25,77 @@ import java.util.ArrayList;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class WorkflowItemRole {
-    /** Our context */
-    private Context myContext;
+@Entity
+@Table(name="cwf_workflowitemrole")
+public class WorkflowItemRole implements ReloadableEntity<Integer> {
 
-    /** The row in the table representing this object */
-    private TableRow myRow;
+    @Id
+    @Column(name="workflowitemrole_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="cwf_workflowitemrole_seq")
+    @SequenceGenerator(name="cwf_workflowitemrole_seq", sequenceName="cwf_workflowitemrole_seq", allocationSize = 1)
+    private Integer id;
+
+//    @Column(name = "role_id")
+//    @Lob
+    @Column(name="role_id", columnDefinition = "text")
+    private String roleId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workflowitem_id")
+    private XmlWorkflowItem workflowItem;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "eperson_id")
+    private EPerson ePerson;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private Group group;
 
     /**
-     * Construct an ResourcePolicy
+     * Protected constructor, create object using:
+     * {@link org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService#create(Context)}
      *
-     * @param context
-     *            the context this object exists in
-     * @param row
-     *            the corresponding row in the table
      */
-    WorkflowItemRole(Context context, TableRow row)
+    protected WorkflowItemRole()
     {
-        myContext = context;
-        myRow = row;
-    }
 
-    public static WorkflowItemRole find(Context context, int id)
-            throws SQLException
-    {
-        TableRow row = DatabaseManager.find(context, "cwf_workflowitemrole", id);
-
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
-            return new WorkflowItemRole(context, row);
-        }
-    }
-
-    public static WorkflowItemRole[] find(Context context, int workflowItemId, String role) throws SQLException {
-         TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_workflowitemrole",
-                "SELECT * FROM cwf_workflowitemrole WHERE workflowitem_id= ? AND role_id= ? ",
-                workflowItemId, role);
-
-        ArrayList<WorkflowItemRole> roles = new ArrayList<WorkflowItemRole>();
-        while(tri.hasNext()){
-
-            roles.add(new WorkflowItemRole(context, tri.next()));
-        }
-        return roles.toArray(new WorkflowItemRole[roles.size()]);
-    }
-
-    public static WorkflowItemRole[] findAllForItem(Context context, int workflowItemId) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_workflowitemrole",
-               "SELECT * FROM cwf_workflowitemrole WHERE workflowitem_id= ? ",
-               workflowItemId);
-
-       ArrayList<WorkflowItemRole> roles = new ArrayList<WorkflowItemRole>();
-       while(tri.hasNext()){
-
-           roles.add(new WorkflowItemRole(context, tri.next()));
-       }
-       return roles.toArray(new WorkflowItemRole[roles.size()]);
-    }
-
-    public static WorkflowItemRole create(Context context) throws SQLException,
-            AuthorizeException {
-
-        TableRow row = DatabaseManager.create(context, "cwf_workflowitemrole");
-
-        return new WorkflowItemRole(context, row);
     }
 
 
-    public void delete() throws SQLException
-    {
-        DatabaseManager.delete(myContext, myRow);
-    }
-
-
-    public void update() throws SQLException
-    {
-        DatabaseManager.update(myContext, myRow);
+    public Integer getID() {
+        return id;
     }
 
     public void setRoleId(String id){
-        myRow.setColumn("role_id",id);
+        this.roleId = id;
     }
 
     public String getRoleId(){
-        return myRow.getStringColumn("role_id");
+        return this.roleId;
     }
 
-    public void setWorkflowItemId(int id){
-        myRow.setColumn("workflowitem_id", id);
+    public void setWorkflowItem(XmlWorkflowItem xmlWorkflowItem){
+        this.workflowItem = xmlWorkflowItem;
     }
 
-    public int getWorkflowItemId(){
-        return myRow.getIntColumn("workflowitem_id");
+    public XmlWorkflowItem getWorkflowItem(){
+        return workflowItem;
     }
 
     public void setEPerson(EPerson eperson){
-        myRow.setColumn("eperson_id", eperson.getID());
+        this.ePerson = eperson;
     }
 
     public EPerson getEPerson() throws SQLException {
-        return EPerson.find(myContext, myRow.getIntColumn("eperson_id"));
+        return ePerson;
     }
 
     public void setGroup(Group group){
-        myRow.setColumn("group_id", group.getID());
+        this.group = group;
     }
 
     public Group getGroup() throws SQLException {
-        return Group.find(myContext, myRow.getIntColumn("group_id"));
+        return group;
     }
-
 }

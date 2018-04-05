@@ -8,23 +8,23 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
-import java.util.List;
 import java.sql.SQLException;
+import java.util.List;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import org.dspace.authorize.AuthorizeException;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.webui.components.StatisticsBean;
+import org.dspace.app.webui.util.JSPManager;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.eperson.Group;
-
-import org.dspace.content.DSpaceObject;
-import org.dspace.handle.HandleManager;
-
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
 import org.dspace.statistics.content.DatasetTimeGenerator;
@@ -32,9 +32,6 @@ import org.dspace.statistics.content.DatasetTypeGenerator;
 import org.dspace.statistics.content.StatisticsDataVisits;
 import org.dspace.statistics.content.StatisticsListing;
 import org.dspace.statistics.content.StatisticsTable;
-
-import org.dspace.app.webui.components.StatisticsBean;
-import org.dspace.app.webui.util.JSPManager;
 
 
 /**
@@ -46,9 +43,12 @@ import org.dspace.app.webui.util.JSPManager;
 public class DisplayStatisticsServlet extends DSpaceServlet
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(DisplayStatisticsServlet.class);
+    private static final Logger log = Logger.getLogger(DisplayStatisticsServlet.class);
 
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
 
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -58,7 +58,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 	boolean privatereport = ConfigurationManager.getBooleanProperty("usage-statistics", "authorization.admin.usage");
 
         // is the user a member of the Administrator (1) group?
-        boolean admin = Group.isMember(context, 1);
+        boolean admin = authorizeService.isAdmin(context);
 
         if (!privatereport || admin)
         {
@@ -89,7 +89,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
         if(handle != null)
         {
-                dso = HandleManager.resolveToObject(context, handle);
+                dso = handleService.resolveToObject(context, handle);
         }
 
         if(dso == null)
@@ -153,7 +153,6 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
 	try
         {
-
             StatisticsTable statisticsTable = new StatisticsTable(new StatisticsDataVisits(dso));
 
             statisticsTable.setTitle("Total Visits Per Month");

@@ -7,6 +7,9 @@
  */
 package org.dspace.sword;
 
+import org.apache.commons.lang.StringUtils;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.purl.sword.base.Collection;
 import org.dspace.content.*;
 import org.dspace.core.Context;
@@ -20,74 +23,89 @@ import java.util.List;
  */
 public class ItemCollectionGenerator extends ATOMCollectionGenerator
 {
-	public ItemCollectionGenerator(SWORDService service)
-	{
-		super(service);
-	}
+    protected ItemService itemService = ContentServiceFactory.getInstance()
+            .getItemService();
 
-	/**
-	 * Build the collection around the give DSpaceObject.  If the object
-	 * is not an instance of a DSpace Item this method will throw an
-	 * exception.
-	 *
-	 * @param dso
-	 * @throws DSpaceSWORDException
-	 */
-	public Collection buildCollection(DSpaceObject dso) throws DSpaceSWORDException
-	{
-		if (!(dso instanceof Item))
-		{
-			throw new DSpaceSWORDException("Incorrect ATOMCollectionGenerator instantiated");
-		}
+    public ItemCollectionGenerator(SWORDService service)
+    {
+        super(service);
+    }
 
-		// get the things we need out of the service
-		SWORDConfiguration swordConfig = swordService.getSwordConfig();
-		SWORDUrlManager urlManager = swordService.getUrlManager();
-		Context context = swordService.getContext();
+    /**
+     * Build the collection around the given DSpaceObject.  If the object
+     * is not an instance of a DSpace Item this method will throw an
+     * exception.
+     *
+     * @param dso the dso for which the collection should be built
+     * @throws DSpaceSWORDException if the dso is not an instance of Item
+     */
+    public Collection buildCollection(DSpaceObject dso)
+            throws DSpaceSWORDException
+    {
+        if (!(dso instanceof Item))
+        {
+            throw new DSpaceSWORDException(
+                    "Incorrect ATOMCollectionGenerator instantiated");
+        }
 
-		Item item = (Item) dso;
-		Collection scol = new Collection();
+        // get the things we need out of the service
+        SWORDConfiguration swordConfig = swordService.getSwordConfig();
+        SWORDUrlManager urlManager = swordService.getUrlManager();
+        Context context = swordService.getContext();
 
-		// prepare the parameters to be put in the sword collection
-		String location = urlManager.getDepositLocation(item);
-		scol.setLocation(location);
+        Item item = (Item) dso;
+        Collection scol = new Collection();
 
-		// the item title is the sword collection title, or "untitled" otherwise
-		String title = "Untitled";
-		Metadatum[] dcv = item.getMetadataByMetadataString("dc.title");
-		if (dcv.length > 0)
-		{
-			title = dcv[0].value;
-		}
-		scol.setTitle(title);
+        // prepare the parameters to be put in the sword collection
+        String location = urlManager.getDepositLocation(item);
+        scol.setLocation(location);
 
-		// FIXME: there is no collection policy for items that is obvious to provide.
-		// the collection policy is the licence to which the collection adheres
-		// String collectionPolicy = col.getLicense();
+        // the item title is the sword collection title, or "untitled" otherwise
+        String title = "Untitled";
+        List<MetadataValue> dcv = itemService
+                .getMetadataByMetadataString(item, "dc.title");
+        if (!dcv.isEmpty())
+        {
+            String firstValue = dcv.get(0).getValue();
+            if (StringUtils.isNotBlank(firstValue))
+            {
+                title = firstValue;
+            }
+        }
+        scol.setTitle(title);
 
-		// abstract is the short description of the item, if it exists
-		String dcAbstract = "";
-		Metadatum[] dcva = item.getMetadataByMetadataString("dc.description.abstract");
-		if (dcva.length > 0)
-		{
-			dcAbstract = dcva[0].value;
-		}
-		if (dcAbstract != null && !"".equals(dcAbstract))
-		{
-			scol.setAbstract(dcAbstract);
-		}
+        // FIXME: there is no collection policy for items that is obvious to provide.
+        // the collection policy is the licence to which the collection adheres
+        // String collectionPolicy = col.getLicense();
 
-		// do we suppot mediated deposit
-		scol.setMediation(swordConfig.isMediated());
+        // abstract is the short description of the item, if it exists
+        String dcAbstract = "";
+        List<MetadataValue> dcva = itemService
+                .getMetadataByMetadataString(item, "dc.description.abstract");
+        if (!dcva.isEmpty())
+        {
+            String firstValue = dcva.get(0).getValue();
+            if (StringUtils.isNotBlank(firstValue))
+            {
+                dcAbstract = firstValue;
+            }
+        }
+        if (StringUtils.isNotBlank(dcAbstract))
+        {
+            scol.setAbstract(dcAbstract);
+        }
 
-		// the list of mime types that we accept, which we take from the
-		// bitstream format registry
-		List<String> acceptFormats = swordConfig.getAccepts(context, item);
-		for (String acceptFormat : acceptFormats)
-		{
-			scol.addAccepts(acceptFormat);
-		}
+        // do we support mediated deposit
+        scol.setMediation(swordConfig.isMediated());
 
-		return scol;
-	}
+        // the list of mime types that we accept, which we take from the
+        // bitstream format registry
+        List<String> acceptFormats = swordConfig.getAccepts(context, item);
+        for (String acceptFormat : acceptFormats)
+        {
+            scol.addAccepts(acceptFormat);
+        }
+
+        return scol;
+    }
 }

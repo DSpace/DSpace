@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.aspect.administrative.community;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -23,8 +24,12 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 import org.dspace.eperson.Group;
 
 /**
@@ -67,7 +72,9 @@ public class AssignCommunityRoles extends AbstractDSpaceTransformer
 	
 	private static final Message T_sysadmins_only = message("xmlui.administrative.community.AssignCommunityRoles.sysadmins_only");
 
-	
+	protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+	protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
@@ -78,8 +85,8 @@ public class AssignCommunityRoles extends AbstractDSpaceTransformer
 	
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
 	{
-        int communityID = parameters.getParameterAsInteger("communityID", -1);
-        Community thisCommunity = Community.find(context, communityID);
+        UUID communityID = UUID.fromString(parameters.getParameter("communityID", null));
+        Community thisCommunity = communityService.find(context, communityID);
 		
 		String baseURL = contextPath + "/admin/community?administrative-continue=" + knot.getId();
 		
@@ -175,7 +182,7 @@ public class AssignCommunityRoles extends AbstractDSpaceTransformer
 	{
     	Button button = cell.addButton(buttonName);
     	button.setValue(buttonLabel);
-    	if (!AuthorizeManager.isAdmin(context))
+    	if (!authorizeService.isAdmin(context))
     	{
     		// Only admins can create or delete
     		button.setDisabled();

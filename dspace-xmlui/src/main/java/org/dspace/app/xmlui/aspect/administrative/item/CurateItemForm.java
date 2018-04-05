@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Map;
+
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.xml.sax.SAXException;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -29,8 +32,6 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 
 /**
  *
@@ -53,7 +54,20 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
 	private static final Message T_trail = message("xmlui.administrative.item.CurateItemForm.trail");
         private static final Message T_label_name = message("xmlui.administrative.item.CurateItemForm.label_name");
         private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
-        
+
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+    /**
+     *
+     * @param resolver source resolver.
+     * @param objectModel Cocoon object model.
+     * @param src source to transform.
+     * @param parameters transformer parameters.
+     * @throws ProcessingException passed through.
+     * @throws SAXException passed through.
+     * @throws IOException passed through.
+     */
+    @Override
         public void setup(SourceResolver resolver, Map objectModel, String src,
 		          Parameters parameters) throws ProcessingException, SAXException, IOException
 		{
@@ -61,34 +75,25 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
         	FlowCurationUtils.setupCurationTasks();
 		}
 
-        /**
-         * common package method for initializing form gui elements
-         * Could be refactored.
-         *
-         * @param pageMeta
-         * @throws WingException
-         */
-        public void addPageMeta(PageMeta pageMeta) throws WingException
+    @Override
+    public void addPageMeta(PageMeta pageMeta) throws WingException
     {
-                pageMeta.addMetadata("title").addContent(T_title);
+        pageMeta.addMetadata("title").addContent(T_title);
 		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
 		pageMeta.addTrailLink(contextPath + "/admin/item",T_item_trail);
 		pageMeta.addTrail().addContent(T_trail);
     }
-    /** addBody
-     *
-     * @param body
-     * @throws WingException
-     * @throws SQLException
-     * @throws AuthorizeException
+
+    /**
+     * @throws WingException passed through.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     * @throws java.io.UnsupportedEncodingException passed through.
      */
-        public void addBody(Body body)
-                                    throws WingException, SQLException,
-                                                        AuthorizeException, UnsupportedEncodingException
+    @Override
+    public void addBody(Body body)
+        throws WingException, SQLException, AuthorizeException, UnsupportedEncodingException
 	{
-                int itemID = parameters.getParameterAsInteger("itemID", -1);
-		Item item = Item.find(context, itemID);
-                
 		String baseURL = contextPath + "/admin/item?administrative-continue="
 				+ knot.getId() ;
 

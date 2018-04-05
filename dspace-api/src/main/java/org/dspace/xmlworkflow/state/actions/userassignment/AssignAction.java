@@ -37,6 +37,7 @@ public class AssignAction extends UserSelectionAction {
     public void generateTasks() {
     }
 
+    @Override
     public boolean isFinished(XmlWorkflowItem wfi) {
         return false;
     }

@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>5.7-drum-1-SNAPSHOT</version>
+        <version>6.2-drum-0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -24,45 +24,6 @@
         <root.basedir>${basedir}/..</root.basedir>
         <global.version>5.6</global.version>
     </properties>
-
-    <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
-
-        <resources>
-            <!-- Enumerate filtered files explicitly to avoid issues with other config tech. -->
-            <resource>
-                <directory>${basedir}</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>config/default.context.xml</include>
-                    <include>config/dspace.cfg</include>
-                    <include>config/log4j-handle-plugin.properties</include>
-                    <include>config/log4j.properties</include>
-                    <include>config/modules/curate.cfg</include>
-                    <include>config/modules/com.atmire.statistics.oai.cfg</include>
-                    <include>config/modules/solr-statistics.cfg</include>
-                </includes>
-            </resource>
-            <!-- Declare a mutually exclusive resource set for non-filtered files. -->
-            <resource>
-                <directory>${basedir}</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>config/default.context.xml</exclude>
-                    <exclude>config/dspace.cfg</exclude>
-                    <exclude>config/log4j-handle-plugin.properties</exclude>
-                    <exclude>config/log4j.properties</exclude>
-                    <exclude>config/modules/curate.cfg</exclude>
-                    <exclude>config/modules/com.atmire.statistics.oai.cfg</exclude>
-                    <exclude>config/modules/solr-statistics.cfg</exclude>
-                </excludes>
-            </resource>
-        </resources>
-
-    </build>
 
     <profiles>
 
@@ -77,7 +38,7 @@
             </activation>
             <!-- Build all Overlay submodules -->
             <modules>
-                <module>modules</module>
+                <!-- <module>modules</module> -->
             </modules> 
         </profile>
 
@@ -232,7 +193,34 @@
             <artifactId>dspace-oai</artifactId>
             <type>jar</type>
             <classifier>classes</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.lyncode</groupId>
+                    <artifactId>builder-commons</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
     	</dependency>
+        <dependency>
+            <groupId>com.lyncode</groupId>
+            <artifactId>builder-commons</artifactId>
+            <version>1.0.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->
     	<dependency>

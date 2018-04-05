@@ -203,7 +203,7 @@ public class PersonAuthorityValue extends AuthorityValue {
 
     @Override
     public String generateString() {
-        return AuthorityValueGenerator.GENERATE + getAuthorityType() + AuthorityValueGenerator.SPLIT + getName();
+        return AuthorityValueServiceImpl.GENERATE + getAuthorityType() + AuthorityValueServiceImpl.SPLIT + getName();
         // the part after "AuthorityValueGenerator.GENERATE + getAuthorityType() + AuthorityValueGenerator.SPLIT" is the value of the "info" parameter in public AuthorityValue newInstance(String info)
     }
 
@@ -225,6 +225,7 @@ public class PersonAuthorityValue extends AuthorityValue {
                 "} " + super.toString();
     }
 
+    @Override
     public boolean hasTheSameInformationAs(Object o) {
         if (this == o) {
             return true;

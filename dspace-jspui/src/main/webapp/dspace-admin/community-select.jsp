@@ -30,19 +30,39 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.Community" %>
+<%@ page import="java.util.List" %>
 
 <%
-    Community [] communities =
-        (Community[]) request.getAttribute("communities");
+    List<Community> communities =
+        (List<Community>) request.getAttribute("communities");
         
     request.setAttribute("LanguageSwitch", "hide");
+    
+    // Is the logged in user an admin or community admin or collection admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
+    
+    Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
+    boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
+    
+    Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
+    boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
+    
+    String naviAdmin = "admin";
+    String link = "/dspace-admin";
+    
+    if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+    {
+        naviAdmin = "community-or-collection-admin";
+        link = "/tools";
+    }
 %>
 
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.community-select.title"
-               navbar="admin"
+               navbar="<%= naviAdmin %>"
                locbar="link"
                parenttitlekey="jsp.administer"
-               parentlink="/dspace-admin">
+               parentlink="<%= link %>">
 
     <%-- <h1>communities:</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.community-select.com"/></h1>
@@ -51,9 +71,9 @@
 
 				<div class="row col-md-4 col-md-offset-4">
                     <select class="form-control" size="12" name="community_id">
-                        <%  for (int i = 0; i < communities.length; i++) { %>
-                            <option value="<%= communities[i].getID()%>">
-                                <%= communities[i].getMetadata("name")%>
+                        <%  for (int i = 0; i < communities.size(); i++) { %>
+                            <option value="<%= communities.get(i).getID()%>">
+                                <%= communities.get(i).getName()%>
                             </option>
                         <%  } %>
                     </select>

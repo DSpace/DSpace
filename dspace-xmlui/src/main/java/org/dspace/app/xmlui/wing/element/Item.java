@@ -33,10 +33,10 @@ public class Item extends RichTextContainer implements StructuralElement
     public static final String E_ITEM = "item";
 
     /** the item's name */
-    private String name;
+    private final String name;
 
     /** Special rendering hints for this item */
-    private String rend;
+    private final String rend;
 
     /**
      * Construct a new item.
@@ -49,6 +49,7 @@ public class Item extends RichTextContainer implements StructuralElement
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Item(WingContext context, String name, String rend)
             throws WingException
@@ -72,7 +73,9 @@ public class Item extends RichTextContainer implements StructuralElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler, 
             NamespaceSupport namespaces) throws SAXException
     {

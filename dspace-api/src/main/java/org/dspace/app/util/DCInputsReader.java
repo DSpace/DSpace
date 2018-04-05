@@ -10,12 +10,12 @@ package org.dspace.app.util;
 import java.io.File;
 import java.util.*;
 
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
 import org.dspace.content.MetadataSchema;
-import org.dspace.core.ConfigurationManager;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation
@@ -53,10 +53,6 @@ public class DCInputsReader
     /** Keyname for storing dropdown value-pair set name */
     static final String PAIR_TYPE_NAME = "value-pairs-name";
 
-    /** The fully qualified pathname of the form definition XML file */
-    private String defsFile = ConfigurationManager.getProperty("dspace.dir")
-            + File.separator + "config" + File.separator + FORM_DEF_FILE;
-
     /**
      * Reference to the collections to forms map, computed from the forms
      * definition file
@@ -86,11 +82,16 @@ public class DCInputsReader
      * level structures: a map between collections and forms, the definition for
      * each page of each form, and lists of pairs of values that populate
      * selection boxes.
+     * @throws DCInputsReaderException if input reader error
      */
 
     public DCInputsReader()
          throws DCInputsReaderException
     {
+        // Load from default file
+        String defsFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
+                + File.separator + "config" + File.separator + FORM_DEF_FILE;
+
         buildInputs(defsFile);
     }
 
@@ -375,28 +376,46 @@ public class DCInputsReader
                         field.put(tagName, value);
                         if (tagName.equals("input-type"))
                         {
-                    if (value.equals("dropdown")
-                            || value.equals("qualdrop_value")
-                            || value.equals("list"))
+                            if (value.equals("dropdown")
+                                    || value.equals("qualdrop_value")
+                                    || value.equals("list"))
+                            {
+                                    String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
+                                    if (pairTypeName == null)
+                                    {
+                                            throw new SAXException("Form " + formName + ", field " +
+                                                                           field.get("dc-element") +
+                                                                           "." + field.get("dc-qualifier") +
+                                                                           " has no name attribute");
+                                    }
+                                    else
+                                    {
+                                            field.put(PAIR_TYPE_NAME, pairTypeName);
+                                    }
+                            }
+                        }
+                        else if (tagName.equals("vocabulary"))
+                        {
+                                String closedVocabularyString = getAttribute(nd, "closed");
+                                field.put("closedVocabulary", closedVocabularyString);
+                        }
+                        else if (tagName.equals("language"))
+                        {
+                                if (Boolean.valueOf(value))
                                 {
                                         String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
                                         if (pairTypeName == null)
                                         {
                                                 throw new SAXException("Form " + formName + ", field " +
-                                                                                                field.get("dc-element") +
-                                                                                                        "." + field.get("dc-qualifier") +
-                                                                                                " has no name attribute");
+                                                                               field.get("dc-element") +
+                                                                               "." + field.get("dc-qualifier") +
+                                                                               " has no language attribute");
                                         }
                                         else
                                         {
                                                 field.put(PAIR_TYPE_NAME, pairTypeName);
                                         }
                                 }
-                        }
-                        else if (tagName.equals("vocabulary"))
-                        {
-                                String closedVocabularyString = getAttribute(nd, "closed");
-                            field.put("closedVocabulary", closedVocabularyString);
                         }
                 }
         }

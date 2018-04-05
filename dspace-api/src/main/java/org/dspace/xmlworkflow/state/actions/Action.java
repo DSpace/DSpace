@@ -11,7 +11,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.WorkflowException;
+import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
@@ -72,7 +72,7 @@ public abstract class Action {
      * @param errorFields
      *            List of all fields (as Strings) which had errors
      */
-    private static void setErrorFields(HttpServletRequest request, List errorFields)
+    private void setErrorFields(HttpServletRequest request, List errorFields)
     {
         if(errorFields==null)
             request.removeAttribute(ERROR_FIELDS_ATTRIBUTE);
@@ -106,7 +106,7 @@ public abstract class Action {
      * @param fieldName
      *            the name of the field which had an error
      */
-    protected static void addErrorField(HttpServletRequest request, String fieldName)
+    protected void addErrorField(HttpServletRequest request, String fieldName)
     {
         //get current list
         List errorFields = getErrorFields(request);

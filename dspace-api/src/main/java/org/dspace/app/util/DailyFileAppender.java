@@ -87,6 +87,7 @@ public class DailyFileAppender extends FileAppender
     /* (non-Javadoc)
      * @see org.apache.log4j.FileAppender#activateOptions()
      */
+    @Override
     public void activateOptions()
     {
         setFileName();
@@ -102,6 +103,7 @@ public class DailyFileAppender extends FileAppender
         return this.mstrDatePattern;
     }
 
+    @Override
     public String getFile()
     {
         return this.mstrFileName;
@@ -133,6 +135,7 @@ public class DailyFileAppender extends FileAppender
         }
     }
 
+    @Override
     public void setFile(String file)
     {
         // Trim spaces from both ends. The users probably does not want
@@ -157,6 +160,7 @@ public class DailyFileAppender extends FileAppender
     /* (non-Javadoc)
      * @see org.apache.log4j.WriterAppender#subAppend(org.apache.log4j.spi.LoggingEvent)
      */
+    @Override
     protected void subAppend(LoggingEvent pobjEvent)
     {
         Date   dtNow = new Date(System.currentTimeMillis());
@@ -231,7 +235,7 @@ public class DailyFileAppender extends FileAppender
     /**
      * This function is responsible for performing the actual file rollover.
      * @param pstrName The name of the new folder based on current system date.
-     * @throws IOException
+     * @throws IOException if IO error
      */
     private static boolean deletingFiles = false;
     private void cleanupOldFiles()

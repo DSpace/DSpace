@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import javax.xml.transform.Templates;
@@ -30,7 +32,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
 /**
@@ -45,13 +50,17 @@ public class LicenseCleanup
 
     protected static final Templates templates;
 
+    protected static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected static final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     static
     {
 
         try
         {
             templates = TransformerFactory.newInstance().newTemplates(
-                    new StreamSource(CreativeCommons.class
+                    new StreamSource(CreativeCommonsServiceImpl.class
                             .getResourceAsStream("LicenseCleanup.xsl")));
         }
         catch (TransformerConfigurationException e)
@@ -63,9 +72,9 @@ public class LicenseCleanup
 
     /**
      * @param args
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     public static void main(String[] args) throws SQLException,
             AuthorizeException, IOException
@@ -73,7 +82,7 @@ public class LicenseCleanup
 
         Context ctx = new Context();
         ctx.turnOffAuthorisationSystem();
-        ItemIterator iter = Item.findAll(ctx);
+        Iterator<Item> iter = itemService.findAll(ctx);
 
         Properties props = new Properties();
 
@@ -101,11 +110,10 @@ public class LicenseCleanup
                 log.info("checking: " + item.getID());
                 if (!props.containsKey("I" + item.getID()))
                 {
-                    handleItem(item);
+                    handleItem(ctx, item);
                     log.info("processed: " + item.getID());
                 }
 
-                item.decache();
                 props.put("I" + item.getID(), "done");
                 i++;
 
@@ -124,25 +132,25 @@ public class LicenseCleanup
     /**
      * Process Item, correcting CC-License if encountered.
      * @param item
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
-    protected static void handleItem(Item item) throws SQLException,
+    protected static void handleItem(Context context, Item item) throws SQLException,
             AuthorizeException, IOException
     {
-        Bundle[] bundles = item.getBundles("CC-LICENSE");
+        List<Bundle> bundles = itemService.getBundles(item, "CC-LICENSE");
 
-        if (bundles == null || bundles.length == 0)
+        if (bundles == null || bundles.size() == 0)
         {
             return;
         }
 
-        Bundle bundle = bundles[0];
+        Bundle bundle = bundles.get(0);
 
-        Bitstream bitstream = bundle.getBitstreamByName("license_rdf");
+        Bitstream bitstream = bundleService.getBitstreamByName(bundle, "license_rdf");
 
-        String license_rdf = new String(copy(bitstream));
+        String license_rdf = new String(copy(context, bitstream));
 
         /* quickly fix xml by ripping out offensive parts */
         license_rdf = license_rdf.replaceFirst("<license", "");
@@ -163,21 +171,21 @@ public class LicenseCleanup
 
         StringBuffer buffer = result.getBuffer();
 
-        Bitstream newBitstream = bundle
-                .createBitstream(new ByteArrayInputStream(buffer.toString()
+        Bitstream newBitstream = bitstreamService
+                .create(context, bundle, new ByteArrayInputStream(buffer.toString()
                         .getBytes()));
 
-        newBitstream.setName(bitstream.getName());
-        newBitstream.setDescription(bitstream.getDescription());
-        newBitstream.setFormat(bitstream.getFormat());
-        newBitstream.setSource(bitstream.getSource());
-        newBitstream.setUserFormatDescription(bitstream
+        newBitstream.setName(context, bitstream.getName());
+        newBitstream.setDescription(context, bitstream.getDescription());
+        newBitstream.setFormat(context, bitstream.getFormat(context));
+        newBitstream.setSource(context, bitstream.getSource());
+        newBitstream.setUserFormatDescription(context, bitstream
                 .getUserFormatDescription());
-        newBitstream.update();
+        bitstreamService.update(context, newBitstream);
 
-        bundle.removeBitstream(bitstream);
+        bundleService.removeBitstream(context, bundle, bitstream);
 
-        bundle.update();
+        bundleService.update(context, bundle);
 
     }
 
@@ -190,18 +198,18 @@ public class LicenseCleanup
      * 
      * @param b the Bitstream to be copied.
      * @return copy of the content of {@code b}.
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    public static byte[] copy(Bitstream b) throws IOException, SQLException,
+    public static byte[] copy(Context context, Bitstream b) throws IOException, SQLException,
             AuthorizeException
     {
         InputStream in = null;
         ByteArrayOutputStream out = null;
         try
         {
-            in = b.retrieve();
+            in = bitstreamService.retrieve(context, b);
             out = new ByteArrayOutputStream();
             while (true)
             {

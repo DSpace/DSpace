@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
-import org.dspace.core.ConfigurationManager;
 
 /**
  * FileTaskQueue provides a TaskQueue implementation based on flat files
@@ -33,15 +33,16 @@ public class FileTaskQueue implements TaskQueue
 {
     private static Logger log = Logger.getLogger(TaskQueue.class);   
     // base directory for curation task queues
-    private String tqDir = ConfigurationManager.getProperty("curate", "taskqueue.dir");
+    protected String tqDir;
 
     // ticket for queue readers
-    private long readTicket = -1L;
+    protected long readTicket = -1L;
     // list of queues owned by reader
-    private List<Integer> readList = new ArrayList<Integer>();
+    protected List<Integer> readList = new ArrayList<Integer>();
 
     public FileTaskQueue()
     {
+        tqDir = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.taskqueue.dir");
     }
     
     @Override
@@ -188,7 +189,7 @@ public class FileTaskQueue implements TaskQueue
         }
     }
     
-    private File ensureQueue(String queueName)
+    protected File ensureQueue(String queueName)
     {
         // create directory structures as needed
         File baseDir = new File(tqDir, queueName);

@@ -38,13 +38,13 @@ public class Row extends AbstractWingElement implements StructuralElement
     public static final String A_ROLE = "role";
 
     /** The row's name */
-    private String name;
+    private final String name;
 
     /** The row's role, see ROLES below */
-    private String role;
+    private final String role;
 
     /** Special rendering instructions */
-    private String rend;
+    private final String rend;
 
     /** The row (and cell) role types: */
     public static final String ROLE_DATA = "data";
@@ -55,7 +55,7 @@ public class Row extends AbstractWingElement implements StructuralElement
     public static final String[] ROLES = { ROLE_DATA, ROLE_HEADER };
 
     /** The contents of this row */
-    List<AbstractWingElement> contents = new ArrayList<AbstractWingElement>();
+    List<AbstractWingElement> contents = new ArrayList<>();
 
     /**
      * Construct a new table row.
@@ -72,6 +72,7 @@ public class Row extends AbstractWingElement implements StructuralElement
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Row(WingContext context, String name, String role, String rend)
             throws WingException
@@ -108,6 +109,7 @@ public class Row extends AbstractWingElement implements StructuralElement
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return a new table cell.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Cell addCell(String name, String role, int rows, int cols,
             String rend) throws WingException
@@ -131,6 +133,7 @@ public class Row extends AbstractWingElement implements StructuralElement
      *            (May be zero for no defined value) determines how many columns
      *            does this cell span.
      * @return a new table cell.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Cell addCell(int rows, int cols) throws WingException
     {
@@ -156,6 +159,7 @@ public class Row extends AbstractWingElement implements StructuralElement
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return a new table cell.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Cell addCell(String name, String role, String rend)
             throws WingException
@@ -174,6 +178,7 @@ public class Row extends AbstractWingElement implements StructuralElement
      *            (May be null) determines what kind of information the cell
      *            carries, either header or data. See cell.ROLES
      * @return a new table cell.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Cell addCell(String role) throws WingException
     {
@@ -188,6 +193,7 @@ public class Row extends AbstractWingElement implements StructuralElement
      * form fields.
      * 
      * @return a new table cell.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Cell addCell() throws WingException
     {
@@ -206,6 +212,7 @@ public class Row extends AbstractWingElement implements StructuralElement
      * 
      * @param characters
      *            (Required) Untranslated character data to be included.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addCellContent(String characters) throws WingException
     {
@@ -226,6 +233,7 @@ public class Row extends AbstractWingElement implements StructuralElement
      * @param message
      *            (Required) Key to the i18n catalogue to translate the content
      *            into the language preferred by the user.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addCellContent(Message message) throws WingException
     {
@@ -246,7 +254,9 @@ public class Row extends AbstractWingElement implements StructuralElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
             NamespaceSupport namespaces) throws SAXException
     {
@@ -275,9 +285,7 @@ public class Row extends AbstractWingElement implements StructuralElement
         endElement(contentHandler, namespaces, E_ROW);
     }
 
-    /**
-     * dispose
-     */
+    @Override
     public void dispose()
     {
         for (AbstractWingElement content : contents)

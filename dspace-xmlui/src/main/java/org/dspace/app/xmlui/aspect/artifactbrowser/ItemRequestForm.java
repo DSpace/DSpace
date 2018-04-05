@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
@@ -29,11 +30,13 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
@@ -121,6 +124,10 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
        return HashUtil.hash(requesterName + "-" + requesterEmail + "-" + allFiles +"-"+message+"-"+bitstreamId);
     }
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+
+
     /**
      * Generate the cache validity object.
      */
@@ -148,8 +155,6 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
 			return;
 		}
 		Request request = ObjectModelHelper.getRequest(objectModel);
-		boolean firstVisit=Boolean.valueOf(request.getParameter("firstVisit"));
-		
 		Item item = (Item) dso;
 		// Build the item viewer division.
 		Division itemRequest = body.addInteractiveDivision("itemRequest-form",
@@ -174,10 +179,10 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
         } else {
             //If user has read permissions to bitstream, redirect them to bitstream, instead of restrict page
             try {
-                int bitstreamID = parameters.getParameterAsInteger("bitstreamId");
-                Bitstream bitstream = Bitstream.find(context, bitstreamID);
+                UUID bitstreamID = UUID.fromString(parameters.getParameter("bitstreamId"));
+                Bitstream bitstream = bitstreamService.find(context, bitstreamID);
 
-                if(AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ)) {
+                if(authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ)) {
                     String redirectURL = request.getContextPath() + "/bitstream/handle/" + item.getHandle() + "/"
                             + bitstream.getName() + "?sequence=" + bitstream.getSequenceID();
 
@@ -192,9 +197,9 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
 
         itemRequest.addPara(T_para1);
 
-		Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-		if (titleDC != null && titleDC.length > 0)
-			itemRequest.addPara(titleDC[0].value);
+		String titleDC = item.getName();
+		if (titleDC != null && titleDC.length() > 0)
+			itemRequest.addPara(titleDC);
 
 		List form = itemRequest.addList("form", List.TYPE_FORM);
 

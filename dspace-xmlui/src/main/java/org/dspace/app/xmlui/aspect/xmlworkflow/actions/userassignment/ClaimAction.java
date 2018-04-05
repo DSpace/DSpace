@@ -62,7 +62,7 @@ public class ClaimAction extends AbstractXMLUIAction {
         if (showfull != null && request.getParameter("submit_simple_item_info") != null)
             showfull = null;
 
-        // Generate a from asking the user two questions: multiple
+        // Generate a form asking the user two questions: multiple
         // titles & published before.
     	Division div = body.addInteractiveDivision("perform-task", actionURL, Division.METHOD_POST, "primary workflow");
         div.setHead(T_workflow_head);

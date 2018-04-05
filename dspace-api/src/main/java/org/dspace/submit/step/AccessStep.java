@@ -12,15 +12,20 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.submit.AbstractProcessingStep;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.UUID;
 
 
 /**
@@ -61,6 +67,12 @@ public class AccessStep extends AbstractProcessingStep
     public static final String FORM_EDIT_BUTTON_SAVE = "submit_save";
     public static final String FORM_ACCESS_BUTTON_ADD = "submit_add_policy";
 
+    protected static GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected static AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected static ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+
+
 
 
 
@@ -87,6 +99,7 @@ public class AccessStep extends AbstractProcessingStep
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
+    @Override
     public int doProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
@@ -97,10 +110,10 @@ public class AccessStep extends AbstractProcessingStep
         // get reference to item
         Item item = subInfo.getSubmissionItem().getItem();
 
-        int groupID = 0;
+        Group group  = null;
         if(request.getParameter("group_id")!=null){
             try{
-                groupID=Integer.parseInt(request.getParameter("group_id"));
+                group=groupService.find(context, UUID.fromString(request.getParameter("group_id")));
             }catch (NumberFormatException nfe){
                 return STATUS_ERROR_SELECT_GROUP;
             }
@@ -117,13 +130,13 @@ public class AccessStep extends AbstractProcessingStep
         // SELECTED OPERATION: Remove Policies
         if(wasRemovePolicyPressed(buttonPressed)){
             removePolicy(context, buttonPressed);
-            context.commit();
+            context.dispatchEvents();
             return STATUS_COMPLETE;
         }
 
         // SELECTED OPERATION: Save or Cancel EditPolicy.
         if(comeFromEditPolicy(request)) {
-            return saveOrCancelEditPolicy(context, request, subInfo, buttonPressed, item, name, groupID, reason);
+            return saveOrCancelEditPolicy(context, request, subInfo, buttonPressed, item, name, group, reason);
         }
 
 
@@ -143,17 +156,17 @@ public class AccessStep extends AbstractProcessingStep
 
             Date dateStartDate = getEmbargoUntil(request);
             ResourcePolicy rp = null;
-            if( (rp=AuthorizeManager.createOrModifyPolicy(null, context, name, groupID, null, dateStartDate, org.dspace.core.Constants.READ, reason, item))==null){
+            if( (rp= authorizeService.createOrModifyPolicy(null, context, name, group, null, dateStartDate, org.dspace.core.Constants.READ, reason, item))==null){
                 return STATUS_DUPLICATED_POLICY;
             }
-            rp.update();
-            context.commit();
+            resourcePolicyService.update(context, rp);
+            context.dispatchEvents();
             return STATUS_COMPLETE;
         }
 
 
         // if arrive here Next, Previous or Save has been pressed
-        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled= configurationService.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
         // if it is a simple form we should create the policy for Anonymous
         // if Anonymous does not have right on this collection, create policies for any other groups with
@@ -164,7 +177,7 @@ public class AccessStep extends AbstractProcessingStep
             {
                 return result;
             }
-            AuthorizeManager.generateAutomaticPolicies(context, getEmbargoUntilDate(request), reason, item, (Collection)HandleManager.resolveToObject(context, subInfo.getCollectionHandle()));
+            authorizeService.generateAutomaticPolicies(context, getEmbargoUntilDate(request), reason, item, (Collection) handleService.resolveToObject(context, subInfo.getCollectionHandle()));
         }
 //        else{
 //            Date dateStartDate = getEmbargoUntil(request);
@@ -174,8 +187,8 @@ public class AccessStep extends AbstractProcessingStep
         if(request.getParameter("private_option")!=null){
             item.setDiscoverable(false);
         }
-        item.update();
-        context.commit();
+        itemService.update(context, item);
+        context.dispatchEvents();
 
         return STATUS_COMPLETE;
     }
@@ -183,14 +196,14 @@ public class AccessStep extends AbstractProcessingStep
     public static boolean wasEditPolicyPressed(Context context, String buttonPressed, SubmissionInfo subInfo) throws SQLException {
         if (buttonPressed.startsWith("submit_edit_edit_policies_") && !buttonPressed.equals(FORM_EDIT_BUTTON_CANCEL)){
             String idPolicy = buttonPressed.substring("submit_edit_edit_policies_".length());
-            ResourcePolicy rp = ResourcePolicy.find(context, Integer.parseInt(idPolicy));
+            ResourcePolicy rp = resourcePolicyService.find(context, Integer.parseInt(idPolicy));
             subInfo.put(SUB_INFO_SELECTED_RP, rp);
             return true;
         }
         return false;
     }
 
-    public static boolean wasAddPolicyPressed(String buttonPressed) throws SQLException {
+    public boolean wasAddPolicyPressed(String buttonPressed) throws SQLException {
         return (buttonPressed.equalsIgnoreCase(FORM_ACCESS_BUTTON_ADD));
     }
 
@@ -202,29 +215,29 @@ public class AccessStep extends AbstractProcessingStep
         return (request.getParameter("policy_id") != null);
     }
 
-    public static int saveOrCancelEditPolicy(Context context, HttpServletRequest request, SubmissionInfo subInfo, String buttonPressed, DSpaceObject dso, String name, int groupID, String reason) throws AuthorizeException, SQLException {
+    public static int saveOrCancelEditPolicy(Context context, HttpServletRequest request, SubmissionInfo subInfo, String buttonPressed, DSpaceObject dso, String name, Group group, String reason) throws AuthorizeException, SQLException {
         if (buttonPressed.equals(FORM_EDIT_BUTTON_CANCEL)){
             return STATUS_COMPLETE;
         }
         else if (buttonPressed.equals(FORM_EDIT_BUTTON_SAVE)){
             String idPolicy = request.getParameter("policy_id");
-            ResourcePolicy resourcePolicy = ResourcePolicy.find(context, Integer.parseInt(idPolicy));
+            ResourcePolicy resourcePolicy = resourcePolicyService.find(context, Integer.parseInt(idPolicy));
             subInfo.put(SUB_INFO_SELECTED_RP, resourcePolicy);
             Date dateStartDate = getEmbargoUntil(request);
-            if( (resourcePolicy=AuthorizeManager.createOrModifyPolicy(resourcePolicy, context, name, groupID, null, dateStartDate, Constants.READ, reason, dso))==null){
+            if( (resourcePolicy= authorizeService.createOrModifyPolicy(resourcePolicy, context, name, group, null, dateStartDate, Constants.READ, reason, dso))==null){
                 return EDIT_POLICY_STATUS_DUPLICATED_POLICY;
             }
 
-            resourcePolicy.update();
-            context.commit();
+            resourcePolicyService.update(context, resourcePolicy);
+            context.dispatchEvents();
         }
         return STATUS_COMPLETE;
     }
 
-    public static void removePolicy(Context context, String buttonPressed) throws SQLException {
+    public static void removePolicy(Context context, String buttonPressed) throws SQLException, AuthorizeException {
         String idPolicy = buttonPressed.substring("submit_delete_edit_policies_".length());
-        ResourcePolicy rp = ResourcePolicy.find(context, Integer.parseInt(idPolicy));
-        rp.delete();
+        ResourcePolicy rp = resourcePolicyService.find(context, Integer.parseInt(idPolicy));
+        resourcePolicyService.delete(context, rp);
     }
 
     public static int checkForm(HttpServletRequest request){
@@ -300,6 +313,7 @@ public class AccessStep extends AbstractProcessingStep
      * 
      * @return the number of pages in this step
      */
+    @Override
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {

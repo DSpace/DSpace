@@ -13,52 +13,66 @@
 		xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	
 	<display-name>XOAI Data Provider</display-name>
-	
-	<context-param>
-		<description>
-			The location of the main DSpace configuration file
-		</description>
-		<param-name>dspace-config</param-name>
-		<param-value>${dspace.dir}/config/dspace.cfg</param-value>
-	</context-param>
 
 	<context-param>
-		<description>The location of the main DSpace configuration file</description>
+		<description>The location of the DSpace home directory</description>
 		<param-name>dspace.dir</param-name>
 		<param-value>${dspace.dir}</param-value>
 	</context-param>
 
-        <!--
-          DSpace Kernel startup listener. This listener is in charge of initializing/starting the
-          DSpace Kernel. It MUST be listed BEFORE any other DSpace listeners, as DSpace services
-          will not function until the Kernel is initialized.
-         -->
-        <listener>
-                <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
-        </listener>
 
-	<listener>
-		<listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
-	</listener>
+    <!-- Location of root application context configs (to be loaded by ContextLoaderListener below) -->
+    <!-- This contains the beans that initialize DSpace Services -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/spring/*.xml</param-value>
+    </context-param>
 
-    <servlet>
+    <!-- Initializes the DSpace Context object -->
+    <listener>
+        <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
+    </listener>
+
+    <!-- Initializes the DSpace Kernel -->
+    <listener>
+        <listener-class>
+		  org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
+        </listener-class>
+    </listener>
+
+    <!-- Registers this DSpace webapp as "running" -->
+    <listener>
+        <listener-class>org.dspace.app.util.DSpaceWebappListener</listener-class>
+    </listener>
+
+    <!-- Load the root application context / beans (defined in contextConfigLocation above) -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+	<servlet>
         <servlet-name>oai</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- Configure DispatcherServlet to use AnnotationConfigWebApplicationContext
+             instead of the default XmlWebApplicationContext -->
         <init-param>
             <param-name>contextClass</param-name>
             <param-value>
                 org.springframework.web.context.support.AnnotationConfigWebApplicationContext
             </param-value>
         </init-param>
+        <!-- @Configuration class which defines our servlet context config -->
+        <!-- This defines beans that are specific to OAI webapp -->
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <param-value>org.dspace.xoai.app.DSpaceWebappConfiguration</param-value>
         </init-param>
     </servlet>
 
-	<servlet-mapping>
-		<servlet-name>oai</servlet-name>
-		<url-pattern>/*</url-pattern>
-	</servlet-mapping>
+    <!-- Load the oai servlet for all paths -->
+    <servlet-mapping>
+        <servlet-name>oai</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
 
 </web-app>

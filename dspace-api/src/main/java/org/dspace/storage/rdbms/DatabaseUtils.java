@@ -17,17 +17,25 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.sql.DataSource;
+
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
+import org.flywaydb.core.api.callback.FlywayCallback;
 import org.flywaydb.core.internal.dbsupport.DbSupport;
 import org.flywaydb.core.internal.dbsupport.DbSupportFactory;
 import org.flywaydb.core.internal.dbsupport.SqlScript;
@@ -41,7 +49,7 @@ import org.flywaydb.core.internal.info.MigrationInfoDumper;
  * <p>
  * Currently, we use Flyway DB (http://flywaydb.org/) for database management.
  *
- * @see org.dspace.storage.rdbms.DatabaseManager
+ * @see org.dspace.storage.rdbms.DatabaseUtils
  * @author Tim Donohue
  */
 public class DatabaseUtils
@@ -52,10 +60,10 @@ public class DatabaseUtils
     // Our Flyway DB object (initialized by setupFlyway())
     private static Flyway flywaydb;
 
-     // When this temp file exists, the "checkReindexDiscovery()" method will auto-reindex Discovery
+    // When this temp file exists, the "checkReindexDiscovery()" method will auto-reindex Discovery
     // Reindex flag file is at [dspace]/solr/search/conf/reindex.flag
     // See also setReindexDiscovery()/getReindexDiscover()
-    private static final String reindexDiscoveryFilePath = ConfigurationManager.getProperty("dspace.dir") +
+    private static final String reindexDiscoveryFilePath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir") +
                             File.separator + "solr" +
                             File.separator + "search" +
                             File.separator + "conf" +
@@ -76,20 +84,15 @@ public class DatabaseUtils
         if (argv.length < 1)
         {
             System.out.println("\nDatabase action argument is missing.");
-            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
+            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', 'validate' or 'clean'");
             System.out.println("\nOr, type 'database help' for more information.\n");
             System.exit(1);
         }
 
         try
         {
-            // Call initDataSource to JUST initialize the dataSource WITHOUT fully
-            // initializing the DatabaseManager itself. This ensures we do NOT
-            // immediately run our Flyway DB migrations on this database
-            DataSource dataSource = DatabaseManager.initDataSource();
-
-            // Get configured DB URL for reporting below
-            String url = ConfigurationManager.getProperty("db.url");
+            // Get a reference to our configured DataSource
+            DataSource dataSource = getDataSource();
 
             // Point Flyway API to our database
             Flyway flyway = setupFlyway(dataSource);
@@ -98,147 +101,254 @@ public class DatabaseUtils
             if(argv[0].equalsIgnoreCase("test"))
             {
                 // Try to connect to the database
-                System.out.println("\nAttempting to connect to database using these configurations: ");
-                System.out.println(" - URL: " + url);
-                System.out.println(" - Driver: " + ConfigurationManager.getProperty("db.driver"));
-                System.out.println(" - Username: " + ConfigurationManager.getProperty("db.username"));
-                System.out.println(" - Password: [hidden]");
-                System.out.println(" - Schema: " + ConfigurationManager.getProperty("db.schema"));
-                System.out.println("\nTesting connection...");
-                try
+                System.out.println("\nAttempting to connect to database");
+                try(Connection connection = dataSource.getConnection())
                 {
-                    // Just do a high level test by getting our configured DataSource and attempting to connect to it
-                    // NOTE: We specifically do NOT call DatabaseManager.getConnection() because that will attempt
-                    // a full initialization of DatabaseManager & also cause database migrations/upgrades to occur
-                    Connection connection = dataSource.getConnection();
-                    connection.close();
+                    System.out.println("Connected successfully!");
+
+                    // Print basic database connection information
+                    printDBInfo(connection);
+
+                    // Print any database warnings/errors found (if any)
+                    boolean issueFound = printDBIssues(connection);
+
+                    // If issues found, exit with an error status (even if connection succeeded).
+                    if(issueFound)
+                        System.exit(1);
+                    else
+                        System.exit(0);
                 }
                 catch (SQLException sqle)
                 {
-                    System.err.println("\nError: ");
+                    System.err.println("\nError running 'test': ");
                     System.err.println(" - " + sqle);
                     System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+                    sqle.printStackTrace();
                     System.exit(1);
                 }
-
-                System.out.println("Connected successfully!\n");
             }
-            // "info" = Basic Database Information
-            else if(argv[0].equalsIgnoreCase("info"))
+            else if(argv[0].equalsIgnoreCase("info") || argv[0].equalsIgnoreCase("status"))
             {
-                // Get basic Database info
-                Connection connection = dataSource.getConnection();
-                DatabaseMetaData meta = connection.getMetaData();
-                System.out.println("\nDatabase URL: " + url);
-                System.out.println("Database Schema: " + getSchemaName(connection));
-                System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
-                System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
-
-                // Get info table from Flyway
-                System.out.println("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
-
-                // If Flyway is NOT yet initialized, also print the determined version information
-                // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
-                // See: http://flywaydb.org/documentation/faq.html#case-sensitive
-                if(!tableExists(connection, flyway.getTable(), true))
+                try(Connection connection = dataSource.getConnection())
                 {
-                    System.out.println("\nNOTE: This database is NOT yet initialized for auto-migrations (via Flyway).");
-                    // Determine which version of DSpace this looks like
-                    String dbVersion = determineDBVersion(connection);
-                    if (dbVersion!=null)
+                    // Print basic Database info
+                    printDBInfo(connection);
+
+                    // Get info table from Flyway
+                    System.out.println("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
+
+                    // If Flyway is NOT yet initialized, also print the determined version information
+                    // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
+                    // See: http://flywaydb.org/documentation/faq.html#case-sensitive
+                    if(!tableExists(connection, flyway.getTable(), true))
                     {
-                        System.out.println("\nYour database looks to be compatible with DSpace version " + dbVersion);
-                        System.out.println("All upgrades *after* version " + dbVersion + " will be run during the next migration.");
-                        System.out.println("\nIf you'd like to upgrade now, simply run 'dspace database migrate'.");
+                        System.out.println("\nNOTE: This database is NOT yet initialized for auto-migrations (via Flyway).");
+                        // Determine which version of DSpace this looks like
+                        String dbVersion = determineDBVersion(connection);
+                        if (dbVersion!=null)
+                        {
+                            System.out.println("\nYour database looks to be compatible with DSpace version " + dbVersion);
+                            System.out.println("All upgrades *after* version " + dbVersion + " will be run during the next migration.");
+                            System.out.println("\nIf you'd like to upgrade now, simply run 'dspace database migrate'.");
+                        }
                     }
+
+                    // Print any database warnings/errors found (if any)
+                    boolean issueFound = printDBIssues(connection);
+
+                    // If issues found, exit with an error status
+                    if(issueFound)
+                        System.exit(1);
+                    else
+                        System.exit(0);
                 }
-                connection.close();
+                catch (SQLException e)
+                {
+                    System.err.println("Info exception:");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             }
-            // "migrate" = Manually run any outstanding Database migrations (if any)
             else if(argv[0].equalsIgnoreCase("migrate"))
             {
-                System.out.println("\nDatabase URL: " + url);
-
-                // "migrate" allows for an OPTIONAL second argument:
-                //    - "ignored" = Also run any previously "ignored" migrations during the migration
-                //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
-                if(argv.length==2)
+                try (Connection connection = dataSource.getConnection())
                 {
-                    if(argv[1].equalsIgnoreCase("ignored"))
+                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+
+                    // "migrate" allows for an OPTIONAL second argument:
+                    //    - "ignored" = Also run any previously "ignored" migrations during the migration
+                    //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
+                    if(argv.length==2)
                     {
-                        System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
-                        Connection connection = dataSource.getConnection();
-                        // Update the database to latest version, but set "outOfOrder=true"
-                        // This will ensure any old migrations in the "ignored" state are now run
-                        updateDatabase(dataSource, connection, null, true);
-                        connection.close();
+                        if(argv[1].equalsIgnoreCase("ignored"))
+                        {
+                            System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
+                            // Update the database to latest version, but set "outOfOrder=true"
+                            // This will ensure any old migrations in the "ignored" state are now run
+                            updateDatabase(dataSource, connection, null, true);
+                        }
+                        else
+                        {
+                            // Otherwise, we assume "argv[1]" is a valid migration version number
+                            // This is only for testing! Never specify for Production!
+                            String migrationVersion = argv[1];
+                            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+
+                            System.out.println("You've specified to migrate your database ONLY to version " + migrationVersion + " ...");
+                            System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
+                            System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
+                            System.out.println("use an OLD version " + migrationVersion + " Database with a newer DSpace API. NEVER do this in a");
+                            System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
+
+                            System.out.print("Are you SURE you only want to migrate your database to version " + migrationVersion + "? [y/n]: ");
+                            String choiceString = input.readLine();
+                            input.close();
+
+                            if (choiceString.equalsIgnoreCase("y"))
+                            {
+                                System.out.println("Migrating database ONLY to version " + migrationVersion + " ... (Check logs for details)");
+                                // Update the database, to the version specified.
+                                updateDatabase(dataSource, connection, migrationVersion, false);
+                            }
+                            else
+                            {
+                                System.out.println("No action performed.");
+                            }
+                        }
                     }
                     else
                     {
-                        // Otherwise, we assume "argv[1]" is a valid migration version number
-                        // This is only for testing! Never specify for Production!
-                        System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
-                        System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
-                        System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
-                        System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
-                        System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
-                        Connection connection = dataSource.getConnection();
-                        // Update the database, to the version specified.
-                        updateDatabase(dataSource, connection, argv[1], false);
-                        connection.close();
+                        System.out.println("Migrating database to latest version... (Check dspace logs for details)");
+                        updateDatabase(dataSource, connection);
                     }
+                    System.out.println("Done.");
+                    System.exit(0);
                 }
-                else
+                catch(SQLException e)
                 {
-                    System.out.println("Migrating database to latest version... (Check logs for details)");
-                    // NOTE: This looks odd, but all we really need to do is ensure the
-                    // DatabaseManager auto-initializes. It'll take care of the migration itself.
-                    // Asking for our DB Name will ensure DatabaseManager.initialize() is called.
-                    DatabaseManager.getDbName();
+                    System.err.println("Migration exception:");
+                    e.printStackTrace();
+                    System.exit(1);
                 }
-                System.out.println("Done.");
             }
             // "repair" = Run Flyway repair script
             else if(argv[0].equalsIgnoreCase("repair"))
             {
-                System.out.println("\nDatabase URL: " + url);
-                System.out.println("Attempting to repair any previously failed migrations via FlywayDB... (Check logs for details)");
-                flyway.repair();
-                System.out.println("Done.");
+                try (Connection connection = dataSource.getConnection();)
+                {
+                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+                    System.out.println("Attempting to repair any previously failed migrations (or mismatched checksums) via FlywayDB... (Check dspace logs for details)");
+                    flyway.repair();
+                    System.out.println("Done.");
+                    System.exit(0);
+                }
+                catch(SQLException|FlywayException e)
+                {
+                    System.err.println("Repair exception:");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            }
+            // "validate" = Run Flyway validation to check for database errors/issues
+            else if(argv[0].equalsIgnoreCase("validate"))
+            {
+                try (Connection connection = dataSource.getConnection();)
+                {
+                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+                    System.out.println("Attempting to validate database status (and migration checksums) via FlywayDB...");
+                    flyway.validate();
+                    System.out.println("No errors thrown. Validation succeeded. (Check dspace logs for more details)");
+                    System.exit(0);
+                }
+                catch(SQLException|FlywayException e)
+                {
+                    System.err.println("Validation exception:");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             }
             // "clean" = Run Flyway clean script
             else if(argv[0].equalsIgnoreCase("clean"))
             {
-                BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                System.out.println("\nDatabase URL: " + url);
-                System.out.println("\nWARNING: ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
-                System.out.println("There is NO turning back from this action. Backup your DB before continuing.");
-                System.out.println("If you are using Oracle, your RECYCLEBIN will also be PURGED.\n");
-                System.out.print("Do you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
-                String choiceString = input.readLine();
-                input.close();
-
-                if (choiceString.equalsIgnoreCase("y"))
+                // If clean is disabled, return immediately
+                if(flyway.isCleanDisabled())
                 {
-                    System.out.println("Scrubbing database clean... (Check logs for details)");
-                    cleanDatabase(flyway, dataSource);
-                    System.out.println("Done.");
+                    System.out.println("\nWARNING: 'clean' command is currently disabled, as it is dangerous to run in Production scenarios!");
+                    System.out.println("\nIn order to run a 'clean' you first must enable it in your DSpace config by specifying 'db.cleanDisabled=false'.\n");
+                    System.exit(1);
+                }
+
+                try (Connection connection = dataSource.getConnection())
+                {
+                    String dbType = getDbType(connection);
+
+                    // Not all Postgres user accounts will be able to run a 'clean',
+                    // as only 'superuser' accounts can remove the 'pgcrypto' extension.
+                    if(dbType.equals(DBMS_POSTGRES))
+                    {
+                        // Check if database user has permissions suitable to run a clean
+                        if(!PostgresUtils.checkCleanPermissions(connection))
+                        {
+                            String username = connection.getMetaData().getUserName();
+                            // Exit immediately, providing a descriptive error message
+                            System.out.println("\nERROR: The database user '" + username + "' does not have sufficient privileges to run a 'database clean' (via Flyway).");
+                            System.out.println("\nIn order to run a 'clean', the database user MUST have 'superuser' privileges");
+                            System.out.println("OR the '" + PostgresUtils.PGCRYPTO + "' extension must be installed in a separate schema (see documentation).");
+                            System.out.println("\nOptionally, you could also manually remove the '" + PostgresUtils.PGCRYPTO + "' extension first (DROP EXTENSION " + PostgresUtils.PGCRYPTO + " CASCADE;), then rerun the 'clean'");
+                            System.exit(1);
+                        }
+                    }
+
+                    BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+
+                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+                    System.out.println("\nWARNING: ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
+                    System.out.println("There is NO turning back from this action. Backup your DB before continuing.");
+                    if(dbType.equals(DBMS_ORACLE))
+                    {
+                        System.out.println("\nORACLE WARNING: your RECYCLEBIN will also be PURGED.\n");
+                    }
+                    else if(dbType.equals(DBMS_POSTGRES))
+                    {
+                        System.out.println("\nPOSTGRES WARNING: the '" + PostgresUtils.PGCRYPTO + "' extension will be dropped if it is in the same schema as the DSpace database.\n");
+                    }
+                    System.out.print("Do you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
+                    String choiceString = input.readLine();
+                    input.close();
+
+                    if (choiceString.equalsIgnoreCase("y"))
+                    {
+                        System.out.println("Scrubbing database clean... (Check dspace logs for details)");
+                        cleanDatabase(flyway, dataSource);
+                        System.out.println("Done.");
+                        System.exit(0);
+                    }
+                    else
+                    {
+                        System.out.println("No action performed.");
+                    }
+                }
+                catch(SQLException e)
+                {
+                    System.err.println("Clean exception:");
+                    e.printStackTrace();
+                    System.exit(1);
                 }
             }
             else
             {
                 System.out.println("\nUsage: database [action]");
                 System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
-                System.out.println(" - test    = Test database connection is OK");
-                System.out.println(" - info    = Describe basic info about database, including migrations run");
-                System.out.println(" - migrate = Migrate the Database to the latest version");
-                System.out.println("             Optionally, specify \"ignored\" to also run \"Ignored\" migrations");
-                System.out.println(" - repair  = Attempt to repair any previously failed database migrations");
-                System.out.println(" - clean   = DESTROY all data and tables in Database (WARNING there is no going back!)");
+                System.out.println(" - test          = Performs a test connection to database to validate connection settings");
+                System.out.println(" - info / status = Describe basic info/status about database, including validating the compatibility of this database");
+                System.out.println(" - migrate       = Migrate the database to the latest version");
+                System.out.println(" - repair        = Attempt to repair any previously failed database migrations or checksum mismatches (via Flyway repair)");
+                System.out.println(" - validate      = Validate current database's migration status (via Flyway validate), validating all migration checksums.");
+                System.out.println(" - clean         = DESTROY all data and tables in database (WARNING there is no going back!). Requires 'db.cleanDisabled=false' setting in config.");
                 System.out.println("");
+                System.exit(0);
             }
 
-            System.exit(0);
         }
         catch (Exception e)
         {
@@ -248,7 +358,103 @@ public class DatabaseUtils
         }
     }
 
+    /**
+     * Print basic information about the current database to System.out.
+     * This is utilized by both the 'test' and 'info' commandline options.
+     * @param connection current database connection
+     * @throws SQLException if database error occurs
+     */
+    private static void printDBInfo(Connection connection) throws SQLException
+    {
+        // Get basic Database info from connection
+        DatabaseMetaData meta = connection.getMetaData();
+        String dbType = getDbType(connection);
+        System.out.println("\nDatabase Type: " + dbType);
+        System.out.println("Database URL: " + meta.getURL());
+        System.out.println("Database Schema: " + getSchemaName(connection));
+        System.out.println("Database Username: " + meta.getUserName());
+        System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
+        System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
 
+        // For Postgres, report whether pgcrypto is installed
+        // (If it isn't, we'll also write out warnings...see below)
+        if(dbType.equals(DBMS_POSTGRES))
+        {
+            boolean pgcryptoUpToDate = PostgresUtils.isPgcryptoUpToDate();
+            Double pgcryptoVersion = PostgresUtils.getPgcryptoInstalledVersion(connection);
+            System.out.println("PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension installed/up-to-date? " + pgcryptoUpToDate  + " " + ((pgcryptoVersion!=null) ? "(version=" + pgcryptoVersion + ")" : "(not installed)"));
+        }
+    }
+
+    /**
+     * Print any warnings about current database setup to System.err (if any).
+     * This is utilized by both the 'test' and 'info' commandline options.
+     * @param connection current database connection
+     * @return boolean true if database issues found, false otherwise
+     * @throws SQLException if database error occurs
+     */
+    private static boolean printDBIssues(Connection connection) throws SQLException
+    {
+        boolean issueFound = false;
+
+        // Get the DB Type
+        String dbType = getDbType(connection);
+
+        // For PostgreSQL databases, we need to check for the 'pgcrypto' extension.
+        // If it is NOT properly installed, we'll need to warn the user, as DSpace will be unable to proceed.
+        if(dbType.equals(DBMS_POSTGRES))
+        {
+            // Get version of pgcrypto available in this postgres instance
+            Double pgcryptoAvailable = PostgresUtils.getPgcryptoAvailableVersion(connection);
+
+            // Generic requirements message
+            String requirementsMsg = "\n** DSpace REQUIRES PostgreSQL >= " + PostgresUtils.POSTGRES_VERSION + " AND " + PostgresUtils.PGCRYPTO + " extension >= " + PostgresUtils.PGCRYPTO_VERSION + " **\n";
+
+            // Check if installed in PostgreSQL & a supported version
+            if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)>=0)
+            {
+                // We now know it's available in this Postgres. Let's see if it is installed in this database.
+                Double pgcryptoInstalled = PostgresUtils.getPgcryptoInstalledVersion(connection);
+
+                // Check if installed in database, but outdated version
+                if(pgcryptoInstalled!=null && pgcryptoInstalled.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
+                {
+                    System.out.println("\nWARNING: Required PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is OUTDATED (installed version=" + pgcryptoInstalled + ", available version = " + pgcryptoAvailable + ").");
+                    System.out.println(requirementsMsg);
+                    System.out.println("To update it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                    System.out.println("\n  ALTER EXTENSION " + PostgresUtils.PGCRYPTO + " UPDATE TO '" + pgcryptoAvailable + "';\n");
+                    issueFound = true;
+                }
+                else if(pgcryptoInstalled==null) // If it's not installed in database
+                {
+                    System.out.println("\nWARNING: Required PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT INSTALLED on this database.");
+                    System.out.println(requirementsMsg);
+                    System.out.println("To install it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                    System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
+                    issueFound = true;
+                }
+            }
+            // Check if installed in Postgres, but an unsupported version
+            else if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
+            {
+                System.out.println("\nWARNING: UNSUPPORTED version of PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension found (version=" + pgcryptoAvailable + ").");
+                System.out.println(requirementsMsg);
+                System.out.println("Make sure you are running a supported version of PostgreSQL, and then install " + PostgresUtils.PGCRYPTO + " version >= " + PostgresUtils.PGCRYPTO_VERSION);
+                System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+                issueFound = true;
+            }
+            else if(pgcryptoAvailable==null) // If it's not installed in Postgres
+            {
+                System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT AVAILABLE. Please install it into this PostgreSQL instance.");
+                System.out.println(requirementsMsg);
+                System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+                System.out.println("Once the extension is installed globally, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
+                issueFound = true;
+            }
+        }
+        return issueFound;
+    }
 
     /**
      * Setup/Initialize the Flyway API to run against our DSpace database
@@ -258,8 +464,10 @@ public class DatabaseUtils
      *      DataSource object initialized by DatabaseManager
      * @return initialized Flyway object
      */
-    private static Flyway setupFlyway(DataSource datasource)
+    private synchronized static Flyway setupFlyway(DataSource datasource)
     {
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+
         if (flywaydb==null)
         {
             try(Connection connection = datasource.getConnection())
@@ -269,11 +477,11 @@ public class DatabaseUtils
                 flywaydb.setDataSource(datasource);
                 flywaydb.setEncoding("UTF-8");
 
+                // Default cleanDisabled to "true" (which disallows the ability to run 'database clean')
+                flywaydb.setCleanDisabled(config.getBooleanProperty("db.cleanDisabled", true));
+
                 // Migration scripts are based on DBMS Keyword (see full path below)
-                DatabaseMetaData meta = connection.getMetaData();
-                // NOTE: we use "findDbKeyword()" here as it won't cause
-                // DatabaseManager.initialize() to be called (which in turn auto-calls Flyway)
-                String dbType = DatabaseManager.findDbKeyword(meta);
+                String dbType = getDbType(connection);
                 connection.close();
 
                 // Determine location(s) where Flyway will load all DB migrations
@@ -282,9 +490,9 @@ public class DatabaseUtils
                 // First, add location for custom SQL migrations, if any (based on DB Type)
                 // e.g. [dspace.dir]/etc/[dbtype]/
                 // (We skip this for H2 as it's only used for unit testing)
-                if(!dbType.equals(DatabaseManager.DBMS_H2))
+                if(!dbType.equals(DBMS_H2))
                 {
-                    scriptLocations.add("filesystem:" + ConfigurationManager.getProperty("dspace.dir") +
+                    scriptLocations.add("filesystem:" + config.getProperty("dspace.dir") +
                                         "/etc/" + dbType);
                 }
 
@@ -295,13 +503,9 @@ public class DatabaseUtils
                 // NOTE: this also loads migrations from any sub-package
                 scriptLocations.add("classpath:org.dspace.storage.rdbms.migration");
 
-                // Special scenario: If XMLWorkflows are enabled, we need to run its migration(s)
-                // as it REQUIRES database schema changes. XMLWorkflow uses Java migrations
-                // which first check whether the XMLWorkflow tables already exist
-                if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
-                {
-                    scriptLocations.add("classpath:org.dspace.storage.rdbms.xmlworkflow");
-                }
+                //Add all potential workflow migration paths
+                List<String> workflowFlywayMigrationLocations = WorkflowServiceFactory.getInstance().getWorkflowService().getFlywayMigrationLocations();
+                scriptLocations.addAll(workflowFlywayMigrationLocations);
 
                 // Now tell Flyway which locations to load SQL / Java migrations from
                 log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));
@@ -310,7 +514,8 @@ public class DatabaseUtils
                 // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
                 // In this situation, we have a Registry Updater that runs PRE-migration
                 // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed once those are obsolete.
-                flywaydb.setCallbacks(new DatabaseRegistryUpdater(), new DatabaseLegacyReindexer());
+                List<FlywayCallback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(FlywayCallback.class);
+                flywaydb.setCallbacks(flywayCallbacks.toArray(new FlywayCallback[flywayCallbacks.size()]));
             }
             catch(SQLException e)
             {
@@ -330,11 +535,36 @@ public class DatabaseUtils
      * If a Flyway DB migration fails it will be rolled back to the last
      * successful migration, and any errors will be logged.
      *
+     * @throws SQLException if database error
+     *      If database cannot be upgraded.
+     */
+    public static synchronized void updateDatabase()
+            throws SQLException
+    {
+        // Get our configured dataSource
+        DataSource dataSource = getDataSource();
+
+        try(Connection connection = dataSource.getConnection())
+        {
+            // Upgrade database to the latest version of our schema
+            updateDatabase(dataSource, connection);
+        }
+    }
+
+    /**
+     * Ensures the current database is up-to-date with regards
+     * to the latest DSpace DB schema. If the scheme is not up-to-date,
+     * then any necessary database migrations are performed.
+     * <P>
+     * FlywayDB (http://flywaydb.org/) is used to perform database migrations.
+     * If a Flyway DB migration fails it will be rolled back to the last
+     * successful migration, and any errors will be logged.
+     *
      * @param datasource
      *      DataSource object (retrieved from DatabaseManager())
      * @param connection
      *      Database connection
-     * @throws SQLException
+     * @throws SQLException if database error
      *      If database cannot be upgraded.
      */
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection)
@@ -363,7 +593,7 @@ public class DatabaseUtils
      * @param outOfOrder
      *      If true, Flyway will run any lower version migrations that were previously "ignored".
      *      If false, Flyway will only run new migrations with a higher version number.
-     * @throws SQLException
+     * @throws SQLException if database error
      *      If database cannot be upgraded.
      */
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection, String targetVersion, boolean outOfOrder)
@@ -382,7 +612,7 @@ public class DatabaseUtils
             // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.
             if(!StringUtils.isBlank(targetVersion))
             {
-                flyway.setTarget(targetVersion);
+                flyway.setTargetAsString(targetVersion);
             }
 
             // Does the necessary Flyway table ("schema_version") exist in this database?
@@ -398,14 +628,14 @@ public class DatabaseUtils
                 if (dbVersion==null)
                 {
                     // Initialize the Flyway database table with defaults (version=1)
-                    flyway.init();
+                    flyway.baseline();
                 }
                 else
                 {
                     // Otherwise, pass our determined DB version to Flyway to initialize database table
-                    flyway.setInitVersion(dbVersion);
-                    flyway.setInitDescription("Initializing from DSpace " + dbVersion + " database schema");
-                    flyway.init();
+                    flyway.setBaselineVersionAsString(dbVersion);
+                    flyway.setBaselineDescription("Initializing from DSpace " + dbVersion + " database schema");
+                    flyway.baseline();
                 }
             }
 
@@ -446,7 +676,7 @@ public class DatabaseUtils
      *      Initialized Flyway object
      * @param dataSource
      *      Initialized DataSource
-     * @throws SQLException
+     * @throws SQLException if database error
      *      If database cannot be cleaned.
      */
     private static synchronized void cleanDatabase(Flyway flyway, DataSource dataSource)
@@ -458,18 +688,15 @@ public class DatabaseUtils
             // For MOST database types, this takes care of everything
             flyway.clean();
 
-            Connection connection = null;
-            try
+            try(Connection connection = dataSource.getConnection())
             {
                 // Get info about which database type we are using
-                connection = dataSource.getConnection();
-                DatabaseMetaData meta = connection.getMetaData();
-                String dbKeyword = DatabaseManager.findDbKeyword(meta);
+                String dbType = getDbType(connection);
 
                 // If this is Oracle, the only way to entirely clean the database
                 // is to also purge the "Recyclebin". See:
                 // http://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_9018.htm
-                if(dbKeyword.equals(DatabaseManager.DBMS_ORACLE))
+                if(dbType.equals(DBMS_ORACLE))
                 {
                     PreparedStatement statement = null;
                     try
@@ -483,11 +710,6 @@ public class DatabaseUtils
                             statement.close();
                     }
                 }
-            }
-            finally
-            {
-                if(connection!=null && !connection.isClosed())
-                    connection.close();
             }
         }
         catch(FlywayException fe)
@@ -508,8 +730,6 @@ public class DatabaseUtils
      *
      * @param connection
      *          Current Database Connection
-     * @param flyway
-     *          Our Flyway settings
      * @throws SQLException if DB status cannot be determined
      * @return DSpace version as a String (e.g. "4.0"), or null if database is empty
      */
@@ -766,11 +986,11 @@ public class DatabaseUtils
             sequenceName = canonicalize(connection, sequenceName);
 
             // Different database types store sequence information in different tables
-            String dbtype = DatabaseManager.findDbKeyword(connection.getMetaData());
+            String dbtype = getDbType(connection);
             String sequenceSQL = null;
             switch(dbtype)
             {
-                case DatabaseManager.DBMS_POSTGRES:
+                case DBMS_POSTGRES:
                     // Default schema in PostgreSQL is "public"
                     if(schema == null)
                     {
@@ -785,12 +1005,12 @@ public class DatabaseUtils
                     // We need to filter by schema in PostgreSQL
                     schemaFilter = true;
                     break;
-                case DatabaseManager.DBMS_ORACLE:
+                case DBMS_ORACLE:
                     // Oracle specific query for a sequence owned by our current DSpace user
                     // NOTE: No need to filter by schema for Oracle, as Schema = User
                     sequenceSQL = "SELECT COUNT(1) FROM user_sequences WHERE sequence_name=?";
                     break;
-                case DatabaseManager.DBMS_H2:
+                case DBMS_H2:
                     // In H2, sequences are listed in the "information_schema.sequences" table
                     // SEE: http://www.h2database.com/html/grammar.html#information_schema
                     sequenceSQL = "SELECT COUNT(1) " +
@@ -853,7 +1073,7 @@ public class DatabaseUtils
      *            Current Database Connection
      * @param sqlToExecute
      *            The actual SQL to execute as a String
-     * @throws SQLException
+     * @throws SQLException if database error
      *            If a database error occurs
      */
     public static void executeSql(Connection connection, String sqlToExecute) throws SQLException
@@ -878,13 +1098,8 @@ public class DatabaseUtils
     /**
      * Get the Database Schema Name in use by this Connection, so that it can
      * be used to limit queries in other methods (e.g. tableExists()).
-     * <P>
-     * NOTE: Once we upgrade to using Apache Commons DBCP / Pool version 2.0,
-     * this method WILL BE REMOVED in favor of java.sql.Connection's new
-     * "getSchema()" method.
-     * http://docs.oracle.com/javase/7/docs/api/java/sql/Connection.html#getSchema()
-     * 
-     * @param connection 
+     *
+     * @param connection
      *            Current Database Connection
      * @return Schema name as a string, or "null" if cannot be determined or unspecified
      */
@@ -892,35 +1107,49 @@ public class DatabaseUtils
             throws SQLException
     {
         String schema = null;
-        DatabaseMetaData meta = connection.getMetaData();
         
-        // Check the configured "db.schema" FIRST for the value configured there
-        schema = DatabaseManager.canonicalize(ConfigurationManager.getProperty("db.schema"));
-        
-        // If unspecified, determine "sane" defaults based on DB type
+        // Try to get the schema from the DB connection itself.
+        // As long as the Database driver supports JDBC4.1, there should be a getSchema() method
+        // If this method is unimplemented or doesn't exist, it will throw an exception (likely an AbstractMethodError)
+        try
+        {
+            schema = connection.getSchema();
+        }
+        catch (Exception|AbstractMethodError e)
+        {
+        }
+
+        // If we don't know our schema, let's try the schema in the DSpace configuration
         if(StringUtils.isBlank(schema))
         {
-            String dbType = DatabaseManager.findDbKeyword(meta);
-        
-            if(dbType.equals(DatabaseManager.DBMS_POSTGRES))
+            schema = canonicalize(connection, DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("db.schema"));
+        }
+            
+        // Still blank? Ok, we'll find a "sane" default based on the DB type
+        if(StringUtils.isBlank(schema))
+        {
+            String dbType = getDbType(connection);
+
+            if(dbType.equals(DBMS_POSTGRES))
             {
                 // For PostgreSQL, the default schema is named "public"
                 // See: http://www.postgresql.org/docs/9.0/static/ddl-schemas.html
                 schema = "public";
             }
-            else if (dbType.equals(DatabaseManager.DBMS_ORACLE))
+            else if (dbType.equals(DBMS_ORACLE))
             {
                 // For Oracle, default schema is actually the user account
                 // See: http://stackoverflow.com/a/13341390
+                DatabaseMetaData meta = connection.getMetaData();
                 schema = meta.getUserName();
             }
-            else
+            else // For H2 (in memory), there is no such thing as a schema
                 schema = null;
         }
-        
+
         return schema;
     }
-    
+
     /**
      * Return the canonical name for a database identifier based on whether this
      * database defaults to storing identifiers in uppercase or lowercase.
@@ -1042,37 +1271,6 @@ public class DatabaseUtils
     }
 
     /**
-     * Determine the type of Database, based on the DB connection.
-     *
-     * @param connection current DB Connection
-     * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
-     * @throws SQLException if database error
-     */
-    public static String getDbType(Connection connection)
-            throws SQLException
-    {
-        DatabaseMetaData meta = connection.getMetaData();
-        String prodName = meta.getDatabaseProductName();
-        String dbms_lc = prodName.toLowerCase(Locale.ROOT);
-        if (dbms_lc.contains("postgresql"))
-        {
-            return DBMS_POSTGRES;
-        }
-        else if (dbms_lc.contains("oracle"))
-        {
-            return DBMS_ORACLE;
-        }
-        else if (dbms_lc.contains("h2")) // Used for unit testing only
-        {
-            return DBMS_H2;
-        }
-        else
-        {
-            return dbms_lc;
-        }
-    }
-
-    /**
      * Internal class to actually perform re-indexing in a separate thread.
      * (See checkReindexDiscovery() method)>
      */
@@ -1082,7 +1280,7 @@ public class DatabaseUtils
 
         /**
          * Constructor. Pass it an existing IndexingService
-         * @param indexer
+         * @param is
          */
         ReindexerThread(IndexingService is)
         {
@@ -1140,5 +1338,91 @@ public class DatabaseUtils
                 }
             }
         }
+    }
+
+    /**
+     * Determine the type of Database, based on the DB connection.
+     * 
+     * @param connection current DB Connection
+     * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
+     * @throws SQLException if database error
+     */
+    public static String getDbType(Connection connection)
+            throws SQLException
+    {
+        DatabaseMetaData meta = connection.getMetaData();
+        String prodName = meta.getDatabaseProductName();
+        String dbms_lc = prodName.toLowerCase(Locale.ROOT);
+        if (dbms_lc.contains("postgresql"))
+        {
+            return DBMS_POSTGRES;
+        }
+        else if (dbms_lc.contains("oracle"))
+        {
+            return DBMS_ORACLE;
+        }
+        else if (dbms_lc.contains("h2")) // Used for unit testing only
+        {
+            return DBMS_H2;
+        }
+        else
+        {
+            return dbms_lc;
+        }
+    }
+
+    /**
+     * Get a reference to the configured DataSource (which can be used to
+     * initialize the database using Flyway).
+     * <P>
+     * This is NOT public, as we discourage direct connections to the database
+     * which bypass Hibernate. Only Flyway should be allowed a direct connection.
+     * @return DataSource
+     */
+    protected static DataSource getDataSource()
+    {
+        // DataSource is configured via our ServiceManager (i.e. via Spring).
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("dataSource", BasicDataSource.class);
+    }
+
+    /**
+     * In case of a unit test the flyway db is cached to long leading to exceptions, we need to clear the object
+     */
+    public static void clearFlywayDBCache()
+    {
+        flywaydb = null;
+    }
+
+    /**
+     * Returns the current Flyway schema_version being used by the given database.
+     * (i.e. the version of the highest numbered migration that this database has run)
+     * @param connection current DB Connection
+     * @return version as string
+     * @throws SQLException if database error occurs
+     */
+    public static String getCurrentFlywayState(Connection connection) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT \"version\" FROM \"schema_version\" ORDER BY \"version\" desc");
+        ResultSet resultSet = statement.executeQuery();
+        resultSet.next();
+        return resultSet.getString("version");
+    }
+
+    /**
+     * Return the DSpace version that this Flyway-enabled database reports to be compatible with.
+     * The version is retrieved from Flyway, and parsed into a Double to represent an actual
+     * DSpace version number (e.g. 5.0, 6.0, etc)
+     * @param connection current DB Connection
+     * @return reported DSpace version as a Double
+     * @throws SQLException if database error occurs
+     */
+    public static Double getCurrentFlywayDSpaceState(Connection connection) throws SQLException
+    {
+        String flywayState = getCurrentFlywayState(connection);
+        Matcher matcher = Pattern.compile("^([0-9]*\\.[0-9]*)(\\.)?.*").matcher(flywayState);
+        if(matcher.matches())
+        {
+            return Double.parseDouble(matcher.group(1));
+        }
+        return null;
     }
 }

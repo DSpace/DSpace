@@ -7,7 +7,7 @@
  */
 package org.dspace.ctask.general;
 
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Item;
 
 import java.util.ArrayList;
@@ -23,16 +23,17 @@ import java.util.List;
  */
 public class MetadataValueLinkChecker extends BasicLinkChecker {
 
+    @Override
     protected List<String> getURLs(Item item)
     {
         // Get all metadata elements that start with http:// or https://
-        Metadatum[] urls = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        List<MetadataValue> urls = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         ArrayList<String> theURLs = new ArrayList<String>();
-        for (Metadatum url : urls)
+        for (MetadataValue url : urls)
         {
-            if ((url.value.startsWith("http://")) || (url.value.startsWith("https://")))
+            if ((url.getValue().startsWith("http://")) || (url.getValue().startsWith("https://")))
             {
-                theURLs.add(url.value);
+                theURLs.add(url.getValue());
             }
         }
         return theURLs;

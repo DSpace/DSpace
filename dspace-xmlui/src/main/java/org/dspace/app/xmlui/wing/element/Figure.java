@@ -38,22 +38,18 @@ public class Figure extends TextContainer implements StructuralElement
     /** The name of the title attribute */
     public static final String A_TITLE = "title";
 
-    /** The name of the class attribute */
-    public static final String A_RENDER = "rend";
-
-
     /** The figure's source */
-    private String source;
+    private final String source;
 
     /** The figure's xref target */
-    private String target;
+    private final String target;
 
 
     /** The figure's xref title */
     private String title;
 
     /** Special rendering hints */
-    private String rend;
+    private final String rend;
 
     /**
      * Construct a new figure.
@@ -68,7 +64,7 @@ public class Figure extends TextContainer implements StructuralElement
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
-     * @throws WingException
+     * @throws WingException passed through.
      */
     protected Figure(WingContext context, String source, String target,
             String rend) throws WingException
@@ -104,7 +100,9 @@ public class Figure extends TextContainer implements StructuralElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
             NamespaceSupport namespaces) throws SAXException
     {

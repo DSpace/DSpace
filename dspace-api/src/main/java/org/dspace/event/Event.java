@@ -9,16 +9,15 @@ package org.dspace.event;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.event.factory.EventServiceFactory;
 
 /**
  * An Event object represents a single action that changed one object in the
@@ -65,7 +64,7 @@ public class Event implements Serializable
     public static final int REMOVE = 1 << 4; // remove content from container
 
     public static final int DELETE = 1 << 5; // destroy object
-    
+
     public static final int INSTALL = 1 << 6; // object exits workspace/flow
 
     /** Index of filter parts in their array: */
@@ -74,35 +73,35 @@ public class Event implements Serializable
     public static final int EVENT_MASK = 1; // mask of event type
 
     // XXX NOTE: keep this up to date with any changes to event (action) types.
-    private static final String eventTypeText[] = { "CREATE", "MODIFY",
+    protected static final String eventTypeText[] = { "CREATE", "MODIFY",
             "MODIFY_METADATA", "ADD", "REMOVE", "DELETE", "INSTALL" };
 
     /** XXX NOTE: These constants must be kept synchronized * */
     /** XXX NOTE: with ALL_OBJECTS_MASK *AND* objTypeToMask hash * */
-    private static final int NONE = 0;
+    protected static final int NONE = 0;
 
-    private static final int BITSTREAM = 1 << Constants.BITSTREAM; // 0
+    protected static final int BITSTREAM = 1 << Constants.BITSTREAM; // 0
 
-    private static final int BUNDLE = 1 << Constants.BUNDLE; // 1
+    protected static final int BUNDLE = 1 << Constants.BUNDLE; // 1
 
-    private static final int ITEM = 1 << Constants.ITEM; // 2
+    protected static final int ITEM = 1 << Constants.ITEM; // 2
 
-    private static final int COLLECTION = 1 << Constants.COLLECTION; // 3
+    protected static final int COLLECTION = 1 << Constants.COLLECTION; // 3
 
-    private static final int COMMUNITY = 1 << Constants.COMMUNITY; // 4
+    protected static final int COMMUNITY = 1 << Constants.COMMUNITY; // 4
 
-    private static final int SITE = 1 << Constants.SITE; // 5
+    protected static final int SITE = 1 << Constants.SITE; // 5
 
-    private static final int GROUP = 1 << Constants.GROUP; // 6
+    protected static final int GROUP = 1 << Constants.GROUP; // 6
 
-    private static final int EPERSON = 1 << Constants.EPERSON; // 7
+    protected static final int EPERSON = 1 << Constants.EPERSON; // 7
 
-    private static final int ALL_OBJECTS_MASK = BITSTREAM | BUNDLE | ITEM
+    protected static final int ALL_OBJECTS_MASK = BITSTREAM | BUNDLE | ITEM
             | COLLECTION | COMMUNITY | SITE | GROUP | EPERSON;
 
-    private static Map<Integer, Integer> objTypeToMask = new HashMap<Integer, Integer>();
+    protected static Map<Integer, Integer> objTypeToMask = new HashMap<Integer, Integer>();
 
-    private static Map<Integer, Integer> objMaskToType = new HashMap<Integer, Integer>();
+    protected static Map<Integer, Integer> objMaskToType = new HashMap<Integer, Integer>();
     static
     {
         objTypeToMask.put(Constants.BITSTREAM, BITSTREAM);
@@ -142,13 +141,13 @@ public class Event implements Serializable
     private int subjectType;
 
     /** content model identifier */
-    private int subjectID;
+    private UUID subjectID;
 
     /** object-type of SUBJECT - see above enumeration */
     private int objectType = NONE;
 
     /** content model identifier */
-    private int objectID = -1;
+    private UUID objectID = null;
 
     /** timestamp */
     private long timeStamp;
@@ -162,22 +161,22 @@ public class Event implements Serializable
      * for more complex consumer abilities that are beyond our purview.
      */
     private String detail;
-    
+
     /**
-     * Contains all identifiers of the DSpaceObject that was changed (added, 
+     * Contains all identifiers of the DSpaceObject that was changed (added,
      * modified, deleted, ...).
-     * 
+     *
      * All events gets fired when a context that contains events gets commited.
      * When the delete event is fired, a deleted DSpaceObject is already gone.
      * This array contains all identifiers of the object, not only the handle
      * as the detail field does. The field may be an empty array if no
      * identifiers could be found.
-     * 
+     *
      * FIXME: As the detail field describes it would be even better if all
      * metadata would be available to a consumer, but the identifiers are the
      * most important once.
      */
-    private String[] identifiers;
+    private ArrayList<String> identifiers;
 
     /** unique key to bind together events from one context's transaction */
     private String transactionID;
@@ -199,7 +198,7 @@ public class Event implements Serializable
      * Constructor.
      * 
      * You should consider to use 
-     * {@link Event#Event(int, int, int, java.lang.String, java.lang.String[])}.
+     * {@link Event#Event(int, int, UUID, java.lang.String)}.
      * 
      * @param eventType
      *            action type, e.g. Event.ADD.
@@ -210,9 +209,9 @@ public class Event implements Serializable
      * @param detail
      *            detail information that depends on context.
      */
-    public Event(int eventType, int subjectType, int subjectID, String detail)
+    public Event(int eventType, int subjectType, UUID subjectID, String detail)
     {
-        this(eventType, subjectType, subjectID, detail, new String[0]);
+        this(eventType, subjectType, subjectID, detail, new ArrayList<String>());
     }
     
     /**
@@ -229,21 +228,21 @@ public class Event implements Serializable
      * @param identifiers
      *            array containing all identifiers of the dso or an empty array
      */
-    public Event(int eventType, int subjectType, int subjectID, String detail, String[] identifiers)
+    public Event(int eventType, int subjectType, UUID subjectID, String detail, ArrayList<String> identifiers)
     {
         this.eventType = eventType;
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
         timeStamp = System.currentTimeMillis();
         this.detail = detail;
-        this.identifiers = identifiers.clone();
+        this.identifiers = (ArrayList<String>) identifiers.clone();
     }
     
     /**
      * Constructor.
      * 
      * You should consider to use 
-     * {@link Event#Event(int, int, int, int, int, java.lang.String)} instead.
+     * {@link Event#Event(int, int, UUID, int, UUID, java.lang.String)} instead.
      * 
      * @param eventType
      *            action type, e.g. Event.ADD.
@@ -258,11 +257,11 @@ public class Event implements Serializable
      * @param detail
      *            detail information that depends on context.
      */
-    public Event(int eventType, int subjectType, int subjectID, int objectType,
-            int objectID, String detail)
+    public Event(int eventType, int subjectType, UUID subjectID, int objectType,
+                 UUID objectID, String detail)
     {
         this(eventType, subjectType, subjectID, objectType, objectID, detail, 
-                new String[0]);
+                new ArrayList<String>());
     }
 
     /**
@@ -283,8 +282,8 @@ public class Event implements Serializable
      * @param identifiers
      *            array containing all identifiers of the dso or an empty array
      */
-    public Event(int eventType, int subjectType, int subjectID, int objectType,
-            int objectID, String detail, String[] identifiers)
+    public Event(int eventType, int subjectType, UUID subjectID, int objectType,
+                 UUID objectID, String detail, ArrayList<String> identifiers)
     {
         this.eventType = eventType;
         this.subjectType = coreTypeToMask(subjectType);
@@ -293,7 +292,7 @@ public class Event implements Serializable
         this.objectID = objectID;
         timeStamp = System.currentTimeMillis();
         this.detail = detail;
-        this.identifiers = identifiers.clone();
+        this.identifiers = (ArrayList<String>) identifiers.clone();
     }
 
     /**
@@ -344,7 +343,7 @@ public class Event implements Serializable
     }
 
     // translate a "core.Constants" object type value to local bitmask value.
-    private static int coreTypeToMask(int core)
+    protected int coreTypeToMask(int core)
     {
         Integer mask = objTypeToMask.get(core);
         if (mask == null)
@@ -358,7 +357,7 @@ public class Event implements Serializable
     }
 
     // translate bitmask object-type to "core.Constants" object type.
-    private static int maskTypeToCore(int mask)
+    protected int maskTypeToCore(int mask)
     {
         Integer core = objMaskToType.get(mask);
         if (core == null)
@@ -379,14 +378,14 @@ public class Event implements Serializable
     public DSpaceObject getObject(Context context) throws SQLException
     {
         int type = getObjectType();
-        int id = getObjectID();
-        if (type < 0 || id < 0)
+        UUID id = getObjectID();
+        if (type < 0 || id == null)
         {
             return null;
         }
         else
         {
-            return DSpaceObject.find(context, type, id);
+            return ContentServiceFactory.getInstance().getDSpaceObjectService(type).find(context, id);
         }
     }
 
@@ -398,13 +397,13 @@ public class Event implements Serializable
      */
     public DSpaceObject getSubject(Context context) throws SQLException
     {
-        return DSpaceObject.find(context, getSubjectType(), getSubjectID());
+        return ContentServiceFactory.getInstance().getDSpaceObjectService(getSubjectType()).find(context, getSubjectID());
     }
 
     /**
      * @return database ID of subject of this event.
      */
-    public int getSubjectID()
+    public UUID getSubjectID()
     {
         return subjectID;
     }
@@ -412,7 +411,7 @@ public class Event implements Serializable
     /**
      * @return database ID of object of this event, or -1 if none was set.
      */
-    public int getObjectID()
+    public UUID getObjectID()
     {
         return objectID;
     }
@@ -578,10 +577,10 @@ public class Event implements Serializable
     /**
      * @return array of identifiers of this event's subject.
      */
-    public String[] getIdentifiers()
+    public List<String> getIdentifiers()
     {
         // don't return a reference to our private array, clone it.
-        return identifiers.clone();
+        return (List<String>) identifiers.clone();
     }
 
     /**
@@ -655,7 +654,7 @@ public class Event implements Serializable
     }
 
     // dumb integer "log base 2", returns -1 if there are no 1's in number.
-    private static int log2(int n)
+    protected int log2(int n)
     {
         for (int i = 0; i < 32; ++i)
         {
@@ -680,7 +679,7 @@ public class Event implements Serializable
      */
     public void setBitSet(String consumerName)
     {
-        consumedBy.set(EventManager.getConsumerIndex(consumerName));
+        consumedBy.set(EventServiceFactory.getInstance().getEventService().getConsumerIndex(consumerName));
     }
 
     /**

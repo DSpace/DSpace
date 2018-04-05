@@ -17,9 +17,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.rdf.negotiation.Negotiator;
-import org.dspace.utils.DSpace;
 
 /**
  *
@@ -31,6 +31,8 @@ public class LocalURIRedirectionServlet extends HttpServlet
     
     private final static Logger log = Logger.getLogger(LocalURIRedirectionServlet.class);
     
+    protected final transient HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -59,9 +61,7 @@ public class LocalURIRedirectionServlet extends HttpServlet
         String[] path = request.getPathInfo().substring(1).split("/");
 
         String handle = path[0] + "/" + path[1];
-        String dspaceURL = 
-                    (new DSpace()).getConfigurationService().getProperty("dspace.url");
-        
+
         // Prepare content negotiation
         int requestedMimeType = Negotiator.negotiate(request.getHeader(ACCEPT_HEADER_NAME));
         
@@ -69,8 +69,8 @@ public class LocalURIRedirectionServlet extends HttpServlet
         DSpaceObject dso = null;
         try
         {
-            context = new Context(Context.READ_ONLY);
-            dso = HandleManager.resolveToObject(context, handle);
+            context = new Context(Context.Mode.READ_ONLY);
+            dso = handleService.resolveToObject(context, handle);
         }
         catch (SQLException ex)
         {
@@ -111,6 +111,7 @@ public class LocalURIRedirectionServlet extends HttpServlet
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
@@ -125,6 +126,7 @@ public class LocalURIRedirectionServlet extends HttpServlet
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
@@ -135,6 +137,7 @@ public class LocalURIRedirectionServlet extends HttpServlet
      *
      * @return a String containing servlet description
      */
+    @Override
     public String getServletInfo() {
         return "Ensures that URIs used in RDF can be dereferenced.";
     }

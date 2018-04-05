@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>5.7-drum-1-SNAPSHOT</version>
+        <version>6.2-drum-0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -89,7 +89,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.9</version>
+                <version>1.9.1</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -103,7 +103,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.4</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -113,6 +113,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
@@ -136,6 +137,7 @@
                 </plugins>
             </build>
         </profile>
+
         <!-- If Unit Testing is enabled, then setup the Unit Test Environment.
              See also the 'skiptests' profile in Parent POM. -->
         <profile>
@@ -156,6 +158,18 @@
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <version>2.8</version>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dspace</groupId>
+                                    <artifactId>dspace-parent</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>testEnvironment</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>setupTestEnvironment</id>
@@ -163,18 +177,13 @@
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/testing</outputDirectory>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.dspace</groupId>
-                                            <artifactId>dspace-parent</artifactId>
-                                            <version>${project.version}</version>
-                                            <type>zip</type>
-                                            <classifier>testEnvironment</classifier>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>setupIntegrationTestEnvironment</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
@@ -196,7 +205,7 @@
                         <executions>
                             <execution>
                                 <id>setproperty</id>
-                                <phase>generate-test-resources</phase>
+                                <phase>generate-test-resources</phase> <!-- XXX I think this should be 'initialize' - MHW -->
                                 <goals>
                                     <goal>execute</goal>
                                 </goals>
@@ -209,73 +218,71 @@
                             </execution>
                         </executions>
                     </plugin>
-                    
-                    <!-- FileWeaver plugin is in charge of initializing & "weaving" together
-                         the dspace.cfg file to be used by the Unit Testing environment.
-                         It weaves two files, the default 'dspace.cfg' and 'dspace.cfg.more',
-                         both of which are included in the testEnvironment.zip. -->
-                    <plugin>
-                        <groupId>edu.iu.ul.maven.plugins</groupId>
-                        <artifactId>fileweaver</artifactId>
-                        <version>1.0</version>
-                        <configuration>
-                            <outputs>
-                                <output>
-                                    <outputPath>${agnostic.build.dir}/testing</outputPath>
-                                    <name>dspace.cfg.woven</name>
-                                    <parts>
-                                        <part>
-                                            <path>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</path>
-                                        </part>
-                                        <part>
-                                            <path>${agnostic.build.dir}/testing/dspace.cfg.more</path>
-                                        </part>
-                                    </parts>
-                                    <properties>
-                                        <dspace.install.dir>${agnostic.build.dir}/testing/dspace</dspace.install.dir>
-                                    </properties>
-                                </output>
-                            </outputs>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>edit-dspace-cfg</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>weave</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
 
-                    <!-- The ant plugin below ensures that the final "woven" dspace.cfg
-                         ends up in the /target/testing/dspace/ directory. This becomes
-                         our final dspace.cfg for the Unit Testing environment. The dspace
-                         service manager needs this "woven" configuration file when it starts.-->
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>process-test-resources</phase>
-                                <configuration>
-                                    <target>
-                                        <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
-                                    </target>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!-- Run Unit/Integration Testing! This plugin just kicks off the tests (when enabled). -->
+                    <!-- Run Unit Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
-                                <!-- Specify the dspace.cfg file to use for test environment -->
-                                <dspace.configuration>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</dspace.configuration>
+                                <!-- Specify the dspace.dir to use for test environment -->
+                                <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                                <!-- Turn off any DSpace logging -->
+                                <dspace.log.init.disable>true</dspace.log.init.disable>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>xml-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                          <execution>
+                            <id>validate-ALL-xml-and-xsl</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                              <goal>validate</goal>
+                            </goals>
+                          </execution>
+                        </executions>
+                        <configuration>
+                          <validationSets>
+                            <!-- validate ALL XML and XSL config files in the testing folder -->
+                             <validationSet>
+                                 <dir>${agnostic.build.dir}/testing</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                     <include>**/*.xsl</include>
+                                     <include>**/*.xconf</include>
+                                 </includes>
+                             </validationSet>
+                             <!-- validate ALL XML and XSL files throughout the project -->
+                             <validationSet>
+                                <dir>${root.basedir}</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                     <include>**/*.xsl</include>
+                                     <include>**/*.xmap</include>
+                                 </includes>
+                                 <excludes>
+                                     <exclude>**/node/node_modules/**</exclude>
+                                 </excludes>
+                              </validationSet>
+                          </validationSets>
+                        </configuration>
+                    </plugin>
+
+
+
+                    <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <!-- Specify the dspace.dir to use for test environment -->
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
                             </systemPropertyVariables>
@@ -289,6 +296,24 @@
 
 
     <dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>org.hibernate</groupId>
+        	<artifactId>hibernate-ehcache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
@@ -306,21 +331,19 @@
             <artifactId>dspace-tm-extractors</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -335,8 +358,8 @@
             <artifactId>commons-collections</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -352,8 +375,8 @@
             <artifactId>commons-lang</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
@@ -379,7 +402,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>jdom</groupId>
+            <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
         </dependency>
         <dependency>
@@ -397,10 +420,6 @@
         <dependency>
            <groupId>org.apache.pdfbox</groupId>
            <artifactId>fontbox</artifactId>
-        </dependency>
-        <dependency>
-           <groupId>org.apache.pdfbox</groupId>
-           <artifactId>jempbox</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -437,10 +456,16 @@
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>xml-apis</groupId>
-            <artifactId>xmlParserAPIs</artifactId>
+            <artifactId>xml-apis</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
@@ -484,6 +509,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.rometools</groupId>
             <artifactId>rome-modules</artifactId>
             <version>1.0</version>
@@ -492,11 +522,30 @@
             <groupId>gr.ekt.bte</groupId>
             <artifactId>bte-core</artifactId>
             <version>0.9.3.5</version>
+            <exclusions>
+                <!-- A more recent version is retrieved from another dependency -->
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>gr.ekt.bte</groupId>
             <artifactId>bte-io</artifactId>
             <version>0.9.3.5</version>
+            <exclusions>
+                <!-- A more recent version is retrieved from another dependency -->
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <!-- A more recent version is retrieved from another dependency -->
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -525,12 +574,11 @@
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
-            <version>1.8</version>
         </dependency>
         <dependency>
             <groupId>com.maxmind.geoip</groupId>
             <artifactId>geoip-api</artifactId>
-            <version>1.2.11</version>
+            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -539,7 +587,7 @@
         <dependency>
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
-            <version>2.1.1</version>
+            <version>2.1.7</version>
         </dependency>
 
         <dependency>
@@ -564,15 +612,15 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>18.0</version>
+            <version>19.0</version>
         </dependency>
 
 
         <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
-		
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -590,12 +638,12 @@
             <artifactId>im4java</artifactId>
             <version>1.4.0</version>
         </dependency>
-        
+
         <!-- Flyway DB API (flywaydb.org) is used to manage DB upgrades automatically. -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>3.0</version>
+            <version>4.0.3</version>
         </dependency>
 
         <!-- Google Analytics -->
@@ -631,13 +679,64 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.3</version>
+            <version>2.9.2</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
             <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-impl</artifactId>
+            <!-- NOTE: SWORDv2 needs 1.2.14, required by Abdera: https://abdera.apache.org/ -->
+            <version>1.2.14</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-api</artifactId>
+            <!-- NOTE: SWORDv2 needs 1.2.14, required by Abdera: https://abdera.apache.org/ -->
+            <version>1.2.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>2.22.1</version>
+        </dependency>
+        <!-- S3 -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.10.50</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- S3 also wanted jackson... -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.7.0</version>
         </dependency>
     </dependencies>
 

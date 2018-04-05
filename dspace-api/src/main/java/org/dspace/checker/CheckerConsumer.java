@@ -8,6 +8,11 @@
 package org.dspace.checker;
 
 import org.apache.log4j.Logger;
+import org.dspace.checker.factory.CheckerServiceFactory;
+import org.dspace.checker.service.ChecksumHistoryService;
+import org.dspace.content.Bitstream;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
@@ -22,12 +27,15 @@ public class CheckerConsumer implements Consumer
     /** log4j logger */
     private static Logger log = Logger.getLogger(CheckerConsumer.class);
     
-    private BitstreamInfoDAO bitstreamInfoDAO = new BitstreamInfoDAO();
+    protected ChecksumHistoryService checksumHistoryService = CheckerServiceFactory.getInstance().getChecksumHistoryService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     
     /**
      * Initialize - allocate any resources required to operate.
      * Called at the start of ANY sequence of event consume() calls.
+     * @throws Exception if error
      */
+    @Override
     public void initialize() throws Exception
     {
     	// no-op
@@ -39,14 +47,17 @@ public class CheckerConsumer implements Consumer
      * @param ctx       the execution context object
      *
      * @param event the content event
+     * @throws Exception if error
      */
+    @Override
     public void consume(Context ctx, Event event) throws Exception
     {
         
     	if (event.getEventType() == Event.DELETE)
     	{
+            Bitstream bitstream = bitstreamService.find(ctx, event.getSubjectID());
             log.debug("Attempting to remove Checker Info");
-    	    bitstreamInfoDAO.deleteBitstreamInfoWithHistory(event.getSubjectID());
+            checksumHistoryService.deleteByBitstream(ctx, bitstream);
             log.debug("Completed removing Checker Info");
     	}
     }
@@ -54,7 +65,10 @@ public class CheckerConsumer implements Consumer
     /**
      * Signal that there are no more events queued in this
      * event stream.
+     * @param ctx Context
+     * @throws Exception if error
      */
+    @Override
     public void end(Context ctx) throws Exception
     {
     	// no-op
@@ -63,7 +77,10 @@ public class CheckerConsumer implements Consumer
     /**
      * Finish - free any allocated resources.
      * Called when consumer is being released
+     * @param ctx Context
+     * @throws Exception if error
      */
+    @Override
     public void finish(Context ctx) throws Exception
     {
     	// no-op

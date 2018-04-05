@@ -97,6 +97,11 @@ public class Choices
 
     /**
      * Constructor for general purpose
+     * @param values values array
+     * @param start start number
+     * @param total total results
+     * @param confidence confidence level
+     * @param more whether more values
      */
     public Choices(Choice values[], int start, int total, int confidence, boolean more)
     {
@@ -110,6 +115,12 @@ public class Choices
 
     /**
      * Constructor for general purpose
+     * @param values values array
+     * @param start start number
+     * @param total total results
+     * @param confidence confidence level
+     * @param more whether more values
+     * @param defaultSelected default selected value
      */
     public Choices(Choice values[], int start, int total, int confidence, boolean more, int defaultSelected)
     {
@@ -124,6 +135,7 @@ public class Choices
 
     /**
      * Constructor for error results
+     * @param confidence confidence level
      */
     public Choices(int confidence)
     {
@@ -133,6 +145,7 @@ public class Choices
 
     /**
      * Constructor for simple empty or error results
+     * @param isError whether error
      */
     public Choices(boolean isError)
     {

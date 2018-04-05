@@ -9,17 +9,16 @@ package org.dspace.app.xmlui.utils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
-import org.dspace.browse.BrowseItem;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -27,19 +26,18 @@ import org.dspace.eperson.Group;
  * This is a validity object specifically implemented for the caching 
  * needs of DSpace, Manakin, and Cocoon.
  * 
- * The basic idea is that each time a DSpace object rendered by a cocoon 
- * component the object and everything about it that makes it unique should 
+ * <p>The basic idea is that, each time a DSpace object is rendered by a Cocoon
+ * component, the object and everything about it that makes it unique should
  * be reflected in the validity object for the component. By following this 
- * principle if the object has been updated externally then the cache will be
+ * principle, if the object has been updated externally then the cache will be
  * invalidated.
  * 
- * This DSpaceValidity object makes this processes easier by abstracting out
+ * <p>This DSpaceValidity object makes this processes easier by abstracting out
  * the processes of determining what is unique about a DSpace object. A class
  * is expected to create a new DSpaceValidity object and add() to it all 
  * DSpaceObjects that are rendered by the component. This validity object will 
  * serialize all those objects to a string, take a hash of the string and compare
  * the hash of the string for any updates.
- * 
  * 
  * @author Scott Phillips
  */
@@ -55,7 +53,7 @@ public class DSpaceValidity implements SourceValidity
     /** Simple flag to note if the object has been completed. */
     protected boolean completed = false;
     
-    /** A hash of the validityKey taken after completetion */
+    /** A hash of the validityKey taken after completion */
     protected long hash;
     
     /** The time when the validity is no longer assumed to be valid */
@@ -63,6 +61,12 @@ public class DSpaceValidity implements SourceValidity
     
     /** The length of time that a cache is assumed to be valid */
     protected long assumedValidityDelay = 0;
+
+
+    transient protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+   	transient protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    transient protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 
     /**
      * Create a new DSpace validity object. 
@@ -89,6 +93,7 @@ public class DSpaceValidity implements SourceValidity
      * Complete this validity object. After the completion no more
      * objects may be added to the validity object and the object
      * will return as valid.
+     * @return this.
      */
     public DSpaceValidity complete() 
     {    
@@ -123,19 +128,19 @@ public class DSpaceValidity implements SourceValidity
     	// Also add the delay time to the validity hash so if the
     	// admin changes the delay time then all the previous caches
     	// are invalidated.
-    	this.validityKey.append("AssumedValidityDelay:"+milliseconds);
+    	this.validityKey.append("AssumedValidityDelay:").append(milliseconds);
     }
     
     /**
      * Set the time delay for how long this cache will be assumed to be valid.
      * 
-     * This method takes a string which is parsed for the delay time, the string 
-     * must be of the following form: "<integer> <scale>" where scale is days,
+     * <p>This method takes a string which is parsed for the delay time.  The string
+     * must be of the following form: "{@code <integer> <scale>}" where scale is days,
      * hours, minutes, or seconds.
      * 
-     * Examples: "1 day" or "12 hours" or "1 hour" or "30 minutes"
+     * <p>Examples: "1 day" or "12 hours" or "1 hour" or "30 minutes"
      * 
-     * See the setAssumedValidityDelay(long) for more information.
+     * @see #setAssumedValidityDelay(long)
      * 
      * @param delay The delay time in a variable scale.
      */
@@ -210,19 +215,27 @@ public class DSpaceValidity implements SourceValidity
      * validity object is created.
      * 
      * Below are the following transitive rules for adding 
-     * objects, i.e. if an item is added then all the items 
-     * bundles & bitstreams will also be added.
+     * objects, i.e. if an item is added then all the item's
+     * bundles and bitstreams will also be added.
      * 
-     * Communities -> logo bitstream
-     * Collection -> logo bitstream
-     * Item -> bundles -> bitstream
-     * Bundles -> bitstreams
-     * EPeople -> groups
+     * <p>
+     * {@literal Communities -> logo bitstream}
+     * <br>
+     * {@literal Collection -> logo bitstream}
+     * <br>
+     * {@literal Item -> bundles -> bitstream}
+     * <br>
+     * {@literal Bundles -> bitstreams}
+     * <br>
+     * {@literal EPeople -> groups}
      * 
+     * @param context
+     *          session context.
      * @param dso
      *          The object to add to the validity.
+     * @throws java.sql.SQLException passed through.
      */
-    public void add(DSpaceObject dso) throws SQLException
+    public void add(Context context, DSpaceObject dso) throws SQLException
     {
         if (this.completed)
         {
@@ -239,14 +252,14 @@ public class DSpaceValidity implements SourceValidity
 
             validityKey.append("Community:");
             validityKey.append(community.getHandle());
-            validityKey.append(community.getMetadata("introductory_text"));
-            validityKey.append(community.getMetadata("short_description"));
-            validityKey.append(community.getMetadata("side_bar_text"));
-            validityKey.append(community.getMetadata("copyright_text"));
-            validityKey.append(community.getMetadata("name"));
+            validityKey.append(communityService.getMetadata(community, "introductory_text"));
+            validityKey.append(communityService.getMetadata(community, "short_description"));
+            validityKey.append(communityService.getMetadata(community, "side_bar_text"));
+            validityKey.append(communityService.getMetadata(community, "copyright_text"));
+            validityKey.append(communityService.getMetadata(community, "name"));
             
             // Add the communities logo
-            this.add(community.getLogo());
+            this.add(context, community.getLogo());
 
         } 
         else if (dso instanceof Collection)
@@ -255,16 +268,16 @@ public class DSpaceValidity implements SourceValidity
             
             validityKey.append("Collection:");
             validityKey.append(collection.getHandle());
-            validityKey.append(collection.getMetadata("introductory_text"));
-            validityKey.append(collection.getMetadata("short_description"));
-            validityKey.append(collection.getMetadata("side_bar_text"));
-            validityKey.append(collection.getMetadata("provenance_description"));
-            validityKey.append(collection.getMetadata("copyright_text"));
-            validityKey.append(collection.getMetadata("license"));
-            validityKey.append(collection.getMetadata("name")); 
+            validityKey.append(collectionService.getMetadata(collection, "introductory_text"));
+            validityKey.append(collectionService.getMetadata(collection, "short_description"));
+            validityKey.append(collectionService.getMetadata(collection, "side_bar_text"));
+            validityKey.append(collectionService.getMetadata(collection, "provenance_description"));
+            validityKey.append(collectionService.getMetadata(collection, "copyright_text"));
+            validityKey.append(collectionService.getMetadata(collection, "license"));
+            validityKey.append(collectionService.getMetadata(collection, "name")); 
             
             // Add the logo also;
-            this.add(collection.getLogo());
+            this.add(context, collection.getLogo());
             
         }
         else if (dso instanceof Item)
@@ -276,36 +289,18 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(item.getOwningCollection());
             validityKey.append(item.getLastModified());
             // Include all metadata values in the validity key.
-            Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY,Item.ANY,Item.ANY);
-            for (Metadatum dcv : dcvs)
+            List<MetadataValue> dcvs = itemService.getMetadata(item, Item.ANY, Item.ANY,Item.ANY,Item.ANY);
+            for (MetadataValue dcv : dcvs)
             {
-                validityKey.append(dcv.schema).append(".");
-                validityKey.append(dcv.element).append(".");
-                validityKey.append(dcv.qualifier).append(".");
-                validityKey.append(dcv.language).append("=");
-                validityKey.append(dcv.value);
+                validityKey.append(dcv.getMetadataField().toString('.'));
+                validityKey.append(dcv.getLanguage()).append("=");
+                validityKey.append(dcv.getValue());
             }
             
             for(Bundle bundle : item.getBundles())
             {
                 // Add each of the items bundles & bitstreams.
-                this.add(bundle);
-            }
-        }
-        else if (dso instanceof BrowseItem)
-        {
-        	BrowseItem browseItem = (BrowseItem) dso;
-        	
-        	validityKey.append("BrowseItem:");
-        	validityKey.append(browseItem.getHandle());
-        	Metadatum[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (Metadatum dcv : dcvs)
-            {
-                validityKey.append(dcv.schema).append(".");
-                validityKey.append(dcv.element).append(".");
-                validityKey.append(dcv.qualifier).append(".");
-                validityKey.append(dcv.language).append("=");
-                validityKey.append(dcv.value);
+                this.add(context, bundle);
             }
         }
         else if (dso instanceof Bundle)
@@ -315,11 +310,11 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append("Bundle:");
             validityKey.append(bundle.getID());
             validityKey.append(bundle.getName());
-            validityKey.append(bundle.getPrimaryBitstreamID());
+            validityKey.append(bundle.getPrimaryBitstream() != null ? bundle.getPrimaryBitstream().getID() : "");
             
             for(Bitstream bitstream : bundle.getBitstreams())
             {
-                this.add(bitstream);
+                this.add(context, bitstream);
             }
         }
         else if (dso instanceof Bitstream)
@@ -336,7 +331,7 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(bitstream.getChecksumAlgorithm());
             validityKey.append(bitstream.getSize());
             validityKey.append(bitstream.getUserFormatDescription());
-            validityKey.append(bitstream.getFormat().getDescription());
+            validityKey.append(bitstream.getFormat(context).getDescription());
         }
         else if (dso instanceof EPerson)
         {
@@ -375,22 +370,16 @@ public class DSpaceValidity implements SourceValidity
      *
      * @param nonDSpaceObject
      *          The non-DSpace object to add to the validity.
+     * @throws java.sql.SQLException passed through.
      */
     public void add(String nonDSpaceObject) throws SQLException
     {
         validityKey.append("String:");
         validityKey.append(nonDSpaceObject);
     }
-    
-    
-    
-    
-    
-    
-    
-    
+
     /**
-     * This method is used during serializion. When Tomcat is shutdown, Cocoon's in-memory 
+     * This method is used during serialization. When Tomcat is shutdown, Cocoon's in-memory
      * cache is serialized and written to disk to later be read back into memory on start 
      * up. When this class is read back into memory the readObject(stream) method will be 
      * called.
@@ -400,9 +389,9 @@ public class DSpaceValidity implements SourceValidity
      * will never be assumed valid. Only after it has been checked once will the regular assume
      * validity mechanism be used.
      * 
-     * @param in
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @param in stream for reading serialized data.
+     * @throws IOException passed through.
+     * @throws ClassNotFoundException passed through.
      */
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
     {
@@ -413,7 +402,6 @@ public class DSpaceValidity implements SourceValidity
     	// has been checked at least once.
     	this.assumedValidityTime = 0;
     }
-    
     
     /**
      * Reset the assume validity time. This should be called only when the validity of this cache
@@ -427,7 +415,11 @@ public class DSpaceValidity implements SourceValidity
     
     /**
      * Determine if the cache is still valid
+     * @return {@link org.apache.excalibur.source.SourceValidity#VALID},
+     *         {@link org.apache.excalibur.source.SourceValidity#UNKNOWN},
+     *         or {@link org.apache.excalibur.source.SourceValidity#INVALID}.
      */
+    @Override
     public int isValid()
     {
         // Return true if we have a hash.
@@ -460,7 +452,10 @@ public class DSpaceValidity implements SourceValidity
      * 
      * @param otherObject 
      *          The other validity object.
+     * @return {@link org.apache.excalibur.source.SourceValidity#VALID}
+     *         or {@link org.apache.excalibur.source.SourceValidity#INVALID}.
      */
+    @Override
     public int isValid(SourceValidity otherObject)
     {
         if (this.completed && otherObject instanceof DSpaceValidity)

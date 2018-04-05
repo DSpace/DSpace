@@ -16,16 +16,34 @@
     <!-- Identifier Service Application Interface.  Will be autowired with
          any Identifier Providers present in Spring context.
     -->
-    <bean id="org.dspace.identifier.IdentifierService"
+    <bean id="org.dspace.identifier.service.IdentifierService"
           class="org.dspace.identifier.IdentifierServiceImpl"
           autowire="byType"
           scope="singleton"/>
 
-   <!-- provider for using the versioned handle identifier instead of the default one. -->
-    <!--<bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"-->
-          <!--scope="singleton">-->
-        <!--<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>-->
-    <!--</bean>-->
+      <!-- If you enabled versioning, you should use one of the versioned
+           handle identifier provider instead of the default one. 
+           The VersionedHandleIdentifierProvider creates a new versioned
+           handle for every new version.
+           -->
+    <!--
+    <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider" scope="singleton">
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+    </bean>
+    -->
+    <!--
+           The VersionedHandleIdentifierProviderWithCanonicalHandles
+           preserves the first handle for every new version. Whenever
+           a new version is created the previous version gets a new
+           handle. This leads to a handle that points always to the
+           newest version, but there is no permanent handle, that
+           will always keep pointing to the acutal newest one.
+           -->
+    <!--
+    <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles" scope="singleton">
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+    </bean>
+    -->
 
     <!-- provider to mint and register DOIs with DSpace.
          To mint DOIs you need a registration agency. The DOIIdentifierProvider
@@ -33,10 +51,24 @@
          a DOIConnector that handles all API calls to your DOI registration
          agency. Please configure a DOIConnector as well! -->
 
-    <!-- In order to mint DOIs with DSpace, get an agreement with a DOI registration
-         agency,  take a look into dspace.cfg, and uncomment this.
+    <!-- In order to mint DOIs with DSpace, get an agreement with a DOI 
+         registration agency,  take a look into dspace.cfg, and activate either
+         the DOIIdentifierProvider or the VersionedDOIIdentifierProvider,
+         depending on whether you have Item Level Versioning activated or not.
+    -->
+    <!--
     <bean id="org.dspace.identifier.DOIIdentifierProvider"
         class="org.dspace.identifier.DOIIdentifierProvider"
+        scope="singleton">
+        <property name="configurationService"
+            ref="org.dspace.services.ConfigurationService" />
+        <property name="DOIConnector"
+            ref="org.dspace.identifier.doi.DOIConnector" />
+    </bean>
+    -->
+    <!--
+    <bean id="org.dspace.identifier.DOIIdentifierProvider"
+        class="org.dspace.identifier.VersionedDOIIdentifierProvider"
         scope="singleton">
         <property name="configurationService"
             ref="org.dspace.services.ConfigurationService" />

@@ -7,12 +7,6 @@
  */
 package org.dspace.app.xmlui.opensearch;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URLDecoder;
-import java.sql.SQLException;
-import java.util.Map;
-
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -24,15 +18,22 @@ import org.apache.cocoon.generation.AbstractGenerator;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.ExpiresValidity;
-import org.dspace.app.util.OpenSearch;
+import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URLDecoder;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * This class provides the common attributes and methods for parameter parsing,
@@ -82,6 +83,8 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
     /** max allowed value for results per page parameter  */
     public static int MAX_RPP = 100;
 
+    protected OpenSearchService openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
+
     /**
      * Generate the unique caching key.
      * This key includes the concrete class name to ensure uniqueness
@@ -122,7 +125,7 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
     {
         if (this.validity == null)
         {
-            long expiry = ConfigurationManager
+            long expiry = DSpaceServicesFactory.getInstance().getConfigurationService()
                     .getLongProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
                 this.validity = new ExpiresValidity(expiry);
         }
@@ -160,7 +163,7 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
 
         // Format param (defaults to atom)
         this.format = request.getParameter("format");
-        if (format == null || format.length() == 0 || !OpenSearch.getFormats().contains(format))
+        if (format == null || format.length() == 0 || !openSearchService.getFormats().contains(format))
         {
             format = "atom";
         }
@@ -169,7 +172,7 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
         String scopeParam = request.getParameter("scope");
         try
         {
-            scope = OpenSearch.resolveScope(context, scopeParam);
+            scope = openSearchService.resolveScope(context, scopeParam);
         }
         catch (SQLException e)
         {

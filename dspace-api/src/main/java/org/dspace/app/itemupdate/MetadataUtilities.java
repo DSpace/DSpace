@@ -32,6 +32,10 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xpath.XPathAPI;
 
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -40,14 +44,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 
 
 /**
- * 		Miscellaneous methods for metadata handling that build on the API
+ * 	Miscellaneous methods for metadata handling that build on the API
  *      which might have general utility outside of the specific use
  *      in context in ItemUpdate.
  *      
@@ -56,7 +57,9 @@ import org.dspace.core.ConfigurationManager;
  *
  */
 public class MetadataUtilities {
-	
+
+    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     /**      
      * 
      *  Working around Item API to delete a value-specific Metadatum
@@ -65,39 +68,38 @@ public class MetadataUtilities {
       clear (i.e. delete) all of these DCValues
      *      add them back, minus the one to actually delete
      *  
-     * 
-     * @param item
-     * @param dtom
-     * @param isLanguageStrict - 
-     * 
+     * @param context DSpace Context
+     * @param item Item Object
+     * @param dtom metadata field
+     * @param isLanguageStrict whether strict or not
+     * @throws SQLException if database error
      * @return true if metadata field is found with matching value and was deleted
      */
-    public static boolean deleteMetadataByValue(Item item, DtoMetadata dtom, boolean isLanguageStrict)
-    {   	
-    	Metadatum[] ar = null;
+    public static boolean deleteMetadataByValue(Context context, Item item, DtoMetadata dtom, boolean isLanguageStrict) throws SQLException {
+    	List<MetadataValue> ar = null;
     	
     	if (isLanguageStrict)
     	{   // get all for given type
-    		ar = item.getMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language);  
+    		ar = itemService.getMetadata(item, dtom.schema, dtom.element, dtom.qualifier, dtom.language);
     	}
     	else
     	{
-    		ar = item.getMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);  
+    		ar = itemService.getMetadata(item, dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
     	}
     	
     	boolean found = false;
     	
     	//build new set minus the one to delete
     	List<String> vals = new ArrayList<String>();
-    	for (Metadatum dcv : ar)
+    	for (MetadataValue dcv : ar)
     	{
-    		if (dcv.value.equals(dtom.value))
+    		if (dcv.getValue().equals(dtom.value))
     		{
     			found = true;
     		}
     		else
     		{
-    			vals.add(dcv.value);
+    			vals.add(dcv.getValue());
     		}
     	}
     	
@@ -105,14 +107,14 @@ public class MetadataUtilities {
     	{   
         	if (isLanguageStrict)
         	{           		
-        		item.clearMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language);
+                itemService.clearMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, dtom.language);
         	}
         	else
         	{
-        		item.clearMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
+                itemService.clearMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
         	}
     	
-    		item.addMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals.toArray(new String[vals.size()]));   	
+            itemService.addMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals);
     	}
 		return found;
     }
@@ -120,78 +122,79 @@ public class MetadataUtilities {
     /**
      *   Append text to value metadata field to item
      *   
-     * @param item
-     * @param dtom
-     * @param isLanguageStrict
-     * @param textToAppend
+     * @param context DSpace Context
+     * @param item DSpace Item
+     * @param dtom metadata field
+     * @param isLanguageStrict if strict
+     * @param textToAppend text to append
      * @throws IllegalArgumentException  - When target metadata field is not found
+     * @throws SQLException if database error
      */
-    public static void appendMetadata(Item item, DtoMetadata dtom, boolean isLanguageStrict, 
+    public static void appendMetadata(Context context, Item item, DtoMetadata dtom, boolean isLanguageStrict,
     		String textToAppend)
-    throws IllegalArgumentException
-    {   	
-    	Metadatum[] ar = null;
+            throws IllegalArgumentException, SQLException {
+    	List<MetadataValue> ar = null;
     	
     	// get all values for given element/qualifier
     	if (isLanguageStrict)  // get all for given element/qualifier
     	{   
-    		ar = item.getMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language);  
+    		ar = itemService.getMetadata(item, dtom.schema, dtom.element, dtom.qualifier, dtom.language);
     	}
     	else
     	{
-    		ar = item.getMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);  
+    		ar = itemService.getMetadata(item, dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
     	}
     	
-    	if (ar.length == 0)
+    	if (ar.size() == 0)
     	{
     		throw new IllegalArgumentException("Metadata to append to not found");
     	}
     	
     	int idx = 0;  //index of field to change
-    	if (ar.length > 1)  //need to pick one, can't be sure it's the last one
+    	if (ar.size() > 1)  //need to pick one, can't be sure it's the last one
     	{
     		// TODO maybe get highest id ?
     	}
     	
     	//build new set minus the one to delete
     	List<String> vals = new ArrayList<String>();
-    	for (int i=0; i < ar.length; i++) 
+    	for (int i=0; i < ar.size(); i++)
     	{
     		if (i == idx)
     		{
-    			vals.add(ar[i].value + textToAppend);
+    			vals.add(ar.get(i).getValue() + textToAppend);
     		}
     		else
     		{
-    			vals.add(ar[i].value);
+    			vals.add(ar.get(i).getValue());
     		}
     	}
 
     	if (isLanguageStrict)
     	{           		
-    		item.clearMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language);
+            itemService.clearMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, dtom.language);
     	}
     	else
     	{
-    		item.clearMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
+            itemService.clearMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
     	}
 	
-		item.addMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals.toArray(new String[vals.size()]));   	
+        itemService.addMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals);
     }
  
     /**
      *  Modification of method from ItemImporter.loadDublinCore 
      *  as a Factory method
      * 
-     * @param docBuilder  - 
+     * @param docBuilder  DocumentBuilder
      * @param is - InputStream of dublin_core.xml
      * @return list of DtoMetadata representing the metadata fields relating to an Item
-     * @throws SQLException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws TransformerException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws ParserConfigurationException if parser config error
+     * @throws SAXException if XML error
+     * @throws TransformerException if transformer error
+     * @throws AuthorizeException if authorization error
      */
     public static List<DtoMetadata> loadDublinCore(DocumentBuilder docBuilder, InputStream is)
     throws SQLException, IOException, ParserConfigurationException,
@@ -268,12 +271,12 @@ public class MetadataUtilities {
     /**
      *    Write dublin_core.xml 
      * 
-     * @param docBuilder
-     * @param dtomList
+     * @param docBuilder DocumentBuilder
+     * @param dtomList List of metadata fields
      * @return xml document
-     * @throws ParserConfigurationException
-     * @throws TransformerConfigurationException
-     * @throws TransformerException
+     * @throws ParserConfigurationException if parser config error
+     * @throws TransformerConfigurationException if transformer config error
+     * @throws TransformerException if transformer error
      */
 	public static Document writeDublinCore(DocumentBuilder docBuilder, List<DtoMetadata> dtomList)
 	throws ParserConfigurationException, TransformerConfigurationException, TransformerException
@@ -312,11 +315,11 @@ public class MetadataUtilities {
 	
     /**
      *   write xml document to output stream
-     * @param doc
-     * @param transformer
-     * @param out
-     * @throws IOException
-     * @throws TransformerException
+     * @param doc XML Document
+     * @param transformer XML Transformer
+     * @param out OutputStream
+     * @throws IOException if IO Error
+     * @throws TransformerException if Transformer error
      */
 	public static void writeDocument(Document doc, Transformer transformer, OutputStream out)
 	throws IOException, TransformerException
@@ -331,9 +334,9 @@ public class MetadataUtilities {
     // XML utility methods
     /**
      * Lookup an attribute from a DOM node.
-     * @param n
-     * @param name
-     * @return
+     * @param n Node
+     * @param name name
+     * @return attribute value
      */
     private static String getAttributeValue(Node n, String name)
     {
@@ -354,8 +357,8 @@ public class MetadataUtilities {
     
     /**
      * Return the String value of a Node.
-     * @param node
-     * @return
+     * @param node node
+     * @return string value
      */
     private static String getStringValue(Node node)
     {
@@ -378,7 +381,11 @@ public class MetadataUtilities {
      * Rewrite of ItemImport's functionality
      * but just the parsing of the file, not the processing of its elements.
      *      
-     * @validate  flag to verify matching files in tree
+     * @param f file
+     * @return list of ContentsEntry
+     * @throws FileNotFoundException if file doesn't exist
+     * @throws IOException if IO error
+     * @throws ParseException if parse error
      */
     public static List<ContentsEntry> readContentsFile(File f)
     throws FileNotFoundException, IOException, ParseException
@@ -420,14 +427,15 @@ public class MetadataUtilities {
 
     /**
      * 
-     * @param f
-     * @throws FileNotFoundException
-     * @throws IOException
+     * @param f file
+     * @return list of lines as strings
+     * @throws FileNotFoundException if file doesn't exist
+     * @throws IOException if IO Error
      */
-    public static List<Integer> readDeleteContentsFile(File f)
+    public static List<String> readDeleteContentsFile(File f)
     throws FileNotFoundException, IOException
     {
-    	List<Integer> list = new ArrayList<Integer>();
+    	List<String> list = new ArrayList<>();
     	
     	BufferedReader in = null;
     	
@@ -444,16 +452,7 @@ public class MetadataUtilities {
 	                continue;
 	            }
 	            
-	            int n = 0;
-	            try
-	            {
-	            	n = Integer.parseInt(line);
-		    		list.add(n);	    		
-	            }
-	            catch(NumberFormatException e)
-	            {
-	            	ItemUpdate.pr("Error reading delete contents line:" + e.toString());
-	            }            	
+                list.add(line);
 	    	}
     	}
     	finally
@@ -474,17 +473,22 @@ public class MetadataUtilities {
     /**
      *    Get display of Metadatum    
 	 *
-     * @param dcv
+     * @param dcv MetadataValue
      * @return string displaying elements of the Metadatum
      */
-    public static String getDCValueString(Metadatum dcv)
+    public static String getDCValueString(MetadataValue dcv)
     {
-    	return "schema: " + dcv.schema + "; element: " + dcv.element + "; qualifier: " + dcv.qualifier +
-    	       "; language: " + dcv.language + "; value: " + dcv.value;
+        MetadataField metadataField = dcv.getMetadataField();
+        MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+        return "schema: " + metadataSchema.getName() + "; element: " + metadataField.getElement() + "; qualifier: " + metadataField.getQualifier() +
+    	       "; language: " + dcv.getLanguage() + "; value: " + dcv.getValue();
     }
 
 	/**
-	 * 
+         * Return compound form of a metadata field (i.e. schema.element.qualifier)
+	 * @param schema schema
+         * @param element element
+         * @param qualifier qualifier
 	 * @return a String representation of the two- or three-part form of a metadata element
 	 *         e.g. dc.identifier.uri
 	 */
@@ -501,9 +505,10 @@ public class MetadataUtilities {
 	}
 	
 	/**
-	 *    Parses metadata field given in the form <schema>.<element>[.<qualifier>|.*]
+	 *    Parses metadata field given in the form {@code <schema>.<element>[.<qualifier>|.*]}
 	 *    checks for correct number of elements (2 or 3) and for empty strings
 	 *    
+         *    @param compoundForm compound form of metadata field
 	 *    @return String Array
 	 *    @throws ParseException if validity checks fail
 	 *    

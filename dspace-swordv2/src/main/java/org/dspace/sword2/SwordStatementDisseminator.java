@@ -15,6 +15,6 @@ import org.swordapp.server.SwordServerException;
 
 public interface SwordStatementDisseminator
 {
-	public Statement disseminate(Context context, Item item)
-        throws DSpaceSwordException, SwordError, SwordServerException;
+    public Statement disseminate(Context context, Item item)
+            throws DSpaceSwordException, SwordError, SwordServerException;
 }

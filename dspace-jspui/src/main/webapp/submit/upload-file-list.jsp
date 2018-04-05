@@ -27,7 +27,6 @@
 <%@ page import="org.apache.commons.lang.time.DateFormatUtils" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
-<%@ page import="org.dspace.authorize.AuthorizeManager" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
@@ -36,6 +35,8 @@
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Bundle" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.authorize.factory.AuthorizeServiceFactory" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -61,7 +62,7 @@
     if (withEmbargo)
     {
         // Policies List
-        policies = AuthorizeManager.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
+        policies = AuthorizeServiceFactory.getInstance().getAuthorizeService().findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
     
         startDate = "";
         globalReason = "";
@@ -140,17 +141,17 @@
 <%
     String row = "even";
 
-    Bitstream[] bitstreams = subInfo.getSubmissionItem().getItem().getNonInternalBitstreams();
-    Bundle[] bundles = null;
+    List<Bitstream> bitstreams = ContentServiceFactory.getInstance().getItemService().getNonInternalBitstreams(context, subInfo.getSubmissionItem().getItem());
+    List<Bundle> bundles = null;
 
-    if (bitstreams[0] != null) {
-        bundles = bitstreams[0].getBundles();
+    if (bitstreams.get(0) != null) {
+        bundles = bitstreams.get(0).getBundles();
     }
 
-    for (int i = 0; i < bitstreams.length; i++)
+    for (int i = 0; i < bitstreams.size(); i++)
     {
-        BitstreamFormat format = bitstreams[i].getFormat();
-        String description = bitstreams[i].getFormatDescription();
+        BitstreamFormat format = bitstreams.get(i).getFormat(context);
+        String description = bitstreams.get(i).getFormatDescription(context);
         String supportLevel = LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.upload-file-list.supportlevel1");
 
         if(format.getSupportLevel() == 1)
@@ -168,37 +169,37 @@
 %>
             <tr>
 		<td headers="t1" class="<%= row %>RowEvenCol" align="center">
-		    <input class="form-control" type="radio" name="primary_bitstream_id" value="<%= bitstreams[i].getID() %>"
-			   <% if (bundles[0] != null) {
-				if (bundles[0].getPrimaryBitstreamID() == bitstreams[i].getID()) { %>
+		    <input class="form-control" type="radio" name="primary_bitstream_id" value="<%= bitstreams.get(i).getID() %>"
+			   <% if (bundles.get(0) != null) {
+				if (bitstreams.get(i).equals(bundles.get(0).getPrimaryBitstream())) { %>
 			       	  <%="checked='checked'" %>
 			   <%   }
 			      } %> />
 		</td>
-                <td headers="t2" class="<%= row %>RowOddCol">
-                	<a href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></a>
+                <td headers="t2" class="<%= row %>RowOddCol break-all">
+                	<a href="<%= request.getContextPath() %>/retrieve/<%= bitstreams.get(i).getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams.get(i).getName()) %>" target="_blank"><%= bitstreams.get(i).getName() %></a>
             <%      // Don't display "remove" button in workflow mode
 			        if (allowFileEditing)
 			        {
 			%>
-	                    <button class="btn btn-danger pull-right" type="submit" name="submit_remove_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button2"/>">
+	                    <button class="btn btn-danger pull-right" type="submit" name="submit_remove_<%= bitstreams.get(i).getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button2"/>">
 	                    <span class="glyphicon glyphicon-trash"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.upload-file-list.button2"/>
 	                    </button>
 			<%
 			        } %>	
                 </td>
-                <td headers="t3" class="<%= row %>RowEvenCol"><%= bitstreams[i].getSize() %> bytes</td>
-                <td headers="t4" class="<%= row %>RowOddCol">
-                    <%= (bitstreams[i].getDescription() == null || bitstreams[i].getDescription().equals("")
+                <td headers="t3" class="<%= row %>RowEvenCol"><%= bitstreams.get(i).getSize() %> bytes</td>
+                <td headers="t4" class="<%= row %>RowOddCol break-all">
+                    <%= (bitstreams.get(i).getDescription() == null || bitstreams.get(i).getDescription().equals("")
                         ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.upload-file-list.empty1")
-                        : bitstreams[i].getDescription()) %>
-                    <button type="submit" class="btn btn-default pull-right" name="submit_describe_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
+                        : bitstreams.get(i).getDescription()) %>
+                    <button type="submit" class="btn btn-default pull-right" name="submit_describe_<%= bitstreams.get(i).getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
                     <span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.upload-file-list.button1"/>
                     </button>
                 </td>
                 <td headers="t5" class="<%= row %>RowEvenCol">
                     <%= description %> <dspace:popup page="<%= supportLevelLink %>">(<%= supportLevel %>)</dspace:popup>
-                    <button type="submit" class="btn btn-default pull-right" name="submit_format_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
+                    <button type="submit" class="btn btn-default pull-right" name="submit_format_<%= bitstreams.get(i).getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
                     <span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.upload-file-list.button1"/>
                     </button>
                 </td>
@@ -208,7 +209,7 @@
         {
 %>
                 <td headers="t6" class="<%= row %>RowOddCol">
-                    <code><%= bitstreams[i].getChecksum() %> (<%= bitstreams[i].getChecksumAlgorithm() %>)</code>
+                    <code><%= bitstreams.get(i).getChecksum() %> (<%= bitstreams.get(i).getChecksumAlgorithm() %>)</code>
                 </td>
 <%
         }
@@ -219,7 +220,7 @@
             column = (showChecksums ? "Even" : "Odd");
 %>
                 <td headers="t6" class="<%= row %>Row<%= column %>Col" style="text-align:center"> 
-                    <button class="btn btn-default pull-left" type="submit" name="submit_editPolicy_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
+                    <button class="btn btn-default pull-left" type="submit" name="submit_editPolicy_<%= bitstreams.get(i).getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
                     <span class="glyphicon glyphicon-lock"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.upload-file-list.button1"/>
                     </button>
                 </td>

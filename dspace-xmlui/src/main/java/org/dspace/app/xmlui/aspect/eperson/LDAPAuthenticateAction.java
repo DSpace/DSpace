@@ -22,26 +22,30 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 /**
  * Attempt to authenticate the user based upon their presented credentials. This
- * action uses the http parameters of username, ldap_password, and login_realm
+ * action uses the HTTP parameters of username, ldap_password, and login_realm
  * as credentials.
  * 
- * If the authentication attempt is successful then an HTTP redirect will be
+ * <p>If the authentication attempt is successful then an HTTP redirect will be
  * sent to the browser redirecting them to their original location in the system
- * before authenticated or if none is supplied back to the DSpace homepage. The
- * action will also return true, thus contents of the action will be excuted.
+ * before authenticated or if none is supplied back to the DSpace home page. The
+ * action will also return true, thus contents of the action will be executed.
  * 
- * If the authentication attempt fails, the action returns false.
+ * <p>If the authentication attempt fails, the action returns false.
  * 
- * Example use:
- * 
+ * <p>Example use:
+ *
+ * <pre>
+ * {@code
  * <map:act name="LDAPAuthenticate"> <map:serialize type="xml"/> </map:act>
  * <map:transform type="try-to-login-again-transformer">
+ * }
+ * </pre>
  * 
  * @author Jay Paz
  */
@@ -50,10 +54,19 @@ public class LDAPAuthenticateAction extends AbstractAction {
 
 	/**
 	 * Attempt to authenticate the user.
+     * @param redirector redirector.
+     * @param resolver source resolver.
+     * @param objectModel object model.
+     * @param source source.
+     * @param parameters sitemap parameters.
+     * @return results of the action.
+     * @throws org.apache.cocoon.sitemap.PatternException if unable to authenticate.
+     * @throws java.lang.Exception passed through.
 	 */
+    @Override
 	public Map act(Redirector redirector, SourceResolver resolver,
 			Map objectModel, String source, Parameters parameters)
-			throws Exception {
+			throws PatternException, Exception {
 		// First check if we are performing a new login
 		Request request = ObjectModelHelper.getRequest(objectModel);
 
@@ -82,12 +95,12 @@ public class LDAPAuthenticateAction extends AbstractAction {
 					redirectURL += AuthenticationUtil
 							.resumeInterruptedRequest(objectModel);
 				}
-                                else
-                                {
-                                        // Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
-                                        String loginRedirect = ConfigurationManager.getProperty("xmlui.user.loginredirect");
-                                        redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
-                                }
+                else
+                {
+                    // Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
+                    String loginRedirect = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.user.loginredirect");
+                    redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
+                }
 
 				// Authentication successful send a redirect.
 				final HttpServletResponse httpResponse = (HttpServletResponse) objectModel

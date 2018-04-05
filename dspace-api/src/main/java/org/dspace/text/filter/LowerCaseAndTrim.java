@@ -15,11 +15,13 @@ package org.dspace.text.filter;
 public class LowerCaseAndTrim implements TextFilter
 {
 
+    @Override
     public String filter(String str)
     {
         return str.toLowerCase().trim();
     }
 
+    @Override
     public String filter(String str, String lang)
     {
         return str.toLowerCase().trim();

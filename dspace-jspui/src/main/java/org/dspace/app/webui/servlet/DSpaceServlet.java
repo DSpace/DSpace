@@ -20,6 +20,8 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -59,14 +61,19 @@ public class DSpaceServlet extends HttpServlet
      */
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(DSpaceServlet.class);
+    private static final Logger log = Logger.getLogger(DSpaceServlet.class);
 
+    protected transient AuthorizeService authorizeService
+             = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
+    @Override
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
         processRequest(request, response);
     }
 
+    @Override
     protected void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
@@ -129,6 +136,7 @@ public class DSpaceServlet extends HttpServlet
             // Also email an alert
             UIUtil.sendAlert(request, se);
 
+            abortContext(context);
             JSPManager.showInternalError(request, response);
         }
         catch (AuthorizeException ae)
@@ -150,14 +158,45 @@ public class DSpaceServlet extends HttpServlet
 
                 JSPManager.showAuthorizeError(request, response, ae);
             }
+            abortContext(context);
+        }
+        catch (IOException ioe)
+        {
+            /*
+             * If a an IOException occurs (e.g. if the client interrupted a download),
+             * just log a simple warning without stacktrace.
+             */
+            log.warn(LogManager.getHeader(context, "io_error", ioe.toString()));
+            abortContext(context);
+        }
+        catch (Exception e)
+        {
+            log.warn(LogManager.getHeader(context, "general_jspui_error", e
+                    .toString()), e);
+
+            abortContext(context);
+            JSPManager.showInternalError(request, response);
         }
         finally
         {
             // Abort the context if it's still valid
             if ((context != null) && context.isValid())
             {
-                context.abort();
+                //Always commit at the end
+                try {
+                    context.complete();
+                } catch (SQLException e) {
+                    log.error(e.getMessage(), e);
+                    JSPManager.showInternalError(request, response);
+                }
             }
+        }
+    }
+
+    private void abortContext(Context context) {
+        if(context != null && context.isValid())
+        {
+            context.abort();
         }
     }
 

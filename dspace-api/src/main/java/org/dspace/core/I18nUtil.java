@@ -15,10 +15,11 @@ import java.io.File;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.ResourceBundle.Control;
 import java.util.StringTokenizer;
 import java.util.List;
 import java.util.ArrayList;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 
@@ -55,11 +56,12 @@ public class I18nUtil
      */
     public static Locale getDefaultLocale()
     {
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         // First, try configured default locale
         Locale defaultLocale = null;
-        if (!StringUtils.isEmpty(ConfigurationManager.getProperty("default.locale")))
+        if (config.hasProperty("default.locale"))
         {
-            defaultLocale = makeLocale(ConfigurationManager.getProperty("default.locale"));
+            defaultLocale = makeLocale(config.getProperty("default.locale"));
         }
 
         // Finally, get the Locale of the JVM
@@ -95,7 +97,8 @@ public class I18nUtil
      * Get the Locale for a specified EPerson. If the language is missing,
      * return the default Locale for the repository.
      *
-     * @param ep
+     * @param ep Eperson
+     * @return Locale
      */
     public static Locale getEPersonLocale(EPerson ep)
     {
@@ -124,11 +127,12 @@ public class I18nUtil
      */
     public static Locale[] getSupportedLocales()
     {
-        
-        String ll = ConfigurationManager.getProperty("webui.supported.locales");
-        if (ll != null)
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+        String[] locales = config.getArrayProperty("webui.supported.locales");
+        if (locales != null && locales.length>0)
         {
-            return parseLocales(ll);
+            return parseLocales(locales);
         }
         else
         {
@@ -232,7 +236,7 @@ public class I18nUtil
         String fileName = "";
         final String FORM_DEF_FILE = "input-forms";
         final String FILE_TYPE = ".xml";
-        String defsFilename = ConfigurationManager.getProperty("dspace.dir")
+        String defsFilename = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator + FORM_DEF_FILE;
         fileName =  getFilename(locale, defsFilename, FILE_TYPE);
         return fileName;
@@ -320,7 +324,7 @@ public class I18nUtil
         /** Name of the default license */
         final String DEF_LIC_FILE = "default";
         final String FILE_TYPE = ".license";
-        String defsFilename = ConfigurationManager.getProperty("dspace.dir")
+        String defsFilename = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator + DEF_LIC_FILE;
         
         fileName = getFilename(locale, defsFilename, FILE_TYPE);
@@ -420,7 +424,7 @@ public class I18nUtil
     public static String getEmailFilename(Locale locale, String name)
     {
         String templateName = "";
-        String templateFile = ConfigurationManager.getProperty("dspace.dir")
+        String templateFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator + "emails"
                 + File.separator + name;
 
@@ -431,13 +435,13 @@ public class I18nUtil
     /**
      * Creates array of Locales from text list of locale-specifications.
      * Used to parse lists in DSpace configuration properties.
-     * @param ll locale list of comma-separated values
+     * @param locales locale string array
      * @return array of locale results, possibly empty
      */
-    public static Locale[] parseLocales(String ll)
+    public static Locale[] parseLocales(String[] locales)
     {
         List<Locale> resultList = new ArrayList<Locale>();
-        for (String ls : ll.trim().split("\\s*,\\s*"))
+        for (String ls : locales)
         {
             Locale lc = makeLocale(ls);
             if (lc != null)

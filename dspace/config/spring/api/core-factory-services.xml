@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+
+
+    <!-- ******************** -->
+    <!-- Factory declarations -->
+    <!-- ******************** -->
+    <bean id="requestItemServiceFactory" class="org.dspace.app.requestitem.factory.RequestItemServiceFactoryImpl"/>
+    <bean id="itemExportServiceFactory" class="org.dspace.app.itemexport.factory.ItemExportServiceFactoryImpl"/>
+    <bean id="itemImportServiceFactory" class="org.dspace.app.itemimport.factory.ItemImportServiceFactoryImpl"/>
+    <bean id="mediaFilterServiceFactory" class="org.dspace.app.mediafilter.factory.MediaFilterServiceFactoryImpl"/>
+    <bean id="sfxServiceFactory" class="org.dspace.app.sfx.factory.SfxServiceFactoryImpl"/>
+    <bean id="appUtilServiceFactory" class="org.dspace.app.util.factory.UtilServiceFactoryImpl"/>
+
+    <bean id="authenticateServiceFactory" class="org.dspace.authenticate.factory.AuthenticateServiceFactoryImpl"/>
+
+    <bean id="authorityServiceFactory" class="org.dspace.authority.factory.AuthorityServiceFactoryImpl"/>
+    <bean id="contentAuthorityServiceFactory" class="org.dspace.content.authority.factory.ContentAuthorityServiceFactoryImpl"/>
+
+    <bean id="authorizeServiceFactory" class="org.dspace.authorize.factory.AuthorizeServiceFactoryImpl"/>
+    <bean id="checkerServiceFactory" class="org.dspace.checker.factory.CheckerServiceFactoryImpl"/>
+    <bean id="contentServiceFactory" class="org.dspace.content.factory.ContentServiceFactoryImpl"/>
+    <bean id="coreServiceFactory" class="org.dspace.core.factory.CoreServiceFactoryImpl"/>
+    <bean id="curateServiceFactory" class="org.dspace.curate.factory.CurateServiceFactoryImpl"/>
+
+
+    <bean id="disseminateServiceFactory" class="org.dspace.disseminate.factory.DisseminateServiceFactoryImpl"/>
+    <bean id="embargoServiceFactory" class="org.dspace.embargo.factory.EmbargoServiceFactoryImpl"/>
+    <bean id="ePersonServiceFactory" class="org.dspace.eperson.factory.EPersonServiceFactoryImpl"/>
+
+    <bean id="eventServiceFactory" class="org.dspace.event.factory.EventServiceFactoryImpl"/>
+
+    <bean id="handleServiceFactory" class="org.dspace.handle.factory.HandleServiceFactoryImpl"/>
+    <bean id="harvestServiceFactory" class="org.dspace.harvest.factory.HarvestServiceFactoryImpl"/>
+    <bean id="identifierServiceFactory" class="org.dspace.identifier.factory.IdentifierServiceFactoryImpl"/>
+
+    <bean id="licenseServiceFactory" class="org.dspace.license.factory.LicenseServiceFactoryImpl"/>
+    <bean id="statisticsServiceFactory" class="org.dspace.statistics.factory.StatisticsServiceFactoryImpl"/>
+    <bean id="storageServiceFactory" class="org.dspace.storage.bitstore.factory.StorageServiceFactoryImpl"/>
+
+    <bean id="versionServiceFactory" class="org.dspace.versioning.factory.VersionServiceFactoryImpl"/>
+
+    <!--Basic workflow services, comment or remove when switching to the configurable workflow -->
+    <bean id="workflowServiceFactory" class="org.dspace.workflowbasic.factory.BasicWorkflowServiceFactoryImpl"/>
+    <!--Configurable workflow services, uncomment to enable-->
+    <!--<bean id="workflowServiceFactory" class="org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactoryImpl"/>-->
+
+
+
+</beans>

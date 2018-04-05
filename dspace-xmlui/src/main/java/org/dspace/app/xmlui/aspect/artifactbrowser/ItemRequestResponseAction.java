@@ -18,23 +18,29 @@ import org.apache.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.handle.HandleManager;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
-import org.dspace.utils.DSpace;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.storage.bitstore.factory.StorageServiceFactory;
+import org.dspace.storage.bitstore.service.BitstreamStorageService;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -47,6 +53,11 @@ import java.util.Map;
  */
 public class ItemRequestResponseAction extends AbstractAction
 {
+    protected RequestItemService requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected BitstreamStorageService bitstreamStorageService = StorageServiceFactory.getInstance().getBitstreamStorageService();
+
 	/** log4j log */
     private static Logger log = Logger.getLogger(ItemRequestResponseAction.class);
 
@@ -58,20 +69,18 @@ public class ItemRequestResponseAction extends AbstractAction
         String token = parameters.getParameter("token","");
         String decision = request.getParameter("decision");
         String isSent = request.getParameter("isSent");
-        String message = request.getParameter("message");
-
         //contactPerson:requester or contactPerson:author
         String contactPerson = request.getParameter("contactPerson");
 
         Context context = ContextUtil.obtainContext(objectModel);
         request.setAttribute("token", token);
 
-        RequestItem requestItem = RequestItem.findByToken(context, token);
+        RequestItem requestItem = requestItemService.findByToken(context, token);
         String title;
-        Item item = Item.find(context, requestItem.getItemID());
-        Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-        if (titleDC != null || titleDC.length > 0) 
-        	title=titleDC[0].value; 
+        Item item = requestItem.getItem();
+        String titleDC = item.getName();
+        if (titleDC != null && titleDC.length() > 0)
+        	title=titleDC;
         else
         	title="untitled";
         
@@ -153,8 +162,7 @@ public class ItemRequestResponseAction extends AbstractAction
     	String mail = request.getParameter("email");
 
     	if(StringUtils.isNotEmpty(name)&&StringUtils.isNotEmpty(mail)){
-            RequestItemAuthor requestItemAuthor = new DSpace()
-                    .getServiceManager()
+            RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()
                     .getServiceByName(RequestItemAuthorExtractor.class.getName(),
                             RequestItemAuthorExtractor.class)
                     .getRequestItemAuthor(context, item);
@@ -162,8 +170,8 @@ public class ItemRequestResponseAction extends AbstractAction
 	    	Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.admin"));
 	        email.addRecipient(requestItemAuthor.getEmail());
 	        
-	        email.addArgument(Bitstream.find(context,requestItem.getBitstreamId()).getName());
-	        email.addArgument(HandleManager.getCanonicalForm(item.getHandle()));
+	        email.addArgument(requestItem.getBitstream().getName());
+	        email.addArgument(handleService.getCanonicalForm(item.getHandle()));
 	        email.addArgument(requestItem.getToken());
 	        email.addArgument(name);    
 	        email.addArgument(mail);   
@@ -185,25 +193,25 @@ public class ItemRequestResponseAction extends AbstractAction
         email.addArgument(message);
        
         if (requestItem.isAllfiles()){
-            Bundle[] bundles = item.getBundles("ORIGINAL");
-            for (int i = 0; i < bundles.length; i++){
-                Bitstream[] bitstreams = bundles[i].getBitstreams();
-                for (int k = 0; k < bitstreams.length; k++){
-                    if (!bitstreams[k].getFormat().isInternal() /*&& RequestItemManager.isRestricted(context, bitstreams[k])*/){
-                        email.addAttachment(BitstreamStorageManager.retrieve(context, bitstreams[k].getID()), bitstreams[k].getName(), bitstreams[k].getFormat().getMIMEType());
+            List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+            for (Bundle bundle : bundles) {
+                List<Bitstream> bitstreams = bundle.getBitstreams();
+                for (Bitstream bitstream : bitstreams) {
+                    if (!bitstream.getFormat(context).isInternal() /*&& RequestItemManager.isRestricted(context, bitstreams[k])*/) {
+                        email.addAttachment(bitstreamStorageService.retrieve(context, bitstream), bitstream.getName(), bitstream.getFormat(context).getMIMEType());
                     }
                 }
             }
         } else {
-            Bitstream bit = Bitstream.find(context,requestItem.getBitstreamId());
-            email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getBitstreamId()), bit.getName(), bit.getFormat().getMIMEType());
+            Bitstream bit = requestItem.getBitstream();
+            email.addAttachment(bitstreamStorageService.retrieve(context, requestItem.getBitstream()), bit.getName(), bit.getFormat(context).getMIMEType());
         }     
         
         email.send();
 
         requestItem.setDecision_date(new Date());
         requestItem.setAccept_request(true);
-        requestItem.update(context);
+        requestItemService.update(context, requestItem);
 	}
 
 	private void processDeny(Context context,Request request, RequestItem requestItem,Item item,String title) throws SQLException, IOException, MessagingException {
@@ -219,7 +227,7 @@ public class ItemRequestResponseAction extends AbstractAction
         
         requestItem.setDecision_date(new Date());
         requestItem.setAccept_request(false);
-        requestItem.update(context);
+        requestItemService.update(context, requestItem);
 	}
 
     /**

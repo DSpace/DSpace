@@ -7,17 +7,12 @@
  */
 package org.dspace.xoai.filter;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
-import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
-import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
 
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterValue;
@@ -34,7 +29,7 @@ import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
 public class DSpaceMetadataExistsFilter extends DSpaceFilter {
-    private static Logger log = LogManager
+    private static final Logger log = LogManager
             .getLogger(DSpaceMetadataExistsFilter.class);
 
     private List<String> fields;
@@ -55,31 +50,6 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter {
 
         }
         return fields;
-    }
-
-    @Override
-    public DatabaseFilterResult buildDatabaseQuery(Context context) {
-        try {
-            List<String> fields = this.getFields();
-            StringBuilder where = new StringBuilder();
-            List<Object> args = new ArrayList<Object>(fields.size());
-            where.append("(");
-            for (int i = 0; i < fields.size(); i++) {
-                where.append("EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM+ " AND tmp.metadata_field_id=?)");
-                args.add(fieldResolver.getFieldID(context, fields.get(i)));
-
-                if (i < fields.size() - 1)
-                    where.append(" OR ");
-            }
-            where.append(")");
-
-            return new DatabaseFilterResult(where.toString(), args);
-        } catch (InvalidMetadataFieldException e) {
-            log.error(e.getMessage(), e);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
-        return new DatabaseFilterResult();
     }
 
     @Override

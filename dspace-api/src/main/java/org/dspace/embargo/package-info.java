@@ -14,7 +14,7 @@
  * <p>
  * Embargo policy is applied through a pair of pluggable classes:  an
  * {@link org.dspace.embargo.EmbargoSetter} and an
- * {@link org.dspace.embargo.EmbargoLifter}.  The {@link org.dspace.embargo.EmbargoManager}
+ * {@link org.dspace.embargo.EmbargoLifter}.  The {@link org.dspace.embargo.EmbargoServiceImpl}
  * must be configured to specify these classes, as well as names of two metadata
  * fields for use by the embargo facility:  an embargo lift date (when the
  * content will be released) and the embargo terms (which the EmbargoSetter will

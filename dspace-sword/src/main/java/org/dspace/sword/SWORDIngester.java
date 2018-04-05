@@ -16,19 +16,21 @@ import org.purl.sword.base.SWORDErrorException;
  * Interface behind which can be implemented ingest mechanisms
  * for SWORD deposit requests.  Instances of this class should
  * be obtained via the SWORDIngesterFactory class.
- * 
+ *
  * @author Richard Jones
  *
  */
 public interface SWORDIngester
 {
-	/**
-	 * Ingest the package as described in the given Deposit object
-	 * within the given DSpace Context
-	 * 
-	 * @param deposit
-	 * @return	the result of the deposit
-	 * @throws DSpaceSWORDException
-	 */
-	DepositResult ingest(SWORDService service, Deposit deposit, DSpaceObject target) throws DSpaceSWORDException, SWORDErrorException;
+    /**
+     * Ingest the package as described in the given Deposit object
+     * within the given DSpace Context
+     *
+     * @param deposit
+     * @return the result of the deposit
+     * @throws DSpaceSWORDException
+     */
+    DepositResult ingest(SWORDService service, Deposit deposit,
+            DSpaceObject target)
+            throws DSpaceSWORDException, SWORDErrorException;
 }

@@ -22,11 +22,11 @@ package org.dspace.core;
  * configuration file.
  * <p>
  * See the documentation in the
- * <code>PluginManager</code> class for more details.
+ * <code>PluginService</code> class for more details.
  *
  * @author Larry Stone
  * @version $Revision$
- * @see PluginManager
+ * @see org.dspace.core.service.PluginService
  */
 public abstract class SelfNamedPlugin
 {
@@ -58,7 +58,7 @@ public abstract class SelfNamedPlugin
      * Get an instance's particular name.
      * Returns the name by which the class was chosen when
      * this instance was created.  Only works for instances created
-     * by <code>PluginManager</code>, or if someone remembers to call <code>setPluginName.</code>
+     * by <code>PluginService</code>, or if someone remembers to call <code>setPluginName.</code>
      * <p>
      * Useful when the implementation class wants to be configured differently
      * when it is invoked under different names.
@@ -73,7 +73,7 @@ public abstract class SelfNamedPlugin
     /**
      * Set the name under which this plugin was instantiated.
      * Not to be invoked by application code, it is
-     * called automatically by <code>PluginManager.getNamedPlugin()</code>
+     * called automatically by <code>PluginService.getNamedPlugin()</code>
      * when the plugin is instantiated.
      *
      * @param name -- name used to select this class.

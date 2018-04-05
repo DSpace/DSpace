@@ -24,7 +24,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * This class represents data, by data we mean the translated and untranslated
  * characters in between XML elements.
  * 
- * When data needs to be translated it is enclosed inside the cocoon i18n schema
+ * <p>When data needs to be translated it is enclosed inside the cocoon i18n schema
  * while untranslated data is enclosed inside nothing.
  * 
  * @author Scott Phillips
@@ -38,7 +38,7 @@ public class Data extends AbstractWingElement
     /** The name of the translate element */
     public static final String E_TRANSLATE = "translate";
 
-    /** The name of the param element */
+    /** The name of the {@code param} element */
     public static final String E_PARAM = "param";
 
     /** The name of the catalogue attribute (used inside text or i18n message) */
@@ -71,7 +71,7 @@ public class Data extends AbstractWingElement
      *            where to route SAX events and what i18n catalogue to use.
      * @param message
      *            (Required) translatable data
-     * @throws WingException
+     * @throws WingException passed through.
      */
     protected Data(WingContext context, Message message)
             throws WingException
@@ -89,7 +89,7 @@ public class Data extends AbstractWingElement
      *            where to route SAX events and what i18n catalogue to use.
      * @param characters
      *            (Required) Untranslated character data.
-     * @throws WingException
+     * @throws WingException passed through.
      */
     protected Data(WingContext context, String characters) throws WingException
     {
@@ -110,7 +110,9 @@ public class Data extends AbstractWingElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
             NamespaceSupport namespaces)throws SAXException
     {

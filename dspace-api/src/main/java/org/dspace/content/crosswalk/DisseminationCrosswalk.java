@@ -7,14 +7,15 @@
  */
 package org.dspace.content.crosswalk;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.jdom.Element;
-import org.jdom.Namespace;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  * Dissemination Crosswalk plugin -- translate DSpace native
@@ -90,6 +91,7 @@ public interface DisseminationCrosswalk
      * When there are no results, an
      * empty list is returned, but never <code>null</code>.
      *
+     * @param context context
      * @param dso the  DSpace Object whose metadata to export.
      * @return results of crosswalk as list of XML elements.
      *
@@ -99,7 +101,7 @@ public interface DisseminationCrosswalk
      * @throws SQLException  Database failure in services this calls
      * @throws AuthorizeException current user not authorized for this operation.
      */
-    public List<Element> disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
                AuthorizeException;
 
@@ -107,11 +109,9 @@ public interface DisseminationCrosswalk
      * Execute crosswalk, returning one XML root element as
      * a JDOM <code>Element</code> object.
      * This is typically the root element of a document.
-     * Note that, if the implementing class is of type "{@link org.dspace.content.crosswalk.ContextAwareDisseminationCrosswalk}"
-     * and a context is present in the method call, you should set the context before calling this method. -> "{@link org.dspace.content.crosswalk.ContextAwareDisseminationCrosswalk#setContext(org.dspace.core.Context)}"
-     * The implementing class should then use the  "{@link ContextAwareDisseminationCrosswalk#getContext()}" and  "{@link ContextAwareDisseminationCrosswalk#handleContextCleanup()}" to retrieve and commit/complete the context respectively
      * <p>
      *
+     * @param context context
      * @param dso the  DSpace Object whose metadata to export.
      * @return root Element of the target metadata, never <code>null</code>
      *
@@ -121,7 +121,7 @@ public interface DisseminationCrosswalk
      * @throws SQLException  Database failure in services this calls
      * @throws AuthorizeException current user not authorized for this operation.
      */
-    public Element disseminateElement(DSpaceObject dso)
+    public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
                AuthorizeException;
 }

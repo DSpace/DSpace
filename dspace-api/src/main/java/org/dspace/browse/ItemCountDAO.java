@@ -7,8 +7,6 @@
  */
 package org.dspace.browse;
 
-import org.dspace.content.Community;
-import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.content.DSpaceObject;
 
@@ -24,46 +22,19 @@ public interface ItemCountDAO
 	/**
 	 * Set the DSpace Context to use during data access
 	 * 
-	 * @param context
-	 * @throws ItemCountException
+	 * @param context DSpace Context
+	 * @throws ItemCountException if count error
 	 */
 	public void setContext(Context context) throws ItemCountException;
-	
-	/**
-	 * Set the given count as the number of items in the given community
-	 * 
-	 * @param community
-	 * @param count
-	 * @throws ItemCountException
-	 */
-	public void communityCount(Community community, int count) throws ItemCountException;
-	
-	/**
-	 * Set the given count as the number of items in the given collection
-	 * 
-	 * @param collection
-	 * @param count
-	 * @throws ItemCountException
-	 */
-	public void collectionCount(Collection collection, int count) throws ItemCountException;
 	
 	/**
 	 * Get the number of items in the given DSpaceObject container.  This method will
 	 * only succeed if the DSpaceObject is an instance of either a Community or a
 	 * Collection.  Otherwise it will throw an exception.
 	 * 
-	 * @param dso
-	 * @throws ItemCountException
+	 * @param dso Dspace Object
+         * @return count
+	 * @throws ItemCountException if count error
 	 */
 	public int getCount(DSpaceObject dso) throws ItemCountException;
-	
-	/**
-	 * Remove any cached data regarding the given DSpaceObject container.  This method will
-	 * only succeed if the DSpaceObject is an instance of either a Community or a
-	 * Collection.  Otherwise it will throw an exception
-	 * 
-	 * @param dso
-	 * @throws ItemCountException
-	 */
-	public void remove(DSpaceObject dso) throws ItemCountException;
 }

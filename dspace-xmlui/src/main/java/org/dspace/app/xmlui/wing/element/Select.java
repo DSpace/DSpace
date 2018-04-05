@@ -37,6 +37,7 @@ public class Select extends Field
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Select(WingContext context, String name, String rend)
             throws WingException
@@ -90,6 +91,7 @@ public class Select extends Field
      * Enable the add operation for this field. When this is enabled the
      * front end will add a button to add more items to the field.
      * 
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void enableAddOperation() throws WingException
     {
@@ -101,6 +103,7 @@ public class Select extends Field
      * the front end will provide a way for the user to select fields (probably
      * checkboxes) along with a submit button to delete the selected fields.
      * 
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void enableDeleteOperation()throws WingException
     {
@@ -114,6 +117,8 @@ public class Select extends Field
      * @param returnValue
      *            (Required) The value to be passed back if this option is
      *            selected.
+     * @return the new option.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Option addOption(String returnValue)
             throws WingException
@@ -132,6 +137,8 @@ public class Select extends Field
      * @param returnValue
      *            (Required) The value to be passed back if this option is
      *            selected.
+     * @return the new option.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Option addOption(boolean selected, String returnValue)
             throws WingException
@@ -151,6 +158,7 @@ public class Select extends Field
      *            selected.
      * @param characters
      *            (Required) The text to set as the visible option.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addOption(String returnValue, String characters) throws WingException
     {
@@ -168,6 +176,7 @@ public class Select extends Field
      *            selected.
      * @param characters
      *            (Required) The text to set as the visible option.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addOption(boolean selected,String returnValue, String characters) throws WingException
     {
@@ -186,6 +195,7 @@ public class Select extends Field
      *            selected.
      * @param characters
      *            (Required) The text to set as the visible option.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addOption(int returnValue, String characters) throws WingException
     {
@@ -203,6 +213,7 @@ public class Select extends Field
      *            selected.
      * @param characters
      *            (Required) The text to set as the visible option.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addOption(boolean selected, int returnValue, String characters) throws WingException
     {
@@ -220,7 +231,8 @@ public class Select extends Field
      *            (Required) The value to be passed back if this option is
      *            selected.
      * @param message
-     *            (Required) The transalted text to set as the visible option.
+     *            (Required) The translated text to set as the visible option.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addOption(String returnValue, Message message) throws WingException
     {
@@ -237,7 +249,8 @@ public class Select extends Field
      *            (Required) The value to be passed back if this option is
      *            selected.
      * @param message
-     *            (Required) The transalted text to set as the visible option.
+     *            (Required) The translated text to set as the visible option.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addOption(boolean selected, String returnValue, Message message) throws WingException
     {
@@ -255,7 +268,8 @@ public class Select extends Field
      *            (Required) The value to be passed back if this option is
      *            selected.
      * @param message
-     *            (Required) The transalted text to set as the visible option.
+     *            (Required) The translated text to set as the visible option.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addOption(int returnValue, Message message) throws WingException
     {
@@ -272,7 +286,8 @@ public class Select extends Field
      *            (Required) The value to be passed back if this option is
      *            selected.
      * @param message
-     *            (Required) The transalted text to set as the visible option.
+     *            (Required) The translated text to set as the visible option.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addOption(boolean selected, int returnValue, Message message) throws WingException
     {
@@ -288,6 +303,7 @@ public class Select extends Field
      * 
      * @param returnValue
      *            (Required) The return value of the option to be selected.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setOptionSelected(String returnValue) throws WingException
     {
@@ -300,6 +316,7 @@ public class Select extends Field
      * 
      * @param returnValue
      *            (Required) The return value of the option to be selected.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setOptionSelected(int returnValue) throws WingException
     {
@@ -310,6 +327,7 @@ public class Select extends Field
     /**
      * Add a field instance
      * @return instance
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Instance addInstance() throws WingException
     {

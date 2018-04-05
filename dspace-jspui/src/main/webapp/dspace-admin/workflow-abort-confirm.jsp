@@ -20,13 +20,16 @@
     prefix="fmt" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.WorkflowAbortServlet" %>
-<%@ page import="org.dspace.workflow.WorkflowItem" %>
-<%@ page import="org.dspace.workflow.WorkflowManager" %>
+<%@ page import="org.dspace.workflowbasic.BasicWorkflowItem" %>
+<%@ page import="org.dspace.workflowbasic.BasicWorkflowServiceImpl" %>
+<%@ page import="org.dspace.workflowbasic.service.BasicWorkflowService" %>
+<%@ page import="org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    WorkflowItem workflow = (WorkflowItem) request.getAttribute("workflow");
+    BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
+    BasicWorkflowItem workflow = (BasicWorkflowItem) request.getAttribute("workflow");
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
@@ -47,19 +50,19 @@
     	<div class="row">
         <%-- <li>Collection: <%= workflow.getCollection().getMetadata("name") %></li> --%>
         <span class="col-md-4"><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.collection">
-            <fmt:param><%= workflow.getCollection().getMetadata("name") %></fmt:param>
+            <fmt:param><%= workflow.getCollection().getName() %></fmt:param>
         </fmt:message></span>
         </div>
         <div class="row">
         <%-- <li>Submitter: <%= WorkflowManager.getSubmitterName(workflow) %></li> --%>
         <span class="col-md-4"><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.submitter">
-            <fmt:param><%= WorkflowManager.getSubmitterName(workflow) %></fmt:param>
+            <fmt:param><%= basicWorkflowService.getSubmitterName(workflow) %></fmt:param>
         </fmt:message></span>
         </div>
         <div class="row">
         <%-- <li>Title: <%= WorkflowManager.getItemTitle(workflow) %></li> --%>
         <span class="col-md-4"><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.item-title">
-            <fmt:param><%= WorkflowManager.getItemTitle(workflow) %></fmt:param>
+            <fmt:param><%= basicWorkflowService.getItemTitle(workflow) %></fmt:param>
         </fmt:message></span>
     	</div>
     <form method="post" action="">

@@ -11,12 +11,16 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.*;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
-import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +38,9 @@ import java.util.Arrays;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public class AssignOriginalSubmitterAction extends UserSelectionAction{
+
+    @Autowired(required = true)
+    protected WorkflowRequirementsService workflowRequirementsService;
 
     @Override
     public boolean isFinished(XmlWorkflowItem wfi) {
@@ -63,14 +70,15 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction{
     @Override
     public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws IOException, SQLException {
         try{
-            XmlWorkflowManager.alertUsersOnTaskActivation(c, wfi, "submit_task", Arrays.asList(wfi.getSubmitter()),
+            XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+            xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", Arrays.asList(wfi.getSubmitter()),
                     //The arguments
                     wfi.getItem().getName(),
                     wfi.getCollection().getName(),
                     wfi.getSubmitter().getFullName(),
                     //TODO: message
                     "New task available.",
-                    XmlWorkflowManager.getMyDSpaceLink()
+                    xmlWorkflowService.getMyDSpaceLink()
             );
         } catch (MessagingException e) {
             log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task", "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
@@ -81,11 +89,16 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction{
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException, WorkflowException {
         EPerson submitter = wfi.getSubmitter();
-        Step currentStep = getParent().getStep();
         WorkflowActionConfig nextAction = getParent().getStep().getNextAction(this.getParent());
         //Retrieve the action which has a user interface
         while(nextAction != null && !nextAction.requiresUI()){
             nextAction = nextAction.getStep().getNextAction(nextAction);
+        }
+        if(nextAction == null)
+        {
+            //Should never occur, but just in case
+            log.error("Could not find next action for step with id: " + step.getId() + " to assign a submitter to. Aborting the action.");
+            throw new IllegalStateException();
         }
 
         createTaskForEPerson(c, wfi, step, nextAction, submitter);
@@ -105,10 +118,10 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction{
      * @throws AuthorizeException ...
      * @throws IOException ...
      */
-    private void createTaskForEPerson(Context c, XmlWorkflowItem wfi, Step step, WorkflowActionConfig actionConfig, EPerson user) throws SQLException, AuthorizeException, IOException {
-        if(ClaimedTask.find(c, wfi.getID(), step.getId(), actionConfig.getId()) != null){
-            WorkflowRequirementsManager.addClaimedUser(c, wfi, step, c.getCurrentUser());
-            XmlWorkflowManager.createOwnedTask(c, wfi, step, actionConfig,user);
+    protected void createTaskForEPerson(Context c, XmlWorkflowItem wfi, Step step, WorkflowActionConfig actionConfig, EPerson user) throws SQLException, AuthorizeException, IOException {
+        if(claimedTaskService.find(c, wfi, step.getId(), actionConfig.getId()) != null){
+            workflowRequirementsService.addClaimedUser(c, wfi, step, c.getCurrentUser());
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().createOwnedTask(c, wfi, step, actionConfig, user);
         }
     }
 

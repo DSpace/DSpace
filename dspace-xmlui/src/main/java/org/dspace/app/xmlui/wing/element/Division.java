@@ -7,18 +7,6 @@
  */
 package org.dspace.app.xmlui.wing.element;
 
-/**
- * Class representing a Division, or the div element, in the XML UI schema.
- * 
- * The div element represents a major section of content and can contain a wide
- * variety of other elements to present that content to the user. It can contain
- * TEI style paragraphs, tables, and lists, as well as references to artifact
- * information stored in artifactMeta. The div element is also recursive,
- * allowing it to be further divided into other divs.
- * 
- * @author Scott Phillips
- */
-
 import java.util.ArrayList;
 
 import org.dspace.app.xmlui.wing.AttributeMap;
@@ -32,6 +20,17 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 
+/**
+ * Class representing a Division, or the div element, in the XML UI schema.
+ *
+ * <p>The {@code div} element represents a major section of content and can contain a wide
+ * variety of other elements to present that content to the user. It can contain
+ * TEI style paragraphs, tables, and lists, as well as references to artifact
+ * information stored in artifactMeta. The {@code div} element is also recursive,
+ * allowing it to be further divided into other {@code div}s.
+ *
+ * @author Scott Phillips
+ */
 public class Division extends AbstractWingElement implements StructuralElement, WingMergeableElement
 {
     /** The name of the division element */
@@ -83,7 +82,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     private boolean merged = false;
     
     /** The name assigned to this div */
-    private String name;
+    private final String name;
 
     /** Is this division interactive if so then action & method must be defined */
     private boolean interactive;
@@ -96,12 +95,12 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
     /** Does this interactive division support the AJAX behavior? */
     private boolean behaviorAJAXenabled = false;
-    
+
     /** A list of fields which need to be handled specially when using behavior */
     private String behaviorSensitiveFields;
     
     /** Special rendering instructions */
-    private String rend;
+    private final String rend;
 
     /** The head, or label of this division */
     private Head head;
@@ -165,7 +164,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     public static final String[] METHODS = { METHOD_GET, METHOD_POST,
             METHOD_MULTIPART };
 
-    /** The possible pagination types: simple & masked */
+    /** The possible pagination types: simple and masked */
     public static final String PAGINATION_SIMPLE = "simple";
 
     public static final String PAGINATION_MASKED = "masked";
@@ -175,7 +174,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
             PAGINATION_MASKED };
 
     /** All content of this container, items & lists */
-    private java.util.List<AbstractWingElement> contents = new ArrayList<AbstractWingElement>();
+    private java.util.List<AbstractWingElement> contents = new ArrayList<>();
 
     /**
      * Construct a non-interactive division.
@@ -190,6 +189,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Division(WingContext context, String name, String rend)
             throws WingException
@@ -226,6 +226,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Division(WingContext context, String name, String action,
             String method, String rend) throws WingException
@@ -263,6 +264,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * 
      * @param fieldName
      *            (Required) The name of a single field (with no spaces).
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addBehaviorSensitiveField(String fieldName) throws WingException
     {
@@ -341,12 +343,13 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
     /**
      * Set the head element which is the label associated with this division.
+     * @return the new Head.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Head setHead() throws WingException
     {
         this.head = new Head(context, null);
         return head;
-
     }
 
     /**
@@ -354,12 +357,12 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * 
      * @param characters
      *            (May be null) Unprocessed characters to be included
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setHead(String characters) throws WingException
     {
-        Head head = this.setHead();
-        head.addContent(characters);
-
+        Head theHead = this.setHead();
+        theHead.addContent(characters);
     }
 
     /**
@@ -368,11 +371,12 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setHead(Message message) throws WingException
     {
-        Head head = this.setHead();
-        head.addContent(message);
+        Head theHead = this.setHead();
+        theHead.addContent(message);
     }
 
     /**
@@ -385,6 +389,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return A new sub Division
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Division addDivision(String name, String rend) throws WingException
     {
@@ -401,6 +406,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            (Required) a local identifier used to differentiate the
      *            element from its siblings.
      * @return A new sub division
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Division addDivision(String name) throws WingException
     {
@@ -428,6 +434,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return A new interactive sub division
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Division addInteractiveDivision(String name, String action,
             String method, String rend) throws WingException
@@ -456,6 +463,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            method should be used if there are any file fields used within
      *            the division.
      * @return A new interactive sub division
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Division addInteractiveDivision(String name, String action,
             String method) throws WingException
@@ -473,6 +481,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * @return A new paragraph.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Para addPara(String name, String rend) throws WingException
     {
@@ -485,6 +494,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * Append an unnamed paragraph to the division
      * 
      * @return A new unnamed paragraph.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Para addPara() throws WingException
     {
@@ -497,6 +507,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * @param characters
      *            (May be null) Untranslated character data to be included as
      *            the contents of this para.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addPara(String characters) throws WingException
     {
@@ -510,6 +521,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * @param message
      *            (Required) Key to the i18n catalogue to translate the content
      *            into the language preferred by the user.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through
      */
     public void addPara(Message message) throws WingException
     {
@@ -529,12 +541,13 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            type of list. In the absence of this attribute, the type of a
      *            list will be inferred from the presence and content of labels
      *            on its items. Accepted values are found at
-     *            org.dspace.app.xmlui.xmltool.List.TYPES
+     *            {@link org.dspace.app.xmlui.wing.element.List#TYPES}
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
      * 
      * @return A new List
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public List addList(String name, String type, String rend)
             throws WingException
@@ -556,9 +569,10 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            type of list. In the absence of this attribute, the type of a
      *            list will be inferred from the presence and content of labels
      *            on its items. Accepted values are found at
-     *            org.dspace.app.xmlui.xmltool.List.TYPES
-     * 
+     *            {@link org.dspace.app.xmlui.wing.element.List#TYPES}
+     *
      * @return A new List
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public List addList(String name, String type) throws WingException
     {
@@ -573,6 +587,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            (Required) a local identifier used to differentiate the
      *            element from its siblings.
      * @return A new List
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public List addList(String name) throws WingException
     {
@@ -597,6 +612,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            display of the element.
      * 
      * @return A new table.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Table addTable(String name, int rows, int cols, String rend)
             throws WingException
@@ -621,6 +637,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            (Required) The number of columns in the table.
      * 
      * @return A new table.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Table addTable(String name, int rows, int cols) throws WingException
     {
@@ -640,6 +657,8 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @return a new ReferenceSet.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public ReferenceSet addReferenceSet(String name, String type, String orderBy,
             String rend) throws WingException
@@ -657,6 +676,8 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            element from its siblings.
      * @param type
      *            (Required) The include type, see IncludeSet.TYPES
+     * @return a new ReferenceSet.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public ReferenceSet addReferenceSet(String name, String type)
             throws WingException
@@ -673,6 +694,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * @param name 
      *              (Required) The hidden fields name.
      * @return A new hidden field.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Hidden addHidden(String name) throws WingException
     {
@@ -683,19 +705,20 @@ public class Division extends AbstractWingElement implements StructuralElement, 
         
         return hiddenFieldsPara.addHidden(name);
     }
-    
-    
+
     /**
      * Add a section of translated HTML to the DRI document. This will only handle 
-     * simple transformations such as <p>, <b>, <i> and <a> tags.
-     * 
-     * Depending on the given HTML this may result in multiple paragraphs being 
+     * simple transformations such as {@literal <p>}, {@literal <b>},
+     * {@literal <i>} and {@literal <a>} tags.
+     *
+     * <p>Depending on the given HTML this may result in multiple paragraphs being
      * opened and several bold tags being included.
      * 
      * @param blankLines
      * 				(Required) Treat blank lines as paragraphs delimiters.
      * @param HTML 
      * 				(Required) The HTML content
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addSimpleHTMLFragment(boolean blankLines, String HTML) throws WingException
     {
@@ -716,6 +739,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            The element's attributes
      * @return True if this WingElement is equivalent to the given SAX Event.
      */
+    @Override
     public boolean mergeEqual(String namespace, String localName, String qName,
             Attributes attributes) throws SAXException, WingException
     {
@@ -732,18 +756,23 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
         context.getLogger().debug("Merging a division");
         
-        String name = attributes.getValue(A_NAME);
-        String interactive = attributes.getValue(A_INTERACTIVE);
-        String action = attributes.getValue(A_ACTION);
-        String method = attributes.getValue(A_METHOD);
+        String aName = attributes.getValue(A_NAME);
+        String isInteractive = attributes.getValue(A_INTERACTIVE);
+        String anAction = attributes.getValue(A_ACTION);
+        String aMethod = attributes.getValue(A_METHOD);
         String render = attributes.getValue(A_RENDER);
         String pagination = attributes.getValue(A_PAGINATION);
         String behavior = attributes.getValue(A_BEHAVIOR);
 
-        context.getLogger().debug("Merging got parameters name="+name+", interactive="+interactive+", action="+action+", method="+method+", render="+render+", pagination="+pagination);
-        
+        context.getLogger().debug("Merging got parameters name=" + aName
+                + ", interactive=" + isInteractive
+                + ", action=" + anAction
+                + ", method=" + aMethod
+                + ", render=" + render
+                + ", pagination=" + pagination);
+
         // The name must be identical (but id's can differ)
-        if (!this.name.equals(name))
+        if (!this.name.equals(aName))
         {
             return false;
         }
@@ -764,15 +793,15 @@ public class Division extends AbstractWingElement implements StructuralElement, 
         if (this.interactive)
         {
             // Ensure all the interactive fields are identical.
-            if (!"yes".equals(interactive))
+            if (!"yes".equals(isInteractive))
             {
                 return false;
             }
-            if (!this.action.equals(action))
+            if (!this.action.equals(anAction))
             {
                 return false;
             }
-            if (!this.method.equals(method))
+            if (!this.method.equals(aMethod))
             {
                 return false;
             }
@@ -785,7 +814,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
             
         } else {
             // Else, ensure that it is also not interactive.
-            if (!(interactive == null || "no".equals(interactive)))
+            if (!(isInteractive == null || "no".equals(isInteractive)))
             {
                 return false;
             }
@@ -807,6 +836,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            The element's attributes
      * @return The child element
      */
+    @Override
     public WingMergeableElement mergeChild(String namespace, String localName,
             String qName, Attributes attributes) throws SAXException,
             WingException
@@ -833,6 +863,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * 
      * @return The attributes for this merged element
      */
+    @Override
     public Attributes merge(Attributes attributes) throws SAXException,
             WingException
     {
@@ -853,6 +884,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler, 
             NamespaceSupport namespaces) throws SAXException
     {
@@ -932,6 +964,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     /**
      * dispose
      */
+    @Override
     public void dispose()
     {
 

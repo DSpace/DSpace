@@ -16,14 +16,16 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
-
+import org.dspace.license.factory.LicenseServiceFactory;
+import org.dspace.license.service.CreativeCommonsService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jaxen.JaxenException;
 import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Attribute;
@@ -31,9 +33,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-
-import org.dspace.core.ConfigurationManager;
 
 
 /**
@@ -46,9 +45,9 @@ public class CCLookup {
         /** log4j logger */
         private static Logger log = Logger.getLogger(CCLookup.class);
 
-	private static String cc_root = ConfigurationManager.getProperty("cc.api.rooturl");
-	private static String jurisdiction; 
-	private static List<String> lcFilter = new ArrayList<String>();
+	private String cc_root;
+	private String jurisdiction; 
+	private List<String> lcFilter = new ArrayList<String>();
 	
 	private Document license_doc        = null;
 	private String rdfString            = null;
@@ -59,24 +58,28 @@ public class CCLookup {
 	private List<CCLicense> licenses    = new ArrayList<CCLicense>();
 	private List<CCLicenseField> licenseFields = new ArrayList<CCLicenseField>();
 	
-	static {
-		String jurisProp = ConfigurationManager.getProperty("cc.license.jurisdiction");
-		jurisdiction = (jurisProp != null) ? jurisProp : "";
-		
-		String filterList = ConfigurationManager.getProperty("cc.license.classfilter");
-		if (filterList != null) {
-			for (String name: filterList.split(",")) {
-				lcFilter.add(name.trim());
-			}
-		}
-	}
-
+	protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+	
 	/**
 	 * Constructs a new instance with the default web services root.
 	 *
 	 */
 	public CCLookup() {
 		super();
+                
+                ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+                
+                cc_root = configurationService.getProperty("cc.api.rooturl");
+                
+                String jurisProp = configurationService.getProperty("cc.license.jurisdiction");
+		jurisdiction = (jurisProp != null) ? jurisProp : "";
+		
+		String[] filters = configurationService.getArrayProperty("cc.license.classfilter");
+		if (filters != null) {
+			for (String name: filters) {
+				lcFilter.add(name.trim());
+			}
+		}
 	}
 
 	/**
@@ -250,7 +253,7 @@ public class CCLookup {
 	 * 			containing the user-supplied answer.
 	 * @param lang The language to request localized elements in.
 	 *
-	 * @throws IOException
+	 * @throws IOException if IO error
 	 *
 	 * @see CCLicense
 	 * @see Map
@@ -259,7 +262,7 @@ public class CCLookup {
 		throws IOException{
 
 		// Determine the issue URL
-		String issueUrl = cc_root + "/license/" + licenseId + "/issue";
+		String issueUrl = this.cc_root + "/license/" + licenseId + "/issue";
 		// Assemble the "answers" document
 		String answer_doc = "<answers>\n<locale>" + lang + "</locale>\n" + "<license-" + licenseId + ">\n";
 		Iterator keys = answers.keySet().iterator();
@@ -319,7 +322,7 @@ public class CCLookup {
 	 *
 	 * Note: does not support localization in 1.5 -- not yet
 	 *
-	 * @throws IOException
+	 * @throws IOException if IO error
 	 *
 	 * @see CCLicense
 	 * @see Map
@@ -331,14 +334,7 @@ public class CCLookup {
                  // Example: http://api.creativecommons.org/rest/1.5/details?
                 //  license-uri=http://creativecommons.org/licenses/by-nc-sa/3.0/
 		String issueUrl = cc_root + "/details?license-uri=" + licenseURI;
-		// todo : modify for post as in the above issue
-		String post_data;
-		try {
-			post_data = URLEncoder.encode("license-uri", "UTF-8") + "=" + URLEncoder.encode(licenseURI, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			return;
-		}
-                //end todo
+
 		URL request_url;
 		try {
 			request_url = new URL(issueUrl);
@@ -413,7 +409,7 @@ public class CCLookup {
 		throws IOException {
 		String result = ""; 
 		try {
-			result = CreativeCommons.fetchLicenseRDF(license_doc);
+			result = creativeCommonsService.fetchLicenseRDF(license_doc);
 		} catch (Exception e) {
 			log.warn("An error occurred getting the rdf . . ." + e.getMessage() );
 			setSuccess(false);
@@ -423,7 +419,7 @@ public class CCLookup {
 
 	public boolean isSuccess() {
 		setSuccess(false);
-		JDOMXPath xp_Success = null;
+		JDOMXPath xp_Success;
 		String text = null;
 		try {
 			xp_Success = new JDOMXPath("//message");

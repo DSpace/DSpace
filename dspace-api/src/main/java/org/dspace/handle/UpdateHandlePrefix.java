@@ -7,14 +7,21 @@
  */
 package org.dspace.handle;
 
+import org.apache.log4j.Logger;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataValueService;
+import org.dspace.core.Context;
+import org.dspace.discovery.IndexClient;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import org.apache.log4j.Logger;
-import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.discovery.IndexClient;
+import java.util.Iterator;
 
 /**
  * A script to update the handle values in the database. This is typically used
@@ -28,6 +35,7 @@ public class UpdateHandlePrefix
 {
 
     private static final Logger log = Logger.getLogger(UpdateHandlePrefix.class);
+    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * When invoked as a command-line tool, updates handle prefix
@@ -46,17 +54,16 @@ public class UpdateHandlePrefix
         }
         else
         {
+            HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+  
             String oldH = args[0];
             String newH = args[1];
 
             // Get info about changes
             System.out.println("\nGetting information about handles from database...");
             Context context = new Context();
-            String sql = "SELECT count(*) as count " +
-                         "FROM handle " +
-                         "WHERE handle LIKE '" + oldH + "%'";
-            TableRow row = DatabaseManager.querySingle(context, sql, new Object[] {});
-            long count = row.getLongColumn("count");
+
+            long count = handleService.countHandlesByPrefix(context, oldH);
 
             if (count > 0)
             {
@@ -78,41 +85,36 @@ public class UpdateHandlePrefix
 
                 if (choiceString.equalsIgnoreCase("y"))
                 {
+                	context.turnOffAuthorisationSystem();
                     try {
                         log.info("Updating handle prefix from " + oldH + " to " + newH);
 
                         // Make the changes
                         System.out.print("\nUpdating handle table... ");
-                        sql = "UPDATE handle " +
-                              "SET handle = '" + newH + "' || '/' || handle_id " +
-                              "WHERE handle like '" + oldH + "/%'";
-                        int updHdl = DatabaseManager.updateQuery(context, sql, new Object[] {});
+                        int updHdl = handleService.updateHandlesWithNewPrefix(context, newH, oldH);
                         System.out.println(
                           updHdl + " item" + ((updHdl > 1) ? "s" : "") + " updated"
                         );
 
                         System.out.print("Updating metadatavalues table... ");
-                        sql = "UPDATE metadatavalue " +
-                              "SET text_value = " +
-                                "(" +
-                                  "SELECT 'http://hdl.handle.net/' || handle " +
-                                  "FROM handle " +
-                                  "WHERE handle.resource_id = metadatavalue.resource_id " +
-                                    "AND handle.resource_type_id = 2" +
-                                ") " +
-                              "WHERE text_value LIKE 'http://hdl.handle.net/" + oldH + "/%'" +
-                                "AND EXISTS " +
-                                  "(" +
-                                    "SELECT 1 " +
-                                    "FROM handle " + 
-                                    "WHERE handle.resource_id = metadatavalue.resource_id " +
-                                      "AND handle.resource_type_id = 2" +
-                                  ")";
-                        int updMeta = DatabaseManager.updateQuery(context, sql, new Object[] {});
+                        MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
+
+                        String handlePrefix = configurationService.getProperty("handle.canonical.prefix");
+                        Iterator<MetadataValue> metadataValues = metadataValueService.findByValueLike(context, handlePrefix + oldH);
+
+                        int updMeta = 0;
+                        while(metadataValues.hasNext()) {
+                            MetadataValue metadataValue = metadataValues.next();
+                            metadataValue.setValue(metadataValue.getValue().replace(handlePrefix + oldH, handlePrefix + newH));
+                            metadataValueService.update(context, metadataValue, true);
+                            context.uncacheEntity(metadataValue);
+                            updMeta++;
+                        }
+
                         System.out.println(
                           updMeta + " metadata value" + ((updMeta > 1) ? "s" : "") + " updated"
                         );
-
+                        
                         // Commit the changes
                         context.complete();
 
@@ -150,17 +152,13 @@ public class UpdateHandlePrefix
                         // Not a lot we can do
                         System.out.println("Error during re-indexing.");
                         System.out.println(
-                          "\n\nAutomatic re-indexing failed. Please perform it manually.\n" +
-                          "You should run one of the following commands:\n\n" +
+                          "\n\nAutomatic re-indexing failed. Please perform it manually.\n\n" +
                           "  [dspace]/bin/dspace index-discovery -b\n\n" +
-                          "If you are using Solr for browse (this is the default setting).\n" +
-                          "When launching this command, your servlet container must be running.\n\n" +
-                          "  [dspace]/bin/dspace index-lucene-init\n\n" +
-                          "If you enabled Lucene for search.\n" +
-                          "When launching this command, your servlet container must be shutdown.\n"
+                          "When launching this command, your servlet container must be running.\n"
                         );
                         throw e;
                     }
+                    context.restoreAuthSystemState();
                 }
                 else
                 {

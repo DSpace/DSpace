@@ -30,23 +30,48 @@
 <%@ page import="org.dspace.app.webui.util.CurateTaskResult" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="java.util.UUID" %>
+<%@ page import="org.dspace.content.service.CollectionService" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.core.Context" %>
 <%!
     private static final String TASK_QUEUE_NAME = ConfigurationManager.getProperty("curate", "ui.queuename");
 %>
 <%
+    Context context = UIUtil.obtainContext(request);
     Collection collection = (Collection) request.getAttribute("collection");
-    int collectionID = (collection != null ? collection.getID() : -1);
-    int communityID = (collection.getParentObject() != null ? collection.getParentObject().getID() : -1);
-    String title = (collection != null ? collection.getMetadata("name") : "Unknown Collection");
+    UUID collectionID = (collection != null ? collection.getID() : null);
+    CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    UUID communityID = (collectionService.getParentObject(context, collection) != null ? collectionService.getParentObject(context, collection).getID() : null);
+    String title = (collection != null ? collection.getName() : "Unknown Collection");
     String groupOptions = (String)request.getAttribute("curate_group_options");
     String taskOptions = (String)request.getAttribute("curate_task_options");
+    // Is the logged in user an admin or community admin or collection admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
+    
+    Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
+    boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
+    
+    Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
+    boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
+    
+    String naviAdmin = "admin";
+    String link = "/dspace-admin";
+    
+    if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+    {
+        naviAdmin = "community-or-collection-admin";
+        link = "/tools";
+    }
 %>
 
 <dspace:layout style="submission" titlekey="jsp.tools.curate.collection.title"
-               navbar="admin"
+               navbar="<%= naviAdmin %>"
                locbar="link"
                parenttitlekey="jsp.administer"
-               parentlink="/dspace-admin">
+               parentlink="<%= link %>">
 
 <%@ include file="/tools/curate-message.jsp" %>
 

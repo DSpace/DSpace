@@ -179,10 +179,10 @@ select.multiple {
 
 #ds-footer-logo {
     display: inline-block;
-    background: url('../../images/@mirelogo-small.png');
+    background: url('../../images/atmire-logo-small.svg');
     background-repeat: no-repeat;
-    width: 79px;
-    height: 40px;
+    width: 110px;
+    height: 30px;
 }
 
 #ds-footer-links {
@@ -1470,4 +1470,57 @@ table.discovery-filters th.new-filter-header
 
 #impact-plumx {
     float:right;
+}
+
+/* Restore standard styling of lists in class ds-ordered-list */
+
+ol.ds-ordered-list {
+    list-style-type: decimal;
+    margin: 1.12em 0;
+    margin-left: 40px;
+}
+
+ol.ds-ordered-list ol.ds-ordered-list {
+    list-style-type: lower-alpha;
+}
+
+ol.ds-ordered-list ol.ds-ordered-list ol.ds-ordered-list {
+    list-style-type: lower-roman;
+}
+.publication-records-modal, .publication-records-modal ul {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+.publication-records-import-btn {
+    margin: 5px 0px 15px 0px;
+}
+
+.imported {
+    background-color: #E2E2E2;
+}
+
+
+#aspect_submission_StepTransformer_div_StartSubmissionLookupStep #aspect_submission_StepTransformer_field_search {
+    width: 81%;
+    display: inline;
+}
+
+#aspect_submission_StepTransformer_div_StartSubmissionLookupStep #aspect_submission_StepTransformer_field_lookup {
+    width:19%
+}
+
+#aspect_submission_StepTransformer_div_StartSubmissionLookupStep .modal .modal-body {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+#aspect_submission_StepTransformer_div_StartSubmissionLookupStep #aspect_submission_StepTransformer_item_publication-title{
+    margin-bottom:5px;
+}
+
+.break-all{
+    -ms-word-break:   break-all;
+    word-break:       break-all;
+    word-wrap:        break-word;
 }

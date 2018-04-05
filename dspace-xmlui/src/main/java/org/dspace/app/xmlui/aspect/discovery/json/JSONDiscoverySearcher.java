@@ -22,8 +22,9 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.handle.HandleManager;
-import org.dspace.utils.DSpace;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -42,6 +43,7 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
 
     private static Logger log = Logger.getLogger(JSONDiscoverySearcher.class);
     private InputStream JSONStream;
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
 
     /** The Cocoon response */
@@ -49,11 +51,7 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
 
     protected SearchService getSearchService()
     {
-        DSpace dspace = new DSpace();
-
-        org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
-
-        return manager.getServiceByName(SearchService.class.getName(),SearchService.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
     }
 
 
@@ -160,7 +158,7 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
         else
         {
             // Get the search scope from the location parameter
-            dso = HandleManager.resolveToObject(context, scopeString);
+            dso = handleService.resolveToObject(context, scopeString);
         }
 
         return dso;

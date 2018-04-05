@@ -28,7 +28,7 @@ public class CrossLinks
 	/**
 	 * Construct a new object which will obtain the configuration for itself.
 	 * 
-	 * @throws BrowseException
+	 * @throws BrowseException if browse error
 	 */
 	public CrossLinks()
 		throws BrowseException
@@ -57,6 +57,7 @@ public class CrossLinks
 	 * Is there a link for the given canonical form of metadata (i.e. schema.element.qualifier)?
 	 * 
 	 * @param metadata	the metadata to check for a link on
+         * @return true/false
 	 */
 	public boolean hasLink(String metadata)
 	{
@@ -67,6 +68,7 @@ public class CrossLinks
 	 * Get the type of link that the bit of metadata has.
 	 * 
 	 * @param metadata	the metadata to get the link type for
+         * @return type
 	 */
 	public String getLinkType(String metadata)
 	{

@@ -18,6 +18,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.util.List"            %>
+<%@ page import="java.util.UUID"            %>
 <%@ page import="java.util.ArrayList"            %>
 <%@ page import="org.dspace.content.Collection"            %>
 
@@ -37,9 +38,9 @@
 		otherCollections = (List<String>)request.getAttribute("otherCollections");
 	}
 		
-	Integer owningCollectionID = null;
+	UUID owningCollectionID = null;
 	if (request.getAttribute("owningCollection")!=null){
-		owningCollectionID = (Integer)request.getAttribute("owningCollection");
+		owningCollectionID = (UUID)request.getAttribute("owningCollection");
 	}
 	
 	String selectedInputType = null;
@@ -132,7 +133,7 @@
 				<option value="-1"><fmt:message key="jsp.dspace-admin.batchmetadataimport.select"/></option>
  <% 
  		for (Collection collection : collections){
-				String selected = ((owningCollectionID != null) && (owningCollectionID == collection.getID())) ? "selected" : "";
+				String selected = ((owningCollectionID != null) && (owningCollectionID.equals(collection.getID()))) ? "selected" : "";
 %> 			
  				<option <%= selected %> value="<%= collection.getID() %>"><%= collection.getName() %></option>	
  <%
@@ -163,9 +164,15 @@
     <script>
 	    $( "#import-type" ).change(function() {
 	    	var index = $("#import-type").prop("selectedIndex");
-	    	if (index == 1){
-	    		$( "#input-file" ).hide();
-	    		$( "#input-url" ).show();
+	    	if (index <= 1){
+	    		if (index == 1) {
+	    			$( "#input-file" ).hide();
+	    			$( "#input-url" ).show();
+	    		}
+	    		else {
+		    		$( "#input-file" ).show();
+		    		$( "#input-url" ).hide();	    			
+	    		}
 	    		$( "#owning-collection-info" ).show();
 	    		$( "#owning-collection-optional" ).show();
 	    	}

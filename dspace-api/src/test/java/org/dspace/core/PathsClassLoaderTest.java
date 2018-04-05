@@ -120,7 +120,7 @@ public class PathsClassLoaderTest
 
     /**
      * Test of findClass method, of class PathsClassLoader.
-     * @throws java.lang.Exception
+     * @throws Exception if error
      */
     @Test
     public void testFindClass()

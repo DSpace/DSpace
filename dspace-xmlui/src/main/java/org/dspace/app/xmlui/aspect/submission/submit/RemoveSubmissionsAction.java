@@ -17,6 +17,8 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 
 /**
@@ -29,17 +31,21 @@ import org.dspace.core.Context;
  */
 public class RemoveSubmissionsAction extends AbstractAction
 {
+	protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     /**
-     * Remove all selected submissions
-     * 
-     * @param redirector
-     * @param resolver
+     * Remove all selected submissions.
+     *
+     * @param redirector unused.
+     * @param resolver unused.
      * @param objectModel
      *            Cocoon's object model
-     * @param source
-     * @param parameters
+     * @param source unused.
+     * @param parameters unused.
+     * @return null.
+     * @throws java.lang.Exception passed through.
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
@@ -55,10 +61,9 @@ public class RemoveSubmissionsAction extends AbstractAction
         	for (String workspaceID : workspaceIDs)
         	{
         		// If they selected to remove the item then delete everything.
-    			WorkspaceItem workspaceItem = WorkspaceItem.find(context, Integer.valueOf(workspaceID));
-    			workspaceItem.deleteAll();
+    			WorkspaceItem workspaceItem = workspaceItemService.find(context, Integer.valueOf(workspaceID));
+				workspaceItemService.deleteAll(context, workspaceItem);
         	}
-        	context.commit();
     	}
     
         return null;

@@ -19,11 +19,11 @@ import java.util.Map;
 public interface ServiceManager {
 
     /**
-     * Allows developers to get the desired service singleton by the provided type. <br/>
+     * Allows developers to get the desired service singleton by the provided type. <br>
      * This should return all instantiated objects of the type specified 
      * (may not all be singletons).
      * 
-     * @param <T>
+     * @param <T> Class type
      * @param type the type for the requested service (this will typically be the interface class but can be concrete as well)
      * @return the list of service singletons OR empty list if none is found
      */
@@ -36,19 +36,15 @@ public interface ServiceManager {
      * <p>
      * <em>NOTE</em>: This also allows special access to the underlying
      * service manager objects.  If using Spring this allows access to the
-     * underlying ApplicationContext object like so:
-     * <xmp>
-     * getServiceByName(ApplicationContext.class.getName(), ApplicationContext.class);
-     * </xmp>
-     * If using Guice then the same applies like so:
-     * <xmp>
-     * getServiceByName(Injector.class.getName(), Injector.class);
-     * </xmp>
+     * underlying ApplicationContext object like so:<br>
+     * {@code getServiceByName(ApplicationContext.class.getName(), ApplicationContext.class);}
+     * If using Guice then the same applies like so:<br>
+     * {@code getServiceByName(Injector.class.getName(), Injector.class);}
      * It is also possible to register a module and cause Guice to fill
      * in any injected core services (see register method).
      * </p>
-     * 
-     * @param <T>
+     *
+     * @param <T> Class type
      * @param name (optional) the unique name for this service.
      * If null then the bean will be returned if there is only one
      * service of this type.
@@ -98,6 +94,7 @@ public interface ServiceManager {
      */
     public void registerService(String name, Object service);
 
+    public void registerServiceNoAutowire(String name, Object service);
     /**
      * Allows adding singleton services and providers in at runtime or 
      * after the service manager has started up.
@@ -111,8 +108,10 @@ public interface ServiceManager {
      * {@link #getServiceByName(String, Class)}.
      * 
      * @see ServiceManager#getServiceByName(String, Class)
+     * @param <T> Class type
      * @param name the name of the service (must be unique)
      * @param type the class type of the service (must be in the current classloader)
+     * @return the service class
      * @throws IllegalArgumentException if the service cannot be registered because the name is taken or type is invalid or other
      */
     public <T> T registerServiceClass(String name, Class<T> type);
@@ -123,9 +122,9 @@ public interface ServiceManager {
      * This is primarily used for providers, filters, plugins, etc. 
      * which were registered but are no longer available because the 
      * context they are running in is shutting down or restarting.
-     * <br/>
-     * WARNING: This should not be used to attempt to unregister core 
-     * services as that will fail.
+     * <br>
+     * <em>WARNING: This should not be used to attempt to unregister core 
+     * services as that will fail.</em>
      * 
      * @param name the name of the service (must be unique)
      * @throws IllegalArgumentException if the bean cannot be unregistered
@@ -141,6 +140,6 @@ public interface ServiceManager {
      * 
      * @param settings a map of keys (names) and values
      */
-    public void pushConfig(Map<String, String> settings);
+    public void pushConfig(Map<String, Object> settings);
 
 }

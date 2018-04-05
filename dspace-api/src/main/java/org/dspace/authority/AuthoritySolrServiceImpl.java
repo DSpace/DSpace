@@ -33,6 +33,10 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
     private static final Logger log = Logger.getLogger(AuthoritySolrServiceImpl.class);
 
+    protected AuthoritySolrServiceImpl()
+    {
+
+    }
 
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
@@ -57,6 +61,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
         return solr;
     }
 
+    @Override
     public void indexContent(AuthorityValue value, boolean force) {
         SolrInputDocument doc = value.getSolrInputDocument();
 
@@ -67,6 +72,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
         }
     }
 
+    @Override
     public void cleanIndex() throws Exception {
         try{
             getSolr().deleteByQuery("*:*");
@@ -76,6 +82,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
         }
     }
 
+    @Override
     public void commit() {
         try {
             getSolr().commit();
@@ -100,7 +107,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     /**
      * Write the document to the solr index
      * @param doc the solr document
-     * @throws java.io.IOException
+     * @throws IOException if IO error
      */
     protected void writeDocument(SolrInputDocument doc) throws IOException {
 
@@ -116,6 +123,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
         }
     }
 
+    @Override
     public QueryResponse search(SolrQuery query) throws SolrServerException, MalformedURLException {
         return getSolr().query(query);
     }
@@ -123,7 +131,9 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     /**
      * Retrieves all the metadata fields which are indexed in the authority control
      * @return a list of metadata fields
+     * @throws Exception if error
      */
+    @Override
     public List<String> getAllIndexedMetadataFields() throws Exception {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("*:*");

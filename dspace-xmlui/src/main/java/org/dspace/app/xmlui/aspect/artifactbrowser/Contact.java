@@ -23,7 +23,7 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -96,7 +96,7 @@ public class Contact extends AbstractDSpaceTransformer implements CacheableProce
      
         contact.setHead(T_head);
         
-        String name = ConfigurationManager.getProperty("dspace.name");
+        String name = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.name");
         contact.addPara(T_para1.parameterize(name));
         
         List list = contact.addList("contact");
@@ -105,7 +105,7 @@ public class Contact extends AbstractDSpaceTransformer implements CacheableProce
         list.addItem().addXref(contextPath+"/feedback",T_feedback_link);
         
         list.addLabel(T_email);
-        String email = ConfigurationManager.getProperty("feedback.recipient");
+        String email = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("feedback.recipient");
         list.addItem().addXref("mailto:"+email,email); 
     }
 }

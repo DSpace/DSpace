@@ -9,7 +9,7 @@ package org.dspace.app.xmlui.wing.element;
 
 /**
  * This class represents a generic Wing Container. The Container class adds a
- * simlpe contents list which may be modified by the extending concret classes.
+ * simple contents list which may be modified by the extending concrete classes.
  * When it comes time to process the element a toSAX method is provided that
  * will iterate over the contents. 
  * 
@@ -30,11 +30,12 @@ public abstract class Container extends AbstractWingElement
 {
 
     /** The internal contents of this container */
-    protected List<AbstractWingElement> contents = new ArrayList<AbstractWingElement>();
+    protected List<AbstractWingElement> contents = new ArrayList<>();
 
     /**
      * @param context
      *            (Required) The context this element is contained in.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Container(WingContext context) throws WingException
     {
@@ -58,7 +59,9 @@ public abstract class Container extends AbstractWingElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler,
             LexicalHandler lexicalHandler, NamespaceSupport namespaces)
             throws SAXException
@@ -69,9 +72,7 @@ public abstract class Container extends AbstractWingElement
         }
     }
 
-    /**
-     * Dispose
-     */
+    @Override
     public void dispose()
     {
 

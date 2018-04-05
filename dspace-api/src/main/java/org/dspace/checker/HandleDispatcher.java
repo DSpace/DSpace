@@ -9,13 +9,18 @@ package org.dspace.checker;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * A BitstreamDispatcher that checks all the bitstreams contained within an
@@ -32,19 +37,19 @@ public class HandleDispatcher implements BitstreamDispatcher
     /** Log 4j logger. */
     private static final Logger LOG = Logger.getLogger(HandleDispatcher.class);
 
+    protected Context context;
+
     /** Handle to retrieve bitstreams from. */
-    private String handle = null;
+    protected String handle = null;
 
     /** Has the type of object the handle refers to been determined. */
-    private boolean init = false;
+    protected boolean init = false;
 
     /** the delegate to dispatch to. */
-    private ListDispatcher delegate = null;
+    protected IteratorDispatcher delegate = null;
 
-    /**
-     * Database access for retrieving bitstreams
-     */
-    BitstreamInfoDAO bitstreamInfoDAO;
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     /**
      * Blanked off, no-op constructor.
@@ -56,75 +61,49 @@ public class HandleDispatcher implements BitstreamDispatcher
     /**
      * Main constructor.
      * 
+     * @param context Context
      * @param hdl
      *            the handle to get bitstreams from.
      */
-    public HandleDispatcher(BitstreamInfoDAO bitInfoDAO, String hdl)
+    public HandleDispatcher(Context context, String hdl)
     {
-        bitstreamInfoDAO = bitInfoDAO;
+        this.context = context;
         handle = hdl;
     }
 
     /**
      * Private initialization routine.
      * 
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if database access fails.
      */
-    private synchronized void init()
-    {
+    protected synchronized void init() throws SQLException {
         if (!init)
         {
-            Context context = null;
-            int dsoType = -1;
+            DSpaceObject dso = handleService.resolveToObject(context, handle);
 
-            int id = -1;
-            try
-            {
-                context = new Context();
-                DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-                id = dso.getID();
-                dsoType = dso.getType();
-                context.abort();
+            Iterator<Bitstream> ids = new ArrayList<Bitstream>().iterator();
 
-            }
-            catch (SQLException e)
+            switch (dso.getType())
             {
-                LOG.error("init error " + e.getMessage(), e);
-                throw new IllegalStateException("init error" + e.getMessage(), e);
+                case Constants.BITSTREAM:
+                    ids = Arrays.asList(((Bitstream) dso)).iterator();
+                    break;
 
-            }
-            finally
-            {
-                // Abort the context if it's still valid
-                if ((context != null) && context.isValid())
-                {
-                    context.abort();
-                }
+                case Constants.ITEM:
+                    ids = bitstreamService.getItemBitstreams(context, (org.dspace.content.Item) dso);
+                    break;
+
+                case Constants.COLLECTION:
+                    ids = bitstreamService.getCollectionBitstreams(context, (org.dspace.content.Collection) dso);
+                    break;
+
+                case Constants.COMMUNITY:
+                    ids = bitstreamService.getCommunityBitstreams(context, (org.dspace.content.Community) dso);
+                    break;
             }
 
-            List<Integer> ids = new ArrayList<Integer>();
-
-            switch (dsoType)
-            {
-            case Constants.BITSTREAM:
-                ids.add(Integer.valueOf(id));
-                break;
-
-            case Constants.ITEM:
-                ids = bitstreamInfoDAO.getItemBitstreams(id);
-                break;
-
-            case Constants.COLLECTION:
-                ids = bitstreamInfoDAO.getCollectionBitstreams(id);
-                break;
-
-            case Constants.COMMUNITY:
-                ids = bitstreamInfoDAO.getCommunityBitstreams(id);
-                break;
-            }
-
-            delegate = new ListDispatcher(ids);
+            delegate = new IteratorDispatcher(ids);
             init = true;
         }
     }
@@ -132,10 +111,11 @@ public class HandleDispatcher implements BitstreamDispatcher
     /**
      * Initializes this dispatcher on first execution.
      * 
+     * @throws SQLException if database error
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
-    public int next()
-    {
+    @Override
+    public Bitstream next() throws SQLException {
         if (!init)
         {
             init();
