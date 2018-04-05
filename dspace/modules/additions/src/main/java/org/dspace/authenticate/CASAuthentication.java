@@ -3,7 +3,6 @@ package org.dspace.authenticate;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -11,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -19,6 +17,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import edu.umd.lib.dspace.authenticate.Ldap;
 import edu.umd.lims.util.ErrorHandling;
@@ -59,6 +59,8 @@ public class CASAuthentication implements AuthenticationMethod
 
     public final static String CASUSER = "dspace.current.user.ldap";
 
+    private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
     /**
      * Predicate, can new user automatically create EPerson. Checks
      * configuration value. You'll probably want this to be true to take
@@ -69,8 +71,8 @@ public class CASAuthentication implements AuthenticationMethod
     public boolean canSelfRegister(Context context, HttpServletRequest request,
             String username) throws SQLException
     {
-        return ConfigurationManager
-                .getBooleanProperty("webui.cas.autoregister");
+        return configurationService
+                .getBooleanProperty("drum.webui.cas.autoregister");
     }
 
     /**
@@ -210,8 +212,8 @@ public class CASAuthentication implements AuthenticationMethod
             try
             {
                 // Determine CAS validation URL
-                String validate = ConfigurationManager
-                        .getProperty("cas.validate.url");
+                String validate = configurationService
+                        .getProperty("drum.cas.validate.url");
                 log.info(LogManager.getHeader(context, "login",
                         "CAS validate:  " + validate));
                 if (validate == null)
@@ -387,8 +389,8 @@ public class CASAuthentication implements AuthenticationMethod
             HttpServletResponse response)
     {
         // Determine CAS server URL
-        final String authServer = ConfigurationManager
-                .getProperty("cas.server.url");
+        final String authServer = configurationService
+                .getProperty("drum.cas.server.url");
         final String origUrl = (String) request.getSession().getAttribute(
                 "interrupted.request.url");
         // final String service = (origUrl != null ? origUrl : request

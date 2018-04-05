@@ -31,7 +31,7 @@ chomp($bindir = `dirname $0`);
 
 
 %mail = ();
-chomp($mail{To} =   `$bindir/dspace dsprop -property mail.etdmarc.recipient`);
+chomp($mail{To} =   `$bindir/dspace dsprop -property drum.mail.etdmarc.recipient`);
 chomp($mail{From} = `$bindir/dspace dsprop -property mail.from.address`);
 chomp($mail{Smtp} = `$bindir/dspace dsprop -property mail.server`);
 $mail{Subject} = "ETD MARC records are available";

@@ -86,9 +86,9 @@ public class Ldap {
   {
     this.context = context;
 
-    String strUrl = configurationService.getProperty("ldap.url");
-    String strBindAuth = configurationService.getProperty("ldap.bind.auth");
-    String strBindPassword =  configurationService.getProperty("ldap.bind.password");
+    String strUrl = configurationService.getProperty("drum.ldap.url");
+    String strBindAuth = configurationService.getProperty("drum.ldap.bind.auth");
+    String strBindPassword =  configurationService.getProperty("drum.ldap.bind.password");
 
     // Setup the JNDI environment
     Properties env = new Properties();
