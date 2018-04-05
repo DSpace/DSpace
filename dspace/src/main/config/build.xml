@@ -1024,8 +1024,8 @@ You may manually install this file by following these steps:
     </target>
     <!-- installs and/or updates Project Counter Robot List resolution database -->
     <target name="update_spiders">
-        <echo>Downloading: ttps://raw.githubusercontent.com/atmire/COUNTER-Robots/master/generated/COUNTER_Robots_list.txt</echo>
-         <get src="https://raw.githubusercontent.com/atmire/COUNTER-Robots/master/generated/COUNTER_Robots_list.txt" dest="$dspace.dir}/config/COUNTER_Robots_list.txt" verbose="true" />
+        <echo>Downloading: https://raw.githubusercontent.com/atmire/COUNTER-Robots/master/generated/COUNTER_Robots_list.txt</echo>
+         <get src="https://raw.githubusercontent.com/atmire/COUNTER-Robots/master/generated/COUNTER_Robots_list.txt" dest="${dspace.dir}/config/COUNTER_Robots_list.txt" verbose="true" />
     </target>
 
     <target name="check_spiders">
