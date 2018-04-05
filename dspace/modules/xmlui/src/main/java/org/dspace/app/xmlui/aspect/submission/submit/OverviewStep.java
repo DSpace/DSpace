@@ -1,5 +1,7 @@
 package org.dspace.app.xmlui.aspect.submission.submit;
 
+import org.apache.commons.io.FileUtils;
+import org.datadryad.api.DryadDataFile;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.utils.UIException;
@@ -275,13 +277,16 @@ public class OverviewStep extends AbstractStep {
     }
 
     private boolean renderDatasetItem(boolean submissionNotFinished, List dataSetList, org.dspace.content.Item dataset, InProgressSubmission wsDataset) throws WingException, SQLException {
-        Item dataItem = dataSetList.addItem();
+        DryadDataFile dryadDataFile = new DryadDataFile(dataset);
+        Item dataItem = dataSetList.addItem(String.valueOf(wsDataset.getID()), "dataset_overview");
+        try {
+            Bitstream mainFile = dryadDataFile.getFirstBitstream();
+            String fileInfo = mainFile.getName() + " (" + FileUtils.byteCountToDisplaySize(mainFile.getSize()) + ")";
+            dataItem.addHighlight("filename").addContent(fileInfo);
+        } catch (Exception e) {
+            dataItem.addHighlight("filename").addContent(dryadDataFile.getItem().getName());
+        }
 
-        String datasetTitle = XSLUtils.getShortFileName(wsDataset.getItem().getName(), 50);
-        if(datasetTitle == null)
-            datasetTitle = "Untitled";
-
-        dataItem.addXref(HandleManager.resolveToURL(context, dataset.getHandle()), datasetTitle);
 
         Button editButton = dataItem.addButton("submit_edit_dataset_" + wsDataset.getID());
         //To determine which name our button is getting check if we are through submission with this
@@ -297,7 +302,12 @@ public class OverviewStep extends AbstractStep {
         }
 
         dataItem.addButton("submit_delete_dataset_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_DELETE);
-        
+
+        Bitstream readme = dryadDataFile.getREADME();
+        if (readme != null) {
+            String readmeFileInfo = readme.getName() + " (" + FileUtils.byteCountToDisplaySize(readme.getSize()) + ")";
+            dataItem.addHighlight("dataset-description").addContent(readmeFileInfo);
+        }
         // add dc_description text if available
         DCValue[] descriptions = dataset.getMetadata("dc", "description", org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
         if (descriptions.length > 0)
