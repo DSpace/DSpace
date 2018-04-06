@@ -39,7 +39,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 public class Unit extends DSpaceObject
 {
 
-    @Column(name="etdunit_id", insertable = false, updatable = false)
+    @Column(name="unit_id", insertable = false, updatable = false)
     private Integer legacyId;
 
     @Column(name="name", length = 256)
@@ -50,9 +50,9 @@ public class Unit extends DSpaceObject
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "collection2etdunit",
-            joinColumns = { @JoinColumn(name = "etdunit_id") },
-            inverseJoinColumns = { @JoinColumn(name = "collection_id") }
+            name = "epersongroup2unit",
+            joinColumns = { @JoinColumn(name = "unit_id") },
+            inverseJoinColumns = { @JoinColumn(name = "eperson_group_id") }
     )
     private Set<Group> groups = new HashSet<>();
 
