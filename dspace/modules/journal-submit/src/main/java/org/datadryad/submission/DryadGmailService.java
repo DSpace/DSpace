@@ -127,7 +127,6 @@ public class DryadGmailService {
         List<Message> messages = retrieveMessagesWithLabels(labels);
         if (messages != null) {
             ArrayList<String> processedMessageIDs = new ArrayList<String>();
-            result = result + ("got " + messages.size() + " test messages");
             for (Message message : messages) {
                 result = result + ("Message: " + message.getId() + ", " + message.getSnippet());
             }

@@ -72,20 +72,21 @@ public class DryadEmailSubmission extends HttpServlet {
                 // Generate Credential using retrieved code.
                 dryadGmailService.authorize(code);
             }
-            return;
         } else if (requestURI.contains("test")) {
             try {
-                LOGGER.info(DryadGmailService.testMethod());
+                String testResult = DryadGmailService.testMethod();
+                aResponse.getWriter().println(testResult);
             } catch (IOException e) {
-                LOGGER.info(e.getMessage());
-                throw new RuntimeException(e.getMessage());
+                aResponse.getWriter().println("test failed, exception is " + e.getMessage());
             }
         } else if (requestURI.contains("retrieve")) {
             LOGGER.info("manually running DryadGmailService");
             retrieveMail();
+            aResponse.getWriter().println("DryadGmailService retrieve completed");
         } else if (requestURI.contains("clear")) {
             LOGGER.info("clearing retrieved messages");
             DryadGmailService.completeJournalProcessing();
+            aResponse.getWriter().println("DryadGmailService cleared");
         } else {
             aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
                     "GET is not supported, you must POST to this service");
