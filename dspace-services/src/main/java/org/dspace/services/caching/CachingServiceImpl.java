@@ -34,6 +34,7 @@ import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
 import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.services.model.RequestInterceptor;
+import org.dspace.services.model.Session;
 import org.dspace.utils.servicemanager.ProviderHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -619,7 +620,8 @@ public final class CachingServiceImpl
 
     private class CachingServiceRequestInterceptor implements RequestInterceptor {
 
-        public void onStart(String requestId) {
+        @Override
+        public void onStart(String requestId, Session session) {
             if (requestId != null) {
                 Map<String, MapCache> requestCaches = requestCachesMap.get(requestId);
                 if (requestCaches == null) {
@@ -629,7 +631,8 @@ public final class CachingServiceImpl
             }
         }
 
-        public void onEnd(String requestId, boolean succeeded, Exception failure) {
+        @Override
+        public void onEnd(String requestId, Session session, boolean succeeded, Exception failure) {
             if (requestId != null) {
                 requestCachesMap.remove(requestId);
             }
@@ -638,5 +641,6 @@ public final class CachingServiceImpl
         public int getOrder() {
             return 1;
         }
+
     }
 }
