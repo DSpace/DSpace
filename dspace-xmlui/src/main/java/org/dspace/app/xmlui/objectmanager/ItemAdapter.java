@@ -423,17 +423,10 @@ public class ItemAdapter extends AbstractAdapter
                 // Generate a second group id for any extra metadata added.
                 String groupID2 = getGenericID("group_dmd_");
 
-                List<Bundle> bundles = itemService.getBundles(item, "METADATA");
-                for (Bundle bundle : bundles)
+                Bitstream bitstream = bitstreamService.getBitstreamByName(item, "METADATA", "MODS.xml");
+
+                if (bitstream!=null)
                 {
-                        Bitstream bitstream = bundleService.getBitstreamByName(bundle, "MODS.xml");
-
-                        if (bitstream == null)
-                        {
-                            continue;
-                        }
-
-
                         String dmdID = getGenericID("dmd_");
 
 
@@ -570,7 +563,13 @@ public class ItemAdapter extends AbstractAdapter
                  {
                     renderAmdSubSection(amdSecName, mdType, crosswalk, bitstream);
                  }
+
+                 //To prevent memory issues, discard an object from the cache after processing
+                 context.uncacheEntity(bitstream);
               } // end for each bitstream
+
+              //To prevent memory issues, discard an object from the cache after processing
+              context.uncacheEntity(bundle);
             } // end for each bundle
           } // end for each crosswalk
         } // end for each amdSec
@@ -800,11 +799,20 @@ public class ItemAdapter extends AbstractAdapter
                         primaryBitstream = bitstream;
                     }
                 }
+                else
+                {
+                    //To prevent memory issues, discard an object from the cache after processing
+                    //NOTE: Content bitstreams will be uncached in renderStructureMap() below
+                    context.uncacheEntity(bitstream);
+                }
             }
 
             // ///////////////////
             // End the bundle's file group
             endElement(METS,"fileGrp");
+
+            //To prevent memory issues, discard an object from the cache after processing
+            context.uncacheEntity(bundle);
         }
 
         // //////////////////////
@@ -893,6 +901,9 @@ public class ItemAdapter extends AbstractAdapter
                 // ///////////////////////////////
                 // End the div
                 endElement(METS,"div");
+
+                //To prevent memory issues, discard an object from the cache after processing
+                context.uncacheEntity(bitstream);
         }
 
         // ////////////////////////////////
@@ -923,18 +934,10 @@ public class ItemAdapter extends AbstractAdapter
             return;
         }
 
+        Bitstream bitstream = bitstreamService.getBitstreamByName(item, "METADATA", "METS.xml");
 
-        List<Bundle> bundles = itemService.getBundles(item, "METADATA");
-
-        for (Bundle bundle : bundles)
+        if (bitstream != null)
         {
-                Bitstream bitstream = bundleService.getBitstreamByName(bundle, "METS.xml");
-
-                if (bitstream == null)
-                {
-                    continue;
-                }
-
                 // ///////////////////////////////
                 // Send the actual XML content
                 try {
@@ -952,11 +955,14 @@ public class ItemAdapter extends AbstractAdapter
                         reader.setProperty("http://xml.org/sax/properties/lexical-handler", filter);
                         reader.parse(new InputSource(bitstreamService.retrieve(context, bitstream)));
                 }
-                        catch (AuthorizeException ae)
-                        {
-                                // just ignore the authorize exception and continue on
-                                // without parsing the xml document.
-                        }
+                catch (AuthorizeException ae)
+                {
+                        // just ignore the authorize exception and continue on
+                        // without parsing the xml document.
+                }
+
+                //To prevent memory issues, discard an object from the cache after processing
+                context.uncacheEntity(bitstream);
         }
     }
 
@@ -1005,45 +1011,17 @@ public class ItemAdapter extends AbstractAdapter
      * @return the corresponding original bitstream (or null)
      * @throws java.sql.SQLException passed through.
      */
-    protected static Bitstream findOriginalBitstream(Item item,Bitstream derived) throws SQLException
+    protected Bitstream findOriginalBitstream(Item item,Bitstream derived) throws SQLException
     {
-        // FIXME: this method is a copy of the one found below. However, the
-        // original method is protected so we can't use it here. I think that
-        // perhaps this should be folded into the DSpace bitstream API. Until
-        // when a good final solution can be determined I am just going to copy
-        // the method here.
-        //
-        // return org.dspace.content.packager.AbstractMetsDissemination
-        // .findOriginalBitstream(item, derived);
 
-        List<Bundle> bundles = item.getBundles();
-
-        // Filename of original will be filename of the derived bitstream
-        // minus the extension (ie everything from and including the last "." character)
+       // Filename of original will be filename of the derived bitstream
+       // minus the extension (ie everything from and including the last "." character)
        int endIndex = derived.getName().lastIndexOf(".");
        String originalFilename = derived.getName().substring(0, endIndex>0?endIndex:(derived.getName().length()-1));
 
-        // First find "original" bundle
-        for (Bundle bundle : bundles)
-        {
-            if ((bundle.getName() != null)
-                    && bundle.getName().equals("ORIGINAL"))
-            {
-                // Now find the corresponding bitstream
-                List<Bitstream> bitstreams = bundle.getBitstreams();
-
-                for (Bitstream bitstream : bitstreams)
-                {
-                    if (bitstream.getName().equals(originalFilename))
-                    {
-                        return bitstream;
-                    }
-                }
-            }
-        }
-
-        // Didn't find it
-        return null;
+       // Find the bitstream in the ORIGINAL bundle of this name (if any)
+       // If not found, this will return null
+       return bitstreamService.getBitstreamByName(item, "ORIGINAL", originalFilename);
     }
 
     /**
