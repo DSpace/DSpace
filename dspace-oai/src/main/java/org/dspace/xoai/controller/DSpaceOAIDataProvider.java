@@ -9,7 +9,7 @@ package org.dspace.xoai.controller;
 
 import static java.util.Arrays.asList;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.apache.logging.log4j.org.apache.logging.log4j.LogManager.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 import java.io.IOException;
 import java.io.OutputStream;
