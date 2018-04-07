@@ -41,7 +41,7 @@ import org.swordapp.server.UriRegistry;
 
 public class MediaResourceManagerDSpace extends DSpaceSwordAPI
     implements MediaResourceManager {
-    private static Logger log = Logger
+    private static Logger log = org.apache.logging.log4j.LogManager
         .getLogger(MediaResourceManagerDSpace.class);
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory

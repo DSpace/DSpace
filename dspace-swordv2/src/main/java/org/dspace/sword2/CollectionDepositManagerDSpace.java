@@ -30,7 +30,7 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI
     /**
      * logger
      */
-    private static Logger log = Logger
+    private static Logger log = org.apache.logging.log4j.LogManager
         .getLogger(CollectionDepositManagerDSpace.class);
 
     protected CollectionService collectionService = ContentServiceFactory

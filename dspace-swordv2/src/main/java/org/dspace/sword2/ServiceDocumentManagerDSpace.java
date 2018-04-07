@@ -32,7 +32,7 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager {
     /**
      * logger
      */
-    private static Logger log = Logger
+    private static Logger log = org.apache.logging.log4j.LogManager
         .getLogger(ServiceDocumentManagerDSpace.class);
 
     protected CommunityService communityService = ContentServiceFactory
