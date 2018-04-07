@@ -37,7 +37,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmissionDefinitionConverter extends DSpaceConverter<SubmissionConfig, SubmissionDefinitionRest> {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionDefinitionConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(SubmissionDefinitionConverter.class);
 
     @Autowired
     private SubmissionSectionConverter panelConverter;

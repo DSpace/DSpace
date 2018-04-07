@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -23,7 +24,7 @@ import org.dspace.handle.service.HandleService;
 import org.swordapp.server.SwordCollection;
 
 public class CommunityCollectionGenerator implements AtomCollectionGenerator {
-    private static Logger log = Logger
+    private static Logger log = LogManager
         .getLogger(CommunityCollectionGenerator.class);
 
     protected HandleService handleService = HandleServiceFactory.getInstance()
