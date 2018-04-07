@@ -43,7 +43,8 @@ import org.springframework.stereotype.Component;
 public class SubmissionUploadRestRepository extends DSpaceRestRepository<SubmissionUploadRest, String>
     implements LinkRestRepository<SubmissionUploadRest> {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionUploadRestRepository.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(SubmissionUploadRestRepository.class);
 
     private SubmissionConfigReader submissionConfigReader;
 
