@@ -12,6 +12,7 @@ import static org.junit.Assert.fail;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+import org.apache.logging.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.rest.builder.AbstractBuilder;
@@ -37,7 +38,8 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractIntegrationTestWithDatabase.class);
+    private static final Logger log = LogManager
+            .getLogger(AbstractIntegrationTestWithDatabase.class);
 
     /**
      * Context mock object to use in the tests.
