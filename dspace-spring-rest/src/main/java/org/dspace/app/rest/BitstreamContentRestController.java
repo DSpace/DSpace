@@ -57,7 +57,8 @@ import org.springframework.web.bind.annotation.RestController;
     + "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/content")
 public class BitstreamContentRestController {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamContentRestController.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(BitstreamContentRestController.class);
 
     //Most file systems are configured to use block sizes of 4096 or 8192 and our buffer should be a multiple of that.
     private static final int BUFFER_SIZE = 4096 * 10;
