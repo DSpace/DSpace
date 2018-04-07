@@ -106,7 +106,15 @@
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
-                </exclusion>
+	        </exclusion>
+		<exclusion>
+		    <groupId>log4j</groupId>
+		    <artifactId>log4j</artifactId>
+	        </exclusion>
+		<exclusion>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-log4j12</artifactId>
+		</exclusion>
             </exclusions>
         </dependency>
 
@@ -159,6 +167,14 @@
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
+		<exclusion>
+		    <groupId>log4j</groupId>
+		    <artifactId>log4j</artifactId>
+	        </exclusion>
+		<exclusion>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-log4j12</artifactId>
+	        </exclusion>
             </exclusions>
         </dependency>
 
@@ -192,12 +208,12 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.10.0</version>
+	    <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.10.0</version>
+	    <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
