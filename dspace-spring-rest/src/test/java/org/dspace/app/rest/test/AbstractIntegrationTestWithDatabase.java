@@ -12,7 +12,7 @@ import static org.junit.Assert.fail;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-import org.apache.logging.LogManager;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.rest.builder.AbstractBuilder;
