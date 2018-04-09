@@ -737,6 +737,9 @@ public class ItemAdapter extends AbstractAdapter
         // Suppress license?
         Boolean showLicense = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.licence_bundle.show");
 
+        // Check if ORIGINAL bundle included (either explicitly or via include all fileGrp types)
+        boolean includeContentBundle = this.fileGrpTypes.isEmpty() ? true : this.fileGrpTypes.contains("ORIGINAL");
+
         // Loop over all requested bundles
         for (Bundle bundle : bundles)
         {
@@ -774,7 +777,9 @@ public class ItemAdapter extends AbstractAdapter
                 String fileID = getFileID(bitstream);
 
                 Bitstream originalBitstream = null;
-                if (isDerivedBundle)
+                // If we are looping through a derived bundle and content bundle is included,
+                // ensure each derived bitstream and original bitstream share the same groupID
+                if (isDerivedBundle && includeContentBundle)
                 {
                     originalBitstream = findOriginalBitstream(item, bitstream);
                 }
