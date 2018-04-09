@@ -44,24 +44,19 @@
     <xsl:template name="filterLink">
     	<xsl:param name="filter"/>
     	<xsl:param name="value"/>
+    	<xsl:param name="filter_relational_operator" select="'equals'"/>
     	
 		<xsl:variable name="normalizedValue" select="translate(string($value),'áéíóú','aeiou')"/>
 
     	<xsl:value-of select="$linkFilter"/>
-    	<xsl:text>?fq=</xsl:text>
+    	<xsl:text>?filtertype=</xsl:text>
     	<xsl:value-of select="$filter"/>
-    	<xsl:text>%3A</xsl:text>
-    	<xsl:call-template name="encodeDiscoveryFilter">	
-    		<xsl:with-param name="filterValue">
-    			<xsl:value-of select="str:toLowerCase($normalizedValue)"/>
-    		</xsl:with-param>
-    	</xsl:call-template>
-    	<xsl:text>\|\|\|</xsl:text>
-    	<xsl:call-template name="encodeDiscoveryFilter">	
-    		<xsl:with-param name="filterValue">
-    			<xsl:value-of select="$normalizedValue"/>
-    		</xsl:with-param>
-    	</xsl:call-template>    			
+    	<xsl:text disable-output-escaping="yes"><![CDATA[&]]></xsl:text>
+    	<xsl:text>filter_relational_operator=</xsl:text>
+    	<xsl:value-of select="$filter_relational_operator"/>    	
+    	<xsl:text disable-output-escaping="yes"><![CDATA[&]]></xsl:text>
+    	<xsl:text>filter=</xsl:text>
+		<xsl:value-of select="$normalizedValue"/>
     </xsl:template>
     
     <xsl:template name="showExternalServices">
@@ -278,14 +273,14 @@
 				<xsl:call-template name="render-normal-field">
 					<xsl:with-param name="name" select="'subtype'"/>
 					<xsl:with-param name="elements" select="dim:field[@element='subtype'] "/>
-					<xsl:with-param name="filter">type_filter</xsl:with-param>
+					<xsl:with-param name="filter">type</xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test="dim:field[@element='type']">
 				<xsl:call-template name="render-normal-field">
 					<xsl:with-param name="name" select="'subtype'"/>
 					<xsl:with-param name="elements" select="dim:field[@element='type'] "/>
-					<xsl:with-param name="filter">type_filter</xsl:with-param>
+					<xsl:with-param name="filter">type</xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
 			<!-- No hay otherwise -->
@@ -605,7 +600,7 @@
 				<xsl:call-template name="render-normal-field">
 					<xsl:with-param name="name" select="'subject-materias'"/>
 					<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='materias'] "/>
-					<xsl:with-param name="filter">subject_filter</xsl:with-param>
+					<xsl:with-param name="filter">subject</xsl:with-param>
 				</xsl:call-template>
 
 				<!-- todos los descriptores (terminos de tesuaro) -->
@@ -853,19 +848,33 @@
 					</span>
 					<xsl:for-each select="$metadata-fields">
 						<span class="metadata-value">
-							<xsl:if test="@authority">
-								<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
-							</xsl:if>	
-								
-							<a>
-								<xsl:attribute name="href">
-									<xsl:call-template name="filterLink">
-										<xsl:with-param name="filter">author_filter</xsl:with-param>
-										<xsl:with-param name="value" select="."/>
-									</xsl:call-template>
-								</xsl:attribute>
-								<xsl:copy-of select="node()" />
-							</a>
+							<xsl:choose>
+								<xsl:when test="@authority">
+									<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+									<a>
+										<xsl:attribute name="href">
+											<xsl:call-template name="filterLink">
+												<xsl:with-param name="filter">author</xsl:with-param>
+												<xsl:with-param name="value" select="@authority"/>
+												<xsl:with-param name="filter_relational_operator" select="'authority'"/>
+											</xsl:call-template>
+										</xsl:attribute>
+										<xsl:copy-of select="node()" />
+									</a>
+								</xsl:when>	
+								<xsl:otherwise>
+									<a>
+										<xsl:attribute name="href">
+											<xsl:call-template name="filterLink">
+												<xsl:with-param name="filter">author</xsl:with-param>
+												<xsl:with-param name="value" select="."/>
+											</xsl:call-template>
+										</xsl:attribute>
+										<xsl:copy-of select="node()" />
+									</a>
+								</xsl:otherwise>
+							</xsl:choose>
+							
 							<xsl:if test="position() != last()">
 								<xsl:text> | </xsl:text>
 							</xsl:if>
