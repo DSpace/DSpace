@@ -764,13 +764,32 @@ public class ItemAdapter extends AbstractAdapter
                 continue;
             }
 
+            // /////////////////////////////////////
+            // Determine which bitstreams to include in bundle
+            List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+
+            // If this is the THUMBNAIL bundle, and we are NOT including content bundle,
+            // Then assume this is an item summary page, and we can just include the main thumbnail.
+            if ("THUMBNAIL".equals(bundle.getName()) && !includeContentBundle)
+            {
+                Thumbnail thumbnail = itemService.getThumbnail(context, item, false);
+                if(thumbnail != null) {
+                    bitstreams.add(thumbnail.getThumb());
+                }
+            }
+            else
+            {   // Default to including all bitstreams
+                bitstreams = bundle.getBitstreams();
+            }
+
+
             // ///////////////////
             // Start bundle's file group
             attributes = new AttributeMap();
             attributes.put("USE", use);
             startElement(METS,"fileGrp",attributes);
 
-            for (Bitstream bitstream : bundle.getBitstreams())
+            for (Bitstream bitstream : bitstreams)
             {
                 // //////////////////////////////
                 // Determine the file's IDs
