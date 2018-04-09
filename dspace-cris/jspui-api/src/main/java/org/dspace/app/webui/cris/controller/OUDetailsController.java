@@ -185,6 +185,7 @@ public class OUDetailsController
                         ou));
         
         mvc.getModel().putAll(model);
+        mvc.getModel().put("isAdmin", isAdmin);
         mvc.getModel().put("ou", ou);
         return mvc;
     }

@@ -39,7 +39,7 @@
 </c:forEach>
 <%
 	// Is the logged in user an admin
-	Boolean admin = (Boolean)request.getAttribute("is.admin");
+	Boolean admin = (Boolean)request.getAttribute("isAdmin");
 	boolean isAdmin = (admin == null ? false : admin.booleanValue());
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);

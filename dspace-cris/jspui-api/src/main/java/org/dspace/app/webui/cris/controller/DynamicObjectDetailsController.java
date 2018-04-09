@@ -193,6 +193,7 @@ public class DynamicObjectDetailsController
                         dyn));
         
         mvc.getModel().putAll(model);
+        mvc.getModel().put("isAdmin", isAdmin);
         mvc.getModel().put("entity", dyn);
         return mvc;
     }

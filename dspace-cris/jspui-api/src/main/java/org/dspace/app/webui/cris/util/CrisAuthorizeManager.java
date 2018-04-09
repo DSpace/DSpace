@@ -138,6 +138,12 @@ public class CrisAuthorizeManager
     public static <T extends ACrisObject> boolean isAdmin(
             Context context, T crisObject) throws SQLException 
     {
+        EPerson currUser = context.getCurrentUser();
+        if(currUser==null) 
+        {
+            return false;
+        }
+        
         // check admin authorization
         if (AuthorizeManager.isAdmin(context))
         {
@@ -145,7 +151,7 @@ public class CrisAuthorizeManager
         }
 
         String crisObjectTypeText = crisObject.getTypeText();
-        EPerson currUser = context.getCurrentUser();        
+        
         String groupName = ConfigurationManager.getProperty("cris", "admin" + crisObjectTypeText);
         if(StringUtils.isBlank(groupName)) {
             groupName = "Administrator "+crisObjectTypeText;
@@ -153,14 +159,6 @@ public class CrisAuthorizeManager
         Group group = Group.findByName(context, groupName);
         if (group != null)
         {
-            if (currUser == null && group.getID() == 0)
-            {
-                boolean isMember = Group.isMember(context, 0);
-                if (isMember)
-                {
-                    return true;
-                }
-            }
             if (Group.isMember(context, group.getID()))
             {
                 return true;

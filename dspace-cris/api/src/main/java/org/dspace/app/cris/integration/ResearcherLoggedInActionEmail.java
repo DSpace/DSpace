@@ -15,6 +15,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.authenticate.PostLoggedInAction;
@@ -65,7 +66,7 @@ public class ResearcherLoggedInActionEmail implements PostLoggedInAction
                     searcher = serviceManager.getServiceByName(
                             SearchService.class.getName(), SearchService.class);
                     SolrQuery query = new SolrQuery();
-                    query.setQuery("search.resourcetype:9");
+                    query.setQuery("search.resourcetype:" + CrisConstants.RP_TYPE_ID);
                     String orcid = (String) request.getAttribute("orcid");
                     String filterQuery = "";
                     if(StringUtils.isNotBlank(eperson.getEmail())){

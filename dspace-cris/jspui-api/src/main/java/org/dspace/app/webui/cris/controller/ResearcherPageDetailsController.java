@@ -146,9 +146,12 @@ public class ResearcherPageDetailsController
                 {
                     Group selfClaimGroup = Group.findByName(context,
                             nameGroupSelfClaim);
-                    if (Group.isMember(context, selfClaimGroup.getID()))
+                    if (selfClaimGroup != null)
                     {
-                        model.put("selfClaimRP", new Boolean(true));
+                        if (Group.isMember(context, selfClaimGroup.getID()))
+                        {
+                            model.put("selfClaimRP", new Boolean(true));
+                        }
                     }
                 }
             }
@@ -267,7 +270,7 @@ public class ResearcherPageDetailsController
                 .put("showStatsOnlyAdmin",
                         ConfigurationManager
                                 .getBooleanProperty(SolrLogger.CFG_STAT_MODULE,"authorization.admin"));
-        
+        mvc.getModel().put("isAdmin", isAdmin);
         
         // Fire usage event.
         request.setAttribute("sectionid", StatsConfig.DETAILS_SECTION);

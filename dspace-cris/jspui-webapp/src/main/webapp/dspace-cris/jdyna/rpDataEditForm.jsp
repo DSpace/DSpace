@@ -811,7 +811,7 @@
 		</div>
 		</div>
 		</c:if>
-		<% if(!changeStatusAdmin) { %>
+		<% if(!changeStatusAdmin || isAdmin) { %>
 		<div class="col-md-6">	
 		<div class="cris-edit-status">
 		<spring:bind path="status">

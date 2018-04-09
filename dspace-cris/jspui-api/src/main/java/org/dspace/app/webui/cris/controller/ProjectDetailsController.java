@@ -190,6 +190,7 @@ public class ProjectDetailsController
                         grant));
         
         mvc.getModel().putAll(model);
+        mvc.getModel().put("isAdmin", isAdmin);
         mvc.getModel().put("project", grant);
         return mvc;
     }

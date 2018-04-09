@@ -73,14 +73,22 @@ public abstract class AFormDynamicRPController<P extends Property<TP>, TP extend
                     ResearcherPage.class, id);
         Context context = UIUtil.obtainContext(request);        
                 EPerson currUser = context.getCurrentUser();
-        if (CrisAuthorizeManager.isAdmin(context, researcher) 
-                || (researcher.getEpersonID()!=null && currUser != null && researcher.getEpersonID().equals(
-                        currUser.getID())))
+                
+        if (CrisAuthorizeManager.isAdmin(context, researcher))
         {
             reference.put("isAdmin", new Boolean(true));
             reference.put("researcher_page_menu", new Boolean(true));
             reference.put("researcher", researcher);         
+        } else if ((researcher.getEpersonID()!=null && currUser != null && researcher.getEpersonID().equals(
+                        currUser.getID())))
+        {
+            reference.put("isAdmin", new Boolean(false));
+            reference.put("researcher_page_menu", new Boolean(true));
+            reference.put("researcher", researcher);         
+        } else {
+            reference.put("isAdmin", new Boolean(false));
         }
+
         reference.put("authority_key", ResearcherPageUtils
                 .getPersistentIdentifier(researcher));
         reference.put("specificPartPath", getSpecificPartPath());      
