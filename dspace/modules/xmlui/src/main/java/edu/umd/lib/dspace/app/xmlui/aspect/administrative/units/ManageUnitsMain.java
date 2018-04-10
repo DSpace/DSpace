@@ -20,6 +20,8 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.eperson.Unit;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.UnitService;
 
 /**
  * Manage units page is the entry point for unit management. From here the user
@@ -74,6 +76,8 @@ public class ManageUnitsMain extends AbstractDSpaceTransformer
     /** The number of results to show on one page. */
     private static final int PAGE_SIZE = 15;
 
+    private static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
+
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -90,9 +94,9 @@ public class ManageUnitsMain extends AbstractDSpaceTransformer
                 + knot.getId();
         String query = decodeFromURL(parameters.getParameter("query", ""));
         int page = parameters.getParameterAsInteger("page", 0);
-        int highlightID = parameters.getParameterAsInteger("highlightID", -1);
-        int resultCount = Unit.searchResultCount(context, query);
-        Unit[] units = Unit.search(context, query, page * PAGE_SIZE, PAGE_SIZE);
+        String highlightID = parameters.getParameter("highlightID", null);
+        int resultCount = unitService.searchResultCount(context, query);
+        java.util.List<Unit> units = unitService.search(context, query, page * PAGE_SIZE, PAGE_SIZE);
 
         // DIVISION: units-main
         Division main = body.addInteractiveDivision("units-main", contextPath
@@ -132,7 +136,7 @@ public class ManageUnitsMain extends AbstractDSpaceTransformer
         {
             // If there are enough results then paginate the results
             int firstIndex = page * PAGE_SIZE + 1;
-            int lastIndex = page * PAGE_SIZE + units.length;
+            int lastIndex = page * PAGE_SIZE + units.size();
 
             String nextURL = null, prevURL = null;
             if (page < (resultCount / PAGE_SIZE))
@@ -149,7 +153,7 @@ public class ManageUnitsMain extends AbstractDSpaceTransformer
         }
 
         Table table = search
-                .addTable("units-search-table", units.length + 1, 1);
+                .addTable("units-search-table", units.size() + 1, 1);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_search_column1);
         header.addCell().addContent(T_search_column2);
@@ -159,7 +163,7 @@ public class ManageUnitsMain extends AbstractDSpaceTransformer
         for (Unit unit : units)
         {
             Row row;
-            if (unit.getID() == highlightID)
+            if (unit.getID().toString().equals(highlightID))
             {
                 row = table.addRow(null, null, "highlight");
             }
@@ -168,11 +172,11 @@ public class ManageUnitsMain extends AbstractDSpaceTransformer
                 row = table.addRow();
             }
 
-            if (unit.getID() > 0)
+            if (unit.getID() != null)
             {
                 CheckBox select = row.addCell().addCheckBox("select_unit");
-                select.setLabel(Integer.valueOf(unit.getID()).toString());
-                select.addOption(Integer.valueOf(unit.getID()).toString());
+                select.setLabel(unit.getName());
+                select.addOption(unit.getID().toString());
             }
             else
             {
@@ -181,19 +185,19 @@ public class ManageUnitsMain extends AbstractDSpaceTransformer
                 row.addCell();
             }
 
-            row.addCell().addContent(unit.getID());
+            row.addCell().addContent(unit.getID().toString());
             row.addCell().addXref(
                     baseURL + "&submit_edit&unitID=" + unit.getID(),
                     unit.getName());
 
-            int memberCount = unit.getGroups().length;
+            int memberCount = unit.getGroups().size();
             // + unit.getMemberUnits().length;
             row.addCell().addContent(
                     memberCount == 0 ? "-" : String.valueOf(memberCount));
 
         }
 
-        if (units.length <= 0)
+        if (units.size() <= 0)
         {
             Cell cell = table.addRow().addCell(1, 5);
             cell.addHighlight("italic").addContent(T_no_results);

@@ -23,3 +23,7 @@ Instructions for installing in UMD Libraries development environments (Mac OS X)
 * [DrumFeatures](dspace/docs/DrumFeatures.md) - Summary of DRUM enhancements to base DSpace functionality
 * [DrumFeaturesandCode](dspace/docs/DrumFeaturesandCode.md) - DRUM enhancements with implementation details
 * [docs](dspace/docs) - additional documentation
+
+## License
+
+See the [DRUM-LICENSE](DRUM-LICENSE.md) file for license rights and limitations (Apache 2.0). This lincense only governs the part of code base developed at UMD. The DSpace license can be found at https://github.com/DSpace/DSpace

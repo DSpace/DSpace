@@ -22,7 +22,6 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <global.version>5.6</global.version>
     </properties>
 
     <profiles>
@@ -38,10 +37,10 @@
             </activation>
             <!-- Build all Overlay submodules -->
             <modules>
-                <!-- <module>modules</module> -->
+                <module>modules</module>
             </modules> 
         </profile>
-
+   
         <!--
             DSpace Assembly profile. By default this is enabled.
             This profile actually builds all submodules and then assembles
@@ -145,6 +144,36 @@
                     </executions>
                  </plugin>
               </plugins>
+               <resources>
+                   <!-- Enumerate filtered files explicitly to avoid issues with other config tech. -->
+                   <resource>
+                       <directory>${basedir}</directory>
+                       <filtering>true</filtering>
+                       <includes>
+                           <include>config/default.context.xml</include>
+                           <include>config/dspace.cfg</include>
+                           <include>config/log4j-handle-plugin.properties</include>
+                           <include>config/log4j.properties</include>
+                           <include>config/modules/curate.cfg</include>
+                           <include>config/modules/com.atmire.statistics.oai.cfg</include>
+                           <include>config/modules/solr-statistics.cfg</include>
+                       </includes>
+                   </resource>
+                   <!-- Declare a mutually exclusive resource set for non-filtered files. -->
+                   <resource>
+                       <directory>${basedir}</directory>
+                       <filtering>false</filtering>
+                       <excludes>
+                           <exclude>config/default.context.xml</exclude>
+                           <exclude>config/dspace.cfg</exclude>
+                           <exclude>config/log4j-handle-plugin.properties</exclude>
+                           <exclude>config/log4j.properties</exclude>
+                           <exclude>config/modules/curate.cfg</exclude>
+                           <exclude>config/modules/com.atmire.statistics.oai.cfg</exclude>
+                           <exclude>config/modules/solr-statistics.cfg</exclude>
+                       </excludes>
+                   </resource>
+               </resources>
            </build>
         </profile>
 
@@ -204,6 +233,12 @@
                 </exclusion>
             </exclusions>
     	</dependency>
+        <!-- Ensure that the additional service API classes are available during spring instantiation-->
+        <dependency>
+            <groupId>com.atmire</groupId>
+            <artifactId>atmire-statistics-exporter-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
             <groupId>com.lyncode</groupId>
             <artifactId>builder-commons</artifactId>

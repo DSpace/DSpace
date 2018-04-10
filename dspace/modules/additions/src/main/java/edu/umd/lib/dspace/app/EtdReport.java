@@ -5,92 +5,29 @@
 
 package edu.umd.lib.dspace.app;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
-import java.util.Enumeration;
+import java.io.File;
+import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
-import java.util.HashSet;
-import java.util.TreeMap;
-import java.util.Set;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import java.text.SimpleDateFormat;
-
-// SQL
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
-// IO
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.Writer;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
-import java.io.StringWriter;
-
-// XML
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
-import org.dom4j.ElementHandler;
-import org.dom4j.ElementPath;
-import org.dom4j.InvalidXPathException;
-import org.dom4j.Namespace;
-import org.dom4j.Node;
-import org.dom4j.QName;
-import org.dom4j.Text;
-import org.dom4j.XPath;
-
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.DocumentSource;
-import org.dom4j.io.DocumentResult;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
-
-import org.xml.sax.InputSource;
-
-// XSL
-import javax.xml.transform.dom.DOMSource;  
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-
-import javax.xml.transform.stream.StreamSource; 
-import javax.xml.transform.stream.StreamResult; 
-
-// XPath
-import org.jaxen.Function;
-import org.jaxen.FunctionCallException;
-import org.jaxen.FunctionContext;
-import org.jaxen.Navigator;
-import org.jaxen.SimpleFunctionContext;
-import org.jaxen.XPathFunctionContext;
 
 // Log4J
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
-// DSpace
-import org.dspace.core.ConfigurationManager;
+import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
+import org.dom4j.InvalidXPathException;
+import org.dom4j.XPath;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.xml.sax.InputSource;
 
 // Lims
 import edu.umd.lims.util.ErrorHandling;
@@ -115,6 +52,8 @@ public class EtdReport {
   static Map mXPath = new HashMap();
   
   static DocumentFactory df = DocumentFactory.getInstance();
+    
+  private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
 
   /***************************************************************** main */
@@ -127,7 +66,7 @@ public class EtdReport {
 
     ErrorHandling.setDefaultLogging();
 
-    String strDspace     = ConfigurationManager.getProperty("dspace.dir");
+    String strDspace     = configurationService.getProperty("dspace.dir");
 
     // Log4j configuration
     PropertyConfigurator.configure(strDspace + "/config/log4j-app.properties");

@@ -445,7 +445,8 @@
             </list>
         </property>
         <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
     
     <bean id="searchFilterDepartment" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -456,7 +457,8 @@
             </list>
         </property>
         <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
     
     <bean id="searchFilterType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -467,7 +469,8 @@
             </list>
         </property>
         <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
     
     <bean id="searchFilterAbstract" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -479,7 +482,8 @@
             </list>
         </property>
         <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
     
     <bean id="searchFilterLanguage" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -490,7 +494,8 @@
             </list>
         </property>
         <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
     
     <bean id="searchFilterAdvisor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -501,7 +506,8 @@
             </list>
         </property>
         <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
 
 

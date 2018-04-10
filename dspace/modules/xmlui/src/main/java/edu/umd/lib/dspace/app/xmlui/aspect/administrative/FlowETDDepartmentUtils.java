@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.utils.UIException;
@@ -19,6 +20,9 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.EtdUnit;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.EtdUnitService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -39,6 +43,10 @@ public class FlowETDDepartmentUtils
     private static final Message T_delete_etd_department_success_notice = new Message(
             "default",
             "xmlui.administrative.FlowETDDepartmentUtils.delete_etd_department_success_notice");
+    
+    private static EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
+    
+    private static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     /**
      * Return the current name for the given etd_department ID.
@@ -49,15 +57,15 @@ public class FlowETDDepartmentUtils
      *            The etd_department id.
      * @return The etd_department's name.
      */
-    public static String getName(Context context, int etd_departmentID)
+    public static String getName(Context context, UUID etd_departmentID)
             throws SQLException
     {
-        if (etd_departmentID < 0)
+        if (etd_departmentID == null)
         {
             return "New ETD Department";
         }
 
-        EtdUnit etd_department = EtdUnit.find(context, etd_departmentID);
+        EtdUnit etd_department = etdunitService.find(context, etd_departmentID);
 
         if (etd_department == null)
         {
@@ -78,27 +86,27 @@ public class FlowETDDepartmentUtils
      * @return An array of ids.
      */
     public static String[] getCollectionMembers(Context context,
-            int etd_departmentID) throws SQLException
+            UUID etd_departmentID) throws SQLException
     {
         // New etd_department, just return an empty list
-        if (etd_departmentID < 0)
+        if (etd_departmentID != null)
         {
             return new String[0];
         }
 
-        EtdUnit etd_department = EtdUnit.find(context, etd_departmentID);
+        EtdUnit etd_department = etdunitService.find(context,etd_departmentID);
 
         if (etd_department == null)
         {
             return new String[0];
         }
 
-        Collection[] collection = etd_department.getCollections();
+        List<Collection> collections = etd_department.getCollections();
 
-        String[] collectionIDs = new String[collection.length];
-        for (int i = 0; i < collection.length; i++)
+        String[] collectionIDs = new String[collections.size()];
+        for (int i = 0; i < collections.size(); i++)
         {
-            collectionIDs[i] = String.valueOf(collection[i].getID());
+            collectionIDs[i] = String.valueOf(collections.get(0).getID());
         }
 
         return collectionIDs;
@@ -155,7 +163,7 @@ public class FlowETDDepartmentUtils
      * @return A result
      */
     public static FlowResult processSaveETDDepartment(Context context,
-            int etd_departmentID, String newName, String[] newCollectionIDsArray)
+            UUID etd_departmentID, String newName, String[] newCollectionIDsArray)
                     throws SQLException, AuthorizeException, UIException
     {
         FlowResult result = new FlowResult();
@@ -171,7 +179,7 @@ public class FlowETDDepartmentUtils
         }
 
         EtdUnit etd_department = null;
-        if (etd_departmentID == -1)
+        if (etd_departmentID == null)
         {
             // First, check if the name is blank.
             if (newName == null || newName.length() == 0)
@@ -188,12 +196,12 @@ public class FlowETDDepartmentUtils
 
             // Create a new etd_department, check if the newName is already in
             // use.
-            EtdUnit potentialDuplicate = EtdUnit.findByName(context, newName);
+            EtdUnit potentialDuplicate = etdunitService.findByName(context, newName);
 
             if (potentialDuplicate == null)
             {
                 // All good, create the new etd_department.
-                etd_department = EtdUnit.create(context);
+                etd_department = etdunitService.create(context);
                 etd_department.setName(newName);
             }
             else
@@ -211,7 +219,7 @@ public class FlowETDDepartmentUtils
         }
         else
         {
-            etd_department = EtdUnit.find(context, etd_departmentID);
+            etd_department = etdunitService.find(context, etd_departmentID);
             String name = etd_department.getName();
 
             // Only update the name if there has been a change.
@@ -220,7 +228,7 @@ public class FlowETDDepartmentUtils
             {
                 // The etd_department name is to be updated, check if the
                 // newName is already in use.
-                EtdUnit potentialDuplicate = EtdUnit.findByName(context,
+                EtdUnit potentialDuplicate = etdunitService.findByName(context,
                         newName);
 
                 if (potentialDuplicate == null)
@@ -244,10 +252,10 @@ public class FlowETDDepartmentUtils
         }
 
         // Second, prepare to check members by turning arrays into lists
-        List<Integer> newCollectionIDs = new ArrayList<Integer>();
+        List<String> newCollectionIDs = new ArrayList<String>();
         for (String collectionID : newCollectionIDsArray)
         {
-            newCollectionIDs.add(Integer.valueOf(collectionID));
+            newCollectionIDs.add(collectionID);
         }
 
         // Third, check if there are any members to remove
@@ -257,7 +265,7 @@ public class FlowETDDepartmentUtils
             if (!newCollectionIDs.contains(collectionMember.getID()))
             {
                 // The current collection is not contained in the new list.
-                etd_department.removeCollection(collectionMember);
+                etdunitService.removeCollection(context, etd_department, collectionMember);
             }
             else
             {
@@ -269,15 +277,15 @@ public class FlowETDDepartmentUtils
 
         // Fourth, check if there are any members to add
         // i.e. scan the list of ids against the etd_department.
-        for (Integer collectionID : newCollectionIDs)
+        for (String collectionID : newCollectionIDs)
         {
-            Collection collection = Collection.find(context, collectionID);
+            Collection collection = collectionService.find(context, UUID.fromString(collectionID));
 
-            etd_department.addCollection(collection);
+            etdunitService.addCollection(context, etd_department, collection);
         }
 
         // Last, create the result flow
-        etd_department.update();
+        etdunitService.update(context, etd_department);
         context.commit();
 
         // Let's record our etd_department id in case we created a new one.
@@ -308,9 +316,8 @@ public class FlowETDDepartmentUtils
 
         for (String id : etd_departmentIDs)
         {
-            EtdUnit etd_DepartmentDeleted = EtdUnit.find(context,
-                    Integer.valueOf(id));
-            etd_DepartmentDeleted.delete();
+            EtdUnit etd_DepartmentDeleted = etdunitService.find(context, UUID.fromString(id));
+            etdunitService.delete(context, etd_DepartmentDeleted);
         }
 
         result.setOutcome(true);

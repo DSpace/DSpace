@@ -379,5 +379,5 @@
         <step>
             <class>com.atmire.statistics.export.RetryOpenUrlTracker</class>
         </step>
-    </command>
+     </command>
 </commands>

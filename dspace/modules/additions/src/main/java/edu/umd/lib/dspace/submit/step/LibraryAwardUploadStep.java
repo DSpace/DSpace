@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,11 +20,16 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.util.UUIDUtils;
 
 /**
  * Upload step for DSpace. Processes the actual upload of files for an item
@@ -52,6 +58,14 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
 
     /** Button to cancel editing of file info * */
     public static final String CANCEL_EDIT_BUTTON = "submit_edit_cancel";
+    
+    private final static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    
+    private final static BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    
+    private final static BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+
+    private final static BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
     /***************************************************************************
      * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
@@ -155,7 +169,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
         if (buttonPressed.startsWith(PROGRESS_BAR_PREFIX))
         {
             // check if a file is required to be uploaded
-            if (!item.hasUploadedFiles())
+            if (!itemService.hasUploadedFiles(item))
             {
                 return STATUS_NO_FILES_ERROR;
             }
@@ -184,8 +198,8 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
             else
             {
                 // load info for bitstream we are editing
-                Bitstream b = Bitstream.find(context,
-                        Integer.parseInt(request.getParameter("bitstream_id")));
+                Bitstream b = bitstreamService.find(context, Util.getUUIDParameter(request, "bitstream_id"));
+                        
 
                 // save bitstream to submission info
                 subInfo.setBitstream(b);
@@ -194,11 +208,9 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
         else if (buttonPressed.startsWith("submit_edit_"))
         {
             // get ID of bitstream that was requested for editing
-            String bitstreamID = buttonPressed.substring("submit_edit_"
-                    .length());
+            String bitstreamID = buttonPressed.substring("submit_edit_".length());
 
-            Bitstream b = Bitstream
-                    .find(context, Integer.parseInt(bitstreamID));
+            Bitstream b = bitstreamService.find(context, UUIDUtils.fromString(bitstreamID));
 
             // save bitstream to submission info
             subInfo.setBitstream(b);
@@ -224,7 +236,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                 // remove each file in the list
                 for (int i = 0; i < removeIDs.length; i++)
                 {
-                    int id = Integer.parseInt(removeIDs[i]);
+                    UUID id = UUID.fromString(removeIDs[i]);
 
                     int status = processRemoveFile(context, item, id);
 
@@ -243,7 +255,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
         {
             // A single file "remove" button must have been pressed
 
-            int id = Integer.parseInt(buttonPressed.substring(14));
+            UUID id = UUID.fromString(buttonPressed.substring(14));
             int status = processRemoveFile(context, item, id);
 
             // if error occurred, return immediately
@@ -301,13 +313,12 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
         // -------------------------------------------------
         if (request.getParameter("primary_bitstream_id") != null)
         {
-            Bundle[] bundles = item.getBundles("ORIGINAL");
-            if (bundles.length > 0)
+            List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+            if (!bundles.isEmpty())
             {
-                bundles[0].setPrimaryBitstreamID(Integer.valueOf(
-                        request.getParameter("primary_bitstream_id"))
-                        .intValue());
-                bundles[0].update();
+              Bitstream bitstream = bitstreamService.find(context, Util.getUUIDParameter(request, "primary_bitstream_id"));
+              bundles.get(0).setPrimaryBitstreamID(bitstream);
+              bundleService.update(context, bundles.get(0));
             }
         }
 
@@ -316,7 +327,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
         // files have been uploaded.
         // ---------------------------------------------------
         // check if a file is required to be uploaded
-        if (!item.hasUploadedFiles())
+        if (!itemService.hasUploadedFiles(item))
         {
             return STATUS_NO_FILES_ERROR;
         }
@@ -396,7 +407,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
      * @return Status or error flag which will be processed by UI-related code!
      *         (if STATUS_COMPLETE or 0 is returned, no errors occurred!)
      */
-    protected int processRemoveFile(Context context, Item item, int bitstreamID)
+    protected int processRemoveFile(Context context, Item item, UUID bitstreamID)
             throws IOException, SQLException, AuthorizeException
     {
         Bitstream bitstream;
@@ -404,7 +415,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
         // Try to find bitstream
         try
         {
-            bitstream = Bitstream.find(context, bitstreamID);
+            bitstream = bitstreamService.find(context, bitstreamID);
         }
         catch (NumberFormatException nfe)
         {
@@ -420,17 +431,17 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
 
         // remove bitstream from bundle..
         // delete bundle if it's now empty
-        Bundle[] bundles = bitstream.getBundles();
+        List<Bundle> bundles = bitstream.getBundles();
 
-        bundles[0].removeBitstream(bitstream);
+        bundles.get(0).removeBitstream(bitstream);
 
-        Bitstream[] bitstreams = bundles[0].getBitstreams();
+        List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
 
         // remove bundle if it's now empty
-        if (bitstreams.length < 1)
+        if (bitstreams.isEmpty())
         {
-            item.removeBundle(bundles[0]);
-            item.update();
+            itemService.removeBundle(context, item, bundles.get(0));
+            itemService.update(context, item);
         }
 
         // no errors occurred
@@ -523,18 +534,17 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                     }
 
                     // do we already have a bundle?
-                    Bundle[] bundles = item.getBundles(bundleName);
+                    List<Bundle> bundles = itemService.getBundles(item, bundleName);
 
-                    if (bundles.length < 1)
+                    if (bundles.isEmpty())
                     {
                         // set bundle's name to ORIGINAL
-                        b = item.createSingleBitstream(fileInputStream,
-                                bundleName);
+                        b = itemService.createSingleBitstream(context, fileInputStream, item, bundleName);
                     }
                     else
                     {
                         // we have a bundle already, just add bitstream
-                        b = bundles[0].createBitstream(fileInputStream);
+                        b = bitstreamService.create(context, bundles.get(0), fileInputStream);
                     }
 
                     // Strip all but the last filename. It would be nice
@@ -551,17 +561,17 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                         noPath = noPath.substring(noPath.indexOf('\\') + 1);
                     }
 
-                    b.setName(noPath);
-                    b.setSource(filePath);
-                    b.setDescription(fileDescription);
+                    b.setName(context, noPath);
+                    b.setSource(context, filePath);
+                    b.setDescription(context, fileDescription);
 
                     // Identify the format
-                    bf = FormatIdentifier.guessFormat(context, b);
-                    b.setFormat(bf);
+                    bf = bitstreamFormatService.guessFormat(context, b);
+                    b.setFormat(context, bf);
 
                     // Update to DB
-                    b.update();
-                    item.update();
+                    bitstreamService.update(context, b);
+                    itemService.update(context, item);
 
                     if (bf == null || !bf.isInternal())
                     {
@@ -573,17 +583,17 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
 
                         // remove bitstream from bundle..
                         // delete bundle if it's now empty
-                        Bundle[] bnd = b.getBundles();
+                        List<Bundle> bnd = b.getBundles();
 
-                        bnd[0].removeBitstream(b);
+                        bnd.get(0).removeBitstream(b);
 
-                        Bitstream[] bitstreams = bnd[0].getBitstreams();
+                        List<Bitstream> bitstreams = bnd.get(0).getBitstreams();
 
                         // remove bundle if it's now empty
-                        if (bitstreams.length < 1)
+                        if (bitstreams.isEmpty())
                         {
-                            item.removeBundle(bnd[0]);
-                            item.update();
+                            itemService.removeBundle(context, item, bnd.get(0));
+                            itemService.update(context, item);
                         }
 
                         subInfo.setBitstream(null);
@@ -664,21 +674,21 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
             // Did the user select a format?
             int typeID = Util.getIntParameter(request, "format");
 
-            BitstreamFormat format = BitstreamFormat.find(context, typeID);
+            BitstreamFormat format = bitstreamFormatService.find(context, typeID);
 
             if (format != null)
             {
-                subInfo.getBitstream().setFormat(format);
+                bitstreamService.setFormat(context, subInfo.getBitstream(), format);
             }
             else
             {
                 String userDesc = request.getParameter("format_description");
 
-                subInfo.getBitstream().setUserFormatDescription(userDesc);
+                bitstreamService.setUserFormatDescription(context, subInfo.getBitstream(), userDesc);
             }
 
             // update database
-            subInfo.getBitstream().update();
+            bitstreamService.update(context, subInfo.getBitstream());
         }
         else
         {
@@ -710,9 +720,9 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
     {
         if (subInfo.getBitstream() != null)
         {
-            subInfo.getBitstream().setDescription(
+            subInfo.getBitstream().setDescription(context,
                     request.getParameter("description"));
-            subInfo.getBitstream().update();
+            bitstreamService.update(context, subInfo.getBitstream());
 
             context.commit();
         }
@@ -753,9 +763,10 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
 
             boolean alreadyPresent = false;
 
+            List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(context, subInfo.getSubmissionItem().getItem());
+
             // iterate over already upload bitstreams
-            for (Bitstream b : subInfo.getSubmissionItem().getItem()
-                    .getNonInternalBitstreams())
+            for (Bitstream b : bitstreams)
             {
                 String desc = b.getDescription();
 
@@ -829,11 +840,12 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
     {
         log.debug(LogManager.getHeader(context, "isAllPdf", "begin"));
 
+        List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(context, subInfo.getSubmissionItem().getItem());
+
         // iterate over already upload bitstreams
-        for (Bitstream b : subInfo.getSubmissionItem().getItem()
-                .getNonInternalBitstreams())
+        for (Bitstream b : bitstreams)
         {
-            BitstreamFormat bf = b.getFormat();
+            BitstreamFormat bf = b.getFormat(context);
 
             if (!bf.getMIMEType().equals("application/pdf"))
             {

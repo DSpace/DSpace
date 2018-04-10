@@ -1,16 +1,20 @@
 package org.dspace.identifier.ezid;
 
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class HandleToTarget implements Transform
 {
 
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
     @Override
     public String transform(String identifierURI) throws Exception
     {
-        String cPrefix = ConfigurationManager
+        String cPrefix = configurationService
                 .getProperty("handle.canonical.prefix");
-        String hPrefix = ConfigurationManager.getProperty("handle.prefix");
+        String hPrefix = configurationService.getProperty("handle.prefix");
         String prefix = cPrefix + hPrefix;
         if (identifierURI.startsWith(prefix))
         {
@@ -20,6 +24,11 @@ public class HandleToTarget implements Transform
         {
             throw new Exception();
         }
+    }
+
+    public void setConfigurationService(ConfigurationService configurationService)
+    {
+        this.configurationService = configurationService;
     }
 
 }

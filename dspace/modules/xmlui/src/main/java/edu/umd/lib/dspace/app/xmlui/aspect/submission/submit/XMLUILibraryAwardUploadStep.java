@@ -9,19 +9,17 @@ package edu.umd.lib.dspace.app.xmlui.aspect.submission.submit;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
-import org.apache.commons.lang.ArrayUtils;
 import org.dspace.app.util.Util;
-import org.dspace.app.webui.util.UIUtil;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.aspect.submission.submit.ReviewStep;
 import org.dspace.app.xmlui.utils.UIException;
@@ -121,7 +119,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
     protected static final Message T_missing_bitstreams = message("xmlui.Submission.submit.XMLUILibraryAwardUploadStep.missing_bitstreams");
 
     protected static final Message T_not_pdf = message("xmlui.Submission.submit.XMLUILibraryAwardUploadStep.not_pdf");
-
+    
     // protected static final Message T_not_pdf_error = message()
     /**
      * Establish our required parameters, abstractStep will enforce these.
@@ -155,12 +153,11 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
         boolean disableFileEditing = (submissionInfo.isInWorkflow())
                 && !ConfigurationManager.getBooleanProperty("workflow",
                         "reviewer.file-edit");
-        Bundle[] bundles = item.getBundles();
-        Bitstream[] bitstreams = new Bitstream[0];
-        for (int index = 0; index < bundles.length; index++)
+        java.util.List<Bundle> bundles = item.getBundles();
+        java.util.List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+        for (Bundle bundle : bundles)
         {
-            bitstreams = (Bitstream[]) ArrayUtils.addAll(bitstreams,
-                    bundles[index].getBitstreams());
+          bitstreams.addAll(bundle.getBitstreams());
         }
 
         // Part A:
@@ -179,7 +176,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
             upload.setHead(T_head);
 
             Request request = ObjectModelHelper.getRequest(objectModel);
-            String buttonPressed = UIUtil.getSubmitButton(request,
+            String buttonPressed = Util.getSubmitButton(request,
                     LibraryAwardUploadStep.NEXT_BUTTON);
 
             // dropdown
@@ -247,10 +244,10 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 
         // Part B:
         // If the user has already uploaded files provide a list for the user.
-        if (bitstreams.length > 0 || disableFileEditing)
+        if (bitstreams.size() > 0 || disableFileEditing)
         {
             Table summary = div.addTable("submit-upload-summary",
-                    (bitstreams.length * 2) + 2, 7);
+                    (bitstreams.size() * 2) + 2, 7);
             summary.setHead(T_head2);
 
             Row header = summary.addRow(Row.ROLE_HEADER);
@@ -264,7 +261,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 
             for (Bitstream bitstream : bitstreams)
             {
-                int id = bitstream.getID();
+                UUID id = bitstream.getID();
                 String name = bitstream.getName();
                 String url = makeBitstreamLink(item, bitstream);
                 long bytes = bitstream.getSize();
@@ -280,7 +277,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 
                 // If this bitstream is already marked as the primary bitstream
                 // mark it as such.
-                if (bundles[0].getPrimaryBitstreamID() == id)
+                if (bundles.get(0).getPrimaryBitstream().getID().equals(id))
                 {
                     primary.setOptionSelected(String.valueOf(id));
                 }
@@ -290,7 +287,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
                     // Workflow users can not remove files.
                     CheckBox remove = row.addCell().addCheckBox("remove");
                     remove.setLabel("remove");
-                    remove.addOption(id);
+                    remove.addOption(id.toString());
                 }
                 else
                 {
@@ -308,7 +305,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
                     row.addCellContent(desc);
                 }
 
-                BitstreamFormat format = bitstream.getFormat();
+                BitstreamFormat format = bitstream.getFormat(context);
                 if (format == null)
                 {
                     row.addCellContent(T_unknown_format);
@@ -388,17 +385,16 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
         uploadSection.setHead(T_head);
         // Review all uploaded files
         Item item = submission.getItem();
-        Bundle[] bundles = item.getBundles();
-        Bitstream[] bitstreams = new Bitstream[0];
-        for (int index = 0; index < bundles.length; index++)
+        java.util.List<Bundle> bundles = item.getBundles();
+        java.util.List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+        for (Bundle bundle : bundles)
         {
-            bitstreams = (Bitstream[]) ArrayUtils.addAll(bitstreams,
-                    bundles[index].getBitstreams());
+            bitstreams.addAll(bundle.getBitstreams());
         }
 
         for (Bitstream bitstream : bitstreams)
         {
-            BitstreamFormat bitstreamFormat = bitstream.getFormat();
+            BitstreamFormat bitstreamFormat = bitstream.getFormat(context);
 
             String name = bitstream.getName();
             String url = makeBitstreamLink(item, bitstream);

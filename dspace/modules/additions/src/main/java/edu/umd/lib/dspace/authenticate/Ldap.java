@@ -5,16 +5,12 @@
 
 package edu.umd.lib.dspace.authenticate;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.naming.Context;
@@ -22,21 +18,23 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
-
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.LogManager;
-
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.UnitService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 /*********************************************************************
@@ -60,6 +58,21 @@ public class Ldap {
   private static final String[] strRequestAttributes = 
   new String[]{"givenname", "sn", "mail", "umfaculty", "telephonenumber", 
                "ou", "umappointment"};
+    
+  private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+  private final static EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
+  private final static GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();   
+  
+  // Begin UMD Customization
+  private final static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();   
+  // End UMD Customization
+  
+  /**
+  * Wild card for Dublin Core metadata qualifiers/languages
+  */
+ public static final String ANY = "*";
 
 
   /******************************************************************* Ldap */
@@ -73,9 +86,9 @@ public class Ldap {
   {
     this.context = context;
 
-    String strUrl = ConfigurationManager.getProperty("ldap.url");
-    String strBindAuth = ConfigurationManager.getProperty("ldap.bind.auth");
-    String strBindPassword =  ConfigurationManager.getProperty("ldap.bind.password");
+    String strUrl = configurationService.getProperty("ldap.url");
+    String strBindAuth = configurationService.getProperty("ldap.bind.auth");
+    String strBindPassword =  configurationService.getProperty("ldap.bind.password");
 
     // Setup the JNDI environment
     Properties env = new Properties();
@@ -217,11 +230,10 @@ public class Ldap {
         String strPassword = strLdapPassword.substring(i+1);
 
         // Find the eperson
-        EPerson eperson = EPerson.findByEmail(context, strEmail.toLowerCase());
-        if (eperson != null && eperson.checkPassword(strPassword)) {
+        EPerson eperson = epersonService.findByEmail(context, strEmail.toLowerCase());
+        if (eperson != null && epersonService.checkPassword(context, eperson, strPassword)) {
           // Is the eperson an admin?
-          Group g = Group.find(context, 1);
-          if (g.isMember(eperson)) {
+          if (groupService.isMember(context, eperson, Group.ADMIN)) {
             return true;
           }
         }
@@ -383,7 +395,7 @@ public class Ldap {
     for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
       String strUnit = (String) i.next();
 
-      Unit unit = Unit.findByName(context, strUnit);
+      Unit unit = unitService.findByName(context, strUnit);
 
       if (unit != null && (!unit.getFacultyOnly() || isFaculty())) {
         ret.addAll(Arrays.asList(unit.getGroups()));
@@ -391,37 +403,6 @@ public class Ldap {
     }
 
     return new ArrayList(ret);
-  }
-
-
-  /********************************************************** getGroupsInt */
-  /**
-   * Cache of mapped groups.
-   */
-
-  private int[] groupsCache = null;
-
-  /**
-   * Groups mapped by the Units.  Returns cached array of int group_id.
-   */
-
-  public int[] getGroupsInt() throws NamingException, java.sql.SQLException 
-  {
-    if (groupsCache != null) {
-      return groupsCache;
-    }
-
-    List groups = getGroups();
-
-    groupsCache = new int[groups.size()];
-
-    int j = 0;
-    for (Iterator i = groups.iterator(); i.hasNext(); ) {
-      Group g = (Group) i.next();
-      groupsCache[j++] = g.getID();
-    }
-
-    return groupsCache;
   }
 
 
@@ -487,11 +468,11 @@ public class Ldap {
 
     try {
       // Use the admin account to create the eperson
-      EPerson admin = EPerson.findByEmail(context, "ldap_um@drum.umd.edu");
+      EPerson admin = epersonService.findByEmail(context, "ldap_um@drum.umd.edu");
       context.setCurrentUser(admin);
 
       // Create a new eperson
-      EPerson eperson = EPerson.create(context);
+      EPerson eperson = epersonService.create(context);
                         
       String strFirstName = getFirstName();
       if (strFirstName == null)
@@ -507,13 +488,13 @@ public class Ldap {
 
       eperson.setNetid(uid);
       eperson.setEmail(uid + "@umd.edu");
-      eperson.setFirstName(strFirstName);
-      eperson.setLastName(strLastName);
-      eperson.setMetadata("phone", strPhone);
+      eperson.setFirstName(context, strFirstName);
+      eperson.setLastName(context, strLastName);
+      epersonService.addMetadata(context, eperson, MetadataSchema.DC_SCHEMA, "phone", null, ANY, strPhone);
       eperson.setCanLogIn(true);
       eperson.setRequireCertificate(false);
 
-      eperson.update();
+      epersonService.update(context, eperson);
       context.commit();
                         
       log.info(LogManager.getHeader(context,

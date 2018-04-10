@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -24,6 +25,9 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.UnitService;
 
 import edu.umd.lib.dspace.app.xmlui.aspect.administrative.FlowUnitsUtils;
 
@@ -101,6 +105,10 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
     /** The maximum size of a collection name allowed */
     private static final int MAX_COLLECTION_NAME = 25;
 
+    private static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
+
+    private static GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -114,18 +122,18 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
     public void addBody(Body body) throws WingException, SQLException
     {
         // Find the unit in question
-        int unitID = parameters.getParameterAsInteger("unitID", -1);
+        String unitID = parameters.getParameter("unitID", null);
         String currentName = decodeFromURL(parameters.getParameter("unitName",
                 null));
         if (currentName == null || currentName.length() == 0)
         {
-            currentName = FlowUnitsUtils.getName(context, unitID);
+            currentName = FlowUnitsUtils.getName(context, UUID.fromString(unitID));
         }
 
         Unit unit = null;
-        if (unitID >= 0)
+        if (unitID != null)
         {
-            unit = Unit.find(context, unitID);
+            unit = unitService.find(context, UUID.fromString(unitID));
 
         }
         boolean facultyOnlyValue = true;
@@ -134,7 +142,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
             facultyOnlyValue = unit.getFacultyOnly();
         }
         // Get list of member groups from url
-        List<Integer> memberGroupIDs = new ArrayList<Integer>();
+        List<UUID> memberGroupIDs = new ArrayList<UUID>();
         String memberGroupIDsString = parameters.getParameter("memberGroupIDs",
                 null);
         if (memberGroupIDsString != null)
@@ -143,13 +151,12 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
             {
                 if (id.length() > 0)
                 {
-                    memberGroupIDs.add(Integer.valueOf(id));
+                    memberGroupIDs.add(UUID.fromString(id));
                 }
             }
         }
 
-        int highlightGroupID = parameters.getParameterAsInteger(
-                "highlightGroupID", -1);
+        String highlightGroupID = parameters.getParameter("highlightGroupID", null);
 
         // Get search parameters
         String query = decodeFromURL(parameters.getParameter("query", null));
@@ -236,12 +243,12 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
      * Search for groups to add to this unit.
      */
     private void addGroupsSearch(Division div, String query, int page,
-            Unit unit, List<Integer> memberGroupIDs) throws SQLException,
+            Unit unit, List<UUID> memberGroupIDs) throws SQLException,
             WingException
     {
-        Group[] groups = Group.search(context, query, page * RESULTS_PER_PAGE,
+        List<Group> groups = groupService.search(context, query, page * RESULTS_PER_PAGE,
                 RESULTS_PER_PAGE);
-        int resultCount = Group.searchResultCount(context, query);
+        int resultCount = groupService.searchResultCount(context, query);
 
         Division results = div.addDivision("results");
 
@@ -251,7 +258,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
             String baseURL = contextPath
                     + "/admin/units?administrative-continue=" + knot.getId();
             int firstIndex = page * RESULTS_PER_PAGE + 1;
-            int lastIndex = page * RESULTS_PER_PAGE + groups.length;
+            int lastIndex = page * RESULTS_PER_PAGE + groups.size();
 
             String nextURL = null, prevURL = null;
             if (page < (resultCount / RESULTS_PER_PAGE))
@@ -269,7 +276,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
 
         /* Set up a table with search results (if there are any). */
         Table table = results.addTable("group-edit-search-groups",
-                groups.length + 1, 2);
+                groups.size() + 1, 2);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_groups_column1);
         header.addCell().addContent(T_groups_column2);
@@ -281,7 +288,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
 
             Row groupData = table.addRow();
 
-            groupData.addCell().addContent(group.getID());
+            groupData.addCell().addContent(groupID);
             groupData.addCell().addContent(name);
 
             // check if they are already a member of the group
@@ -305,7 +312,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
             }
         }
 
-        if (groups.length <= 0)
+        if (groups.size() <= 0)
         {
             table.addRow().addCell(1, 2).addContent(T_no_results);
         }
@@ -319,7 +326,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
      */
 
     private boolean addMemberList(Division div, Unit parent,
-            List<Integer> memberGroupIDs, int highlightGroupID)
+            List<UUID> memberGroupIDs, String highlightGroupID)
             throws WingException, SQLException
     {
         // Flag to remember if there are any pending changes.
@@ -337,7 +344,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
 
         // get all member groups, pend or actual
         // the cast is correct
-        List<Integer> allMemberGroupIDs = new ArrayList<Integer>(memberGroupIDs);
+        List<UUID> allMemberGroupIDs = new ArrayList<UUID>(memberGroupIDs);
 
         for (Group group : parent.getGroups())
         {
@@ -349,10 +356,10 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
         // Sort them to a consistent ordering
         Collections.sort(allMemberGroupIDs);
 
-        for (Integer groupID : allMemberGroupIDs)
+        for (UUID groupID : allMemberGroupIDs)
         {
-            Group group = Group.find(context, groupID);
-            boolean highlight = (group.getID() == highlightGroupID);
+            Group group = groupService.find(context, groupID);
+            boolean highlight = (group.getID().toString().equals(highlightGroupID));
             boolean pendingAddition = !parent.isMember(group);
             boolean pendingRemoval = !memberGroupIDs.contains(groupID);
             addMemberRow(table, group, highlight, pendingAddition,
@@ -395,7 +402,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
         Row groupData = table
                 .addRow(null, null, highlight ? "highlight" : null);
 
-        groupData.addCell().addContent(group.getID());
+        groupData.addCell().addContent(group.getID().toString());
 
         Cell nameCell = groupData.addCell();
         nameCell.addContent(fullName);

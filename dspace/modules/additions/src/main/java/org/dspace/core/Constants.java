@@ -10,7 +10,7 @@ package org.dspace.core;
 /**
  * Class with constants and matching strings, for DSpace types. These numbers
  * must never be changed!!
- *
+ * 
  * @author David Stuve
  * @version $Revision$
  */
@@ -20,7 +20,7 @@ public class Constants
     public static final int UNIT = 666;
 
     public static final int ETDUNIT = 667;
-
+  
     /** Type of bitstream objects */
     public static final int BITSTREAM = 0;
 
@@ -55,15 +55,15 @@ public class Constants
      * Special Bundle and Bitstream Names:
      */
 
-    /** Magic name of item license, as bitstream in LICENSE_BUNDLE_NAME */
+    /** Magic name of item license, as bitstream in LICENSE_BUNDLE_NAME  */
     public static final String LICENSE_BITSTREAM_NAME = "license.txt";
 
     /** Magic name of bundle containing item license */
     public static final String LICENSE_BUNDLE_NAME = "LICENSE";
 
     /**
-     * Default bundle name for the "original" item content; "derived" content
-     * such as thumbnails goes in other bundles.
+     * Default bundle name for the "original" item content;
+     * "derived" content such as thumbnails goes in other bundles.
      */
     public static final String DEFAULT_BUNDLE_NAME = "ORIGINAL";
 
@@ -75,6 +75,7 @@ public class Constants
     /** Bundle name for structured metadata bitstreams. */
     public static final String METADATA_BUNDLE_NAME = "METADATA";
 
+
     /** Action of reading, viewing or downloading something */
     public static final int READ = 0;
 
@@ -84,7 +85,7 @@ public class Constants
     /**
      * Action of deleting something. Different from removing something from a
      * container. (DELETE is now obsolete)
-     *
+     * 
      * @see #REMOVE
      */
     public static final int DELETE = 2;
@@ -98,7 +99,7 @@ public class Constants
 
     /**
      * Action of removing something from a container. Different from deletion.
-     *
+     * 
      * @see #DELETE
      */
     public static final int REMOVE = 4;
@@ -124,16 +125,15 @@ public class Constants
     /**
      * @deprecated As of DSpace 1.6, replaced by Constants.ADMIN
      */
-    @Deprecated
     public static final int COLLECTION_ADMIN = 11;
 
     /**
      * Administrative actions - System Admin, Community Admin, Collection Admin
      */
     public static final int ADMIN = 11;
-
+    
     public static final int WITHDRAWN_READ = 12;
-
+    
     /** Position of front page news item -- top box */
     public static final int NEWS_TOP = 0;
 
@@ -150,7 +150,7 @@ public class Constants
 
     /**
      * generating constants for the relevance array dynamically is simple: just
-     * 1 << TYPE
+     * {@code 1 << TYPE}
      */
     public static final int RBITSTREAM = 1 << BITSTREAM;
 
@@ -172,7 +172,7 @@ public class Constants
     public static final int[] actionTypeRelevance = {
             RBITSTREAM | RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 0 - READ
             RBITSTREAM | RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 1 -
-            // WRITE
+                                                                     // WRITE
             0, // 2 - DELETE (obsolete)
             RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 3 - ADD
             RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 4 - REMOVE
@@ -184,19 +184,18 @@ public class Constants
             RCOLLECTION, // 10 - DEFAULT_ITEM_READ
             RITEM | RCOLLECTION | RCOMMUNITY, // 11 - ADMIN
             RBITSTREAM | RBUNDLE | RITEM // 12 - WITHDRAWN_READ
-
     };
 
     public static final String DEFAULT_ENCODING = "UTF-8";
 
     /**
      * If you know the type string, look up the corresponding type ID constant.
-     *
+     * 
      * @param type
      *            String with the name of the type (must be exact match)
-     *
-     * @return the corresponding type ID, or <code>-1</code> if the type string
-     *         is unknown
+     * 
+     * @return the corresponding type ID, or <code>-1</code> if the type
+     *         string is unknown
      */
     public static int getTypeID(String type)
     {
@@ -214,10 +213,10 @@ public class Constants
     /**
      * If you know the action string, look up the corresponding type ID
      * constant.
-     *
+     * 
      * @param action
      *            String with the name of the action (must be exact match)
-     *
+     * 
      * @return the corresponding action ID, or <code>-1</code> if the action
      *         string is unknown
      */

@@ -6,6 +6,7 @@ package edu.umd.lib.dspace.app.xmlui.aspect.administrative.units;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -18,6 +19,8 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.Unit;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.UnitService;
 
 /**
  * Present the user with a list of soon-to-be-deleted Units. If the user clicks
@@ -32,26 +35,20 @@ public class DeleteUnitsConfirm extends AbstractDSpaceTransformer
     private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
     private static final Message T_unit_trail = message("xmlui.administrative.units.general.unit_trail");
-
     private static final Message T_title = message("xmlui.administrative.units.DeleteUnitsConfirm.title");
-
     private static final Message T_trail = message("xmlui.administrative.units.DeleteUnitsConfirm.trail");
-
     private static final Message T_head = message("xmlui.administrative.units.DeleteUnitsConfirm.head");
-
     private static final Message T_para = message("xmlui.administrative.units.DeleteUnitsConfirm.para");
-
     private static final Message T_column1 = message("xmlui.administrative.units.DeleteUnitsConfirm.column1");
-
     private static final Message T_column2 = message("xmlui.administrative.units.DeleteUnitsConfirm.column2");
-
     private static final Message T_column3 = message("xmlui.administrative.units.DeleteUnitsConfirm.column3");
-
     private static final Message T_column4 = message("xmlui.administrative.units.DeleteUnitsConfirm.column4");
 
     private static final Message T_submit_confirm = message("xmlui.general.delete");
 
     private static final Message T_submit_cancel = message("xmlui.general.cancel");
+
+    private static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -71,7 +68,7 @@ public class DeleteUnitsConfirm extends AbstractDSpaceTransformer
         ArrayList<Unit> units = new ArrayList<Unit>();
         for (String id : idsString.split(","))
         {
-            Unit unit = Unit.find(context, Integer.valueOf(id));
+            Unit unit = unitService.find(context, UUID.fromString(id));
             units.add(unit);
         }
 
@@ -91,9 +88,9 @@ public class DeleteUnitsConfirm extends AbstractDSpaceTransformer
         for (Unit unit : units)
         {
             Row row = table.addRow();
-            row.addCell().addContent(unit.getID());
+            row.addCell().addContent(unit.getID().toString());
             row.addCell().addContent(unit.getName());
-            row.addCell().addContent(unit.getGroups().length);
+            row.addCell().addContent(unit.getGroups().size());
             // row.addCell().addContent(unit.getMemberGroups().length);
         }
 

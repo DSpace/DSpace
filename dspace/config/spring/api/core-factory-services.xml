@@ -44,6 +44,12 @@
 
     <!--Basic workflow services, comment or remove when switching to the configurable workflow -->
     <bean id="workflowServiceFactory" class="org.dspace.workflowbasic.factory.BasicWorkflowServiceFactoryImpl"/>
+
+    <!-- Begin UMD Customization -->
+    <!-- IRUS Patch -->
+    <bean id="openURLTrackerLoggerServiceFactory" class="com.atmire.statistics.export.factory.OpenURLTrackerLoggerServiceFactoryImpl"/>
+    <!-- End UMD Customization -->
+
     <!--Configurable workflow services, uncomment to enable-->
     <!--<bean id="workflowServiceFactory" class="org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactoryImpl"/>-->
 
