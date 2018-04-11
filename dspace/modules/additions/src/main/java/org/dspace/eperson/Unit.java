@@ -42,7 +42,7 @@ public class Unit extends DSpaceObject
     @Column(name="unit_id", insertable = false, updatable = false)
     private Integer legacyId;
 
-    @Column(name="name", length = 256)
+    @Column(name="name", length = 256, unique = true)
     private String name;
 
     @Column(name="faculty_only")
@@ -73,7 +73,7 @@ public class Unit extends DSpaceObject
      */
     public String getName()
     {
-        return this.name;
+        return this.name == null ? "" : this.name;
     }
 
     /**
@@ -182,15 +182,5 @@ public class Unit extends DSpaceObject
     public boolean isMember(Group group)
     {
         return this.groups.contains(group);
-    }
-
-    public boolean isUnitChanged() {
-        return unitChanged;
-    }
-    public void clearUnitChanged() {
-        this.unitChanged = false;
-    }
-    protected void setUnitChanged() {
-        this.unitChanged = true;
     }
 }
