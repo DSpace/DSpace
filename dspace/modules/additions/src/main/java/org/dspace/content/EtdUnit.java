@@ -43,7 +43,7 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
     @Column(name="etdunit_id", insertable = false, updatable = false)
     private Integer legacyId;
 
-    @Column(name="name", length = 256)
+    @Column(name="name", length = 256, unique = true)
     private String name;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -69,7 +69,7 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
     @Override
     public String getName()
     {
-        return this.name;
+        return this.name == null ? "" : this.name;
     }
 
     /**
