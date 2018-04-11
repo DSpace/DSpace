@@ -908,6 +908,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
 
         // Remove all existing policies from the Item
         AuthorizeManager.removeAllPolicies(context, item);
+        context.commit();
 
         // Export item AIP
         log.info("testRestoreItemNoPolicies() - CREATE Item AIP");
