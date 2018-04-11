@@ -14,112 +14,108 @@
 /**
  * Prevent the navbar from covering up the UMD header toggle arrow (#umh-toggle-arrow)
  */
-.navbar-static-top {
-     z-index: auto;
+ .navbar-static-top {
+  z-index: auto;
 }
 
 header .navbar-default {
-    background-color: white;
+ background-color: white;
 }
 header .navbar-brand img {
-    height: 50px;
+ height: 50px;
 }
 .navbar-brand {
-    padding: 5px 15px;
-    height: 60px;
+ padding: 5px 15px;
+ height: 60px;
 }
 .trail-wrapper {
-    background-color: #555;
-    border-bottom: 1px solid #555;
-    color: #fff;
+ background-color: #555;
+ border-bottom: 1px solid #555;
+ color: #fff;
 }
 .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
-    background-color: #777;
-    border-color: #555;
+ background-color: #777;
+ border-color: #555;
 }
 .btn-primary {
-    background-color: #777;
-    border-color: #555;
+ background-color: #777;
+ border-color: #555;
 }
 .trail-wrapper .breadcrumb > .active {
-    color: #fff;
+ color: #fff;
 }
 .breadcrumb a {
-    color: #fff7af;
+ color: #fff7af;
 }
 header .navbar-default .navbar-toggle > li > a, header .navbar-default .navbar-nav > li > a {
-    background: #555 none repeat scroll 0 0;
+ background: #555 none repeat scroll 0 0;
 }
 
 header .navbar-default .navbar-toggle, header .navbar-default .navbar-nav {
-    background: #555 none repeat scroll 0 0;
-    border-color: transparent;
-    color: #fff;
+ background: #555 none repeat scroll 0 0;
+ border-color: transparent;
+ color: #fff;
 }
 
 @media (max-width: 991px) {
-	.clear-float-xs-sm {
-		float:none;
-	}
+.clear-float-xs-sm {
+ float:none;
+}
 }
 
 .citation-handle {
-	text-align: center;
+text-align: center;
 }
 
 .citation-handle-label {
-	background: #dddddd;
-	display: inline;
-	font-weight: bold;
+background: #dddddd;
+display: inline;
+font-weight: bold;
 }
 
 .citation-handle-value {
-	padding: 2px 4px;
-	font-size: 90%;
-	color: #c7254e;
-	white-space: nowrap;
-	background-color: #f9f2f4;
-	display: inline;
-}
-@include selection {
-    color: white;
-    background: hotpink;
+padding: 2px 4px;
+font-size: 90%;
+color: #c7254e;
+white-space: nowrap;
+background-color: #f9f2f4;
+display: inline;
 }
 
 .publication-records-modal, .publication-records-modal ul {
-  list-style-type: none;
-  padding-left: 0px;
+list-style-type: none;
+padding-left: 0px;
 }
 
 .publication-records-import-btn {
-  margin: 5px 0px 15px 0px;
+margin: 5px 0px 15px 0px;
 }
 
 .bold {
-  font-weight: bold;
+font-weight: bold;
 }
 
 .imported {
-  background-color: #E2E2E2;
+background-color: #E2E2E2;
 }
 
 #aspect_submission_StepTransformer_div_StartSubmissionLookupStep {
 
-  #aspect_submission_StepTransformer_field_search {
-    width: 81%;
-    display: inline;
-  }
+#aspect_submission_StepTransformer_field_search {
+ width: 81%;
+ display: inline;
+}
 
-  #aspect_submission_StepTransformer_field_lookup {
-    width:19%
-  }
+#aspect_submission_StepTransformer_field_lookup {
+ width:19%
+}
 
-  .modal .modal-body {
-    max-height: 500px;
-    overflow-y: auto;
-  }
+.modal .modal-body {
+ max-height: 500px;
+ overflow-y: auto;
+}
 
-  #aspect_submission_StepTransformer_item_publication-title{
-    margin-bottom:5px;
-  }
+#aspect_submission_StepTransformer_item_publication-title{
+ margin-bottom:5px;
+}
 }
