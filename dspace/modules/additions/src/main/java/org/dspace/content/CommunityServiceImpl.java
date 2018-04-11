@@ -693,35 +693,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     }
 
     // Begin UMD Customization
-    // Customization to support getting/setting int metadata value, finding top level community by CommunityGroup
-    // Used in EditCommunityMetadataForm.java, FlowContainerUtils.java, CommunityGroup.java
-    @Override
-    public int getIntMetadata(Community community, String field) throws NumberFormatException {
-        String[] MDValue = getMDValueByLegacyField(field);
-        String value = getMetadataFirstValue(community, MDValue[0], MDValue[1], MDValue[2], Item.ANY);
-        return Integer.parseInt(value);
-    }
-
-    @Override
-    public void setMetadata(Context context, Community community, String field, Integer value) throws MissingResourceException, SQLException {
-        String[] MDValue = getMDValueByLegacyField(field);
-
-        /*
-         * Set metadata field to null if null
-         * and trim strings to eliminate excess
-         * whitespace.
-         */
-        if(value == null)
-        {
-            clearMetadata(context, community, MDValue[0], MDValue[1], MDValue[2], Item.ANY);
-        }
-        else
-        {
-            setMetadataSingleValue(context, community, MDValue[0], MDValue[1], MDValue[2], null, value.toString());
-        }
-        community.addDetails(field);
-    }
-
     @Override
     public List<Community> findByCommunityGroupTop(Context context, CommunityGroup group) throws SQLException
     {
@@ -730,7 +701,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         List<Community> topGroupCommunities = new ArrayList<Community>();
       
         for (Community community : topCommunities) {
-            if(group.getID() == getIntMetadata(community, Community.GROUP_ID_FIELD)) {
+            if(group.getID() == community.getGroupID()) {
                 topGroupCommunities.add(community);
             }
         }

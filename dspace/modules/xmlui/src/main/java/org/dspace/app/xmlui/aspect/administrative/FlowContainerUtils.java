@@ -897,7 +897,7 @@ public class FlowContainerUtils
         
     // Begin UMD Customizaiton
     String communityGroup = request.getParameter("community_group");
-		communityService.setMetadata(context, newCommunity, "Community.GROUP_ID_FIELD", communityGroup);
+    newCommunity.setGroupID(Integer.parseInt(communityGroup));
     // End UMD Customizaiton
 
     	// Upload the logo
@@ -985,7 +985,7 @@ public class FlowContainerUtils
 
     // Begin UMD Customizaiton
     String communityGroup = request.getParameter("community_group");
-		communityService.setMetadata(context, community, Community.GROUP_ID_FIELD, communityGroup);
+    community.setGroupID(Integer.parseInt(communityGroup));
     // End UMD Customizaiton
         
         if (deleteLogo)
