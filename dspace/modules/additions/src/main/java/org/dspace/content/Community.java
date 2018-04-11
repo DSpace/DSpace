@@ -42,6 +42,11 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     @Column(name="community_id", insertable = false, updatable = false)
     private Integer legacyId;
 
+    // Begin UMD Customization
+    @Column(name="group_id")
+    private Integer groupId;
+    // End UMD Customization
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "community2community",
@@ -275,6 +280,13 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     // Begin UMD Customization
     // Customization to support finding top level community by CommunityGroup
     // Used in EditCommunityMetadataForm.java, FlowContainerUtils.java, CommunityGroup.java
-    public static final String GROUP_ID_FIELD = "group_id";
+    public int getGroupID() {
+      return this.groupId;
+    }
+
+    public void setGroupID(int groupId) {
+      this.groupId = groupId;
+      setModified();
+    }
     // End UMD Customization
 }
