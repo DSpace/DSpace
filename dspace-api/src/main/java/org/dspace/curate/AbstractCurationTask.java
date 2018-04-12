@@ -86,7 +86,9 @@ public abstract class AbstractCurationTask implements CurationTask {
             if (Constants.COLLECTION == type) {
                 Iterator<Item> iter = itemService.findByCollection(Curator.curationContext(), (Collection) dso);
                 while (iter.hasNext()) {
-                    performObject(iter.next());
+                    Item item = iter.next();
+                    performObject(item);
+                    Curator.curationContext().uncacheEntity(item);
                 }
             } else if (Constants.COMMUNITY == type) {
                 Community comm = (Community) dso;
