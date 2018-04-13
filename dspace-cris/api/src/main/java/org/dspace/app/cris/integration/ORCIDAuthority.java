@@ -34,7 +34,7 @@ public class ORCIDAuthority extends RPAuthority {
 	@Override
 	public Choices getMatches(String field, String query, int collection, int start, int limit, String locale) {
 		Choices choices = super.getMatches(field, query, collection, start, limit, locale);		
-		return new Choices(addExternalResults(field, query, choices, start, limit==0?DEFAULT_MAX_ROWS:limit), choices.start, choices.total, choices.confidence, choices.more);
+		return new Choices(addExternalResults(field, query, choices, start, limit<=0?DEFAULT_MAX_ROWS:limit), choices.start, choices.total, choices.confidence, choices.more);
 	}
 
 	protected Choice[] addExternalResults(String field, String text, Choices choices, int start, int max) {
