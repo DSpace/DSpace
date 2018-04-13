@@ -147,7 +147,10 @@ public class ZDBService {
 			if(i == 0) {
 				zdbItem.setValue(title);
 			}
-			zdbItem.addOtherMetadata("journalTitle", title);
+			else {
+				zdbItem.addOtherMetadata("journalTitle", title);
+			}
+			i++;
 		}
 
 		List<String> publishers = XMLUtils.getElementValueList(rdfDescElementRoot, "dc:publisher");
