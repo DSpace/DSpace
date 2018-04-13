@@ -28,9 +28,26 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import java.util.*;
+
+import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
+import java.util.Map.Entry;
+
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
+import org.jdom.Element;
+
 import java.sql.SQLException;
 import java.util.*;
 import java.util.Map.Entry;
+
 
 /**
  * Configuration and mapping for Google Scholar output metadata
@@ -51,7 +68,7 @@ public class GoogleMetadata
     private String itemURL;
 
     // Configuration keys and fields
-    private static Map<String, String> configuredFields = new HashMap<String, String>();
+    private static Map<String, String> googleScholarSettings = new HashMap<String, String>();
 
     // Google field names (e.g. citation_fieldname) and formatted metadata
     // values
@@ -119,7 +136,10 @@ public class GoogleMetadata
 
     private static final int ALL_FIELDS_IN_OPTION = 2;
 
+    private static GoogleBitstreamComparator googleBitstreamComparator = null;
+
     private Context ourContext;
+
     // Load configured fields from google-metadata.properties
     static
     {
@@ -173,7 +193,7 @@ public class GoogleMetadata
                 if (null != name && !name.equals("") && null != field
                         && !field.equals(""))
                 {
-                    configuredFields.put(name.trim(), field.trim());
+                    googleScholarSettings.put(name.trim(), field.trim());
                 }
             }
         }
@@ -182,6 +202,8 @@ public class GoogleMetadata
         {
             logConfiguration();
         }
+
+
     }
 
     /**
@@ -192,9 +214,9 @@ public class GoogleMetadata
     {
         log.debug("Google Metadata Configuration Mapping:");
 
-        for (String name : configuredFields.keySet())
+        for (String name : googleScholarSettings.keySet())
         {
-            log.debug("  " + name + " => " + configuredFields.get(name));
+            log.debug("  " + name + " => " + googleScholarSettings.get(name));
         }
     }
 
@@ -211,9 +233,13 @@ public class GoogleMetadata
         // Hold onto the item in case we need to refresh a stale parse
         this.item = item;
         itemURL = HandleManager.resolveToURL(context, item.getHandle());
+
+        googleBitstreamComparator = new GoogleBitstreamComparator(context, googleScholarSettings);
+
         ourContext=context;
         EPerson currentUser = ourContext.getCurrentUser();
         ourContext.setCurrentUser(null);
+
         parseItem();
         ourContext.setCurrentUser(currentUser);
     }
@@ -228,7 +254,7 @@ public class GoogleMetadata
     private boolean addSingleField(String fieldName)
     {
 
-        String config = configuredFields.get(fieldName);
+        String config = googleScholarSettings.get(fieldName);
 
         if (null == config || config.equals(""))
         {
@@ -729,7 +755,7 @@ public class GoogleMetadata
             addSingleField(PATENT_NUMBER);
 
             // Use config value for patent country. Should be a literal.
-            String countryConfig = configuredFields.get(PATENT_COUNTRY);
+            String countryConfig = googleScholarSettings.get(PATENT_COUNTRY);
             if (null != countryConfig && !countryConfig.trim().equals(""))
             {
                 metadataMappings.put(PATENT_COUNTRY, countryConfig.trim());
@@ -1044,15 +1070,15 @@ public class GoogleMetadata
 		Bundle[] contentBundles = item.getBundles("ORIGINAL");
 		for (Bundle bundle : contentBundles) {
 			int primaryBitstreamId = bundle.getPrimaryBitstreamID();
-			Bitstream[] bitstreams = bundle.getBitstreams();
-			for (Bitstream candidate : bitstreams) {
+			List<Bitstream> bitstreams = Arrays.asList(bundle.getBitstreams());
+            Collections.sort(bitstreams, googleBitstreamComparator);
+            for (Bitstream candidate : bitstreams) {
 				if (candidate.getID() == primaryBitstreamId) { // is primary -> use this one
 					if (isPublic(candidate)) {
 						return candidate;
 					}					
 				} else 
 					{
-						
 						if (bestSoFar == null && isPublic(candidate)) { //if bestSoFar is null but the candidate is not public you don't use it and try to find another
 						bestSoFar = candidate;
 						}					
@@ -1087,7 +1113,7 @@ public class GoogleMetadata
     private void addAggregateValues(String FIELD, String delim)
     {
 
-        String authorConfig = configuredFields.get(FIELD);
+        String authorConfig = googleScholarSettings.get(FIELD);
         ArrayList<Metadatum> fields = resolveMetadataFields(authorConfig);
 
         if (null != fields && !fields.isEmpty())
@@ -1115,7 +1141,7 @@ public class GoogleMetadata
      */
     private void addMultipleValues(String FIELD)
     {
-        String fieldConfig = configuredFields.get(FIELD);
+        String fieldConfig = googleScholarSettings.get(FIELD);
         ArrayList<Metadatum> fields = resolveMetadataFields(fieldConfig);
 
         if (null != fields && !fields.isEmpty())
@@ -1136,7 +1162,7 @@ public class GoogleMetadata
     private boolean itemIsDissertation()
     {
 
-        String dConfig = configuredFields.get(DISSERTATION_ID);
+        String dConfig = googleScholarSettings.get(DISSERTATION_ID);
         if (null == dConfig || dConfig.trim().equals(""))
         {
             return false;
@@ -1155,7 +1181,7 @@ public class GoogleMetadata
     private boolean itemIsPatent()
     {
 
-        String dConfig = configuredFields.get(PATENT_ID);
+        String dConfig = googleScholarSettings.get(PATENT_ID);
         if (null == dConfig || dConfig.trim().equals(""))
         {
             return false;
@@ -1174,7 +1200,7 @@ public class GoogleMetadata
     private boolean itemIsTechReport()
     {
 
-        String dConfig = configuredFields.get(TECH_REPORT_ID);
+        String dConfig = googleScholarSettings.get(TECH_REPORT_ID);
         if (null == dConfig || dConfig.trim().equals(""))
         {
             return false;
