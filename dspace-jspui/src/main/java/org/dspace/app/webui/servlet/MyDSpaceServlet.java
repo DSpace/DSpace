@@ -860,12 +860,9 @@ public class MyDSpaceServlet extends DSpaceServlet
         {
             Group selfClaimGroup = Group.findByName(context,
                     nameGroupSelfClaim);
-            if (selfClaimGroup != null)
+            if (selfClaimGroup != null && Group.isMember(context, selfClaimGroup.getID()))
             {
-                if (Group.isMember(context, selfClaimGroup.getID()))
-                {
-                    selfClaim = true;
-                }
+                selfClaim = true;
             }
         }
         

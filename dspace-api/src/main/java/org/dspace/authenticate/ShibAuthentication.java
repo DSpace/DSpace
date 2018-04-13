@@ -211,7 +211,7 @@ public class ShibAuthentication implements AuthenticationMethod
                 {
                     String attributeName = attributeNames.nextElement();
                     Object attribute = request.getAttribute(attributeName);
-                    if (attribute != null)
+                    if (attribute != null && attribute instanceof String)
                     {
                         String attributeValue = (String) attribute;
                         messageAttribute += "" + attributeName + "='"
@@ -229,9 +229,9 @@ public class ShibAuthentication implements AuthenticationMethod
             {
                 while (attributeSessionNames.hasMoreElements())
                 {
-                    String attributeName = attributeNames.nextElement();
+                    String attributeName = attributeSessionNames.nextElement();
                     Object attribute = request.getAttribute(attributeName);
-                    if (attribute != null)
+                    if (attribute != null && attribute instanceof String)
                     {
                         String attributeValue = (String) attribute;
                         messageSession += "" + attributeName + "='"

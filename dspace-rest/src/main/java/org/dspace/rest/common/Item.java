@@ -45,7 +45,8 @@ public class Item extends DSpaceObject {
     List<Community> parentCommunityList;
     List<MetadataEntry> metadata;
     List<Bitstream> bitstreams;
-
+	private ResourcePolicy[] policies = null;
+	
     public Item(){}
 
     public Item(org.dspace.content.Item item, String expand, Context context, ServletContext servletContext) throws SQLException, WebApplicationException{
@@ -116,6 +117,21 @@ public class Item extends DSpaceObject {
         } else {
             this.addExpand("bitstreams");
         }
+        
+        if(expandFields.contains("policies") || expandFields.contains("all")) {
+            // Find policies
+        	List<ResourcePolicy> tempPolicies = new ArrayList<ResourcePolicy>();
+			List<org.dspace.authorize.ResourcePolicy> itemPolicies = AuthorizeManager.getPolicies(context, item);
+			for (org.dspace.authorize.ResourcePolicy policy : itemPolicies) {
+				if (policy.getResourceID() == this.getId()) {
+					tempPolicies.add(new ResourcePolicy(policy));
+				}
+			}
+			
+			policies = tempPolicies.toArray(new ResourcePolicy[0]);
+        } else {
+            this.addExpand("policies");
+        }
 
         if(!expandFields.contains("all")) {
             this.addExpand("all");
@@ -185,5 +201,13 @@ public class Item extends DSpaceObject {
 
 	public void setBitstreams(List<Bitstream> bitstreams) {
 		this.bitstreams = bitstreams;
+	}
+	
+	public ResourcePolicy[] getPolicies() {
+		return policies;
+	}
+
+	public void setPolicies(ResourcePolicy[] policies) {
+		this.policies = policies;
 	}
 }
