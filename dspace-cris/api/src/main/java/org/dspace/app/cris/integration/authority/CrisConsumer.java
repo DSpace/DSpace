@@ -268,7 +268,18 @@ public class CrisConsumer implements Consumer
                         }
                         else
                         {
-                            String filterQuery = "cris" + rp.getPublicPath()
+                            String prefix = "";
+                            if (choiceAuthorityObject instanceof DOAuthority)
+                            {
+                                prefix = ConfigurationManager.getProperty("cris",
+                                        "DOAuthority."
+                                                + toBuildMetadata.get(authorityKey)
+                                                + ".new-instances");
+                            }
+                            else {
+                            	prefix = rp.getPublicPath();
+                            }
+                            String filterQuery = "cris" + prefix
                                     + "." + typeAuthority.toLowerCase() + ":\""
                                     + authorityKey + "\"";
                             query.addFilterQuery(filterQuery);
