@@ -127,8 +127,6 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
             hiddenElementSets = new HashMap<>();
             hiddenElementMaps = new HashMap<>();
 
-            //Enumeration pne = ConfigurationManager.propertyNames();
-            //while (pne.hasMoreElements()) {
             List<String> propertyKeys = configurationService.getPropertyKeys();
             for (String key : propertyKeys) {
                 if (key.startsWith(CONFIG_PREFIX)) {
