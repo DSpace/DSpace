@@ -136,6 +136,16 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
             throws SQLException;
 
+	/**
+     * Get all Items installed or withdrawn, NON-discoverable, and modified since a Date.
+     * @param context context
+     * @param since earliest interesting last-modified date, or null for no date test.
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+            throws SQLException;
+			
     /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
      *
