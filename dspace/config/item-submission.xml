@@ -18,6 +18,12 @@
 	<!-- for handle "default". -->
 	<submission-map>
 		<name-map collection-handle="default" submission-name="traditional" />
+		<name-map collection-handle="123456789/6" submission-name="People"/>
+		<name-map collection-handle="123456789/7" submission-name="Project"/>
+		<name-map collection-handle="123456789/8" submission-name="OrgUnit"/>
+		<name-map collection-handle="123456789/28" submission-name="Journals"/>
+		<name-map collection-handle="123456789/29" submission-name="JournalVolumes"/>
+		<name-map collection-handle="123456789/30" submission-name="JournalIssues"/>
 	</submission-map>
 
 
@@ -53,6 +59,37 @@
 			<scope visibility="hidden" visibilityOutside="hidden">submission</scope>       
      	</step>
 		<step id="traditionalpageone" mandatory="true">
+			<heading>submit.progressbar.describe.stepone</heading>
+			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+			<type>submission-form</type>
+		</step>
+
+		<step id="peopleStep" mandatory="true">
+			<heading>submit.progressbar.describe.stepone</heading>
+			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+			<type>submission-form</type>
+		</step>
+		<step id="projectStep" mandatory="true">
+			<heading>submit.progressbar.describe.stepone</heading>
+			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+			<type>submission-form</type>
+		</step>
+		<step id="orgUnitStep" mandatory="true">
+			<heading>submit.progressbar.describe.stepone</heading>
+			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+			<type>submission-form</type>
+		</step>
+		<step id="journalStep" mandatory="true">
+			<heading>submit.progressbar.describe.stepone</heading>
+			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+			<type>submission-form</type>
+		</step>
+		<step id="journalVolumesStep" mandatory="true">
+			<heading>submit.progressbar.describe.stepone</heading>
+			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+			<type>submission-form</type>
+		</step>
+		<step id="journalIssuesStep" mandatory="true">
 			<heading>submit.progressbar.describe.stepone</heading>
 			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
 			<type>submission-form</type>
@@ -150,6 +187,26 @@
 			<!-- <step id="verify"/> -->
 		</submission-process>
 
+		<submission-process name="People">
+			<step id="peopleStep"/>
+		</submission-process>
+
+		<submission-process name="Project">
+			<step id="projectStep"/>
+		</submission-process>
+
+		<submission-process name="OrgUnit">
+			<step id="orgUnitStep"/>
+		</submission-process>
+		<submission-process name="Journals">
+			<step id="journalStep"/>
+		</submission-process>
+		<submission-process name="JournalVolumes">
+			<step id="journalVolumesStep"/>
+		</submission-process>
+		<submission-process name="JournalIssues">
+			<step id="journalIssuesStep"/>
+		</submission-process>
 	</submission-definitions>
 
 </item-submission>

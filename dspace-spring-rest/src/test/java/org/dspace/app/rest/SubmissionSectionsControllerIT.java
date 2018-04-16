@@ -48,7 +48,7 @@ public class SubmissionSectionsControllerIT extends AbstractControllerIntegratio
                    .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$._links.self.href",
-                                       Matchers.startsWith(REST_SERVER_URL + "config/submissionsections")))
+                                       Matchers.startsWith(REST_SERVER_URL + "api/config/submissionsections")))
 
                    //The array of browse index should have a size greater or equals to 1
                    .andExpect(jsonPath("$._embedded.submissionsections", hasSize(greaterThanOrEqualTo(1))

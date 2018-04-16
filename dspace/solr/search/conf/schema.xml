@@ -559,6 +559,9 @@
    <!--<copyField source="dc.creator" dest="dc.contributor.author_sort"/>-->
 
 
+     <!-- Dynamic field used to store the relation metadata as a keywordFilter -->
+     <dynamicField name="relation.*" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+
  	<!--Dynamic field used to store metadata for projection-->
     <dynamicField name="*_stored" type="dspaceMetadataProjection" indexed="false" stored="true" multiValued="true"/>
 

@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -33,14 +34,22 @@ import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Entity;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.EntityService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -101,6 +110,10 @@ public class MetadataImport {
     protected final CollectionService collectionService;
     protected final HandleService handleService;
     protected final WorkspaceItemService workspaceItemService;
+    protected final RelationshipTypeService relationshipTypeService;
+    protected final RelationshipService relationshipService;
+    protected final EntityTypeService entityTypeService;
+    protected final EntityService entityService;
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -120,6 +133,10 @@ public class MetadataImport {
         handleService = HandleServiceFactory.getInstance().getHandleService();
         authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
         workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+        relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+        relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
+        entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
+        entityService = ContentServiceFactory.getInstance().getEntityService();
     }
 
     /**
@@ -336,16 +353,30 @@ public class MetadataImport {
                         item = wsItem.getItem();
 
                         // Add the metadata to the item
+                        List<BulkEditMetadataValue> relationships = new LinkedList<>();
                         for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                            itemService.addMetadata(c, item, dcv.getSchema(),
-                                                    dcv.getElement(),
-                                                    dcv.getQualifier(),
-                                                    dcv.getLanguage(),
-                                                    dcv.getValue(),
-                                                    dcv.getAuthority(),
-                                                    dcv.getConfidence());
+                            if (StringUtils.equals(dcv.getSchema(), "relationship")) {
+
+                                if (!StringUtils.equals(dcv.getElement(), "type")) {
+                                    relationships.add(dcv);
+                                } else {
+                                    handleRelationshipMetadataValueFromBulkEditMetadataValue(item, dcv);
+                                }
+
+                            } else {
+                                itemService.addMetadata(c, item, dcv.getSchema(),
+                                                        dcv.getElement(),
+                                                        dcv.getQualifier(),
+                                                        dcv.getLanguage(),
+                                                        dcv.getValue(),
+                                                        dcv.getAuthority(),
+                                                        dcv.getConfidence());
+                            }
                         }
 
+                        for (BulkEditMetadataValue relationship : relationships) {
+                            handleRelationshipMetadataValueFromBulkEditMetadataValue(item, relationship);
+                        }
                         // Should the workflow be used?
                         if (useWorkflow) {
                             WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
@@ -394,6 +425,19 @@ public class MetadataImport {
 
         // Return the changes
         return changes;
+    }
+
+    private void handleRelationshipMetadataValueFromBulkEditMetadataValue(Item item, BulkEditMetadataValue dcv)
+        throws SQLException, AuthorizeException {
+        LinkedList<String> values = new LinkedList<>();
+        values.add(dcv.getValue());
+        LinkedList<String> authorities = new LinkedList<>();
+        authorities.add(dcv.getAuthority());
+        LinkedList<Integer> confidences = new LinkedList<>();
+        confidences.add(dcv.getConfidence());
+        handleRelationMetadata(c, item, dcv.getSchema(), dcv.getElement(),
+                               dcv.getQualifier(),
+                               dcv.getLanguage(), values, authorities, confidences);
     }
 
     /**
@@ -583,9 +627,154 @@ public class MetadataImport {
                 }
             }
 
-            // Set those values
+
+            if (StringUtils.equals(schema, "relationship")) {
+                handleRelationMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
+            } else {
+                itemService.clearMetadata(c, item, schema, element, qualifier, language);
+                itemService.addMetadata(c, item, schema, element, qualifier,
+                                        language, values, authorities, confidences);
+                itemService.update(c, item);
+            }
+        }
+    }
+
+    private void handleRelationMetadata(Context c, Item item, String schema, String element, String qualifier,
+                                        String language, List<String> values, List<String> authorities,
+                                        List<Integer> confidences) throws SQLException, AuthorizeException {
+
+        if (StringUtils.equals(element, "type") && StringUtils.isBlank(qualifier)) {
+            handleRelationTypeMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
+
+        } else {
+            handleRelationOtherMetadata(c, item, element, values);
+        }
+
+    }
+
+    private void handleRelationOtherMetadata(Context c, Item item, String element, List<String> values)
+        throws SQLException, AuthorizeException {
+        Entity entity = entityService.findByItemId(c, item.getID());
+        boolean left = false;
+        List<RelationshipType> acceptableRelationshipTypes = new LinkedList<>();
+        String[] components = values.get(0).split("-");
+        String url = handleService.resolveToURL(c, values.get(0));
+        if (components.length != 5 && StringUtils.isNotBlank(url)) {
+            return;
+        }
+
+        Entity relationEntity = entityService.findByItemId(c, UUID.fromString(values.get(0)));
+
+
+        List<RelationshipType> leftRelationshipTypesForEntity = entityService.getLeftRelationshipTypes(c, entity);
+        List<RelationshipType> rightRelationshipTypesForEntity = entityService.getRightRelationshipTypes(c, entity);
+
+        for (RelationshipType relationshipType : entityService.getAllRelationshipTypes(c, entity)) {
+            if (StringUtils.equalsIgnoreCase(relationshipType.getLeftLabel(), element)) {
+                left = handleLeftLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
+                                                                      acceptableRelationshipTypes,
+                                                                      leftRelationshipTypesForEntity,
+                                                                      relationshipType);
+            } else if (StringUtils.equalsIgnoreCase(relationshipType.getRightLabel(), element)) {
+                left = handleRightLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
+                                                                       acceptableRelationshipTypes,
+                                                                       rightRelationshipTypesForEntity,
+                                                                       relationshipType);
+            }
+        }
+
+        if (acceptableRelationshipTypes.size() > 1) {
+            System.out.println("Ambiguous relationship_types were found");
+            log.error("Ambiguous relationship_types were found");
+            return;
+        }
+        if (acceptableRelationshipTypes.size() == 0) {
+            System.out.println("no relationship_types were found");
+            log.error("no relationship_types were found");
+            return;
+        }
+
+        buildRelationObject(c, item, values, left, acceptableRelationshipTypes);
+    }
+
+    private void buildRelationObject(Context c, Item item, List<String> values, boolean left,
+                                     List<RelationshipType> acceptableRelationshipTypes)
+        throws SQLException, AuthorizeException {
+        Relationship relationship = new Relationship();
+        RelationshipType acceptedRelationshipType = acceptableRelationshipTypes.get(0);
+        if (left) {
+            relationship.setLeftItem(item);
+            relationship.setRightItem(itemService.findByIdOrLegacyId(c, values.get(0)));
+        } else {
+            relationship.setRightItem(item);
+            relationship.setLeftItem(itemService.findByIdOrLegacyId(c, values.get(0)));
+        }
+        relationship.setRelationshipType(acceptedRelationshipType);
+        relationship.setLeftPlace(relationshipService.findLeftPlaceByLeftItem(c, relationship.getLeftItem()) + 1);
+        relationship.setRightPlace(relationshipService.findRightPlaceByRightItem(c, relationship.getLeftItem()) + 1);
+        Relationship persistedRelationship = relationshipService.create(c, relationship);
+        relationshipService.update(c, persistedRelationship);
+    }
+
+    private boolean handleRightLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
+                                                                    boolean left,
+                                                                    List<RelationshipType> acceptableRelationshipTypes,
+                                                                    List<RelationshipType>
+                                                                        rightRelationshipTypesForEntity,
+                                                                    RelationshipType relationshipType)
+        throws SQLException {
+        if (StringUtils.equalsIgnoreCase(entityService.getType(c, entity).getLabel(),
+                                         relationshipType.getRightType().getLabel()) &&
+            StringUtils.equalsIgnoreCase(entityService.getType(c, relationEntity).getLabel(),
+                                         relationshipType.getLeftType().getLabel())) {
+
+            for (RelationshipType rightRelationshipType : rightRelationshipTypesForEntity) {
+                if (StringUtils.equalsIgnoreCase(rightRelationshipType.getLeftType().getLabel(),
+                                                 relationshipType.getLeftType().getLabel()) ||
+                    StringUtils.equalsIgnoreCase(rightRelationshipType.getRightType().getLabel(),
+                                                 relationshipType.getLeftType().getLabel())) {
+                    left = false;
+                    acceptableRelationshipTypes.add(relationshipType);
+                }
+            }
+        }
+        return left;
+    }
+
+    private boolean handleLeftLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
+                                                                   boolean left,
+                                                                   List<RelationshipType> acceptableRelationshipTypes,
+                                                                   List<RelationshipType>
+                                                                       leftRelationshipTypesForEntity,
+                                                                   RelationshipType relationshipType)
+        throws SQLException {
+        if (StringUtils.equalsIgnoreCase(entityService.getType(c, entity).getLabel(),
+                                         relationshipType.getLeftType().getLabel()) &&
+            StringUtils.equalsIgnoreCase(entityService.getType(c, relationEntity).getLabel(),
+                                         relationshipType.getRightType().getLabel())) {
+            for (RelationshipType leftRelationshipType : leftRelationshipTypesForEntity) {
+                if (StringUtils.equalsIgnoreCase(leftRelationshipType.getRightType().getLabel(),
+                                                 relationshipType.getRightType().getLabel()) ||
+                    StringUtils.equalsIgnoreCase(leftRelationshipType.getLeftType().getLabel(),
+                                                 relationshipType.getRightType().getLabel())) {
+                    left = true;
+                    acceptableRelationshipTypes.add(relationshipType);
+                }
+            }
+        }
+        return left;
+    }
+
+    private void handleRelationTypeMetadata(Context c, Item item, String schema, String element, String qualifier,
+                                            String language, List<String> values, List<String> authorities,
+                                            List<Integer> confidences)
+        throws SQLException, AuthorizeException {
+        EntityType entityType = entityTypeService.findByEntityType(c, values.get(0));
+        if (entityType != null) {
+            authorities.add(String.valueOf(entityType.getId()));
             itemService.clearMetadata(c, item, schema, element, qualifier, language);
-            itemService.addMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
+            itemService.addMetadata(c, item, schema, element, qualifier, language,
+                                    values, authorities, confidences);
             itemService.update(c, item);
         }
     }

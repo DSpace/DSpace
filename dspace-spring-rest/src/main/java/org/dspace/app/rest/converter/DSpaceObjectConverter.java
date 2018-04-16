@@ -34,16 +34,22 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
             resource.setUuid(obj.getID().toString());
         }
         resource.setName(obj.getName());
+        List<MetadataValue> fullList = obj.getMetadata();
+        List<MetadataEntryRest> metadata = convertMetadataToRest(fullList);
+        resource.setMetadata(metadata);
+        return resource;
+    }
+
+    public List<MetadataEntryRest> convertMetadataToRest(List<MetadataValue> fullList) {
         List<MetadataEntryRest> metadata = new ArrayList<MetadataEntryRest>();
-        for (MetadataValue mv : obj.getMetadata()) {
+        for (MetadataValue mv : fullList) {
             MetadataEntryRest me = new MetadataEntryRest();
             me.setKey(mv.getMetadataField().toString('.'));
             me.setValue(mv.getValue());
             me.setLanguage(mv.getLanguage());
             metadata.add(me);
         }
-        resource.setMetadata(metadata);
-        return resource;
+        return metadata;
     }
 
     @Override

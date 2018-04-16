@@ -1,0 +1,19 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Relationship</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>relationship</name>
+        <namespace>http://dspace.org/relationship</namespace>
+    </dc-schema>
+
+
+    <dc-type>
+        <schema>relationship</schema>
+        <element>type</element>
+        <scope_note>Metadata field used for the type of entity, stored in the item</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

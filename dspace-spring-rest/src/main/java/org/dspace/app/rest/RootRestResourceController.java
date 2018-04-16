@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.RootRest;
 import org.dspace.app.rest.model.hateoas.RootResource;
@@ -39,20 +40,15 @@ public class RootRestResourceController {
     @Autowired
     RootRestRepository rootRestRepository;
 
+    private static Logger log = Logger.getLogger(RootRestResourceController.class);
+
     @RequestMapping(method = RequestMethod.GET)
     public RootResource listDefinedEndpoint(HttpServletRequest request) {
 
-        String restUrl = getRestURL(request);
-
-        RootRest rootRest = rootRestRepository.getRoot(restUrl);
+        RootRest rootRest = rootRestRepository.getRoot();
         RootResource rootResource = new RootResource(rootRest);
         halLinkService.addLinks(rootResource);
 
         return rootResource;
-    }
-
-    private String getRestURL(HttpServletRequest request) {
-        String url = request.getRequestURL().toString();
-        return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath();
     }
 }

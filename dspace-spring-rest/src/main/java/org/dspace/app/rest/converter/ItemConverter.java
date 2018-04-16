@@ -7,16 +7,25 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.MetadataEntryRest;
+import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +41,12 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
     private CollectionConverter collectionConverter;
     @Autowired(required = true)
     private BitstreamConverter bitstreamConverter;
+    @Autowired
+    private RelationshipService relationshipService;
+    @Autowired
+    private RelationshipConverter relationshipConverter;
+    @Autowired
+    private ItemService itemService;
 
     private static final Logger log = Logger.getLogger(ItemConverter.class);
 
@@ -66,6 +81,27 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
             }
         }
         item.setBitstreams(bitstreams);
+        List<Relationship> relationships = new LinkedList<>();
+        try {
+            relationships = relationshipService.findByItem(new Context(), obj);
+        } catch (SQLException e) {
+            log.error(e, e);
+        }
+        List<RelationshipRest> relationshipRestList = new LinkedList<>();
+        for (Relationship relationship : relationships) {
+            RelationshipRest relationshipRest = relationshipConverter.fromModel(relationship);
+            relationshipRestList.add(relationshipRest);
+        }
+        item.setRelationships(relationshipRestList);
+
+        List<MetadataValue> fullList = new LinkedList<>();
+        fullList.addAll(obj.getMetadata());
+        fullList.addAll(itemService.getRelationshipMetadata(obj));
+
+        List<MetadataEntryRest> metadata = super.convertMetadataToRest(fullList);
+        item.setMetadata(metadata);
+
+
         return item;
     }
 
