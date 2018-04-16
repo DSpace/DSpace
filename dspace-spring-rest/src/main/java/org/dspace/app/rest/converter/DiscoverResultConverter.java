@@ -46,6 +46,9 @@ public class DiscoverResultConverter {
     private List<DSpaceObjectConverter> converters;
 
     @Autowired
+    private ItemService itemService;
+
+    @Autowired
     private SearchService searchService;
 
     private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();

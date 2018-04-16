@@ -27,6 +27,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -208,7 +209,7 @@ public class DSpaceCSV implements Serializable {
                     // Check that the metadata element exists in the schema
                     MetadataField foundField = metadataFieldService
                         .findByElement(c, foundSchema, metadataElement, metadataQualifier);
-                    if (foundField == null) {
+                    if (foundField == null && !StringUtils.equals(metadataSchema, "relationship")) {
                         throw new MetadataImportInvalidHeadingException(clean[0],
                                                                         MetadataImportInvalidHeadingException.ELEMENT,
                                                                         columnCounter);

@@ -1,0 +1,55 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace OrgUnit Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>orgunit</name>
+        <namespace>http://dspace.org/orgunit</namespace>
+    </dc-schema>
+
+
+    <dc-type>
+        <schema>orgunit</schema>
+        <element>identifier</element>
+        <qualifier>name</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>orgunit</schema>
+        <element>identifier</element>
+        <qualifier>id</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>orgunit</schema>
+        <element>identifier</element>
+        <qualifier>dateestablished</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>orgunit</schema>
+        <element>identifier</element>
+        <qualifier>city</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>orgunit</schema>
+        <element>identifier</element>
+        <qualifier>country</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>orgunit</schema>
+        <element>identifier</element>
+        <qualifier>description</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>

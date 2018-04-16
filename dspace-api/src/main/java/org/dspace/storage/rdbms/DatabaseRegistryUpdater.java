@@ -71,6 +71,13 @@ public class DatabaseRegistryUpdater implements FlywayCallback {
             MetadataImporter.loadRegistry(base + "dublin-core-types.xml", true);
             MetadataImporter.loadRegistry(base + "dcterms-types.xml", true);
             MetadataImporter.loadRegistry(base + "local-types.xml", true);
+            MetadataImporter.loadRegistry(base + "relationship-formats.xml", true);
+            MetadataImporter.loadRegistry(base + "person-types.xml", true);
+            MetadataImporter.loadRegistry(base + "project-types.xml", true);
+            MetadataImporter.loadRegistry(base + "orgunit-types.xml", true);
+            MetadataImporter.loadRegistry(base + "journal-types.xml", true);
+            MetadataImporter.loadRegistry(base + "journalissue-types.xml", true);
+            MetadataImporter.loadRegistry(base + "journalvolume-types.xml", true);
             MetadataImporter.loadRegistry(base + "eperson-types.xml", true);
             MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
 
@@ -163,6 +170,5 @@ public class DatabaseRegistryUpdater implements FlywayCallback {
 
     @Override
     public void afterInfo(Connection connection) {
-
     }
 }

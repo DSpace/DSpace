@@ -366,4 +366,19 @@
             <class>org.dspace.app.util.Version</class>
         </step>
     </command>
+    <command>
+        <name>initialize-entities</name>
+        <description>Initialize the entities with a provided xml</description>
+        <step>
+            <class>org.dspace.app.util.InitializeEntities</class>
+        </step>
+    </command>
+
+    <command>
+        <name>additional-relationship-demo</name>
+        <description>Creates additional relationships for the demo</description>
+        <step>
+            <class>org.dspace.app.util.AdditionalRelationshipScript</class>
+        </step>
+    </command>
 </commands>
