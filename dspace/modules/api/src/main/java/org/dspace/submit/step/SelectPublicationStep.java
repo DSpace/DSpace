@@ -11,6 +11,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.paymentsystem.PaymentSystemService;
@@ -62,7 +63,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public final static int  UNKNOWN_DOI=5;
     public final static int  MANU_ACC=6;
 
-    public final static String crossRefApiRoot = "http://api.crossref.org/works/";
+    public final static String crossRefApiRoot = "https://api.crossref.org/works/";
     public final static String crossRefApiFormat = "/transform/application/vnd.crossref.unixref+xml";
 
     public int doProcessing(Context context, HttpServletRequest request, HttpServletResponse response, SubmissionInfo submissionInfo) throws ServletException, IOException, SQLException, AuthorizeException {
@@ -118,7 +119,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
      **/
     private boolean processDOI(Context context, Item item, String identifier){
         try {
-            Element jElement = retrieveXML(crossRefApiRoot + identifier + crossRefApiFormat);
+            Element jElement = retrieveXML(crossRefApiRoot + identifier + crossRefApiFormat  +
+                                           "?mailto=" + ConfigurationManager.getProperty("alert.recipient"));
             if (jElement != null) {
                 if (!jElement.getName().equals("doi_records") || jElement.getChildren().size()==0) {
                     return false;
