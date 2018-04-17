@@ -45,7 +45,6 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -75,6 +74,10 @@ import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.UsageWorkflowEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Static holder for a HttpSolrClient connection pool to issue
@@ -87,8 +90,8 @@ import org.dspace.usage.UsageWorkflowEvent;
  */
 public class SolrLogger
 {
-    private static final Logger log = Logger.getLogger(SolrLogger.class);
-	
+    private static final Logger log = LoggerFactory.getLogger(SolrLoggerServiceImpl.class);
+
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
     
     private static final HttpSolrServer solr;
@@ -382,7 +385,7 @@ public class SolrLogger
                         doc1.addField("longitude", longitude);
                     }
                 } catch (IOException | GeoIp2Exception e) {
-                    log.error("Unable to get location of request", e);
+                    log.error("Unable to get location of request:  {}", e.getMessage());
                 }
             }
         }
@@ -470,7 +473,7 @@ public class SolrLogger
                         doc1.addField("longitude", longitude);
                     }
                 } catch (GeoIp2Exception | IOException e) {
-                    log.error("Unable to get location of request", e);
+                    log.error("Unable to get location of request:  {}", e.getMessage());
                 }
             }
         }
