@@ -399,12 +399,12 @@ public class SubscribeCLITool {
     }
 
     // Begin UMD Customization
-    // If the eperson email is listed in the "eperson.subscription.limiteperson"
+    // If the eperson email is listed in the "drum.eperson.subscription.limiteperson"
     // return true
     private static boolean isEPersonRestricted(EPerson eperson) {
         // Check for restricted eperson list
         String epersonLimit = ConfigurationManager
-                .getProperty("eperson.subscription.limiteperson");
+                .getProperty("drum.eperson.subscription.limiteperson");
         if (!(epersonLimit == null || epersonLimit.equals("")))
         {
             List l = Arrays.asList(epersonLimit.split(" *, *"));

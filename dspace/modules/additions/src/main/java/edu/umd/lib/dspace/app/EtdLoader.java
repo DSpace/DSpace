@@ -218,12 +218,12 @@ public class EtdLoader
             // dspace dir
             String strDspace = configurationService.getProperty("dspace.dir");
             String strEPerson = configurationService
-                    .getProperty("etdloader.eperson");
+                    .getProperty("drum.etdloader.eperson");
             String strCollection = configurationService
-                    .getProperty("etdloader.collection");
+                    .getProperty("drum.etdloader.collection");
 
             String transferMarc = configurationService
-                    .getProperty("etdloader.transfermarc");
+                    .getProperty("drum.etdloader.transfermarc");
 
             log.info("DSpace directory : " + strDspace);
             log.info("ETD Loaeder Eperson : " + strEPerson);
@@ -258,7 +258,7 @@ public class EtdLoader
 
             if (strCollection == null)
             {
-                throw new Exception("etdloader.collection not set");
+                throw new Exception("drum.etdloader.collection not set");
             }
             etdcollection = collectionService.find(context,
                     UUIDUtils.fromString(strCollection));
@@ -270,7 +270,7 @@ public class EtdLoader
 
             if (strEPerson == null)
             {
-                throw new Exception("etdloader.eperson not set");
+                throw new Exception("drum.etdloader.eperson not set");
             }
             etdeperson = epersonService.findByEmail(context, strEPerson);
             if (etdeperson == null)
@@ -636,7 +636,7 @@ public class EtdLoader
 
                     // Get the email recipient
                     String email = configurationService
-                            .getProperty("mail.duplicate_title");
+                            .getProperty("drum.mail.duplicate_title");
                     if (email == null)
                     {
                         email = configurationService.getProperty("mail.admin");
@@ -1108,7 +1108,7 @@ public class EtdLoader
         String strTitle= itemService.getMetadataFirstValue(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
 
         // Get the email recipient
-        String email = configurationService.getProperty("load.alert.recipient");
+        String email = configurationService.getProperty("drum.mail.etd.recipient");
         if (email == null)
         {
             email = configurationService.getProperty("mail.admin");
