@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.configuration.RelationPreferenceConfiguration;
@@ -28,17 +30,18 @@ import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseException;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.AuthorityDAO;
 import org.dspace.content.authority.AuthorityDAOFactory;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -56,6 +59,8 @@ public class BindItemToRP
     /** the logger */
     private static Logger log = Logger.getLogger(BindItemToRP.class);
 
+    public static final String EMAIL_TEMPLATE_NAME = "binditemtorp-alerts";
+    
     private RelationPreferenceService relationPreferenceService;
 
     public static int automaticClaim(Context context, ResearcherPage rp)
@@ -423,6 +428,10 @@ public class BindItemToRP
     {
         context.turnOffAuthorisationSystem();
         Map<String, Integer> cacheCount = new HashMap<String, Integer>();
+
+        Map<String, List<String>> mapOwnerToNewHandleBinded = new HashMap<String, List<String>>();
+        boolean sendEmailToOwner = ConfigurationManager.getBooleanProperty("cris","system.script.subscribe.binditemtorp", false);
+        
         for (Item item : items)
         {
             if (tempName.getRejectItems() != null
@@ -466,6 +475,20 @@ public class BindItemToRP
                                     matches >= 1 ? Choices.CF_AMBIGUOUS
                                             : matches == 1 ? Choices.CF_UNCERTAIN
                                                     : Choices.CF_NOTFOUND);
+                            
+							if (sendEmailToOwner) {
+								if (mapOwnerToNewHandleBinded.containsKey(tempName.getPersistentIdentifier())) {
+									List<String> handles = mapOwnerToNewHandleBinded
+											.get(tempName.getPersistentIdentifier());
+									handles.add(item.getHandle());
+									mapOwnerToNewHandleBinded.put(tempName.getPersistentIdentifier(), handles);
+								} else {
+									List<String> handles = new ArrayList<String>();
+									handles.add(item.getHandle());
+									mapOwnerToNewHandleBinded.put(tempName.getPersistentIdentifier(), handles);
+								}
+							}
+                            
                             modified = true;
                         }
                         else
@@ -487,10 +510,51 @@ public class BindItemToRP
                 context.clearCache();
             }
         }
+        
+        if(sendEmailToOwner) {
+			sendEmail(context, mapOwnerToNewHandleBinded, relationPreferenceService);
+        }
         context.restoreAuthSystemState();
     }
 
-    private static int countNamesMatching(Map<String, Integer> cacheCount,
+	private static void sendEmail(Context context, Map<String, List<String>> mapOwnerToNewHandleBinded,
+			RelationPreferenceService relationPreferenceService) {
+
+		org.dspace.core.Email email;
+		try {
+			email = org.dspace.core.Email
+					.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), BindItemToRP.EMAIL_TEMPLATE_NAME));
+
+			ApplicationService applicationService = relationPreferenceService.getApplicationService();
+			int i = 0;
+			for (String owner : mapOwnerToNewHandleBinded.keySet()) {
+				if (i > 0) {
+					email.reset();
+				}
+
+				ResearcherPage rp = applicationService.getEntityByCrisId(owner, ResearcherPage.class);
+				if (rp.getEpersonID() != null) {
+					EPerson eperson;
+					try {
+						eperson = EPerson.find(context, rp.getEpersonID());
+						if (eperson != null) {
+							email.addRecipient(eperson.getEmail());
+							email.addArgument(mapOwnerToNewHandleBinded.get(owner));
+							email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/cris/rp/" + owner);
+							email.send();
+						}
+					} catch (SQLException | MessagingException e) {
+						log.error(e.getMessage(), e);
+					}
+				}
+			}
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+
+	}
+
+	private static int countNamesMatching(Map<String, Integer> cacheCount,
             String name)
     {
         if (cacheCount.containsKey(name))

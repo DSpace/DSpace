@@ -129,6 +129,8 @@
 	String cfg = ConfigurationManager.getProperty("exportcitation.options");
 	boolean coreRecommender = ConfigurationManager.getBooleanProperty("core-aggregator","core-aggregator.enabled");
 	String coreCredentials = ConfigurationManager.getProperty("core-aggregator", "core-aggregator.credentials");
+	
+	String crisID = (String)request.getAttribute("crisID");
 %>
 
 <% if(pmcEnabled || scopusEnabled || wosEnabled || scholarEnabled || altMetricEnabled) { %>
@@ -619,6 +621,21 @@ if (dedupEnabled && admin_button) { %>
 <%
     }
 %>
+
+	<% if(StringUtils.isNotBlank(crisID)) { %>
+	
+	       <div class="col-sm-5 col-md-4 col-lg-3">
+            <div class="panel panel-warning">
+            	<div class="panel-heading"><fmt:message key="jsp.usertools"/></div>
+            	<div class="panel-body">
+        			<a class="btn btn-primary col-md-12" href="<%= request.getContextPath() %>/tools/claim?handle=<%= handle %>">
+            			<fmt:message key="jsp.display-item.claim-publication"/>
+        			</a>    	
+            	</div>
+            </div>
+            </div>
+    <% } %>
+    
 </div>
 </div>
 <div class="container">

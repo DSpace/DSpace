@@ -517,7 +517,12 @@
     	<servlet-name>authority-management</servlet-name>
     	<servlet-class>org.dspace.app.webui.servlet.admin.AuthorityManagementServlet</servlet-class>
   	</servlet>
-		
+
+	<servlet>
+    	<servlet-name>authority-claim</servlet-name>
+    	<servlet-class>org.dspace.app.webui.cris.servlet.AuthorityClaimServlet</servlet-class>
+  	</servlet>
+  			
 	<servlet>
     	<servlet-name>sherpapolicy</servlet-name>
     	<servlet-class>org.dspace.app.webui.servlet.SHERPAPublisherPolicyServlet</servlet-class>
@@ -964,6 +969,16 @@
         <url-pattern>/dspace-admin/authority</url-pattern>
     </servlet-mapping>
     
+    <servlet-mapping>
+        <servlet-name>authority-management</servlet-name>
+        <url-pattern>/tools/authority</url-pattern>
+    </servlet-mapping>
+
+  	<servlet-mapping>
+    	<servlet-name>authority-claim</servlet-name>
+    	<url-pattern>/tools/claim</url-pattern>
+  	</servlet-mapping>
+      
   	<servlet-mapping>
     	<servlet-name>sherpapolicy</servlet-name>
     	<url-pattern>/tools/sherpaPolicy</url-pattern>

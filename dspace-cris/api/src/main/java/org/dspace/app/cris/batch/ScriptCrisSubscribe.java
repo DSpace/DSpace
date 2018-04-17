@@ -61,6 +61,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -69,11 +70,13 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.configuration.RelationConfiguration;
 import org.dspace.app.cris.discovery.CrisSearchService;
+import org.dspace.app.cris.discovery.OwnerRPAuthorityIndexer;
 import org.dspace.app.cris.integration.CrisComponentsService;
 import org.dspace.app.cris.integration.ICRISComponent;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.CrisSubscription;
 import org.dspace.app.cris.service.ApplicationService;
+import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.content.Metadatum;
@@ -93,7 +96,7 @@ import org.dspace.handle.HandleManager;
  * Class defining methods for sending new item e-mail alerts to users. Based on
  * {@link Subscribe} written by Robert Tansley
  * 
- * @author pascarelli
+ * @author Luigi Andrea Pascarelli
  */
 public class ScriptCrisSubscribe
 {
@@ -354,8 +357,8 @@ public class ScriptCrisSubscribe
      */
     public static void main(String[] argv)
     {
-        log.info("#### START DELETE: -----" + new Date() + " ----- ####");
-        String usage = "it.cilea.hku.authority.ScriptRPSubscribe [-t] or nothing to send out subscriptions.";
+        log.info("#### START PROCESS DAILY: -----" + new Date() + " ----- ####");
+        String usage = "org.dspace.app.cris.batch.ScriptCrisSubscribe [-t|-s] or nothing to send out subscriptions.";
 
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
@@ -372,6 +375,13 @@ public class ScriptCrisSubscribe
                     "Print this help message");
             opt.setRequired(false);
             options.addOption(opt);
+        }
+        
+        {
+        	Option opt = new Option("s", "subscribe", false,
+        			"First to process Daily Notification, try to subscribe all owner of the CRIS entity to the daily content");
+            opt.setRequired(false);
+            options.addOption(opt);        	
         }
 
         try
@@ -394,8 +404,10 @@ public class ScriptCrisSubscribe
 
         boolean test = line.hasOption("t");
 
-        if (test)
+        if (test) {
             log.setLevel(Level.DEBUG);
+        }
+        
         Context context = null;
         try
         {
@@ -403,6 +415,39 @@ public class ScriptCrisSubscribe
             Researcher researcher = new Researcher();
             ApplicationService applicationService = researcher
                     .getApplicationService();
+            
+            if(line.hasOption("s")) {
+        
+            	CrisSearchService searchService = researcher.getCrisSearchService();
+            	
+                SolrQuery query = new SolrQuery();
+                query.setFields("cris-uuid", OwnerRPAuthorityIndexer.OWNER_I);
+                query.addFilterQuery("{!field f=search.resourcetype}"
+                        + CrisConstants.RP_TYPE_ID);
+                query.setRows(Integer.MAX_VALUE);
+   				query.setQuery("*:*");
+
+                QueryResponse qResponse = searchService.search(query);
+                SolrDocumentList results = qResponse.getResults();
+
+                if (results.getNumFound() > 0)
+                {
+                    for (SolrDocument solrDoc : results)
+                    {
+                    	String uuid = (String) solrDoc.getFieldValue("cris-uuid");
+                    	Integer oo = (Integer) solrDoc.getFieldValue(OwnerRPAuthorityIndexer.OWNER_I);
+                    	
+                    	if(oo!=null) {
+	                    	CrisSubscribeService crisSubscribeService = researcher.getCrisSubscribeService();
+	                    	EPerson eperson = EPerson.find(context, oo);
+	                    	if(eperson!=null && StringUtils.isNotBlank(uuid)) {
+	                    		crisSubscribeService.subscribe(eperson, uuid);
+	                    	}
+                    	}
+                    }
+                }
+            	
+            }
 
             List<CrisComponentsService> serviceComponent = researcher
                     .getAllCrisComponents();

@@ -1045,37 +1045,33 @@ public class ApplicationService extends ExtendedTabService
         }
     }
     
-    private static class ConfigurationThread extends Thread
-    {
+	private static class ConfigurationThread extends Thread {
 
-        /**
-         * Actually perform Rebuild Cris Configuration.
-         */
-        @Override
-        public void run()
-        {
-                if(DatabaseUtils.getRebuildCrisConfiguration())
-                {
-                    try
-                    {
-                        log.info("Post database migration, rebuild cris configuration");
-                        String file = ConfigurationManager.getProperty("dspace.dir") + File.separator + "etc" + File.separator + "configuration-tool-demo.xls";
-                        String[] args = new String[]{"-f", file};
-                        ImportCRISDataModelConfiguration.main(args);    
-                        log.info("Rebuild CRIS Configuration is complete");
-                    }
-                    catch(SQLException | IOException | BiffException | InstantiationException | IllegalAccessException | ParseException e)
-                    {
-                        log.error("Error attempting to Rebuild CRIS Configuration", e);
-                    }
-                    finally
-                    {
-                        // Reset our flag. Job is done or it threw an error,
-                        // Either way, we shouldn't try again.
-                        DatabaseUtils.setRebuildCrisConfiguration(false);
+		/**
+		 * Actually perform Rebuild Cris Configuration.
+		 */
+		@Override
+		public void run() {
+			if (DatabaseUtils.getRebuildCrisConfiguration()) {
+				try {
+					log.info("Post database migration, rebuild cris configuration");
+					String file = ConfigurationManager.getProperty("dspace.dir") + File.separator + "etc"
+							+ File.separator + "configuration-tool-demo.xls";
+					String[] args = new String[] { "-f", file };
+					ImportCRISDataModelConfiguration.main(args);
+					log.info("Rebuild CRIS Configuration is complete");
+				} catch (SQLException | IOException | BiffException | InstantiationException | IllegalAccessException
+						| ParseException e) {
+					log.error("Error attempting to Rebuild CRIS Configuration", e);
+				} finally {
+					// Reset our flag. Job is done or it threw an error,
+					// Either way, we shouldn't try again.
+					DatabaseUtils.setRebuildCrisConfiguration(false);
 
-                    }
-                }
-            }
-        }
+				}
+			}
+		}
+	}
+	
+	
 } 

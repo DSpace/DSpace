@@ -31,7 +31,7 @@ import javax.persistence.Table;
         // eperson as it is needed by the batch script
         @NamedQuery(name = "CrisSubscription.findAll", query = "from CrisSubscription sub order by sub.epersonID"),
         @NamedQuery(name = "CrisSubscription.countByUUID", query = "select count(*) from CrisSubscription where uuid = ? order by id"),
-        @NamedQuery(name = "CrisSubscription.findUUIDByEpersonID", query = "select uuid from CrisSubscription sub where sub.epersonID = ?"),
+        @NamedQuery(name = "CrisSubscription.findUUIDByEpersonID", query = "select uuid from CrisSubscription sub where sub.epersonID = ?"),        
         @NamedQuery(name = "CrisSubscription.deleteByEpersonID", query = "delete from CrisSubscription sub where sub.epersonID = ?"),
         @NamedQuery(name = "CrisSubscription.uniqueByEpersonIDandUUID", query = "from CrisSubscription sub where sub.epersonID = ? and uuid = ?"),
         @NamedQuery(name = "CrisSubscription.countByEpersonIDandUUID", query = "select count(*) from CrisSubscription sub where sub.epersonID = ? and uuid = ?") })

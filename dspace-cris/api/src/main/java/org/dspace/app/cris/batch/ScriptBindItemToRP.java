@@ -36,6 +36,12 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.utils.DSpace;
 
+/**
+ * Script to search and bind potential matches (Items) for all the ResearcherPage (or single) 
+ * 
+ * @author Luigi Andrea Pascarelli
+ *
+ */
 public class ScriptBindItemToRP
 {
     

@@ -250,6 +250,10 @@ public class RelationPreferenceService
         }
     }
 
+	public ApplicationService getApplicationService() {
+		return applicationService;
+	}
+	
     public void setApplicationService(ApplicationService applicationService)
     {
         this.applicationService = applicationService;
@@ -265,4 +269,5 @@ public class RelationPreferenceService
     {
         return applicationService.findRelationsPreferencesByUUIDByRelTypeAndStatus(uuid, relationType, status);
     }
+
 }

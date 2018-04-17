@@ -130,6 +130,7 @@ public class ResearcherPageDetailsController
         EPerson currUser = context.getCurrentUser();
         
         model.put("selfClaimRP", new Boolean(false));
+        model.put("publicationSelfClaimRP", new Boolean(false));
         if(currUser != null) {
             model.put("isLoggedIn", new Boolean(true));
             ResearcherPage rp = ((ApplicationService) applicationService).getResearcherPageByEPersonId(currUser.getID());
@@ -155,6 +156,22 @@ public class ResearcherPageDetailsController
                     }
                 }
             }
+            
+            
+            String nameGroupPublicationSelfClaim = ConfigurationManager.getProperty("cris",
+                    "publication.claim.group.name");
+            if (StringUtils.isNotBlank(nameGroupPublicationSelfClaim))
+            {
+                Group selfClaimGroup = Group.findByName(context,
+                		nameGroupPublicationSelfClaim);
+                if (selfClaimGroup != null)
+                {
+                    if (Group.isMember(context, selfClaimGroup.getID()))
+                    {
+                        model.put("publicationSelfClaimRP", new Boolean(true));
+                    }
+                }
+            }
         }
         else {
             model.put("isLoggedIn", new Boolean(false));
@@ -171,16 +188,10 @@ public class ResearcherPageDetailsController
             model.put("authority_key",
                     ResearcherPageUtils.getPersistentIdentifier(researcher));
 
-            if (isAdmin)
-            {
-                AuthorityDAO dao = AuthorityDAOFactory.getInstance(context);
-                long pendingItems = dao
-                        .countIssuedItemsByAuthorityValueInAuthority(
-                                RPAuthority.RP_AUTHORITY_NAME,
-                                ResearcherPageUtils
-                                        .getPersistentIdentifier(researcher));
-                model.put("pendingItems", new Long(pendingItems));
-            }
+			AuthorityDAO dao = AuthorityDAOFactory.getInstance(context);
+			long pendingItems = dao.countIssuedItemsByAuthorityValueInAuthority(RPAuthority.RP_AUTHORITY_NAME,
+					ResearcherPageUtils.getPersistentIdentifier(researcher));
+			model.put("pendingItems", new Long(pendingItems));
         }
         
         else if ((researcher.getStatus() == null || researcher.getStatus()

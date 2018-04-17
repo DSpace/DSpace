@@ -457,6 +457,7 @@ public class HandleServlet extends DSpaceServlet
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
         request.setAttribute("dspace.layout.head", headMetadata);
+        request.setAttribute("crisID", context.getCrisID());
         JSPManager.showJSP(request, response, "/display-item.jsp");
     }
     

@@ -25,15 +25,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.StringConfigurationComparator;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.AuthorityDAO;
 import org.dspace.content.authority.AuthorityDAOFactory;
 import org.dspace.content.authority.AuthorityInfo;
@@ -44,6 +46,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
@@ -58,46 +61,45 @@ public class AuthorityManagementServlet extends DSpaceServlet
     private static Logger log = Logger
             .getLogger(AuthorityManagementServlet.class);
 
-    protected void doDSGet(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
-    {
+	protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, SQLException, AuthorizeException {
+
+		boolean isAdmin = AuthorizeManager.isAdmin(context);
+		EPerson currUser = context.getCurrentUser();
+		if (isAdmin || (currUser != null)) {
         String issued = request.getParameter("issued");
         String authority = request.getParameter("authority");
         String authkey = request.getParameter("key");
 
-        if (authority != null)
-        {
-            if (authkey != null)
-            {
+			if (isAdmin || (currUser != null && StringUtils.isNotBlank(authkey) && StringUtils.isNotBlank(context.getCrisID())
+					&& context.getCrisID().equals(authkey))) {
+				if (authority != null) {
+					if (authkey != null) {
                 doAuthorityKeyDetailsForAuthority(context, authority, authkey, request, response);
-            }
-            else
-            {
+					} else {
                 doAuthorityIssuedForAuthority(context, authority, request, response);
             }
-        }
-        else
-        {
-            if (authkey != null && issued != null)
-            {
+				} else {
+					if (authkey != null && issued != null) {
                 doAuthorityKeyDetails(context, issued, authkey, request, response);
-            }
-            else if (issued != null)
-            {
+					} else if (issued != null) {
                 doAuthorityIssued(context, issued, request, response);
-            }
-            else
-            {
+					} else {
                 doMainPage(context, request, response);
             }
         }
+			} else {
+				throw new AuthorizeException("Wrong permission!!!");
+			}
+		}
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+    	boolean admin = AuthorizeManager.isAdmin(context, context.getCurrentUser());
+    	context.turnOffAuthorisationSystem();    	
         String key = request.getParameter("key");
         String issuedParam = request.getParameter("issued");
         String authority = request.getParameter("authority");
@@ -211,12 +213,20 @@ public class AuthorityManagementServlet extends DSpaceServlet
             long numIssuedItems = dao.countIssuedItemsByAuthorityValueInAuthority(authority, key);
             if (numIssuedItems > 0)
             {
+            	if(admin) {
                 response.sendRedirect(request.getContextPath()
                         + "/dspace-admin/authority?key="
                         + URLEncoder.encode(key, "UTF-8") + "&authority=" + authority);
             }
+            	else {
+	                response.sendRedirect(request.getContextPath()
+	                        + "/tools/authority?key="
+	                        + URLEncoder.encode(key, "UTF-8") + "&authority=" + authority);
+            	}
+            }
             else
             {
+				if(admin) {
                 long numIssuedKeys = dao.countIssuedAuthorityKeysByAuthority(authority);
                 if (numIssuedKeys > 0)
                 {
@@ -226,48 +236,62 @@ public class AuthorityManagementServlet extends DSpaceServlet
                     { // there is no next... go back!
                         authkey = dao.findPreviousIssuedAuthorityKeyInAuthority(authority, key);
                     }
-                    response.sendRedirect(request.getContextPath()
-                            + "/dspace-admin/authority?" + "&authority=" + authority
-                            + "&key=" + URLEncoder.encode(authkey, "UTF-8"));
+						response.sendRedirect(request.getContextPath() + "/dspace-admin/authority?" + "&authority="
+									+ authority + "&key=" + URLEncoder.encode(authkey, "UTF-8"));
                 }
                 else
                 {
-                    response.sendRedirect(request.getContextPath()
-                            + "/dspace-admin/authority");
+						response.sendRedirect(request.getContextPath() + "/dspace-admin/authority");
+	                }
+            	}
+            	else {
+            		response.sendRedirect(request.getContextPath() + "/cris/rp/" + key);
                 }
             }
         }
         else
         {
+        	
             long numIssuedItems = dao.countIssuedItemsByAuthorityValue(metadataList.get(0), key);
             if (numIssuedItems > 0)
             {
-                response.sendRedirect(request.getContextPath()
-                        + "/dspace-admin/authority?key="
+				if (admin) {
+					response.sendRedirect(request.getContextPath() + "/dspace-admin/authority?key="
                         + URLEncoder.encode(key, "UTF-8") + "&issued=" + issuedParam);
+				} else {
+					response.sendRedirect(request.getContextPath() + "/dspace-admin/authority?key="
+							+ URLEncoder.encode(key, "UTF-8") + "&issued=" + issuedParam);
+				}
             }
             else
             {
+				if (admin) {
                 long numIssuedKeys = dao.countIssuedAuthorityKeys(issuedParam);
-                if (numIssuedKeys > 0)
-                {
+					if (numIssuedKeys > 0) {
                     // search the next authority key to process...
                     String authkey = dao.findNextIssuedAuthorityKey(issuedParam, key);
-                    if (authkey == null)
-                    { // there is no next... go back!
+						if (authkey == null) { // there is no next... go back!
                         authkey = dao.findPreviousIssuedAuthorityKey(issuedParam, key);
                     }
-                    response.sendRedirect(request.getContextPath()
-                            + "/dspace-admin/authority?" + "&issued=" + issuedParam
-                            + "&key=" + URLEncoder.encode(authkey, "UTF-8"));
+
+						if (admin) {
+							response.sendRedirect(request.getContextPath() + "/dspace-admin/authority?" + "&issued="
+									+ issuedParam + "&key=" + URLEncoder.encode(authkey, "UTF-8"));
+						} else {
+							response.sendRedirect(request.getContextPath() + "/dspace-admin/authority?" + "&issued="
+									+ issuedParam + "&key=" + URLEncoder.encode(authkey, "UTF-8"));
                 }
-                else
-                {
-                    response.sendRedirect(request.getContextPath()
-                            + "/dspace-admin/authority");
+					} else {
+
+						response.sendRedirect(request.getContextPath() + "/dspace-admin/authority");
+
+					}
+				} else {
+					response.sendRedirect(request.getContextPath() + "/cris/rp/" + key);
                 }
             }
         }
+        context.restoreAuthSystemState();
     }
 
     private void doMainPage(Context context, HttpServletRequest request,
@@ -313,6 +337,7 @@ public class AuthorityManagementServlet extends DSpaceServlet
     
             log.info(LogManager.getHeader(context, "show_main_page",
                     "#authorities: " + authorityMetadata.size()));
+            
             JSPManager.showJSP(request, response, "/dspace-admin/authority.jsp");//XXX
         }
         else
@@ -512,6 +537,7 @@ public class AuthorityManagementServlet extends DSpaceServlet
             String authority, String authkey, HttpServletRequest request,
             HttpServletResponse response) throws SQLException, AuthorizeException, IOException, ServletException
     {
+    	boolean isAdmin = AuthorizeManager.isAdmin(context, context.getCurrentUser());
         MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
         ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
         AuthorityDAO dao = AuthorityDAOFactory.getInstance(context);
@@ -637,8 +663,14 @@ public class AuthorityManagementServlet extends DSpaceServlet
                 + arrItems_novalue.length + arrItems_failed.length
                 + arrItems_unset.length));
 
+        if(isAdmin) {
         JSPManager
                 .showJSP(request, response, "/dspace-admin/authority-key.jsp");
+        }
+        else {
+        	JSPManager
+            .showJSP(request, response, "/tools/authority-key.jsp");
+        }
     }
 
     private void doAuthorityIssuedForAuthority(Context context,

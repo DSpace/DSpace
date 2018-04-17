@@ -368,14 +368,14 @@
 		</p>
 	</c:if>
 
-	<c:if test="${pendingItems > 0}">
+	<c:if test="${pendingItems > 0 && publicationSelfClaimRP}">
 		<p class="warning pending">
 			<fmt:message
 				key="jsp.layout.hku.detail.researcher-pending-items">
 				<fmt:param>${pendingItems}</fmt:param>
 			</fmt:message> <fmt:message
 				key="jsp.layout.hku.detail.researcher-goto-pending-items">
-				<fmt:param><%=request.getContextPath()%>/dspace-admin/authority?authority=<%=RPAuthority.RP_AUTHORITY_NAME%>&key=${authority_key}</fmt:param>
+                <fmt:param><%=request.getContextPath()%>/tools/authority?authority=<%=RPAuthority.RP_AUTHORITY_NAME%>&key=${authority_key}</fmt:param>
 			</fmt:message>
 		</p>	
 	</c:if>

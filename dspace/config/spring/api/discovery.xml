@@ -90,7 +90,10 @@
 		<property name="applicationService" ref="applicationService" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
 	</bean>
-					
+
+	<!--  Additional indexing plugin to index multilanguage for authority field -->
+	<bean id="ownerAuthorityIndexer" class="org.dspace.app.cris.discovery.OwnerRPAuthorityIndexer"/>
+						
 	<!--Bean that is used for mapping communities/collections to certain discovery 
 		configurations. -->
 	<bean

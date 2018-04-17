@@ -1,0 +1,14 @@
+# Email sent to DSpace users when they have pending possible matches
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: You have possible matches
+
+The system have found the following items that it could be yours:
+
+{0}
+
+To claim, please login and visit the item details page.
+
+The DSpace Team
+

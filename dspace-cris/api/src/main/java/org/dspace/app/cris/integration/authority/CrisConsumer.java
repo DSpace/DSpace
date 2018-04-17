@@ -379,7 +379,18 @@ public class CrisConsumer implements Consumer
                 {
                     Metadatum newValue = Metadatum.copy();
                     newValue.authority = toBuildAuthority.get(orcid);
-                    newValue.confidence = Choices.CF_ACCEPTED;
+                    boolean bindvalue = false;
+                    int confidence = Metadatum.confidence;
+                    if(confidence != Choices.CF_UNSET) {                    	
+                    	//if binditemtorp script then Choices.CF_AMBIGUOUS, Choices.CF_UNCERTAIN, Choices.CF_NOTFOUND or has CF_REJECTED
+                    	if(confidence==Choices.CF_AMBIGUOUS || confidence==Choices.CF_UNCERTAIN || confidence==Choices.CF_NOTFOUND || confidence==Choices.CF_REJECTED) {
+                    		newValue.confidence = confidence;
+                    		bindvalue = true;
+                    	}
+                    }
+                    if(!bindvalue) {
+                    	newValue.confidence = Choices.CF_ACCEPTED;
+                    }
                     newValue.setPlace(Metadatum.getPlace());
                     item.replaceMetadataValue(Metadatum, newValue);
                 }

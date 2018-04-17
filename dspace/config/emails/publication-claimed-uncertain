@@ -1,0 +1,18 @@
+# Email sent to DSpace users when there is an uncertain authority claim
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Authority Claimed
+
+The system have found the following action: CLAIM {0}
+
+Metadata Field: {0}
+Current Value: {1}
+Current Authority: {2}
+Current Confidence: {3}
+
+Research Profile that claimed {4}
+Click here to view the item page {5}
+
+The DSpace Team
+
