@@ -169,7 +169,7 @@ public class GrobidFileDataLoader extends FileDataLoader {
 		}
 
 		List<Object> getProfileDescsAndXenoDatas = teiHeader.getProfileDescsAndXenoDatas();
-		extractInfo(record, getProfileDescsAndXenoDatas, "profileDescs");
+		extractInfo(record, getProfileDescsAndXenoDatas, "profileDesc");
 		
 		return record;
 	}
