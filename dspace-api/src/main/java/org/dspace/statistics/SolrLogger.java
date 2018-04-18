@@ -90,7 +90,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SolrLogger
 {
-    private static final Logger log = LoggerFactory.getLogger(SolrLoggerServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SolrLogger.class);
 
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
     
