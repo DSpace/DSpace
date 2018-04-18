@@ -632,6 +632,9 @@ public class JournalUtils {
 
             // sanity check:
             if (currentMatch != null) {
+                if (currentMatch.getAuthorList() == null || currentMatch.getAuthorList().size() == 0) {
+                    throw new RESTModelException("CrossRef match does not have authors");
+                }
                 if (!queryManuscript.getJournalISSN().equals(currentMatch.getJournalISSN())) {
                     throw new RESTModelException("publication DOI listed for item does not belong to the correct journal");
                 }
