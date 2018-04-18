@@ -510,7 +510,6 @@ public class JournalUtils {
      */
     public static TreeMap<Integer, Date> getArchivedPackagesFromKeyset(Context context, DryadJournalConcept journalConcept, int keyset) throws SQLException {
         TreeMap<Integer, Date> items = new TreeMap<Integer, Date>();
-        SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
             log.error("starting search");
             int pubNameFieldID = MetadataField.findByElement("prism.publicationName").getFieldID();
@@ -520,7 +519,13 @@ public class JournalUtils {
             while (tri.hasNext()) {
                 TableRow tableRow = tri.next();
                 int itemId = tableRow.getIntColumn("item_id");
-                Date date = dateIso.parse(tableRow.getStringColumn("mdv_date"));
+                String rawDate = tableRow.getStringColumn("mdv_date");
+                Matcher dateMatcher = Pattern.compile("(\\d+-\\d+-\\d+).?").matcher(rawDate);
+                Date date = null;
+                if (dateMatcher.find()) {
+                    SimpleDateFormat dateShort = new SimpleDateFormat("yyyy-MM-dd");
+                    date = dateShort.parse(dateMatcher.group(1));
+                }
                 items.put(itemId, date);
             }
             log.error("ending search");
