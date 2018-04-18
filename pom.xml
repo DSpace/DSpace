@@ -30,6 +30,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
+        <jackson.version>2.9.3</jackson.version>
         <java.version>1.7</java.version>
         <lucene.version>4.10.2</lucene.version>
         <solr.version>4.10.2</solr.version>
@@ -1292,8 +1294,23 @@
               <version>3.0.0</version>
               <scope>provided</scope>
           </dependency>
-      </dependencies>
-   </dependencyManagement>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
    <licenses>
       <license>
