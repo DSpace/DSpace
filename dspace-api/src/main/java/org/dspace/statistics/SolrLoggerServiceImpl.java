@@ -7,10 +7,37 @@
  */
 package org.dspace.statistics;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -18,7 +45,6 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -52,17 +78,10 @@ import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.UsageWorkflowEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Static holder for a HttpSolrClient connection pool to issue
@@ -75,7 +94,7 @@ import java.util.*;
  */
 public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBean
 {
-    private static final Logger log = Logger.getLogger(SolrLoggerServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SolrLoggerServiceImpl.class);
 
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
 
@@ -85,7 +104,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     public static final String DATE_FORMAT_DCDATE = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-    protected LookupService locationService;
+    protected DatabaseReader locationService;
 
     protected boolean useProxies;
 
@@ -142,23 +161,24 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         // Read in the file so we don't have to do it all the time
         //spiderIps = SpiderDetector.getSpiderIpAddresses();
 
-        LookupService service = null;
+        DatabaseReader service = null;
         // Get the db file for the location
-        String dbfile = configurationService.getProperty("usage-statistics.dbfile");
-        if (dbfile != null)
-        {
-            try
-            {
-                service = new LookupService(dbfile,
-                        LookupService.GEOIP_STANDARD);
-            }
-            catch (FileNotFoundException fe)
-            {
-                log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
-            }
-            catch (IOException e)
-            {
-                log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
+        String dbPath = configurationService.getProperty("usage-statistics.dbfile");
+        if (dbPath != null) {
+            try {
+                File dbFile = new File(dbPath);
+                service = new DatabaseReader.Builder(dbFile).build();
+            } catch (FileNotFoundException fe) {
+                log.error(
+                    "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
+                        "based reports! Please see the DSpace installation instructions for instructions to install " +
+                        "this file.",
+                    fe);
+            } catch (IOException e) {
+                log.error(
+                    "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the " +
+                        "DSpace installation instructions for more details.",
+                    e);
             }
         }
         else
@@ -315,30 +335,32 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 		    doc1.addField("isBot",isSpiderBot);
             // Save the location information if valid, save the event without
             // location information if not valid
-            if(locationService != null)
-            {
-                Location location = locationService.getLocation(ip);
-                if (location != null
-                        && !("--".equals(location.countryCode)
-                        && location.latitude == -180 && location.longitude == -180))
-                {
-                    try
-                    {
-                        doc1.addField("continent", LocationUtils
-                                .getContinentCode(location.countryCode));
+            if (locationService != null) {
+                try {
+                    InetAddress ipAddress = InetAddress.getByName(ip);
+                    CityResponse location = locationService.city(ipAddress);
+                    String countryCode = location.getCountry().getIsoCode();
+                    double latitude = location.getLocation().getLatitude();
+                    double longitude = location.getLocation().getLongitude();
+                    if (!(
+                            "--".equals(countryCode)
+                            && latitude == -180
+                            && longitude == -180)
+                    ) {
+                        try {
+                            doc1.addField("continent", LocationUtils
+                                .getContinentCode(countryCode));
+                        } catch (Exception e) {
+                            System.out
+                                .println("COUNTRY ERROR: " + countryCode);
+                        }
+                        doc1.addField("countryCode", countryCode);
+                        doc1.addField("city", location.getCity().getName());
+                        doc1.addField("latitude", latitude);
+                        doc1.addField("longitude", longitude);
                     }
-                    catch (Exception e)
-                    {
-                        System.out
-                                .println("COUNTRY ERROR: " + location.countryCode);
-                    }
-                    doc1.addField("countryCode", location.countryCode);
-                    doc1.addField("city", location.city);
-                    doc1.addField("latitude", location.latitude);
-                    doc1.addField("longitude", location.longitude);
-                    
-
-
+                } catch (IOException | GeoIp2Exception e) {
+                    log.error("Unable to get location of request:  {}", e.getMessage());
                 }
             }
         }
@@ -401,30 +423,32 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 		    doc1.addField("isBot",isSpiderBot);
             // Save the location information if valid, save the event without
             // location information if not valid
-            if(locationService != null)
-            {
-                Location location = locationService.getLocation(ip);
-                if (location != null
-                        && !("--".equals(location.countryCode)
-                        && location.latitude == -180 && location.longitude == -180))
-                {
-                    try
-                    {
-                        doc1.addField("continent", LocationUtils
-                                .getContinentCode(location.countryCode));
+            if (locationService != null) {
+                try {
+                    InetAddress ipAddress = InetAddress.getByName(ip);
+                    CityResponse location = locationService.city(ipAddress);
+                    String countryCode = location.getCountry().getIsoCode();
+                    double latitude = location.getLocation().getLatitude();
+                    double longitude = location.getLocation().getLongitude();
+                    if (!(
+                            "--".equals(countryCode)
+                            && latitude == -180
+                            && longitude == -180)
+                    ) {
+                        try {
+                            doc1.addField("continent", LocationUtils
+                                .getContinentCode(countryCode));
+                        } catch (Exception e) {
+                            System.out
+                                .println("COUNTRY ERROR: " + countryCode);
+                        }
+                        doc1.addField("countryCode", countryCode);
+                        doc1.addField("city", location.getCity().getName());
+                        doc1.addField("latitude", latitude);
+                        doc1.addField("longitude", longitude);
                     }
-                    catch (Exception e)
-                    {
-                        System.out
-                                .println("COUNTRY ERROR: " + location.countryCode);
-                    }
-                    doc1.addField("countryCode", location.countryCode);
-                    doc1.addField("city", location.city);
-                    doc1.addField("latitude", location.latitude);
-                    doc1.addField("longitude", location.longitude);
-                    
-
-
+                } catch (GeoIp2Exception | IOException e) {
+                    log.error("Unable to get location of request:  {}", e.getMessage());
                 }
             }
         }

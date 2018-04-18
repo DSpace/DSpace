@@ -9,10 +9,7 @@
 
 -->
 <!--
-  - DSpace build file
-  -
-  - Version:  $Revision$
-  - Date:     $Date$
+  - DSpace installer scripts
   -->
 
 <project name="DSpace" default="help">
@@ -82,8 +79,8 @@ Common usage:
         <format property="build.date" pattern="yyyyMMdd-HHmmss" />
     </tstamp>
 
-    <!-- Default location of GeoLiteCity.dat.gz to download. This may be overridden, if URL path changes. -->
-    <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" />
+    <!-- Default location of GeoLite2 City database to download. This may be overridden, if URL path changes. -->
+    <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz" />
 
     <!-- Default location of lucene-core JAR to download (for update_solr_indexes). This may be overridden, if URL path changes. -->
     <!-- NOTE: this URL should have the version of the JAR replaced with "[version]" -->
@@ -899,9 +896,18 @@ Common usage:
         <echo>Downloading: ${geolite}</echo>
         <trycatch property="geolite.error">
             <try>
-                <get src="${geolite}" dest="${dspace.dir}/config/GeoLiteCity.dat.gz" verbose="true"/>
-                <gunzip src="${dspace.dir}/config/GeoLiteCity.dat.gz" dest="${dspace.dir}/config/GeoLiteCity.dat" />
-                <delete file="${dspace.dir}/config/GeoLiteCity.dat.gz" />
+                <get src="${geolite}"
+                     dest="${dspace.dir}/config/GeoLite2-City.tar.gz"
+                     verbose="true"/>
+                <untar src="${dspace.dir}/config/GeoLite2-City.tar.gz"
+                       dest="${dspace.dir}/config/"
+                       compression='gzip'>
+                    <patternset>
+                        <include name='**/GeoLite2-City.mmdb'/>
+                    </patternset>
+                    <mapper type='flatten'/>
+                </untar>
+                <delete file="${dspace.dir}/config/GeoLite2-City.tar.gz"/>
             </try>
             <catch>
                 <echo>
@@ -919,9 +925,9 @@ ant update_geolite
 OR
 
 You may manually install this file by following these steps:
-(1) Download the file from ${geolite}
-(2) Unzip it to create a file named 'GeoLiteCity.dat'
-(3) Copy that file to '${dspace.dir}/config/GeoLiteCity.dat'
+(1) Download the latest database archive from ${geolite}
+(2) Unpack it.'
+(3) Copy the file 'GeoLite2-City.mmdb' to '${usage-statistics.dbfile}'.
 
 ====================================================================
                 </echo>
@@ -933,7 +939,7 @@ You may manually install this file by following these steps:
     <target name="check_geolite">
         <condition property="need.geolite">
             <not>
-                <available file="${dspace.dir}/config/GeoLiteCity.dat" />
+                <available file="${usage-statistics.dbfile}" />
             </not>
         </condition>
     </target>

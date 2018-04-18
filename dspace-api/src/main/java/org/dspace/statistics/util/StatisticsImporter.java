@@ -7,7 +7,32 @@
  */
 package org.dspace.statistics.util;
 
-import org.apache.commons.cli.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.model.CityResponse;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
@@ -22,13 +47,6 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.statistics.SolrLoggerServiceImpl;
-
-import java.text.*;
-import java.io.*;
-import java.util.*;
-
-import com.maxmind.geoip.LookupService;
-import com.maxmind.geoip.Location;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
 
@@ -55,8 +73,10 @@ public class StatisticsImporter
     /** Solr server connection */
     private static HttpSolrServer solr;
 
-    /** GEOIP lookup service */
-    private static LookupService geoipLookup;
+    /**
+     * GEOIP lookup service
+     */
+    private static DatabaseReader geoipLookup;
 
     /** Whether to skip the DNS reverse lookup or not */
     private static boolean skipReverseDNS = false;
@@ -191,8 +211,8 @@ public class StatisticsImporter
             String continent = "";
             String country = "";
             String countryCode = "";
-            float longitude = 0f;
-            float latitude = 0f;
+            double longitude = 0f;
+            double latitude = 0f;
             String city = "";
             String dns;
 
@@ -257,15 +277,15 @@ public class StatisticsImporter
                 }
 
                 // Get the geo information for the user
-                Location location;
                 try {
-                    location = geoipLookup.getLocation(ip);
-                    city = location.city;
-                    country = location.countryName;
-                    countryCode = location.countryCode;
-                    longitude = location.longitude;
-                    latitude = location.latitude;
-                    if(verbose) {
+                    InetAddress ipAddress = InetAddress.getByName(ip);
+                    CityResponse cityResponse = geoipLookup.city(ipAddress);
+                    city = cityResponse.getCity().getName();
+                    country = cityResponse.getCountry().getName();
+                    countryCode = cityResponse.getCountry().getIsoCode();
+                    longitude = cityResponse.getLocation().getLongitude();
+                    latitude = cityResponse.getLocation().getLatitude();
+                    if (verbose) {
                         data += (", country = " + country);
                         data += (", city = " + city);
                         System.out.println(data);
@@ -476,18 +496,21 @@ public class StatisticsImporter
         }
 		solr = new HttpSolrServer(sserver);
 
-        String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
-        try
-        {
-            geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
-        }
-        catch (FileNotFoundException fe)
-        {
-            log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
-        }
-        catch (IOException e)
-        {
-            log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
+        String dbPath = ConfigurationManager.getProperty("usage-statistics", "dbfile");
+        try {
+            File dbFile = new File(dbPath);
+            geoipLookup = new DatabaseReader.Builder(dbFile).build();
+        } catch (FileNotFoundException fe) {
+            log.error(
+                "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
+                    "based reports! Please see the DSpace installation instructions for instructions to install this " +
+                    "file.",
+                fe);
+        } catch (IOException e) {
+            log.error(
+                "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the DSpace " +
+                    "installation instructions for more details.",
+                e);
         }
 
 
