@@ -51,7 +51,7 @@ public class JournalUtils {
         JOURNAL_NOT_INTEGRATED
     }
 
-    public final static String crossRefApiRoot = "http://api.crossref.org/";
+    public final static String crossRefApiRoot = "https://api.crossref.org/";
     public final static String nsfApiRoot = "http://api.nsf.gov/services/v1/awards/";
 
     public static final String archivedDataPackageIds    = "SELECT * FROM ArchivedPackageItemIdsByJournal(?,?);";
@@ -552,7 +552,7 @@ public class JournalUtils {
     public static String getCrossRefJournalForISSN(String issn) throws RESTModelException {
         String crossRefURL = crossRefApiRoot + "journals/" + issn;
         try {
-            URL url = new URL(crossRefURL.replaceAll("\\s+", ""));
+            URL url = new URL(crossRefURL.replaceAll("\\s+", "") + "?mailto=" + ConfigurationManager.getProperty("alert.recipient"));
             ObjectMapper m = new ObjectMapper();
             JsonNode rootNode = m.readTree(url.openStream());
             JsonNode titleNode = rootNode.path("message").path("title");
@@ -574,7 +574,8 @@ public class JournalUtils {
         StringBuilder queryString = new StringBuilder();
         String pubDOI = queryManuscript.getPublicationDOI();
         if (pubDOI != null && (!"".equals(StringUtils.stripToEmpty(pubDOI).replaceAll("null","")))) {
-            crossRefURLs.add(crossRefApiRoot + "works/" + queryManuscript.getPublicationDOI());
+            crossRefURLs.add(crossRefApiRoot + "works/" + queryManuscript.getPublicationDOI() +
+                             "?mailto=" + ConfigurationManager.getProperty("alert.recipient"));
         } else {
             // make a query string of the authors' last names
             ArrayList<String> lastNames = new ArrayList<String>();
@@ -588,7 +589,8 @@ public class JournalUtils {
             // append the title to the query
             queryString.append(queryManuscript.getTitle().replaceAll("[^a-zA-Z\\s]", "").replaceAll("\\s+", " "));
             for (String issn : queryManuscript.getJournalConcept().getISSNs()) {
-                crossRefURLs.add(crossRefApiRoot + "journals/" + issn + "/works?sort=score&order=desc&query=" + queryString.toString().replaceAll("\\s+", "+"));
+                crossRefURLs.add(crossRefApiRoot + "journals/" + issn + "/works?sort=score&order=desc&query=" +
+                                 queryString.toString().replaceAll("\\s+", "+") + "?mailto=" + ConfigurationManager.getProperty("alert.recipient"));
             }
         }
 
