@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -25,8 +26,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -84,7 +85,7 @@ public class StatisticsImporter {
     /**
      * GEOIP lookup service
      */
-    private static LookupService geoipLookup;
+    private static DatabaseReader geoipLookup;
 
     /**
      * Whether to skip the DNS reverse lookup or not
@@ -219,8 +220,8 @@ public class StatisticsImporter {
             String continent = "";
             String country = "";
             String countryCode = "";
-            float longitude = 0f;
-            float latitude = 0f;
+            double longitude = 0f;
+            double latitude = 0f;
             String city = "";
             String dns;
 
@@ -275,14 +276,14 @@ public class StatisticsImporter {
                 }
 
                 // Get the geo information for the user
-                Location location;
                 try {
-                    location = geoipLookup.getLocation(ip);
-                    city = location.city;
-                    country = location.countryName;
-                    countryCode = location.countryCode;
-                    longitude = location.longitude;
-                    latitude = location.latitude;
+                    InetAddress ipAddress = InetAddress.getByName(ip);
+                    CityResponse cityResponse = geoipLookup.city(ipAddress);
+                    city = cityResponse.getCity().getName();
+                    country = cityResponse.getCountry().getName();
+                    countryCode = cityResponse.getCountry().getIsoCode();
+                    longitude = cityResponse.getLocation().getLongitude();
+                    latitude = cityResponse.getLocation().getLatitude();
                     if (verbose) {
                         data += (", country = " + country);
                         data += (", city = " + city);
@@ -469,18 +470,19 @@ public class StatisticsImporter {
         }
         solr = new HttpSolrServer(sserver);
 
-        String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
+        String dbPath = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         try {
-            geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
+            File dbFile = new File(dbPath);
+            geoipLookup = new DatabaseReader.Builder(dbFile).build();
         } catch (FileNotFoundException fe) {
             log.error(
-                "The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location " +
+                "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
                     "based reports! Please see the DSpace installation instructions for instructions to install this " +
                     "file.",
                 fe);
         } catch (IOException e) {
             log.error(
-                "Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace " +
+                "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the DSpace " +
                     "installation instructions for more details.",
                 e);
         }
