@@ -118,9 +118,11 @@
 	            <entry key="orcid" value-ref="orcidOnlineDataLoader"/>
 	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
 	            <entry key="cinii" value-ref="ciniiOnlineDataLoader"/>
-<!-- 	            depending on your apiKey you should use scopusOnlineDataLoader or scivalOnlineDataLoader
+<!-- 	            depending on your apiKey you should use scopusOnlineDataLoader or scivalOnlineDataLoader or
+					adsOnlineDataLoader 
 		    <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
-	            <entry key="wos" value-ref="wosOnlineDataLoader"/> -->
+	            <entry key="wos" value-ref="wosOnlineDataLoader"/> 
+	            <entry key="ads" value-ref="adsOnlineDataLoader"/>-->
 	            <entry key="pubmedXML" value-ref="pubmedFileDataLoader"/>
 	            <!-- <entry key="pubmedEuropeXML" value-ref="pubmedEuropeFileDataLoader"/> -->
 	            <entry key="crossRefXML" value-ref="crossRefFileDataLoader"/>
@@ -192,6 +194,17 @@
 	    </property>
 	</bean>
 
+	<bean name="mapConverter_adsType" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
+	    <constructor-arg value="mapConverter_adsType Modifier"/>
+	    <property name="converterNameFile" value="mapConverter-adsType.properties"/>
+	    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+	    <property name="fieldKeys">
+	        <list>
+	            <!-- Specify the internal BTE keys that this modifier needs to be applied for -->
+	        	<value>subtype</value>
+	        </list>
+	    </property>
+	</bean>
 	<!-- Converts an input value to an output one -->
 	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
 	    <constructor-arg value="mapConverter_pubstatusPubmed Modifier"/>
@@ -488,10 +501,9 @@
 				<entry key="analyticname" value="authors" />
 				<entry key="monogrtitle" value="journal" />
 				<entry key="publicationstmtdatepublished" value="issued" />
-				<entry key="issn" value="jissn" />
-				<entry key="eissn" value="eissn" />
-				<entry key="isbn" value="pisbn" />
-				<entry key="doi" value="doi" />
+				<entry key="ISSN" value="jissn" />
+				<entry key="ISBN" value="pisbn" />
+				<entry key="DOI" value="doi" />
 				<entry key="profiledescsabstractparagraph" value="abstract" />
 				<entry key="profiledescskeywordsterm" value="allkeywords" />
 			</map>
@@ -690,6 +702,8 @@
                 </map>
             </constructor-arg>
 	</bean>
+
+	
 	
 	<!-- **************************************************************************************************** -->
 	<!-- Output Mapping 																					  -->
@@ -731,6 +745,7 @@
 				<entry value="publisherPlace" key="dc.publisher.place" />
 				<entry value="pubmedID" key="dc.identifier.pmid" />
 				<entry value="pubmedcentralID" key="dc.identifier.pmcid" />
+				<entry value="adsbibcode" key="dc.identifier.bibcode" />
 				<entry value="uri" key="dc.identifier.uri" />
 				<entry value="url" key="dc.identifier.url" />
 				<entry value="issue" key="dc.identifier.issue" />
@@ -745,7 +760,9 @@
 				<entry value="eid" key="dc.identifier.scopus" />
 				<entry value="isiId" key="dc.identifier.isi" />
 				<entry value="providerType" key="dc.source.type" />
-				<entry value="orcid" key="dc.contributor.orcid" />				
+				<entry value="orcid" key="dc.contributor.orcid" />
+				<entry value="rights" key="dc.rights" />
+				<entry value="description" key="dc.description" />				
 				
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
 				<!-- 
@@ -973,6 +990,57 @@
 		</constructor-arg>
 	</bean>
 
+
+	<!-- ADS -->
+	<bean id="adsOnlineDataLoader" class="org.dspace.submit.lookup.ADSOnlineDataLoader">
+	    	<property name="token" value="" />
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="adsInputMap" />
+	</bean>
+
+	<bean name="adsInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="abstract" value="abstract" /> 
+				<entry key="aff" value="affiliation" />
+				<entry key="alternate_title"  value="titleAlternative" />
+				<entry key="arxiv_class"  value="arXivCategory" /> 
+				<entry key="author" value="authors" />
+				<entry key="bibcode" value="adsbibcode" />
+				<entry key="doi" value="doi" />
+				<entry key="doctype" value="subtype" />
+				<entry key="id" value="adsid" />
+				<entry key="issue" value="issue" />
+				<entry key="keyword" value="keywords" />
+				<entry key="lang" value="language" />
+				<entry key="page" value="firstpage" />
+				<entry key="pub" value="journal" />
+				<entry key="year" value="issued" />
+				<entry key="volume" value="volume" />
+				<entry key="title" value="title" />
+				<entry key="copyright" value="rights" />
+				 <entry key="ack" value="description" />
+				<!--  <entry key="vizier" value="" />
+						<entry key="indexstamp" value="" />
+						<entry key="alternate_bibcode" value="" />
+						<entry key="read_count" value="" />
+						<entry key="year" value="" />
+     					 <entry key="orcid_pub" value="" />
+						<entry key="orcid_user" value="" />
+						<entry key="orcid_other" value="" />
+						<entry key="property" value="" />
+						<entry key="bibgroup" value="" /> 
+						<entry key="bibstem" value="" />
+						<entry key="citation_count" value="" />
+						<entry key="database" value="" />
+						<entry key="first_author" value="" />
+						<entry key="grant" value="" />
+						<entry key="identifier" value="" /> TODO: should parse to find out which identifier is;	   
+				-->
+			</map>
+		</constructor-arg>
+	</bean>
+	
 	<!--  PUBMED EUROPE FEED -->	
 	<bean name="pubmedFeedPhase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
 	    <property name="dataLoader" ref="pubmedEuropeDataLoader"/>
@@ -1048,4 +1116,28 @@
 		<property name="providerName" value="wos" />		
 	</bean>
 	
+	<!-- ADS FEED -->
+	<bean name="adsFeedTransformationEnginePhaseOne" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="adsFeedDataLoader"/>
+    	<property name="workflow" ref="phase1LinearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+  	</bean>
+  	<bean name="adsFeedDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	    <property name="dataloadersMap">
+	        <map>
+	            <entry key="ads" value-ref="adsOnlineDataLoader"/>
+			</map>
+	    </property>
+	</bean>
+	
+	<bean name="adsFeedTransformationEnginePhaseTwo" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="submissionItemDataLoader"/>
+    	<property name="workflow" ref="phase2linearWorkflow"/>
+    	<property name="outputGenerator" ref="adsOutputGenerator"/>
+  	</bean>
+	<bean name="adsOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
+		<property name="outputMap" ref="outputMap"/>
+		<property name="sourceIdMetadata" value="dc.identifier.adsbibcode" />
+		<property name="providerName" value="scopus" />		
+	</bean>	
 </beans>

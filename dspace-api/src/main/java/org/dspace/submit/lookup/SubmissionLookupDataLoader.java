@@ -34,6 +34,8 @@ public interface SubmissionLookupDataLoader extends DataLoader
     public final static String PUBMEDEUROPE = "pubmedEurope";
 
     public final static String ARXIV = "arxiv";
+    
+    public final static String ADSBIBCODE = "adsbibcode";
 
     public final static String REPEC = "repec";
 
