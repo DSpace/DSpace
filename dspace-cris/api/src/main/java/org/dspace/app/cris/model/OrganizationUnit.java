@@ -57,7 +57,7 @@ public class OrganizationUnit extends
 		Cloneable
 {
 
-	private static final String NAME = "name";
+	public static final String NAME = "name";
 	
     @Transient
     /**

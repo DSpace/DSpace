@@ -25,7 +25,6 @@ import org.dspace.app.cris.integration.authority.ItemMetadataImportFillerConfigu
 import org.dspace.app.cris.metrics.common.model.CrisMetrics;
 import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.model.ACrisObject;
-import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
@@ -46,7 +45,7 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
 
     private Map<String, ItemMetadataImportFillerConfiguration> configurations;
 
-    private ApplicationService applicationService;
+    protected ApplicationService applicationService;
 
     private MetricsPersistenceService metricsPersistenceService;
 

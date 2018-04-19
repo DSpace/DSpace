@@ -33,6 +33,9 @@
 				<entry key="orcid">
 					<bean class="org.dspace.app.cris.integration.authority.ORCIDImportFiller" parent="fullitemMetadataConfiguration" />
 				</entry>
+				<entry key="openAireProject">
+					<ref bean="openAIREProjectImportFiller" />
+				</entry>
 				<entry key-ref="CrisConsumer-SOURCE_INTERNAL">
 					<bean class="org.dspace.app.cris.integration.authority.ItemMetadataImportFiller" parent="fullitemMetadataConfiguration" />
 				</entry>
@@ -47,6 +50,11 @@
 		<property name="configurations">
 			<bean class="java.util.HashMap" />
 		</property>
+	</bean>
+	
+	<bean id="openAIREProjectImportFiller" class="org.dspace.app.cris.integration.authority.OpenAIREProjectImportFiller" parent="fullitemMetadataConfiguration">
+		<property name="searchService" ref="org.dspace.discovery.SearchService" />
+		<property name="openAIREProjectService" ref="org.dspace.authority.openaireproject.OpenAIREProjectService" />
 	</bean>
 
 </beans>

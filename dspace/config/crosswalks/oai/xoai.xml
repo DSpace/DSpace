@@ -30,7 +30,7 @@
             <Format ref="qdc"/>
             <Format ref="marc"/>
             <Format ref="uketd_dc"/>
-            <!--<Format ref="junii2" />-->
+            <!--<Format ref="junii2" />-->            
             <Description>
                 This is the default context of the DSpace OAI-PMH data provider.
             </Description>
@@ -80,6 +80,20 @@
             <Format ref="mets"/>
             <Description>
                 This contexts complies with OpenAIRE rules.
+            </Description>
+        </Context>
+        
+        <Context baseurl="openairedata" name="OpenAIRE Data Repository Context">
+            <!-- OpenAIRE filter -->
+            <Filter ref="openaireDataFilter"/>
+            <!-- Just an alias, in fact it returns all items within the driver context -->
+            <Set ref="openaireDataSet"/>
+            <!-- Metadata Formats -->
+            <Format ref="oaidc"/>
+            <!-- set the reference at the new format called datacite41_openaire -->
+            <Format ref="datacite41_openaire"/>
+            <Description>
+                This contexts complies with Data Archive OpenAIRE rules.
             </Description>
         </Context>
     </Contexts>
@@ -166,6 +180,13 @@
             <XSLT>metadataFormats/junii2.xsl</XSLT>
             <Namespace>http://irdb.nii.ac.jp/oai</Namespace>
             <SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3-1.xsd</SchemaLocation>
+        </Format>
+        <!-- set the format that use the new XSL file called datacite41-openaire -->
+        <Format id="datacite41_openaire">
+            <Prefix>oai_datacite</Prefix>
+            <XSLT>metadataFormats/datacite41-openaire.xsl</XSLT>
+            <Namespace>http://schema.datacite.org/oai/oai-1.1/</Namespace>
+            <SchemaLocation>http://schema.datacite.org/oai/oai-1.1/oai.xsd</SchemaLocation>
         </Format>
     </Formats>
 
@@ -277,6 +298,41 @@
                 </And>
             </Definition>
         </Filter>
+        
+        <!-- create a new filter for the openairedata Context -->
+        <Filter id="openaireDataFilter">
+            <Definition>
+                <And>
+                    <LeftCondition>
+                        <And>
+                            <LeftCondition>
+                                <Custom ref="titleExistsCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="authorExistsCondition"/>
+                            </RightCondition>
+                        </And>
+                    </LeftCondition>
+                    <RightCondition>
+                        <And>
+                            <LeftCondition>
+                                <Custom ref="identifierExistsCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <And>
+                                    <LeftCondition>
+                                        <Custom ref="dateExistsCondition"/> 
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <Custom ref="publisherExistsCondition"/>
+                                    </RightCondition>
+                                </And>
+                            </RightCondition>
+                        </And>
+                    </RightCondition>
+                </And>
+            </Definition>
+        </Filter>
 
         <!-- UKETD Filter for records returned by OAI-PMH.
              By default, return an Item record:
@@ -334,6 +390,38 @@
             <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
             <Configuration>
                 <string name="field">dc.title</string>
+            </Configuration>
+        </CustomCondition>
+        
+        <!-- This condition determines if an Item has a "dc.identifier.doi" or a "dc.identifier.uri" or a "dc.identifier.url" -->
+        <CustomCondition id="identifierExistsCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <list name="fields">
+                	<string>dc.identifier.doi</string>
+                	<string>dc.identifier.uri</string>
+                	<string>dc.identifier.url</string>
+               	</list>
+            </Configuration>
+        </CustomCondition>
+        
+        <!-- This condition determines if an Item has a "dc.date.issued" or a "dc.date.available" or a "dc.date.accessioned" -->
+        <CustomCondition id="dateExistsCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <list name="fields">
+                	<string>dc.date.issued</string>
+                	<string>dc.date.available</string>
+                	<string>dc.date.accessioned</string>
+               	</list>
+            </Configuration>
+        </CustomCondition>
+        
+        <!-- This condition determines if an Item has a "dc.publisher" -->
+        <CustomCondition id="publisherExistsCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <string name="field">dc.publisher</string>
             </Configuration>
         </CustomCondition>
 
@@ -415,6 +503,12 @@
             <Spec>ec_fundedresources</Spec>
             <Name>EC_fundedresources set</Name>
             <!-- Just an alias -->
+        </Set>
+        <!-- set the OpenAIRE Data Archive OAI Set. See: https://guidelines.openaire.eu/en/latest/data/use_of_oai_pmh.html -->
+        <Set id="openaireDataSet">
+            <Spec>openaire_data</Spec>
+            <Name>OpenAIRE</Name>
+            <!-- Just an alias or set a filter condition to expose only specific kind of items (dataset) -->
         </Set>
     </Sets>
 </Configuration>

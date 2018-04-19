@@ -21,7 +21,7 @@
 			<xsl:apply-templates select="@*|node()" />
 		</xsl:copy>
 	</xsl:template>
- 
+	
  	<!-- Formatting dc.date.issued -->
 	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field/text()">
 		<xsl:call-template name="formatdate">
@@ -31,7 +31,7 @@
 	
 	<!-- Removing other dc.date.* -->
 	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name!='issued']" />
-
+	
 	<!-- Prefixing dc.type -->
 	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field/text()">
 		<xsl:call-template name="addPrefix">
@@ -63,7 +63,7 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-
+	
 	<!-- AUXILIARY TEMPLATES -->
 	
 	<!-- dc.type prefixing -->
