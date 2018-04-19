@@ -2209,6 +2209,10 @@ div.page-license {
     display: none;
 
 }
+
+span.filename {
+    font-weight: bold;
+}
 #aspect_submission_StepTransformer_list_submit-select-publication li.ds-form-item .ds-form-label {
     padding: 8px 20px 0 10px;
 }
