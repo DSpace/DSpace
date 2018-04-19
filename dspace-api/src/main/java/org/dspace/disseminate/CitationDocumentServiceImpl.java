@@ -288,7 +288,24 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         try {
             Item item = (Item) bitstreamService.getParentObject(context, bitstream);
             sourceDocument = sourceDocument.load(bitstreamService.retrieve(context, bitstream));
-            PDPage coverPage = new PDPage(PDRectangle.LETTER); // TODO: needs to be configurable
+	    // Page format can be either LETTER (default) or A4
+	    String pageformat_cfg = configurationService.getProperty("citation-page.page_format");
+	    PDRectangle pageformat = PDRectangle.LETTER;
+	    if (pageformat_cfg == null) {
+		pageformat = PDRectangle.LETTER;
+	    } else {
+		String pf = pageformat_cfg.toUpperCase();
+		if (pf.equals("A4")) {
+		    pageformat = PDRectangle.A4;
+		} else if (pf.equals("LETTER")) {
+		    pageformat = PDRectangle.LETTER;
+		} else {
+		    log.info("Citation-page: Unknown page format ' " + pageformat_cfg + "', using LETTER.");
+		    pageformat = PDRectangle.LETTER;
+		}
+	    }
+
+	    PDPage coverPage = new PDPage(pageformat);
             generateCoverPage(context, document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
 
