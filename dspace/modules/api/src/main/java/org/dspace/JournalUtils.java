@@ -688,26 +688,26 @@ public class JournalUtils {
 
     public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode) throws RESTModelException {
         // manuscripts should only be returned if the crossref match is of type "journal-article"
-        if (jsonNode.path("type") != null) {
+        if (!jsonNode.path("type").isMissingNode()) {
             if (!"journal-article".equals(jsonNode.path("type").textValue())) {
                 throw new RESTModelException("crossref result is not of type journal-article: " + jsonNode.path("type").textValue());
             }
         }
 
         Manuscript manuscript = new Manuscript();
-        if (jsonNode.path("DOI") != null) {
+        if (!jsonNode.path("DOI").isMissingNode()) {
             manuscript.setPublicationDOI(jsonNode.path("DOI").textValue());
         }
 
         JsonNode authorsNode = jsonNode.path("author");
-        if (authorsNode.isArray()) {
+        if (!authorsNode.isMissingNode() && authorsNode.isArray()) {
             for (JsonNode authorNode : authorsNode) {
                 manuscript.addAuthor(new Author(authorNode.path("family").textValue(),authorNode.path("given").textValue()));
             }
         }
 
         JsonNode dateNode = jsonNode.path("created");
-        if (dateNode != null) {
+        if (!dateNode.isMissingNode()) {
             //2016-04-11T17:53:39Z
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             try {
@@ -724,22 +724,22 @@ public class JournalUtils {
             String trimmedTitle = titleNode.elements().next().textValue().replace("\n", " ").replaceAll("\\s+", " ");
             manuscript.setTitle(trimmedTitle);
         }
-        if (jsonNode.path("publisher") != null) {
+        if (!jsonNode.path("publisher").isMissingNode()) {
             manuscript.setPublisher(jsonNode.path("publisher").textValue());
         }
-        if (jsonNode.path("volume") != null) {
+        if (!jsonNode.path("volume").isMissingNode()) {
             manuscript.setJournalVolume(jsonNode.path("volume").textValue());
         }
-        if (jsonNode.path("article-number") != null) {
+        if (!jsonNode.path("article-number").isMissingNode()) {
             manuscript.setPages(jsonNode.path("article-number").textValue());
         }
-        if (jsonNode.path("page") != null) {
+        if (!jsonNode.path("page").isMissingNode() ) {
             manuscript.setPages(jsonNode.path("page").textValue());
         }
-        if (jsonNode.path("issue") != null) {
+        if (!jsonNode.path("issue").isMissingNode()) {
             manuscript.setJournalNumber(jsonNode.path("issue").textValue());
         }
-        if (jsonNode.path("ISSN") != null && jsonNode.path("ISSN").isArray()) {
+        if (!jsonNode.path("ISSN").isMissingNode() && jsonNode.path("ISSN").isArray()) {
             for (JsonNode issnNode : jsonNode.path("ISSN")) {
                 DryadJournalConcept dryadJournalConcept = getJournalConceptByISSN(issnNode.textValue());
                 if (dryadJournalConcept != null) {
