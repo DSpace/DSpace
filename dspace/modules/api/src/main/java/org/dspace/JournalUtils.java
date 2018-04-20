@@ -725,6 +725,9 @@ public class JournalUtils {
         if (jsonNode.path("volume") != null) {
             manuscript.setJournalVolume(jsonNode.path("volume").textValue());
         }
+        if (jsonNode.path("article-number") != null) {
+            manuscript.setPages(jsonNode.path("article-number").textValue());
+        }
         if (jsonNode.path("page") != null) {
             manuscript.setPages(jsonNode.path("page").textValue());
         }
