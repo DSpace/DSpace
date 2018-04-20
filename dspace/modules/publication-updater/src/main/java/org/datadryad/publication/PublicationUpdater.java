@@ -580,7 +580,8 @@ public class PublicationUpdater extends HttpServlet {
             LOGGER.debug("old citation was: " + itemCitation);
             LOGGER.debug("new citation is: " + manuscript.getFullCitation());
             LOGGER.debug("citation match score is " + score);
-            if (score < 0.95) {
+            // old citation doesn't match new citation, or old citation had "null" for page number (match score is still v high)
+            if ((score < 0.95) || (itemCitation.contains("null"))) {
                 fieldsChanged.add(FULL_CITATION);
                 item.clearMetadata(FULL_CITATION);
                 item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);
