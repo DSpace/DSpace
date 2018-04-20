@@ -62,7 +62,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             //Anonymous requests should have the "ANONYMOUS" security grant
             .anonymous().authorities(ANONYMOUS_GRANT).and()
             //Wire up the HttpServletRequest with the current SecurityContext values
-            .servletApi().and()
+            .servletApi().and().cors().and()
             //Disable CSRF as our API can be used by clients on an other domain, we are also protected against this,
             // since we pass the token in a header
             .csrf().disable()

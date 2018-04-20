@@ -266,7 +266,10 @@ public class IPMatcherTest {
 
 
     private ArrayList<String> getAllIp4Except(ArrayList<String> exceptions) {
-        int d1 = 0, d2 = 0, d3 = 0, d4 = 0;
+        int d1 = 0;
+        int d2 = 0;
+        int d3 = 0;
+        int d4 = 0;
         ArrayList<String> ips = new ArrayList<String>();
         for (d1 = 0; d1 <= 255; d1 += increment) {
             for (d2 = 0; d2 <= 255; d2 += increment) {
@@ -285,7 +288,10 @@ public class IPMatcherTest {
 
     private void verifyAllIp4Except(ArrayList<String> exceptions, boolean asserted, IPMatcher ipMatcher)
         throws IPMatcherException {
-        int d1 = 0, d2 = 0, d3 = 0, d4 = 0;
+        int d1 = 0;
+        int d2 = 0;
+        int d3 = 0;
+        int d4 = 0;
         for (d1 = 0; d1 <= 255; d1 += increment) {
             for (d2 = 0; d2 <= 255; d2 += increment) {
                 for (d3 = 0; d3 <= 255; d3 += increment) {

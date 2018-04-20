@@ -27,9 +27,6 @@ import org.junit.Test;
  */
 public class I18nUtilTest extends AbstractDSpaceTest {
 
-    public I18nUtilTest() {
-    }
-
     @BeforeClass
     public static void setUpClass() {
     }
@@ -147,12 +144,10 @@ public class I18nUtilTest extends AbstractDSpaceTest {
         // Assert our overridden default.locale is set in I18nUtil
         assertEquals("Default locale", new Locale("en", "US", "UTF-8"), I18nUtil.getDefaultLocale());
 
-        String key, expResult, result;
-
         // Test for a stock key
-        key = "jsp.general.home";
-        expResult = "DSpace Home";
-        result = I18nUtil.getMessage(key);
+        String key = "jsp.general.home";
+        String expResult = "DSpace Home";
+        String result = I18nUtil.getMessage(key);
         assertEquals("Returns the translation of the key if it is defined",
                      expResult, result);
 
@@ -168,13 +163,12 @@ public class I18nUtilTest extends AbstractDSpaceTest {
     @Test
     public void testGetMessage_String_Locale() {
         System.out.println("getMessage");
-        String key, expResult, result;
         Locale locale = Locale.US;
 
         // Test for a stock key
-        key = "jsp.general.home";
-        expResult = "DSpace Home";
-        result = I18nUtil.getMessage(key, locale);
+        String key = "jsp.general.home";
+        String expResult = "DSpace Home";
+        String result = I18nUtil.getMessage(key, locale);
         assertEquals("Returns the translation of the key if it is defined",
                      expResult, result);
 

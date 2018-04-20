@@ -101,9 +101,6 @@ public class FilteredCollectionsResource extends Resource {
 
         try {
             context = createContext();
-            if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
-                context.turnOffAuthorisationSystem();
-            }
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0))) {
                 log.warn("Paging was badly set.");
@@ -194,9 +191,6 @@ public class FilteredCollectionsResource extends Resource {
         FilteredCollection retColl = new org.dspace.rest.common.FilteredCollection();
         try {
             context = createContext();
-            if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
-                context.turnOffAuthorisationSystem();
-            }
 
             org.dspace.content.Collection collection = collectionService.findByIdOrLegacyId(context, collection_id);
             if (authorizeService.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {

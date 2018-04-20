@@ -44,7 +44,8 @@ public class PasswordHashTest extends AbstractDSpaceTest {
     @Test
     public void testConstructors()
         throws DecoderException {
-        PasswordHash h1, h3;
+        PasswordHash h1;
+        PasswordHash h3;
 
         // Test null inputs, as from NULL database columns (old EPerson using
         // unsalted hash, for example).

@@ -72,8 +72,8 @@ public class BasicWorkflowAuthorizationRolesIT
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance()
-                                                                                             .getBasicWorkflowItemService();
+    protected BasicWorkflowItemService basicWorkflowItemService =
+        BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
     protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance()
                                                                                      .getBasicWorkflowService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -90,7 +90,7 @@ public class BasicWorkflowAuthorizationRolesIT
     protected EPerson member;
     protected WorkspaceItem wsi;
 
-    protected enum ROLE {ADMIN, SUB, STEP1, STEP2, STEP3;}
+    protected enum ROLE { ADMIN, SUB, STEP1, STEP2, STEP3 }
 
     protected HashMap<ROLE, Group> roleGroups = new HashMap<>();
     protected HashMap<ROLE, EPerson> roleEPersons = new HashMap<>();

@@ -1090,6 +1090,8 @@ public class ShibAuthentication implements AuthenticationMethod {
      *
      * This method will not interpret the header value in any way.
      *
+     * This method will return null if value is empty.
+     *
      * @param request The HTTP request to look for values in.
      * @param name    The name of the attribute or header
      * @return The value of the attribute or header requested, or null if none found.
@@ -1116,6 +1118,16 @@ public class ShibAuthentication implements AuthenticationMethod {
         }
         if (StringUtils.isEmpty(value)) {
             value = request.getHeader(name.toUpperCase());
+        }
+
+        // Added extra check for empty value of an attribute.
+        // In case that value is Empty, it should not be returned, return 'null' instead.
+        // This prevents passing empty value to other methods, stops the authentication process
+        // and prevents creation of 'empty' DSpace EPerson if autoregister == true and it subsequent
+        // authentication.
+        if (StringUtils.isEmpty(value)) {
+            log.debug("ShibAuthentication - attribute " + name + " is empty!");
+            return null;
         }
 
         boolean reconvertAttributes =

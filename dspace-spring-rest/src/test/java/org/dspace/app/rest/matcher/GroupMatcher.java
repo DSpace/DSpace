@@ -18,6 +18,8 @@ import org.hamcrest.Matcher;
 
 public class GroupMatcher {
 
+    private GroupMatcher() { }
+
     public static Matcher<? super Object> matchGroupEntry(UUID uuid, String name) {
         return allOf(
             hasJsonPath("$.uuid", is(uuid.toString())),
