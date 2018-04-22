@@ -1413,7 +1413,6 @@
                    {
                         if (value.equals(defaults[j].value))
                         {
-                        	System.out.println(defaults[j].value);
                         	checked = true;
                         	break;
                         }
