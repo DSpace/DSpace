@@ -31,6 +31,13 @@
 				<entry key="dept">
 					<value>dept</value>
 				</entry>
+				<entry key="orcid">
+					<value>orcid</value>
+				</entry>
+				<entry key="parentorg">
+					<value>dept.parentorgunit</value>
+				</entry>
+				
 			</map>
 		</property>
 	</bean>
@@ -46,12 +53,75 @@
 		</property>
 		<property name="qualifiers2path">
 			<map>
+				<entry key="funder">
+					<value>funder</value>
+				</entry>
+				<entry key="funderid">
+					<value>funder.crossrefid</value>
+				</entry>
 				<entry key="grantno">
-					<value>projectNumber</value>
+					<value>code</value>
+				</entry>
+				<entry key="awardURL">
+					<value>awardURL</value>
+				</entry>
+				<entry key="projectURL">
+					<value>projectURL</value>
+				</entry>
+				<entry key="fundingProgram">
+					<value>fundingProgram</value>
 				</entry>
 			</map>
 		</property>
 	</bean>	
+
+	<bean class="org.dspace.app.cris.integration.CrisItemEnhancer">
+		<property name="alias" value="classification" />
+		<property name="metadata">
+			<list>
+				<value>dc.subject.INGV</value>
+			</list>
+		</property>
+		<property name="clazz">
+			<value>org.dspace.app.cris.model.ResearchObject</value>
+		</property>
+		<property name="type">
+			<value>classification</value>
+		</property>		
+		<property name="qualifiers2path">
+			<map>
+				<entry key="parent">
+					<value>classificationparentclassification</value>
+				</entry>
+			</map>
+		</property>
+	</bean>	
+
+
+	<bean class="org.dspace.app.cris.integration.CrisItemEnhancer">
+		<property name="alias" value="journal" />
+		<property name="metadata">
+			<list>
+				<value>dc.relation.ispartof</value>
+			</list>
+		</property>
+		<property name="clazz">
+			<value>org.dspace.app.cris.model.ResearchObject</value>
+		</property>
+		<property name="type">
+			<value>journals</value>
+		</property>				
+		<property name="qualifiers2path">
+			<map>
+				<entry key="journalissn">
+					<value>journalissn</value>
+				</entry>
+				<entry key="journaleissn">
+					<value>journaleissn</value>
+				</entry>				
+			</map>
+		</property>
+	</bean>
 
 	<!-- CRIS enhanced metadata, used to add dynamically to the CRIS entity information from linked
          CRIS entities as it was metadata of the current CRIS entity from clazz -->

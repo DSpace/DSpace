@@ -1399,30 +1399,26 @@
 
             //flag that lets us know when we are in Column2
             boolean inColumn2 = false;
-            boolean notSet = false;
+            
             //loop through all values
             for (int i = 0; i < valueList.size(); i += 2)
             {
                    //get display value and actual value
 	               display = (String)valueList.get(i);
                    value = (String)valueList.get(i+1);
-
+					
                    boolean checked = false;
                    //check if this value has been selected previously
                    for (j = 0; j < defaults.length; j++)
                    {
                         if (value.equals(defaults[j].value))
                         {
+                        	System.out.println(defaults[j].value);
                         	checked = true;
                         	break;
                         }
 	               }
                    
-         		   if(!checked && i==0 && StringUtils.isBlank(value)) {
-         		       notSet = true;
-         		       continue;
-         		   }
-           
                    // print input field
                    sb.append("<div class=\"input-group\"><span class=\"input-group-addon\">");
                    sb.append("<input type=\"");
@@ -1440,10 +1436,14 @@
                    {
                        sb.append(" disabled=\"disabled\"");
                    }
-                   if (!checked && i==0 && !notSet)
+                   
+
+                   //setting a default value in the radio case (the first element of the list)
+                   if (!checked && i==0 && !repeatable)
                    {
                        sb.append(" checked");
                    }
+                 	
                    sb.append(" name=\"")
                      .append(fieldName)
                      .append("\"")
@@ -1469,7 +1469,7 @@
                    }
                    
             }//end for each value
-
+            
             sb.append("</div></div></div></div><br/>");
             
             out.write(sb.toString());
