@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.authority.orcid;
@@ -19,13 +19,24 @@ import org.orcid.jaxb.model.record_v2.*;
 import java.util.*;
 
 /**
- * Created by jonas - jonas@atmire.com on 12/04/2018.
+ * @author Jonas Van Goolen (jonas at atmire dot com)
  */
-public class Orcidv2AuthorityValue extends PersonAuthorityValue{
+public class Orcidv2AuthorityValue extends PersonAuthorityValue {
 
-
+    /*
+     * The ORCID identifier
+     */
     private String orcid_id;
+
+    /*
+     * Map containing key-value pairs filled in by "setValues(Person person)".
+     * This represents all dynamic information of the object.
+     */
     private Map<String, List<String>> otherMetadata = new HashMap<String, List<String>>();
+
+    /**
+     * The syntax that the ORCID id needs to conform to
+     */
     public static final String ORCID_ID_SYNTAX = "\\d{4}-\\d{4}-\\d{4}-(\\d{3}X|\\d{4})";
 
 
@@ -36,6 +47,7 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
      */
     public Orcidv2AuthorityValue() {
     }
+
     public Orcidv2AuthorityValue(SolrDocument document) {
         super(document);
     }
@@ -49,6 +61,10 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
         this.orcid_id = orcid_id;
     }
 
+    /**
+     * Create an empty authority.
+     * @return OrcidAuthorityValue
+     */
     public static Orcidv2AuthorityValue create() {
         Orcidv2AuthorityValue orcidAuthorityValue = new Orcidv2AuthorityValue();
         orcidAuthorityValue.setId(UUID.randomUUID().toString());
@@ -62,7 +78,7 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
      * @return OrcidAuthorityValue
      */
     public static Orcidv2AuthorityValue create(Person person) {
-        if(person == null){
+        if (person == null) {
             return null;
         }
         Orcidv2AuthorityValue authority = Orcidv2AuthorityValue.create();
@@ -72,6 +88,10 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
         return authority;
     }
 
+    /**
+     * Initialize this instance based on a Person object
+     * @param person Person
+     */
     protected void setValues(Person person) {
         Name name = person.getName();
 
@@ -128,6 +148,11 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
 
     }
 
+    /**
+     * Makes an instance of the AuthorityValue with the given information.
+     * @param info string info
+     * @return AuthorityValue
+     */
     @Override
     public AuthorityValue newInstance(String info) {
         AuthorityValue authorityValue = null;
@@ -144,6 +169,10 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
     public void setValue(String value) {
         super.setValue(value);
     }
+
+    /**
+     * Check to see if the provided label / data pair is already present in the "otherMetadata" or not
+     * */
     public boolean isNewMetadata(String label, String data) {
         List<String> strings = getOtherMetadata().get(label);
         boolean update;
@@ -155,6 +184,8 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
         return update;
     }
 
+    /**
+     * Add additional metadata to the otherMetadata map*/
     public void addOtherMetadata(String label, String data) {
         List<String> strings = otherMetadata.get(label);
         if (strings == null) {
@@ -163,11 +194,16 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
         strings.add(data);
         otherMetadata.put(label, strings);
     }
+
     public Map<String, List<String>> getOtherMetadata() {
         return otherMetadata;
     }
 
 
+    /**
+     * Generate a solr record from this instance
+     * @return SolrInputDocument
+     */
     @Override
     public SolrInputDocument getSolrInputDocument() {
         SolrInputDocument doc = super.getSolrInputDocument();
@@ -184,13 +220,17 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
         return doc;
     }
 
+    /**
+     * Information that can be used the choice ui
+     * @return map
+     */
     @Override
     public Map<String, String> choiceSelectMap() {
 
         Map<String, String> map = super.choiceSelectMap();
 
         String orcid_id = getOrcid_id();
-        if(StringUtils.isNotBlank(orcid_id)){
+        if (StringUtils.isNotBlank(orcid_id)) {
             map.put("orcid", orcid_id);
         }
 
@@ -202,6 +242,10 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
         return "orcid";
     }
 
+    /**
+     * Provides a string that will allow this AuthorityType to be recognized and provides information to create a new instance to be created using public Orcidv2AuthorityValue newInstance(String info).
+     * @return see {@link org.dspace.authority.service.AuthorityValueService#GENERATE AuthorityValueService.GENERATE}
+     */
     @Override
     public String generateString() {
         String generateString = AuthorityValueServiceImpl.GENERATE + getAuthorityType() + AuthorityValueServiceImpl.SPLIT;
@@ -235,6 +279,13 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
         return orcid_id != null ? orcid_id.hashCode() : 0;
     }
 
+    /**
+     * The regular equals() only checks if both AuthorityValues describe the same authority.
+     * This method checks if the AuthorityValues have different information
+     * E.g. it is used to decide when lastModified should be updated.
+     * @param o object
+     * @return true or false
+     */
     @Override
     public boolean hasTheSameInformationAs(Object o) {
         if (this == o) {
@@ -254,7 +305,7 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
         }
 
         for (String key : otherMetadata.keySet()) {
-            if(otherMetadata.get(key) != null){
+            if (otherMetadata.get(key) != null) {
                 List<String> metadata = otherMetadata.get(key);
                 List<String> otherMetadata = that.otherMetadata.get(key);
                 if (otherMetadata == null) {
@@ -266,8 +317,8 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue{
                         return false;
                     }
                 }
-            }else{
-                if(that.otherMetadata.get(key) != null){
+            } else {
+                if (that.otherMetadata.get(key) != null) {
                     return false;
                 }
             }

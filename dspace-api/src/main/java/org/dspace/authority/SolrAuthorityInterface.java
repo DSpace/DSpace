@@ -10,7 +10,7 @@ package org.dspace.authority;
 import java.util.List;
 
 /**
- * Created by jonas - jonas@atmire.com on 13/04/2018.
+ * @author Jonas Van Goolen (jonas at atmire dot com)
  */
 public interface SolrAuthorityInterface {
 
