@@ -1,0 +1,51 @@
+# /etc/cron.d/backups-sedici: crontab fragment for backups
+
+# Shell to use
+SHELL=/bin/sh
+
+DSPACE_BACKUP_DIR=/var/dspace/backups
+DSPACE_SOURCE_DIR=/var/dspace/source
+DSPACE_INSTALL_DIR=/var/dspace/install
+
+DATESTR=date +%Y-%m-%d_%H%M
+DATEMTH=date +%m
+
+##################################################################################
+##  SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS ##
+##################################################################################
+1 12 2,25 * *	root	tar --directory / -czf $DSPACE_BACKUP_DIR/etc/etc.backup.$($DATESTR).tgz etc/
+#Envio los backups al storage de jursoc
+#0 6,17 * * *       root    rsync -arvz --delete $DSPACE_INSTALL_DIR/* dspace@A.B.C.D:dspace/ > /var/log/rsync-a-jursoc.log
+
+##################################################################################
+## DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE ##
+##################################################################################
+
+#backups de la base de datos postgres de SEDICI dspace_sedici@data-pg.sedici.unlp.edu.ar (todos los días de la semana a las 21:00hs)
+0 21 * * *	root	sh $DSPACE_BACKUP_DIR/do_pgdump.sh > /dev/null
+
+#rotación de backups de postgres (todos los lunes a las 05:00hs). Se eliminan aquellos mas antiguos a 30 dias de creación pero se conservan los de primero de cada mes
+0 5 * * 1       dspace find $DSPACE_BACKUP_DIR/postgres -maxdepth 1 -name "dspace_sedici*.tgz" -mtime +30 -not -name "dspace_sedici-20??-??-01*.tgz" -exec rm {} \; > /dev/null
+
+#backup de la base de datos mysql con las autoridades de SEDICI (de lunes a viernes a las 1230)
+MYSQL_sedici_dspace_PWD='XXX'
+30 12 * * 1,2,3,4,5	root	mysqldump -usedici_dspace -p$MYSQL_sedici_dspace_PWD -hdata.sedici.unlp.edu.ar s2003_sedici | gzip -c > $DSPACE_BACKUP_DIR/mysql/s2003_sedici.sql.gz
+
+#backups de configuraciones (todos los 1ro de mes a las 4:38hs)
+38 4 1 * * 	root	tar --directory $DSPACE_INSTALL_DIR -czf $DSPACE_BACKUP_DIR/config/config.backup.$($DATESTR).tgz config/ 
+
+#Backup en AIP una vez por semana
+#5 22 * *       dspace  sun date && $DSPACE/bin/dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 $DSPACE/backups/aip/aip-site.zip && date
+
+##################################################################################
+##  BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG  ##
+##################################################################################
+
+#backups del htdocs del BLOG (domingos a las 4:55AM)
+#55 4 * * sun	root	tar --directory /var/www -czf $DSPACE_BACKUP_DIR/blog/sedici_blog.htdocs.mes-$($DATEMTH).tgz sedici_blog/
+
+#backups del mysql del blog todos los días a las 16:30
+#MYSQL_sedici_blog_PWD='YYY'
+#30 16 * * 1,2,3,4,5	root	mysqldump -usedici_blog -p$MYSQL_sedici_blog_PWD -hdata.server.sedici.unlp.edu.ar sedici_blog2 | gzip -c > $DSPACE_BACKUP_DIR/mysql/sedici_blog2.sql.gz
+
+
