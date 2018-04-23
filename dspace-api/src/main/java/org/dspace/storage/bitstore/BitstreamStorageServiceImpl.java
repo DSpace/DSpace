@@ -381,7 +381,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             log.info("Copying bitstream:" + bitstream
                 .getID() + " from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "] " +
                          "Name:" + bitstream
-                .getName() + ", SizeBytes:" + bitstream.getSize());
+                .getName() + ", SizeBytes:" + bitstream.getSizeBytes());
 
             InputStream inputStream = retrieve(context, bitstream);
             stores.get(assetstoreDestination).put(bitstream, inputStream);

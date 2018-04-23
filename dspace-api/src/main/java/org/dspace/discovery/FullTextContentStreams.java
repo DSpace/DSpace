@@ -168,7 +168,7 @@ public class FullTextContentStreams extends ContentStreamBase {
         }
 
         public long getSize() {
-            return bitstream.getSize();
+            return bitstream.getSizeBytes();
         }
 
         public InputStream getInputStream() throws SQLException, IOException, AuthorizeException {
