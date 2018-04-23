@@ -244,7 +244,7 @@ public class DryadDataFile extends DryadObject {
             if (bundles.length > 0) {
                 Bitstream[] bitstreams = bundles[0].getBitstreams();
                 for (Bitstream bitstream : bitstreams) {
-                    if (bitstream.getName().toLowerCase().contains("readme.")) {
+                    if (bitstream.getName().toLowerCase().contains("readme.") || bitstream.getName().equalsIgnoreCase("readme")) {
                         return bitstream;
                     }
                 }
