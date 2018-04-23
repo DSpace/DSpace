@@ -15,11 +15,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.authority.orcid.xml.XMLtoBio;
-import org.dspace.authority.orcid.xml.XMLtoWork;
 import org.dspace.authority.rest.RESTConnector;
 import org.json.JSONObject;
 import org.orcid.jaxb.model.record_v2.Person;
-import org.orcid.jaxb.model.record_v2.Work;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,7 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by jonas - jonas@atmire.com on 13/04/2018.
+ * @author Jonas Van Goolen (jonas at atmire dot com)
+ * This class contains all methods for retrieving "Person" objects calling the ORCID (version 2) endpoints.
+ * Additionally, this can also create AuthorityValues based on these returned Person objects
  */
 public class Orcidv2 implements SolrAuthorityInterface {
 
@@ -43,6 +43,9 @@ public class Orcidv2 implements SolrAuthorityInterface {
 
     private String accessToken;
 
+    /**
+     *  Initialize the accessToken that is required for all subsequent calls to ORCID
+     */
     public void init() throws IOException {
         if (StringUtils.isNotBlank(accessToken) && StringUtils.isNotBlank(clientSecret)) {
             String authenticationParameters = "?client_id=" + clientId + "&client_secret=" + clientSecret + "&scope=/read-public&grant_type=client_credentials";
@@ -73,31 +76,32 @@ public class Orcidv2 implements SolrAuthorityInterface {
                 accessToken = (String) responseObject.get("access_token");
             }
         }
-
     }
 
+    /**
+     * Makes an instance of the Orcidv2 class based on the provided parameters.
+     * This constructor is called through the spring bean initialization
+     */
     private Orcidv2(String url, String OAUTHUrl, String clientId, String clientSecret) {
         this.restConnector = new RESTConnector(url);
         this.OAUTHUrl = OAUTHUrl;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
     }
+
+    /**
+     * Makes an instance of the Orcidv2 class based on the provided parameters.
+     * This constructor is called through the spring bean initialization
+     */
     private Orcidv2(String url) {
         this.restConnector = new RESTConnector(url);
     }
-    public List<Work> getWorks(String id) {
-        InputStream document = restConnector.get(id + "/works", accessToken);
-        XMLtoWork converter = new XMLtoWork();
-        List<Work> workSummaries = converter.convert(document);
-        return workSummaries;
-    }
 
-    public Work getWork(String path) {
-        InputStream document = restConnector.get(path, accessToken);
-        XMLtoWork converter = new XMLtoWork();
-        Work work = converter.toWork(document);
-        return work;
-    }
+    /**
+     * Makes an instance of the AuthorityValue with the given information.
+     * @param text string info
+     * @return List<AuthorityValue>
+     */
     @Override
     public List<AuthorityValue> queryAuthorities(String text, int max) {
         List<Person> bios = queryBio(text, max);
@@ -111,12 +115,22 @@ public class Orcidv2 implements SolrAuthorityInterface {
         return result;
     }
 
+    /**
+     * Create an AuthorityValue from a Person retrieved using the given orcid identifier.
+     * @param id orcid identifier
+     * @return AuthorityValue
+     */
     public AuthorityValue queryAuthorityID(String id) {
         Person person = getBio(id);
         AuthorityValue valueFromPerson = Orcidv2AuthorityValue.create(person);
         return valueFromPerson;
     }
 
+    /**
+     * Retrieve a Person object based on a given orcid identifier
+     * @param id orcid identifier
+     * @return Person
+     */
     public Person getBio(String id) {
         if(!isValid(id)){
             return null;
@@ -128,12 +142,19 @@ public class Orcidv2 implements SolrAuthorityInterface {
     }
 
 
-    public List<Person> queryBio(String name, int start, int rows) {
+    /**
+     * Retrieve a list of Person objects.
+     * @param orcidID string info
+     * @param start offset to use
+     * @param rows how many rows to return
+     * @return List<AuthorityValue>
+     */
+    public List<Person> queryBio(String orcidID, int start, int rows) {
         if (rows > 100) {
             throw new IllegalArgumentException("The maximum number of results to retrieve from solr cannot exceed 100.");
         }
         StringBuilder query = new StringBuilder();
-        query.append("orcid:").append(name);
+        query.append("orcid:").append(orcidID);
 
 
         String searchPath = "search?q=" + URLEncoder.encode(query.toString()) + "&start=" + start + "&rows=" + rows;
@@ -142,10 +163,21 @@ public class Orcidv2 implements SolrAuthorityInterface {
         List<Person> bios = converter.convert(bioDocument);
         return bios;
     }
-    public List<Person> queryBio(String text, int max) {
-        return queryBio(text, 0, max);
+
+    /**
+     * Retrieve a list of Person objects.
+     * @param orcidID string info
+     * @param max how many rows to return
+     * @return List<AuthorityValue>
+     */
+    public List<Person> queryBio(String orcidID, int max) {
+        return queryBio(orcidID, 0, max);
     }
 
+    /**
+     * Check to see if the provided text has the correct ORCID syntax.
+     * Since only searching on ORCID id is allowed, this way, we filter out any queries that would return a blank result anyway
+     */
     private boolean isValid(String text) {
         return StringUtils.isNotBlank(text) && text.matches(Orcidv2AuthorityValue.ORCID_ID_SYNTAX);
     }
