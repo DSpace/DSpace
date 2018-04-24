@@ -664,6 +664,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         while(bundles.hasNext())
         {
             Bundle bundle = bundles.next();
+            //Mark bitstreams to be deleted from all bundles that are about to be deleted
+            for(Bitstream bs : bundle.getBitstreams()){
+                bs.setDeleted(true);
+            }
             bundles.remove();
             deleteBundle(context, item, bundle);
         }
