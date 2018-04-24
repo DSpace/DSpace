@@ -93,13 +93,19 @@ public class ADSOnlineDataLoader extends NetworkSubmissionLookupDataLoader
         
         if(query.length()>0){
         	strQuery=query.toString();
+          
+        	List<Record> adsResults= new ArrayList<Record>();
+	        try{
+	        	        adsResults = adsService.search(strQuery,token);
+	        }catch(Exception e){
+	        	log.warn(e.getMessage(),e);
+	        }
+	        for (Record p : adsResults)
+	        {
+	            results.add(convertFields(p));
+	        }
         }
-
-        List<Record> adsResults = adsService.search(strQuery,token);
-        for (Record p : adsResults)
-        {
-            results.add(convertFields(p));
-        }
+        
 
         return results;
     }
