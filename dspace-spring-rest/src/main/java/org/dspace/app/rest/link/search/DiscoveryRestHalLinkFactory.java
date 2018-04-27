@@ -51,7 +51,7 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
         try {
             UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
                     .getFacets(data.getQuery(), data.getDsoType(), data.getScope(),
-                            data.getConfigurationName(), null));
+                            data.getConfigurationName(), null, null));
 
             uriBuilder = addSortingParms(uriBuilder, data);
 
