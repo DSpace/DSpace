@@ -11,7 +11,7 @@ package org.dspace.authority.orcid.xml;
 import org.apache.log4j.Logger;
 import org.dspace.authority.orcid.Orcidv2;
 import org.dspace.utils.DSpace;
-import org.orcid.jaxb.model.common_v2.OrcidIdentifier;
+import org.orcid.jaxb.model.common_v2.OrcidId;
 import org.orcid.jaxb.model.record_v2.Person;
 import org.orcid.jaxb.model.search_v2.Result;
 import org.orcid.jaxb.model.search_v2.Search;
@@ -42,8 +42,8 @@ public class XMLtoBio extends Converter {
             Orcidv2 connector = new DSpace().getServiceManager().getServiceByName("AuthoritySource", Orcidv2.class);
 
             Search search = (Search) unmarshall(xml, Search.class);
-            for(Result result : search.getResults()){
-                OrcidIdentifier orcidIdentifier = result.getOrcidIdentifier();
+            for(Result result : search.getResult()){
+                OrcidId orcidIdentifier = result.getOrcidIdentifier();
                 if(orcidIdentifier!=null){
                     Person bio = connector.getBio(orcidIdentifier.getPath());
                     if(bio!=null){

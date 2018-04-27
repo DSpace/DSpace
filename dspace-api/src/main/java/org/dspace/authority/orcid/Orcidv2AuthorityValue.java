@@ -14,6 +14,7 @@ import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueServiceImpl;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.utils.DSpace;
+import org.orcid.jaxb.model.common_v2.ExternalId;
 import org.orcid.jaxb.model.record_v2.*;
 
 import java.util.*;
@@ -93,47 +94,47 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
      * @param person Person
      */
     protected void setValues(Person person) {
-        Name name = person.getName();
+        NameType name = person.getName();
 
         if (!StringUtils.equals(name.getPath(), this.getOrcid_id())) {
             this.setOrcid_id(name.getPath());
         }
 
-        if (!StringUtils.equals(name.getFamilyName().getContent(), this.getLastName())) {
-            this.setLastName(name.getFamilyName().getContent());
+        if (!StringUtils.equals(name.getFamilyName().getValue(), this.getLastName())) {
+            this.setLastName(name.getFamilyName().getValue());
         }
 
-        if (!StringUtils.equals(name.getGivenNames().getContent(), this.getFirstName())) {
-            this.setFirstName(name.getGivenNames().getContent());
+        if (!StringUtils.equals(name.getGivenNames().getValue(), this.getFirstName())) {
+            this.setFirstName(name.getGivenNames().getValue());
         }
 
-        if (name.getCreditName() != null && StringUtils.isNotBlank(name.getCreditName().getContent())) {
+        if (name.getCreditName() != null && StringUtils.isNotBlank(name.getCreditName().getValue())) {
             if (!this.getNameVariants().contains(name.getCreditName())) {
-                this.addNameVariant(name.getCreditName().getContent());
+                this.addNameVariant(name.getCreditName().getValue());
             }
         }
 
         if (person.getKeywords() != null) {
-            for (Keyword keyword : person.getKeywords().getKeywords()) {
+            for (KeywordType keyword : person.getKeywords().getKeyword()) {
                 if (this.isNewMetadata("keyword", keyword.getContent())) {
                     this.addOtherMetadata("keyword", keyword.getContent());
                 }
             }
         }
 
-        PersonExternalIdentifiers externalIdentifiers = person.getExternalIdentifiers();
+        ExternalIdentifiers externalIdentifiers = person.getExternalIdentifiers();
         if (externalIdentifiers != null) {
-            for (PersonExternalIdentifier externalIdentifier : externalIdentifiers.getExternalIdentifiers()) {
-                if (this.isNewMetadata("external_identifier", externalIdentifier.toString())) {
-                    this.addOtherMetadata("external_identifier", externalIdentifier.toString());
+            for (ExternalId externalIdentifier : externalIdentifiers.getExternalIdentifier()) {
+                if (this.isNewMetadata("external_identifier", externalIdentifier.getExternalIdValue())) {
+                    this.addOtherMetadata("external_identifier", externalIdentifier.getExternalIdValue());
 
                 }
             }
         }
         if (person.getResearcherUrls() != null) {
-            for (ResearcherUrl researcherUrl : person.getResearcherUrls().getResearcherUrls()) {
-                if (this.isNewMetadata("researcher_url", researcherUrl.toString())) {
-                    this.addOtherMetadata("researcher_url", researcherUrl.toString());
+            for (ResearcherUrlType researcherUrl : person.getResearcherUrls().getResearcherUrl()) {
+                if (this.isNewMetadata("researcher_url", researcherUrl.getUrl().getValue())) {
+                    this.addOtherMetadata("researcher_url", researcherUrl.getUrl().getValue());
                 }
             }
 
