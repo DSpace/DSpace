@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.collections4.CollectionUtils;
+import org.dspace.app.rest.link.search.SearchResultsResourceHalLinkFactory;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
@@ -53,8 +54,12 @@ public class SearchResultsResource extends HALResource<SearchResultsRest> {
         for (SearchResultEntryRest searchResultEntry : CollectionUtils.emptyIfNull(data.getSearchResults())) {
             entryResources.add(new SearchResultEntryResource(searchResultEntry, utils));
         }
+
         Page page = new PageImpl<>(entryResources, pageable, data.getTotalNumberOfResults());
-        EmbeddedPage embeddedPage = new EmbeddedPage("objects", page, entryResources, "objects");
+
+        SearchResultsResourceHalLinkFactory linkFactory = new SearchResultsResourceHalLinkFactory();
+        EmbeddedPage embeddedPage = new EmbeddedPage(linkFactory.buildSearchBaseLink(data).toUriString(),
+                page, entryResources, "objects");
         embedResource("searchResult", embeddedPage);
     }
 }

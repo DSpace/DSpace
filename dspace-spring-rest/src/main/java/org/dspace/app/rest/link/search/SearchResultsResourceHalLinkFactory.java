@@ -9,11 +9,11 @@ package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
 
+import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.model.hateoas.SearchResultsResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * This class will add links to the SearchResultsResource. This method will be called when calling the higher up
@@ -24,16 +24,9 @@ public class SearchResultsResourceHalLinkFactory extends DiscoveryRestHalLinkFac
 
     protected void addLinks(SearchResultsResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
-        UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                                                         .getSearchObjects(halResource.getContent().getQuery(),
-                                                                           halResource.getContent().getDsoType(),
-                                                                           halResource.getContent().getScope(),
-                                                                           halResource.getContent()
-                                                                                      .getConfigurationName(),
-                                                                           halResource.getContent().getSearchFilters(),
-                                                                           null));
-        list.add(buildLink(Link.REL_SELF, uriBuilder.build().toUriString()));
+        SearchResultsRest resultsRest = halResource.getContent();
 
+        list.add(buildLink(Link.REL_SELF, buildSearchBaseLink(resultsRest).toUriString()));
     }
 
     @Override
