@@ -145,11 +145,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 return;
             }
         }
-        
-        //Ensure that the last modified from the item is triggered !
+
+        // Ensure that the last modified from the item is triggered !
         Item owningItem = (Item) getParentObject(context, bundle);
-        if(owningItem != null)
-        {
+        if (owningItem != null) {
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
         }
