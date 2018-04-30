@@ -388,9 +388,9 @@ public class Ldap {
    * Groups mapped by the Units for faculty.
    */
 
-  public List getGroups() throws NamingException, java.sql.SQLException 
+  public List<Group> getGroups() throws NamingException, java.sql.SQLException 
   {
-    HashSet ret = new HashSet();
+    HashSet<Group> ret = new HashSet();
 
     for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
       String strUnit = (String) i.next();
@@ -398,11 +398,11 @@ public class Ldap {
       Unit unit = unitService.findByName(context, strUnit);
 
       if (unit != null && (!unit.getFacultyOnly() || isFaculty())) {
-        ret.addAll(Arrays.asList(unit.getGroups()));
+        ret.addAll(unit.getGroups());
       }
     }
 
-    return new ArrayList(ret);
+    return new ArrayList<Group>(ret);
   }
 
 
