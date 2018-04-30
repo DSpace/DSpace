@@ -20,8 +20,10 @@ import org.springframework.data.domain.Page;
  */
 public class EmbeddedPage extends EmbeddedPageHeader {
 
-    //TODO Make map get relation name from constructor
-    private Map<String, List> fullMap;
+    private List fullList;
+
+    @JsonIgnore
+    private Map<String, List> embeddedPageContent;
 
     public EmbeddedPage(String self, Page page, List fullList, String relation) {
         this(self, page, fullList, true, relation);
@@ -29,18 +31,19 @@ public class EmbeddedPage extends EmbeddedPageHeader {
 
     public EmbeddedPage(String self, Page page, List fullList, boolean totalElementsIsKnown, String relation) {
         super(self, page, totalElementsIsKnown);
-        fullMap = new HashMap<String, List>();
-        fullMap.put(relation, fullList);
+        this.fullList = fullList;
+        this.embeddedPageContent = new HashMap<>();
+        embeddedPageContent.put(relation, page.getContent());
     }
 
     @JsonProperty(value = "_embedded")
     public Map<String, List> getPageContent() {
-        return fullMap;
+        return embeddedPageContent;
     }
 
     @JsonIgnore
-    public Map<String, List> getFullList() {
-        return fullMap;
+    public List getFullList() {
+        return fullList;
     }
 
 }

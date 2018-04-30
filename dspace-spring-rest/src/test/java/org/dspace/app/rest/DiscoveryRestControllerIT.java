@@ -764,6 +764,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.sortOptions", containsInAnyOrder(
                        SortOptionMatcher.titleSortOption(),
                        SortOptionMatcher.dateIssuedSortOption(),
+                       SortOptionMatcher.dateAccessionedSortOption(),
                        SortOptionMatcher.scoreSortOption()
                    )));
     }
