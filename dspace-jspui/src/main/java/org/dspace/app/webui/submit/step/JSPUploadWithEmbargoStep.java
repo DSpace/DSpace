@@ -140,7 +140,7 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
                 Bitstream bitstream = subInfo.getBitstream();
                 bitstreamName = bitstream.getName();
                 bitstreamID = bitstream.getID();
-                size = bitstream.getSize();
+                size = bitstream.getSizeBytes();
                 url = request.getContextPath() + "/retrieve/" + bitstreamID
                         + "/" + UIUtil.encodeBitstreamName(bitstreamName);
                 jsonResponse.addUploadFileStatus(bitstreamName, bitstreamID, size,

@@ -223,7 +223,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 } catch (Exception e) {
                     String handle = myItem.getHandle();
                     List<Bundle> bundles = myBitstream.getBundles();
-                    long size = myBitstream.getSize();
+                    long size = myBitstream.getSizeBytes();
                     String checksum = myBitstream.getChecksum() + " (" + myBitstream.getChecksumAlgorithm() + ")";
                     int assetstore = myBitstream.getStoreNumber();
 

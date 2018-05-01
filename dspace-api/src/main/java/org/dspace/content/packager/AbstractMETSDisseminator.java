@@ -460,7 +460,7 @@ public abstract class AbstractMETSDisseminator
                             String zname = makeBitstreamURL(context, bitstream, params);
                             ZipEntry ze = new ZipEntry(zname);
                             if (log.isDebugEnabled()) {
-                                log.debug(new StringBuilder().append("Writing CONTENT stream of bitstream(").append(bitstream.getID()).append(") to Zip: ").append(zname).append(", size=").append(bitstream.getSize()).toString());
+                                log.debug(new StringBuilder().append("Writing CONTENT stream of bitstream(").append(bitstream.getID()).append(") to Zip: ").append(zname).append(", size=").append(bitstream.getSizeBytes()).toString());
                             }
                             if (lmTime != 0) {
                                 ze.setTime(lmTime);
@@ -468,7 +468,7 @@ public abstract class AbstractMETSDisseminator
                             {
                                 ze.setTime(DEFAULT_MODIFIED_DATE);
                             }
-                            ze.setSize(auth ? bitstream.getSize() : 0);
+                            ze.setSize(auth ? bitstream.getSizeBytes() : 0);
                             zip.putNextEntry(ze);
                             if (auth) {
                                 InputStream input = bitstreamService.retrieve(context, bitstream);
@@ -504,9 +504,9 @@ public abstract class AbstractMETSDisseminator
                 ZipEntry ze = new ZipEntry(zname);
                 if (log.isDebugEnabled())
                 {
-                    log.debug("Writing CONTENT stream of bitstream(" + String.valueOf(logoBs.getID()) + ") to Zip: " + zname + ", size=" + String.valueOf(logoBs.getSize()));
+                    log.debug("Writing CONTENT stream of bitstream(" + String.valueOf(logoBs.getID()) + ") to Zip: " + zname + ", size=" + String.valueOf(logoBs.getSizeBytes()));
                 }
-                ze.setSize(logoBs.getSize());
+                ze.setSize(logoBs.getSizeBytes());
                 //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
                 ze.setTime(DEFAULT_MODIFIED_DATE);
                 zip.putNextEntry(ze);
@@ -990,7 +990,7 @@ public abstract class AbstractMETSDisseminator
                     }
                     file.setGROUPID(groupID);
                     file.setMIMETYPE(bitstream.getFormat(context).getMIMEType());
-                    file.setSIZE(auth ? bitstream.getSize() : 0);
+                    file.setSIZE(auth ? bitstream.getSizeBytes() : 0);
 
                     // Translate checksum and type to METS
                     String csType = bitstream.getChecksumAlgorithm();
@@ -1164,7 +1164,7 @@ public abstract class AbstractMETSDisseminator
         String fileID = gensym("logo");
         file.setID(fileID);
         file.setMIMETYPE(logoBs.getFormat(context).getMIMEType());
-        file.setSIZE(logoBs.getSize());
+        file.setSIZE(logoBs.getSizeBytes());
 
         // Translate checksum and type to METS
         String csType = logoBs.getChecksumAlgorithm();

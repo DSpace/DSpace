@@ -188,7 +188,7 @@
 			<%
 			        } %>	
                 </td>
-                <td headers="t3" class="<%= row %>RowEvenCol"><%= bitstreams.get(i).getSize() %> bytes</td>
+                <td headers="t3" class="<%= row %>RowEvenCol"><%= bitstreams.get(i).getSizeBytes() %> bytes</td>
                 <td headers="t4" class="<%= row %>RowOddCol break-all">
                     <%= (bitstreams.get(i).getDescription() == null || bitstreams.get(i).getDescription().equals("")
                         ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.upload-file-list.empty1")
