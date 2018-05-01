@@ -637,6 +637,9 @@ public class JournalUtils {
 
             // sanity check:
             if (currentMatch != null) {
+                if (currentMatch.getPublicationDate() != null && currentMatch.getPublicationDate().after(new Date())) {
+                    throw new RESTModelException("CrossRef match has publication date in the future");
+                }
                 if (currentMatch.getAuthorList() == null || currentMatch.getAuthorList().size() == 0) {
                     throw new RESTModelException("CrossRef match does not have authors");
                 }
