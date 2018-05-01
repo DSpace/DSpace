@@ -959,20 +959,24 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             }
             return collections;
         } catch(IllegalArgumentException e) {
-            MetadataField textValueField = metadataFieldService.findByElement(context, "collection", "text_value", null);
+            MetadataField textValueField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
             if (StringUtils.isBlank(query))
             {
                 query = null;
             }
-            return collectionDAO.search(context, query, Arrays.asList(textValueField), Arrays.asList(textValueField), offset, limit);
+            return collectionDAO.search(context, query, Collections.singletonList(textValueField), Collections.singletonList(textValueField), offset, limit);
         }
     }
 
     @Override
     public int searchResultCount(Context context, String query) throws SQLException {
-        MetadataField textValueField = metadataFieldService.findByElement(context, "collection", "firstname", null);
         if(StringUtils.isBlank(query)) query = null;
-        return collectionDAO.searchResultCount(context, query, Arrays.asList(textValueField));
+        MetadataField textValueField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if (StringUtils.isBlank(query))
+        {
+            query = null;
+        }
+        return collectionDAO.searchResultCount(context, query, Collections.singletonList(textValueField));
     }
     // End UMD Customization
 }

@@ -7,6 +7,7 @@ package edu.umd.lib.dspace.app.xmlui.aspect.administrative.etd_departments;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -163,7 +164,8 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
         for (EtdUnit etd_department : etd_departments)
         {
             Row row;
-            if (etd_department.getID().equals(UUID.fromString(highlightID)))
+
+            if (StringUtils.isNotBlank(highlightID) && etd_department.getID().equals(UUID.fromString(highlightID)))
             {
                 row = table.addRow(null, null, "highlight");
             }

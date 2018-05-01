@@ -9,7 +9,6 @@ package org.dspace.eperson;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,16 +56,16 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
         // Authorize
         canEdit(context);
 
-        Unit newEtdunit = unitDAO.create(context, new Unit());
+        Unit newUnit = unitDAO.create(context, new Unit());
 
-        unitDAO.save(context, newEtdunit);
+        unitDAO.save(context, newUnit);
 
-        context.addEvent(new Event(Event.CREATE, Constants.ETDUNIT, newEtdunit.getID(), null));
+        context.addEvent(new Event(Event.CREATE, Constants.UNIT, newUnit.getID(), newUnit.getName()));
 
         log.info(LogManager.getHeader(context, "create_unit",
-                "unit_id=" + newEtdunit.getID()));
+                "unit_id=" + newUnit.getID()));
 
-        return newEtdunit;
+        return newUnit;
     }
 
     @Override
@@ -118,7 +117,7 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
         unitDAO.save(context, unit);
         if (unit.isModified())
         {
-            context.addEvent(new Event(Event.MODIFY, Constants.ETDUNIT, unit.getID(), null));
+            context.addEvent(new Event(Event.MODIFY, Constants.UNIT, unit.getID(), unit.getName()));
             unit.clearModified();
         }
         unit.clearDetails();
@@ -140,8 +139,8 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
 
         unit.addGroup(group);
         
-        context.addEvent(new Event(Event.ADD, Constants.ETDUNIT, unit.getID(),
-        Constants.COLLECTION, group.getID(), null, null));
+        context.addEvent(new Event(Event.ADD, Constants.UNIT, unit.getID(),
+        Constants.COLLECTION, group.getID(), unit.getName()));
     }
 
 
@@ -155,8 +154,8 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
 
         unit.removeGroup(group);
         
-        context.addEvent(new Event(Event.REMOVE, Constants.ETDUNIT, unit.getID(),
-        Constants.COLLECTION, group.getID(), null, null));
+        context.addEvent(new Event(Event.REMOVE, Constants.UNIT, unit.getID(),
+        Constants.COLLECTION, group.getID(), unit.getName()));
     }
 
     @Override
@@ -173,17 +172,16 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
         log.info(LogManager.getHeader(context, "delete_unit",
                 "unit_id=" + unit.getID()));
 
-        ArrayList<String> removedIdentifiers = getIdentifiers(context, unit);
         UUID removedId = unit.getID();
 
         unitDAO.delete(context, unit);
 
-        context.addEvent(new Event(Event.REMOVE, Constants.ETDUNIT, removedId, null, removedIdentifiers));
+        context.addEvent(new Event(Event.REMOVE, Constants.UNIT, removedId, unit.getName()));
     }
 
     @Override
     public int getSupportsTypeConstant() {
-        return Constants.ETDUNIT;
+        return Constants.UNIT;
     }
 
 
@@ -215,7 +213,7 @@ public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements Un
     public void updateLastModified(Context context, Unit unit) {
         //Also fire a modified event since the unit HAS been modified
         context.addEvent(new Event(Event.MODIFY, Constants. UNIT,
-                unit.getID(), null));
+                unit.getID(), unit.getName()));
 
     }
 

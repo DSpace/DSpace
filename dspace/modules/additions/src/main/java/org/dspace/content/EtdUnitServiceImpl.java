@@ -9,7 +9,6 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,7 +56,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
 
         etdunitDAO.save(context, newEtdunit);
 
-        context.addEvent(new Event(Event.CREATE, Constants.ETDUNIT, newEtdunit.getID(), null));
+        context.addEvent(new Event(Event.CREATE, Constants.ETDUNIT, newEtdunit.getID(), newEtdunit.getName()));
 
         log.info(LogManager.getHeader(context, "create_etdunit",
                 "etdunit_id=" + newEtdunit.getID()));
@@ -114,7 +113,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
         etdunitDAO.save(context, etdunit);
         if (etdunit.isModified())
         {
-            context.addEvent(new Event(Event.MODIFY, Constants.ETDUNIT, etdunit.getID(), null));
+            context.addEvent(new Event(Event.MODIFY, Constants.ETDUNIT, etdunit.getID(), etdunit.getName()));
             etdunit.clearModified();
         }
         etdunit.clearDetails();
@@ -137,7 +136,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
         etdunit.addCollection(collection);
         
         context.addEvent(new Event(Event.ADD, Constants.ETDUNIT, etdunit.getID(),
-        Constants.COLLECTION, collection.getID(), null, null));
+        Constants.COLLECTION, collection.getID(), etdunit.getName()));
     }
 
 
@@ -152,7 +151,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
         etdunit.removeCollection(collection);
         
         context.addEvent(new Event(Event.REMOVE, Constants.ETDUNIT, etdunit.getID(),
-        Constants.COLLECTION, collection.getID(), null, null));
+        Constants.COLLECTION, collection.getID(), etdunit.getName()));
     }
 
     @Override
@@ -169,7 +168,6 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
         log.info(LogManager.getHeader(context, "delete_etdunit",
                 "etdunit_id=" + etdunit.getID()));
 
-        ArrayList<String> removedIdentifiers = getIdentifiers(context, etdunit);
         UUID removedId = etdunit.getID();
 
         // Remove all collection references to this etdunit.
@@ -179,7 +177,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
 
         etdunitDAO.delete(context, etdunit);
 
-        context.addEvent(new Event(Event.REMOVE, Constants.ETDUNIT, removedId, null, removedIdentifiers));
+        context.addEvent(new Event(Event.REMOVE, Constants.ETDUNIT, removedId, etdunit.getName()));
     }
 
     @Override
@@ -216,7 +214,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
     public void updateLastModified(Context context, EtdUnit etdunit) {
         //Also fire a modified event since the etdunit HAS been modified
         context.addEvent(new Event(Event.MODIFY, Constants.ETDUNIT,
-                etdunit.getID(), null));
+                etdunit.getID(), etdunit.getName()));
 
     }
 
