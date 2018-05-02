@@ -1806,7 +1806,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 // Multi-valued solr parameter
                 for(String val : (String[])solrParameter.getValue()) {
                     postParameters.add(new BasicNameValuePair(solrParameter.getKey(), val));
-                    log.info("String array: " + solrParameter.getKey() + " : " + val;
+                    log.info("String array: " + solrParameter.getKey() + " : " + val);
                 }
 
             }
