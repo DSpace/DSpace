@@ -1994,17 +1994,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
         HttpHost hostURL = (HttpHost)(getSolr().getHttpClient().getParams().getParameter(ClientPNames.DEFAULT_HOST));
 
-        HttpGet method = new HttpGet(hostURL.toHostString() + "");
-        try
-        {
-            URI uri = new URIBuilder(method.getURI()).addParameter("q",query.toString()).build();
-        }
-        catch (URISyntaxException e)
-        {
-            throw new SearchServiceException(e);
-        }
+        HttpPost post = new HttpPost(hostURL.toHostString());
+        List<NameValuePair> postParameters = new ArrayList<>();
+        postParameters.add(new BasicNameValuePair("q",query.toString());
 
-        HttpResponse response = getSolr().getHttpClient().execute(method);
+        HttpResponse response = getSolr().getHttpClient().execute(post);
 
         return response.getEntity().getContent();
     }
