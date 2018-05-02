@@ -131,7 +131,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
         }
 
         Unit unit = null;
-        if (unitID != null)
+        if (unitID != null && !unitID.isEmpty())
         {
             unit = unitService.find(context, UUID.fromString(unitID));
 

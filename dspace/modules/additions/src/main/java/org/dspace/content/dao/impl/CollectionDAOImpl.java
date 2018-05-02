@@ -214,8 +214,8 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         if(!CollectionUtils.isEmpty(metadataFieldsToJoin)) {
             addMetadataLeftJoin(queryBuilder, Collection.class.getSimpleName().toLowerCase(), metadataFieldsToJoin);
         }
-        if(queryParam != null) {
-            addMetadataValueWhereQuery(queryBuilder, queryFields, "like", Collection.class.getSimpleName().toLowerCase() + ".text_value like :queryParam");
+        if(StringUtils.isNotBlank(queryParam)) {
+            addMetadataValueWhereQuery(queryBuilder, queryFields, "like", null);
         }
         if(!CollectionUtils.isEmpty(sortFields)) {
             addMetadataSortQuery(queryBuilder, sortFields, Collections.singletonList(sortField));

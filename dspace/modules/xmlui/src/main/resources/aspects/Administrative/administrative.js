@@ -48,6 +48,8 @@ importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowContainerUti
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowCurationUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMetadataImportUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowBatchImportUtils);
+importClass(Packages.edu.umd.lib.dspace.app.xmlui.aspect.administrative.FlowETDDepartmentUtils);
+importClass(Packages.edu.umd.lib.dspace.app.xmlui.aspect.administrative.FlowUnitsUtils);
 importClass(Packages.java.lang.System);
 
 /**
@@ -3258,34 +3260,6 @@ function doCurate()
 
 // Customization for LIBDRUM-343 and LIBDRUM-376
 /**
- * Assert that the currently authenticated eperson can edit the given ETD department. If
- * they cannot then this method will never return.
- */
-function assertEditETDDepartment(etd_departmentID) {
-	// Check authorizations
-	if (etd_departmentID == null) {
-		// only system admin can create "top level" group
-		assertAdministrator();
-	} else {
-		assertAuthorized(Constants.ETDUNIT, etd_departmentID, Constants.WRITE);
-	}
-}
-
-/**
- * Assert that the currently authenticated eperson can edit the given unit. If
- * they cannot then this method will never return.
- */
-function assertEditUnits(unitID) {
-	// Check authorizations
-	if (unitID == null) {
-		// only system admin can create "top level" group
-		assertAdministrator();
-	} else {
-		assertAuthorized(Constants.UNIT, unitID, Constants.WRITE);
-	}
-}
-
-/**
  * Start managing etd_departments
  */
 function startManageETDDepartments() {
@@ -3328,7 +3302,7 @@ function startManageUnits() {
 function doManageETDDepartments() {
 	assertAdministrator();
 
-	var highlightID = -1
+	var highlightID = null
 	var query = "";
 	var page = 0;
 	var result;
@@ -3350,18 +3324,17 @@ function doManageETDDepartments() {
 			// Grab the new query and reset the page parameter
 			query = cocoon.request.get("query");
 			page = 0
-			highlightID = -1
+			highlightID = null
 		} else if (cocoon.request.get("submit_add")) {
 			// Just create a blank etd_department then pass it to the group
 			// editor.
-			result = doEditETDDepartment(-1);
-
-			if (result != null && result.getParameter("etd_departmentID"))
-        highlightID = UUID.fromString(result.getParameter("etd_departmentID"));
-		  } else if (cocoon.request.get("submit_edit")
+			result = doEditETDDepartment(null);
+            if (result != null && result.getParameter("etd_departmentID"))
+                highlightID = UUID.fromString(result.getParameter("etd_departmentID"));
+        } else if (cocoon.request.get("submit_edit")
 				&& cocoon.request.get("etd_departmentID")) {
 			// Edit a specific etd_department
-      var etd_departmentID = UUID.fromString(cocoon.request.get("etd_departmentID"));
+            var etd_departmentID = UUID.fromString(cocoon.request.get("etd_departmentID"));
 			result = doEditETDDepartment(etd_departmentID);
 			highlightID = etd_departmentID;
 		} else if (cocoon.request.get("submit_delete")
@@ -3370,7 +3343,7 @@ function doManageETDDepartments() {
 			var etd_departmentIDs = cocoon.request
 					.getParameterValues("select_etd_department");
 			result = doDeleteETDDepartments(etd_departmentIDs);
-			highlightID = -1;
+			highlightID = null;
 		} else if (cocoon.request.get("submit_return")) {
 			// Not implemented in the UI, but should be in case someone links to
 			// us.
@@ -3391,7 +3364,7 @@ function doEditETDDepartment(etd_departmentID) {
 	var memberCollectionIDs = FlowETDDepartmentUtils.getCollectionMembers(
 			getDSContext(), etd_departmentID);
 
-	assertEditETDDepartment(etd_departmentID);
+	assertAdministrator();
 
 	var highlightCollectionID;
 
@@ -3410,7 +3383,7 @@ function doEditETDDepartment(etd_departmentID) {
 			"page" : page,
 			"type" : type
 		}, result);
-		assertEditETDDepartment(etd_departmentID);
+		assertAdministrator();
 
 		result = null;
 		highlightCollectionID = null;
@@ -3452,14 +3425,14 @@ function doEditETDDepartment(etd_departmentID) {
 			var name = names.nextElement();
 			var match = null;
 
-			if ((match = name.match(/submit_add_collection_(\d+)/)) != null) {
+			if ((match = name.match(/submit_add_collection_([^]+)/)) != null) {
 				// Add a collection
 				var collectionID = match[1];
 				memberCollectionIDs = FlowETDDepartmentUtils.addMember(
 						memberCollectionIDs, collectionID);
 				highlightCollectionID = collectionID;
 			}
-			if ((match = name.match(/submit_remove_collection_(\d+)/)) != null) {
+			if ((match = name.match(/submit_remove_collection_([^]+)/)) != null) {
 				// remove a collection
 				var collectionID = match[1];
 				memberCollectionIDs = FlowETDDepartmentUtils.removeMember(
@@ -3506,7 +3479,7 @@ function doDeleteETDDepartments(etd_departmentIDs) {
 function doManageUnits() {
 	assertAdministrator();
 
-	var highlightID = -1
+	var highlightID = null
 	var query = "";
 	var page = 0;
 	var result;
@@ -3528,11 +3501,11 @@ function doManageUnits() {
 			// Grab the new query and reset the page parameter
 			query = cocoon.request.get("query");
 			page = 0
-			highlightID = -1
+			highlightID = null
 		} else if (cocoon.request.get("submit_add")) {
 			// Just create a blank unit then pass it to the group
 			// editor.
-			result = doEditUnits(-1);
+			result = doEditUnits(null);
 
 			if (result != null && result.getParameter("unitID"))
 				highlightID = UUID.fromString(result.getParameter("unitID"));
@@ -3548,7 +3521,7 @@ function doManageUnits() {
 			var unitIDs = cocoon.request
 					.getParameterValues("select_unit");
 			result = doDeleteUnits(unitIDs);
-			highlightID = -1;
+			highlightID = null;
 		} else if (cocoon.request.get("submit_return")) {
 			// Not implemented in the UI, but should be in case someone links to
 			// us.
@@ -3569,7 +3542,7 @@ function doEditUnits(unitID) {
 	var memberGroupIDs = FlowUnitsUtils.getUnitMembers(
 			getDSContext(), unitID);
 
-	assertEditUnits(unitID);
+	assertAdministrator();
 
 	var highlightGroupID;
 
@@ -3588,7 +3561,7 @@ function doEditUnits(unitID) {
 			"page" : page,
 			"type" : type
 		}, result);
-		assertEditUnits(unitID);
+		assertAdministrator();
 
 		result = null;
 		highlightGroupID = null;
@@ -3630,14 +3603,14 @@ function doEditUnits(unitID) {
 			var name = names.nextElement();
 			var match = null;
 
-			if ((match = name.match(/submit_add_group_(\d+)/)) != null) {
+			if ((match = name.match(/submit_add_group_([^]+)/)) != null) {
 				// Add a group
 				var groupID = match[1];
 				memberGroupIDs = FlowUnitsUtils.addMember(
 						memberGroupIDs, groupID);
 				highlightGroupID = groupID;
 			}
-			if ((match = name.match(/submit_remove_group_(\d+)/)) != null) {
+			if ((match = name.match(/submit_remove_group_([^]+)/)) != null) {
 				// remove a group
 				var groupID = match[1];
 				memberGroupIDs = FlowUnitsUtils.removeMember(

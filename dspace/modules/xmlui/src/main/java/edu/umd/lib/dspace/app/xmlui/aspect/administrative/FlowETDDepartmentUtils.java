@@ -89,7 +89,7 @@ public class FlowETDDepartmentUtils
             UUID etd_departmentID) throws SQLException
     {
         // New etd_department, just return an empty list
-        if (etd_departmentID != null)
+        if (etd_departmentID == null)
         {
             return new String[0];
         }
@@ -106,7 +106,7 @@ public class FlowETDDepartmentUtils
         String[] collectionIDs = new String[collections.size()];
         for (int i = 0; i < collections.size(); i++)
         {
-            collectionIDs[i] = String.valueOf(collections.get(0).getID());
+            collectionIDs[i] = String.valueOf(collections.get(i).getID());
         }
 
         return collectionIDs;
@@ -262,7 +262,7 @@ public class FlowETDDepartmentUtils
         // i.e. scan the list on the etd_department against the ids.
         for (Collection collectionMember : etd_department.getCollections())
         {
-            if (!newCollectionIDs.contains(collectionMember.getID()))
+            if (!newCollectionIDs.contains(collectionMember.getID().toString()))
             {
                 // The current collection is not contained in the new list.
                 etdunitService.removeCollection(context, etd_department, collectionMember);

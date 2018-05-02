@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -110,7 +111,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         }
 
         EtdUnit etd_department = null;
-        if (etd_departmentID != null)
+        if (StringUtils.isNotBlank(etd_departmentID))
         {
             etd_department = etdunitService.find(context, UUID.fromString(etd_departmentID));
         }
@@ -130,8 +131,11 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
             }
         }
 
-        String highlightCollectionID = parameters.getParameter(
-                "highlightCollectionID", null);
+        String highlightCollectionIDString = parameters.getParameter("highlightCollectionID", null);
+        UUID highlightCollectionID = null;
+        if (StringUtils.isNotBlank(highlightCollectionIDString)) {
+            highlightCollectionID = UUID.fromString(highlightCollectionIDString);
+        }
 
         // Get search parameters
         String query = decodeFromURL(parameters.getParameter("query", null));
@@ -194,8 +198,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         boolean changes = false;
         if (etd_department != null)
         {
-            changes = addMemberList(main, etd_department, memberCollectionIDs,
-                    UUID.fromString(highlightCollectionID));
+            changes = addMemberList(main, etd_department, memberCollectionIDs, highlightCollectionID);
         }
 
         Para buttons = main.addPara();
@@ -333,7 +336,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         for (UUID collectionID : allMemberCollectionIDs)
         {
             Collection collection = collectionService.find(context, collectionID);
-            boolean highlight = (highlightCollectionID.equals(collection.getID()));
+            boolean highlight = (collection.getID().equals(highlightCollectionID));
             boolean pendingAddition = !parent.isMember(collection);
             boolean pendingRemoval = !memberCollectionIDs
                     .contains(collectionID);
