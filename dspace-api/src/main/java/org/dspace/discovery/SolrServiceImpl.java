@@ -16,10 +16,13 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -1789,12 +1792,37 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         solrQuery.setParam(CommonParams.WT, "json");
 
         StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getSolr().getBaseURL()).append("/select?");
-        urlBuilder.append(solrQuery.toString());
+        //urlBuilder.append(getSolr().getBaseURL()).append("/select?");
+        //urlBuilder.append(solrQuery.toString());
+
+        // New url without any query params appended
+        urlBuilder.append(getSolr().getBaseURL()).append("/select");
+
+        // Post setup
+        NamedList<Object> solrParameters = solrQuery.toNamedList();
+        List<NameValuePair> postParameters = new ArrayList<>();
+        for (Map.Entry<String, Object> solrParameter : solrParameters) {
+            if (solrParameter.getValue() instanceof String[]) {
+                // Multi-valued solr parameter
+                for(String val : (String[])solrParameter.getValue()) {
+                    postParameters.add(new BasicNameValuePair(solrParameter.getKey(), val));
+                    log.info("String array: " + solrParameter.getKey() + " : " + val;
+                }
+
+            }
+            else if(solrParameter.getValue() instanceof String) {
+                log.info("String scalar: " + solrParameter.getKey() + " : " + solrParameter.getValue().toString());
+                postParameters.add(new BasicNameValuePair(solrParameter.getKey(), solrParameter.getValue().toString()));
+            }
+            else {
+                log.info("Non-array, non-string?!: " + solrParameter.getKey() + " : " + solrParameter.getValue().toString());
+            }
+        }
 
         try {
-            HttpGet get = new HttpGet(urlBuilder.toString());
-            HttpResponse response = new DefaultHttpClient().execute(get);
+            HttpPost post = new HttpPost(urlBuilder.toString());
+            post.setEntity(new UrlEncodedFormEntity(postParameters));
+            HttpResponse response = new DefaultHttpClient().execute(post);
             return response.getEntity().getContent();
 
         } catch (Exception e)
