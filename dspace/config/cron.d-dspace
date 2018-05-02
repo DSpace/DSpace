@@ -35,7 +35,6 @@ DSPACE=/var/dspace/install
 #0 2 * * *	dspace	$DSPACE/bin/dspace filter-media
 # silencio el media filter porque tira demasiados errores
 1 1,17 * * *	dspace	$DSPACE/bin/dspace filter-media -m 50 -s 10915/5621,10915/2618,10915/2762,10915/15912,10915/2272,10915/15920,10915/5226 -q 
-30 1 * * 1	dspace	$DSPACE/bin/dspace filter-media -p "JPEG Thumbnail" -m 50 -q
 
 # Run the checksum checker at 03:00
 0 3 * * *	dspace	$DSPACE/bin/dspace checker -lp | grep -v " old results from the database"
