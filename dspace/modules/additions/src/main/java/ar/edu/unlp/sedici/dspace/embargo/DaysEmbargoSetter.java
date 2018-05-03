@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 import org.dspace.embargo.DefaultEmbargoSetter;
 import org.dspace.embargo.EmbargoManager;
@@ -43,6 +44,11 @@ public class DaysEmbargoSetter extends DefaultEmbargoSetter {
 	 */
 	public DCDate parseTerms(Context context, Item item, String terms)
 			throws SQLException, AuthorizeException, IOException {
+
+		if (item.getMetadataByMetadataString("sedici.embargo.liftDate").length != 0){
+			Metadatum liftDates[] = item.getMetadataByMetadataString("sedici.embargo.liftDate");
+			return new DCDate(liftDates[0].value);
+		}
 		if (terms == null || "".equals(terms.trim())) {
 			log.trace("No se aplica embargo sobre el doc "+item.getHandle()+" dado que no hay un terms definido como metadato");
 			return null;

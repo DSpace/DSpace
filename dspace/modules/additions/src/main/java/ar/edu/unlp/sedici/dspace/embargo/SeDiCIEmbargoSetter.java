@@ -1,13 +1,22 @@
 package ar.edu.unlp.sedici.dspace.embargo;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.embargo.EmbargoManager;
+import org.dspace.license.CreativeCommons;
 
 /**
 
@@ -62,5 +71,21 @@ public class SeDiCIEmbargoSetter extends DaysEmbargoSetter {
 		return new DCDate(exposureDates[0].value).toDate();
 	}
 	
-	
+    /**
+     * Enforce embargo by turning off all read access to bitstreams in
+     * this Item.
+     *
+     * @param context the DSpace context
+     * @param item the item to embargo
+     */
+    public void setEmbargo(Context context, Item item)
+        throws SQLException, AuthorizeException, IOException
+    {
+    	super.setEmbargo(context, item);
+        item.clearMetadata("dc", "date", "available", Item.ANY);
+        item.addMetadata("dc", "date", "available", null, item.getMetadataByMetadataString("dc.date.accessioned")[0].value);
+        log.info("Set dc.date.available on Item "+item.getHandle());
+        item.update();
+    }
+
 }
