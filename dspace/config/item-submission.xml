@@ -137,9 +137,9 @@
       <!--Step sediciUploadItem will be to Upload the item.-->
       <step id="sediciUploadItem">
         <heading>submit.progressbar.upload</heading>
-        <processing-class>org.dspace.submit.step.UploadStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
+        <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadWithEmbargoStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadWithEmbargoStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
       
