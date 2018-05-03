@@ -128,7 +128,9 @@ public class AutoReturnReviewItem {
                     if (!testMode) {
                         log.info("check to see if item " + item.getID() + " is approved or rejected");
                         Manuscript databaseManuscript = ApproveRejectReviewItem.getStoredManuscriptForWorkflowItem(context, wfi);
-                        ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfi, databaseManuscript);
+                        if (databaseManuscript != null && databaseManuscript.isAccepted()) {
+                            ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfi, databaseManuscript);
+                        }
                     }
                     if (itemIsOldItemInReview(item)) {
                         if (testMode) {
