@@ -7,13 +7,12 @@
  */
 package org.dspace.authority.rest;
 
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.dspace.authority.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -38,26 +37,27 @@ public class RESTConnector {
         this.url = url;
     }
 
-    public Document get(String path) {
-        Document document = null;
-
+    public InputStream get(String path, String accessToken) {
         InputStream result = null;
         path = trimSlashes(path);
 
         String fullPath = url + '/' + path;
         HttpGet httpGet = new HttpGet(fullPath);
+        if(StringUtils.isNotBlank(accessToken)){
+            httpGet.addHeader("Content-Type", "application/vnd.orcid+xml");
+            httpGet.addHeader("Authorization","Bearer "+accessToken);
+        }
         try {
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpResponse getResponse = httpClient.execute(httpGet);
             //do not close this httpClient
             result = getResponse.getEntity().getContent();
-            document = XMLUtils.convertStreamToXML(result);
 
         } catch (Exception e) {
             getGotError(e, fullPath);
         }
 
-        return document;
+        return result;
     }
 
     protected void getGotError(Exception e, String fullPath) {
