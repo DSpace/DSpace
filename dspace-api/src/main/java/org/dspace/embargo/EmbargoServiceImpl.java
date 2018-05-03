@@ -147,7 +147,8 @@ public class EmbargoServiceImpl implements EmbargoService {
     @Override
     public void liftEmbargo(Context context, Item item)
         throws SQLException, AuthorizeException, IOException {
-        // Since 3.0 the lift process for all embargoes is performed through the dates on the authorization process (see DS-2588)
+        // Since 3.0 the lift process for all embargoes is performed through the dates
+        // on the authorization process (see DS-2588)
         // lifter.liftEmbargo(context, item);
         itemService.clearMetadata(context, item, lift_schema, lift_element, lift_qualifier, Item.ANY);
 
