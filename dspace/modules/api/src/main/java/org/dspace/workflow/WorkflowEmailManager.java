@@ -439,7 +439,7 @@ public class WorkflowEmailManager {
         if (pubNames != null && pubNames.length > 0) {
             journalName = pubNames[0].value;
         }
-        log.error("looking for journal for item " + item.getID() + ": " + journalName);
+        log.debug("looking for journal for item " + item.getID() + ": " + journalName);
         return journalName;
     }
 }

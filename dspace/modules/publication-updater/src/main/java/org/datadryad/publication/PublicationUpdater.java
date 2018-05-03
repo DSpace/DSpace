@@ -258,27 +258,19 @@ public class PublicationUpdater extends HttpServlet {
                     // First, compare this item with anything in manuscript metadata storage:
                     // If this workflow item does not have a msid, it might have come from a submitter
                     // who didn't use a journal link.
-                    List<Manuscript> databaseManuscripts = null;
                     Manuscript databaseManuscript = null;
                     try {
-                        databaseManuscripts = JournalUtils.getStoredManuscriptsMatchingManuscript(queryManuscript);
-                        if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
-                            databaseManuscript = databaseManuscripts.get(0);
-                            // only update the metadata if the item is in review and this ms is not one of the known former msids for this item.
-                            if (isInReview && !JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item, databaseManuscript)) {
-                                StringBuilder provenance = new StringBuilder("Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ");
-                                if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {
-                                    message = provenance;
-                                }
-                                if (databaseManuscript.isAccepted()) {
-                                    // see if this can be pushed out of review
-                                    ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfi, databaseManuscript);
-                                }
+                        databaseManuscript = ApproveRejectReviewItem.getStoredManuscriptForWorkflowItem(context, wfi);
+                        if (isInReview && databaseManuscript != null) {
+                            StringBuilder provenance = new StringBuilder("Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ");
+                            if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {
+                                message = provenance;
+                            }
+                            if (databaseManuscript.isAccepted()) {
+                                // see if this can be pushed out of review
+                                ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfi, databaseManuscript);
                             }
                         }
-                    } catch (ParseException e) {
-                        // do we want to collect workflow items with faulty manuscript IDs?
-                        LOGGER.error("Problem updating item " + item.getID() + ": Manuscript ID is incorrect.");
                     } catch (ApproveRejectReviewItemException e) {
                         LOGGER.error("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage());
                     }
