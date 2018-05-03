@@ -326,7 +326,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 List<Bitstream> bitstreams = bundle.getBitstreams();
 
                 for (Bitstream bitstream : bitstreams) {
-                    if (bitstream.getName().equals(newName)) {
+                    if (bitstream.getName().trim().equals(newName.trim())) {
                         existingBundle = bundle;
                         existingBitstream = bitstream;
                     }
