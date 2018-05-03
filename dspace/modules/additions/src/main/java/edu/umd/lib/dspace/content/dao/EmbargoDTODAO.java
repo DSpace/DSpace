@@ -9,6 +9,6 @@ import edu.umd.lib.dspace.content.EmbargoDTO;
 
 public interface EmbargoDTODAO {
 
-  List<EmbargoDTO> getEmbargoDTOList(Context context, int titleId, int advisorId, int authorId, int departmentId, int typeId, int resourceType, String groupName) throws SQLException;
+  List<EmbargoDTO> getEmbargoDTOList(Context context, int titleId, int advisorId, int authorId, int departmentId, int typeId, String groupName) throws SQLException;
   
 }

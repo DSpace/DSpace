@@ -6,7 +6,6 @@ package edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +19,7 @@ import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
 
@@ -76,9 +76,12 @@ public class EmbargoListDownloader extends AbstractReader implements Recyclable
 
     }
 
-    private void addEmbargoDataToWriter(Request request) throws SQLException
+    private void addEmbargoDataToWriter(Request request) throws SQLException, IOException
     {
         
+        if (context == null) {
+            context = ContextUtil.obtainContext(request);
+        }
         java.util.List<EmbargoDTO> embargoDTOs = embargoDTOService.getEmbargoList(context);
 
         writer.writeNext(new String[] { "Handle", "Item ID", "Bitstream ID",
@@ -105,6 +108,7 @@ public class EmbargoListDownloader extends AbstractReader implements Recyclable
             entryData[8] = embargoETO.getEndDateString();
             writer.writeNext(entryData);
         }
+        writer.flush();
     }
 
     @Override

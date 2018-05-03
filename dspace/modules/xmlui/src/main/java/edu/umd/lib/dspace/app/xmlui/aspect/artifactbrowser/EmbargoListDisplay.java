@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.statistics.StatisticsLoader;
 import org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -240,7 +241,9 @@ CacheableProcessingComponent
         List download = div.addList("download");
         download.addItemXref(contextPath + "/embargo-list/csv", "Download CSV");
 
-        Request request = ObjectModelHelper.getRequest(objectModel);
+        if (context == null) {
+            context = ContextUtil.obtainContext(objectModel);
+        }
 
         java.util.List<EmbargoDTO> embargoDTOs = embargoDTOService.getEmbargoList(context);
         Table table = div.addTable("list-of-embargoes", 22, 9);
