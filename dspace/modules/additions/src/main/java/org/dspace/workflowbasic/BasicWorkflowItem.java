@@ -17,6 +17,7 @@ import org.dspace.workflow.WorkflowItem;
 import javax.persistence.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -54,7 +55,7 @@ public class BasicWorkflowItem implements WorkflowItem
     @JoinTable(name = "collection2workflowitem", 
                joinColumns = { @JoinColumn(name = "workflow_id") },
                inverseJoinColumns = { @JoinColumn(name = "collection_id") })
-    private Set<Collection> mappedCollections;
+    private Set<Collection> mappedCollections = new HashSet<>();
     // End UMD Customization
 
     /** EPerson owning the current state */

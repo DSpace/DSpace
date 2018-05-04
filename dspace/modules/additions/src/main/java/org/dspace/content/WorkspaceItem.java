@@ -19,6 +19,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -56,7 +57,7 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     @JoinTable(name = "collection2workspaceitem", 
                joinColumns = { @JoinColumn(name = "workspace_item_id") },
                inverseJoinColumns = { @JoinColumn(name = "collection_id") })
-    private Set<Collection> mappedCollections;
+    private Set<Collection> mappedCollections = new HashSet<>();
     // End UMD Customization
 
     @Column(name = "multiple_titles")

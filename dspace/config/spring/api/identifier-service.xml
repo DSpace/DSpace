@@ -133,7 +133,7 @@
             </map>
         </property>
         <property name='generateDataciteXML' value='true'/>
-        <property name='disseminationCrosswalkName' value='DataCite'/>
+        <property name='disseminationCrosswalkName' value='UmdDataCite'/>
 
     </bean>
 
