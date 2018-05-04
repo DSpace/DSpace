@@ -23,7 +23,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-        <jackson.version>2.9.3</jackson.version>
+        <jackson.version>2.7.0</jackson.version>
+        <jersey.version>2.22.1</jersey.version>
         <java.version>1.7</java.version>
         <postgresql.driver.version>42.2.1</postgresql.driver.version>
         <solr.version>4.10.4</solr.version>
