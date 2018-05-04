@@ -587,6 +587,10 @@ public class DatabaseUtils
             return checkOldVersion(connection, true);
         }
         
+        if(tableExists(connection, "imp_bitstream_metadatavalue")){
+        	return "5.8.0.5";
+        }
+        
         if(tableColumnExists(connection, "cris_orcid_history", "orcid", null, null)) {
             return "5.8.0.0";
         }
