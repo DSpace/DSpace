@@ -162,4 +162,8 @@ public class XslExtensions {
 		return urlToEncode;
 	}
 	
+	public static String getFileExtension(String filename) {
+		return filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+	}
+	
 }

@@ -13,6 +13,7 @@ import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.ContextAwareDisseminationCrosswalk;
@@ -21,6 +22,7 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
@@ -33,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -1003,11 +1006,12 @@ public class ItemAdapter extends AbstractAdapter
      * @param admID
      *            The IDs of the administrative metadata sections which pertain
      *            to this file
+     * @throws SQLException 
      */
     
     // FIXME: this method is a copy of the one inherited. However the
     // original method is final so we must rename it.
-	protected void renderFileWithAllowed(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException
+	protected void renderFileWithAllowed(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException, SQLException
 	{
 		AttributeMap attributes;
 		
@@ -1099,6 +1103,32 @@ public class ItemAdapter extends AbstractAdapter
 	} catch (SQLException e) {/* Do nothing */}
 	
 	url += "&isAllowed=" + isAllowed;
+
+
+    ArrayList<ResourcePolicy> resourcePolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bitstream);
+    String embargo = null;
+    Date maxDate = null;
+	Date today = new Date();
+	SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+    sdf.setTimeZone(TimeZone.getTimeZone("ZULU"));
+    for(ResourcePolicy policy : resourcePolicies)
+    {
+    	Group group = policy.getGroup();
+    	if (group == null || Group.ANONYMOUS_ID != (group.getID()) || (policy.getEndDate() != null && policy.getEndDate().before(today))){
+     		continue;
+     	}
+       	if (policy.getStartDate() == null || policy.getStartDate().before(today)){
+       		break;
+       	}
+       	else if (maxDate == null || policy.getStartDate().after(maxDate)){
+       		maxDate = policy.getStartDate();
+    		embargo = sdf.format(policy.getStartDate());                        				
+       	}
+    };
+    
+    if (embargo != null){
+    	url += "&embargoDate=" + embargo;    	
+    }
 
         // //////////////////////
         // Start the file location
