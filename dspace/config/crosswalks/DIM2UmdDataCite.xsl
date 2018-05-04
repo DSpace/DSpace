@@ -6,11 +6,11 @@
     Author     : pbecker, ffuerste
     Description: Converts metadata from DSpace Intermediat Format (DIM) into
                  metadata following the DataCite Schema for the Publication and
-                 Citation of Research Data, Version 2.2
+                 Citation of Research Data, Version 4
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:dspace="http://www.dspace.org/xmlns/dspace/dim"
-                xmlns="http://datacite.org/schema/kernel-2.2"
+                xmlns="http://datacite.org/schema/kernel-4"
                 version="1.0">
     
     <!-- CONFIGURATION -->
@@ -39,9 +39,9 @@
             properties are in the metadata of the item to export.
             The classe named above respects this.
         -->
-        <resource xmlns="http://datacite.org/schema/kernel-4.1"
+        <resource xmlns="http://datacite.org/schema/kernel-4"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://datacite.org/schema/kernel-4.1 http://schema.datacite.org/meta/kernel-4.1/metadata.xsd">
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
 
             <!-- 
                 MANDATORY PROPERTIES
@@ -56,6 +56,7 @@
             <!-- 
                 DataCite (2)
                 Add creator information. 
+                Occ: 1-n
             -->
             <creators>
                 <xsl:choose>
@@ -72,7 +73,8 @@
 
             <!-- 
                 DataCite (3)
-                Add Title information. 
+                Add Title information.
+                Occ: 1-n
             -->
             <titles>
                 <xsl:choose>
@@ -88,6 +90,7 @@
             <!-- 
                 DataCite (4)
                 Add Publisher information from configuration above
+                Occ: 1
             -->
             <publisher>
                 <xsl:value-of select="$publisher" />
@@ -96,6 +99,8 @@
             <!-- 
                 DataCite (5)
                 Add PublicationYear information
+                Occ: 1
+                Format: YYYY
             -->
             <publicationYear>
                 <xsl:choose>
@@ -103,7 +108,7 @@
                         <xsl:value-of select="substring(//dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued'], 1, 4)" />
                     </xsl:when>
                     <xsl:when test="//dspace:field[@mdschema='dc' and @element='date' and @qualifier='available']">
-                        <xsl:value-of select="substring(//dspace:field[@mdschema='dc' and @element='date' and @qualifier='issued'], 1, 4)" />
+                        <xsl:value-of select="substring(//dspace:field[@mdschema='dc' and @element='date' and @qualifier='available'], 1, 4)" />
                     </xsl:when>
                     <xsl:when test="//dspace:field[@mdschema='dc' and @element='date']">
                         <xsl:value-of select="substring(//dspace:field[@mdschema='dc' and @element='date'], 1, 4)" />
@@ -113,12 +118,20 @@
             </publicationYear>
 
             <!-- 
+                Add resource type.
+                Occ: 1
+            -->
+            <xsl:apply-templates select="(//dspace:field[@mdschema='dc' and @element='type'])[1]" />
+
+            <!-- 
                 OPTIONAL PROPERTIES
             -->
 
-            <!-- 
-                DataCite (6)
+            <!--
                 Template Call for subjects.
+                Occ: 0-n
+                Format: open
+                Attribute: subjectSchema (optional), schemeURI (optional)
             -->  
             <xsl:if test="//dspace:field[@mdschema='dc' and @element='subject']">
                 <subjects>
@@ -126,27 +139,28 @@
                 </subjects>
             </xsl:if>
 
-            <!-- Add language(s). -->
-            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='language' and (@qualifier='iso' or @qualifier='rfc3066')]" />
+            <!-- 
+                Templacte Call for Language.
+                Occ: 0-1
+                Format: IETF BCP 47 or ISO 639-1
+             -->
+            <xsl:apply-templates select="(//dspace:field[@mdschema='dc' and @element='language' and (@qualifier='iso' or @qualifier='rfc3066')])[1]" />
 
-            <!-- Add resource type. -->
-            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='type']" />
-
-
-            <!-- Add rights. -->
-            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='rights']" />
-
-            <!-- Add descriptions. -->
+            <!-- 
+                Templacte Call for descriptions.
+                Occ: 0-n
+                Required Attribute: descriptionType - controlled list
+            -->
             <xsl:if test="//dspace:field[@mdschema='dc' and @element='description'][not(@qualifier='provenance')]">
                 <xsl:element name="descriptions">
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='description'][not(@qualifier='provenance')]" />
+                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='description' and (@qualifier='abstract' or not(@qualifier))]" />
                 </xsl:element>
             </xsl:if>
 
         </resource>
     </xsl:template>
     
-    
+    <!-- TEMPLATES -->
     <!-- DataCite (2) :: Creator -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
         <creator>
@@ -161,6 +175,15 @@
         <xsl:element name="title">
             <xsl:if test="@qualifier='alternative'">
                 <xsl:attribute name="titleType">AlternativeTitle</xsl:attribute>
+            </xsl:if>
+            <!-- DSpace does include niehter a dc.title.subtitle nor a 
+                 dc.title.translated. If necessary, please create those in the 
+                 metadata field registry. -->
+            <xsl:if test="@qualifier='subtitle'">
+                <xsl:attribute name="titleType">Subtitle</xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@qualifier='translated'">
+                <xsl:attribute name="titleType">TranslatedTitle</xsl:attribute>
             </xsl:if>
             <xsl:value-of select="." />
         </xsl:element>
@@ -191,72 +214,64 @@
         Adds Language information
         Transforming the language flags according to ISO 639-2/B & ISO 639-3
     -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='language' and (@qualifier='iso' or @qualifier='rfc3066')]">
-        <xsl:for-each select=".">
-            <xsl:element name="language">
-                <xsl:choose>
-                    <xsl:when test="contains(string(text()), '_')">
-                        <xsl:value-of select="translate(string(text()), '_', '-')"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="string(text())"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:element>
-        </xsl:for-each>
+    <xsl:template match="//dspace:field[@mdschema='dc' and @element='language' and (@qualifier='iso' or @qualifier='rfc3066')][1]">
+        <xsl:element name="language">
+            <xsl:choose>
+                <xsl:when test="contains(string(text()), '_')">
+                    <xsl:value-of select="translate(string(text()), '_', '-')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="string(text())"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:element>
     </xsl:template>
 
     <!-- 
         DataCite (10), DataCite (10.1)
         Adds resourceType and resourceTypeGeneral information
     -->
-        <xsl:template match="//dspace:field[@mdschema='dc' and @element='type']">
-        <xsl:for-each select=".">
-            <!-- Transforming the language flags according to ISO 639-2/B & ISO 639-3 -->
-            <xsl:element name="resourceType">
-                <xsl:attribute name="resourceTypeGeneral">
-                    <xsl:choose>
-                        <xsl:when test="string(text())='Animation'">Image</xsl:when>
-                        <xsl:when test="string(text())='Article'">Text</xsl:when>
-                        <xsl:when test="string(text())='Book'">Text</xsl:when>
-                        <xsl:when test="string(text())='Book chapter'">Text</xsl:when>
-                        <xsl:when test="string(text())='Dataset'">Dataset</xsl:when>
-                        <xsl:when test="string(text())='Learning Object'">InteractiveResource</xsl:when>
-                        <xsl:when test="string(text())='Image'">Image</xsl:when>
-                        <xsl:when test="string(text())='Image, 3-D'">Image</xsl:when>
-                        <xsl:when test="string(text())='Map'">Image</xsl:when>
-                        <xsl:when test="string(text())='Musical Score'">Sound</xsl:when>
-                        <xsl:when test="string(text())='Plan or blueprint'">Image</xsl:when>
-                        <xsl:when test="string(text())='Preprint'">Text</xsl:when>
-                        <xsl:when test="string(text())='Presentation'">Image</xsl:when>
-                        <xsl:when test="string(text())='Recording, acoustical'">Sound</xsl:when>
-                        <xsl:when test="string(text())='Recording, musical'">Sound</xsl:when>
-                        <xsl:when test="string(text())='Recording, oral'">Sound</xsl:when>
-                        <xsl:when test="string(text())='Software'">Software</xsl:when>
-                        <xsl:when test="string(text())='Technical Report'">Text</xsl:when>
-                        <xsl:when test="string(text())='Thesis'">Text</xsl:when>
-                        <xsl:when test="string(text())='Video'">Film</xsl:when>
-                        <xsl:when test="string(text())='Working Paper'">Text</xsl:when>
-                        <!-- FIXME -->
-                        <xsl:when test="string(text())='Other'">Collection</xsl:when>
-                        <!-- FIXME -->
-                        <xsl:otherwise>Collection</xsl:otherwise>
-                    </xsl:choose>
-                </xsl:attribute>
-                <xsl:value-of select="." />
-            </xsl:element>
-        </xsl:for-each>
+    <xsl:template match="//dspace:field[@mdschema='dc' and @element='type'][1]">
+        <xsl:element name="resourceType">
+            <xsl:attribute name="resourceTypeGeneral">
+                <xsl:choose>
+                    <xsl:when test="string(text())='Animation'">Image</xsl:when>
+                    <xsl:when test="string(text())='Article'">Text</xsl:when>
+                    <xsl:when test="string(text())='Book'">Text</xsl:when>
+                    <xsl:when test="string(text())='Book chapter'">Text</xsl:when>
+                    <xsl:when test="string(text())='Dataset'">Dataset</xsl:when>
+                    <xsl:when test="string(text())='Learning Object'">InteractiveResource</xsl:when>
+                    <xsl:when test="string(text())='Image'">Image</xsl:when>
+                    <xsl:when test="string(text())='Image, 3-D'">Image</xsl:when>
+                    <xsl:when test="string(text())='Map'">Image</xsl:when>
+                    <xsl:when test="string(text())='Musical Score'">Sound</xsl:when>
+                    <xsl:when test="string(text())='Plan or blueprint'">Image</xsl:when>
+                    <xsl:when test="string(text())='Preprint'">Text</xsl:when>
+                    <xsl:when test="string(text())='Presentation'">Image</xsl:when>
+                    <xsl:when test="string(text())='Recording, acoustical'">Sound</xsl:when>
+                    <xsl:when test="string(text())='Recording, musical'">Sound</xsl:when>
+                    <xsl:when test="string(text())='Recording, oral'">Sound</xsl:when>
+                    <xsl:when test="string(text())='Software'">Software</xsl:when>
+                    <xsl:when test="string(text())='Technical Report'">Text</xsl:when>
+                    <xsl:when test="string(text())='Thesis'">Text</xsl:when>
+                    <xsl:when test="string(text())='Video'">Film</xsl:when>
+                    <xsl:when test="string(text())='Working Paper'">Text</xsl:when>
+                    <xsl:when test="string(text())='Other'">Other</xsl:when>
+                    <xsl:otherwise>Collection</xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:value-of select="." />
+        </xsl:element>
     </xsl:template>
-
 
     <!-- 
         DataCite (17)
         Description
     -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='description'][not(@qualifier='provenance')]">
+    <xsl:template match="//dspace:field[@mdschema='dc' and @element='description' and (@qualifier='abstract' or not(@qualifier))]">
         <xsl:element name="description">
             <xsl:attribute name="descriptionType">
-           	<xsl:choose>           
+           	<xsl:choose>
                     <xsl:when test="@qualifier='abstract'">Abstract</xsl:when>
                	    <xsl:otherwise>Other</xsl:otherwise>
                 </xsl:choose>
