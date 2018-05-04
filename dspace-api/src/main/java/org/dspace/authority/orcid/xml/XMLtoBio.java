@@ -45,7 +45,9 @@ public class XMLtoBio extends Converter {
             for(Result result : search.getResult()){
                 OrcidId orcidIdentifier = result.getOrcidIdentifier();
                 if(orcidIdentifier!=null){
-                    Person bio = connector.getBio(orcidIdentifier.getPath());
+                    log.debug("Found OrcidId=" + orcidIdentifier.toString());
+                    String orcid = orcidIdentifier.getUriPath();
+                    Person bio = connector.getBio(orcid);
                     if(bio!=null){
                         bios.add(bio);
                     }

@@ -12,6 +12,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.authority.orcid.xml.XMLtoBio;
@@ -34,6 +35,7 @@ import java.util.List;
  */
 public class Orcidv2 implements SolrAuthorityInterface {
 
+    private static Logger log = Logger.getLogger(Orcidv2.class);
 
     public RESTConnector restConnector;
     private String OAUTHUrl;
@@ -99,7 +101,7 @@ public class Orcidv2 implements SolrAuthorityInterface {
 
     /**
      * Makes an instance of the AuthorityValue with the given information.
-     * @param text string info
+     * @param text search string
      * @return List<AuthorityValue>
      */
     @Override
@@ -132,6 +134,7 @@ public class Orcidv2 implements SolrAuthorityInterface {
      * @return Person
      */
     public Person getBio(String id) {
+        log.debug("getBio called with ID=" + id);
         if(!isValid(id)){
             return null;
         }
@@ -144,20 +147,18 @@ public class Orcidv2 implements SolrAuthorityInterface {
 
     /**
      * Retrieve a list of Person objects.
-     * @param orcidID string info
+     * @param text search string
      * @param start offset to use
      * @param rows how many rows to return
-     * @return List<AuthorityValue>
+     * @return List<Person>
      */
-    public List<Person> queryBio(String orcidID, int start, int rows) {
+    public List<Person> queryBio(String text, int start, int rows) {
         if (rows > 100) {
-            throw new IllegalArgumentException("The maximum number of results to retrieve from solr cannot exceed 100.");
+            throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
-        StringBuilder query = new StringBuilder();
-        query.append("orcid:").append(orcidID);
 
-
-        String searchPath = "search?q=" + URLEncoder.encode(query.toString()) + "&start=" + start + "&rows=" + rows;
+        String searchPath = "search?q=" + URLEncoder.encode(text) + "&start=" + start + "&rows=" + rows;
+        log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = restConnector.get(searchPath, accessToken);
         XMLtoBio converter = new XMLtoBio();
         List<Person> bios = converter.convert(bioDocument);
@@ -166,12 +167,12 @@ public class Orcidv2 implements SolrAuthorityInterface {
 
     /**
      * Retrieve a list of Person objects.
-     * @param orcidID string info
+     * @param text search string
      * @param max how many rows to return
-     * @return List<AuthorityValue>
+     * @return List<Person>
      */
-    public List<Person> queryBio(String orcidID, int max) {
-        return queryBio(orcidID, 0, max);
+    public List<Person> queryBio(String text, int max) {
+        return queryBio(text, 0, max);
     }
 
     /**
