@@ -119,3 +119,25 @@ background-color: #E2E2E2;
  margin-bottom:5px;
 }
 }
+
+/* Environment Banner  */
+.environment-banner {
+    /* height: 30px; */ /* fixed height 30px */
+    padding: 8px 25px;
+    margin: 0;
+}
+.local.environment-banner {
+    background:#008000;
+    color: #fff;
+}
+.dev.environment-banner {
+    background:#fff100;
+    color: #000;
+}
+.stage.environment-banner {
+    background:#0000ff;
+    color: #fff;
+}
+.prod.environment-banner {
+    display: none!important;
+}

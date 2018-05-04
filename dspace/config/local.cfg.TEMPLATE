@@ -118,3 +118,9 @@ drum.etdloader.transfermarc = false
 # IRUS Tracker Environment
 stats.tracker.environment = test
 stats.spider.agentregex.regexfile = ${dspace.dir}/config/COUNTER_Robots_list.txt
+
+# Environment Banner configuration
+# Leave blank on production environment
+# Valid options: local, dev, stage
+drum.environment.name = local
+drum.environment.bannerText = Local Environment
