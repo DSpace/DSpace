@@ -25,6 +25,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.I18nUtil;
 import org.xml.sax.SAXException;
@@ -111,6 +112,13 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("request","serverName").addContent(request.getServerName());
         pageMeta.addMetadata("request","URI").addContent(request.getSitemapURI());
 
+        // Begin UMD Customization
+        // Add Environment Banner configuration to pageMeta
+        ConfigurationService conf = DSpaceServicesFactory.getInstance().getConfigurationService();
+        pageMeta.addMetadata("environment", "name").addContent(conf.getProperty("drum.environment.name"));
+        pageMeta.addMetadata("environment", "bannerText").addContent(conf.getProperty("drum.environment.bannerText"));
+        // End UMD Customization
+        
         String dspaceVersion = Util.getSourceVersion();
         if (dspaceVersion != null)
         {
