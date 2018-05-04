@@ -875,10 +875,7 @@
 
         <!-- Begin UMD Customization -->
         <!-- UMD Header -->
-        <script src="//s3.amazonaws.com/umdheader.umd.edu/app/js/main.min.js"></script>
-        <script>
-            umdHeader.init(); 
-        </script>
+        <script src="https://umd-header.umd.edu/build/bundle.js?search=0&amp;search_domain=&amp;events=0&amp;news=0&amp;schools=0&amp;admissions=0&amp;support=1&amp;support_url=https%253A%252F%252Fgiving.umd.edu%252Fgiving%252FshowSchool.php%253Fname%253Dlibraries&amp;wrapper=1160&amp;sticky=0"></script>
         <!-- End UMD Customization -->
 
         <xsl:call-template name="addJavascript-google-analytics" />
