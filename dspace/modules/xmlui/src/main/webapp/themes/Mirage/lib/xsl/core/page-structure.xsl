@@ -481,7 +481,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                                 <li>
                                     <a href="/pages/policies">Terms of service</a>
-                                </li>                            
+                                </li>
+                                <li>
+                                    <a href="/pages/policies#privacy">Privacy policy</a>
+                                </li>
                             </ul>
                         </li>
                         <li>

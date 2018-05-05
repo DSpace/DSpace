@@ -536,7 +536,9 @@
 		characters long.</message>
 	<message key="xmlui.EPerson.EditProfile.password">Password</message>
 	<message key="xmlui.EPerson.EditProfile.confirm_password">Retype to confirm</message>
-    <message key="xmlui.EPerson.EditProfile.terms">Terms of Service</message>
+	<message key="xmlui.EPerson.EditProfile.privacy">Privacy Policy</message>
+	<message key="xmlui.EPerson.EditProfile.privacy_help">Dryad respects the privacy of our users and works to protect the personally identifiable information we collect, which is limited to name and contact information. View our <a target="_blank" href="/pages/policies#privacy">privacy policy</a>. If you have concerns about your personal information stored in Dryad, please contact us at <a href="mailto:help@datadryad.org">help@datadryad.org</a>.</message>
+	<message key="xmlui.EPerson.EditProfile.terms">Terms of Service</message>
     <message key="xmlui.EPerson.EditProfile.terms_help">To use Dryad's data publishing services, you must agree to the <a target="_blank" href="/pages/policies">Terms of Service</a>.</message>
     <message key="xmlui.EPerson.EditProfile.terms.checkbox">I agree to Dryad's Terms of Service.</message>
 

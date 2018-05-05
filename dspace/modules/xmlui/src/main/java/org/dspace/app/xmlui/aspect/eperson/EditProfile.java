@@ -154,8 +154,14 @@ public class EditProfile extends AbstractDSpaceTransformer
     private static final Message T_head_security =
         message("xmlui.EPerson.EditProfile.head_security");
 
+    private static final Message T_privacy =
+            message("xmlui.EPerson.EditProfile.privacy");
+
+    private static final Message T_privacy_help =
+            message("xmlui.EPerson.EditProfile.privacy_help");
+
     private static final Message T_terms =
-	message("xmlui.EPerson.EditProfile.terms");
+	        message("xmlui.EPerson.EditProfile.terms");
 
     private static final Message T_terms_help =
             message("xmlui.EPerson.EditProfile.terms_help");
@@ -373,20 +379,6 @@ public class EditProfile extends AbstractDSpaceTransformer
            lastName.setDisabled();
        }
        
-       // Phone
-       Text phone = identity.addItem().addText("phone");
-       phone.setRequired();
-       phone.setLabel(T_telephone);
-       phone.setValue(defaultPhone);
-       if (errors.contains("phone"))
-       {
-           phone.addError(T_error_required);
-       }
-       if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
-       {
-           phone.setDisabled();
-       }
-        
        // Language
        Select lang = identity.addItem().addSelect("language");
        lang.setLabel(T_language);
@@ -508,7 +500,11 @@ public class EditProfile extends AbstractDSpaceTransformer
 
        }
        */
-       
+
+       List privacyList = form.addList("privacy",List.TYPE_FORM);
+       privacyList.setHead(T_privacy);
+       privacyList.addItem(T_privacy_help);
+
        List tl = form.addList("terms",List.TYPE_FORM);
        tl.setHead(T_terms);
        tl.addItem(T_terms_help);
