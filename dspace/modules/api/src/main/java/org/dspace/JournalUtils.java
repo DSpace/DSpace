@@ -716,7 +716,6 @@ public class JournalUtils {
             try {
                 JsonNode dateParts = dateNode.path("date-parts").get(0);
                 Date date = dateFormat.parse(dateParts.get(0).intValue() + "-" + dateParts.get(1).intValue() + "-" + dateParts.get(2).intValue());
-                }
                 manuscript.setPublicationDate(date);
             } catch (ParseException e) {
                 log.error("couldn't parse date: " + dateNode.path("date-time").textValue());
