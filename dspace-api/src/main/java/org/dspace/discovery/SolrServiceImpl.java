@@ -1995,6 +1995,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         HttpPost post = new HttpPost(hostURL.toHostString());
         List<NameValuePair> postParameters = new ArrayList<>();
         postParameters.add(new BasicNameValuePair("q",query.toString()));
+        post.setEntity(new UrlEncodedFormEntity(postParameters));
 
         HttpResponse response = getSolr().getHttpClient().execute(post);
 
