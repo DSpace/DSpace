@@ -21,6 +21,7 @@ import org.dspace.core.Context;
 import org.dspace.core.service.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,7 +44,7 @@ public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
         return new LicenseResource(model);
     }
 
-    //TODO @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('EPERSON')")
     public LicenseRest getLicenseCollection(HttpServletRequest request, UUID uuid, Pageable pageable, String projection)
         throws Exception {
         Context context = obtainContext();

@@ -19,23 +19,25 @@ public class EmptyRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
         //Test retrieval of all communities while none exist
-        getClient().perform(get("/api/core/communities"))
+        getClient(token).perform(get("/api/core/communities"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         //Test retrieval of all collections while none exist
-        getClient().perform(get("/api/core/collections"))
+        getClient(token).perform(get("/api/core/collections"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         //Test retrieval of all items while none exist
-        getClient().perform(get("/api/core/items"))
+        getClient(token).perform(get("/api/core/items"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         //Test retrieval of all bitstreams while none exist
-        getClient().perform(get("/api/core/bitstreams"))
+        getClient(token).perform(get("/api/core/bitstreams"))
         .   andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(0)));
     }

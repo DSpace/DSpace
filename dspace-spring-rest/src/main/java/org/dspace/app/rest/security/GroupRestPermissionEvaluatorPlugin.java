@@ -26,6 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+/**
+ * An authenticated user is allowed to view information on all the groups he or she is a member of.
+ * This {@link RestPermissionEvaluatorPlugin} implements that requirement by validating the group membership.
+ */
 @Component
 public class GroupRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEvaluatorPlugin {
 
@@ -40,7 +44,17 @@ public class GroupRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEv
     @Autowired
     private EPersonService ePersonService;
 
-
+    /**
+     * Alternative method for evaluating a permission where only the identifier of the
+     * target object is available, rather than the target instance itself.
+     *
+     * @param authentication represents the user in question. Should not be null.
+     * @param targetId the UUID for the DSpace object
+     * @param targetType represents the DSpace object type of the target object. Not null.
+     * @param permission a representation of the permission object as supplied by the
+     * expression system. This corresponds to the DSpace action. Not null.
+     * @return true if the permission is granted by one of the plugins, false otherwise
+     */
     public boolean hasPermission(Authentication authentication, Serializable targetId,
                                  String targetType, Object permission) {
         Request request = requestService.getCurrentRequest();
@@ -50,10 +64,10 @@ public class GroupRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEv
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
             UUID dsoId = UUID.fromString(targetId.toString());
 
-            if (Constants.getTypeID(targetType.toString()) == Constants.GROUP) {
+            if (Constants.getTypeID(targetType) == Constants.GROUP) {
                 Group group = groupService.find(context, dsoId);
 
-                if (group.getMembers().contains(ePerson)) {
+                if (groupService.isMember(context, ePerson, group)) {
                     return true;
                 }
             }

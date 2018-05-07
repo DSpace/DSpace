@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -61,7 +62,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
         submissionConfigReader = new SubmissionConfigReader();
     }
 
-    //TODO @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('EPERSON')")
     @Override
     public SubmissionUploadRest findOne(String submitName) {
         UploadConfiguration config = uploadConfigurationService.getMap().get(submitName);
@@ -73,7 +74,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
         return null;
     }
 
-    //TODO @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('EPERSON')")
     @Override
     public Page<SubmissionUploadRest> findAll(Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();

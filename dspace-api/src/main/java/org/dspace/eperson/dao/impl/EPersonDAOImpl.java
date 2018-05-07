@@ -164,7 +164,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
             addMetadataValueWhereQuery(queryBuilder, queryFields, "like",
                                        EPerson.class.getSimpleName().toLowerCase() + ".email like :queryParam");
         }
-        if (!CollectionUtils.isEmpty(sortFields)) {
+        if (!CollectionUtils.isEmpty(sortFields) || StringUtils.isNotBlank(sortField)) {
             addMetadataSortQuery(queryBuilder, sortFields, Collections.singletonList(sortField));
         }
 

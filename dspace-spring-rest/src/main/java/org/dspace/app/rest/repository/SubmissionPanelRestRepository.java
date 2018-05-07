@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,7 +42,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
         submissionConfigReader = new SubmissionConfigReader();
     }
 
-    //TODO @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('EPERSON')")
     @Override
     public SubmissionSectionRest findOne(String id) {
         try {
@@ -53,7 +54,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
         }
     }
 
-    //TODO @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('EPERSON')")
     @Override
     public Page<SubmissionSectionRest> findAll(Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();

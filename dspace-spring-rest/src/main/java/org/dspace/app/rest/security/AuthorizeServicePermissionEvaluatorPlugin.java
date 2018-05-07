@@ -28,6 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+/**
+ * DSpaceObjectPermissionEvaluatorPlugin will check persmissions based on the DSpace {@link AuthorizeService}.
+ * This service will validate if the authenticated user is allowed to perform an action on the given DSpace Object
+ * based on the resource policies attached to that DSpace object.
+ */
 @Component
 public class AuthorizeServicePermissionEvaluatorPlugin extends DSpaceObjectPermissionEvaluatorPlugin {
 
@@ -42,7 +47,17 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends DSpaceObjectPermi
     @Autowired
     private EPersonService ePersonService;
 
-
+    /**
+     * Alternative method for evaluating a permission where only the identifier of the
+     * target object is available, rather than the target instance itself.
+     *
+     * @param authentication represents the user in question. Should not be null.
+     * @param targetId the UUID for the DSpace object
+     * @param targetType represents the DSpace object type of the target object. Not null.
+     * @param permission a representation of the permission object as supplied by the
+     * expression system. This corresponds to the DSpace action. Not null.
+     * @return true if the permission is granted by one of the plugins, false otherwise
+     */
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
                                  Object permission) {
         Request request = requestService.getCurrentRequest();
@@ -54,7 +69,7 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends DSpaceObjectPermi
             UUID dsoId = UUID.fromString(targetId.toString());
             DSpaceObjectService<DSpaceObject> dSpaceObjectService =
                     ContentServiceFactory.getInstance()
-                                         .getDSpaceObjectService(Constants.getTypeID(targetType.toString()));
+                                         .getDSpaceObjectService(Constants.getTypeID(targetType));
             DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
 
             //If the dso is null then we give permission so we can throw another status code instead

@@ -29,7 +29,7 @@ public class EPersonMatcher {
             hasJsonPath("$.type", is("eperson")),
             hasJsonPath("$.canLogIn", not(empty())),
             hasJsonPath("$._links.self.href", containsString("/api/eperson/epersons/" + ePerson.getID().toString())),
-            hasJsonPath("$.metadata", Matchers.containsInAnyOrder(
+            hasJsonPath("$.metadata", Matchers.hasItems(
                 EPersonMetadataMatcher.matchFirstName(ePerson.getFirstName()),
                 EPersonMetadataMatcher.matchLastName(ePerson.getLastName())
             ))
@@ -42,5 +42,11 @@ public class EPersonMatcher {
             hasJsonPath("$.type", is("eperson")),
             hasJsonPath("$.email", is(email))
             );
+    }
+
+    public static Matcher<? super Object> matchDefaultTestEPerson() {
+        return allOf(
+                hasJsonPath("$.type", is("eperson"))
+        );
     }
 }
