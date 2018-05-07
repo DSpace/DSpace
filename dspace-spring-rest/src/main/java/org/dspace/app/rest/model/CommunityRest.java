@@ -35,16 +35,16 @@ public class CommunityRest extends DSpaceObjectRest {
         this.collections = collections;
     }
 
-    private List<CommunityRest> subCommunities;
+    private List<CommunityRest> subcommunities;
 
     @LinkRest(linkClass = CommunityRest.class)
     @JsonIgnore
-    public List<CommunityRest> getSubCommunities() {
-        return subCommunities;
+    public List<CommunityRest> getSubcommunities() {
+        return subcommunities;
     }
 
-    public void setSubCommunities(List<CommunityRest> subCommunities) {
-        this.subCommunities = subCommunities;
+    public void setSubCommunities(List<CommunityRest> subcommunities) {
+        this.subcommunities = subcommunities;
     }
 
     public BitstreamRest getLogo() {
