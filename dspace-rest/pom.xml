@@ -65,19 +65,7 @@
             <version>${jersey.version}</version>
             <exclusions>
                 <!-- Pinned to 2.5.4 below, this is because the current version number includes both 2.5.4 AND 2.5.0 jackson-annotations-->
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-jaxrs-base</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-jaxrs-json-provider</artifactId>
-                </exclusion>
-                <exclusion>
+               <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-module-jaxb-annotations</artifactId>
                 </exclusion>
