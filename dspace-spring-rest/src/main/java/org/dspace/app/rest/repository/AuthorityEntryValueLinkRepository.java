@@ -20,6 +20,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,7 +43,7 @@ public class AuthorityEntryValueLinkRepository extends AbstractDSpaceRestReposit
         return new AuthorityEntryResource(model);
     }
 
-    //TODO @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('EPERSON')")
     public AuthorityEntryRest getResource(HttpServletRequest request, String name, String relId,
                                           Pageable pageable, String projection) {
         Context context = obtainContext();

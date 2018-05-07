@@ -87,7 +87,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         } catch (SQLException se) {
             log.error("Error initializing database", se);
             fail("Error initializing database: " + se.getMessage()
-                     + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
+                         + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
         }
     }
 

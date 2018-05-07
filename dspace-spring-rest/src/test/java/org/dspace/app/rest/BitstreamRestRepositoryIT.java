@@ -467,7 +467,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(status().is(204));
 
         // Verify 404 after delete
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isNotFound());
     }
 

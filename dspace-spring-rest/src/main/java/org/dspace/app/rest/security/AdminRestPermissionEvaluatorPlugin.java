@@ -28,6 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+/**
+ * Administrators are always allowed to perform any action on any DSpace object. This plugin will check if
+ * the authenticated EPerson is an administrator of the provided target DSpace Object. If that is the case,
+ * the authenticated EPerson is allowed to perform the requested action.
+ */
 @Component
 public class AdminRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEvaluatorPlugin {
 
@@ -43,6 +48,7 @@ public class AdminRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEv
     @Autowired
     private EPersonService ePersonService;
 
+    @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
                                  Object permission) {
         Request request = requestService.getCurrentRequest();
@@ -56,8 +62,7 @@ public class AdminRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEv
                     ContentServiceFactory.getInstance()
                                          .getDSpaceObjectService(
                                                  Constants.getTypeID(
-                                                         targetType
-                                                                 .toString()));
+                                                         targetType));
             DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
 
             return authorizeService.isAdmin(context, ePerson, dSpaceObject);

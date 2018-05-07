@@ -108,8 +108,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.page.totalElements", is(3)))
         ;
 
-        getClient().perform(get("/api/eperson/eperson"))
-                .andExpect(status().isForbidden())
+        getClient().perform(get("/api/eperson/epersons"))
+                   .andExpect(status().isForbidden())
         ;
     }
 
@@ -144,20 +144,20 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findAllPaginationTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson ePerson = EPersonBuilder.createEPerson(context)
+        EPerson testEPerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
 
         String authToken = getAuthToken(admin.getEmail(), password);
         // using size = 2 the first page will contains our test user and admin
-        getClient(authToken).perform(get("/api/eperson/eperson")
+        getClient(authToken).perform(get("/api/eperson/epersons")
                                 .param("size", "2"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                           EPersonMatcher.matchDefaultTestEPerson(),
-                           EPersonMatcher.matchDefaultTestEPerson()
+                           EPersonMatcher.matchEPersonEntry(admin),
+                           EPersonMatcher.matchEPersonEntry(testEPerson)
                    )))
                    .andExpect(jsonPath("$._embedded.epersons", Matchers.not(
                        Matchers.contains(
@@ -169,20 +169,21 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
 
         // using size = 2 the first page will contains our test user and admin
-        getClient(authToken).perform(get("/api/eperson/eperson")
+        getClient(authToken).perform(get("/api/eperson/epersons")
                                 .param("size", "2")
                                 .param("page", "1"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
-                       EPersonMatcher.matchEPersonEntry(admin)
+                       EPersonMatcher.matchEPersonEntry(eperson)
                    )))
+                   .andExpect(jsonPath("$._embedded.epersons", Matchers.hasSize(1)))
                    .andExpect(jsonPath("$.page.size", is(2)))
                    .andExpect(jsonPath("$.page.totalElements", is(3)))
         ;
 
         getClient().perform(get("/api/eperson/epersons"))
-                .andExpect(status().isForbidden())
+                   .andExpect(status().isForbidden())
         ;
     }
 
@@ -250,7 +251,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(epersonToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
-                .andExpect(status().isForbidden());
+                               .andExpect(status().isForbidden());
 
 
         getClient(epersonToken).perform(get("/api/eperson/epersons/" + eperson.getID()))
@@ -268,12 +269,12 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findOneTestWrongUUID() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson ePerson = EPersonBuilder.createEPerson(context)
+        EPerson testEPerson1 = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
 
-        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+        EPerson testEPerson2 = EPersonBuilder.createEPerson(context)
                                          .withNameInMetadata("Jane", "Smith")
                                          .withEmail("janesmith@fake-email.com")
                                          .build();

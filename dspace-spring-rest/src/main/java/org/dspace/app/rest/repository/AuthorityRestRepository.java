@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,7 +37,7 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
     @Autowired
     private AuthorityUtils authorityUtils;
 
-    //TODO @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('EPERSON')")
     @Override
     public AuthorityRest findOne(String name) {
         ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(name);
@@ -44,7 +45,7 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
         return result;
     }
 
-    //TODO @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('EPERSON')")
     @Override
     public Page<AuthorityRest> findAll(Pageable pageable) {
         Set<String> authoritiesName = cas.getChoiceAuthoritiesNames();

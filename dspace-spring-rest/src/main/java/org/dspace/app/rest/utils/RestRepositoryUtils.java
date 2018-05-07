@@ -61,7 +61,9 @@ public class RestRepositoryUtils {
      */
     public boolean haveSearchMethods(DSpaceRestRepository repository) {
         for (Method method : repository.getClass().getMethods()) {
-            SearchRestMethod ann = method.getAnnotation(SearchRestMethod.class);
+//            SearchRestMethod ann = method.getAnnotation(SearchRestMethod.class);
+            SearchRestMethod ann =
+                    AnnotationUtils.findAnnotation(method, SearchRestMethod.class);
             if (ann != null) {
                 return true;
             }
@@ -99,7 +101,8 @@ public class RestRepositoryUtils {
         Method searchMethod = null;
         Method[] methods = org.springframework.util.ClassUtils.getUserClass(repository.getClass()).getMethods();
         for (Method method : methods) {
-            SearchRestMethod ann = AnnotationUtils.findAnnotation(method, SearchRestMethod.class);
+            SearchRestMethod ann =
+                    AnnotationUtils.findAnnotation(method, SearchRestMethod.class);
             if (ann != null) {
                 String name = ann.name();
                 if (name.isEmpty()) {

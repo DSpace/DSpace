@@ -31,8 +31,16 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllTest() throws Exception {
-        //When we call the root endpoint
+
         getClient().perform(get("/api/eperson/groups"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isForbidden());
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/eperson/groups"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -48,8 +56,16 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllPaginationTest() throws Exception {
-        context.turnOffAuthorisationSystem();
+
         getClient().perform(get("/api/eperson/groups"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isForbidden());
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/eperson/groups"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))

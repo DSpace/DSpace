@@ -56,18 +56,18 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
     }
 
     @Override
-	@PreAuthorize("hasPermission(#id, 'COLLECTION', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'COLLECTION', 'READ')")
     public CollectionRest findOne(UUID id) {
-		Collection collection = null;
-		try {
-			collection = cs.find(obtainContext(), id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (collection == null) {
-			return null;
-		}
-		return converter.fromModel(collection);
+        Collection collection = null;
+        try {
+            collection = cs.find(obtainContext(), id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (collection == null) {
+            return null;
+        }
+        return converter.fromModel(collection);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
             if (com == null) {
                 throw new ResourceNotFoundException(
                         CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
-                        + " not found");
+                                + " not found");
             }
             it = cs.findAuthorized(context, com, Constants.ADD);
             for (Collection c : it) {
