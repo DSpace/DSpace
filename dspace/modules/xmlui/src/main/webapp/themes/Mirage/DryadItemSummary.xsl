@@ -1422,7 +1422,19 @@
                     <xsl:when test="$article_id">
                         <xsl:value-of select="$citation"/>
                         <xsl:text> </xsl:text>
-                        <xsl:value-of select="$article_id"/>
+                        <xsl:choose>
+                        <xsl:when test="contains($article_id, 'http')">
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:value-of select="$article_id"/>
+                                </xsl:attribute>
+                                <xsl:value-of select="$article_id"/>
+                            </a>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="$article_id"/>
+                        </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:when>
                     <xsl:when
                             test="$article_doi and not(contains($citation, $article_doi))">
