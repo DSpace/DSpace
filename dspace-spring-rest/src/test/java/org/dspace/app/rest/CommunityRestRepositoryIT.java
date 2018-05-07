@@ -190,6 +190,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/logo"))
                    .andExpect(status().isOk());
 
+        //Main community has no collections, therefore contentType is not set
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/collections"))
                    .andExpect(status().isOk());
 
@@ -197,12 +198,12 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType));
 
+        //child1 subcommunity has no subcommunities, therefore contentType is not set
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/subcommunities"))
                    .andExpect(status().isOk());
 
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/subcommunities"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType));
+                   .andExpect(status().isOk());
     }
 
 
