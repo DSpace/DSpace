@@ -178,6 +178,9 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                        .containsString("/api/core/communities/" + parentCommunity.getID().toString() + "/logo")))
                    .andExpect(jsonPath("$._links.collections.href", Matchers
                        .containsString("/api/core/communities/" + parentCommunity.getID().toString() + "/collections")))
+                   .andExpect(jsonPath("$._links.subcommunities.href", Matchers
+                        .containsString("/api/core/communities/" + parentCommunity.getID().toString() +
+                                "/subcommunities")))
         ;
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/logo"))
@@ -191,6 +194,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk());
 
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/collections"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType));
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/subcommunities"))
+                   .andExpect(status().isOk());
+
+        getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/subcommunities"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType));
     }
