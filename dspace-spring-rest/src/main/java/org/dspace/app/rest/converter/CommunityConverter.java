@@ -14,6 +14,7 @@ import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,9 @@ public class CommunityConverter
 
     @Autowired
     private CollectionConverter collectionConverter;
+
+    @Autowired
+    private CommunityConverter communityConverter;
 
     @Override
     public org.dspace.content.Community toModel(org.dspace.app.rest.model.CommunityRest obj) {
@@ -52,6 +56,15 @@ public class CommunityConverter
                 collectionsRest.add(colrest);
             }
             com.setCollections(collectionsRest);
+        }
+        List<Community> subCommunities = obj.getSubcommunities();
+        if (subCommunities != null) {
+            List<CommunityRest> communityRest = new ArrayList<CommunityRest>();
+            for (Community scom : subCommunities) {
+                CommunityRest scomrest = communityConverter.fromModel(scom);
+                communityRest.add(scomrest);
+            }
+            com.setSubCommunities(communityRest);
         }
         return com;
     }
