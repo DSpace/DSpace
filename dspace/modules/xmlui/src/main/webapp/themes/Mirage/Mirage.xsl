@@ -529,19 +529,6 @@
       </div>
     </xsl:template>
 
-    <xsl:template match="dri:options/dri:list[@n='DryadMail']" priority="3">
-        <!-- START MAILING LIST-->
-        <div class="home-col-2">
-            <h1 class="ds-div-head">Dryad mailing list</h1>
-            <div id="file_news_div_mailing_list" class="ds-static-div primary">
-                <p class="ds-paragraph">
-                    <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
-
-                </p>
-            </div>
-        </div>
-    </xsl:template>
-
     <xsl:variable name="meta" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata"/>
     <xsl:variable name="pageName" select="$meta[@element='request'][@qualifier='URI']"/>
     <!--xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/-->
