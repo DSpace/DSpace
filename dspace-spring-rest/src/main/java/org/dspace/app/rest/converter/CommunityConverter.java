@@ -46,23 +46,25 @@ public class CommunityConverter
             com.setLogo(bitstreamConverter.convert(logo));
         }
         List<Collection> collections = obj.getCollections();
+        List<CollectionRest> collectionsRest = new ArrayList<CollectionRest>();
         if (collections != null) {
-            List<CollectionRest> collectionsRest = new ArrayList<CollectionRest>();
             for (Collection col : collections) {
                 CollectionRest colrest = collectionConverter.fromModel(col);
                 collectionsRest.add(colrest);
             }
-            com.setCollections(collectionsRest);
         }
+        com.setCollections(collectionsRest);
+
         List<Community> subCommunities = obj.getSubcommunities();
+        List<CommunityRest> communityRest = new ArrayList<CommunityRest>();
         if (subCommunities != null) {
-            List<CommunityRest> communityRest = new ArrayList<CommunityRest>();
             for (Community scom : subCommunities) {
                 CommunityRest scomrest = this.fromModel(scom);
                 communityRest.add(scomrest);
             }
-            com.setSubCommunities(communityRest);
         }
+        com.setSubCommunities(communityRest);
+
         return com;
     }
 
