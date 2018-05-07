@@ -33,9 +33,6 @@ public class CommunityConverter
     @Autowired
     private CollectionConverter collectionConverter;
 
-    @Autowired
-    private CommunityConverter communityConverter;
-
     @Override
     public org.dspace.content.Community toModel(org.dspace.app.rest.model.CommunityRest obj) {
         return (org.dspace.content.Community) super.toModel(obj);
@@ -61,7 +58,7 @@ public class CommunityConverter
         if (subCommunities != null) {
             List<CommunityRest> communityRest = new ArrayList<CommunityRest>();
             for (Community scom : subCommunities) {
-                CommunityRest scomrest = communityConverter.fromModel(scom);
+                CommunityRest scomrest = this.fromModel(scom);
                 communityRest.add(scomrest);
             }
             com.setSubCommunities(communityRest);
