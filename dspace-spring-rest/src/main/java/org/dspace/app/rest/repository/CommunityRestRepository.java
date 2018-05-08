@@ -96,6 +96,10 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     // with pagination and authorization check
     @SearchRestMethod(name = "subCommunities")
     public Page<CommunityRest> findSubCommunities(@Param(value = "parent") UUID parentCommunity, Pageable pageable) {
+        if (parentCommunity == null) {
+            throw new IllegalArgumentException("Missing parameter 'parent'.  "
+                    + "This parameter should contain the UUID of a parent community");
+        }
         Context context = obtainContext();
         List<Community> subCommunities = new ArrayList<Community>();
         try {
