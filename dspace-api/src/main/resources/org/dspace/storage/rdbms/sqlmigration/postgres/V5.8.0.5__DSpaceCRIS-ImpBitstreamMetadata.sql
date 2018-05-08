@@ -29,7 +29,7 @@ CREATE TABLE imp_bitstream_metadatavalue
 );
 
 CREATE INDEX imp_bitstream_mv_idx_impid  ON imp_bitstream_metadatavalue(imp_bitstream_id);
- CREATE SEQUENCE imp_bitstream_metadatavlue_seq
+ CREATE SEQUENCE imp_bitstream_metadatavalue_seq
   INCREMENT 1
   MINVALUE 1
   MAXVALUE 9223372036854775807
