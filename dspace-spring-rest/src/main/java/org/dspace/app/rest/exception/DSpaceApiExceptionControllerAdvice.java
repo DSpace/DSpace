@@ -50,6 +50,16 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected void IllegalArgumentException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
+
+        //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
+        sendErrorResponse(request, response, ex,
+                          "Illegal Argument Exception.",
+                          422);
+    }
+
     private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,
                                    final Exception ex, final String message, final int statusCode) throws IOException {
         //Make sure Spring picks up this exception
