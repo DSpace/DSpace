@@ -1810,10 +1810,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
 
             }
-            else if(solrParameter.getValue() instanceof String) {postParameters.add(new BasicNameValuePair(solrParameter.getKey(), solrParameter.getValue().toString()));
+            else if(solrParameter.getValue() instanceof String) {
+                postParameters.add(new BasicNameValuePair(solrParameter.getKey(), solrParameter.getValue().toString()));
             }
             else {
-                // Is this a problem?
+                log.warn("Search parameters contain non-string value: " + solrParameter.getValue().toString());
             }
         }
 
