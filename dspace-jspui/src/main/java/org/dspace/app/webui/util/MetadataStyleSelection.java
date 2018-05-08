@@ -53,7 +53,7 @@ public class MetadataStyleSelection extends AKeyBasedStyleSelection
         
        
         // Specific style specified. Check style exists
-        if (isConfigurationDefinedForStyle(context, styleName, req))
+        if (!isConfigurationDefinedForStyle(context, styleName, req))
         {
             log.warn("metadata '" + metadata + "' specify undefined item display style '"
                     + styleName + "'.  Using default");
