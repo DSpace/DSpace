@@ -55,8 +55,9 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         throws IOException {
 
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
-        sendErrorResponse(request, response, ex,
-                          "Illegal Argument Exception.",
+        //Since this is a handled exception case, the stack trace will not be returned.
+        sendErrorResponse(request, response, null,
+                          String.format("Illegal argument for operation: %s", ex.getMessage()),
                           422);
     }
 
