@@ -446,22 +446,35 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public void removeSubcommunity(Context context, Community parentCommunity, Community childCommunity) throws SQLException, AuthorizeException, IOException {
-                // Check authorisation
+        removeSubcommunity(context, parentCommunity, childCommunity, false);
+    }
+
+    @Override
+    public void removeSubcommunity(Context context, Community parentCommunity, Community childCommunity, boolean mappingOnly)
+            throws SQLException, AuthorizeException, IOException {
+        // Check authorisation
         authorizeService.authorizeAction(context, parentCommunity, Constants.REMOVE);
 
-        ArrayList<String> removedIdentifiers = getIdentifiers(context, childCommunity);
+        ArrayList<String> removedIdentifiers = null;
         String removedHandle = childCommunity.getHandle();
         UUID removedId = childCommunity.getID();
-
-        rawDelete(context, childCommunity);
-
+        if (!mappingOnly) {
+            removedIdentifiers = getIdentifiers(context, childCommunity);
+            rawDelete(context, childCommunity);
+        }
+        
         childCommunity.removeParentCommunity(parentCommunity);
         parentCommunity.removeSubCommunity(childCommunity);
 
-        log.info(LogManager.getHeader(context, "remove_subcommunity",
-                "parent_comm_id=" + parentCommunity.getID() + ",child_comm_id=" + childCommunity.getID()));
+        log.info(LogManager.getHeader(context, "remove_subcommunity" + (mappingOnly ? " mapping" : "cascade"),"parent_comm_id=" + parentCommunity.getID() + ",child_comm_id=" + childCommunity.getID()));
 
-        context.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, parentCommunity.getID(), Constants.COMMUNITY, removedId, removedHandle, removedIdentifiers));
+        if (!mappingOnly) {
+            context.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, parentCommunity.getID(), Constants.COMMUNITY, removedId, removedHandle, removedIdentifiers));
+        }
+        else {
+            context.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, parentCommunity.getID(), Constants.COMMUNITY, removedId, removedHandle));          
+        }
+                
     }
 
     @Override
