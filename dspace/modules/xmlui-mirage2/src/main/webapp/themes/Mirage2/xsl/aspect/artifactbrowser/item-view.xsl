@@ -132,6 +132,10 @@
                     <xsl:call-template name="itemSummaryView-DIM-abstract"/>
                     <xsl:call-template name="itemSummaryView-DIM-URI"/>
                     <xsl:call-template name="itemSummaryView-collections"/>
+                    <!-- Begin UMD Customization -->
+                    <!-- Show additional metadata fields in the summary view -->
+                    <xsl:call-template name="itemSummaryView-DIM-rights"/>
+                    <!-- End UMD Customization -->
                 </div>
             </div>
         </div>
@@ -848,6 +852,20 @@
                         </xsl:for-each>
                     </xsl:when>
                 </xsl:choose>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
+    <!-- Template to display rights metadata -->
+    <xsl:template name="itemSummaryView-DIM-rights">
+        <xsl:if test="dim:field[@element='rights' and descendant::text()]">
+            <div class="simple-item-view-rights item-page-field-wrapper table">
+                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-rights</i18n:text></h5>
+                <xsl:for-each select="dim:field[@element='rights']">
+                    <span>
+                        <xsl:copy-of select="node()"/>
+                    </span>
+                </xsl:for-each>
             </div>
         </xsl:if>
     </xsl:template>
