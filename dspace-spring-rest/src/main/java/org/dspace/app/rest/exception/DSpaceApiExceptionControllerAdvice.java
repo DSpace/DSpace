@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.authorize.AuthorizeException;
+import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -53,6 +54,18 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     @ExceptionHandler(MissingParameterException.class)
     protected void MissingParameterException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
+
+        //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
+        //Using the value from HttpStatus.
+        //Since this is a handled exception case, the stack trace will not be returned.
+        sendErrorResponse(request, response, null,
+                          ex.getMessage(),
+                          HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
+    @ExceptionHandler(QueryMethodParameterConversionException.class)
+    protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
 
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
