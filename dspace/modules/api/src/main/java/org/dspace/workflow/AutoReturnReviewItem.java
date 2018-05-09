@@ -2,6 +2,7 @@ package org.dspace.workflow;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+import org.datadryad.rest.models.Manuscript;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -126,7 +127,10 @@ public class AutoReturnReviewItem {
                     // make sure that this item is updated according to the ApproveReject mechanism:
                     if (!testMode) {
                         log.info("check to see if item " + item.getID() + " is approved or rejected");
-                        ApproveRejectReviewItem.lookupReviewItem(wfi);
+                        Manuscript databaseManuscript = ApproveRejectReviewItem.getStoredManuscriptForWorkflowItem(context, wfi);
+                        if (databaseManuscript != null && databaseManuscript.isAccepted()) {
+                            ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfi, databaseManuscript);
+                        }
                     }
                     if (itemIsOldItemInReview(item)) {
                         if (testMode) {

@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
 import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
@@ -19,7 +18,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.actions.WorkflowActionConfig;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -124,38 +122,26 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    static void lookupReviewItem(WorkflowItem workflowItem) {
+    public static Manuscript getStoredManuscriptForWorkflowItem(Context c, WorkflowItem workflowItem) throws ApproveRejectReviewItemException {
         Item item = workflowItem.getItem();
         Manuscript manuscript = new Manuscript(item);
-        ManuscriptDatabaseStorageImpl manuscriptDatabaseStorage = new ManuscriptDatabaseStorageImpl();
-        Context c = null;
         try {
-            c = new Context();
             c.turnOffAuthorisationSystem();
-            List<Manuscript> storedManuscripts = manuscriptDatabaseStorage.getManuscriptsMatchingManuscript(manuscript);
+            List<Manuscript> storedManuscripts = JournalUtils.getStoredManuscriptsMatchingManuscript(manuscript);
             if (storedManuscripts != null && storedManuscripts.size() > 0) {
                 Manuscript storedManuscript = storedManuscripts.get(0);
                 log.info("found stored manuscript " + storedManuscript.getManuscriptId() + " with status " + storedManuscript.getLiteralStatus());
                 if (!JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item, storedManuscript)) {
-                    processWorkflowItemUsingManuscript(c, workflowItem, storedManuscript);
+                    return storedManuscript;
                 } else {
                     log.info("stored manuscript match was a known former manuscript number");
                 }
             }
             c.restoreAuthSystemState();
         } catch (Exception e) {
-            log.error("couldn't process review workflowitem " + workflowItem.getID() + ": " + e.getMessage());
-        } finally {
-            if(c != null) {
-                try {
-                    c.complete();
-                } catch (SQLException ex) {
-                    // Swallow it
-                } finally {
-                    c = null;
-                }
-            }
+            throw new ApproveRejectReviewItemException("couldn't process workflowitem " + workflowItem.getID() + ": " + e.getMessage());
         }
+        return null;
     }
 
     public static void processWorkflowItemsUsingManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
@@ -264,17 +250,7 @@ public class ApproveRejectReviewItem {
                     disassociateFromManuscript(dataPackage, manuscript);
                 }
             }
-        } catch (SQLException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (AuthorizeException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (WorkflowConfigurationException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (IOException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (MessagingException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (WorkflowException ex) {
+        } catch (Exception ex) {
             throw new ApproveRejectReviewItemException(ex);
         }
         finally {
