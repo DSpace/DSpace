@@ -16,9 +16,8 @@
 dspace.dir=/apps/drum
 dspace.hostname = localhost
 dspace.baseUrl = http://localhost:8080
-dspace.name = Digital Repository at the University of Maryland (DRUM)
 dspace.url = ${dspace.baseUrl}
-oai.url = ${dspace.baseUrl}/oai
+dspace.name = Digital Repository at the University of Maryland (DRUM)
 
 ############################
 # ASSETSTORE CONFIGURATION #
@@ -44,15 +43,11 @@ oai.solr.url=${solr.server}/drum-oai
 # DATABASE CONFIGURATION #
 ##########################
 db.url = jdbc:postgresql://localhost:5432/dspace
-db.driver = org.postgresql.Driver
-db.dialect = org.dspace.storage.rdbms.hibernate.postgres.DSpacePostgreSQL82Dialect
 db.username = dspace
 db.password = dspace
-db.schema = public
 #db.maxconnections = 512
 #db.maxwait = 5000
 #db.maxidle = 20
-
 
 #######################
 # EMAIL CONFIGURATION #
@@ -61,9 +56,10 @@ mail.server = localhost
 mail.server.port = 25
 mail.from.address = drum@drumlocal
 mail.admin = mohideen@umd.edu
-feedback.recipient = mohideen@umd.edu
 alert.recipient = mohideen@umd.edu
 registration.notify = mohideen@umd.edu
+# Feedback recipient is currently limited to only one recipient
+feedback.recipient = mohideen@umd.edu
 
 ########################
 # HANDLE CONFIGURATION #
@@ -115,12 +111,12 @@ drum.eperson.subscription.limiteperson =
 # Used by etd loader cron job
 drum.etdloader.transfermarc = false
 
-# IRUS Tracker Environment
-stats.tracker.environment = test
-stats.spider.agentregex.regexfile = ${dspace.dir}/config/COUNTER_Robots_list.txt
-
 # Environment Banner configuration
 # Leave blank on production environment
 # Valid options: local, dev, stage
 drum.environment.name = local
 drum.environment.bannerText = Local Environment
+
+# IRUS Tracker Environment
+stats.tracker.environment = test
+stats.spider.agentregex.regexfile = ${dspace.dir}/config/COUNTER_Robots_list.txt
