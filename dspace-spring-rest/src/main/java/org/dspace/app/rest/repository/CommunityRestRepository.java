@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
+import org.dspace.app.rest.exception.MissingParameterException;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
 import org.dspace.content.Community;
@@ -95,9 +96,10 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     // TODO: add method in dspace api to support direct query for subcommunities
     // with pagination and authorization check
     @SearchRestMethod(name = "subCommunities")
-    public Page<CommunityRest> findSubCommunities(@Param(value = "parent") UUID parentCommunity, Pageable pageable) {
+    public Page<CommunityRest> findSubCommunities(@Param(value = "parent") UUID parentCommunity, Pageable pageable)
+            throws MissingParameterException {
         if (parentCommunity == null) {
-            throw new IllegalArgumentException("Missing parameter 'parent'.  "
+            throw new MissingParameterException("Missing parameter 'parent'.  "
                     + "This parameter should contain the UUID of a parent community");
         }
         Context context = obtainContext();
