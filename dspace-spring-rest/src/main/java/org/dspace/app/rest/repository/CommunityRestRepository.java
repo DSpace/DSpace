@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -97,7 +98,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     // with pagination and authorization check
     @SearchRestMethod(name = "subCommunities")
     public Page<CommunityRest> findSubCommunities(@Param(value = "parent") UUID parentCommunity, Pageable pageable)
-            throws MissingParameterException {
+            throws MissingParameterException, QueryMethodParameterConversionException {
         if (parentCommunity == null) {
             throw new MissingParameterException("Missing parameter 'parent'.  "
                     + "This parameter should contain the UUID of a parent community");

@@ -10,7 +10,7 @@ package org.dspace.app.rest.exception;
 /**
  * This class provides an exception to be used when the SearchFilter given is invalid
  */
-public class MissingParameterException extends InvalidRequestException {
+public class MissingParameterException extends IllegalArgumentException {
     public MissingParameterException(String message, Throwable cause) {
         super(message, cause);
     }
