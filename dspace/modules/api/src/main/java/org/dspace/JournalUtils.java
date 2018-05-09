@@ -637,6 +637,12 @@ public class JournalUtils {
 
             // sanity check:
             if (currentMatch != null) {
+                if (currentMatch.getPublicationDate() == null) {
+                    throw new RESTModelException("CrossRef match does not have a publication date");
+                }
+                if (currentMatch.getPublicationDate() != null && currentMatch.getPublicationDate().after(new Date())) {
+                    throw new RESTModelException("CrossRef match has publication date in the future");
+                }
                 if (currentMatch.getAuthorList() == null || currentMatch.getAuthorList().size() == 0) {
                     throw new RESTModelException("CrossRef match does not have authors");
                 }
@@ -706,15 +712,14 @@ public class JournalUtils {
             }
         }
 
-        JsonNode dateNode = jsonNode.path("created");
+        JsonNode dateNode = jsonNode.path("issued");
         if (!dateNode.isMissingNode()) {
             //2016-04-11T17:53:39Z
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             try {
-                if (dateNode.path("date-time") != null) {
-                    Date date = dateFormat.parse(dateNode.path("date-time").textValue());
-                    manuscript.setPublicationDate(date);
-                }
+                JsonNode dateParts = dateNode.path("date-parts").get(0);
+                Date date = dateFormat.parse(dateParts.get(0).intValue() + "-" + dateParts.get(1).intValue() + "-" + dateParts.get(2).intValue());
+                manuscript.setPublicationDate(date);
             } catch (ParseException e) {
                 log.error("couldn't parse date: " + dateNode.path("date-time").textValue());
             }
