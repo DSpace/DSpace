@@ -22,7 +22,6 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
