@@ -193,17 +193,20 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         //Main community has no collections, therefore contentType is not set
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/collections"))
                    .andExpect(status().isOk());
+                   //.andExpect(status().isNoContent()); //TODO After DS-3808 is implemented
 
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/collections"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType));
 
-        //child1 subcommunity has no subcommunities, therefore contentType is not set
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/subcommunities"))
-                   .andExpect(status().isOk());
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType));
 
+        //child1 subcommunity has no subcommunities, therefore contentType is not set
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/subcommunities"))
                    .andExpect(status().isOk());
+                   .andExpect(status().isNoContent()); //TODO After DS-3808 is implemented
     }
 
 
