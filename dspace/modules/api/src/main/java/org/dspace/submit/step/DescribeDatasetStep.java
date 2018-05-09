@@ -7,7 +7,6 @@ import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Context;
-import org.dspace.submit.step.DescribeStep;
 import org.dspace.usagelogging.EventLogger;
 import org.dspace.workflow.DryadWorkflowUtils;
 
@@ -17,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.String;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -28,6 +28,7 @@ import java.util.LinkedList;
  * The processing of the describe page for a data file
  */
 public class DescribeDatasetStep extends DescribeStep {
+    private final static String PROVENANCE = "dc.description.provenance";
     public int doProcessing(Context context, HttpServletRequest request, HttpServletResponse response, SubmissionInfo subInfo) throws ServletException, IOException, SQLException, AuthorizeException {
         // check what submit button was pressed in User Interface
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
@@ -254,6 +255,9 @@ public class DescribeDatasetStep extends DescribeStep {
                 	item.clearMetadata(MetadataSchema.DC_SCHEMA, "rights", "uri", Item.ANY); // remove any existing
                     item.addMetadata(MetadataSchema.DC_SCHEMA, "rights", "uri", null, "http://creativecommons.org/publicdomain/zero/1.0/");
                     datasetFileSuccess = processUploadFile(context, request, subInfo, "dataset-file", false);
+                    if (datasetFileSuccess == FILE_UPLOAD_OK) {
+                        item.addMetadata(PROVENANCE, "en", "File was uploaded at " + new Date().toString(), null, -1);
+                    }
                 }
                 else
                 if("identifier".equals(request.getParameter("datafile_type"))) {
