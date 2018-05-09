@@ -51,15 +51,15 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    protected void IllegalArgumentException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+    @ExceptionHandler(MissingParameterException.class)
+    protected void MissingParameterException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
 
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
         //Using the value from HttpStatus.
         //Since this is a handled exception case, the stack trace will not be returned.
         sendErrorResponse(request, response, null,
-                          String.format("Illegal argument for operation: %s", ex.getMessage()),
+                          ex.getMessage(),
                           HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
