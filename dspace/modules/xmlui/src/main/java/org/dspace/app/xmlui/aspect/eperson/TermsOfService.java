@@ -39,9 +39,6 @@ public class TermsOfService extends AbstractDSpaceTransformer
     private static final Message T_head =
             message("xmlui.EPerson.TermsOfService.head");
 
-    private static final Message T_telephone =
-            message("xmlui.EPerson.TermsOfService.telephone");
-
     private static final Message T_terms =
             message("xmlui.EPerson.TermsOfService.terms");
 
@@ -61,8 +58,7 @@ public class TermsOfService extends AbstractDSpaceTransformer
             // Log that we are viewing a profile
             log.info(LogManager.getHeader(context, "terms_and_condition", ""));
 
-            if((eperson.getPhone() == null || eperson.getPhone().trim().length() == 0) ||
-                    !eperson.getTerms())
+            if(!eperson.getTerms())
             {
                 //needed for modal
                 body.addDivision("background");
