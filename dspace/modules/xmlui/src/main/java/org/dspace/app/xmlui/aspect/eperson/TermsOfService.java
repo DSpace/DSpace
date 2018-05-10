@@ -73,9 +73,6 @@ public class TermsOfService extends AbstractDSpaceTransformer
 
                 profile.setHead(T_head);
 
-                if((eperson.getPhone() == null || eperson.getPhone().trim().length() == 0))
-                    profile.addPara(T_telephone);
-
                 if(!eperson.getTerms())
                     profile.addPara(T_terms);
 
