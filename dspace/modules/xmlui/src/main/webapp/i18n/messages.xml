@@ -2369,9 +2369,10 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-abstract">Abstract</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-description">Description</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-uri">URI</message>
-  <message key="xmlui.dri2xhtml.METS-1.0.item-citation">Citation</message>
-  <message key="xmlui.dri2xhtml.METS-1.0.item-advisor">Advisor</message>
-  <message key="xmlui.dri2xhtml.METS-1.0.item-doi">DRUM DOI</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-rights">Rights</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-citation">Citation</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-advisor">Advisor</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-doi">DRUM DOI</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-date">Date</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Publisher</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
