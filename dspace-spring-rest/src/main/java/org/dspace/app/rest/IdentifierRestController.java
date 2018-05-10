@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class IdentifierRestController implements InitializingBean {
 
     private static final Logger log =
-	Logger.getLogger(IdentifierRestController.class);
+        Logger.getLogger(IdentifierRestController.class);
 
     @Autowired
     DiscoverableEndpointsService discoverableEndpointsService;
@@ -58,49 +58,45 @@ public class IdentifierRestController implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-	List<Link> links = new ArrayList<Link>();
+        List<Link> links = new ArrayList<Link>();
 
         Link l = new Link("/api", "pid");
-	links.add ( l );
+        links.add(l);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{prefix}/{suffix}")
     @SuppressWarnings("unchecked")
-    public void getDSObyIdentifier(@PathVariable String prefix, 
-				   @PathVariable String suffix,
-				   HttpServletResponse response,
-				   HttpServletRequest request)
-	throws IOException, SQLException {
+    public void getDSObyIdentifier(@PathVariable String prefix,
+                                   @PathVariable String suffix,
+                                   HttpServletResponse response,
+                                   HttpServletRequest request)
+        throws IOException, SQLException {
 
-	DSpaceObject dso = null;
-	Context context = ContextUtil.obtainContext(request);
-	IdentifierService identifierService = IdentifierServiceFactory
-	    .getInstance().getIdentifierService();
+        DSpaceObject dso = null;
+        Context context = ContextUtil.obtainContext(request);
+        IdentifierService identifierService = IdentifierServiceFactory
+            .getInstance().getIdentifierService();
 
-	try {
-	    dso = identifierService.resolve(context, prefix + "/" + suffix);
-	    if ( dso != null ) {
-		DSpaceObjectRest dsor = convertDSpaceObject(dso);
+        try {
+            dso = identifierService.resolve(context, prefix + "/" + suffix);
+            if (dso != null) {
+                DSpaceObjectRest dsor = convertDSpaceObject(dso);
                 URI link = linkTo(dsor.getController(), dsor.getCategory(),
-				     English.plural(dsor.getType()))
-		    .slash(dsor.getId()).toUri();
-		response.setStatus ( HttpServletResponse.SC_FOUND );
-		response.sendRedirect ( link.toString() );
-	    }
-	    else {
-		response.setStatus ( HttpServletResponse.SC_NOT_FOUND );
-	    }
-	}
-	catch (IdentifierNotFoundException e ) {
-	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-	}
-	catch (IdentifierNotResolvableException e) {
-	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-	}
-	finally {
-	    log.info("DBG " + "aborting context");
-	    context.abort();
-	}
+                    English.plural(dsor.getType()))
+                    .slash(dsor.getId()).toUri();
+                response.setStatus(HttpServletResponse.SC_FOUND);
+                response.sendRedirect(link.toString());
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } catch (IdentifierNotFoundException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } catch (IdentifierNotResolvableException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } finally {
+            log.info("DBG " + "aborting context");
+            context.abort();
+        }
     }
 
     /**
