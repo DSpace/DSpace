@@ -7,22 +7,34 @@
  */
 package org.dspace.app.rest;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+
+import java.net.URI;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.SQLException;
-import org.dspace.app.rest.link.HalLinkService;
-import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.atteo.evo.inflector.English;
+
+import org.dspace.app.rest.converter.DSpaceObjectConverter;
+import org.dspace.app.rest.link.HalLinkService;
+import org.dspace.app.rest.model.DSpaceObjectRest;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.factory.HandleServiceFactory;
-import org.dspace.handle.service.HandleService;
-import org.apache.log4j.Logger;
-import org.springframework.hateoas.Link;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.identifier.service.IdentifierService;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,7 +44,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/pid")
 public class IdentifierRestController implements InitializingBean {
 
-    private static final Logger log = Logger.getLogger(IdentifierRestController.class);
+    private static final Logger log =
+	Logger.getLogger(IdentifierRestController.class);
 
     @Autowired
     DiscoverableEndpointsService discoverableEndpointsService;
@@ -40,66 +53,65 @@ public class IdentifierRestController implements InitializingBean {
     @Autowired
     private HalLinkService halLinkService;
 
+    @Autowired
+    private List<DSpaceObjectConverter> converters;
+
     @Override
     public void afterPropertiesSet() throws Exception {
 	List<Link> links = new ArrayList<Link>();
 
-        Link l = new Link("/api/pid/handles", "handles");
+        Link l = new Link("/api", "pid");
 	links.add ( l );
     }
 
-    /**
-     *
-     */
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.HEAD}, value = "/handles/{prefix}/{suffix}")
+    @RequestMapping(method = RequestMethod.GET, value = "/{prefix}/{suffix}")
     @SuppressWarnings("unchecked")
-    public void getDSObyHandle (@PathVariable String prefix, 
-				@PathVariable String suffix, 
-				HttpServletResponse response, 
-				HttpServletRequest request)  throws IOException, SQLException {
+    public void getDSObyIdentifier(@PathVariable String prefix, 
+				   @PathVariable String suffix,
+				   HttpServletResponse response,
+				   HttpServletRequest request)
+	throws IOException, SQLException {
 
-	HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-	Context context = null;
 	DSpaceObject dso = null;
+	Context context = ContextUtil.obtainContext(request);
+	IdentifierService identifierService = IdentifierServiceFactory
+	    .getInstance().getIdentifierService();
+
 	try {
-	    context = new Context();
-	    dso = handleService.resolveToObject ( context, 
-						  prefix + "/" + suffix );
+	    dso = identifierService.resolve(context, prefix + "/" + suffix);
 	    if ( dso != null ) {
-		int type = dso.getType();
-		String model = getModel ( dso.getType() );
+		DSpaceObjectRest dsor = convertDSpaceObject(dso);
+                URI link = linkTo(dsor.getController(), dsor.getCategory(),
+				     English.plural(dsor.getType()))
+		    .slash(dsor.getId()).toUri();
 		response.setStatus ( HttpServletResponse.SC_FOUND );
-		response.sendRedirect ( "/spring-rest/api/core/" 
-					+ model + "/" + dso.getID() );
+		response.sendRedirect ( link.toString() );
 	    }
 	    else {
 		response.setStatus ( HttpServletResponse.SC_NOT_FOUND );
 	    }
 	}
-	catch ( SQLException e ) {
-	    log.error ( "DBG " + e.getMessage() );
+	catch (IdentifierNotFoundException e ) {
+	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	}
+	catch (IdentifierNotResolvableException e) {
+	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	}
+	finally {
+	    log.info("DBG " + "aborting context");
+	    context.abort();
 	}
     }
 
     /**
      *
      */
-    private String getModel ( int i ) {
-
-	String model = new String();
-	switch ( i ) {
-	    case 2:
-		model =  "items";
-		break;
-	    case 3:
-		model = "collections";
-		break;
-	    case 4:
-		model =  "communities";
-		break;
-	    default:
-		model =  "items";
-	}
-	return model;
+    private DSpaceObjectRest convertDSpaceObject(DSpaceObject dspaceObject) {
+        for (DSpaceObjectConverter converter : converters) {
+            if (converter.supportsModel(dspaceObject)) {
+                return converter.fromModel(dspaceObject);
+            }
+        }
+        return null;
     }
 }
