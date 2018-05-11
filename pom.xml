@@ -1267,15 +1267,19 @@
                 <artifactId>fontbox</artifactId>
                 <version>2.0.2</version>
             </dependency>
+            <!-- DSpace doesn't use bcprov or bcmail, but pdfbox will
+                 try to load them at runtime if it encounters an
+                 encrypted PDF, and throw an exception if the JARs are
+                 not available. -->
             <dependency>
 	        <groupId>org.bouncycastle</groupId>
-	        <artifactId>bcprov-jdk15</artifactId>
-	        <version>1.46</version>
+	        <artifactId>bcprov-jdk15on</artifactId>
+	        <version>1.59</version>
 	    </dependency>
 	    <dependency>
 	        <groupId>org.bouncycastle</groupId>
-	        <artifactId>bcmail-jdk15</artifactId>
-	        <version>1.46</version>
+	        <artifactId>bcmail-jdk15on</artifactId>
+	        <version>1.59</version>
 	    </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
