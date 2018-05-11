@@ -35,6 +35,9 @@ mvn install
 The `dspace-installer` directory that contains all the artifacts and the ant script to perform the deployment. The `installer-dist` maven profile creates a tar file of the installer directory which can be pushed to the UMD nexus by using the `deploy-release` or `deploy-snapshot` profile.
 
 ```
+# Switch to the dspace directory
+cd /apps/git/drum/dspace
+
 # Deploy a snapshot version to nexus
 # (use this profile if the current project version is a SNAPSHOT version)
 mvn -P installer-dist,deploy-snapshot
