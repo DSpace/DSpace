@@ -38,20 +38,17 @@ import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/pid")
 public class IdentifierRestController implements InitializingBean {
 
+    private static final String REGEX_HANDLE = "^\\d+/\\d+$";
+
     private static final Logger log =
         Logger.getLogger(IdentifierRestController.class);
-
-    @Autowired
-    DiscoverableEndpointsService discoverableEndpointsService;
-
-    @Autowired
-    private HalLinkService halLinkService;
 
     @Autowired
     private List<DSpaceObjectConverter> converters;
@@ -60,25 +57,23 @@ public class IdentifierRestController implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         List<Link> links = new ArrayList<Link>();
 
-        Link l = new Link("/api", "pid");
+        Link l = new Link("/api/pid", "pid");
         links.add(l);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{prefix}/{suffix}")
+    @RequestMapping(method = RequestMethod.GET, value = "/find", params = "id")
     @SuppressWarnings("unchecked")
-    public void getDSObyIdentifier(@PathVariable String prefix,
-                                   @PathVariable String suffix,
+    public void getDSObyIdentifier(HttpServletRequest request,
                                    HttpServletResponse response,
-                                   HttpServletRequest request)
+                                   @RequestParam("id") String id)
         throws IOException, SQLException {
 
         DSpaceObject dso = null;
         Context context = ContextUtil.obtainContext(request);
         IdentifierService identifierService = IdentifierServiceFactory
             .getInstance().getIdentifierService();
-
         try {
-            dso = identifierService.resolve(context, prefix + "/" + suffix);
+            dso = identifierService.resolve(context, id);
             if (dso != null) {
                 DSpaceObjectRest dsor = convertDSpaceObject(dso);
                 URI link = linkTo(dsor.getController(), dsor.getCategory(),
@@ -92,9 +87,8 @@ public class IdentifierRestController implements InitializingBean {
         } catch (IdentifierNotFoundException e) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (IdentifierNotResolvableException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
         } finally {
-            log.info("DBG " + "aborting context");
             context.abort();
         }
     }
