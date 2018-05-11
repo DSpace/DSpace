@@ -13,12 +13,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.converter.ItemConverter;
+import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,6 +44,10 @@ import org.springframework.stereotype.Component;
 @Component(ItemRest.CATEGORY + "." + ItemRest.NAME)
 public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
+    public static final String OPERATION_PATH_WITHDRAW = "withdraw";
+
+    private static final Logger log = Logger.getLogger(ItemRestRepository.class);
+
     @Autowired
     ItemService is;
 
@@ -47,6 +61,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
     @Override
     public ItemRest findOne(Context context, UUID id) {
+
         Item item = null;
         try {
             item = is.find(context, id);
@@ -76,6 +91,36 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         }
         Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(converter);
         return page;
+    }
+
+    @Override
+    public void patch (Context context, HttpServletRequest request, String apiCategory, String model, UUID id, Patch patch)
+            throws PatchUnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException {
+
+        List<Operation> operations = patch.getOperations();
+        for (Operation op : operations) {
+            if ("replace".equals(op.getOp())) {
+                if(OPERATION_PATH_WITHDRAW.equals(op.getPath())) {
+                    withdraw(context, id);
+                }
+            }
+        }
+        findOne(context, id);
+    }
+
+    private void withdraw(Context context, UUID id) throws PatchUnprocessableEntityException, SQLException, AuthorizeException {
+
+        try {
+            Item item = is.find(context, id);
+            if(!item.isArchived()) {
+                throw new PatchUnprocessableEntityException("Item is not archived.  Cannot be withdrawn.");
+            }
+            is.withdraw(context, item);
+        } catch (SQLException | AuthorizeException e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+
     }
 
     @Override
