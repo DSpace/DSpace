@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
 
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 
@@ -68,8 +68,8 @@ public class FlowCurationUtils
     {
         if (map.isEmpty())
         {
-            String statusCodes = ConfigurationManager.getProperty("curate", "ui.statusmessages");
-            for (String pair : statusCodes.split(","))
+            String[] statusCodes = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate.ui.statusmessages");
+            for (String pair : statusCodes)
             {
                 String[] parts = pair.split("=");
                 map.put(parts[0].trim(), parts[1].trim());
@@ -152,8 +152,8 @@ public class FlowCurationUtils
      */
     protected static String getUITaskName(String taskID)
     {       
-            String tasksString = ConfigurationManager.getProperty("curate", "ui.tasknames");
-            String[] tasks = tasksString.split(",");
+            String[] tasks = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate.ui.tasknames");
+
             for (String task : tasks)
             {
                 //retrieve keyValuePair (format [taskID]=[UI Task Name])
@@ -222,7 +222,7 @@ public class FlowCurationUtils
         
         Curator curator = FlowCurationUtils.getCurator(task);
         
-        String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+        String taskQueueName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.queuename");
         boolean status = false;
        
         if (objHandle != null)
@@ -270,8 +270,7 @@ public class FlowCurationUtils
     
     public static void setAllTasks() throws WingException, UnsupportedEncodingException
     {
-    	String csvList = ConfigurationManager.getProperty("curate", CURATE_TASK_NAMES);
-    	String[] properties = csvList.split(",");
+    	String[] properties = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate." + CURATE_TASK_NAMES);
     	for (String property : properties)
     	{
              //System.out.println("set all tasks and property = " + property + "\n");
@@ -283,12 +282,11 @@ public class FlowCurationUtils
     
     public static void setGroups() throws WingException, UnsupportedEncodingException
     {
-    	String csvList = ConfigurationManager.getProperty("curate", CURATE_GROUP_NAMES);
-        if (csvList != null)
+    	String[] properties = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate." + CURATE_GROUP_NAMES);
+        if (properties != null)
         {
-        	String[] properties = csvList.split(",");
         	for (String property : properties)
-            {
+                {
         		String[] keyValuePair = property.split("=");
         		groups.put(URLDecoder.decode(keyValuePair[0].trim(), "UTF-8"),
                           URLDecoder.decode(keyValuePair[1].trim(), "UTF-8"));
@@ -308,8 +306,7 @@ public class FlowCurationUtils
     		while (iterator.hasNext())
     		{
                 String key = iterator.next();
-                String csvList = ConfigurationManager.getProperty("curate", CURATE_GROUP_PREFIX + "." + key);
-                String[] properties  = csvList.split(",");
+                String[] properties = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate." + CURATE_GROUP_PREFIX + "." + key);
                 groupedTasks.put(URLDecoder.decode(key, "UTF-8"), properties);
             }
         }
@@ -328,7 +325,7 @@ public class FlowCurationUtils
     
     public static Select getTaskSelectOptions(Select select, String curateGroup) throws WingException
     {
-    	String key = new String();
+    	String key;
     	String[] values = null;
         Iterator<String> iterator = null;
         if (groupedTasks.isEmpty())
@@ -357,7 +354,7 @@ public class FlowCurationUtils
                     while (innerIterator.hasNext())
                     {
                     	String optionValue = innerIterator.next().trim();
-                    	String optionText  = new String("");
+                    	String optionText;
                     	// out.print("Value: " + value + ": OptionValue: " + optionValue + ". Does value.trim().equals(optionValue)? " + value.equals(opti$
                     	if (optionValue.equals(value.trim()))
                     	{	

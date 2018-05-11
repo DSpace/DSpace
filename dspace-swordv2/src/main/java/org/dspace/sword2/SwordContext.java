@@ -31,157 +31,157 @@ import org.dspace.eperson.EPerson;
  *
  * and not from any of the other context retrieval methods in this
  * class
- * 
+ *
  * @author Richard Jones
  *
  */
 public class SwordContext
 {
-	/** The primary authenticated user for the request */
-	private EPerson authenticated = null;
-	
-	/** The onBehalfOf user for the request */
-	private EPerson onBehalfOf = null;
+    /** The primary authenticated user for the request */
+    private EPerson authenticated = null;
 
-	/** The primary context, representing the on behalf of user if exists, and the authenticated user if not */
-	private Context context;
+    /** The onBehalfOf user for the request */
+    private EPerson onBehalfOf = null;
 
-	/** the context for the authenticated user, which may not, therefore, be the primary context also */
-	private Context authenticatorContext;
+    /** The primary context, representing the on behalf of user if exists, and the authenticated user if not */
+    private Context context;
 
-	/**
-	 * @return	the authenticated user
-	 */
-	public EPerson getAuthenticated() 
-	{
-		return authenticated;
-	}
+    /** the context for the authenticated user, which may not, therefore, be the primary context also */
+    private Context authenticatorContext;
 
-	/**
-	 * @param authenticated	the eperson to set
-	 */
-	public void setAuthenticated(EPerson authenticated) 
-	{
-		this.authenticated = authenticated;
-	}
+    /**
+     * @return the authenticated user
+     */
+    public EPerson getAuthenticated()
+    {
+        return authenticated;
+    }
 
-	/**
-	 * @return	the onBehalfOf user
-	 */
-	public EPerson getOnBehalfOf() 
-	{
-		return onBehalfOf;
-	}
+    /**
+     * @param authenticated    the eperson to set
+     */
+    public void setAuthenticated(EPerson authenticated)
+    {
+        this.authenticated = authenticated;
+    }
 
-	/**
-	 * @param onBehalfOf	the eperson to set
-	 */
-	public void setOnBehalfOf(EPerson onBehalfOf) 
-	{
-		this.onBehalfOf = onBehalfOf;
-	}
+    /**
+     * @return the onBehalfOf user
+     */
+    public EPerson getOnBehalfOf()
+    {
+        return onBehalfOf;
+    }
 
-	/**
-	 * Returns the most appropriate context for operations on the
-	 * database.  This is the on-behalf-of user's context if the
-	 * user exists, or the authenticated user's context otherwise.
-	 */
-	public Context getContext()
-	{
-		return context;
-	}
+    /**
+     * @param onBehalfOf    the eperson to set
+     */
+    public void setOnBehalfOf(EPerson onBehalfOf)
+    {
+        this.onBehalfOf = onBehalfOf;
+    }
 
-	public void setContext(Context context)
-	{
-		this.context = context;
-	}
+    /**
+     * Returns the most appropriate context for operations on the
+     * database.  This is the on-behalf-of user's context if the
+     * user exists, or the authenticated user's context otherwise.
+     */
+    public Context getContext()
+    {
+        return context;
+    }
 
-	/**
-	 * Get the context of the user who authenticated.  This should only be
-	 * used for authentication purposes.  If there is an on-behalf-of user,
-	 * that context should be used to write database changes.  Use:
-	 *
-	 * getContext()
-	 *
-	 * on this class instead.
-	 */
-	public Context getAuthenticatorContext()
-	{
-		return authenticatorContext;
-	}
+    public void setContext(Context context)
+    {
+        this.context = context;
+    }
 
-	public void setAuthenticatorContext(Context authenticatorContext)
-	{
-		this.authenticatorContext = authenticatorContext;
-	}
+    /**
+     * Get the context of the user who authenticated.  This should only be
+     * used for authentication purposes.  If there is an on-behalf-of user,
+     * that context should be used to write database changes.  Use:
+     *
+     * getContext()
+     *
+     * on this class instead.
+     */
+    public Context getAuthenticatorContext()
+    {
+        return authenticatorContext;
+    }
 
-	/**
-	 * Get the context of the on-behalf-of user.  This method should only
-	 * be used for authentication purposes.  In all other cases, use:
-	 *
-	 * getContext()
-	 *
-	 * on this class instead.  If there is no on-behalf-of user, this
-	 * method will return null.
-	 */
-	public Context getOnBehalfOfContext()
-	{
-		// return the obo context if this is an obo deposit, else return null
-		if (this.onBehalfOf != null)
-		{
-			return context;
-		}
-		return null;
-	}
+    public void setAuthenticatorContext(Context authenticatorContext)
+    {
+        this.authenticatorContext = authenticatorContext;
+    }
 
-	/**
-	 * Abort all of the contexts held by this class.  No changes will
-	 * be written to the database
-	 */
-	public void abort()
-	{
-		// abort both contexts
-		if (context != null && context.isValid())
-		{
-			context.abort();
-		}
+    /**
+     * Get the context of the on-behalf-of user.  This method should only
+     * be used for authentication purposes.  In all other cases, use:
+     *
+     * getContext()
+     *
+     * on this class instead.  If there is no on-behalf-of user, this
+     * method will return null.
+     */
+    public Context getOnBehalfOfContext()
+    {
+        // return the obo context if this is an obo deposit, else return null
+        if (this.onBehalfOf != null)
+        {
+            return context;
+        }
+        return null;
+    }
 
-		if (authenticatorContext != null && authenticatorContext.isValid())
-		{
-			authenticatorContext.abort();
-		}
-	}
+    /**
+     * Abort all of the contexts held by this class.  No changes will
+     * be written to the database
+     */
+    public void abort()
+    {
+        // abort both contexts
+        if (context != null && context.isValid())
+        {
+            context.abort();
+        }
 
-	/**
-	 * Commit the primary context held by this class, and abort the authenticated
-	 * user's context if it is different.  This ensures that only changes written
-	 * through the appropriate user's context is persisted, and all other
-	 * operations are flushed.  You should, in general, not try to commit the contexts directly
-	 * when using the sword api.
-	 *
-	 * @throws DSpaceSwordException
-	 */
-	public void commit()
-			throws DSpaceSwordException
-	{
-		try
-		{
-			// commit the primary context
-			if (context != null && context.isValid())
-			{
-				context.commit();
-			}
+        if (authenticatorContext != null && authenticatorContext.isValid())
+        {
+            authenticatorContext.abort();
+        }
+    }
 
-			// the secondary context is for filtering permissions by only, and is
-			// never committed, so we abort here
-			if (authenticatorContext != null && authenticatorContext.isValid())
-			{
-				authenticatorContext.abort();
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-	}
+    /**
+     * Commit the primary context held by this class, and abort the authenticated
+     * user's context if it is different.  This ensures that only changes written
+     * through the appropriate user's context is persisted, and all other
+     * operations are flushed.  You should, in general, not try to commit the contexts directly
+     * when using the sword api.
+     *
+     * @throws DSpaceSwordException
+     */
+    public void commit()
+            throws DSpaceSwordException
+    {
+        try
+        {
+            // commit the primary context
+            if (context != null && context.isValid())
+            {
+                context.complete();
+            }
+
+            // the secondary context is for filtering permissions by only, and is
+            // never committed, so we abort here
+            if (authenticatorContext != null && authenticatorContext.isValid())
+            {
+                authenticatorContext.abort();
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new DSpaceSwordException(e);
+        }
+    }
 }

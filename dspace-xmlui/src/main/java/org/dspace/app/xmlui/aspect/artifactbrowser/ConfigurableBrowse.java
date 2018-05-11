@@ -7,11 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.*;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
@@ -28,36 +23,28 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.*;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseEngine;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowseItem;
-import org.dspace.browse.BrowserScope;
-import org.dspace.sort.SortOption;
-import org.dspace.sort.SortException;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCDate;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.browse.*;
+import org.dspace.content.*;
+import org.dspace.content.Item;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
 import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implements all the browse functionality (browse by title, subject, authors,
@@ -134,6 +121,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     private Message titleMessage = null;
     private Message trailMessage = null;
 
+    protected ChoiceAuthorityService choicheAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
         super.setup(resolver, objectModel, src, parameters);
@@ -187,12 +176,15 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         {
             try
             {
+                Context.Mode originalMode = context.getCurrentMode();
+                context.setMode(Context.Mode.READ_ONLY);
+
                 DSpaceValidity validity = new DSpaceValidity();
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
                 if (dso != null)
                 {
-                    validity.add(dso);
+                    validity.add(context, dso);
                 }
                 
                 BrowseInfo info = getBrowseInfo();
@@ -203,9 +195,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 if (isItemBrowse(info))
                 {
                     // Add the browse items to the validity
-                    for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+                    for (Item item : (java.util.List<Item>) info.getResults())
                     {
-                        validity.add(item);
+                        validity.add(context, item);
                     }
                 }
                 else
@@ -218,6 +210,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 }
 
                 this.validity =  validity.complete();
+
+                context.setMode(originalMode);
             }
             catch (RuntimeException re)
             {
@@ -243,6 +237,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException, UIException,
             SQLException, IOException, AuthorizeException
     {
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
+
         BrowseInfo info = getBrowseInfo();
 
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
@@ -252,10 +249,12 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         if (dso != null)
         {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
+            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath, true);
         }
 
         pageMeta.addTrail().addContent(getTrailMessage(info));
+
+        context.setMode(originalMode);
     }
 
     /**
@@ -264,6 +263,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException,
             IOException, AuthorizeException
     {
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
+
         BrowseParams params = null;
 
         try {
@@ -272,9 +274,16 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
            HttpServletResponse response = (HttpServletResponse)objectModel
 		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
 
         BrowseInfo info = getBrowseInfo();
+        if(info == null)
+        {
+            HttpServletResponse response = (HttpServletResponse)objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+ 	        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         String type = info.getBrowseIndex().getName();
 
@@ -311,7 +320,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             if (isItemBrowse(info))
             {
                 // Add the items to the browse results
-                for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+                for (Item item : (java.util.List<Item>) info.getResults())
                 {
                     referenceSet.addReference(item);
                 }
@@ -358,6 +367,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         {
             results.addPara(T_no_results);
         }
+
+        context.setMode(originalMode);
     }
 
     /**
@@ -677,7 +688,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             if(!request.getParameters().containsKey("type"))
             {
                 // default to first browse index.
-                String defaultBrowseIndex = ConfigurationManager.getProperty("webui.browse.index.1");
+                String defaultBrowseIndex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.browse.index.1");
                 if(defaultBrowseIndex != null)
                 {
                     type = defaultBrowseIndex.split(":")[0];
@@ -844,7 +855,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             if (params.etAl < 0)
             {
                 // there is no limit, or the UI says to use the default
-                int etAl = ConfigurationManager.getIntProperty("webui.browse.author-limit");
+                int etAl = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("webui.browse.author-limit");
                 if (etAl != 0)
                 {
                     this.browseInfo.setEtAl(etAl);
@@ -906,9 +917,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 if (bix.isAuthorityIndex())
                 {
-                    ChoiceAuthorityManager cm = ChoiceAuthorityManager.getManager();
-                    String fk = cm.makeFieldKey(bix.getMetadata(0));
-                    value = "\""+cm.getLabel(fk, info.getValue(), null)+"\"";
+                    String fk = bix.getMetadata(0).replace(".", "_");
+                    value = "\""+choicheAuthorityService.getLabel(fk, info.getValue(), null)+"\"";
                 }
                 else
                 {

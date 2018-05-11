@@ -10,16 +10,23 @@ package org.dspace.embargo;
 import java.sql.SQLException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
+import org.dspace.embargo.factory.EmbargoServiceFactory;
+import org.dspace.embargo.service.EmbargoService;
 import org.dspace.eperson.Group;
-import org.dspace.license.CreativeCommons;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.license.CreativeCommonsServiceImpl;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Default plugin implementation of the embargo setting function.
@@ -33,14 +40,14 @@ import org.dspace.license.CreativeCommons;
  */
 public class DefaultEmbargoSetter implements EmbargoSetter
 {
-    protected String termsOpen = null;
-	
+    protected AuthorizeService authorizeService;
+    protected ResourcePolicyService resourcePolicyService;
+
     public DefaultEmbargoSetter()
     {
         super();
-        termsOpen = ConfigurationManager.getProperty("embargo.terms.open");
     }
-    
+
     /**
      * Parse the terms into a definite date. Terms are expected to consist of
      * either: a token (value configured in 'embargo.terms.open' property) to indicate
@@ -51,14 +58,17 @@ public class DefaultEmbargoSetter implements EmbargoSetter
      * @param terms the embargo terms
      * @return parsed date in DCDate format
      */
+    @Override
     public DCDate parseTerms(Context context, Item item, String terms)
-        throws SQLException, AuthorizeException, IOException
+        throws SQLException, AuthorizeException
     {
+        String termsOpen = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("embargo.terms.open");
+
     	if (terms != null && terms.length() > 0)
     	{
     		if (termsOpen.equals(terms))
             {
-                return EmbargoManager.FOREVER;
+                return EmbargoService.FOREVER;
             }
             else
             {
@@ -75,15 +85,16 @@ public class DefaultEmbargoSetter implements EmbargoSetter
      * @param context the DSpace context
      * @param item the item to embargo
      */
+    @Override
     public void setEmbargo(Context context, Item item)
-        throws SQLException, AuthorizeException, IOException
+        throws SQLException, AuthorizeException
     {
-        DCDate liftDate = EmbargoManager.getEmbargoTermsAsDate(context, item);
+        DCDate liftDate = EmbargoServiceFactory.getInstance().getEmbargoService().getEmbargoTermsAsDate(context, item);
         for (Bundle bn : item.getBundles())
         {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
             String bnn = bn.getName();
-            if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn.equals(CreativeCommons.CC_BUNDLE_NAME)))
+            if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn.equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME)))
             {
                 //AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
                 generatePolicies(context, liftDate.toDate(), null, bn, item.getOwningCollection());
@@ -102,29 +113,29 @@ public class DefaultEmbargoSetter implements EmbargoSetter
         // add only embargo policy
         if(embargoDate!=null){
 
-            Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, owningCollection, Constants.DEFAULT_ITEM_READ);
+            List<Group> authorizedGroups = getAuthorizeService().getAuthorizedGroups(context, owningCollection, Constants.DEFAULT_ITEM_READ);
 
             // look for anonymous
             boolean isAnonymousInPlace=false;
             for(Group g : authorizedGroups){
-                if(g.getID()==Group.ANONYMOUS_ID){
+                if(StringUtils.equals(g.getName(), Group.ANONYMOUS)){
                     isAnonymousInPlace=true;
                 }
             }
             if(!isAnonymousInPlace){
                 // add policies for all the groups
                 for(Group g : authorizedGroups){
-                    ResourcePolicy rp = AuthorizeManager.createOrModifyPolicy(null, context, null, g.getID(), null, embargoDate, Constants.READ, reason, dso);
+                    ResourcePolicy rp = getAuthorizeService().createOrModifyPolicy(null, context, null, g, null, embargoDate, Constants.READ, reason, dso);
                     if(rp!=null)
-                        rp.update();
+                        getResourcePolicyService().update(context, rp);
                 }
 
             }
             else{
                 // add policy just for anonymous
-                ResourcePolicy rp = AuthorizeManager.createOrModifyPolicy(null, context, null, 0, null, embargoDate, Constants.READ, reason, dso);
+                ResourcePolicy rp = getAuthorizeService().createOrModifyPolicy(null, context, null, EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS), null, embargoDate, Constants.READ, reason, dso);
                 if(rp!=null)
-                    rp.update();
+                    getResourcePolicyService().update(context, rp);
             }
         }
 
@@ -140,6 +151,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter
      * @param context the DSpace context
      * @param item the item to embargo
      */
+    @Override
     public void checkEmbargo(Context context, Item item)
         throws SQLException, AuthorizeException, IOException
     {
@@ -147,31 +159,47 @@ public class DefaultEmbargoSetter implements EmbargoSetter
         {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
             String bnn = bn.getName();
-            if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn.equals(CreativeCommons.CC_BUNDLE_NAME)))
+            if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn.equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME)))
             {
                 // don't report on "TEXT" or "THUMBNAIL" bundles; those
                 // can have READ long as the bitstreams in them do not.
                 if (!(bnn.equals("TEXT") || bnn.equals("THUMBNAIL")))
                 {
                     // check for ANY read policies and report them:
-                    for (ResourcePolicy rp : AuthorizeManager.getPoliciesActionFilter(context, bn, Constants.READ))
+                    for (ResourcePolicy rp : getAuthorizeService().getPoliciesActionFilter(context, bn, Constants.READ))
                     {
                         System.out.println("CHECK WARNING: Item "+item.getHandle()+", Bundle "+bn.getName()+" allows READ by "+
-                          ((rp.getEPersonID() < 0) ? "Group "+rp.getGroup().getName() :
+                          ((rp.getEPerson() != null) ? "Group "+rp.getGroup().getName() :
                                                       "EPerson "+rp.getEPerson().getFullName()));
                     }
                 }
 
                 for (Bitstream bs : bn.getBitstreams())
                 {
-                    for (ResourcePolicy rp : AuthorizeManager.getPoliciesActionFilter(context, bs, Constants.READ))
+                    for (ResourcePolicy rp : getAuthorizeService().getPoliciesActionFilter(context, bs, Constants.READ))
                     {
                         System.out.println("CHECK WARNING: Item "+item.getHandle()+", Bitstream "+bs.getName()+" (in Bundle "+bn.getName()+") allows READ by "+
-                          ((rp.getEPersonID() < 0) ? "Group "+rp.getGroup().getName() :
+                          ((rp.getEPerson() != null) ? "Group "+rp.getGroup().getName() :
                                                       "EPerson "+rp.getEPerson().getFullName()));
                     }
                 }
             }
         }
+    }
+
+    private AuthorizeService getAuthorizeService() {
+        if(authorizeService == null)
+        {
+            authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        }
+        return authorizeService;
+    }
+
+    private ResourcePolicyService getResourcePolicyService() {
+        if(resourcePolicyService == null)
+        {
+            resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+        }
+        return resourcePolicyService;
     }
 }

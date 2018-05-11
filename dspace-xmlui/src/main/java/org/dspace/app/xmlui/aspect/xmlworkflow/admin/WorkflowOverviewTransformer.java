@@ -18,24 +18,36 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.WorkflowFactory;
+import org.dspace.xmlworkflow.XmlWorkflowFactoryImpl;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.List;
 
 /**
  * A transformer that renders all xmlworkflow items
@@ -74,10 +86,15 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
     private static final Message T_button_delete = message("xmlui.XMLWorkflow.WorkflowOverviewTransformer.button.submit_delete");
     private static final Message T_no_results = message("xmlui.XMLWorkflow.WorkflowOverviewTransformer.button.no_results");
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected ClaimedTaskService claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
+    protected PoolTaskService poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
+    protected XmlWorkflowFactory workflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+    protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
 
-    /**
-     * Add Page metadata.
-     */
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException
     {
         pageMeta.addMetadata("title").addContent(T_title);
@@ -86,10 +103,10 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
         pageMeta.addTrail().addContent(T_trail);
     }
 
-
+    @Override
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
         Context context = ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel));
-        if(!AuthorizeManager.isAdmin(context)){
+        if(!authorizeService.isAdmin(context)){
             throw new AuthorizeException();
         }
         
@@ -97,12 +114,15 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
         this.buildSearchResultsDivision(div);
     }
 
-
     /**
      * Attach a division to the given search division named "search-results"
      * which contains results for this search query.
      *
      * @param div The division to contain the results division.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     protected void buildSearchResultsDivision(Division div)
             throws IOException, SQLException, WingException, AuthorizeException {
@@ -110,12 +130,14 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
         int page = getParameterPage();
         try {
             Request request = ObjectModelHelper.getRequest(objectModel);
-            int collectionIdFilter = Util.getIntParameter(request, "filter_collection");
+            UUID collectionIdFilter = Util.getUUIDParameter(request, "filter_collection");
 
-            XmlWorkflowItem[] results = XmlWorkflowItem.findAllInCollection(context, page, pageSize, collectionIdFilter);
+            Collection collection = collectionService.find(context, collectionIdFilter);
+            int offset = (page - 1) * pageSize;
+            List<XmlWorkflowItem> results = xmlWorkflowItemService.findAllInCollection(context, offset, pageSize, collection);
             Para para = div.addPara("result-query", "result-query");
 
-            int hitCount = XmlWorkflowItem.countAllInCollection(context, collectionIdFilter);
+            int hitCount = xmlWorkflowItemService.countAllInCollection(context, collection);
             para.addContent(message("").parameterize("", hitCount));
 
 
@@ -127,7 +149,7 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
             if (hitCount > 0) {
                 // Pagination variables.
                 int firstItemIndex = ((page - 1) * pageSize) + 1;
-                int lastItemIndex = (page - 1) * pageSize + results.length;
+                int lastItemIndex = (page - 1) * pageSize + results.size();
                 if (hitCount < lastItemIndex) {
                     lastItemIndex = hitCount;
                 }
@@ -141,7 +163,7 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
 
 
                 // Look for any items in the result set.
-                Table table = resultsDiv.addTable("workflow-item-overview-table", results.length + 1, 5);
+                Table table = resultsDiv.addTable("workflow-item-overview-table", results.size() + 1, 5);
 
                 Row headerRow = table.addRow(Row.ROLE_HEADER);
                 headerRow.addCellContent(T_search_column1);
@@ -155,17 +177,17 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
                     Item item = wfi.getItem();
                     Row itemRow = table.addRow();
 
-                    java.util.List<PoolTask> pooltasks = PoolTask.find(context,wfi);
-                    java.util.List<ClaimedTask> claimedtasks = ClaimedTask.find(context, wfi);
+                    java.util.List<PoolTask> pooltasks = poolTaskService.find(context,wfi);
+                    java.util.List<ClaimedTask> claimedtasks = claimedTaskService.find(context, wfi);
 
                     Message state = message("xmlui.XMLWorkflow.step.unknown");
                     for(PoolTask task: pooltasks){
-                        Workflow wf = WorkflowFactory.getWorkflow(wfi.getCollection());
+                        Workflow wf = workflowFactory.getWorkflow(wfi.getCollection());
                         Step step = wf.getStep(task.getStepID());
                         state = message("xmlui.XMLWorkflow." + wf.getID() + "." + step.getId());
                     }
                     for(ClaimedTask task: claimedtasks){
-                        Workflow wf = WorkflowFactory.getWorkflow(wfi.getCollection());
+                        Workflow wf = workflowFactory.getWorkflow(wfi.getCollection());
                         Step step = wf.getStep(task.getStepID());
                         state = message("xmlui.XMLWorkflow." + wf.getID() + "." + step.getId());
                     }
@@ -179,12 +201,9 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
                     //Column 2 Item name
                     itemRow.addCell().addXref(request.getContextPath() + "/admin/display-workflowItem?wfiId=" +wfi.getID(), item.getName() );
                     //Column 3 collection
-                    itemRow.addCell().addXref(HandleManager.resolveToURL(context, wfi.getCollection().getHandle()), wfi.getCollection().getName());
+                    itemRow.addCell().addXref(handleService.resolveToURL(context, wfi.getCollection().getHandle()), wfi.getCollection().getName());
                     //Column 4 submitter
                     itemRow.addCell().addXref("mailto:" + wfi.getSubmitter().getEmail(), wfi.getSubmitter().getFullName());
-
-
-
                 }
 
                 Para buttonsPara = resultsDiv.addPara();
@@ -232,9 +251,11 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
         return s != null ? s : "DESC";
     }
 
-
     /**
-     * Generate a url to the simple search url.
+     * Generate a URL to the simple search url.
+     * @param parameters search parameters.
+     * @return the URL.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
      */
     protected String generateURL(Map<String, String> parameters)
             throws UIException {
@@ -270,13 +291,13 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
         Cell filterCell = controlsRow.addCell();
 
         // Create a drop down of the different sort columns available
-        int selectedCollectionId = Util.getIntParameter(request, "filter_collection");
+        UUID selectedCollectionId = Util.getUUIDParameter(request, "filter_collection");
         filterCell.addContent("Collection filter:");
         Select sortSelect = filterCell.addSelect("filter_collection");
-        sortSelect.addOption(-1 == selectedCollectionId,-1, "None");
-        Collection[] collections = Collection.findAll(context);
+        sortSelect.addOption(null== selectedCollectionId,-1, "None");
+        List<Collection> collections = collectionService.findAll(context);
         for (Collection collection : collections) {
-            sortSelect.addOption(collection.getID() == selectedCollectionId, collection.getID(), collection.getName());
+            sortSelect.addOption(collection.getID().equals(selectedCollectionId), collection.getID().toString(), collection.getName());
         }
 
         controlsRow.addCell().addButton("submit_search_controls").setValue(T_go);

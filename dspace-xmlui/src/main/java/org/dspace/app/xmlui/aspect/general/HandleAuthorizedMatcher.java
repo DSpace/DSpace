@@ -17,7 +17,9 @@ import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -33,7 +35,9 @@ import org.dspace.core.Context;
 
 public class HandleAuthorizedMatcher extends AbstractLogEnabled implements Matcher
 {
-    
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     /**
      * Match method to see if the sitemap parameter exists. If it does have a
      * value the parameter added to the array list for later sitemap
@@ -83,7 +87,7 @@ public class HandleAuthorizedMatcher extends AbstractLogEnabled implements Match
                 return null;
             }
             
-            boolean authorized = AuthorizeManager.authorizeActionBoolean(context, dso, action);
+            boolean authorized = authorizeService.authorizeActionBoolean(context, dso, action);
 
             // XOR
             if (not ^ authorized)

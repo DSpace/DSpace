@@ -17,6 +17,8 @@ import org.apache.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -25,11 +27,13 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.handle.HandleManager;
-import org.dspace.utils.DSpace;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -75,6 +79,10 @@ public class ItemRequestContactAuthor extends AbstractDSpaceTransformer implemen
     private static final Message T_subject =
             message("xmlui.ArtifactBrowser.ItemRequestContactAuthor.subject");
 
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected RequestItemService requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -112,20 +120,19 @@ public class ItemRequestContactAuthor extends AbstractDSpaceTransformer implemen
         Context context = ContextUtil.obtainContext(objectModel);
 
         String token = (String) request.getAttribute("token");
-        RequestItem requestItem = RequestItem.findByToken(context, token);
+        RequestItem requestItem = requestItemService.findByToken(context, token);
 
-        Item item = Item.find(context, requestItem.getItemID());
+        Item item = requestItem.getItem();
 
-        RequestItemAuthor requestItemAuthor = new DSpace()
-                .getServiceManager()
+        RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServiceByName(RequestItemAuthorExtractor.class.getName(),
                         RequestItemAuthorExtractor.class)
                 .getRequestItemAuthor(context, item);
 
         Object[] args = new String[]{
-                ItemService.getFirstMetadataValue(item, "dc.contributor.author"),
-                ItemService.getFirstMetadataValue(item, "dc.title"),
-                HandleManager.getCanonicalForm(item.getHandle()),
+                itemService.getMetadataFirstValue(item, "dc", "contributor", "author", Item.ANY),
+                itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY),
+                handleService.getCanonicalForm(item.getHandle()),
                 requestItemAuthor.getFullName(),
                 requestItemAuthor.getEmail(),
                 requestItem.getReqName(),

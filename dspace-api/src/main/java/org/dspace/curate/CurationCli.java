@@ -7,20 +7,18 @@
  */
 package org.dspace.curate;
 
+import org.apache.commons.cli.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.Context;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.curate.factory.CurateServiceFactory;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Iterator;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-
-import org.dspace.content.Site;
-import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
-import org.dspace.eperson.EPerson;
 
 /**
  * CurationCli provides command-line access to Curation tools and processes.
@@ -48,8 +46,6 @@ public class CurationCli
                 "email address of curating eperson");
         options.addOption("r", "reporter", true,
                 "reporter to manage results - use '-' to report to console. If absent, no reporting");
-        options.addOption("l", "limit", true,
-                "maximum number of objects allowed in context cache. If absent, no limit");
         options.addOption("s", "scope", true,
                 "transaction scope to impose: use 'object', 'curation', or 'open'. If absent, 'open' applies");
         options.addOption("v", "verbose", false,
@@ -64,7 +60,6 @@ public class CurationCli
         String taskQueueName = null;
         String ePersonName = null;
         String reporterName = null;
-        String limit = null;
         String scope = null;
         boolean verbose = false;
 
@@ -111,11 +106,7 @@ public class CurationCli
             reporterName = line.getOptionValue('r');
         }
         
-        if (line.hasOption('l'))
-        { // cache limit
-            limit = line.getOptionValue('l');
-        }
-        
+
         if (line.hasOption('s'))
         { // transaction scope
             scope = line.getOptionValue('s');
@@ -139,22 +130,17 @@ public class CurationCli
             System.exit(1);
         }
         
-        if (limit != null && Integer.parseInt(limit) <= 0 )
-        {
-        	System.out.println("Cache limit '" + limit + "' must be a positive integer");
-        	System.exit(1);
-        }
-        
         if (scope != null && Curator.TxScope.valueOf(scope.toUpperCase()) == null)
     	{
         	System.out.println("Bad transaction scope '" + scope + "': only 'object', 'curation' or 'open' recognized");
         	System.exit(1);
     	}
+        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-        Context c = new Context();
+        Context c = new Context(Context.Mode.BATCH_EDIT);
         if (ePersonName != null)
         {
-            EPerson ePerson = EPerson.findByEmail(c, ePersonName);
+            EPerson ePerson = ePersonService.findByEmail(c, ePersonName);
             if (ePerson == null)
             {
                 System.out.println("EPerson not found: " + ePersonName);
@@ -171,10 +157,6 @@ public class CurationCli
         if (reporterName != null)
         {
             curator.setReporter(reporterName);
-        }
-        if (limit != null)
-        {
-        	curator.setCacheLimit(Integer.parseInt(limit));
         }
         if (scope != null)
         {
@@ -235,7 +217,7 @@ public class CurationCli
             if ("all".equals(idName))
             {
             	// run on whole Site
-            	curator.curate(c, Site.getSiteHandle());
+            	curator.curate(c, ContentServiceFactory.getInstance().getSiteService().findSite(c).getHandle());
             }
             else
             {
@@ -245,7 +227,7 @@ public class CurationCli
         else
         {
             // process the task queue
-            TaskQueue queue = (TaskQueue)PluginManager.getSinglePlugin("curate", TaskQueue.class);
+            TaskQueue queue = (TaskQueue) CoreServiceFactory.getInstance().getPluginService().getSinglePlugin(TaskQueue.class);
             if (queue == null)
             {
                 System.out.println("No implementation configured for queue");
@@ -274,12 +256,12 @@ public class CurationCli
                 else
                 {
                     // make eperson who queued task the effective user
-                    EPerson agent = EPerson.findByEmail(c, entry.getEpersonId());
+                    EPerson agent = ePersonService.findByEmail(c, entry.getEpersonId());
                     if (agent != null)
                     {
                         c.setCurrentUser(agent);
                     }
-                    WorkflowCurator.curate(curator, c, entry.getObjectId());
+                    CurateServiceFactory.getInstance().getWorkflowCuratorService().curate(curator, c, entry.getObjectId());
                 }
             }
             queue.release(taskQueueName, ticket, true);

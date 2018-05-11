@@ -34,6 +34,7 @@
 <%@ page import="org.dspace.content.Collection"  %>
 <%@ page import="org.dspace.content.Item"        %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="java.util.UUID" %>
 
 <%
     Collection collection = (Collection)request.getAttribute("collection");
@@ -44,7 +45,7 @@
     Map items             = (Map)request.getAttribute("items");
     Map collections       = (Map)request.getAttribute("collections");
     Map collection_counts = (Map)request.getAttribute("collection_counts");
-    Collection [] all_collections = (Collection[])
+    List<Collection> all_collections = (List<Collection>)
                                     request.getAttribute("all_collections");
     List<String> searchIndices = (List<String>) request.getAttribute("searchIndices");
     String prefixKey = (String) request.getAttribute("prefixKey");
@@ -59,7 +60,7 @@
 
     <%--  <p>Collection: "<%=collection.getMetadata("name")%>"</p> --%>
     <h2><fmt:message key="jsp.tools.itemmap-main.collection">
-        <fmt:param><%=collection.getMetadata("name")%></fmt:param>
+        <fmt:param><%=collection.getName()%></fmt:param>
     </fmt:message></h2>
 	 
     <%-- <p>There are <%=count_native%> items owned by this collection, and
@@ -175,11 +176,11 @@
     while( colKeys.hasNext() )
     {
         Collection myCollection = (Collection)collections.get(colKeys.next());
-        String myTitle = myCollection.getMetadata("name");
-        int cid        = collection.getID();
-        int myID       = myCollection.getID();
+        String myTitle = myCollection.getName();
+        UUID cid        = collection.getID();
+        UUID myID       = myCollection.getID();
         int myCount    = ((Integer)collection_counts.get(
-                                new Integer(myID))).intValue();    
+                                (myID))).intValue();
 
         String myLink = request.getContextPath()+"/tools/itemmap?action=browse";
 %>

@@ -24,8 +24,13 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
-import org.dspace.handle.HandleManager;
+import org.dspace.core.Context;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.xml.sax.SAXException;
 
 import org.dspace.app.util.CollectionDropDown;
@@ -59,7 +64,10 @@ public class SelectCollectionStep extends AbstractSubmissionStep
     {
     	this.requireHandle = true;
     }
-    
+
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
     WingException
     {
@@ -71,18 +79,21 @@ public class SelectCollectionStep extends AbstractSubmissionStep
   
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
-    {     
-        Collection[] collections; // List of possible collections.
+    {
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
+
+        java.util.List<Collection> collections; // List of possible collections.
         String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
-        DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+        DSpaceObject dso = handleService.resolveToObject(context, handle);
         
         if (dso instanceof Community)
         {
-            collections = Collection.findAuthorized(context, ((Community) dso), Constants.ADD);   
+            collections = collectionService.findAuthorized(context, ((Community) dso), Constants.ADD);
         } 
         else
         {
-            collections = Collection.findAuthorizedOptimized(context, Constants.ADD);
+            collections = collectionService.findAuthorizedOptimized(context, Constants.ADD);
         }
         
         // Basic form with a drop down list of all the collections
@@ -98,7 +109,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         select.setHelp(T_collection_help);
         
         select.addOption("",T_collection_default);
-	    CollectionDropDown.CollectionPathEntry[] collectionPaths = CollectionDropDown.annotateWithPaths(collections);
+	    CollectionDropDown.CollectionPathEntry[] collectionPaths = CollectionDropDown.annotateWithPaths(context, collections);
         for (CollectionDropDown.CollectionPathEntry entry : collectionPaths)
         {
             select.addOption(entry.collection.getHandle(), entry.path);
@@ -106,6 +117,8 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         
         Button submit = list.addItem().addButton("submit");
         submit.setValue(T_submit_next);
+
+        context.setMode(originalMode);
     }
     
     /** 

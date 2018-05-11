@@ -7,22 +7,27 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
@@ -39,21 +44,26 @@ public class FlowGroupUtils {
 	private static final Message T_delete_group_success_notice =
 		new Message("default","xmlui.administrative.FlowGroupUtils.delete_group_success_notice");
 
-	
+	protected static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+	protected static final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+	protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	protected static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+
 	/**
 	 * Return the current name for the given group ID.
 	 * @param context The current DSpace context.
 	 * @param groupID The group id.
 	 * @return The group's name.
+     * @throws java.sql.SQLException passed through.
 	 */
-	public static String getName(Context context, int groupID) throws SQLException
+	public static String getName(Context context, UUID groupID) throws SQLException
 	{
-		if (groupID < 0)
+		if (groupID == null)
         {
             return "New Group";
         }
 		
-		Group group = Group.find(context,groupID);
+		Group group = groupService.find(context,groupID);
 		
 		if (group == null)
         {
@@ -69,28 +79,29 @@ public class FlowGroupUtils {
 	 * @param context The current DSpace context
 	 * @param groupID The group's id.
 	 * @return An array of ids.
+     * @throws java.sql.SQLException passed through.
 	 */
-	public static String[] getEPeopleMembers(Context context, int groupID) throws SQLException
+	public static String[] getEPeopleMembers(Context context, UUID groupID) throws SQLException
 	{
 		// New group, just return an empty list
-		if (groupID < 0)
+		if (groupID == null)
         {
             return new String[0];
         }
 		
-		Group group = Group.find(context,groupID);
+		Group group = groupService.find(context,groupID);
 		
 		if (group == null)
         {
             return new String[0];
         }
 		
-		EPerson[] epeople = group.getMembers();
+		List<EPerson> epeople = group.getMembers();
 		
-		String[] epeopleIDs = new String[epeople.length];
-		for (int i=0; i < epeople.length; i++)
+		String[] epeopleIDs = new String[epeople.size()];
+		for (int i=0; i < epeople.size(); i++)
         {
-			epeopleIDs[i] = String.valueOf(epeople[i].getID());
+			epeopleIDs[i] = String.valueOf(epeople.get(i).getID());
         }
 		
 		return epeopleIDs;
@@ -102,33 +113,33 @@ public class FlowGroupUtils {
 	 * @param context The current DSpace context
 	 * @param groupID The group's id.
 	 * @return An array of ids.
+     * @throws java.sql.SQLException passed through.
 	 */
-	public static String[] getGroupMembers(Context context, int groupID) throws SQLException
+	public static String[] getGroupMembers(Context context, UUID groupID) throws SQLException
 	{
-		if (groupID < 0)
+		if (groupID == null)
         {
             return new String[0];
         }
 		
-		Group group = Group.find(context,groupID);
+		Group group = groupService.find(context,groupID);
 		
 		if (group == null)
         {
             return new String[0];
         }
 		
-		Group[] groups = group.getMemberGroups();
+		List<Group> groups = group.getMemberGroups();
 		
-		String[] groupIDs = new String[groups.length];
-		for (int i=0; i < groups.length; i++)
+		String[] groupIDs = new String[groups.size()];
+		for (int i=0; i < groups.size(); i++)
         {
-			groupIDs[i] = String.valueOf(groups[i].getID());
+			groupIDs[i] = String.valueOf(groups.get(i).getID());
         }
 		
 		return groupIDs;
 	}
-	
-	
+
 	/**
 	 * Add the given id to the list and return a new list.
 	 * 
@@ -171,8 +182,12 @@ public class FlowGroupUtils {
 	 * @param newEPeopleIDsArray All epeople members
 	 * @param newGroupIDsArray All group members.
 	 * @return A result
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException on bad encoding.
 	 */
-	public static FlowResult processSaveGroup(Context context, int groupID, String newName, String[] newEPeopleIDsArray, String[] newGroupIDsArray) throws SQLException, AuthorizeException, UIException
+	public static FlowResult processSaveGroup(Context context, UUID groupID, String newName, String[] newEPeopleIDsArray, String[] newGroupIDsArray)
+            throws SQLException, AuthorizeException, UIException
 	{
 		FlowResult result = new FlowResult();
 		
@@ -187,7 +202,7 @@ public class FlowGroupUtils {
         }
 		
 		Group group = null;
-		if (groupID == -1)
+		if (groupID == null)
 		{
 			// First, check if the name is blank.
 			if (newName == null || newName.length() == 0)
@@ -202,13 +217,13 @@ public class FlowGroupUtils {
 			}
 			
 			// Create a new group, check if the newName is already in use.
-			Group potentialDuplicate = Group.findByName(context,newName);
+			Group potentialDuplicate = groupService.findByName(context,newName);
 			
 			if (potentialDuplicate == null)
 	    	{
 				// All good, create the new group.
-				group = Group.create(context);
-				group.setName(newName);
+				group = groupService.create(context);
+				groupService.setName(group, newName);
 	    	}
 			else
 			{
@@ -224,19 +239,19 @@ public class FlowGroupUtils {
 		}
 		else
 		{
-			group = Group.find(context,groupID);
+			group = groupService.find(context,groupID);
 			String name = group.getName();
 			
 			// Only update the name if there has been a change.
 			if (newName != null && newName.length() > 0 && !name.equals(newName))
 			{
 				// The group name is to be updated, check if the newName is already in use.
-				Group potentialDuplicate = Group.findByName(context,newName);
+				Group potentialDuplicate = groupService.findByName(context,newName);
 				
 				if (potentialDuplicate == null)
 		    	{
 					// All good, update the name
-					group.setName(newName);
+					groupService.setName(group, newName);
 		    	}
 				else
 				{
@@ -253,26 +268,28 @@ public class FlowGroupUtils {
 		}
 		
 		// Second, prepare to check members by turning arrays into lists
-		List<Integer> newEPeopleIDs = new ArrayList<Integer>();
+		List<UUID> newEPeopleIDs = new ArrayList<>();
 		for (String epeopleID : newEPeopleIDsArray)
         {
-			newEPeopleIDs.add(Integer.valueOf(epeopleID));
+			newEPeopleIDs.add(UUID.fromString(epeopleID));
         }
-		List<Integer> newGroupIDs = new ArrayList<Integer>();
+		List<UUID> newGroupIDs = new ArrayList<>();
 		for (String _groupID : newGroupIDsArray)
         {
-			newGroupIDs.add(Integer.valueOf(_groupID));
+			newGroupIDs.add(UUID.fromString(_groupID));
         }
 		
 		
 		// Third, check if there are any members to remove
 		// i.e. scan the list on the group against the ids.
-		for (EPerson epersonMember : group.getMembers())
+		for (Iterator<EPerson> it = group.getMembers().iterator(); it.hasNext(); )
 		{
+            EPerson epersonMember = it.next();
 			if (!newEPeopleIDs.contains(epersonMember.getID()))
 			{
 				// The current eperson is not contained in the new list.
-				group.removeMember(epersonMember);
+                it.remove();
+				groupService.removeMember(context, group, epersonMember);
 			}
 			else
 			{
@@ -281,12 +298,14 @@ public class FlowGroupUtils {
 				newEPeopleIDs.remove((Object)epersonMember.getID());
 			}
 		}
-		for (Group groupMember : group.getMemberGroups())
+		for (Iterator<Group> it = group.getMemberGroups().iterator(); it.hasNext(); )
 		{
+            Group groupMember = it.next();
 			if (!newGroupIDs.contains(groupMember.getID()))
 			{
 				// The current group is not contained in the new list.
-				group.removeMember(groupMember);
+                it.remove();
+				groupService.removeMember(context, group, groupMember);
 			}
 			else
 			{
@@ -298,24 +317,23 @@ public class FlowGroupUtils {
 		
 		// Third, check if there are any members to add
 		// i.e. scan the list of ids against the group.
-		for (Integer epersonID : newEPeopleIDs)
+		for (UUID epersonID : newEPeopleIDs)
 		{
-			EPerson eperson = EPerson.find(context, epersonID);
+			EPerson eperson = ePersonService.find(context, epersonID);
 			
-			group.addMember(eperson);
+			groupService.addMember(context, group, eperson);
 		}
 		
-		for (Integer _groupID : newGroupIDs)
+		for (UUID _groupID : newGroupIDs)
 		{
-			Group _group = Group.find(context, _groupID);
+			Group _group = groupService.find(context, _groupID);
 			
-			group.addMember(_group);
+			groupService.addMember(context, group, _group);
 		}
 		
 		// Last, create the result flow
-		group.update();
-		context.commit();
-		
+		groupService.update(context, group);
+
 		// Let's record our group id in case we created a new one.
 		result.setParameter("groupID", group.getID());
 		result.setContinue(true);
@@ -331,6 +349,9 @@ public class FlowGroupUtils {
 	 * @param context The current DSpace context
 	 * @param groupIDs A list of groups to be removed.
 	 * @return A results object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
 	public static FlowResult processDeleteGroups(Context context, String[] groupIDs) throws SQLException, AuthorizeException, IOException
 	{
@@ -339,41 +360,41 @@ public class FlowGroupUtils {
 		
     	for (String id : groupIDs) 
     	{
-    		Group groupDeleted = Group.find(context, Integer.valueOf(id));
+    		Group groupDeleted = groupService.find(context, UUID.fromString(id));
     		
     		// If this group is related to a collection, then un-link it.
-    		int collectionId = getCollectionId(groupDeleted.getName());
+    		UUID collectionId = getCollectionId(context, groupDeleted.getName());
     		Role role = getCollectionRole(groupDeleted.getName());
-    		if (collectionId != -1 && role != Role.none)
+    		if (collectionId != null && role != Role.none)
     		{
-	    		Collection collection = Collection.find(context, collectionId);
+	    		Collection collection = collectionService.find(context, collectionId);
 	    		
 	    		if (collection != null)
 	    		{
 		    		if (role == Role.Administrators)
 		    		{
-		    			collection.removeAdministrators();
-		    			collection.update();
+						collectionService.removeAdministrators(context, collection);
+						collectionService.update(context, collection);
 		    		} 
 		    		else if (role == Role.Submitters)
 		    		{
-		    			collection.removeSubmitters();
-		    			collection.update();
+						collectionService.removeSubmitters(context, collection);
+						collectionService.update(context, collection);
 		    		}
 		    		else if (role == Role.WorkflowStep1)
 		    		{
-		    			collection.setWorkflowGroup(1, null);
-		    			collection.update();
+		    			collectionService.setWorkflowGroup(context, collection, 1, null);
+						collectionService.update(context, collection);
 		    		}
 		    		else if (role == Role.WorkflowStep2)
 		    		{
-		    			collection.setWorkflowGroup(2, null);
-		    			collection.update();
+						collectionService.setWorkflowGroup(context, collection, 2, null);
+						collectionService.update(context, collection);
 		    		}
 		    		else if (role == Role.WorkflowStep3)
 		    		{
-		    			collection.setWorkflowGroup(3, null);
-		    			collection.update();
+						collectionService.setWorkflowGroup(context, collection, 3, null);
+						collectionService.update(context, collection);
 		    		}
 		    		else if (role == Role.DefaultRead)
 		    		{
@@ -382,7 +403,7 @@ public class FlowGroupUtils {
 	    		}
     		}
 
-			groupDeleted.delete();
+			groupService.delete(context, groupDeleted);
 	    }
     	
     	result.setOutcome(true);
@@ -405,15 +426,15 @@ public class FlowGroupUtils {
 	 * Note: the order of these suffixes are important, see getCollectionRole()
 	 */
 	private static final String[] COLLECTION_SUFFIXES = {"_SUBMIT","_ADMIN","_WFSTEP_1","_WORKFLOW_STEP_1","_WFSTEP_2","_WORKFLOW_STEP_2","_WFSTEP_3","_WORKFLOW_STEP_3","_DEFAULT_ITEM_READ"};
-	
-	
+
 	/**
-	 * Extracts the collection id that may be immbedded in the given group name.
-	 * 
+	 * Extracts the collection id that may be embedded in the given group name.
+	 *
+     * @param context session context.
 	 * @param groupName - the name of a group (ie group.getName())
 	 * @return the integer collection id or -1 if the group is not that of a collection
 	 */
-	public static int getCollectionId(String groupName)
+	public static UUID getCollectionId(Context context, String groupName)
 	{
 		if (groupName != null && groupName.startsWith(COLLECTION_PREFIX))
 		{
@@ -424,14 +445,16 @@ public class FlowGroupUtils {
 					String idString = groupName.substring(COLLECTION_PREFIX.length());
 					idString = idString.substring(0, idString.length() - suffix.length());
 
-					int collectionID = -1;
 					try {
-						collectionID = Integer.valueOf(idString); 
-						
-						return collectionID;
-						// All good, we were able to ah 
+						Collection collection = collectionService.findByIdOrLegacyId(context, idString);
+						if(collection != null)
+						{
+							return collection.getID();
+						}else{
+							return null;
+						}
 					}
-					catch (NumberFormatException nfe)
+					catch (Exception nfe)
 					{
 						// Something went wrong, just ignore the exception and
 						// continue searching for a collection id
@@ -440,7 +463,7 @@ public class FlowGroupUtils {
 			} // for each possible suffix
 		} // if it starts with COLLECTION_
 		
-		return -1;
+		return null;
     }
 	
 	public enum Role {Administrators, Submitters, WorkflowStep1, WorkflowStep2, WorkflowStep3, DefaultRead, none};
@@ -496,9 +519,7 @@ public class FlowGroupUtils {
 		
 		return Role.none;
 	}
-	
-	
-	
+
     /**
      * The community prefix: all groups which are specific to
      * a community start with this.
@@ -518,10 +539,11 @@ public class FlowGroupUtils {
     /**
      * Extracts the community id that may be embedded in the given group name.
      * 
-     * @param groupName - the name of a group (ie group.getName())
+     * @param context session context.
+     * @param groupName the name of a group (ie group.getName())
      * @return the integer community id or -1 if the group is not that of a community
      */
-    public static int getCommunityId(String groupName)
+    public static UUID getCommunityId(Context context, String groupName)
     {
         if (groupName != null && groupName.startsWith(COMMUNITY_PREFIX))
         {
@@ -532,19 +554,25 @@ public class FlowGroupUtils {
                     String idString = groupName.substring(COMMUNITY_PREFIX.length());
                     idString = idString.substring(0, idString.length() - suffix.length());
 
-                    int communityID = -1;
-                    try {
-                        communityID = Integer.valueOf(idString); 
-                        
-                        return communityID;
-}
-                    catch (NumberFormatException nfe)
-                    {}
+					try {
+						Community community = communityService.findByIdOrLegacyId(context, idString);
+						if(community != null)
+						{
+							return community.getID();
+						}else{
+							return null;
+						}
+					}
+					catch (Exception nfe)
+					{
+						// Something went wrong, just ignore the exception and
+						// continue searching for a collection id
+					} // try & catch
                 } // if it ends with a proper suffix.
             } // for each possible suffix
         } // if it starts with COLLECTION_
         
-        return -1;
+        return null;
     }
     
     public static Role getCommunityRole(String groupName)
@@ -598,6 +626,5 @@ public class FlowGroupUtils {
         
         return Role.none;
     }
-    
-	
+
 }

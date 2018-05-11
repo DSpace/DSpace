@@ -4,80 +4,63 @@
 
 package org.dspace.content;
 
-import java.sql.SQLException;
-
-import org.dspace.core.Context;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class representing a community group.
  */
 public class CommunityGroup
 {
-    private static final int FACULTY   = 0;
-    private static final int LIBRARIES = 1;
-    private static final int UM        = 2;
+    public static final int FACULTY   = 0;
+    public static final int LIBRARIES = 1;
+    public static final int UM        = 2;
 
-    private Context context;
+    private static final Map<Integer, String> names;
+    static {
+        Map<Integer, String> staticNames = new HashMap<>();
+        staticNames.put(FACULTY, "Collections Organized by Department");
+        staticNames.put(LIBRARIES, "Collections Managed by UM Libraries");
+        staticNames.put(UM, "UM Community-managed Collections");
+        names = Collections.unmodifiableMap(staticNames);
+    }
+
+    private static final Map<Integer, String> shortNames;
+    static {
+        Map<Integer, String> staticShortNames = new HashMap<>();
+        staticShortNames.put(FACULTY, "UM Faculty");  
+        staticShortNames.put(LIBRARIES, "UM Libraries");
+        staticShortNames.put(UM, "UM Community");
+        shortNames = Collections.unmodifiableMap(staticShortNames);
+    }
+
+    protected static final Map<Integer, CommunityGroup> communityGroups;
+    static {
+        Map<Integer, CommunityGroup> staticCommunityGroups = new HashMap<>();
+        staticCommunityGroups.put(FACULTY, new CommunityGroup(FACULTY));
+        //staticCommunityGroups.put(LIBRARIES, new CommunityGroup(LIBRARIES));
+        staticCommunityGroups.put(UM, new CommunityGroup(UM));
+        communityGroups = Collections.unmodifiableMap(staticCommunityGroups);
+    }
 
     private int id;
 
     /**
      * Construct a group object.
      */
-    CommunityGroup(Context context, int id)
-    {
-	this.context = context;
-	this.id = id;
+    private CommunityGroup(int id) {
+        this.id = id;
     }
-
-
-    /**
-     * Get a list of all the community groups.
-     *
-     * @return list of groups
-     */
-
-    public static CommunityGroup[] findAll(Context context)
-    {
-	return new CommunityGroup[]{
-	    new CommunityGroup(context, FACULTY),
-	    new CommunityGroup(context, UM)
-		};
-    }
-
-
-    /**
-     * Get the top level communities in this group.
-     *
-     * @return  array of Community objects
-     */
-
-    public Community[] getCommunities()
-	throws SQLException
-    {
-	return Community.findByCommunityGroupTop(context, this);
-    }
-
 
     /**
      * Get the name of this community group.
      * @return the name of the group
      */
-
     public String getName()
     {
-	switch (id) {
-	case FACULTY:
-	    return "Collections Organized by Department";
-	case LIBRARIES:
-	    return "Collections Managed by UM Libraries";
-	case UM:
-	    return "UM Community-managed Collections";
-	default:
-	    return "??";
-	}
+        return CommunityGroup.names.get(id);
     }
-	    
 
     /**
      * Get the short name of this community group.
@@ -86,32 +69,18 @@ public class CommunityGroup
      *
      * @return the name of the group
      */
-
     public String getShortName()
     {
-	switch (id) {
-	case FACULTY:
-	    return "UM Faculty";
-	case LIBRARIES:
-	    return "UM Libraries";
-	case UM:
-	    return "UM Community";
-	default:
-	    return "??";
-	}
+      return CommunityGroup.shortNames.get(id);
     }
-	    
 
     /**
      * Get the internal ID of this community group
      *
      * @return the internal identifier
      */
-
     public int getID()
     {
-        return id;
+        return this.id;
     }
-
-
 }

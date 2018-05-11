@@ -22,7 +22,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -123,7 +123,7 @@ public class AccessStep extends AbstractSubmissionStep
         asu.addReason(request.getParameter("reason"), form, errorFlag);
 
         // Add Policy Button
-        boolean isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled=DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         if(isAdvancedFormEnabled){
             Button addPolicy = form.addItem().addButton(org.dspace.submit.step.AccessStep.FORM_ACCESS_BUTTON_ADD);
             addPolicy.setValue(T_submit_add_policy);

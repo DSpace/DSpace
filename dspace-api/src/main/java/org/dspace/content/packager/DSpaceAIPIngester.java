@@ -16,12 +16,8 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.Context;
@@ -99,6 +95,11 @@ public class DSpaceAIPIngester
      * 3. If (1) or (2) succeeds, crosswalk it and ignore all other DMDs with
      *    same GROUPID<br>
      * 4. Crosswalk remaining DMDs not eliminated already.
+     * @throws PackageValidationException validation error
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void crosswalkObjectDmd(Context context, DSpaceObject dso,
@@ -197,6 +198,10 @@ public class DSpaceAIPIngester
      * license supplied by explicit argument next, else use collection's
      * default deposit license.
      * Normally the rightsMD crosswalks should provide a license.
+     * @throws PackageValidationException validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void addLicense(Context context, Item item, String license,
@@ -236,13 +241,19 @@ public class DSpaceAIPIngester
      * @param context DSpace Context
      * @param dso DSpace object
      * @param params Packager Parameters
+     * @throws org.dspace.content.packager.PackageValidationException
+     * @throws java.sql.SQLException
+     * @throws org.dspace.content.crosswalk.CrosswalkException
+     * @throws java.io.IOException
+     * @throws org.dspace.authorize.AuthorizeException
      */
     @Override
     public void finishObject(Context context, DSpaceObject dso, PackageParameters params)
         throws PackageValidationException, CrosswalkException,
          AuthorizeException, SQLException, IOException
     {
-        if(dso.getType()==Constants.ITEM)
+        //Metadata fields are now required before adding, so this logic isn't needed anymore
+        /*if(dso.getType()==Constants.ITEM)
         {
             // Check if 'createMetadataFields' option is enabled (default=true)
             // This defaults to true as by default we should attempt to restore as much metadata as we can.
@@ -254,10 +265,15 @@ public class DSpaceAIPIngester
                 createMissingMetadataFields(context, (Item) dso);
             }
         }
+        */
     }
 
     /**
      * Nothing extra to do to bitstream after ingestion.
+     * @throws MetadataValidationException if validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void finishBitstream(Context context,
@@ -273,6 +289,8 @@ public class DSpaceAIPIngester
     /**
      * Return the type of DSpaceObject in this package; it is
      * in the TYPE attribute of the mets:mets element.
+     * @return type
+     * @throws PackageValidationException if package validation error
      */
     @Override
     public int getObjectType(METSManifest manifest)
@@ -298,84 +316,12 @@ public class DSpaceAIPIngester
 
     /**
      * Name used to distinguish DSpace Configuration entries for this subclass.
+     * @return config name
      */
     @Override
     public String getConfigurationName()
     {
         return "dspaceAIP";
-    }
-
-    /**
-     * Verifies that all the unsaved, crosswalked metadata fields that have
-     * been added to an Item actually exist in our Database.  If they don't
-     * exist, they are created within the proper database tables.
-     * <P>
-     * This method must be called *before* item.update(), as the call to update()
-     * will throw a SQLException when attempting to save any fields which
-     * don't already exist in the database.
-     * <P>
-     * NOTE: This will NOT create a missing Metadata Schema (e.g. "dc" schema),
-     * as we do not have enough info to create schemas on the fly.
-     *
-     * @param context - DSpace Context
-     * @param item - Item whose unsaved metadata fields we are testing
-     * @throws AuthorizeException if a metadata field doesn't exist and current user is not authorized to create it (i.e. not an Admin)
-     * @throws PackageValidationException if a metadata schema doesn't exist, as we cannot autocreate a schema
-     */
-    protected static void createMissingMetadataFields(Context context, Item item)
-        throws PackageValidationException, AuthorizeException, IOException, SQLException
-    {
-        // Get all metadata fields/values currently added to this Item
-        Metadatum allMD[] = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-
-        // For each field, we'll check if it exists. If not, we'll create it.
-        for(Metadatum md : allMD)
-        {
-            MetadataSchema mdSchema = null;
-            MetadataField mdField = null;
-            try
-            {
-                //Try to access this Schema
-                mdSchema = MetadataSchema.find(context, md.schema);
-                //If Schema found, try to locate field from database
-                if(mdSchema!=null)
-                {
-                    mdField = MetadataField.findByElement(context, mdSchema.getSchemaID(), md.element, md.qualifier);
-                }
-            }
-            catch(SQLException se)
-            {
-                //If a SQLException error is thrown, then this field does NOT exist in DB
-                //Set field to null, so we know we need to create it
-                mdField = null;
-            }
-
-            // If our Schema was not found, we have a problem
-            // We cannot easily create a Schema automatically -- as we don't know its Namespace
-            if(mdSchema==null)
-            {
-                throw new PackageValidationException("Unknown Metadata Schema encountered (" + md.schema + ") when attempting to ingest an Item.  You will need to create this Metadata Schema in DSpace Schema Registry before the Item can be ingested.");
-            }
-
-            // If our Metadata Field is null, we will attempt to create it in the proper Schema
-            if(mdField==null)
-            {
-                try
-                {
-                    //initialize field (but don't set a scope note) & create it
-                    mdField = new MetadataField(mdSchema, md.element, md.qualifier, null);
-                    // NOTE: Only Adminstrators can create Metadata Fields -- create() will throw an AuthorizationException for non-Admins
-                    mdField.create(context);
-                    //log that field was created
-                    log.info("Located a missing metadata field (schema:'" + mdSchema.getName() +"', element:'"+ md.element +"', qualifier:'"+ md.qualifier +"') while ingesting Item.  This missing field has been created in the DSpace Metadata Field Registry.");
-                }
-                catch(NonUniqueMetadataException ne)
-                {   // This exception should never happen, as we already checked to make sure the field doesn't exist.
-                    // But, we'll catch it anyways so that the Java compiler doesn't get upset
-                    throw new SQLException("Unable to create Metadata Field (element='" + md.element + "', qualifier='" + md.qualifier + "') in Schema "+ mdSchema.getName() +".", ne);
-                }
-            }
-        }
     }
 
     /**

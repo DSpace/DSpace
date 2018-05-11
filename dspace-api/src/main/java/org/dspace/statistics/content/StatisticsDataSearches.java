@@ -12,12 +12,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.ObjectCount;
-import org.dspace.statistics.SolrLogger;
+import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.content.filter.StatisticsFilter;
-import org.dspace.utils.DSpace;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -38,7 +39,7 @@ public class StatisticsDataSearches extends StatisticsData {
     private static final DecimalFormat pageViewFormat = new DecimalFormat("0.00");
     private static final DecimalFormat percentageFormat = new DecimalFormat("0.00%");
     /** Current DSpaceObject for which to generate the statistics. */
-    private DSpaceObject currentDso;
+    protected DSpaceObject currentDso;
 
     public StatisticsDataSearches(DSpaceObject dso) {
         super();
@@ -82,7 +83,7 @@ public class StatisticsDataSearches extends StatisticsData {
                     }
                     fqBuffer.append(getSearchFilterQuery());
 
-                    ObjectCount[] topCounts = SolrLogger.queryFacetField(query, fqBuffer.toString(), typeGenerator.getType(), typeGenerator.getMax(), (typeGenerator.isPercentage() || typeGenerator.isIncludeTotal()), null);
+                    ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, fqBuffer.toString(), typeGenerator.getType(), typeGenerator.getMax(), (typeGenerator.isPercentage() || typeGenerator.isIncludeTotal()), null);
                     long totalCount = -1;
                     if(typeGenerator.isPercentage() && 0 < topCounts.length){
                         //Retrieve the total required to calculate the percentage
@@ -113,7 +114,7 @@ public class StatisticsDataSearches extends StatisticsData {
 
                         dataset.setRowLabel(i, String.valueOf(i + 1));
                         String displayedValue = queryCount.getValue();
-                        if(new DSpace().getConfigurationService().getPropertyAsType("usage-statistics.search.statistics.unescape.queries", Boolean.TRUE)){
+                        if(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType("usage-statistics.search.statistics.unescape.queries", Boolean.TRUE)){
                             displayedValue = displayedValue.replace("\\", "");
                         }
                         dataset.addValueToMatrix(i, 0, displayedValue);
@@ -135,7 +136,7 @@ public class StatisticsDataSearches extends StatisticsData {
                 }else
                 if(typeGenerator.getMode() == DatasetSearchGenerator.Mode.SEARCH_OVERVIEW_TOTAL){
                     //Retrieve the total counts !
-                    ObjectCount totalCount = SolrLogger.queryTotal(query, getSearchFilterQuery());
+                    ObjectCount totalCount = solrLoggerService.queryTotal(query, getSearchFilterQuery());
 
                     //Retrieve the filtered count by using the default filter query
                     StringBuilder fqBuffer = new StringBuilder(defaultFilterQuery);
@@ -145,7 +146,7 @@ public class StatisticsDataSearches extends StatisticsData {
                     }
                     fqBuffer.append(getSearchFilterQuery());
 
-                    ObjectCount totalFiltered = SolrLogger.queryTotal(query, fqBuffer.toString());
+                    ObjectCount totalFiltered = solrLoggerService.queryTotal(query, fqBuffer.toString());
 
 
                     fqBuffer = new StringBuilder(defaultFilterQuery);
@@ -153,7 +154,7 @@ public class StatisticsDataSearches extends StatisticsData {
                     {
                         fqBuffer.append(" AND ");
                     }
-                    fqBuffer.append("statistics_type:").append(SolrLogger.StatisticsType.SEARCH_RESULT.text());
+                    fqBuffer.append("statistics_type:").append(SolrLoggerServiceImpl.StatisticsType.SEARCH_RESULT.text());
 
                     ObjectCount totalPageViews = getTotalPageViews(query, defaultFilterQuery);
 
@@ -201,26 +202,30 @@ public class StatisticsDataSearches extends StatisticsData {
     protected String getQuery() {
         String query;
         if(currentDso != null){
-            query = "scopeType: " + currentDso.getType() + " AND scopeId: " + currentDso.getID();
-
+            query = "scopeType: " + currentDso.getType() + " AND ";
+            if(currentDso instanceof DSpaceObjectLegacySupport){
+                query += " (scopeId:" + currentDso.getID() + " OR scopeId:" + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
+            }else{
+                query += "scopeId:" + currentDso.getID();
+            }
         }else{
             query = "*:*";
         }
         return query;
     }
 
-    private ObjectCount getTotalPageViews(String query, String defaultFilterQuery) throws SolrServerException {
+    protected ObjectCount getTotalPageViews(String query, String defaultFilterQuery) throws SolrServerException {
         StringBuilder fqBuffer;
         fqBuffer = new StringBuilder(defaultFilterQuery);
         if(0 < fqBuffer.length())
         {
             fqBuffer.append(" AND ");
         }
-        fqBuffer.append("statistics_type:").append(SolrLogger.StatisticsType.SEARCH_RESULT.text());
+        fqBuffer.append("statistics_type:").append(SolrLoggerServiceImpl.StatisticsType.SEARCH_RESULT.text());
 
 
         //Retrieve the number of page views by this query !
-        return SolrLogger.queryTotal(query, fqBuffer.toString());
+        return solrLoggerService.queryTotal(query, fqBuffer.toString());
     }
 
     /**
@@ -228,9 +233,9 @@ public class StatisticsDataSearches extends StatisticsData {
      * new searches are searches that haven't been paged through
      * @return a solr filterquery
      */
-    private String getSearchFilterQuery() {
+    protected String getSearchFilterQuery() {
         StringBuilder fqBuffer = new StringBuilder();
-        fqBuffer.append("statistics_type:").append(SolrLogger.StatisticsType.SEARCH.text());
+        fqBuffer.append("statistics_type:").append(SolrLoggerServiceImpl.StatisticsType.SEARCH.text());
         //Also append a filter query to ensure that paging is left out !
         fqBuffer.append(" AND -page:[* TO *]");
         return fqBuffer.toString();

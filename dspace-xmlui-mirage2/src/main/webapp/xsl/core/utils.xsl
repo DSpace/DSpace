@@ -141,5 +141,18 @@
         </xsl:if>
     </xsl:template>
 
+    <!-- Replacing has content in original bundle lables (true,false) in Discover section with i18n elements -->
+    <xsl:template match="//dri:list[@id='aspect.discovery.SidebarFacetsTransformer.list.has_content_in_original_bundle']/dri:item//text()">
+        <xsl:choose>
+            <xsl:when test="substring-before(.,' ') = 'true'">
+                <i18n:text>xmlui.ArtifactBrowser.AdvancedSearch.value_has_content_in_original_bundle_true</i18n:text> 
+            </xsl:when>
+            <xsl:otherwise>
+                <i18n:text>xmlui.ArtifactBrowser.AdvancedSearch.value_has_content_in_original_bundle_false</i18n:text> 
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="substring-after(.,' ')"/>
+    </xsl:template>
 
 </xsl:stylesheet>

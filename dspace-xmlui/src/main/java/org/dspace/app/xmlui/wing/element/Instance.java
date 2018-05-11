@@ -34,7 +34,8 @@ public class Instance extends Container
      * Construct a new field value, when used in a multiple value context
      *
      * @param context
-     *            (Required) The context this element is contained in
+     *            (Required) The context this element is contained in.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Instance(WingContext context) throws WingException
     {
@@ -48,6 +49,8 @@ public class Instance extends Container
 
     /**
      * Set the raw value of the field removing any previous raw values.
+     * @return the new Value.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Value setValue() throws WingException
     {
@@ -62,6 +65,7 @@ public class Instance extends Container
      *
      * @param characters
      *            (May be null) Field value as a string
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setValue(String characters) throws WingException
     {
@@ -75,6 +79,7 @@ public class Instance extends Container
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setValue(Message message) throws WingException
     {
@@ -89,6 +94,7 @@ public class Instance extends Container
      *
      * @param checked
      *            (Required) Whether the checkbox is checked or not.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setValue(boolean checked) throws WingException
     {
@@ -100,6 +106,8 @@ public class Instance extends Container
     /**
      * Set the authority value of the field removing any previous authority values.
      * Initialized to an empty value.
+     * @return the new authority Value.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Value setAuthorityValue() throws WingException
     {
@@ -111,6 +119,9 @@ public class Instance extends Container
      *
      * @param characters
      *            (May be null) Field value as a string
+     * @param confidence measure of confidence.
+     * @return the new Value.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Value setAuthorityValue(String characters, String confidence) throws WingException
     {
@@ -126,6 +137,7 @@ public class Instance extends Container
      *
      * @param returnValue
      *            (Required) The return value of the option to be selected.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setOptionSelected(String returnValue) throws WingException
     {
@@ -138,6 +150,7 @@ public class Instance extends Container
      *
      * @param returnValue
      *            (Required) The return value of the option to be selected.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setOptionSelected(int returnValue) throws WingException
     {
@@ -151,6 +164,8 @@ public class Instance extends Container
     /**
      * Set the interpreted value of the field removing any previous interpreted
      * values.
+     * @return the new Value.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Value setInterpretedValue() throws WingException
     {
@@ -166,6 +181,7 @@ public class Instance extends Container
      *
      * @param characters
      *            (May be null) Field value as a string
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setInterpretedValue(String characters) throws WingException
     {
@@ -180,6 +196,7 @@ public class Instance extends Container
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setInterpretedValue(Message message) throws WingException
     {
@@ -198,6 +215,8 @@ public class Instance extends Container
      *
      * @param option
      *            (Required) The return value of the selected option.
+     * @return the new Value.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Value addOptionValue(String option) throws WingException
     {
@@ -215,6 +234,7 @@ public class Instance extends Container
      *            (Required) determine if the value is selected or not.
      * @param characters
      *            (may be null) The returned value for this field, if selected.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setCheckedValue(boolean checked, String characters) throws WingException
     {
@@ -238,8 +258,10 @@ public class Instance extends Container
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
 
+    @Override
     public void toSAX(ContentHandler contentHandler,
             LexicalHandler lexicalHandler, NamespaceSupport namespaces)
             throws SAXException
@@ -257,7 +279,7 @@ public class Instance extends Container
      */
     private void removeValueOfType(String removeType)
     {
-        List<Value> found = new ArrayList<Value>();
+        List<Value> found = new ArrayList<>();
         for (AbstractWingElement awe : contents)
         {
             if (awe instanceof Value)

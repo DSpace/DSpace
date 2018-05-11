@@ -11,12 +11,16 @@ package org.dspace.authorize;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 
 /**
  * Command line tool to locate collections without default item and bitstream
@@ -30,6 +34,8 @@ public class FixDefaultPolicies
 {
     /**
      * Command line interface to setPolicies - run to see arguments
+     * @param argv arguments
+     * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception
     {
@@ -41,42 +47,31 @@ public class FixDefaultPolicies
         //////////////////////
         // carnage begins here
         //////////////////////
-        Collection[] collections = Collection.findAll(c);
+        ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
+        List<Collection> collections = contentServiceFactory.getCollectionService().findAll(c);
 
-        for (int i = 0; i < collections.length; i++)
-        {
-            Collection t = collections[i];
-
-            System.out.println("Collection " + t + " " + t.getMetadata("name"));
+        for (Collection t : collections) {
+            System.out.println("Collection " + t + " " + t.getName());
 
             // check for READ
-            if (checkForPolicy(c, t, Constants.READ))
-            {
+            if (checkForPolicy(c, t, Constants.READ)) {
                 System.out.println("\tFound READ policies!");
-            }
-            else
-            {
+            } else {
                 System.out.println("\tNo READ policy found, adding anonymous.");
                 addAnonymousPolicy(c, t, Constants.READ);
             }
 
-            if (checkForPolicy(c, t, Constants.DEFAULT_ITEM_READ))
-            {
+            if (checkForPolicy(c, t, Constants.DEFAULT_ITEM_READ)) {
                 System.out.println("\tFound DEFAULT_ITEM_READ policies!");
-            }
-            else
-            {
+            } else {
                 System.out
                         .println("\tNo DEFAULT_ITEM_READ policy found, adding anonymous.");
                 addAnonymousPolicy(c, t, Constants.DEFAULT_ITEM_READ);
             }
 
-            if (checkForPolicy(c, t, Constants.DEFAULT_BITSTREAM_READ))
-            {
+            if (checkForPolicy(c, t, Constants.DEFAULT_BITSTREAM_READ)) {
                 System.out.println("\tFound DEFAULT_BITSTREAM_READ policies!");
-            }
-            else
-            {
+            } else {
                 System.out
                         .println("\tNo DEFAULT_BITSTREAM_READ policy found, adding anonymous.");
                 addAnonymousPolicy(c, t, Constants.DEFAULT_BITSTREAM_READ);
@@ -84,21 +79,15 @@ public class FixDefaultPolicies
         }
 
         // now ensure communities have READ policies
-        Community[] communities = Community.findAll(c);
+        List<Community> communities = contentServiceFactory.getCommunityService().findAll(c);
 
-        for (int i = 0; i < communities.length; i++)
-        {
-            Community t = communities[i];
-
-            System.out.println("Community " + t + " " + t.getMetadata("name"));
+        for (Community t : communities) {
+            System.out.println("Community " + t + " " + t.getName());
 
             // check for READ
-            if (checkForPolicy(c, t, Constants.READ))
-            {
+            if (checkForPolicy(c, t, Constants.READ)) {
                 System.out.println("\tFound READ policies!");
-            }
-            else
-            {
+            } else {
                 System.out.println("\tNo READ policy found, adding anonymous.");
                 addAnonymousPolicy(c, t, Constants.READ);
             }
@@ -115,7 +104,7 @@ public class FixDefaultPolicies
             int myaction) throws SQLException
     {
         // check to see if any policies exist for this action
-        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(c, t, myaction);
+        List<ResourcePolicy> policies = AuthorizeServiceFactory.getInstance().getAuthorizeService().getPoliciesActionFilter(c, t, myaction);
 
         return policies.size() > 0;
     }
@@ -128,13 +117,14 @@ public class FixDefaultPolicies
             int myaction) throws SQLException, AuthorizeException
     {
         // group 0 is the anonymous group!
-        Group anonymousGroup = Group.find(c, 0);
+        Group anonymousGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(c, Group.ANONYMOUS);
 
         // now create the default policies for submitted items
-        ResourcePolicy myPolicy = ResourcePolicy.create(c);
-        myPolicy.setResource(t);
+        ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+        ResourcePolicy myPolicy = resourcePolicyService.create(c);
+        myPolicy.setdSpaceObject(t);
         myPolicy.setAction(myaction);
         myPolicy.setGroup(anonymousGroup);
-        myPolicy.update();
+        resourcePolicyService.update(c, myPolicy);
     }
 }

@@ -25,9 +25,9 @@ import org.dspace.core.ConfigurationManager;
 /**
  * This class allows the running of the DSpace statistic tools
  * 
- * Usage: java CreateStatReport -r <statistic to run>
- * Available: 	<stat-initial> <stat-general> <stat-monthly> <stat-report-initial> 
- * 				<stat-report-general> <stat-report-monthly>
+ * Usage: {@code java CreateStatReport -r <statistic to run>}
+ * Available: {@code <stat-initial> <stat-general> <stat-monthly> <stat-report-initial> 
+ * 				<stat-report-general> <stat-report-monthly>}
  * 
  * @author Chris Yates
  *
@@ -95,7 +95,7 @@ public class CreateStatReport {
         context.turnOffAuthorisationSystem();
         
         //get paths to directories
-        outputLogDirectory = ConfigurationManager.getProperty("log.dir") + File.separator;
+        outputLogDirectory = ConfigurationManager.getProperty("log.report.dir") + File.separator;
         outputReportDirectory = ConfigurationManager.getProperty("report.dir") + File.separator;
         
         //read in command line variable to determine which statistic to run
@@ -145,7 +145,7 @@ public class CreateStatReport {
 	/**
 	 * This method generates a report from the first of the current month to the end of the current month.
 	 * 
-	 * @throws Exception
+	 * @throws Exception if error
 	 */
 	private static void statMonthly() throws Exception {
         
@@ -184,7 +184,7 @@ public class CreateStatReport {
 	/**
 	 * This method generates a full report based on the full log period
 	 * 
-	 * @throws Exception
+	 * @throws Exception if error
 	 */
 	private static void statGeneral() throws Exception {
 		
@@ -216,7 +216,7 @@ public class CreateStatReport {
 	 * This script starts from the year and month specified below and loops each month until the current month
 	 * generating a monthly aggregation files for the DStat system.
 	 * 
-	 * @throws Exception
+	 * @throws Exception if error
 	 */
 	private static void statInitial() throws Exception {
 				
@@ -265,7 +265,7 @@ public class CreateStatReport {
 	/**
 	 * This method generates a full report based on the full log period
 	 * 
-	 * @throws Exception
+	 * @throws Exception if error
 	 */
 	private static void statReportGeneral() throws Exception {
 		
@@ -304,7 +304,7 @@ public class CreateStatReport {
 	 * This script starts from the year and month specified below and loops each month until the current month
 	 * generating monthly reports from the DStat aggregation files
 	 * 
-	 * @throws Exception
+	 * @throws Exception if error
 	 */
 	private static void statReportInitial() throws Exception {
 		
@@ -349,7 +349,7 @@ public class CreateStatReport {
 	/**
 	 * This method generates a report from the aggregation files which have been run for the most recent month
 	 * 
-	 * @throws Exception
+	 * @throws Exception if error
 	 */
 	private static void statReportMonthly() throws Exception 
 	{

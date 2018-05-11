@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <!--
+        Every url in the rest will pass through these filters, login & shibboleth-login will trigger an authentication attempt.
+     -->
+    <bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
+        <security:filter-chain-map path-type="ant">
+            <security:filter-chain pattern="/login" filters="sif,passwordLoginAuthenticationFilter"/>
+            <security:filter-chain pattern="/shibboleth-login" filters="sif,passwordLoginAuthenticationFilter"/>
+            <security:filter-chain pattern="/logout" filters="sif,logoutFilter" />
+            <security:filter-chain pattern="/**" filters="sif"/>
+        </security:filter-chain-map>
+    </bean>
+
+    <!-- Creates the spring security context object based on what was there previously -->
+    <bean id="sif" class="org.springframework.security.web.context.SecurityContextPersistenceFilter"  />
+
+    <!--Authentication filter for login -->
+    <bean id="passwordLoginAuthenticationFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+        <!--Custom DSpace authentication manager, will handle the actual login-->
+        <property name="authenticationManager" ref="dspaceAuthenticationManager"/>
+        <!-- Ensures that after login no redirect is made to the home page, the rest will return a 200 status code -->
+        <property name="authenticationSuccessHandler" ref="org.dspace.rest.authentication.NoRedirectAuthenticationLoginSuccessHandler"/>
+        <property name="usernameParameter" value="email"/>
+        <property name="passwordParameter" value="password"/>
+        <property name="postOnly" value="false"/>
+        <!--Match on any request-->
+        <property name="requiresAuthenticationRequestMatcher" ref="org.springframework.security.web.util.matcher.AnyRequestMatcher"/>
+    </bean>
+
+    <security:authentication-manager alias="dspaceAuthenticationManager">
+        <security:authentication-provider ref='dspaceAuthenticationProvider'/>
+    </security:authentication-manager>
+
+    <!-- Custom DSpace authentication provider, this bean is responsible to login the user, it is triggered by calling the "passwordLoginAuthenticationFilter"  -->
+    <bean class="org.dspace.rest.authentication.DSpaceAuthenticationProvider" id="dspaceAuthenticationProvider" lazy-init="true" />
+
+
+    <!--Filter for logout, destroys the spring security context-->
+    <bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+        <constructor-arg index="0" ref="org.dspace.rest.authentication.NoRedirectAuthenticationLogoutSuccessHandler" />
+        <constructor-arg index="1">
+            <list>
+                <bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+            </list>
+        </constructor-arg>
+        <!--Match on any request-->
+        <property name="logoutRequestMatcher" ref="org.springframework.security.web.util.matcher.AnyRequestMatcher"/>
+    </bean>
+
+    <!--Utility beans-->
+    <bean id="org.springframework.security.web.util.matcher.AnyRequestMatcher" class="org.springframework.security.web.util.matcher.AnyRequestMatcher"/>
+
+    <bean id="org.dspace.rest.authentication.NoRedirectAuthenticationLoginSuccessHandler" class="org.dspace.rest.authentication.NoRedirectAuthenticationLoginSuccessHandler"/>
+    <bean id="org.dspace.rest.authentication.NoRedirectAuthenticationLogoutSuccessHandler" class="org.dspace.rest.authentication.NoRedirectAuthenticationLogoutSuccessHandler"/>
+</beans>

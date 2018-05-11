@@ -10,7 +10,7 @@
  * Generally, subclasses of {@link org.dspace.identifier.IdentifierProvider}
  * offer methods to create, delete, and resolve subclasses of
  * {@link org.dspace.identifier.Identifier}.  Classes outside this package
- * should rely on {@link org.dspace.identifier.IdentifierService} to perform
+ * should rely on {@link org.dspace.identifier.service.IdentifierService} to perform
  * these operations using the most appropriate provider.
  */
 

@@ -12,6 +12,8 @@ import java.util.List;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.dspace.content.Collection;
 import org.xml.sax.XMLReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -72,10 +74,10 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
     }
 
     // this implements the specific RoMEO API args and XML tag naming
-    public abstract Choices getMatches(String text, int collection, int start, int limit, String locale);
+    public abstract Choices getMatches(String text, Collection collection, int start, int limit, String locale);
 
     @Override
-    public Choices getBestMatch(String field, String text, int collection, String locale)
+    public Choices getBestMatch(String field, String text, Collection collection, String locale)
     {
         return getMatches(field, text, collection, 0, 2, locale);
     }

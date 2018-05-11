@@ -12,12 +12,14 @@ import java.awt.Color;
 import java.awt.image.*;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
+import java.awt.Font;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -25,10 +27,11 @@ import org.dspace.core.ConfigurationManager;
  * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
  * no bigger than. Creates only JPEGs.
  *
- * @author Jason Sherman <jsherman@usao.edu>
+ * @author Jason Sherman jsherman@usao.edu
  */
 public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 {
+    @Override
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".jpg";
@@ -38,6 +41,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
      * @return String bundle name
      *  
      */
+    @Override
     public String getBundleName()
     {
         return "THUMBNAIL";
@@ -46,6 +50,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
     /**
      * @return String bitstreamformat
      */
+    @Override
     public String getFormatString()
     {
         return "JPEG";
@@ -54,23 +59,33 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
     /**
      * @return String description
      */
+    @Override
     public String getDescription()
     {
         return "Generated Thumbnail";
     }
 
     /**
-     * @param source
-     *            source input stream
+     * @param currentItem item
+     * @param source source input stream
+     * @param verbose verbose mode
      * 
      * @return InputStream the resulting input stream
+     * @throws Exception if error
      */
-    public InputStream getDestinationStream(InputStream source)
+    @Override
+    public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
             throws Exception
     {
         // read in bitstream's image
         BufferedImage buf = ImageIO.read(source);
 
+        return getThumb(currentItem, buf, verbose);
+    }
+
+    public InputStream getThumb(Item currentItem, BufferedImage buf, boolean verbose)
+            throws Exception
+    {
         // get config params
         float xmax = (float) ConfigurationManager
                 .getIntProperty("thumbnail.maxwidth");
@@ -81,13 +96,19 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
         boolean hqscaling = (boolean) ConfigurationManager
                 .getBooleanProperty("thumbnail.hqscaling");
 
+        return getThumbDim(currentItem, buf, verbose, xmax, ymax, blurring, hqscaling, 0, 0, null);
+    }
+
+    public InputStream getThumbDim(Item currentItem, BufferedImage buf, boolean verbose, float xmax, float ymax, boolean blurring, boolean hqscaling, int brandHeight, int brandFontPoint, String brandFont)
+            throws Exception
+    {
         // now get the image dimensions
         float xsize = (float) buf.getWidth(null);
         float ysize = (float) buf.getHeight(null);
 
         // if verbose flag is set, print out dimensions
         // to STDOUT
-        if (MediaFilterManager.isVerbose)
+        if (verbose)
         {
             System.out.println("original size: " + xsize + "," + ysize);
         }
@@ -100,7 +121,7 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
-            if (MediaFilterManager.isVerbose)
+            if (verbose)
             {
                 System.out.println("x scale factor: " + scale_factor);
             }
@@ -112,9 +133,9 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
-            if (MediaFilterManager.isVerbose)
+            if (verbose)
             {
-                System.out.println("new size: " + xsize + "," + ysize);
+                System.out.println("size after fitting to maximum width: " + xsize + "," + ysize);
             }
         }
 
@@ -130,9 +151,9 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
         }
 
         // if verbose flag is set, print details to STDOUT
-        if (MediaFilterManager.isVerbose)
+        if (verbose)
         {
-            System.out.println("created thumbnail size: " + xsize + ", "
+            System.out.println("size after fitting to maximum height: " + xsize + ", "
                     + ysize);
         }
 
@@ -161,6 +182,15 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
         Graphics2D g2d = thumbnail.createGraphics();
         g2d.drawImage(buf, 0, 0, (int) xsize, (int) ysize, null);
 
+        if (brandHeight != 0) {
+            Brand brand = new Brand((int) xsize, brandHeight, new Font(brandFont, Font.PLAIN, brandFontPoint), 5);
+            BufferedImage brandImage = brand.create(ConfigurationManager.getProperty("webui.preview.brand"),
+                                                    ConfigurationManager.getProperty("webui.preview.brand.abbrev"),
+                                                    currentItem == null ? "" : "hdl:" + currentItem.getHandle());
+
+            g2d.drawImage(brandImage, (int)0, (int)ysize, (int) xsize, (int) 20, null);
+        }
+
         // now create an input stream for the thumbnail buffer and return it
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -173,16 +203,19 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
     }
 
 
+    @Override
     public String[] getInputMIMETypes()
     {
         return ImageIO.getReaderMIMETypes();
     }
 
+    @Override
     public String[] getInputDescriptions()
     {
         return null;
     }
 
+    @Override
     public String[] getInputExtensions()
     {
         // Temporarily disabled as JDK 1.6 only
@@ -204,14 +237,15 @@ public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
      return normal;
     }
 
-    public BufferedImage getBlurredInstance(BufferedImage buf)
-    {
     /**
      * Convenience method that returns a blurred instance of the
      * provided {@code BufferedImage}.
      *
+     * @param buf buffered image
+     * @return updated BufferedImage
      */
-
+    public BufferedImage getBlurredInstance(BufferedImage buf)
+    {
      buf = getNormalizedInstance(buf);
 
      // kernel for blur op

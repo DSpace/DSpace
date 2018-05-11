@@ -51,7 +51,7 @@ public final class SessionImpl implements Session {
     /**
      * Make a session that is associated with the current HTTP request.
      *
-     * @param request
+     * @param request current request
      */
     public SessionImpl(HttpServletRequest request) {
         if (request == null) {
@@ -81,7 +81,7 @@ public final class SessionImpl implements Session {
 
     /**
      * Set the sessionId.  Normally this should not probably happen much.
-     * @param sessionId
+     * @param sessionId the session ID
      */
     public void setSessionId(String sessionId) {
         if (! isAttributeSet(SESSION_ID)) {
@@ -99,8 +99,8 @@ public final class SessionImpl implements Session {
      * re-binding the session or clearing the associated user.
      * If userId is null then user is cleared.
      *
-     * @param userId
-     * @param userEid
+     * @param userId the user ID
+     * @param userEid the user EID
      */
     public void setUserId(String userId, String userEid) {
         if (isBlank(userId)) {
@@ -271,6 +271,7 @@ public final class SessionImpl implements Session {
     /* (non-Javadoc)
      * @see org.dspace.services.model.Session#getAttribute(java.lang.String)
      */
+    @Override
     public String getAttribute(String key) {
         return getKeyAttribute(key);
     }
@@ -278,6 +279,7 @@ public final class SessionImpl implements Session {
     /* (non-Javadoc)
      * @see org.dspace.services.model.Session#setAttribute(java.lang.String, java.lang.String)
      */
+    @Override
     public void setAttribute(String key, String value) {
         setKeyAttribute(key, value);
     }
@@ -285,6 +287,7 @@ public final class SessionImpl implements Session {
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpSession#removeAttribute(java.lang.String)
      */
+    @Override
     public void removeAttribute(String name) {
         removeKeyAttribute(name);
     }
@@ -292,6 +295,7 @@ public final class SessionImpl implements Session {
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpSession#setAttribute(java.lang.String, java.lang.Object)
      */
+    @Override
     public void setAttribute(String name, Object value) {
         if (value != null && !(value instanceof String)) {
             throw new UnsupportedOperationException("Invalid session attribute ("+name+","+value+"), Only strings can be stored in the session");
@@ -304,6 +308,7 @@ public final class SessionImpl implements Session {
      * Modifying it has no effect on the session attributes.
      */
     @SuppressWarnings("unchecked")
+    @Override
     public Map<String, String> getAttributes() {
         Map<String, String> map = new HashMap<String, String>();
         if (! isInvalidated()) {
@@ -321,6 +326,7 @@ public final class SessionImpl implements Session {
      * @see javax.servlet.http.HttpSession#getAttributeNames()
      */
     @SuppressWarnings("unchecked")
+    @Override
     public Enumeration getAttributeNames() {
         return this.httpSession.getAttributeNames();
     }
@@ -329,6 +335,7 @@ public final class SessionImpl implements Session {
      * @see org.dspace.services.model.Session#clear()
      */
     @SuppressWarnings("unchecked")
+    @Override
     public void clear() {
         if (! isInvalidated()) {
             Enumeration<String> names = this.httpSession.getAttributeNames();
@@ -339,40 +346,49 @@ public final class SessionImpl implements Session {
         }
     }
 
+    @Override
     public String getOriginatingHostIP() {
         return getKeyAttribute(HOST_IP);
     }
 
+    @Override
     public String getOriginatingHostName() {
         return getKeyAttribute(HOST_NAME);
     }
 
+    @Override
     public String getServerId() {
         return getKeyAttribute(SERVER_ID);
     }
 
+    @Override
     public String getSessionId() {
         return getKeyAttribute(SESSION_ID);
     }
 
+    @Override
     public String getUserEID() {
         return getKeyAttribute(USER_EID);
     }
 
+    @Override
     public String getUserId() {
         return getKeyAttribute(USER_ID);
     }
 
+    @Override
     public boolean isActive() {
         return ! isInvalidated();
     }
 
     // HTTP SESSION passthroughs
 
+    @Override
     public long getCreationTime() {
         return this.httpSession.getCreationTime();
     }
 
+    @Override
     public String getId() {
         String id = null;
         if (isAttributeSet(SESSION_ID)) {
@@ -383,18 +399,22 @@ public final class SessionImpl implements Session {
         return id;
     }
 
+    @Override
     public long getLastAccessedTime() {
         return this.httpSession.getLastAccessedTime();
     }
 
+    @Override
     public int getMaxInactiveInterval() {
         return this.httpSession.getMaxInactiveInterval();
     }
 
+    @Override
     public void setMaxInactiveInterval(int interval) {
         this.httpSession.setMaxInactiveInterval(interval);
     }
 
+    @Override
     public ServletContext getServletContext() {
         if (this.httpSession != null) {
             return this.httpSession.getServletContext();
@@ -402,6 +422,7 @@ public final class SessionImpl implements Session {
         throw new UnsupportedOperationException("No http session available for this operation");
     }
 
+    @Override
     public void invalidate() {
         if (! isInvalidated()) {
             this.httpSession.invalidate();
@@ -409,6 +430,7 @@ public final class SessionImpl implements Session {
         // TODO nothing otherwise?
     }
 
+    @Override
     public boolean isNew() {
         if (! isInvalidated()) {
             return this.httpSession.isNew();
@@ -421,6 +443,7 @@ public final class SessionImpl implements Session {
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpSession#getValue(java.lang.String)
      */
+    @Override
     public Object getValue(String name) {
         return getKeyAttribute(name);
     }
@@ -428,6 +451,7 @@ public final class SessionImpl implements Session {
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpSession#getValueNames()
      */
+    @Override
     public String[] getValueNames() {
         Set<String> keys = getAttributes().keySet();
         return keys.toArray(new String[keys.size()]);
@@ -436,6 +460,7 @@ public final class SessionImpl implements Session {
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpSession#removeValue(java.lang.String)
      */
+    @Override
     public void removeValue(String name) {
         removeAttribute(name);
     }
@@ -443,10 +468,12 @@ public final class SessionImpl implements Session {
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpSession#putValue(java.lang.String, java.lang.Object)
      */
+    @Override
     public void putValue(String name, Object value) {
         setAttribute(name, value);
     }
 
+    @Override
     public HttpSessionContext getSessionContext() {
         if (this.httpSession != null) {
             return this.httpSession.getSessionContext();
@@ -461,7 +488,7 @@ public final class SessionImpl implements Session {
     /**
      * Check if something is blank (null or "").
      *
-     * @param string
+     * @param string string to check
      * @return true if is blank
      */
     public static boolean isBlank(String string) {

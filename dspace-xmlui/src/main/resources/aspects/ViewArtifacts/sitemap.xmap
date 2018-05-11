@@ -11,9 +11,8 @@
 
 <!--
 
-The ArtifactBrowser Aspect is responsible for browsing communities /
-collections / items / and bitstreams, viewing an individual item,
-and searching the repository.
+The ViewArtifacts Aspect is responsible for viewing communities /
+collections / items / and bitstreams
 -->
 
 <!-- Added request-item support

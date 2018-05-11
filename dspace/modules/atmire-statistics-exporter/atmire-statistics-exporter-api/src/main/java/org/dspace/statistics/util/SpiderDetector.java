@@ -7,16 +7,13 @@
  */
 package org.dspace.statistics.util;
 
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.statistics.SolrLogger;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
+import java.util.regex.*;
+import javax.servlet.http.*;
+import org.apache.log4j.*;
+import org.dspace.services.factory.*;
+import org.dspace.statistics.factory.*;
 
 /**
  * SpiderDetector is used to find IP's that are spiders...
@@ -30,13 +27,15 @@ import java.util.regex.Pattern;
  */
 public class SpiderDetector {
 
-    private static Logger log = Logger.getLogger(SpiderDetector.class);
+    private static final Logger log = Logger.getLogger(SpiderDetector.class);
+
+
 
     /**
      * Sparse HAshTable structure to hold IP Address Ranges.
      */
     private static IPTable table = null;
-    private static Set<Pattern> spidersRegex = null;
+    private static Set<Pattern> spidersRegex = Collections.synchronizedSet(new HashSet<Pattern>());
     private static Set<String> spidersMatched = null;
 
     /**
@@ -47,32 +46,32 @@ public class SpiderDetector {
      * @throws java.io.IOException could not happen since we check the file be4 we use it
      */
     public static Set<String> readIpAddresses(File spiderIpFile) throws IOException {
-        Set<String> ips = new HashSet<String>();
+        Set<String> ips = new HashSet<>();
 
         if (!spiderIpFile.exists() || !spiderIpFile.isFile()) {
             return ips;
         }
 
         //Read our file & get all them ip's
-        BufferedReader in = new BufferedReader(new FileReader(spiderIpFile));
-        String line;
-        while ((line = in.readLine()) != null) {
-            if (!line.startsWith("#")) {
-                line = line.trim();
+        try (BufferedReader in = new BufferedReader(new FileReader(spiderIpFile))){
+            String line;
+            while ((line = in.readLine()) != null) {
+                if (!line.startsWith("#")) {
+                    line = line.trim();
 
-                if (!line.equals("") && !Character.isDigit(line.charAt(0))) {
-                    // is a hostname
-                    // add this functionality later...
-                } else if (!line.equals("")) {
-                    ips.add(line);
-                    // is full v4 ip (too tired to deal with v6)...
+                    if (!line.equals("") && !Character.isDigit(line.charAt(0))) {
+                        // is a hostname
+                        // add this functionality later...
+                    } else if (!line.equals("")) {
+                        ips.add(line);
+                        // is full v4 ip (too tired to deal with v6)...
+                    }
+                } else {
+                    //   ua.add(line.replaceFirst("#","").replaceFirst("UA","").trim());
+                    // ... add this functionality later
                 }
-            } else {
-                //   ua.add(line.replaceFirst("#","").replaceFirst("UA","").trim());
-                // ... add this functionality later
             }
         }
-        in.close();
         return ips;
     }
 
@@ -90,11 +89,11 @@ public class SpiderDetector {
         private loader to populate the table from files.
      */
 
-    private static void loadSpiderIpAddresses() {
+    private static synchronized void loadSpiderIpAddresses() {
         if (table == null) {
             table = new IPTable();
 
-            String filePath = ConfigurationManager.getProperty("dspace.dir");
+            String filePath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir");
             try {
                 File spidersDir = new File(filePath, "config/spiders");
 
@@ -130,9 +129,9 @@ public class SpiderDetector {
         /*
         * 1) If the IP address matches the spider IP addresses (this is the current implementation)
         */
-        boolean checkSpidersIP = ConfigurationManager.getBooleanProperty("stats","spider.ipmatch.enabled", true);
+        boolean checkSpidersIP = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType("stats.spider.ipmatch.enabled", true, true);
         if (checkSpidersIP) {
-            if (SolrLogger.isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
+            if (StatisticsServiceFactory.getInstance().getSolrLoggerService().isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
                 /* This header is a comma delimited list */
                 for (String xfip : request.getHeader("X-Forwarded-For").split(",")) {
                     if (isSpider(xfip)) {
@@ -148,7 +147,7 @@ public class SpiderDetector {
         /*
          * 2) if the user-agent header is empty - DISABLED BY DEFAULT -
          */
-        boolean checkSpidersEmptyAgent = ConfigurationManager.getBooleanProperty("stats","spider.agentempty.enabled", false);
+        boolean checkSpidersEmptyAgent = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType("stats.spider.agentempty.enabled", false, true);
         if (checkSpidersEmptyAgent) {
             if (request.getHeader("user-agent") == null || request.getHeader("user-agent").length() == 0) {
                 log.debug("spider.agentempty");
@@ -158,7 +157,7 @@ public class SpiderDetector {
         /*
          * 3) if the user-agent corresponds to one of the regexes at http://www.projectcounter.org/r4/COUNTER_robot_txt_list_Jan_2011.txt
          */
-        boolean checkSpidersTxt = ConfigurationManager.getBooleanProperty("stats","spider.agentregex.enabled", true);
+        boolean checkSpidersTxt = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType("stats.spider.agentregex.enabled", true, true);
         if (checkSpidersTxt) {
             String userAgent = request.getHeader("user-agent");
 
@@ -206,15 +205,17 @@ public class SpiderDetector {
             log.debug("spider.agentregex");
             return true;
         } else {
-            if (spidersRegex == null)
+            synchronized(spidersRegex) {
+                if (spidersRegex.isEmpty())
                 loadSpiderRegexFromFile();
+            }
 
             if (spidersRegex != null) {
                 for (Object regex : spidersRegex.toArray()) {
                     Matcher matcher = ((Pattern) regex).matcher(userAgent);
                     if (matcher.find()) {
                         if (spidersMatched == null) {
-                            spidersMatched = new HashSet<String>();
+                            spidersMatched = new HashSet<>();
                         }
                         if (spidersMatched.size() >= 100) {
                             spidersMatched.clear();
@@ -234,8 +235,7 @@ public class SpiderDetector {
      * Original file downloaded from http://www.projectcounter.org/r4/COUNTER_robot_txt_list_Jan_2011.txt during build
      */
     public static void loadSpiderRegexFromFile() {
-        spidersRegex = new HashSet<Pattern>();
-        String spidersTxt = ConfigurationManager.getProperty("stats","spider.agentregex.regexfile");
+        String spidersTxt = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType("stats.spider.agentregex.regexfile", String.class);
         DataInputStream in = null;
         try {
             FileInputStream fstream = new FileInputStream(spidersTxt);

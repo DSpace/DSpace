@@ -22,7 +22,7 @@ import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -81,17 +81,17 @@ public class METSDisseminationCrosswalk
     }
 
     @Override
-    public List<Element> disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
         List<Element> result = new ArrayList<Element>(1);
-        result.add(disseminateElement(dso));
+        result.add(disseminateElement(context, dso));
         return result;
     }
 
     @Override
-    public Element disseminateElement(DSpaceObject dso)
+    public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -101,7 +101,7 @@ public class METSDisseminationCrosswalk
         }
         
         PackageDisseminator dip = (PackageDisseminator)
-          PluginManager.getNamedPlugin(PackageDisseminator.class, METS_PACKAGER_PLUGIN);
+          CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(PackageDisseminator.class, METS_PACKAGER_PLUGIN);
         if (dip == null)
         {
             throw new CrosswalkInternalException("Cannot find a disseminate plugin for package=" + METS_PACKAGER_PLUGIN);
@@ -121,9 +121,7 @@ public class METSDisseminationCrosswalk
             tempFile.deleteOnExit();
 
             // Disseminate METS to temp file
-            Context context = new Context();
             dip.disseminate(context, dso, pparams, tempFile);
-            context.complete();
 
             try
             {

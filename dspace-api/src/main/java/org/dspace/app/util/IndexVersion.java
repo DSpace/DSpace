@@ -21,10 +21,10 @@ import org.apache.lucene.util.Version;
  * so that they can be upgraded to the latest version.
  * <p>
  * You must pass it the full path of the index directory, e.g.
- * [dspace]/solr/statistics/data/index/
+ * {@code [dspace]/solr/statistics/data/index/}
  * <p>
  * The response is simply a version number (e.g. 4.4), as this is utilized by
- * the "ant update_solr_indexes" target in [src]/dspace/src/main/config/build.xml
+ * the {@code ant update_solr_indexes} target in {@code [src]/dspace/src/main/config/build.xml}
  * 
  * @author tdonohue
  */
@@ -106,7 +106,7 @@ public class IndexVersion
      *          Full path of the Solr/Lucene index directory
      * @return version as a string (e.g. "4.4"), empty string ("") if index directory is empty,
      *         or null if directory doesn't exist.
-     * @throws IOException 
+     * @throws IOException if IO error
      */
     public static String getIndexVersion(String indexDirPath)
             throws IOException
@@ -218,14 +218,14 @@ public class IndexVersion
      * <P>
      * NOTE: In case it is not obvious, software version numbering does NOT 
      * behave like normal decimal numbers. For example, in software versions
-     * the following statement is TRUE: 4.1 < 4.4 < 4.5 < 4.10 < 4.21 < 4.51
+     * the following statement is TRUE: {@code 4.1 < 4.4 < 4.5 < 4.10 < 4.21 < 4.51}
      * 
      * @param firstVersion
      *          First version to compare, as a String
      * @param secondVersion
      *          Second version to compare as a String
-     * @return -1 if first < second, 1 if first > second, 0 if equal
-     * @throws IOException 
+     * @return -1 if first less than second, 1 if first greater than second, 0 if equal
+     * @throws IOException if IO error
      */
     public static int compareSoftwareVersions(String firstVersion, String secondVersion)
             throws IOException

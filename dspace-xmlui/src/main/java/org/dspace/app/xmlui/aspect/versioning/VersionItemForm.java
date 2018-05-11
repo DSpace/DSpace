@@ -14,12 +14,16 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
-import org.dspace.utils.DSpace;
-import org.dspace.versioning.VersioningService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 /**
  *
@@ -44,6 +48,10 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
     private static final Message T_summary = message("xmlui.aspect.versioning.VersionItemForm.summary");
 
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
 		pageMeta.addMetadata("title").addContent(T_title);
 		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
@@ -51,7 +59,7 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
         Item item = getItem();
         if(item != null)
         {
-            HandleUtil.buildHandleTrail(item, pageMeta, contextPath);
+            HandleUtil.buildHandleTrail(context, item, pageMeta, contextPath);
             pageMeta.addTrailLink(contextPath + "/handle/" +  item.getHandle(), item.getName());
         }
         pageMeta.addTrail().addContent(T_trail);
@@ -63,7 +71,7 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
         Item item = getItem();
 
         //Only (collection) admins should be able to create a new version
-        if(!AuthorizeManager.isAdmin(context, item.getOwningCollection())){
+        if(!authorizeService.isAdmin(context, item.getOwningCollection())){
             throw new AuthorizeException();
         }
 
@@ -93,7 +101,7 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
         Para actions = main.addPara();
 
         org.dspace.versioning.VersionHistory history = retrieveVersionHistory(item);
-        if(history!=null && history.hasNext(item))
+        if(history!=null && versionHistoryService.hasNext(context, history ,item))
         {
             actions.addButton("submit_update_version").setValue(T_submit_update_version);
         }
@@ -108,13 +116,13 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
 	}
 
     private Item getItem() throws SQLException {
-        int itemID = parameters.getParameterAsInteger("itemID",-1);
-        return Item.find(context, itemID);
+        UUID itemID = UUID.fromString(parameters.getParameter("itemID",null));
+        return itemService.find(context, itemID);
     }
 
 
-    private org.dspace.versioning.VersionHistory retrieveVersionHistory(Item item){
-       VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-        return versioningService.findVersionHistory(context, item.getID());
+    private org.dspace.versioning.VersionHistory retrieveVersionHistory(Item item) throws SQLException
+    {
+        return versionHistoryService.findByItem(context, item);
     }
 }

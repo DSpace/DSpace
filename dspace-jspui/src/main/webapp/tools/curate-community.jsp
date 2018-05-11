@@ -30,22 +30,42 @@
 <%@ page import="org.dspace.app.webui.util.CurateTaskResult" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="java.util.UUID" %>
 <%!
     private static final String TASK_QUEUE_NAME = ConfigurationManager.getProperty("curate", "ui.queuename");
 %>
 <%
     Community community = (Community) request.getAttribute("community");
-    int communityID = (community != null ? community.getID() : -1);
-    String title = (community != null ? community.getMetadata("name") : "Unknown Community");
+    UUID communityID = (community != null ? community.getID() : null);
+    String title = (community != null ? community.getName() : "Unknown Community");
     String groupOptions = (String)request.getAttribute("curate_group_options");
-    String taskOptions = (String)request.getAttribute("curate_task_options");
+    String taskOptions = (String)request.getAttribute("curate_task_options"); 
+
+   // Is the logged in user an admin or community admin or collection admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
+    
+    Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
+    boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
+    
+    Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
+    boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
+    
+    String naviAdmin = "admin";
+    String link = "/dspace-admin";
+    
+    if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+    {
+        naviAdmin = "community-or-collection-admin";
+        link = "/tools";
+    }
 %>
 
 <dspace:layout style="submission" titlekey="jsp.tools.curate.community.title"
-               navbar="admin"
+               navbar="<%= naviAdmin %>"
                locbar="link"
                parenttitlekey="jsp.administer"
-               parentlink="/dspace-admin">
+               parentlink="<%= link %>">
 
 <%@ include file="/tools/curate-message.jsp" %>
 

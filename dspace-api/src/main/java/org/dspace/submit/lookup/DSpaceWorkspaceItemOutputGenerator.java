@@ -13,7 +13,6 @@ import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.Value;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,8 +34,13 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Andrea Bollini
@@ -50,19 +54,28 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
     private static Logger log = Logger
             .getLogger(DSpaceWorkspaceItemOutputGenerator.class);
 
-    private Context context;
+    protected Context context;
 
-    private String formName;
+    protected String formName;
 
-    private List<WorkspaceItem> witems;
+    protected List<WorkspaceItem> witems;
 
-    private ItemSubmissionLookupDTO dto;
+    protected ItemSubmissionLookupDTO dto;
 
-    private Collection collection;
+    protected Collection collection;
 
     Map<String, String> outputMap;
 
-    private List<String> extraMetadataToKeep;
+    protected List<String> extraMetadataToKeep;
+
+    @Autowired(required = true)
+    protected ItemService itemService;
+    @Autowired(required = true)
+    protected MetadataFieldService metadataFieldService;
+    @Autowired(required = true)
+    protected MetadataSchemaService metadataSchemaService;
+    @Autowired(required = true)
+    protected WorkspaceItemService workspaceItemService;
 
     @Override
     public List<String> generateOutput(RecordSet recordSet)
@@ -86,7 +99,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
         {
             try
             {
-                WorkspaceItem wi = WorkspaceItem.create(context, collection,
+                WorkspaceItem wi = workspaceItemService.create(context, collection,
                         true);
                 merge(formName, wi.getItem(), rec);
 
@@ -98,10 +111,6 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
                 log.error(e.getMessage(), e);
             }
             catch (SQLException e)
-            {
-                log.error(e.getMessage(), e);
-            }
-            catch (IOException e)
             {
                 log.error(e.getMessage(), e);
             }
@@ -160,72 +169,70 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
     // Methods
     public void merge(String formName, Item item, Record record)
     {
-
-        Record itemLookup = record;
-
-        Set<String> addedMetadata = new HashSet<String>();
-        for (String field : itemLookup.getFields())
+        try
         {
-            String metadata = getMetadata(formName, itemLookup, field);
-            if (StringUtils.isBlank(metadata))
+            Record itemLookup = record;
+
+            Set<String> addedMetadata = new HashSet<String>();
+            for (String field : itemLookup.getFields())
             {
-                continue;
-            }
-            if (item.getMetadataByMetadataString(metadata).length == 0
-                    || addedMetadata.contains(metadata))
-            {
-                addedMetadata.add(metadata);
-                String[] md = splitMetadata(metadata);
-                if (isValidMetadata(formName, md))
-                { // if in extra metadata or in the spefific form
-                    List<Value> values = itemLookup.getValues(field);
-                    if (values != null && values.size() > 0)
-                    {
-                        if (isRepeatableMetadata(formName, md))
-                        { // if metadata is repeatable in form
-                            for (Value value : values)
+                String metadata = getMetadata(formName, itemLookup, field);
+                if (StringUtils.isBlank(metadata))
+                {
+                    continue;
+                }
+                if (itemService.getMetadataByMetadataString(item, metadata).size() == 0
+                        || addedMetadata.contains(metadata))
+                {
+                    addedMetadata.add(metadata);
+                    String[] md = splitMetadata(metadata);
+                    if (isValidMetadata(formName, md))
+                    { // if in extra metadata or in the spefific form
+                        List<Value> values = itemLookup.getValues(field);
+                        if (values != null && values.size() > 0)
+                        {
+                            if (isRepeatableMetadata(formName, md))
+                            { // if metadata is repeatable in form
+                                for (Value value : values)
+                                {
+                                    String[] splitValue = splitValue(value
+                                            .getAsString());
+                                    if (splitValue[3] != null)
+                                    {
+                                        itemService.addMetadata(context, item, md[0], md[1], md[2],
+                                                md[3], splitValue[0],
+                                                splitValue[1],
+                                                Integer.parseInt(splitValue[2]));
+                                    }
+                                    else
+                                    {
+                                        itemService.addMetadata(context, item, md[0], md[1], md[2],
+                                                md[3], value.getAsString());
+                                    }
+                                }
+                            }
+                            else
                             {
-                                String[] splitValue = splitValue(value
-                                        .getAsString());
+                                String value = values.iterator().next()
+                                        .getAsString();
+                                String[] splitValue = splitValue(value);
                                 if (splitValue[3] != null)
                                 {
-                                    item.addMetadata(md[0], md[1], md[2],
-                                            md[3], splitValue[0],
-                                            splitValue[1],
+                                    itemService.addMetadata(context, item, md[0], md[1], md[2], md[3],
+                                            splitValue[0], splitValue[1],
                                             Integer.parseInt(splitValue[2]));
                                 }
                                 else
                                 {
-                                    item.addMetadata(md[0], md[1], md[2],
-                                            md[3], value.getAsString());
+                                    itemService.addMetadata(context, item, md[0], md[1], md[2], md[3],
+                                            value);
                                 }
-                            }
-                        }
-                        else
-                        {
-                            String value = values.iterator().next()
-                                    .getAsString();
-                            String[] splitValue = splitValue(value);
-                            if (splitValue[3] != null)
-                            {
-                                item.addMetadata(md[0], md[1], md[2], md[3],
-                                        splitValue[0], splitValue[1],
-                                        Integer.parseInt(splitValue[2]));
-                            }
-                            else
-                            {
-                                item.addMetadata(md[0], md[1], md[2], md[3],
-                                        value);
                             }
                         }
                     }
                 }
             }
-        }
-
-        try
-        {
-            item.update();
+            itemService.update(context, item);
         }
         catch (SQLException e)
         {
@@ -238,7 +245,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
 
     }
 
-    private String getMetadata(String formName, Record itemLookup, String name)
+    protected String getMetadata(String formName, Record itemLookup, String name)
     {
         String type = SubmissionLookupService.getType(itemLookup);
 
@@ -269,7 +276,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
         return md;
     }
 
-    private String[] splitMetadata(String metadata)
+    protected String[] splitMetadata(String metadata)
     {
         String[] mdSplit = new String[3];
         if (StringUtils.isNotBlank(metadata))
@@ -303,7 +310,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
         return mdSplit;
     }
 
-    private boolean isValidMetadata(String formName, String[] md)
+    protected boolean isValidMetadata(String formName, String[] md)
     {
         try
         {
@@ -322,7 +329,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
         return false;
     }
 
-    private DCInput getDCInput(String formName, String schema, String element,
+    protected DCInput getDCInput(String formName, String schema, String element,
             String qualifier) throws DCInputsReaderException
     {
         DCInputSet dcinputset = new DCInputsReader().getInputs(formName);
@@ -343,7 +350,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
         return null;
     }
 
-    private boolean isRepeatableMetadata(String formName, String[] md)
+    protected boolean isRepeatableMetadata(String formName, String[] md)
     {
         try
         {
@@ -361,7 +368,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
         return false;
     }
 
-    private String[] splitValue(String value)
+    protected String[] splitValue(String value)
     {
         String[] splitted = value
                 .split(SubmissionLookupService.SEPARATOR_VALUE_REGEX);
@@ -394,40 +401,38 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
         return result;
     }
 
-    private void makeSureMetadataExist(Context context, String schema,
+    protected void makeSureMetadataExist(Context context, String schema,
             String element, String qualifier)
     {
         try
         {
             context.turnOffAuthorisationSystem();
             boolean create = false;
-            MetadataSchema mdschema = MetadataSchema.find(context, schema);
+            MetadataSchema mdschema = metadataSchemaService.find(context, schema);
             MetadataField mdfield = null;
             if (mdschema == null)
             {
-                mdschema = new MetadataSchema(
-                        SubmissionLookupService.SL_NAMESPACE_PREFIX + schema,
-                        schema);
-                mdschema.create(context);
+                mdschema = metadataSchemaService.create(context, schema,
+                        SubmissionLookupService.SL_NAMESPACE_PREFIX + schema
+                        );
                 create = true;
             }
             else
             {
-                mdfield = MetadataField.findByElement(context,
-                        mdschema.getSchemaID(), element, qualifier);
+                mdfield = metadataFieldService.findByElement(context,
+                        mdschema, element, qualifier);
             }
 
             if (mdfield == null)
             {
-                mdfield = new MetadataField(mdschema, element, qualifier,
+                metadataFieldService.create(context, mdschema, element, qualifier,
                         "Campo utilizzato per la cache del provider submission-lookup: "
                                 + schema);
-                mdfield.create(context);
                 create = true;
             }
             if (create)
             {
-                context.commit();
+                context.complete();
             }
             context.restoreAuthSystemState();
         }

@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.group;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -21,6 +22,8 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 
 /**
  * Present the user with a list of soon-to-be-deleted Groups. 
@@ -55,7 +58,9 @@ public class DeleteGroupsConfirm extends AbstractDSpaceTransformer
 		message("xmlui.general.delete");
 	private static final Message T_submit_cancel =
 		message("xmlui.general.cancel");
-	
+
+	protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -72,7 +77,7 @@ public class DeleteGroupsConfirm extends AbstractDSpaceTransformer
 		ArrayList<Group> groups = new ArrayList<Group>();
 		for (String id : idsString.split(","))
 		{
-			Group group = Group.find(context,Integer.valueOf(id));
+			Group group = groupService.find(context, UUID.fromString(id));
 			groups.add(group);
 		}
      
@@ -91,10 +96,10 @@ public class DeleteGroupsConfirm extends AbstractDSpaceTransformer
     	for (Group group : groups) 
     	{	
     		Row row = table.addRow();
-    		row.addCell().addContent(group.getID());
+    		row.addCell().addContent(group.getID().toString());
         	row.addCell().addContent(group.getName());
-        	row.addCell().addContent(group.getMembers().length);
-        	row.addCell().addContent(group.getMemberGroups().length);
+        	row.addCell().addContent(group.getMembers().size());
+        	row.addCell().addContent(group.getMemberGroups().size());
 	    }
     	
     	Para buttons = deleted.addPara();

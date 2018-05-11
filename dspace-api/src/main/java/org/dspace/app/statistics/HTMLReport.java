@@ -69,6 +69,7 @@ public class HTMLReport implements Report
      *
      * @return      the HTML report
      */
+    @Override
     public String render()
     {
         StringBuffer frag = new StringBuffer();
@@ -165,6 +166,7 @@ public class HTMLReport implements Report
      *
      * @param   stat    the statistics object to be added to the report
      */
+    @Override
     public void addBlock(Statistics stat)
     {
         blocks.add(stat);
@@ -177,6 +179,7 @@ public class HTMLReport implements Report
      *
      * @param   start   the start date for the report
      */
+    @Override
     public void setStartDate(Date start)
     {
         this.start = (start == null ? null : new Date(start.getTime()));
@@ -188,6 +191,7 @@ public class HTMLReport implements Report
      *
      * @param   end     the end date for the report
      */
+    @Override
     public void setEndDate(Date end)
     {
         this.end = (end == null ? null : new Date(end.getTime()));
@@ -200,6 +204,7 @@ public class HTMLReport implements Report
      *
      * @return      a string containing date range information
      */
+    @Override
     public String dateRange()
     {
         StringBuffer frag = new StringBuffer();
@@ -238,6 +243,7 @@ public class HTMLReport implements Report
      *
      * @return      a string containing the title of the report
      */
+    @Override
     public String mainTitle()
     {
         return "<div class=\"reportTitle\"><a name=\"top\">" + mainTitle + "</a></div>\n\n";
@@ -250,6 +256,7 @@ public class HTMLReport implements Report
      * @param   name    the name of the service
      * @param   serverName  the name of the server
      */
+    @Override
     public void setMainTitle(String name, String serverName)
     {
         mainTitle = "Statistics for " + name + " on " + serverName;
@@ -266,6 +273,7 @@ public class HTMLReport implements Report
      *
      * @return      a string containing the header for the report
      */
+    @Override
     public String header()
     {
         return header("");
@@ -277,6 +285,7 @@ public class HTMLReport implements Report
      *
      * @param   title   the title of the item being headered
      */
+    @Override
     public String header(String title)
     {
         // FIXME: this need to be figured out to integrate nicely into the 
@@ -309,6 +318,7 @@ public class HTMLReport implements Report
      *
      * @return          a string containing the section title HTML formatted
      */
+    @Override
     public String sectionHeader(String title)
     {
         // prepare the title to be an <a name="#title"> style link
@@ -324,7 +334,7 @@ public class HTMLReport implements Report
     
     /**
      * output the report block based on the passed mapping, where the mapping
-     * sould be "name of report element" => "value", where both sides of the
+     * should be "name of report element" to "value", where both sides of the
      * mapping should be Strings.  This class also assumes that the reference
      * is a linkable URL to the resource
      *
@@ -332,6 +342,7 @@ public class HTMLReport implements Report
      *
      * @return              a string containing the statistics block HTML formatted
      */
+    @Override
     public String statBlock(Statistics content)
     {
         StringBuffer frag = new StringBuffer();
@@ -417,6 +428,7 @@ public class HTMLReport implements Report
      *
      * @return          a string containing floor information HTML formatted
      */
+    @Override
     public String floorInfo(int floor)
     {
         if (floor > 0)
@@ -440,6 +452,7 @@ public class HTMLReport implements Report
      *
      * @return      a string containing an explanaton HTML formatted
      */
+    @Override
     public String blockExplanation(String explanation)
     {
         if (explanation != null)
@@ -461,6 +474,7 @@ public class HTMLReport implements Report
      *
      * @return      a string containing the report footer
      */
+    @Override
     public String footer()
     {
         return "";

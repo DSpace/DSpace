@@ -10,12 +10,17 @@ package org.dspace.app.sherpa.submit;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class MetadataValueISSNExtractor implements ISSNItemExtractor
 {
+    @Autowired(required = true)
+    public ItemService itemService;
+
     private List<String> metadataList;
 
     public void setMetadataList(List<String> metadataList)
@@ -29,10 +34,10 @@ public class MetadataValueISSNExtractor implements ISSNItemExtractor
         List<String> values = new ArrayList<String>();
         for (String metadata : metadataList)
         {
-            Metadatum[] dcvalues = item.getMetadataByMetadataString(metadata);
-            for (Metadatum dcvalue : dcvalues)
+            List<MetadataValue> dcvalues = itemService.getMetadataByMetadataString(item, metadata);
+            for (MetadataValue dcvalue : dcvalues)
             {
-                values.add(dcvalue.value);
+                values.add(dcvalue.getValue());
             }
         }
         return values;

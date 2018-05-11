@@ -26,8 +26,12 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.jdom.Attribute;
@@ -65,26 +69,34 @@ public class OREIngestionCrosswalk
     private static final Namespace DS_NS =
     	Namespace.getNamespace("ds","http://www.dspace.org/objectModel/");
 
+
+	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+	protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     
 
-	public void ingest(Context context, DSpaceObject dso, List<Element> metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
+	@Override
+	public void ingest(Context context, DSpaceObject dso, List<Element> metadata, boolean createMissingMetadataFields) throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
 		// If this list contains only the root already, just pass it on
         if (metadata.size() == 1) {
-			ingest(context, dso, metadata.get(0));
+			ingest(context, dso, metadata.get(0), createMissingMetadataFields);
 		}
 		// Otherwise, wrap them up 
 		else {
 			Element wrapper = new Element("wrap", metadata.get(0).getNamespace());
 			wrapper.addContent(metadata);
 
-			ingest(context,dso,wrapper);
+			ingest(context,dso,wrapper, createMissingMetadataFields);
 		}
 	}
 
 	
 	
-	public void ingest(Context context, DSpaceObject dso, Element root) throws CrosswalkException, IOException, SQLException, AuthorizeException {
+	@Override
+	public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields) throws CrosswalkException, IOException, SQLException, AuthorizeException {
 		
 		Date timeStart = new Date();
 		
@@ -151,16 +163,16 @@ public class OREIngestionCrosswalk
         	}
         	
         	// Bundle names are not unique, so we just pick the first one if there's more than one. 
-        	Bundle[] targetBundles = item.getBundles(bundleName);
+        	List<Bundle> targetBundles = itemService.getBundles(item, bundleName);
         	Bundle targetBundle;
         	
         	// if null, create the new bundle and add it in
-        	if (targetBundles.length == 0) {
-        		targetBundle = item.createBundle(bundleName);
-        		item.addBundle(targetBundle);
+        	if (targetBundles.size() == 0) {
+        		targetBundle = bundleService.create(context, item, bundleName);
+        		itemService.addBundle(context, item, targetBundle);
         	}
         	else {
-        		targetBundle = targetBundles[0];
+        		targetBundle = targetBundles.get(0);
         	}
         	
         	URL ARurl = null;
@@ -186,22 +198,22 @@ public class OREIngestionCrosswalk
         	
         	// ingest and update
         	if (in != null) {
-	        	Bitstream newBitstream = targetBundle.createBitstream(in);
+	        	Bitstream newBitstream = bitstreamService.create(context, targetBundle, in);
 	        	
 	        	String bsName = resource.getAttributeValue("title");
-	        	newBitstream.setName(bsName);
+	        	newBitstream.setName(context, bsName);
 	        	
 	            // Identify the format
 	        	String mimeString = resource.getAttributeValue("type");
-	        	BitstreamFormat bsFormat = BitstreamFormat.findByMIMEType(context, mimeString);
+	        	BitstreamFormat bsFormat = bitstreamFormatService.findByMIMEType(context, mimeString);
 	        	if (bsFormat == null) {
-	        		bsFormat = FormatIdentifier.guessFormat(context, newBitstream);
+	        		bsFormat = bitstreamFormatService.guessFormat(context, newBitstream);
 	        	}
-	        	newBitstream.setFormat(bsFormat);
-	            newBitstream.update();
+	        	newBitstream.setFormat(context, bsFormat);
+				bitstreamService.update(context, newBitstream);
 	            
-	            targetBundle.addBitstream(newBitstream);
-	        	targetBundle.update();
+				bundleService.addBitstream(context, targetBundle, newBitstream);
+	        	bundleService.update(context, targetBundle);
         	}
         	else {
         		throw new CrosswalkException("Could not retrieve bitstream: " + entryId);
@@ -213,7 +225,7 @@ public class OREIngestionCrosswalk
 	
 	
 	/**
-     * Helper method to escape all chaacters that are not part of the canon set 
+     * Helper method to escape all characters that are not part of the canon set
      * @param sourceString source unescaped string
      */
     private String encodeForURL(String sourceString) {

@@ -24,7 +24,7 @@ import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -126,7 +126,7 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
 	            DSpaceValidity validity = new DSpaceValidity();
 
 	            // Add the actual collection;
-	            validity.add(collection);
+	            validity.add(context, collection);
 
 	            this.validity = validity.complete();
 	        }
@@ -156,7 +156,7 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
         Collection collection = (Collection) dso;
 
         // Set the page title
-        String name = collection.getMetadata("name");
+        String name = collection.getName();
         if (name == null || name.length() == 0)
         {
             pageMeta.addMetadata("title").addContent(T_untitled);
@@ -167,13 +167,13 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
         }
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(collection,pageMeta,contextPath);
+        HandleUtil.buildHandleTrail(context, collection,pageMeta,contextPath);
 
         // Add RSS links if available
-        String formats = ConfigurationManager.getProperty("webui.feed.formats");
+        String[] formats = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.formats");
 		if ( formats != null )
 		{
-			for (String format : formats.split(","))
+			for (String format : formats)
 			{
 				// Remove the protocol number, i.e. just list 'rss' or' atom'
 				String[] parts = format.split("_");
@@ -207,7 +207,7 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
 
         // Build the collection viewer division.
         Division home = body.addDivision("collection-home", "primary repository collection");
-        String name = collection.getMetadata("name");
+        String name = collection.getName();
         if (name == null || name.length() == 0)
         {
             home.setHead(T_untitled);

@@ -1,0 +1,163 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+
+    <util:map id="pubmedMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="dc.title" value-ref="titleContrib"/>
+        <entry key-ref="dc.description.abstract" value-ref="abstractContrib"/>
+        <entry key-ref="dc.identifier.other" value-ref="pubmedContrib"/>
+        <entry key-ref="dc.contributor.author" value-ref="authorContrib"/>
+        <entry key-ref="dc.date.issued" value-ref="dateContrib"/>
+        <entry key-ref="dc.language.iso" value-ref="pubmedLanguageContrib"/>
+        <entry key-ref="dc.subject" value-ref="keywordContrib"/>
+
+    </util:map>
+
+    <bean id="pubmedLanguageContrib" class="org.dspace.importer.external.pubmed.metadatamapping.contributor.PubmedLanguageMetadatumContributor">
+        <property name="field" ref="dc.language.iso"/>
+        <property name="language" ref="languageContrib"/>
+    </bean>
+    <bean id="dateContrib" class="org.dspace.importer.external.pubmed.metadatamapping.contributor.PubmedDateMetadatumContributor">
+        <property name="dateFormatsToAttempt">
+            <!-- The first format that is successful will be used and the rest will be skipped. Make sure to add the most specific at the top and add the more lenient at the bottom-->
+            <list>
+                <value>yyyy-MMM-dd</value>
+                <value>yyyy-MMM</value>
+                <value>yyyy-MM-dd</value>
+            </list>
+        </property>
+        <property name="year" ref="yearContrib"/>
+        <property name="month" ref="monthContrib"/>
+        <property name="day" ref="dayContrib"/>
+        <property name="field" ref="dc.date.issued"/>
+    </bean>
+    <bean id="pubmedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.other"/>
+        <property name="query" value="descendant::MedlineCitation/PMID"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+    <bean id="titleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.title"/>
+        <property name="query" value="descendant::ArticleTitle"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+
+    <bean id="abstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.description.abstract"/>
+        <property name="query" value="descendant::AbstractText"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+
+    <bean id="authorContrib" class="org.dspace.importer.external.metadatamapping.contributor.CombinedMetadatumContributor">
+        <property name="separator" value=", "/>
+
+        <property name="metadatumContributors" ref="combinedauthorList"/>
+        <property name="field" ref="dc.contributor.author"/>
+    </bean>
+
+    <util:list id="combinedauthorList" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor" list-class="java.util.LinkedList">
+        <ref bean="lastNameContrib"/>
+        <ref bean="firstNameContrib"/>
+    </util:list>
+    <bean id="lastNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.contributor.author"/>
+        <property name="query" value="descendant::Author/LastName"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+
+    <bean id="firstNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.contributor.author"/>
+        <property name="query" value="descendant::Author/ForeName"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+
+    <bean id="keywordContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.subject"/>
+        <property name="query" value="descendant::Keyword"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+    <bean id="yearContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.date.issued"/>
+        <property name="query" value="descendant::PubDate/Year"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+
+    <bean id="monthContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.date.issued"/>
+        <property name="query" value="descendant::PubDate/Month"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+
+    <bean id="dayContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.date.issued"/>
+        <property name="query" value="descendant::PubDate/Day"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+
+    <bean id="languageContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.language.iso"/>
+        <property name="query" value="descendant::Language"/>
+        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+    </bean>
+
+    <bean id="dc.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+
+    <bean id="dc.description.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description.abstract"/>
+    </bean>
+
+
+    <bean id="dc.contributor.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="dc.date.issued" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.date.issued"/>
+    </bean>
+
+    <bean id="dc.language.iso" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.language.iso"/>
+    </bean>
+
+
+    <bean id="dc.subject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+
+    <bean id="dc.identifier.other" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
+
+    <util:map id="prefixToNamespaceMapping">
+    </util:map>
+
+
+    <bean class="java.lang.Integer" id="maxRetry">
+        <constructor-arg value="2"/>
+    </bean>
+
+    <bean class="org.dspace.importer.external.pubmed.metadatamapping.transform.GeneratePubmedQueryService" id="pubmedService">
+        <description>Defines how an org.dspace.content.Item is mapped to a query in scopus. Please note that exactly one of
+            these must be present. If multiple are present the result is undefined.
+        </description>
+    </bean>
+    
+
+</beans>

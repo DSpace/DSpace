@@ -17,9 +17,13 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.*;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.statistics.DataTermsFacet;
-import org.dspace.statistics.ElasticSearchLogger;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
+import org.dspace.statistics.service.ElasticSearchLoggerService;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -33,6 +37,7 @@ import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
 import org.elasticsearch.search.facet.terms.TermsFacet;
 
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -40,6 +45,10 @@ import java.util.List;
 /**
  * Usage Statistics viewer, powered by Elastic Search.
  * Allows for the user to dig deeper into the statistics for topDownloads, topCountries, etc.
+ *
+ * @deprecated  As of DSpace 6.0, ElasticSearch statistics are replaced by Solr statistics
+ * @see org.dspace.app.xmlui.aspect.statistics.StatisticsTransformer#StatisticsTransformer
+ *
  * @author Peter Dietz (pdietz84@gmail.com)
  */
 public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
@@ -47,14 +56,28 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
     
     public static final String elasticStatisticsPath = "stats";
 
-    private static SimpleDateFormat monthAndYearFormat = new SimpleDateFormat("MMMMM yyyy");
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static ThreadLocal<DateFormat> monthAndYearFormat = new ThreadLocal<DateFormat>(){
+                        @Override
+                        protected DateFormat initialValue() {
+                            return new SimpleDateFormat("MMMMM yyyy");
+                        }
+                      };
+    private static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>(){
+                        @Override
+                        protected DateFormat initialValue() {
+                            return new SimpleDateFormat("yyyy-MM-dd");
+                        }
+                      };
 
     private static Client client;
     private static Division division;
     private static DSpaceObject dso;
     private static Date dateStart;
     private static Date dateEnd;
+
+    protected ElasticSearchLoggerService elasticSearchLoggerService = StatisticsServiceFactory.getInstance().getElasticSearchLoggerService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     protected static TermFilterBuilder justOriginals = FilterBuilders.termFilter("bundleName", "ORIGINAL");
 
@@ -98,7 +121,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         pageMeta.addMetadata("title").addContent("Statistics Report for : " + dso.getName());
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(dso,pageMeta,contextPath, true);
+        HandleUtil.buildHandleTrail(context, dso,pageMeta,contextPath, true);
         pageMeta.addTrail().addContent("View Statistics");
     }
 
@@ -110,14 +133,14 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         this.dso = dso;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
-        client = ElasticSearchLogger.getInstance().getClient();
+        client = elasticSearchLoggerService.getClient();
     }
     
     public void addBody(Body body) throws WingException, SQLException {
         try {
             //Try to find our dspace object
             dso = HandleUtil.obtainHandle(objectModel);
-            client = ElasticSearchLogger.getInstance().getClient();
+            client = elasticSearchLoggerService.getClient();
 
             division = body.addDivision("elastic-stats");
             division.setHead("Statistical Report for " + dso.getName());
@@ -149,10 +172,10 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
                 division.addPara("Showing Data ( " + dateRange + " )");
                 division.addHidden("timeRangeString").setValue("Data Range: " + dateRange);
                 if(dateStart != null) {
-                    division.addHidden("dateStart").setValue(dateFormat.format(dateStart));
+                    division.addHidden("dateStart").setValue(dateFormat.get().format(dateStart));
                 }
                 if(dateEnd != null) {
-                    division.addHidden("dateEnd").setValue(dateFormat.format(dateEnd));
+                    division.addHidden("dateEnd").setValue(dateFormat.get().format(dateEnd));
                 }
 
                 showAllReports();
@@ -171,21 +194,21 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
                 
                 String dateRange = "";
                 if(dateStart != null && dateEnd != null) {
-                    dateRange = "from: "+dateFormat.format(dateStart) + " to: "+dateFormat.format(dateEnd);
+                    dateRange = "from: "+dateFormat.get().format(dateStart) + " to: "+dateFormat.get().format(dateEnd);
                 } else if (dateStart != null && dateEnd == null) {
-                    dateRange = "starting from: "+dateFormat.format(dateStart);
+                    dateRange = "starting from: "+dateFormat.get().format(dateStart);
                 } else if(dateStart == null && dateEnd != null) {
-                    dateRange = "ending with: "+dateFormat.format(dateEnd);
+                    dateRange = "ending with: "+dateFormat.get().format(dateEnd);
                 } else if(dateStart == null && dateEnd == null) {
                     dateRange = "All Data Available";
                 }
                 division.addPara("Showing Data ( " + dateRange + " )");
                 division.addHidden("timeRangeString").setValue(dateRange);
                 if(dateStart != null) {
-                    division.addHidden("dateStart").setValue(dateFormat.format(dateStart));
+                    division.addHidden("dateStart").setValue(dateFormat.get().format(dateStart));
                 }
                 if(dateEnd != null) {
-                    division.addHidden("dateEnd").setValue(dateFormat.format(dateEnd));
+                    division.addHidden("dateEnd").setValue(dateFormat.get().format(dateEnd));
                 }
 
 
@@ -253,10 +276,10 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         calendar.add(Calendar.MONTH, -1);
 
         calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
-        String lowerBound = dateFormat.format(calendar.getTime());
+        String lowerBound = dateFormat.get().format(calendar.getTime());
 
         calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        String upperBound = dateFormat.format(calendar.getTime());
+        String upperBound = dateFormat.get().format(calendar.getTime());
 
         log.info("Lower:"+lowerBound+" -- Upper:"+upperBound);
         
@@ -274,7 +297,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         calendar.add(Calendar.MONTH, -1);
 
         calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
-        return monthAndYearFormat.format(calendar.getTime());
+        return monthAndYearFormat.get().format(calendar.getTime());
     }
     
     public SearchRequestBuilder facetedQueryBuilder(FacetBuilder facet) throws WingException{
@@ -298,7 +321,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         FilterBuilder rangeFilter = FilterBuilders.rangeFilter("time").from(dateStart).to(dateEnd);
         FilteredQueryBuilder filteredQueryBuilder = QueryBuilders.filteredQuery(termQuery, rangeFilter);
 
-        SearchRequestBuilder searchRequestBuilder = client.prepareSearch(ElasticSearchLogger.getInstance().indexName)
+        SearchRequestBuilder searchRequestBuilder = client.prepareSearch(elasticSearchLoggerService.getIndexName())
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(filteredQueryBuilder)
                 .setSize(0);
@@ -358,8 +381,8 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
             Row row = facetTable.addRow();
 
             if(termName.equalsIgnoreCase("bitstream")) {
-                Bitstream bitstream = Bitstream.find(context, Integer.parseInt(facetEntry.getTerm().string()));
-                Item item = (Item) bitstream.getParentObject();
+                Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, facetEntry.getTerm().string());
+                Item item = (Item) bitstreamService.getParentObject(context, bitstream);
                 row.addCell().addXref(contextPath + "/handle/" + item.getHandle(), item.getName());
                 row.addCellContent(getFirstMetadataValue(item, "dc.creator"));
                 row.addCellContent(getFirstMetadataValue(item, "dc.publisher"));
@@ -390,7 +413,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         for(DateHistogramFacet.Entry histogramEntry : monthlyFacetEntries) {
             Row dataRow = monthlyTable.addRow();
             Date facetDate = new Date(histogramEntry.getTime());
-            dataRow.addCell("date", Cell.ROLE_DATA,"date").addContent(dateFormat.format(facetDate));
+            dataRow.addCell("date", Cell.ROLE_DATA,"date").addContent(dateFormat.get().format(facetDate));
             dataRow.addCell("count", Cell.ROLE_DATA,"count").addContent("" + histogramEntry.getCount());
         }
     }
@@ -409,9 +432,9 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
     }
     
     private String getFirstMetadataValue(Item item, String metadataKey) {
-        Metadatum[] dcValue = item.getMetadataByMetadataString(metadataKey);
-        if(dcValue.length > 0) {
-            return dcValue[0].value;
+        List<MetadataValue> dcValue = itemService.getMetadataByMetadataString(item, metadataKey);
+        if(dcValue.size() > 0) {
+            return dcValue.get(0).getValue();
         } else {
             return "";
         }

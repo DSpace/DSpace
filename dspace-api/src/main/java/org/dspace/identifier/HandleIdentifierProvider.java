@@ -10,16 +10,18 @@ package org.dspace.identifier;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * The old DSpace handle identifier service, used to create handles or retrieve objects based on their handle
@@ -36,35 +38,48 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     /** Prefix registered to no one */
     protected static final String EXAMPLE_PREFIX = "123456789";
 
-    protected String[] supportedPrefixes = new String[]{"info:hdl", "hdl", "http://"};
+    @Autowired(required = true)
+    protected HandleService handleService;
+    @Autowired(required = true)
+    protected ItemService itemService;
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
         return Handle.class.isAssignableFrom(identifier);
     }
 
+    @Override
     public boolean supports(String identifier)
     {
-        for(String prefix : supportedPrefixes){
-            if(identifier.startsWith(prefix))
-            {
-                return true;
-            }
+        String prefix = handleService.getPrefix();
+        String canonicalPrefix = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("handle.canonical.prefix");
+        if (identifier == null)
+        {
+            return false;
         }
-
-        try {
-            String outOfUrl = retrieveHandleOutOfUrl(identifier);
-            if(outOfUrl != null)
-            {
+        // return true if handle has valid starting pattern
+        if (identifier.startsWith(prefix + "/")
+                || identifier.startsWith(canonicalPrefix)
+                || identifier.startsWith("hdl:")
+                || identifier.startsWith("info:hdl")
+                || identifier.matches("^https?://hdl\\.handle\\.net/.*")
+                || identifier.matches("^https?://.+/handle/.*"))
+        {
+            return true;
+        }
+        
+        //Check additional prefixes supported in the config file
+        String[] additionalPrefixes = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("handle.additional.prefixes");
+        for(String additionalPrefix: additionalPrefixes) {
+            if (identifier.startsWith(additionalPrefix + "/")) {
                 return true;
             }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
         }
 
         return false;
     }
 
+    @Override
     public String register(Context context, DSpaceObject dso) {
         try{
             String id = mint(context, dso);
@@ -73,7 +88,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
             if(dso instanceof Item)
             {
                 Item item = (Item)dso;
-                populateHandleMetadata(item, id);
+                populateHandleMetadata(context, item, id);
             }
 
             return id;
@@ -83,13 +98,14 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         }
     }
 
+    @Override
     public void register(Context context, DSpaceObject dso, String identifier) {
         try{
-            createNewIdentifier(context, dso, identifier);
+            handleService.createHandle(context, dso, identifier);
             if(dso instanceof Item)
             {
                 Item item = (Item)dso;
-                populateHandleMetadata(item, identifier);
+                populateHandleMetadata(context, item, identifier);
             }
         }catch (Exception e){
             log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
@@ -98,10 +114,10 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     }
 
 
+    @Override
     public void reserve(Context context, DSpaceObject dso, String identifier) {
         try{
-            TableRow handle = DatabaseManager.create(context, "Handle");
-            modifyHandleRecord(context, dso, handle, identifier);
+            handleService.createHandle(context, dso, identifier);
         }catch(Exception e){
             log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
@@ -117,6 +133,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
      * @return The newly created handle
      * @exception java.sql.SQLException If a database error occurs
      */
+    @Override
     public String mint(Context context, DSpaceObject dso) {
         if(dso.getHandle() != null)
         {
@@ -124,77 +141,19 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         }
 
         try{
-            return createNewIdentifier(context, dso, null);
+            return handleService.createHandle(context, dso);
         }catch (Exception e){
             log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }
 
+    @Override
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
         try
         {
-            TableRow dbhandle = findHandleInternal(context, identifier);
-
-            if (dbhandle == null)
-            {
-                //Check for an url
-                identifier = retrieveHandleOutOfUrl(identifier);
-                if(identifier != null)
-                {
-                    dbhandle = findHandleInternal(context, identifier);
-                }
-
-                if(dbhandle == null)
-                {
-                    return null;
-                }
-            }
-
-            if ((dbhandle.isColumnNull("resource_type_id")) || (dbhandle.isColumnNull("resource_id")))
-            {
-                throw new IllegalStateException("No associated resource type");
-            }
-
-            // What are we looking at here?
-            int handletypeid = dbhandle.getIntColumn("resource_type_id");
-            int resourceID = dbhandle.getIntColumn("resource_id");
-
-            if (handletypeid == Constants.ITEM)
-            {
-                Item item = Item.find(context, resourceID);
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Resolved handle " + identifier + " to item "
-                            + ((item == null) ? (-1) : item.getID()));
-                }
-
-                return item;
-            }
-            else if (handletypeid == Constants.COLLECTION)
-            {
-                Collection collection = Collection.find(context, resourceID);
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Resolved handle " + identifier + " to collection "
-                            + ((collection == null) ? (-1) : collection.getID()));
-                }
-
-                return collection;
-            }
-            else if (handletypeid == Constants.COMMUNITY)
-            {
-                Community community = Community.find(context, resourceID);
-
-                if (log.isDebugEnabled())
-                {
-                    log.debug("Resolved handle " + identifier + " to community "
-                            + ((community == null) ? (-1) : community.getID()));
-                }
-
-                return community;
-            }
+            return handleService.resolveToObject(context, identifier);
         }catch (Exception e){
             log.error(LogManager.getHeader(context, "Error while resolving handle to item", "handle: " + identifier), e);
         }
@@ -208,22 +167,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
 
         try
         {
-            TableRow row = getHandleInternal(context, dso.getType(), dso.getID());
-            if (row == null)
-            {
-                if (dso.getType() == Constants.SITE)
-                {
-                    return Site.getSiteHandle();
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return row.getStringColumn("handle");
-            }
+            return handleService.findHandle(context, dso);
         }catch(SQLException sqe){
             throw new IdentifierNotResolvableException(sqe.getMessage(),sqe);
         }
@@ -234,28 +178,10 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         delete(context, dso);
     }
 
+    @Override
     public void delete(Context context, DSpaceObject dso) throws IdentifierException {
         try{
-        TableRow row = getHandleInternal(context, dso.getType(), dso.getID());
-        if (row != null)
-        {
-            //Only set the "resouce_id" column to null when unbinding a handle.
-            // We want to keep around the "resource_type_id" value, so that we
-            // can verify during a restore whether the same *type* of resource
-            // is reusing this handle!
-            row.setColumnNull("resource_id");
-            DatabaseManager.update(context, row);
-
-            if(log.isDebugEnabled())
-            {
-                log.debug("Unbound Handle " + row.getStringColumn("handle") + " from object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
-            }
-
-        }
-        else
-        {
-            log.warn("Cannot find Handle entry to unbind for object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
-        }
+            handleService.unbindHandle(context, dso);
         }catch(SQLException sqe)
         {
             throw new IdentifierException(sqe.getMessage(),sqe);
@@ -291,158 +217,25 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         return prefix;
     }
 
-    protected static String getCanonicalForm(String handle)
-    {
-
-        // Let the admin define a new prefix, if not then we'll use the
-        // CNRI default. This allows the admin to use "hdl:" if they want to or
-        // use a locally branded prefix handle.myuni.edu.
-        String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
-        if (handlePrefix == null || handlePrefix.length() == 0)
-        {
-            handlePrefix = "http://hdl.handle.net/";
-        }
-
-        return handlePrefix + handle;
-    }
-
-    protected String createNewIdentifier(Context context, DSpaceObject dso, String handleId) throws SQLException {
-        TableRow handle=null;
-        if(handleId != null)
-        {
-            handle = findHandleInternal(context, handleId);
-
-
-            if(handle!=null && !handle.isColumnNull("resource_id"))
-            {
-                //Check if this handle is already linked up to this specified DSpace Object
-                if(handle.getIntColumn("resource_id")==dso.getID() &&
-                        handle.getIntColumn("resource_type_id")==dso.getType())
-                {
-                    //This handle already links to this DSpace Object -- so, there's nothing else we need to do
-                    return handleId;
-                }
-                else
-                {
-                    //handle found in DB table & already in use by another existing resource
-                    throw new IllegalStateException("Attempted to create a handle which is already in use: " + handleId);
-                }
-            }
-
-        }
-        else if(handle!=null && !handle.isColumnNull("resource_type_id"))
-        {
-            //If there is a 'resource_type_id' (but 'resource_id' is empty), then the object using
-            // this handle was previously unbound (see unbindHandle() method) -- likely because object was deleted
-            int previousType = handle.getIntColumn("resource_type_id");
-
-            //Since we are restoring an object to a pre-existing handle, double check we are restoring the same *type* of object
-            // (e.g. we will not allow an Item to be restored to a handle previously used by a Collection)
-            if(previousType != dso.getType())
-            {
-                throw new IllegalStateException("Attempted to reuse a handle previously used by a " +
-                        Constants.typeText[previousType] + " for a new " +
-                        Constants.typeText[dso.getType()]);
-            }
-        }
-
-        if(handle==null){
-            handle = DatabaseManager.create(context, "Handle");
-            handleId = createId(handle.getIntColumn("handle_id"));
-        }
-
-        modifyHandleRecord(context, dso, handle, handleId);
-        return handleId;
-    }
-
-    protected String modifyHandleRecord(Context context, DSpaceObject dso, TableRow handle, String handleId) throws SQLException {
-        handle.setColumn("handle", handleId);
-        handle.setColumn("resource_type_id", dso.getType());
-        handle.setColumn("resource_id", dso.getID());
-        DatabaseManager.update(context, handle);
-
-        if (log.isDebugEnabled())
-        {
-            log.debug("Created new handle for "
-                    + Constants.typeText[dso.getType()] + " " + handleId);
-        }
-        return handleId;
-    }
-
-    /**
-     * Return the handle for an Object, or null if the Object has no handle.
-     *
-     * @param context
-     *            DSpace context
-     * @param type
-     *            The type of object
-     * @param id
-     *            The id of object
-     * @return The handle for object, or null if the object has no handle.
-     * @exception java.sql.SQLException
-     *                If a database error occurs
-     */
-    protected static TableRow getHandleInternal(Context context, int type, int id)
-            throws SQLException
-    {
-        String sql = "SELECT * FROM Handle WHERE resource_type_id = ? " +
-                "AND resource_id = ?";
-
-        return DatabaseManager.querySingleTable(context, "Handle", sql, type, id);
-    }
-
-    /**
-     * Find the database row corresponding to handle.
-     *
-     * @param context DSpace context
-     * @param handle The handle to resolve
-     * @return The database row corresponding to the handle
-     * @exception java.sql.SQLException If a database error occurs
-     */
-    protected static TableRow findHandleInternal(Context context, String handle)
-            throws SQLException {
-        if (handle == null)
-        {
-            throw new IllegalArgumentException("Handle is null");
-        }
-        return DatabaseManager.findByUnique(context, "Handle", "handle", handle);
-    }
-
-    /**
-     * Create a new handle id. The implementation uses the PK of the RDBMS
-     * Handle table.
-     *
-     * @return A new handle id
-     * @exception java.sql.SQLException
-     *                If a database error occurs
-     */
-    protected static String createId(int id) throws SQLException
-    {
-        String handlePrefix = getPrefix();
-
-        return handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + id;
-    }
-
-
-    protected void populateHandleMetadata(Item item, String handle)
+    protected void populateHandleMetadata(Context context, Item item, String handle)
             throws SQLException, IOException, AuthorizeException
     {
-        String handleref = getCanonicalForm(handle);
+        String handleref = handleService.getCanonicalForm(handle);
 
         // Add handle as identifier.uri DC value.
         // First check that identifier doesn't already exist.
         boolean identifierExists = false;
-        Metadatum[] identifiers = item.getDC("identifier", "uri", Item.ANY);
-        for (Metadatum identifier : identifiers)
+        List<MetadataValue> identifiers = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
+        for (MetadataValue identifier : identifiers)
         {
-            if (handleref.equals(identifier.value))
+            if (handleref.equals(identifier.getValue()))
             {
                 identifierExists = true;
             }
         }
         if (!identifierExists)
         {
-            item.addDC("identifier", "uri", null, handleref);
+            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
         }
     }
 }

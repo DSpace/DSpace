@@ -5,39 +5,13 @@
 
 package edu.umd.lib.dspace.app.cleanup;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
-import java.util.Enumeration;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Iterator;
 import java.util.Properties;
-import java.util.Vector;
-import java.util.HashSet;
-import java.util.TreeMap;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
-import java.text.SimpleDateFormat;
 
 // IO
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.Writer;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
-import java.io.StringWriter;
 
 // Log4J
 import org.apache.log4j.Logger;
@@ -45,28 +19,16 @@ import org.apache.log4j.PropertyConfigurator;
 
 // DSpace
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Email;
-
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
-
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-
-import org.dspace.handle.HandleManager;
-
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 // Lims
 import edu.umd.lims.util.ErrorHandling;
@@ -86,7 +48,13 @@ public class DeleteItems {
   static long lRead = 0;
   static long lDeleted = 0;
 
+  private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+  protected final static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();;
+
+  protected final static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+
+  protected final static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
   /***************************************************************** main */
   /**
    * Command line interface.
@@ -96,7 +64,7 @@ public class DeleteItems {
   {
 
     Context context = new Context();
-    context.setIgnoreAuthorization(true);
+    context.ignoreAuthorization();
 
     try {
 
@@ -104,7 +72,7 @@ public class DeleteItems {
       Properties props     = System.getProperties();
 
       // dspace dir
-      String strDspace     = ConfigurationManager.getProperty("dspace.dir");
+      String strDspace     = configurationService.getProperty("dspace.dir");
 
       // logging (log4j.defaultInitOverride needs to be set or
       // config/log4j.properties will be read and used additionally)
@@ -119,20 +87,18 @@ public class DeleteItems {
         lRead++;
         String strHandle = strLine.trim();
 
-        Item item = (Item)HandleManager.resolveToObject(context, strHandle);
+        Item item = (Item)handleService.resolveToObject(context, strHandle);
 
         if (item == null) {
           log.info(strHandle + ": not found");
         } else {
-          Metadatum dcval[] = item.getDC("title", null, Item.ANY);
-          String strTitle = dcval[0].value;
+          String strTitle = itemService.getMetadataFirstValue(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
 
           // Remove from all collection; will be deleted when removed from
           // last collection
-          Collection[] cs = item.getCollections();
-          for (int i=0; i < cs.length; i++) {
-            Collection c = cs[i];
-            c.removeItem(item);
+          List<Collection> cs = item.getCollections();
+          for (Collection collection : cs) {
+            collectionService.removeItem(context, collection, item);
           }
 
           context.commit();

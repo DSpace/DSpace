@@ -27,11 +27,15 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * This class performs the action of coordinating a usage report being
@@ -140,11 +144,17 @@ public class ReportGenerator
    /** the log file action to human readable action map */
    private static String map = ConfigurationManager.getProperty("dspace.dir") +
                             File.separator + "config" + File.separator + "dstat.map";
-   
+
+    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
    
     /**
      * main method to be run from command line.  See usage information for
      * details as to how to use the command line flags
+     * @param argv
+     * @throws java.lang.Exception
+     * @throws java.sql.SQLException
      */
     public static void main(String [] argv)
         throws Exception, SQLException
@@ -199,10 +209,13 @@ public class ReportGenerator
      * this method is retained for backwards compatibility, but delegates the actual
      * wprk to a new method
      *
-     * @param   context     the DSpace context in which this action is performed
-     * @param   myFormat    the desired output format (currently on HTML supported)
-     * @param   myInput     the aggregation file to be turned into a report
-     * @param   myOutput    the file into which to write the report
+     * @param context     the DSpace context in which this action is performed
+     * @param myFormat    the desired output format (currently on HTML supported)
+     * @param myInput     the aggregation file to be turned into a report
+     * @param myOutput    the file into which to write the report
+     * @param myMap       the map
+     * @throws Exception if error
+     * @throws SQLException if database error
      */
     public static void processReport(Context context, String myFormat, 
                                      String myInput, String myOutput,
@@ -235,6 +248,11 @@ public class ReportGenerator
      * using the pre-configuration information passed here, read in the
      * aggregation data and output a file containing the report in the
      * requested format
+     * @param context context
+     * @param report report
+     * @param myInput input
+     * @throws Exception if error
+     * @throws SQLException if database error
      */
     public static void processReport(Context context, Report report,
                                      String myInput)
@@ -520,6 +538,7 @@ public class ReportGenerator
      * actions which are more understandable to humans
      *
      * @param   map     the map file
+     * @throws IOException if IO error
      */
     public static void readMap(String map)
         throws IOException
@@ -605,6 +624,8 @@ public class ReportGenerator
      * The values that come from this file form the basis of the analysis report
      *
      * @param   input   the aggregator file
+     * @throws IOException if IO error
+     * @throws ParseException if parse error
      */
     public static void readInput(String input)
         throws IOException, ParseException
@@ -776,6 +797,7 @@ public class ReportGenerator
      *
      * @return      a string containing a reference (almost citation) to the
      *              article
+     * @throws SQLException if database error
      */
     public static String getItemInfo(Context context, String handle)
         throws SQLException
@@ -785,7 +807,7 @@ public class ReportGenerator
         // ensure that the handle exists
         try 
         {
-            item = (Item) HandleManager.resolveToObject(context, handle);
+            item = (Item) handleService.resolveToObject(context, handle);
         } 
         catch (Exception e)
         {
@@ -801,24 +823,24 @@ public class ReportGenerator
         // build the referece
         // FIXME: here we have blurred the line between content and presentation
         // and it should probably be un-blurred
-        Metadatum[] title = item.getDC("title", null, Item.ANY);
-        Metadatum[] author = item.getDC("contributor", "author", Item.ANY);
+        List<MetadataValue> title = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        List<MetadataValue> author = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "contributor", "author", Item.ANY);
         
         StringBuffer authors = new StringBuffer();
-        if (author.length > 0)
+        if (author.size() > 0)
         {
-            authors.append("(" + author[0].value);
+            authors.append("(" + author.get(0).getValue());
         }
-        if (author.length > 1)
+        if (author.size() > 1)
         {
             authors.append(" et al");
         }
-        if (author.length > 0)
+        if (author.size() > 0)
         {
            authors.append(")");
         }
         
-        String content = title[0].value + " " + authors.toString();
+        String content = title.get(0).getValue() + " " + authors.toString();
         
         return content;
     }

@@ -25,13 +25,13 @@ import java.util.Date;
 public class SitemapsOrgGenerator extends AbstractGenerator
 {
     /** Stem of URLs sitemaps will eventually appear at */
-    private String indexURLStem;
+    protected String indexURLStem;
 
     /** Tail of URLs sitemaps will eventually appear at */
-    private String indexURLTail;
+    protected String indexURLTail;
 
     /** The correct date format */
-    private DateFormat w3dtfFormat = new SimpleDateFormat(
+    protected DateFormat w3dtfFormat = new SimpleDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     /**
@@ -56,33 +56,39 @@ public class SitemapsOrgGenerator extends AbstractGenerator
         indexURLTail = (urlTail == null ? "" : urlTail);
     }
 
+    @Override
     public String getFilename(int number)
     {
         return "sitemap" + number + ".xml.gz";
     }
 
+    @Override
     public String getLeadingBoilerPlate()
     {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
     }
 
+    @Override
     public int getMaxSize()
     {
         // 10 Mb
         return 10485760;
     }
 
+    @Override
     public int getMaxURLs()
     {
         return 50000;
     }
 
+    @Override
     public String getTrailingBoilerPlate()
     {
         return "</urlset>";
     }
 
+    @Override
     public String getURLText(String url, Date lastMod)
     {
         StringBuffer urlText = new StringBuffer();
@@ -98,16 +104,19 @@ public class SitemapsOrgGenerator extends AbstractGenerator
         return urlText.toString();
     }
 
+    @Override
     public boolean useCompression()
     {
         return true;
     }
 
+    @Override
     public String getIndexFilename()
     {
         return "sitemap_index.xml.gz";
     }
 
+    @Override
     public void writeIndex(PrintStream output, int sitemapCount)
             throws IOException
     {

@@ -9,6 +9,7 @@ package org.dspace.text.filter;
 
 public class StripLeadingNonAlphaNum implements TextFilter
 {
+    @Override
     public String filter(String str)
     {
         int i = 0;
@@ -26,6 +27,7 @@ public class StripLeadingNonAlphaNum implements TextFilter
         return str;
     }
 
+    @Override
     public String filter(String str, String lang)
     {
         return filter(str);

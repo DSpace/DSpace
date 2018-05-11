@@ -19,7 +19,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -84,13 +84,13 @@ public class EditBitstreamPolicies extends AbstractStep
         asu.addReason(request.getParameter("reason"), form, errorFlag);
 
         // Add Policy Button
-        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled= DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         if(isAdvancedFormEnabled){
             Button addPolicy = form.addItem().addButton(org.dspace.submit.step.AccessStep.FORM_ACCESS_BUTTON_ADD);
             addPolicy.setValue(T_submit_add_policy);
         }
 
-        div.addHidden("bitstream_id").setValue(submissionInfo.getBitstream().getID());
+        div.addHidden("bitstream_id").setValue(submissionInfo.getBitstream().getID().toString());
 
         // Note, not standard control actions, this page just goes back to the upload step.
         Item actions = form.addItem();

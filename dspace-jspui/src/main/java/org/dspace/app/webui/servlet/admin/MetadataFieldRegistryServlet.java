@@ -9,6 +9,7 @@ package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -24,6 +25,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 
 /**
@@ -36,20 +40,27 @@ import org.dspace.core.Context;
 public class MetadataFieldRegistryServlet extends DSpaceServlet
 {
     /** Logger */
-    private static Logger log = Logger.getLogger(MetadataFieldRegistryServlet.class);
-    private String clazz = "org.dspace.app.webui.servlet.admin.MetadataFieldRegistryServlet";
+    private static final Logger log = Logger.getLogger(MetadataFieldRegistryServlet.class);
+    private static final String clazz = "org.dspace.app.webui.servlet.admin.MetadataFieldRegistryServlet";
+
+    private final transient MetadataFieldService fieldService
+             = ContentServiceFactory.getInstance().getMetadataFieldService();
+
+    private final transient MetadataSchemaService schemaService
+             = ContentServiceFactory.getInstance().getMetadataSchemaService();
 
     /**
      * @see org.dspace.app.webui.servlet.DSpaceServlet#doDSGet(org.dspace.core.Context,
      *      javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
         // GET just displays the list of type
-        int schemaID = getSchemaID(request);
+        MetadataSchema schemaID = getSchema(context, request);
         showTypes(context, request, response, schemaID);
     }
 
@@ -58,23 +69,32 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
      *      javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
         String button = UIUtil.getSubmitButton(request, "submit");
-        int schemaID = getSchemaID(request);
+        MetadataSchema schema = getSchema(context, request);
 
         // Get access to the localized resource bundle
         Locale locale = context.getCurrentLocale();
         ResourceBundle labels = ResourceBundle.getBundle("Messages", locale);
 
-        if (button.equals("submit_update"))
+        String element = request.getParameter("element");
+		String scope = request.getParameter("scope_note");
+        String qual = request.getParameter("qualifier");
+        if ("".equals(qual))
+        {
+            qual = null;
+        }
+
+		if ("submit_update".equals(button))
         {
             // The sanity check will update the request error string if needed
             if (!sanityCheck(request, labels))
             {
-                showTypes(context, request, response, schemaID);
+                showTypes(context, request, response, schema);
                 context.abort();
                 return;
             }
@@ -82,20 +102,14 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             try
             {
                 // Update the metadata for a DC type
-                MetadataField dc = MetadataField.find(context, UIUtil
+                MetadataField dc = fieldService.find(context, UIUtil
                         .getIntParameter(request, "dc_type_id"));
-            dc.setElement(request.getParameter("element"));
-
-            String qual = request.getParameter("qualifier");
-            if (qual.equals(""))
-            {
-                qual = null;
-            }
+            dc.setElement(element);
 
             dc.setQualifier(qual);
-            dc.setScopeNote(request.getParameter("scope_note"));
-                dc.update(context);
-                showTypes(context, request, response, schemaID);
+            dc.setScopeNote(scope);
+                fieldService.update(context, dc);
+                showTypes(context, request, response, schema);
             context.complete();
         }
             catch (NonUniqueMetadataException e)
@@ -104,13 +118,13 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 log.error(e);
             }
         }
-        else if (button.equals("submit_add"))
+        else if ("submit_add".equals(button))
         {
 
             // The sanity check will update the request error string if needed
             if (!sanityCheck(request, labels))
             {
-                showTypes(context, request, response, schemaID);
+                showTypes(context, request, response, schema);
                 context.abort();
                 return;
             }
@@ -119,20 +133,9 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             // edit with the main form
             try
             {
-                MetadataField dc = new MetadataField();
-                dc.setSchemaID(schemaID);
-                dc.setElement(request.getParameter("element"));
-
-                String qual = request.getParameter("qualifier");
-                if (qual.equals(""))
-                {
-                    qual = null;
-                }
-
-                dc.setQualifier(qual);
-                dc.setScopeNote(request.getParameter("scope_note"));
-                dc.create(context);
-                showTypes(context, request, response, schemaID);
+                MetadataField dc = fieldService.create(context, schema, element, qual, scope);
+                fieldService.update(context, dc);
+                showTypes(context, request, response, schema);
             context.complete();
         }
             catch (NonUniqueMetadataException e)
@@ -144,29 +147,29 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 // user that the metadata field was not created and why
                 request.setAttribute("error", labels.getString(clazz
                         + ".createfailed"));
-                showTypes(context, request, response, schemaID);
+                showTypes(context, request, response, schema);
                 context.abort();
             }
         }
-        else if (button.equals("submit_delete"))
+        else if ("submit_delete".equals(button))
         {
             // Start delete process - go through verification step
-            MetadataField dc = MetadataField.find(context, UIUtil
+            MetadataField dc = fieldService.find(context, UIUtil
                     .getIntParameter(request, "dc_type_id"));
             request.setAttribute("type", dc);
             JSPManager.showJSP(request, response,
                     "/dspace-admin/confirm-delete-mdfield.jsp");
         }
-        else if (button.equals("submit_confirm_delete"))
+        else if ("submit_confirm_delete".equals(button))
         {
             // User confirms deletion of type
-            MetadataField dc = MetadataField.find(context, UIUtil
+            MetadataField dc = fieldService.find(context, UIUtil
                     .getIntParameter(request, "dc_type_id"));
             try
             {
-                dc.delete(context);
+                fieldService.delete(context, dc);
                 request.setAttribute("failed", Boolean.FALSE);
-                showTypes(context, request, response, schemaID);
+                showTypes(context, request, response, schema);
             } catch (Exception e)
             {
                 request.setAttribute("type", dc);
@@ -176,32 +179,33 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             }
             context.complete();
         }
-        else if (button.equals("submit_move"))
+        else if ("submit_move".equals(button))
         {
             // User requests that one or more metadata elements be moved to a
             // new metadata schema. Note that we change the default schema ID to
             // be the destination schema.
             try
             {
-                schemaID = Integer.parseInt(request
+                int schemaID = Integer.parseInt(request
                         .getParameter("dc_dest_schema_id"));
                 String[] param = request.getParameterValues("dc_field_id");
                 if (schemaID == 0 || param == null)
                 {
                     request.setAttribute("error", labels.getString(clazz
                             + ".movearguments"));
-                    showTypes(context, request, response, schemaID);
+                    showTypes(context, request, response, schemaService.find(context, schemaID));
                     context.abort();
                 }
                 else
                 {
+                	schema = schemaService.find(context, schemaID);
                     for (int ii = 0; ii < param.length; ii++)
                     {
                         int fieldID = Integer.parseInt(param[ii]);
-                        MetadataField field = MetadataField.find(context,
+                        MetadataField field = fieldService.find(context,
                                 fieldID);
-                        field.setSchemaID(schemaID);
-                        field.update(context);
+                        field.setMetadataSchema(schema);
+                        fieldService.update(context, field);
 
                     }
             context.complete();
@@ -221,32 +225,28 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 // user that the metadata field could not be moved
                 request.setAttribute("error", labels.getString(clazz
                         + ".movefailed"));
-                showTypes(context, request, response, schemaID);
+                showTypes(context, request, response, schema);
                 context.abort();
             }
         }
         else
         {
             // Cancel etc. pressed - show list again
-            showTypes(context, request, response, schemaID);
+            showTypes(context, request, response, schema);
         }
     }
 
     /**
-     * Get the schema that we are currently working in from the HTTP request. If
-     * not present then default to the DSpace Dublin Core schema (schemaID 1).
+     * Get the schema that we are currently working in from the HTTP request.
      *
      * @param request
      * @return the current schema ID
+     * @throws SQLException 
      */
-    private int getSchemaID(HttpServletRequest request)
+    private MetadataSchema getSchema(Context context, HttpServletRequest request) throws SQLException
     {
-        int schemaID = MetadataSchema.DC_SCHEMA_ID;
-        if (request.getParameter("dc_schema_id") != null)
-        {
-            schemaID = Integer.parseInt(request.getParameter("dc_schema_id"));
-        }
-        return schemaID;
+        int schemaID = Integer.parseInt(request.getParameter("dc_schema_id"));
+        return schemaService.find(context, schemaID);
     }
 
     /**
@@ -265,21 +265,20 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
      * @throws AuthorizeException
      */
     private void showTypes(Context context, HttpServletRequest request,
-            HttpServletResponse response, int schemaID)
+            HttpServletResponse response, MetadataSchema schema)
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
         // Find matching metadata fields
-        MetadataField[] types = MetadataField
-                .findAllInSchema(context, schemaID);
+        List<MetadataField> types = fieldService
+                .findAllInSchema(context, schema);
         request.setAttribute("types", types);
 
         // Pull the metadata schema object as well
-        MetadataSchema schema = MetadataSchema.find(context, schemaID);
         request.setAttribute("schema", schema);
 
         // Pull all metadata schemas for the pulldown
-        MetadataSchema[] schemas = MetadataSchema.findAll(context);
+        List<MetadataSchema> schemas = schemaService.findAll(context);
         request.setAttribute("schemas", schemas);
 
         JSPManager

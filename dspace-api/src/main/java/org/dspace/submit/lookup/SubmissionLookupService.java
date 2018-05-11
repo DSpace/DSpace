@@ -44,19 +44,19 @@ public class SubmissionLookupService
 
     public static final String SEPARATOR_VALUE_REGEX = SEPARATOR_VALUE;
 
-    private List<DataLoader> providers;
+    protected List<DataLoader> providers;
 
-    private Map<String, List<String>> idents2provs;
+    protected Map<String, List<String>> idents2provs;
 
-    private List<String> searchProviders;
+    protected List<String> searchProviders;
 
-    private List<String> fileProviders;
+    protected List<String> fileProviders;
 
-    private TransformationEngine phase1TransformationEngine;
+    protected TransformationEngine phase1TransformationEngine;
 
-    private TransformationEngine phase2TransformationEngine;
+    protected TransformationEngine phase2TransformationEngine;
     
-    private List<String> detailFields = null;
+    protected List<String> detailFields = null;
 
     public void setPhase2TransformationEngine(
             TransformationEngine phase2TransformationEngine)

@@ -33,21 +33,20 @@ Common usage:
     % ant -Dconfig=/installdir/config/dspace.cfg update
 
 ========================================================================
-  </description>
-  
-  	<!-- DS-1391: Ant 1.8.0+ is required, fail if not available. -->
-	<fail message="Ant 1.8.0+ is required, ${ant.version} is not supported">
+    </description>
+
+    <!-- DS-1391: Ant 1.8.0+ is required, fail if not available. -->
+    <fail message="Ant 1.8.0+ is required, ${ant.version} is not supported">
         <condition>
-			<not>
-				<antversion atleast="1.8.0"/>
-			</not>
+            <not>
+                <antversion atleast="1.8.0"/>
+            </not>
         </condition>
     </fail>
 
     <!-- ============================================================= -->
     <!-- Will be using various environment variables                   -->
     <!-- ============================================================= -->
-
     <property environment="env" />
 
 
@@ -62,29 +61,20 @@ Common usage:
         </not>
     </condition>
 
-
-    <!-- Default configuration to use.  This may be overridden. -->
+    <!-- Default configurations to use.  This may be overridden. -->
+    <!-- First, the default localized config file -->
+    <property name="local-config" value="config/local.cfg" />
+    <!-- Next, the default dspace.cfg -->
     <property name="config" value="config/dspace.cfg" />
 
     <!-- Give user a chance to override without editing this file
        (and without typing -D each time s/he compiles it) -->
     <property file="${user.home}/.dspace.properties" />
 
-    <!-- First, set the dspace.dir property so it can be
-       interpolated when loading the config file.
-       This crudely mimics the way ConfigurationManager interpolates properties.
-       Note that it ONLY works for directories that interpolate ${dspace.dir}
-       but that _should_ cover all cases used in this build configuration.
-    -->
-    <loadproperties srcFile="${config}">
-        <filterchain>
-            <linecontainsregexp>
-                <regexp pattern="^\s*dspace\.dir\s+" />
-            </linecontainsregexp>
-        </filterchain>
-    </loadproperties>
-
-    <!-- Load the configuration -->
+    <!-- Load the configurations -->
+    <!-- In Ant, properties are immutable, so the first one "wins". In this case,
+         we load the local.cfg FIRST, so that its settings are used by default. -->
+    <property file="${local-config}" />
     <property file="${config}" />
 
     <!-- Timestamp date used when creating backup directories -->
@@ -94,11 +84,11 @@ Common usage:
 
     <!-- Default location of GeoLiteCity.dat.gz to download. This may be overridden, if URL path changes. -->
     <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" />
-    
+
     <!-- Default location of lucene-core JAR to download (for update_solr_indexes). This may be overridden, if URL path changes. -->
     <!-- NOTE: this URL should have the version of the JAR replaced with "[version]" -->
     <property name="lucene-core" value="http://search.maven.org/remotecontent?filepath=org/apache/lucene/lucene-core/[version]/lucene-core-[version].jar" />
-    
+
 
     <!-- ============================================================= -->
     <!-- The DSpace class path for executing installation targets      -->
@@ -115,8 +105,8 @@ Common usage:
     <!-- ============================================================= -->
     <!-- Load various Ant libraries which define extra tasks.          -->
     <!-- ============================================================= -->
-     <!--Load/initialize all Ant-Contrib libraries from DSpace 'class.path' above.
-         For more info, see: 
+    <!--Load/initialize all Ant-Contrib libraries from DSpace 'class.path' above.
+         For more info, see:
         http://ant-contrib.sourceforge.net/tasks/index.html -->
     <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="class.path"/>
 
@@ -187,7 +177,7 @@ Common usage:
     <!-- Update an installation                                        -->
     <!-- ============================================================= -->
 
-    <target name="update" depends="update_configs,update_code,update_webapps,update_solr_indexes" description="Update installed code and web applications (without clobbering data/config)">
+    <target name="update" depends="update_configs,update_code,test_database,update_webapps,update_solr_indexes" description="Update installed code and web applications (without clobbering data/config)">
     </target>
 
     <!-- ============================================================= -->
@@ -415,6 +405,13 @@ Common usage:
         <mkdir dir="config-temp" />
 
         <!--
+        Copy over all config files (not including dspace.cfg)
+        -->
+        <copy todir="config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
+            <fileset dir="config" excludes="dspace.cfg" />
+        </copy>
+
+        <!--
         Copy designated dspace.cfg
         -->
         <copy file="${config}" tofile="config-temp/dspace.cfg" preservelastmodified="true" />
@@ -429,15 +426,28 @@ Common usage:
             <globmapper from="*" to="*.default" />
         </copy>
 
-        <!--
-        Prepare properly filtered files
-        -->
+        <!-- Finally, filter some very specific configuration files, which cannot
+             be managed by DSpace's configuration service. NOTE: please refrain
+             from appending files to this list unless ABSOLUTELY NECESSARY.
+             MOST config files are now auto-interpolated at runtime and don't need filtering! -->
         <copy todir="config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
-            <fileset dir="config" excludes="dspace.cfg" />
+            <fileset dir="config">
+                <!-- Filter all log4j files, as log4j requires absolute paths
+                     to its log files. In addition, log4j strongly prefers
+                     autoconfiguring itself (e.g. see DS-3104). -->
+                <include name="log4j*.properties"/>
+                <!-- Filter OAI-PMH description so it can include hostname and handle prefix -->
+                <include name="crosswalks/oai/description.xml"/>
+                <!-- Filter sample Tomcat context.xml -->
+                <include name="default.context.xml"/>
+                <!-- Filter RDF configs as these are TTL files -->
+                <include name="modules/rdf/*.ttl"/>
+            </fileset>
             <filterchain>
                 <expandproperties />
             </filterchain>
         </copy>
+
         <echo file='config-temp/ant.properties' message='ant.version = ${ant.version}'/>
 
     </target>
@@ -598,16 +608,13 @@ Common usage:
         <mkdir dir="solr-config-temp" />
 
         <!--
-        Prepare properly filtered files
+        Prepare configuration files
         -->
         <copy todir="solr-config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
             <fileset dir="solr">
                 <!-- exclude all "data" directories from being overwritten -->
                 <exclude name="**/data/**"/>
             </fileset>
-            <filterchain>
-                <expandproperties />
-            </filterchain>
         </copy>
 
     </target>
@@ -774,10 +781,6 @@ Common usage:
             <fileset dir="${dspace.dir}/webapps/oai/" />
         </war>
 
-        <war destfile="${dspace.dir}/webapps/lni.war">
-            <fileset dir="${dspace.dir}/webapps/lni/" />
-        </war>
-
         <war destfile="${dspace.dir}/webapps/jspui.war">
             <fileset dir="${dspace.dir}/webapps/jspui/" />
         </war>
@@ -822,13 +825,9 @@ Common usage:
 
         <mkdir dir="${org.dspace.app.itemexport.download.dir}" />
 
-        <mkdir dir="${assetstore.dir}" />
-
         <mkdir dir="${handle.dir}" />
 
-        <mkdir dir="${search.dir}" />
-
-        <mkdir dir="${log.dir}" />
+        <mkdir dir="${dspace.dir}/log" />
 
         <mkdir dir="${upload.temp.dir}" />
 
@@ -847,23 +846,19 @@ Common usage:
     <!-- Fresh install of config files                                 -->
     <!-- ============================================================= -->
 
-    <!-- Writes the configuration files to ${dspace.dir}/config.  It does *not*
-       run the install-configs script.  The "log4j.build.properties" file is
-       copied to ${dspace.dir}/config so there's a simple log4j.properties
-       file present for the initial run of "install-configs". -->
-    <target name="init_configs" depends="init_installation">
+    <!-- Copies the configuration files to ${dspace.dir}/config. -->
+    <target name="init_configs" depends="init_installation,prepare_configs">
 
         <copy todir="${dspace.dir}/config" preservelastmodified="true" failonerror="false">
-            <fileset dir="config" excludes="dspace.cfg" />
-            <filterchain>
-                <expandproperties />
-            </filterchain>
+            <fileset dir="config-temp" excludes="dspace.cfg" />
         </copy>
+
+        <!-- Remove the prepare_configs work directory -->
+        <delete dir="config-temp" />
 
         <copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
 
         <echo file='${dspace.dir}/config/ant.properties' message='ant.version = ${ant.version}'/>
-
 
     </target>
 
@@ -873,10 +868,11 @@ Common usage:
 
     <!-- Test the connection to the database -->
     <target name="test_database">
-        <java classname="org.dspace.storage.rdbms.DatabaseUtils" classpathref="class.path" fork="yes" failonerror="yes">
+        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
             <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
+            <sysproperty key="dspace.dir" value="${dspace.dir}" />
+            <arg value="database" />
             <arg value="test" />
         </java>
     </target>
@@ -884,7 +880,7 @@ Common usage:
     <!-- ============================================================= -->
     <!-- Install fresh code but do not touch the database              -->
     <!-- ============================================================= -->
-    
+
     <target name="install_code"
             depends="init_installation,init_configs"
             description="Do a fresh install of the code, preserving any data."
@@ -993,10 +989,10 @@ Common usage:
 ====================================================================
 WARNING : FAILED TO DOWNLOAD GEOLITE DATABASE FILE
           (Used for DSpace Solr Usage Statistics)
-          
+
 Underlying Error: ${geolite.error}
-     
-In order to use DSpace Solr Usage Statistics, you will need to 
+
+In order to use DSpace Solr Usage Statistics, you will need to
 manually re-run:
 
 ant update_geolite
@@ -1007,12 +1003,12 @@ You may manually install this file by following these steps:
 (1) Download the file from ${geolite}
 (2) Unzip it to create a file named 'GeoLiteCity.dat'
 (3) Copy that file to '${dspace.dir}/config/GeoLiteCity.dat'
-        
+
 ====================================================================
                 </echo>
             </catch>
-        </trycatch>    
-        
+        </trycatch>
+
     </target>
 
     <target name="check_geolite">
@@ -1026,16 +1022,16 @@ You may manually install this file by following these steps:
     <target name="init_geolite" depends="check_geolite" if="need.geolite">
         <antcall target="update_geolite" />
     </target>
-     <!-- installs and/or updates Project Counter Robot List resolution database -->
+    <!-- installs and/or updates Project Counter Robot List resolution database -->
     <target name="update_spiders">
-        <echo>Downloading: https://www.projectcounter.org/wp-content/uploads/2016/08/COUNTER_Robots_list_Jul2016.txt</echo>
-        <get src="https://www.projectcounter.org/wp-content/uploads/2016/08/COUNTER_Robots_list_Jul2016.txt" dest="${dspace.dir}/config/COUNTER_Robots_list_Jul2016.txt" verbose="true" />
+        <echo>Downloading: https://raw.githubusercontent.com/atmire/COUNTER-Robots/master/generated/COUNTER_Robots_list.txt</echo>
+         <get src="https://raw.githubusercontent.com/atmire/COUNTER-Robots/master/generated/COUNTER_Robots_list.txt" dest="${dspace.dir}/config/COUNTER_Robots_list.txt" verbose="true" />
     </target>
 
     <target name="check_spiders">
         <condition property="need.spiders">
             <not>
-                <available file="${dspace.dir}/config/COUNTER_Robots_list_Jul2016.txt" />
+                <available file="${dspace.dir}/config/COUNTER_Robots_list.txt" />
             </not>
         </condition>
     </target>
@@ -1049,7 +1045,7 @@ You may manually install this file by following these steps:
     <target name="update_solr_indexes">
         <echo>Checking if any Solr indexes (${dspace.dir}/solr/*) need upgrading...</echo>
 
-        <!-- 
+        <!--
             For each index, this is currently a two step process:
              (1) Ensure the index is upgraded to Solr/Lucene 3.5.0
                  (really old indexes need upgrading to this version first)
@@ -1133,7 +1129,7 @@ You may manually install this file by following these steps:
             <fileset dir="." includes="lucene-core-*.jar"/>
         </delete>
     </target>
-    
+
     <!-- Target to check an existing Solr index to see if it            -->
     <!-- meets a particular version requirement.                        -->
     <!-- If the index is outdated, "upgrade_solr_index" is              -->
@@ -1143,7 +1139,7 @@ You may manually install this file by following these steps:
     <!--   * version   = Version of Solr to check against.              -->
     <!--   * included  = Whether this version of Solr/Lucene is already -->
     <!--                 included in DSpace classpath.                  -->
-    <target name="check_solr_index">       
+    <target name="check_solr_index">
         <!-- Check if the Solr Statistics index is AT LEAST compatible with Solr/Lucene version 3.5 -->
         <echo>Checking if the Solr index at ${indexDir} is >= Solr ${version}</echo>
         <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" resultproperty="version_returncode" outputproperty="version_compare">
@@ -1166,7 +1162,7 @@ You may manually install this file by following these steps:
 ERROR occurred while checking Solr index version:
 ${version_compare}
         </fail>
-        
+
         <!-- If the above java command returned -1, that means this index is NOT yet
              upgraded to the specified Solr version. So, let's upgrade it! -->
         <if>
@@ -1185,7 +1181,7 @@ ${version_compare}
             </else>
         </if>
     </target>
-    
+
     <!-- Target to actually *upgrade* an existing Solr index            -->
     <!-- REQUIRES these params:                                         -->
     <!--   * indexDir  = Full path to Index directory                   -->
@@ -1198,7 +1194,7 @@ ${version_compare}
 
         <!-- Replace the "[version]" placeholders in ${lucene-core} with the actual ${version}-->
         <propertyregex property="lucene-core.jar" input="${lucene-core}" regexp="\[version\]" replace="${version}" global="true"/>
-        
+
         <!-- Download the appropriate version of the lucene-core.jar, if we
              haven't already AND it's not included on our DSpace classpath. -->
         <if>
@@ -1244,7 +1240,7 @@ For more information, please see the Upgrade Instructions.
                 </trycatch>
             </then>
         </if>
-  
+
         <!-- If we downloaded a "lucene-core-*.jar" in the previous step,
              then use that downloaded JAR to upgrade the Solr/Lucene Index -->
         <if>

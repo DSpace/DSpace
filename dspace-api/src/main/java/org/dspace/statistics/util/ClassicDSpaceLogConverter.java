@@ -12,11 +12,10 @@ import org.apache.log4j.Logger;
 import org.dspace.app.statistics.LogAnalyser;
 import org.dspace.app.statistics.LogLine;
 import org.dspace.content.*;
-import org.dspace.handle.HandleManager;
 import org.dspace.core.Context;
+import org.dspace.handle.factory.HandleServiceFactory;
 
 import java.io.*;
-import java.sql.SQLException;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.text.SimpleDateFormat;
@@ -189,7 +188,7 @@ public class ClassicDSpaceLogConverter {
                             ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents))
                     {
                         handle = lline.getParams().substring(7);
-                        dso = HandleManager.resolveToObject(context, handle);
+                        dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handle);
                         id = "" + dso.getID();
                     }
                     else if ((lline.getAction().equals("view_collection")) &&
@@ -317,18 +316,8 @@ public class ClassicDSpaceLogConverter {
         boolean newEvents = line.hasOption('n');
 
         // Create a copy of the converter
-        Context context = null;
-        try
-        {
-            context = new Context();
+        Context context = new Context();
             context.turnOffAuthorisationSystem();
-        }
-        catch (SQLException sqle)
-        {
-            System.err.println("Unable to create DSpace context: " + sqle.getMessage());
-            System.exit(1);
-        }
-
         ClassicDSpaceLogConverter converter = new ClassicDSpaceLogConverter(context,
                                                                             line.hasOption('v'),
                                                                             newEvents);

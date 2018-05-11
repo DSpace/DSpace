@@ -7,33 +7,31 @@
  */
 package org.dspace.app.sitemap;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import org.apache.commons.cli.*;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Date;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Command-line utility for generating HTML and Sitemaps.org protocol Sitemaps.
@@ -45,6 +43,11 @@ public class GenerateSitemaps
 {
     /** Logger */
     private static Logger log = Logger.getLogger(GenerateSitemaps.class);
+
+    private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public static void main(String[] args) throws Exception
     {
@@ -140,22 +143,22 @@ public class GenerateSitemaps
      *            if {@code true}, generate an HTML sitemap.
      * @param makeSitemapOrg
      *            if {@code true}, generate an sitemap.org sitemap.
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if a database error occurs.
-     * @throws IOException
+     * @throws IOException if IO error
      *             if IO error occurs.
      */
     public static void generateSitemaps(boolean makeHTMLMap,
             boolean makeSitemapOrg) throws SQLException, IOException
     {
-        String sitemapStem = ConfigurationManager.getProperty("dspace.url")
+        String sitemapStem = configurationService.getProperty("dspace.url")
                 + "/sitemap";
-        String htmlMapStem = ConfigurationManager.getProperty("dspace.url")
+        String htmlMapStem = configurationService.getProperty("dspace.url")
                 + "/htmlmap";
-        String handleURLStem = ConfigurationManager.getProperty("dspace.url")
+        String handleURLStem = configurationService.getProperty("dspace.url")
                 + "/handle/";
 
-        File outputDir = new File(ConfigurationManager.getProperty("sitemap.dir"));
+        File outputDir = new File(configurationService.getProperty("sitemap.dir"));
         if (!outputDir.exists() && !outputDir.mkdir())
         {
             log.error("Unable to create output directory");
@@ -176,90 +179,79 @@ public class GenerateSitemaps
                     + "?map=", null);
         }
 
-        Context c = new Context();
+        Context c = new Context(Context.Mode.READ_ONLY);
 
-        Community[] comms = Community.findAll(c);
+        List<Community> comms = communityService.findAll(c);
 
-        for (int i = 0; i < comms.length; i++)
-        {
-            String url = handleURLStem + comms[i].getHandle();
+        for (Community comm : comms) {
+            String url = handleURLStem + comm.getHandle();
 
-            if (makeHTMLMap)
-            {
+            if (makeHTMLMap) {
                 html.addURL(url, null);
             }
-            if (makeSitemapOrg)
-            {
+            if (makeSitemapOrg) {
                 sitemapsOrg.addURL(url, null);
             }
+
+            c.uncacheEntity(comm);
         }
 
-        Collection[] colls = Collection.findAll(c);
+        List<Collection> colls = collectionService.findAll(c);
 
-        for (int i = 0; i < colls.length; i++)
-        {
-            String url = handleURLStem + colls[i].getHandle();
+        for (Collection coll : colls) {
+            String url = handleURLStem + coll.getHandle();
 
-            if (makeHTMLMap)
-            {
+            if (makeHTMLMap) {
                 html.addURL(url, null);
             }
-            if (makeSitemapOrg)
-            {
+            if (makeSitemapOrg) {
                 sitemapsOrg.addURL(url, null);
             }
+
+            c.uncacheEntity(coll);
         }
 
-        ItemIterator allItems = Item.findAll(c);
-        try
+        Iterator<Item> allItems = itemService.findAll(c);
+        int itemCount = 0;
+
+        while (allItems.hasNext())
         {
-            int itemCount = 0;
-
-            while (allItems.hasNext())
-            {
-                Item i = allItems.next();
-                String url = handleURLStem + i.getHandle();
-                Date lastMod = i.getLastModified();
-
-                if (makeHTMLMap)
-                {
-                    html.addURL(url, lastMod);
-                }
-                if (makeSitemapOrg)
-                {
-                    sitemapsOrg.addURL(url, lastMod);
-                }
-                i.decache();
-
-                itemCount++;
-            }
+            Item i = allItems.next();
+            String url = handleURLStem + i.getHandle();
+            Date lastMod = i.getLastModified();
 
             if (makeHTMLMap)
             {
-                int files = html.finish();
-                log.info(LogManager.getHeader(c, "write_sitemap",
-                        "type=html,num_files=" + files + ",communities="
-                                + comms.length + ",collections=" + colls.length
-                                + ",items=" + itemCount));
+                html.addURL(url, lastMod);
             }
-
             if (makeSitemapOrg)
             {
-                int files = sitemapsOrg.finish();
-                log.info(LogManager.getHeader(c, "write_sitemap",
-                        "type=html,num_files=" + files + ",communities="
-                                + comms.length + ",collections=" + colls.length
-                                + ",items=" + itemCount));
+                sitemapsOrg.addURL(url, lastMod);
             }
+
+            c.uncacheEntity(i);
+
+            itemCount++;
         }
-        finally
+
+        if (makeHTMLMap)
         {
-            if (allItems != null)
-            {
-                allItems.close();
-            }
+            int files = html.finish();
+            log.info(LogManager.getHeader(c, "write_sitemap",
+                    "type=html,num_files=" + files + ",communities="
+                            + comms.size() + ",collections=" + colls.size()
+                            + ",items=" + itemCount));
         }
-        
+
+        if (makeSitemapOrg)
+        {
+            int files = sitemapsOrg.finish();
+            log.info(LogManager.getHeader(c, "write_sitemap",
+                    "type=html,num_files=" + files + ",communities="
+                            + comms.size() + ",collections=" + colls.size()
+                            + ",items=" + itemCount));
+        }
+
         c.abort();
     }
 
@@ -272,17 +264,10 @@ public class GenerateSitemaps
     public static void pingConfiguredSearchEngines()
             throws UnsupportedEncodingException
     {
-        String engineURLProp = ConfigurationManager
-                .getProperty("sitemap.engineurls");
-        String engineURLs[] = null;
-
-        if (engineURLProp != null)
-        {
-            engineURLs = engineURLProp.trim().split("\\s*,\\s*");
-        }
-
-        if (engineURLProp == null || engineURLs == null
-                || engineURLs.length == 0 || engineURLs[0].trim().equals(""))
+        String[] engineURLs = configurationService
+                .getArrayProperty("sitemap.engineurls");
+        
+        if (ArrayUtils.isEmpty(engineURLs))
         {
             log.warn("No search engine URLs configured to ping");
             return;
@@ -317,17 +302,17 @@ public class GenerateSitemaps
             throws MalformedURLException, UnsupportedEncodingException
     {
         // Set up HTTP proxy
-        if ((StringUtils.isNotBlank(ConfigurationManager.getProperty("http.proxy.host")))
-                && (StringUtils.isNotBlank(ConfigurationManager.getProperty("http.proxy.port"))))
+        if ((StringUtils.isNotBlank(configurationService.getProperty("http.proxy.host")))
+                && (StringUtils.isNotBlank(configurationService.getProperty("http.proxy.port"))))
         {
             System.setProperty("proxySet", "true");
-            System.setProperty("proxyHost", ConfigurationManager
+            System.setProperty("proxyHost", configurationService
                     .getProperty("http.proxy.host"));
-            System.getProperty("proxyPort", ConfigurationManager
+            System.getProperty("proxyPort", configurationService
                     .getProperty("http.proxy.port"));
         }
 
-        String sitemapURL = ConfigurationManager.getProperty("dspace.url")
+        String sitemapURL = configurationService.getProperty("dspace.url")
                 + "/sitemap";
 
         URL url = new URL(engineURL + URLEncoder.encode(sitemapURL, "UTF-8"));

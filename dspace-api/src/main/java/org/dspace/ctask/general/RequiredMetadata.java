@@ -8,7 +8,6 @@
 package org.dspace.ctask.general;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +17,7 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -38,9 +37,9 @@ import org.dspace.curate.Suspendable;
 public class RequiredMetadata extends AbstractCurationTask
 {
     // map of DCInputSets
-    private DCInputsReader reader = null;
+    protected DCInputsReader reader = null;
     // map of required fields
-    private Map<String, List<String>> reqMap = new HashMap<String, List<String>>();
+    protected Map<String, List<String>> reqMap = new HashMap<String, List<String>>();
     
     @Override 
     public void init(Curator curator, String taskId) throws IOException
@@ -60,7 +59,7 @@ public class RequiredMetadata extends AbstractCurationTask
      * Perform the curation task upon passed DSO
      *
      * @param dso the DSpace object
-     * @throws IOException
+     * @throws IOException if IO error
      */
     @Override
     public int perform(DSpaceObject dso) throws IOException
@@ -81,8 +80,8 @@ public class RequiredMetadata extends AbstractCurationTask
                 sb.append("Item: ").append(handle);
                 for (String req : getReqList(item.getOwningCollection().getHandle()))
                 {
-                    Metadatum[] vals = item.getMetadataByMetadataString(req);
-                    if (vals.length == 0)
+                    List<MetadataValue> vals = itemService.getMetadataByMetadataString(item, req);
+                    if (vals.size() == 0)
                     {
                         sb.append(" missing required field: ").append(req);
                         count++;
@@ -99,10 +98,6 @@ public class RequiredMetadata extends AbstractCurationTask
             {
                 throw new IOException(dcrE.getMessage(), dcrE);
             }
-            catch (SQLException sqlE)
-            {
-                throw new IOException(sqlE.getMessage(), sqlE);
-            }
             return (count == 0) ? Curator.CURATE_SUCCESS : Curator.CURATE_FAIL;
         }
         else
@@ -112,7 +107,7 @@ public class RequiredMetadata extends AbstractCurationTask
         }
     }
     
-    private List<String> getReqList(String handle) throws DCInputsReaderException
+    protected List<String> getReqList(String handle) throws DCInputsReaderException
     {
         List<String> reqList = reqMap.get(handle);
         if (reqList == null)

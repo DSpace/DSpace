@@ -55,6 +55,7 @@ public abstract class AbstractTextFilterOFD implements OrderFormatDelegate
 	 * @param	value	the string value
 	 * @param	language	the language to interpret in
 	 */
+	@Override
 	public String makeSortString(String value, String language)
 	{
 		if (filters == null)

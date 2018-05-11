@@ -38,7 +38,7 @@ public class CiNiiService
     /** log4j category */
     private static final Logger log = Logger.getLogger(CiNiiService.class);
 
-    private int timeout = 1000;
+    protected int timeout = 1000;
 
     public void setTimeout(int timeout)
     {
@@ -77,7 +77,7 @@ public class CiNiiService
      * Get metadata by searching CiNii RDF API with CiNii NAID
      *
      */
-    private Record search(String id, String appId)
+    protected Record search(String id, String appId)
         throws IOException, HttpException
     {
         HttpGet method = null;
@@ -134,7 +134,7 @@ public class CiNiiService
      * Get CiNii NAIDs by searching CiNii OpenURL API with title, author and year
      *
      */
-    private  List<String> getCiNiiIDs(String title, String author, int year, 
+    protected  List<String> getCiNiiIDs(String title, String author, int year,
         int maxResults, String appId) 
         throws IOException, HttpException
     {

@@ -32,7 +32,7 @@ public interface ServiceManagerSystem extends ServiceManager {
     /**
      * Map service names to their beans.
      *
-     * @return a map of name -> bean for all services that are currently known
+     * @return a map of name to bean for all services that are currently known
      */
     public Map<String, Object> getServices();
 

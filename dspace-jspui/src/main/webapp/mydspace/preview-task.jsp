@@ -24,12 +24,12 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
-<%@ page import="org.dspace.workflow.WorkflowItem" %>
-<%@ page import="org.dspace.workflow.WorkflowManager" %>
+<%@ page import="org.dspace.workflowbasic.BasicWorkflowItem" %>
+<%@ page import="org.dspace.workflowbasic.service.BasicWorkflowService" %>
 
 <%
-    WorkflowItem workflowItem =
-        (WorkflowItem) request.getAttribute("workflow.item");
+    BasicWorkflowItem workflowItem =
+        (BasicWorkflowItem) request.getAttribute("workflow.item");
 
     Collection collection = workflowItem.getCollection();
     Item item = workflowItem.getItem();
@@ -45,27 +45,27 @@
 	<h1><fmt:message key="jsp.mydspace.preview-task.title"/></h1>
     
 <%
-    if (workflowItem.getState() == WorkflowManager.WFSTATE_STEP1POOL)
+    if (workflowItem.getState() == BasicWorkflowService.WFSTATE_STEP1POOL)
     {
 %>
 	<p><fmt:message key="jsp.mydspace.preview-task.text1"> 
-        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+        <fmt:param><%= collection.getName() %></fmt:param>
     </fmt:message></p>
 <%
     }
-    else if(workflowItem.getState() == WorkflowManager.WFSTATE_STEP2POOL)
+    else if(workflowItem.getState() == BasicWorkflowService.WFSTATE_STEP2POOL)
     {
 %>    
 	<p><fmt:message key="jsp.mydspace.preview-task.text3"> 
-        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+        <fmt:param><%= collection.getName() %></fmt:param>
     </fmt:message></p>
 <%
     }
-    else if(workflowItem.getState() == WorkflowManager.WFSTATE_STEP3POOL)
+    else if(workflowItem.getState() == BasicWorkflowService.WFSTATE_STEP3POOL)
     {
 %>
 	<p><fmt:message key="jsp.mydspace.preview-task.text4"> 
-        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+        <fmt:param><%= collection.getName() %></fmt:param>
     </fmt:message></p>
 <%
     }

@@ -20,9 +20,10 @@ import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * When only one login method is defined in the dspace.cfg file this class will
@@ -34,6 +35,8 @@ import org.dspace.core.ConfigurationManager;
  */
 public class LoginRedirect extends AbstractAction {
 
+	protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+
 	public Map act(Redirector redirector, SourceResolver resolver,
 			Map objectModel, String source, Parameters parameters)
 			throws Exception {
@@ -42,7 +45,7 @@ public class LoginRedirect extends AbstractAction {
 				.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 		final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
 				.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-		final Iterator<AuthenticationMethod> authMethods = AuthenticationManager
+		final Iterator<AuthenticationMethod> authMethods = authenticationService
 				    .authenticationMethodIterator();
 
         if (authMethods == null)
@@ -74,11 +77,11 @@ public class LoginRedirect extends AbstractAction {
 
 	      
 		// now we want to check for the force ssl property
-		if (ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) {
+		if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.force.ssl")) {
 
 			if (!httpRequest.isSecure()) {
 				StringBuffer location = new StringBuffer("https://");
-				location.append(ConfigurationManager.getProperty("dspace.hostname")).append(url).append(
+				location.append(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname")).append(url).append(
 						httpRequest.getQueryString() == null ? ""
 								: ("?" + httpRequest.getQueryString()));
 				httpResponse.sendRedirect(location.toString());

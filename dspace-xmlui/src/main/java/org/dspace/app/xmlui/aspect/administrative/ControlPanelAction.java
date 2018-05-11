@@ -16,7 +16,8 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
-import org.dspace.harvest.OAIHarvester;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestSchedulingService;
 
 /**
  * Update the alert system based upon the form submitted from the control panel.
@@ -26,6 +27,8 @@ import org.dspace.harvest.OAIHarvester;
 
 public class ControlPanelAction extends AbstractAction
 {
+
+    protected HarvestSchedulingService harvestSchedulingService = HarvestServiceFactory.getInstance().getHarvestSchedulingService();
 
     /**
      * Either activate or deactivate the alert system.
@@ -99,19 +102,19 @@ public class ControlPanelAction extends AbstractAction
         	SystemwideAlerts.deactivateAlert();
         }
         else if (request.getParameter("submit_harvest_start") != null) {
-        	OAIHarvester.startNewScheduler();
+            harvestSchedulingService.startNewScheduler();
         }
         else if (request.getParameter("submit_harvest_resume") != null) {
-        	OAIHarvester.resumeScheduler();
+            harvestSchedulingService.resumeScheduler();
         }
         else if (request.getParameter("submit_harvest_pause") != null) {
-        	OAIHarvester.pauseScheduler();
+            harvestSchedulingService.pauseScheduler();
         }
         else if (request.getParameter("submit_harvest_stop") != null) {
-        	OAIHarvester.stopScheduler();
+            harvestSchedulingService.stopScheduler();
         }
         else if (request.getParameter("submit_harvest_reset") != null) {
-        	OAIHarvester.resetScheduler();
+            harvestSchedulingService.resetScheduler();
         }
 
         return null;

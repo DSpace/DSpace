@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+
+    <!-- Hibernate 4 Configuration -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" lazy-init="true">
+        <!-- Load most Hibernate settings from hibernate.cfg.xml -->
+        <property name="configLocation" value="file:${dspace.dir}/config/hibernate.cfg.xml"/>
+        <!-- Use the dataSource defined in the bean below. This is necessary so that Flyway can initialize
+             our database using the dataSource *prior* to Hibernate taking over -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- Specify some additional Hibernate settings via dynamic properties. As noted below,
+        these values will be dynamically loaded from DSpace's ConfigurationService. -->
+        <!-- All other Hibernate settings are specified via the hibernate.cfg.xml referenced above. -->
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">${db.dialect}</prop>
+                <prop key="hibernate.default_schema">${db.schema}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="java.lang.System" />
+        <property name="targetMethod" value="setProperty" />
+        <property name="arguments">
+            <list>
+                <value>net.sf.ehcache.configurationResourceName</value>
+                <value>file:${dspace.dir}/config/hibernate-ehcache-config.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id='dataSource'
+          class='org.springframework.jndi.JndiObjectFactoryBean'>
+        <description>
+            Try to look up the DataSource in JNDI.  If not found, return a
+            DataSource built from connection details in the DSpace configuration.
+        </description>
+        <property name='jndiName' value='java:comp/env/jdbc/dspace'/>
+        <property name='defaultObject' ref='dspaceDataSource'/>
+    </bean>
+
+    <!-- NOTE: All of the properties which are used to configure the BasicDataSource are
+         dynamically loaded from DSpace's ConfigurationService. This is performed via
+         the Spring PropertyPlaceholderConfigurer configured by dspace-services
+         (see spring-dspace-core-services.xml). -->
+    <bean id="dspaceDataSource" class="org.apache.commons.dbcp2.BasicDataSource" lazy-init="true" destroy-method="close">
+        <property name="driverClassName" value="${db.driver}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="maxWaitMillis" value="${db.maxwait}"/>
+        <property name="maxIdle" value="${db.maxidle}"/>
+        <property name="maxTotal" value="${db.maxconnections}"/>
+    </bean>
+
+</beans>

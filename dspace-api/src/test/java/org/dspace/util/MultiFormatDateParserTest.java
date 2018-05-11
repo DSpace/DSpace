@@ -80,7 +80,6 @@ public class MultiFormatDateParserTest
        });
     }
 
-
     @BeforeClass
     public static void setUpClass()
     {

@@ -108,7 +108,7 @@ public class SelectReviewerAction extends AbstractXMLUIAction {
     private void renderSearchResults(Request request, String actionUrl, Division div) throws WingException {
         //We need to show our search results
         //Retrieve em
-        EPerson[] epeople = (EPerson[]) request.getAttribute("eperson-results");
+        java.util.List<EPerson> epeople = (java.util.List<EPerson>) request.getAttribute("eperson-results");
         int resultCount = (Integer) request.getAttribute("eperson-result-count");
         int page = (Integer) request.getAttribute("result-page");
         Division results = div.addDivision("results");
@@ -119,7 +119,7 @@ public class SelectReviewerAction extends AbstractXMLUIAction {
             String baseURL = actionUrl + "?submission-continue="+knot.getId() + "&submit_search=search";
             baseURL += "&query=" + request.getParameter("query");
             int firstIndex = page* org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction.RESULTS_PER_PAGE+1;
-            int lastIndex = page* org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction.RESULTS_PER_PAGE + epeople.length;
+            int lastIndex = page* org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction.RESULTS_PER_PAGE + epeople.size();
 
             String nextURL = null, prevURL = null;
             if (page < (resultCount / org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction.RESULTS_PER_PAGE))
@@ -136,7 +136,7 @@ public class SelectReviewerAction extends AbstractXMLUIAction {
 
 
         /* Set up a table with search results (if there are any). */
-        Table table = results.addTable("group-edit-search-eperson",epeople.length + 1, 1);
+        Table table = results.addTable("group-edit-search-eperson",epeople.size() + 1, 1);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_epeople_column1);
         header.addCell().addContent(T_epeople_column2);
@@ -151,7 +151,7 @@ public class SelectReviewerAction extends AbstractXMLUIAction {
 
             Row personData = table.addRow();
 
-            personData.addCell().addContent(person.getID());
+            personData.addCell().addContent(person.getID().toString());
             personData.addCell().addContent(fullName);
             personData.addCell().addContent(email);
 

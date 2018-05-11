@@ -120,7 +120,7 @@
 				<dc:format><xsl:value-of select="." /></dc:format>
 			</xsl:for-each>
 			<!-- ? -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='bitstreams']/doc:element[@name='bitstream']/doc:field[@name='format']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle']/doc:field[@name='name'][text()='ORIGINAL']/../doc:element[@name='bitstreams']/doc:element[@name='bitstream']/doc:field[@name='format']">
 				<dc:format><xsl:value-of select="." /></dc:format>
 			</xsl:for-each>
 			<!-- dc.coverage -->

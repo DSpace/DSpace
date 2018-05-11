@@ -19,6 +19,7 @@ public abstract class InitialArticleWord implements TextFilter
     /**
      * When no language is passed, use null and let implementation decide what to do
      */
+    @Override
     public String filter(String str)
     {
         return filter(str, null);
@@ -33,6 +34,7 @@ public abstract class InitialArticleWord implements TextFilter
      * @param lang The language of the passed string
      * @return String The filtered string
      */
+    @Override
     public String filter(String str, String lang)
     {
         // Get the list of article words for this language

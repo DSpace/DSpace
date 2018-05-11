@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,13 +30,17 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.Curator;
-import org.dspace.handle.HandleManager;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * Upload step with the advanced embargo system for DSpace. Processes the actual 
@@ -67,6 +73,10 @@ public class UploadWithEmbargoStep extends UploadStep
     /** log4j logger */
     private static Logger log = Logger.getLogger(UploadWithEmbargoStep.class);
 
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)
@@ -90,6 +100,7 @@ public class UploadWithEmbargoStep extends UploadStep
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
+    @Override
     public int doProcessing(Context context, HttpServletRequest request,
                             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
@@ -127,7 +138,7 @@ public class UploadWithEmbargoStep extends UploadStep
         		buttonPressed.startsWith(PREVIOUS_BUTTON))
         {
             // check if a file is required to be uploaded
-            if (fileRequired && !item.hasUploadedFiles())
+            if (fileRequired && !itemService.hasUploadedFiles(item))
             {
                 return STATUS_NO_FILES_ERROR;
             }
@@ -160,8 +171,8 @@ public class UploadWithEmbargoStep extends UploadStep
             else
             {
                 // load info for bitstream we are editing
-                Bitstream b = Bitstream.find(context, Integer.parseInt(request
-                        .getParameter("bitstream_id")));
+                Bitstream b = bitstreamService.find(context, Util.getUUIDParameter(request
+                        , "bitstream_id"));
 
                 // save bitstream to submission info
                 subInfo.setBitstream(b);
@@ -173,8 +184,8 @@ public class UploadWithEmbargoStep extends UploadStep
             String bitstreamID = buttonPressed.substring("submit_edit_"
                     .length());
 
-            Bitstream b = Bitstream
-                    .find(context, Integer.parseInt(bitstreamID));
+            Bitstream b = bitstreamService
+                    .find(context, UUID.fromString(bitstreamID));
 
             // save bitstream to submission info
             subInfo.setBitstream(b);
@@ -200,7 +211,7 @@ public class UploadWithEmbargoStep extends UploadStep
                 // remove each file in the list
                 for (int i = 0; i < removeIDs.length; i++)
                 {
-                    int id = Integer.parseInt(removeIDs[i]);
+                    UUID id = UUID.fromString(removeIDs[i]);
 
                     int status = processRemoveFile(context, item, id);
 
@@ -219,7 +230,7 @@ public class UploadWithEmbargoStep extends UploadStep
         {
             // A single file "remove" button must have been pressed
 
-            int id = Integer.parseInt(buttonPressed.substring(14));
+            UUID id = UUID.fromString(buttonPressed.substring(14));
             int status = processRemoveFile(context, item, id);
 
             // if error occurred, return immediately
@@ -255,16 +266,16 @@ public class UploadWithEmbargoStep extends UploadStep
             // we got descriptions from the resumable upload
             if (item != null)
             {
-                Bundle[] bundles = item.getBundles("ORIGINAL");
+                List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
                 for (Bundle bundle : bundles)
                 {
-                    Bitstream[] bitstreams = bundle.getBitstreams();
+                    List<Bitstream> bitstreams = bundle.getBitstreams();
                     for (Bitstream bitstream : bitstreams)
                     {
                         if (descriptions.containsKey(bitstream.getName()))
                         {
-                            bitstream.setDescription(descriptions.get(bitstream.getName()));
-                            bitstream.update();
+                            bitstream.setDescription(context, descriptions.get(bitstream.getName()));
+                            bitstreamService.update(context, bitstream);
                         }
                     }
                 }
@@ -322,12 +333,12 @@ public class UploadWithEmbargoStep extends UploadStep
         // -------------------------------------------------
         if (request.getParameter("primary_bitstream_id") != null)
         {
-            Bundle[] bundles = item.getBundles("ORIGINAL");
-            if (bundles.length > 0)
+            List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+            if (bundles.size() > 0)
             {
-                bundles[0].setPrimaryBitstreamID(Integer.valueOf(request
-                        .getParameter("primary_bitstream_id")).intValue());
-                bundles[0].update();
+                bundles.get(0).setPrimaryBitstreamID(bitstreamService.find(context, Util.getUUIDParameter(request
+                        , "primary_bitstream_id")));
+                bundleService.update(context, bundles.get(0));
             }
         }
 
@@ -336,7 +347,7 @@ public class UploadWithEmbargoStep extends UploadStep
         // files have been uploaded.
         // ---------------------------------------------------
         //check if a file is required to be uploaded
-        if (fileRequired && !item.hasUploadedFiles())
+        if (fileRequired && !itemService.hasUploadedFiles(item))
         {
             return STATUS_NO_FILES_ERROR;
         }
@@ -359,6 +370,7 @@ public class UploadWithEmbargoStep extends UploadStep
      *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
+    @Override
     public int processUploadFile(Context context, HttpServletRequest request,
                                     HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
@@ -418,17 +430,17 @@ public class UploadWithEmbargoStep extends UploadStep
                 Item item = subInfo.getSubmissionItem().getItem();
 
                 // do we already have a bundle?
-                Bundle[] bundles = item.getBundles("ORIGINAL");
+                List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
 
-                if (bundles.length < 1)
+                if (bundles.size() < 1)
                 {
                     // set bundle's name to ORIGINAL
-                    b = item.createSingleBitstream(fileInputStream, "ORIGINAL");
+                    b = itemService.createSingleBitstream(context, fileInputStream, item, "ORIGINAL");
                 }
                 else
                 {
                     // we have a bundle already, just add bitstream
-                    b = bundles[0].createBitstream(fileInputStream);
+                    b = bitstreamService.create(context, bundles.get(0), fileInputStream);
                 }
 
                 // Strip all but the last filename. It would be nice
@@ -445,47 +457,45 @@ public class UploadWithEmbargoStep extends UploadStep
                     noPath = noPath.substring(noPath.indexOf('\\') + 1);
                 }
 
-                b.setName(noPath);
-                b.setSource(filePath);
-                b.setDescription(fileDescription);
+                b.setName(context, noPath);
+                b.setSource(context, filePath);
+                b.setDescription(context, fileDescription);
 
                 // Identify the format
-                bf = FormatIdentifier.guessFormat(context, b);
-                b.setFormat(bf);
+                bf = bitstreamFormatService.guessFormat(context, b);
+                b.setFormat(context, bf);
 
                 // Update to DB
-                b.update();
-                item.update();
+                bitstreamService.update(context, b);
+                itemService.update(context, item);
 
 
                 processAccessFields(context, request, subInfo, b);
 
 
-                // commit all changes to database
-                context.commit();
 
 
                 if ((bf != null) && (bf.isInternal()))
                 {
                     log.warn("Attempt to upload file format marked as internal system use only");
-                    backoutBitstream(subInfo, b, item);
+                    backoutBitstream(context, subInfo, b, item);
                     return STATUS_UPLOAD_ERROR;
                 }
 
                 // Check for virus
-                if (ConfigurationManager.getBooleanProperty("submission-curation", "virus-scan"))
+                if (configurationService.getBooleanProperty("submission-curation.virus-scan"))
                 {
                     Curator curator = new Curator();
                     curator.addTask("vscan").curate(item);
                     int status = curator.getStatus("vscan");
                     if (status == Curator.CURATE_ERROR)
                     {
-                        backoutBitstream(subInfo, b, item);
+                        backoutBitstream(context, subInfo, b, item);
                         return STATUS_VIRUS_CHECKER_UNAVAILABLE;
                     }
                     else if (status == Curator.CURATE_FAIL)
                     {
-                        backoutBitstream(subInfo, b, item);
+                        backoutBitstream(context, subInfo, b, item);
                         return STATUS_CONTAINS_VIRUS;
                     }
                 }
@@ -494,7 +504,7 @@ public class UploadWithEmbargoStep extends UploadStep
 
                 // Comment - not sure if this is the right place for a commit here
                 // but I'm not brave enough to remove it - Robin.
-                context.commit();
+                context.dispatchEvents();
 
                 // save this bitstream to the submission info, as the
                 // bitstream we're currently working with
@@ -517,7 +527,7 @@ public class UploadWithEmbargoStep extends UploadStep
 
     private void processAccessFields(Context context, HttpServletRequest request, SubmissionInfo subInfo, Bitstream b) throws SQLException, AuthorizeException {
         // ResourcePolicy Management
-        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled= configurationService.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         // if it is a simple form we should create the policy for Anonymous
         // if Anonymous does not have right on this collection, create policies for any other groups with
         // DEFAULT_ITEM_READ specified.
@@ -529,7 +539,7 @@ public class UploadWithEmbargoStep extends UploadStep
                 //Ignore start date already null
             }
             String reason = request.getParameter("reason");
-            AuthorizeManager.generateAutomaticPolicies(context, startDate, reason, b, (Collection) HandleManager.resolveToObject(context, subInfo.getCollectionHandle()));
+            authorizeService.generateAutomaticPolicies(context, startDate, reason, b, (Collection) handleService.resolveToObject(context, subInfo.getCollectionHandle()));
         }
     }
 
@@ -543,14 +553,14 @@ public class UploadWithEmbargoStep extends UploadStep
         }
         // FORM: UploadStep SELECTED OPERATION: go to EditBitstreamPolicies
         else if (buttonPressed.startsWith("submit_editPolicy_")){
-            String bitstreamID = buttonPressed.substring("submit_editPolicy_".length());
-            Bitstream b = Bitstream.find(context, Integer.parseInt(bitstreamID));
+            UUID bitstreamID = UUID.fromString(buttonPressed.substring("submit_editPolicy_".length()));
+            Bitstream b = bitstreamService.find(context, bitstreamID);
             subInfo.setBitstream(b);
             return STATUS_EDIT_POLICIES;
         }
         // FORM: EditBitstreamPolicies SELECTED OPERATION: Add New Policy.
         else if (buttonPressed.startsWith(AccessStep.FORM_ACCESS_BUTTON_ADD)){
-            Bitstream b = Bitstream.find(context, Integer.parseInt(request.getParameter("bitstream_id")));
+            Bitstream b = bitstreamService.find(context, Util.getUUIDParameter(request, "bitstream_id"));
             subInfo.setBitstream(b);
 
             int result=-1;
@@ -561,55 +571,55 @@ public class UploadWithEmbargoStep extends UploadStep
             String reason = request.getParameter("reason");
             String name = request.getParameter("name");
 
-            int groupID = 0;
+            Group group = null;
             if(request.getParameter("group_id")!=null){
                 try{
-                    groupID=Integer.parseInt(request.getParameter("group_id"));
+                    group=groupService.find(context, Util.getUUIDParameter(request, "group_id"));
                 }catch (NumberFormatException nfe){
                     return STATUS_EDIT_POLICIES_ERROR_SELECT_GROUP;
                 }
             }
-            ResourcePolicy rp = null;
-            if( (rp= AuthorizeManager.createOrModifyPolicy(null, context, name, groupID, null, dateStartDate, org.dspace.core.Constants.READ, reason, b))==null){
+            ResourcePolicy rp;
+            if( (rp= authorizeService.createOrModifyPolicy(null, context, name, group, null, dateStartDate, org.dspace.core.Constants.READ, reason, b))==null){
                 return STATUS_EDIT_POLICIES_DUPLICATED_POLICY;
             }
-            rp.update();
-            context.commit();
+            resourcePolicyService.update(context, rp);
+            context.dispatchEvents();
             return STATUS_EDIT_POLICIES;
         }
         // FORM: EditBitstreamPolicies SELECTED OPERATION: go to EditPolicyForm
         else if(org.dspace.submit.step.AccessStep.wasEditPolicyPressed(context, buttonPressed, subInfo)){
-            Bitstream b = Bitstream.find(context, Integer.parseInt(request.getParameter("bitstream_id")));
+            Bitstream b = bitstreamService.find(context, Util.getUUIDParameter(request, "bitstream_id"));
             subInfo.setBitstream(b);
             return org.dspace.submit.step.AccessStep.STATUS_EDIT_POLICY;
         }
         // FORM: EditPolicy SELECTED OPERATION: Save or Cancel.
         else if(org.dspace.submit.step.AccessStep.comeFromEditPolicy(request)) {
-            Bitstream b = Bitstream.find(context, Integer.parseInt(request.getParameter("bitstream_id")));
+            Bitstream b = bitstreamService.find(context, Util.getUUIDParameter(request, "bitstream_id"));
             subInfo.setBitstream(b);
             String reason = request.getParameter("reason");
             String name = request.getParameter("name");
 
-            int groupID = 0;
+            Group group = groupService.findByName(context, Group.ANONYMOUS);
             if(request.getParameter("group_id")!=null){
                 try{
-                    groupID=Integer.parseInt(request.getParameter("group_id"));
+                    group=groupService.find(context, UUID.fromString(request.getParameter("group_id")));
                 }catch (NumberFormatException nfe){
                     return STATUS_EDIT_POLICIES_ERROR_SELECT_GROUP;
                 }
             }
             if(org.dspace.submit.step.AccessStep.saveOrCancelEditPolicy(context, request,
-                    subInfo, buttonPressed, b, name, groupID, reason)==org.dspace.submit.step.AccessStep.EDIT_POLICY_STATUS_DUPLICATED_POLICY)
+                    subInfo, buttonPressed, b, name, group, reason)==org.dspace.submit.step.AccessStep.EDIT_POLICY_STATUS_DUPLICATED_POLICY)
                 return STATUS_EDIT_POLICY_DUPLICATED_POLICY;
 
             return STATUS_EDIT_POLICIES;
         }
         // FORM: EditBitstreamPolicies SELECTED OPERATION: Remove Policies
         if(org.dspace.submit.step.AccessStep.wasRemovePolicyPressed(buttonPressed)){
-            Bitstream b = Bitstream.find(context, Integer.parseInt(request.getParameter("bitstream_id")));
+            Bitstream b = bitstreamService.find(context, Util.getUUIDParameter(request, "bitstream_id"));
             subInfo.setBitstream(b);
             org.dspace.submit.step.AccessStep.removePolicy(context, buttonPressed);
-            context.commit();
+            context.dispatchEvents();
             return STATUS_EDIT_POLICIES;
         }
         return -1;

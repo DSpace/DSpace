@@ -38,14 +38,31 @@
 <% request.setAttribute("LanguageSwitch", "hide"); %>
 
 <%
-// this space intentionally left blank
+    // Is the logged in user an admin or community admin or collection admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
+    
+    Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
+    boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
+    
+    Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
+    boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
+    
+    String naviAdmin = "admin";
+    String link = "/dspace-admin";
+    
+    if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+    {
+        naviAdmin = "community-or-collection-admin";
+        link = "/tools";
+    }
 %>
 
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.authorize-main.title"
-               navbar="admin"
+               navbar="<%= naviAdmin %>"
                locbar="link"
                parenttitlekey="jsp.administer"
-               parentlink="/dspace-admin">
+               parentlink="<%= link %>">
 
     <%-- <h1>Administer Authorization Policies</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.authorize-main.adm"/>
@@ -62,10 +79,12 @@
     <form method="post" action="">    
 
 				<div class="btn-group col-md-offset-5">
+                    <% if(isAdmin){ %>
 					<div class="row">
                     <%-- <input type="submit" name="submit_community" value="Manage a Community's Policies"> --%>
                     	<input class="btn btn-default col-md-12" type="submit" name="submit_community" value="<fmt:message key="jsp.dspace-admin.authorize-main.manage1"/>" />
 					</div>
+                    <% } %>
 					<div class="row">
                     <%-- <input type="submit" name="submit_collection" value="Manage Collection's Policies"> --%>
                     	<input class="btn btn-default col-md-12" type="submit" name="submit_collection" value="<fmt:message key="jsp.dspace-admin.authorize-main.manage2"/>" />
@@ -74,10 +93,12 @@
                     <%-- <input type="submit" name="submit_item" value="Manage An Item's Policies"> --%>
                     	<input class="btn btn-default col-md-12" type="submit" name="submit_item" value="<fmt:message key="jsp.dspace-admin.authorize-main.manage3"/>" />
 					</div>
+                    <% if(isAdmin){ %>
 					<div class="row">
                     <%-- <input type="submit" name="submit_advanced" value="Advanced/Item Wildcard Policy Admin Tool"> --%>
                     	<input class="btn btn-default col-md-12" type="submit" name="submit_advanced" value="<fmt:message key="jsp.dspace-admin.authorize-main.advanced"/>" />
                     </div>
+                    <% } %>
      			</div>
 
     </form>

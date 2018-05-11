@@ -7,11 +7,10 @@
  */
 package org.dspace.identifier.doi;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
@@ -19,8 +18,8 @@ import org.dspace.event.Event;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierNotFoundException;
-import org.dspace.search.SearchConsumer;
 import org.dspace.utils.DSpace;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  *
@@ -61,10 +60,18 @@ public class DOIConsumer implements Consumer
         //FIXME
         if (!(dso instanceof Item))
         {
-            log.warn("DOIConsumer got an event whose subject was not an item, "
+            log.debug("DOIConsumer got an event whose subject was not an item, "
                     + "skipping: " + event.toString());
+            return;
         }
         Item item = (Item) dso;
+        
+        if (ContentServiceFactory.getInstance().getWorkspaceItemService().findByItem(ctx, item) != null
+                || WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(ctx, item) != null)
+        {
+            // ignore workflow and workspace items, DOI will be minted when item is installed
+            return;
+        }
         
         DOIIdentifierProvider provider = new DSpace().getSingletonService(
                 DOIIdentifierProvider.class);
@@ -75,8 +82,14 @@ public class DOIConsumer implements Consumer
         }
         catch (IdentifierNotFoundException ex)
         {
-            log.warn("DOIConsumer cannot handles items without DOIs, skipping: "
+            // nothing to do here, next if clause will stop us from processing
+            // items without dois.
+        }
+        if (doi == null)
+        {
+            log.debug("DOIConsumer cannot handles items without DOIs, skipping: "
                     + event.toString());
+            return;
         }
         try
         {

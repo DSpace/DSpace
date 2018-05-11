@@ -17,8 +17,11 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
+import org.dspace.workflowbasic.BasicWorkflowItem;
+import org.dspace.workflowbasic.BasicWorkflowServiceImpl;
+import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
+import org.dspace.workflowbasic.service.BasicWorkflowItemService;
+import org.dspace.workflowbasic.service.BasicWorkflowService;
 
 /**
  * Claim all the selected workflows. This action is used by the 
@@ -29,14 +32,22 @@ import org.dspace.workflow.WorkflowManager;
 public class ClaimTasksAction extends AbstractAction
 {
 
+	protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
+	protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
+
     /**
-     * @param redirector
-     * @param resolver
+     * Claim-tasks action.
+     *
+     * @param redirector unused.
+     * @param resolver unused.
      * @param objectModel
-     *            Cocoon's object model
-     * @param source
-     * @param parameters
+     *            Cocoon's object model.
+     * @param source unused.
+     * @param parameters unused.
+     * @return null.
+     * @throws java.lang.Exception passed through.
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
@@ -49,19 +60,17 @@ public class ClaimTasksAction extends AbstractAction
     	{
     		for (String workflowID : workflowIDs)
     		{
-    			WorkflowItem workflowItem = WorkflowItem.find(context, Integer.valueOf(workflowID));
+    			BasicWorkflowItem workflowItem = basicWorkflowItemService.find(context, Integer.valueOf(workflowID));
     			
     			int state = workflowItem.getState();
     			// Only unclaim tasks that are already claimed.
-    			if ( state == WorkflowManager.WFSTATE_STEP1POOL || 
-    				 state == WorkflowManager.WFSTATE_STEP2POOL || 
-    				 state == WorkflowManager.WFSTATE_STEP3POOL)
+    			if ( state == BasicWorkflowServiceImpl.WFSTATE_STEP1POOL ||
+    				 state == BasicWorkflowServiceImpl.WFSTATE_STEP2POOL ||
+    				 state == BasicWorkflowServiceImpl.WFSTATE_STEP3POOL)
     			{
-    				WorkflowManager.claim(context, workflowItem, context.getCurrentUser());
+					basicWorkflowService.claim(context, workflowItem, context.getCurrentUser());
     			}
     		}
-
-    		context.commit();
     	}
     	
     	return null;

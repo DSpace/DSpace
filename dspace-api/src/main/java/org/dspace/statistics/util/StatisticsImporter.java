@@ -15,11 +15,13 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
 import org.dspace.core.Context;
-import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.statistics.SolrLogger;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.statistics.SolrLoggerServiceImpl;
 
 import java.text.*;
 import java.io.*;
@@ -27,6 +29,8 @@ import java.util.*;
 
 import com.maxmind.geoip.LookupService;
 import com.maxmind.geoip.Location;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
+import org.dspace.statistics.service.SolrLoggerService;
 
 /**
  * Class to load intermediate statistics files (produced from log files by {@link ClassicDSpaceLogConverter}) into Solr.
@@ -40,7 +44,13 @@ public class StatisticsImporter
     private static final Logger log = Logger.getLogger(StatisticsImporter.class);
 
     /** Date format (for solr) */
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        }
+    };
+    protected final SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
 
     /** Solr server connection */
     private static HttpSolrServer solr;
@@ -52,19 +62,24 @@ public class StatisticsImporter
     private static boolean skipReverseDNS = false;
 
     /** Local items */
-    private List<Integer> localItems;
+    private List<UUID> localItems;
 
     /** Local collections */
-    private List<Integer> localCollections;
+    private List<UUID> localCollections;
 
     /** Local communities */
-    private List<Integer> localCommunities;
+    private List<UUID> localCommunities;
 
     /** Local bitstreams */
-    private List<Integer> localBitstreams;
+    private List<UUID> localBitstreams;
 
     /** Whether or not to replace item IDs with local values (for testing) */
     private final boolean useLocal;
+
+    protected final BitstreamService bitstreamService;
+    protected final CollectionService collectionService;
+    protected final CommunityService communityService;
+    protected final ItemService itemService;
 
     /**
      * Constructor. Optionally loads local data to replace foreign data
@@ -74,16 +89,22 @@ public class StatisticsImporter
      */
     public StatisticsImporter(boolean local)
     {
+        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        collectionService = ContentServiceFactory.getInstance().getCollectionService();
+        communityService = ContentServiceFactory.getInstance().getCommunityService();
+        itemService = ContentServiceFactory.getInstance().getItemService();
         // Setup the lists of communities, collections, items & bitstreams if required
         useLocal = local;
         if (local)
         {
             try
             {
+                ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
                 System.out.print("Loading local communities... ");
+
                 Context c = new Context();
-                Community[] communities = Community.findAll(c);
-                localCommunities = new ArrayList<Integer>();
+                List<Community> communities = communityService.findAll(c);
+                localCommunities = new ArrayList<>();
                 for (Community community : communities)
                 {
                     localCommunities.add(community.getID());
@@ -91,8 +112,8 @@ public class StatisticsImporter
                 System.out.println("Found " + localCommunities.size());
 
                 System.out.print("Loading local collections... ");
-                Collection[] collections = Collection.findAll(c);
-                localCollections = new ArrayList<Integer>();
+                List<Collection> collections = collectionService.findAll(c);
+                localCollections = new ArrayList<>();
                 for (Collection collection : collections)
                 {
                     localCollections.add(collection.getID());
@@ -100,8 +121,8 @@ public class StatisticsImporter
                 System.out.println("Found " + localCollections.size());
 
                 System.out.print("Loading local items... ");
-                ItemIterator items = Item.findAll(c);
-                localItems = new ArrayList<Integer>();
+                Iterator<Item> items = itemService.findAll(c);
+                localItems = new ArrayList<>();
                 Item i;
                 while (items.hasNext())
                 {
@@ -111,8 +132,8 @@ public class StatisticsImporter
                 System.out.println("Found " + localItems.size());
 
                 System.out.print("Loading local bitstreams... ");
-                Bitstream[] bitstreams = Bitstream.findAll(c);
-                localBitstreams = new ArrayList<Integer>();
+                List<Bitstream> bitstreams = bitstreamService.findAll(c);
+                localBitstreams = new ArrayList<>();
                 for (Bitstream bitstream : bitstreams)
                 {
                     if (bitstream.getName() != null)
@@ -138,7 +159,7 @@ public class StatisticsImporter
      * @param context The DSpace Context
      * @param verbose Whether to display verbose output
      */
-    private void load(String filename, Context context, boolean verbose)
+    protected void load(String filename, Context context, boolean verbose)
     {
         // Item counter
         int counter = 0;
@@ -193,7 +214,7 @@ public class StatisticsImporter
 //                uuid = parts[0];
                 action = parts[1];
                 id = parts[2];
-                date = dateFormat.parse(parts[3]);
+                date = dateFormat.get().parse(parts[3]);
                 user = parts[4];
                 ip = parts[5];
 
@@ -263,10 +284,11 @@ public class StatisticsImporter
                 }
 
                 // Now find our dso
-                int type = 0;
+                ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
+                DSpaceObjectLegacySupportService legacySupportService = null;
                 if ("view_bitstream".equals(action))
                 {
-                    type = Constants.BITSTREAM;
+                    legacySupportService = contentServiceFactory.getBitstreamService();
                     if (useLocal)
                     {
                         id = "" + localBitstreams.get(rand.nextInt(localBitstreams.size()));
@@ -274,7 +296,7 @@ public class StatisticsImporter
                 }
                 else if ("view_item".equals(action))
                 {
-                    type = Constants.ITEM;
+                    legacySupportService = contentServiceFactory.getItemService();
                     if (useLocal)
                     {
                         id = "" + localItems.get(rand.nextInt(localItems.size()));
@@ -282,7 +304,7 @@ public class StatisticsImporter
                 }
                 else if ("view_collection".equals(action))
                 {
-                    type = Constants.COLLECTION;
+                    legacySupportService = contentServiceFactory.getCollectionService();
                     if (useLocal)
                     {
                         id = "" + localCollections.get(rand.nextInt(localCollections.size()));
@@ -290,14 +312,18 @@ public class StatisticsImporter
                 }
                 else if ("view_community".equals(action))
                 {
-                    type = Constants.COMMUNITY;
+                    legacySupportService = contentServiceFactory.getCommunityService();
                     if (useLocal)
                     {
                         id = "" + localCommunities.get(rand.nextInt(localCommunities.size()));
                     }
                 }
+                if(legacySupportService == null)
+                {
+                    continue;
+                }
 
-                DSpaceObject dso = DSpaceObject.find(context, type, Integer.parseInt(id));
+                DSpaceObject dso = legacySupportService.findByIdOrLegacyId(context, id);
                 if (dso == null)
                 {
                     if (verbose)
@@ -308,7 +334,7 @@ public class StatisticsImporter
                 }
 
                 // Get the eperson details
-                EPerson eperson = EPerson.findByEmail(context, user);
+                EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, user);
                 int epersonId = 0;
                 if (eperson != null)
                 {
@@ -320,7 +346,7 @@ public class StatisticsImporter
                 sid.addField("ip", ip);
                 sid.addField("type", dso.getType());
                 sid.addField("id", dso.getID());
-                sid.addField("time", DateFormatUtils.format(date, SolrLogger.DATE_FORMAT_8601));
+                sid.addField("time", DateFormatUtils.format(date, SolrLoggerServiceImpl.DATE_FORMAT_8601));
                 sid.addField("continent", continent);
                 sid.addField("country", country);
                 sid.addField("countryCode", countryCode);
@@ -336,7 +362,7 @@ public class StatisticsImporter
                     sid.addField("dns", dns.toLowerCase());
                 }
 
-                SolrLogger.storeParents(sid, dso);
+                solrLoggerService.storeParents(sid, dso);
                 solr.add(sid);
                 errors--;
             }

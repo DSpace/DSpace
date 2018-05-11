@@ -7,18 +7,24 @@
  */
 package org.dspace.curate;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
-import org.dspace.disseminate.CitationDocument;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.core.Context;
+import org.dspace.disseminate.factory.DisseminateServiceFactory;
+import org.dspace.disseminate.service.CitationDocumentService;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,12 +45,12 @@ public class CitationPage extends AbstractCurationTask {
      */
     private static Logger log = Logger.getLogger(CitationPage.class);
 
-    private int status = Curator.CURATE_UNSET;
-    private String result = null;
+    protected int status = Curator.CURATE_UNSET;
+    protected String result = null;
     /**
      * A StringBuilder to handle result string building process.
      */
-    private StringBuilder resBuilder;
+    protected StringBuilder resBuilder;
 
 
 
@@ -52,12 +58,15 @@ public class CitationPage extends AbstractCurationTask {
     /**
      * The name to give the bundle we add the cited pages to.
      */
-    private static final String DISPLAY_BUNDLE_NAME = "DISPLAY";
+    protected static final String DISPLAY_BUNDLE_NAME = "DISPLAY";
     /**
      * The name of the bundle to move source documents into after they have been
      * cited.
      */
-    private static final String PRESERVATION_BUNDLE_NAME = "PRESERVATION";
+    protected static final String PRESERVATION_BUNDLE_NAME = "PRESERVATION";
+
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
 
     /**
      * {@inheritDoc}
@@ -83,17 +92,17 @@ public class CitationPage extends AbstractCurationTask {
     @Override
     protected void performItem(Item item) throws SQLException {
         //Determine if the DISPLAY bundle exits. If not, create it.
-        Bundle[] dBundles = item.getBundles(CitationPage.DISPLAY_BUNDLE_NAME);
+        List<Bundle> dBundles = itemService.getBundles(item, CitationPage.DISPLAY_BUNDLE_NAME);
         Bundle dBundle = null;
-        if (dBundles == null || dBundles.length == 0) {
+        if (dBundles == null || dBundles.size() == 0) {
             try {
-                dBundle = item.createBundle(CitationPage.DISPLAY_BUNDLE_NAME);
+                dBundle = bundleService.create(Curator.curationContext(), item ,CitationPage.DISPLAY_BUNDLE_NAME);
             } catch (AuthorizeException e) {
                 log.error("User not authroized to create bundle on item \""
                         + item.getName() + "\": " + e.getMessage());
             }
         } else {
-            dBundle = dBundles[0];
+            dBundle = dBundles.get(0);
         }
 
         //Create a map of the bitstreams in the displayBundle. This is used to
@@ -106,41 +115,42 @@ public class CitationPage extends AbstractCurationTask {
         //Determine if the preservation bundle exists and add it if we need to.
         //Also, set up bundles so it contains all ORIGINAL and PRESERVATION
         //bitstreams.
-        Bundle[] pBundles = item.getBundles(CitationPage.PRESERVATION_BUNDLE_NAME);
+        List<Bundle> pBundles = itemService.getBundles(item, CitationPage.PRESERVATION_BUNDLE_NAME);
         Bundle pBundle = null;
-        Bundle[] bundles = null;
-        if (pBundles != null && pBundles.length > 0) {
-            pBundle = pBundles[0];
-            bundles = (Bundle[]) ArrayUtils.addAll(item.getBundles("ORIGINAL"), pBundles);
+        List<Bundle> bundles = new ArrayList<>();
+        if (pBundles != null && pBundles.size() > 0) {
+            pBundle = pBundles.get(0);
+            bundles.addAll(itemService.getBundles(item, "ORIGINAL"));
+            bundles.addAll(pBundles);
         } else {
             try {
-                pBundle = item.createBundle(CitationPage.PRESERVATION_BUNDLE_NAME);
+                pBundle = bundleService.create(Curator.curationContext(), item, CitationPage.PRESERVATION_BUNDLE_NAME);
             } catch (AuthorizeException e) {
                 log.error("User not authroized to create bundle on item \""
                         + item.getName() + "\": " + e.getMessage());
             }
-            bundles = item.getBundles("ORIGINAL");
+            bundles = itemService.getBundles(item, "ORIGINAL");
         }
 
         //Start looping through our bundles. Anything that is citable in these
         //bundles will be cited.
         for (Bundle bundle : bundles) {
-            Bitstream[] bitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
             // Loop through each file and generate a cover page for documents
             // that are PDFs.
             for (Bitstream bitstream : bitstreams) {
-                BitstreamFormat format = bitstream.getFormat();
+                BitstreamFormat format = bitstream.getFormat(Curator.curationContext());
 
                 //If bitstream is a PDF document then it is citable.
-                CitationDocument citationDocument = new CitationDocument();
+                CitationDocumentService citationDocument = DisseminateServiceFactory.getInstance().getCitationDocumentService();
 
-                if(citationDocument.canGenerateCitationVersion(bitstream)) {
+                if(citationDocument.canGenerateCitationVersion(Curator.curationContext(), bitstream)) {
                     this.resBuilder.append(item.getHandle() + " - "
                             + bitstream.getName() + " is citable.");
                     try {
                         //Create the cited document
-                        File citedDocument = citationDocument.makeCitedDocument(bitstream);
+                        File citedDocument = citationDocument.makeCitedDocument(Curator.curationContext(), bitstream);
                         //Add the cited document to the approiate bundle
                         this.addCitedPageToItem(citedDocument, bundle, pBundle,
                                 dBundle, displayMap, item, bitstream);
@@ -186,21 +196,22 @@ public class CitationPage extends AbstractCurationTask {
      * bundle.
      * @param item The item containing the bundles being used.
      * @param bitstream The original source bitstream.
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
-    private void addCitedPageToItem(File citedTemp, Bundle bundle, Bundle pBundle,
+    protected void addCitedPageToItem(File citedTemp, Bundle bundle, Bundle pBundle,
                                     Bundle dBundle, Map<String,Bitstream> displayMap, Item item,
                                     Bitstream bitstream) throws SQLException, AuthorizeException, IOException {
         //If we are modifying a file that is not in the
         //preservation bundle then we have to move it there.
+        Context context = Curator.curationContext();
         if (bundle.getID() != pBundle.getID()) {
-            pBundle.addBitstream(bitstream);
-            bundle.removeBitstream(bitstream);
-            Bitstream[] originalBits = bundle.getBitstreams();
-            if (originalBits == null || originalBits.length == 0) {
-                item.removeBundle(bundle);
+            bundleService.addBitstream(context, pBundle, bitstream);
+            bundleService.removeBitstream(context, bundle, bitstream);
+            List<Bitstream> bitstreams = bundle.getBitstreams();
+            if (bitstreams == null || bitstreams.size() == 0) {
+                itemService.removeBundle(context, item, bundle);
             }
         }
 
@@ -209,16 +220,16 @@ public class CitationPage extends AbstractCurationTask {
         //bitstream from it.
         InputStream inp = new FileInputStream(citedTemp);
         if (displayMap.containsKey(bitstream.getName())) {
-            dBundle.removeBitstream(displayMap.get(bitstream.getName()));
+            bundleService.removeBitstream(context, dBundle, displayMap.get(bitstream.getName()));
         }
-        Bitstream citedBitstream = dBundle.createBitstream(inp);
+        Bitstream citedBitstream = bitstreamService.create(context, dBundle, inp);
         inp.close(); //Close up the temporary InputStream
 
         //Setup a good name for our bitstream and make
         //it the same format as the source document.
-        citedBitstream.setName(bitstream.getName());
-        citedBitstream.setFormat(bitstream.getFormat());
-        citedBitstream.setDescription(bitstream.getDescription());
+        citedBitstream.setName(context, bitstream.getName());
+        bitstreamService.setFormat(context, citedBitstream, bitstream.getFormat(Curator.curationContext()));
+        citedBitstream.setDescription(context, bitstream.getDescription());
 
         this.resBuilder.append(" Added "
                 + citedBitstream.getName()
@@ -226,7 +237,7 @@ public class CitationPage extends AbstractCurationTask {
 
         //Run update to propagate changes to the
         //database.
-        item.update();
+        itemService.update(context, item);
         this.status = Curator.CURATE_SUCCESS;
     }
 }

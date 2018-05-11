@@ -38,8 +38,10 @@ public class DSpaceServiceManagerTest {
     @Before
     public void init() {
         configurationService = new DSpaceConfigurationService();
-        configurationService.loadConfig("testName@" + SampleAnnotationBean.class.getName(), "beckyz");
-        configurationService.loadConfig("fakeParam@fakeBean", "beckyz");
+
+        // Set some sample configurations relating to services/beans
+        configurationService.loadConfig(SampleAnnotationBean.class.getName() + ".sampleValue", "beckyz");
+        configurationService.loadConfig("fakeBean.fakeParam", "beckyz");
 
         dsm = new DSpaceServiceManager(configurationService, TestSpringServiceManager.SPRING_TEST_CONFIG_FILE);
     }
@@ -106,16 +108,15 @@ public class DSpaceServiceManagerTest {
     public void testRegisterServiceClass() {
         dsm.startup();
 
-        int currentSize = dsm.getServicesByType(SampleAnnotationBean.class).size();
-
         SampleAnnotationBean sab = dsm.registerServiceClass("newAnnote", SampleAnnotationBean.class);
         assertNotNull(sab);
+
+        SampleAnnotationBean sampleAnnotationBean = dsm.getServiceByName("newAnnote", SampleAnnotationBean.class);
+        assertNotNull(sampleAnnotationBean);
+        assertEquals(sampleAnnotationBean, sab);
+        sampleAnnotationBean = null;
         sab = null;
 
-        List<SampleAnnotationBean> l = dsm.getServicesByType(SampleAnnotationBean.class);
-        assertNotNull(l);
-        assertEquals(currentSize+1, l.size());
-        l = null;
 
         try {
             dsm.registerService("fakey", (Class<?>)null);
@@ -169,8 +170,11 @@ public class DSpaceServiceManagerTest {
         assertEquals("azeckoski", concrete.getName());
         concrete = null;
 
+        // initialize a SampleAnnotationBean
         SampleAnnotationBean sab = dsm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
+        // Based on the configuration for "sampleValue" in the init() method above,
+        // a value should be pre-set!
         assertEquals("beckyz", sab.getSampleValue());
         sab = null;
     }
@@ -194,11 +198,6 @@ public class DSpaceServiceManagerTest {
         assertNotNull(l2);
         assertTrue(l2.size() >= 1);
         l2 = null;
-
-        List<ServiceConfig> l3 = dsm.getServicesByType(ServiceConfig.class);
-        assertNotNull(l3);
-        assertEquals(0, l3.size());
-        l3 = null;
     }
 
     /**
@@ -249,7 +248,7 @@ public class DSpaceServiceManagerTest {
     public void testPushConfig() {
         dsm.startup();
 
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("some.test.thing", "A value");
         dsm.pushConfig(properties);
 
@@ -290,7 +289,7 @@ public class DSpaceServiceManagerTest {
         assertEquals(1, service.getTriggers());
 
         // now we do a config change
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("azeckoski.FakeService1.something", "THING");
         dsm.pushConfig(properties);
         assertEquals("config:THING", service.getSomething());

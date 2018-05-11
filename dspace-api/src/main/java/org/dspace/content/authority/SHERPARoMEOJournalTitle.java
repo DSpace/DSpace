@@ -10,6 +10,7 @@ package org.dspace.content.authority;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.http.message.BasicNameValuePair;
+import org.dspace.content.Collection;
 
 /**
  * Sample Journal-name authority based on SHERPA/RoMEO
@@ -34,7 +35,7 @@ public class SHERPARoMEOJournalTitle extends SHERPARoMEOProtocol
     }
 
     @Override
-    public Choices getMatches(String text, int collection, int start, int limit, String locale)
+    public Choices getMatches(String text, Collection collection, int start, int limit, String locale)
     {
         // punt if there is no query text
         if (text == null || text.trim().length() == 0)
@@ -56,7 +57,7 @@ public class SHERPARoMEOJournalTitle extends SHERPARoMEOProtocol
     }
 
     @Override
-    public Choices getMatches(String field, String text, int collection, int start, int limit, String locale) {
+    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
         return getMatches(text, collection, start, limit, locale);
     }
 }

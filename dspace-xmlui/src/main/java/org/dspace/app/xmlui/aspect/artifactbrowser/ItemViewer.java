@@ -25,6 +25,8 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.dspace.app.sfx.factory.SfxServiceFactory;
+import org.dspace.app.sfx.service.SFXFileReaderService;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -38,25 +40,20 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.app.util.GoogleMetadata;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.core.PluginManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.app.sfx.SFXFileReader;
 import org.dspace.app.xmlui.wing.element.Metadata;
-import org.dspace.content.MetadataSchema;
-import org.dspace.identifier.IdentifierNotFoundException;
-import org.dspace.identifier.IdentifierNotResolvableException;
-import org.dspace.identifier.IdentifierProvider;
-import org.dspace.utils.DSpace;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,14 +88,17 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	/** XHTML crosswalk instance */
 	private DisseminationCrosswalk xHTMLHeadCrosswalk = null;
 
-	private final String sfxFile = ConfigurationManager.getProperty("dspace.dir")
+	private final String sfxFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
             + File.separator + "config" + File.separator + "sfx.xml";
 
     private static final Logger log = LoggerFactory.getLogger(ItemViewer.class);
 
+    protected SFXFileReaderService sfxFileReaderService = SfxServiceFactory.getInstance().getSfxFileReaderService();
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
+     * @return the key.
      */
     @Override
     public Serializable getKey() {
@@ -123,7 +123,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
      * Generate the cache validity object.
      *
      * The validity object will include the item being viewed,
-     * along with all bundles & bitstreams.
+     * along with all bundles and bitstreams.
+     * @return validity.
      */
     @Override
     public SourceValidity getValidity()
@@ -135,9 +136,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	        try {
 	            dso = HandleUtil.obtainHandle(objectModel);
 
-	            DSpaceValidity validity = new DSpaceValidity();
-	            validity.add(dso);
-	            this.validity =  validity.complete();
+	            DSpaceValidity newValidity = new DSpaceValidity();
+	            newValidity.add(context, dso);
+	            this.validity =  newValidity.complete();
 	        }
 	        catch (Exception e)
 	        {
@@ -158,6 +159,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     /**
      * Add the item's title and trail links to the page's metadata.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException if a crosswalk fails.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
@@ -173,7 +180,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         Item item = (Item) dso;
 
         // Set the page title
-        String title = getItemTitle(item);
+        String title = item.getName();
 
         if (title != null)
         {
@@ -185,17 +192,17 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         }
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(item,pageMeta,contextPath);
+        HandleUtil.buildHandleTrail(context, item,pageMeta,contextPath);
         pageMeta.addTrail().addContent(T_trail);
 
         // Add SFX link
-        String sfxserverUrl = ConfigurationManager.getProperty("sfx.server.url");
+        String sfxserverUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.url");
         if (sfxserverUrl != null && sfxserverUrl.length() > 0)
         {
             String sfxQuery = "";
 
             // parse XML file -> XML document will be build
-            sfxQuery = SFXFileReader.loadSFXFile(sfxFile, item);
+            sfxQuery = sfxFileReaderService.loadSFXFile(sfxFile, item);
 
             // Remove initial &, if any
             if (sfxQuery.startsWith("&"))
@@ -210,7 +217,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         /* Temporarily switch to using metadata directly.
          * FIXME Proper fix is to have IdentifierService handle all durable
          * identifiers, whether minted here or elsewhere.
-        List<IdentifierProvider> idPs = new DSpace().getServiceManager()
+        List<IdentifierProvider> idPs = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServicesByType(IdentifierProvider.class);
         for (IdentifierProvider idP : idPs)
         {
@@ -238,26 +245,26 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
         */
-        String identifierField = new DSpace().getConfigurationService()
+        String identifierField = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getPropertyAsType("altmetrics.field", "dc.identifier.uri");
-        for (Metadatum uri : dso.getMetadataByMetadataString(identifierField))
+        for (MetadataValue uri : ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getMetadataByMetadataString(dso, identifierField))
         {
             String idType, idValue;
-            Matcher handleMatcher = handlePattern.matcher(uri.value);
-            Matcher doiMatcher = doiPattern.matcher(uri.value);
+            Matcher handleMatcher = handlePattern.matcher(uri.getValue());
+            Matcher doiMatcher = doiPattern.matcher(uri.getValue());
             if (handleMatcher.lookingAt())
             {
                 idType = "handle";
-                idValue = uri.value.substring(handleMatcher.end());
+                idValue = uri.getValue().substring(handleMatcher.end());
             }
             else if (doiMatcher.lookingAt())
             {
                 idType = "doi";
-                idValue = uri.value.substring(doiMatcher.end());
+                idValue = uri.getValue().substring(doiMatcher.end());
             }
             else
             {
-                log.info("Unhandled identifier URI {}", uri.value);
+                log.info("Unhandled identifier URI {}", uri.getValue());
                 continue;
             }
             log.debug("Adding identifier of type {}", idType);
@@ -265,13 +272,13 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             md.addContent(idValue);
         }
 
-        String sfxserverImg = ConfigurationManager.getProperty("sfx.server.image_url");
+        String sfxserverImg = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.image_url");
         if (sfxserverImg != null && sfxserverImg.length() > 0)
         {
             pageMeta.addMetadata("sfx","image_url").addContent(sfxserverImg);
         }
 
-        boolean googleEnabled = ConfigurationManager.getBooleanProperty(
+        boolean googleEnabled = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
             "google-metadata.enable", false);
 
         if (googleEnabled)
@@ -288,14 +295,14 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         // Metadata for <head> element
         if (xHTMLHeadCrosswalk == null)
         {
-            xHTMLHeadCrosswalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(
+            xHTMLHeadCrosswalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
               DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
         }
 
         // Produce <meta> elements for header from crosswalk
         try
         {
-            List l = xHTMLHeadCrosswalk.disseminateList(item);
+            List l = xHTMLHeadCrosswalk.disseminateList(context, item);
             StringWriter sw = new StringWriter();
 
             XMLOutputter xmlo = new XMLOutputter();
@@ -321,6 +328,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     /**
      * Display a single item
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     @Override
     public void addBody(Body body) throws SAXException, WingException,
@@ -337,7 +350,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
         // Build the item viewer division.
         Division division = body.addDivision("item-view","primary");
-        String title = getItemTitle(item);
+        String title = item.getName();
         if (title != null)
         {
             division.setHead(title);
@@ -412,42 +425,17 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     /**
      * Determine if the full item should be referenced or just a summary.
+     * @param objectModel to get the request.
+     * @return true if the full item should be shown.
      */
     public static boolean showFullItem(Map objectModel)
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         String show = request.getParameter("show");
 
-        if (show != null && show.length() > 0)
-        {
-            return true;
-        }
-
-        return false;
+        return show != null && show.length() > 0;
     }
 
-    /**
-     * Obtain the item's title.
-     */
-    public static String getItemTitle(Item item)
-    {
-        Metadatum[] titles = item.getDC("title", Item.ANY, Item.ANY);
-
-        String title;
-        if (titles != null && titles.length > 0)
-        {
-            title = titles[0].value;
-        }
-        else
-        {
-            title = null;
-        }
-        return title;
-    }
-
-    /**
-     * Recycle
-     */
     @Override
     public void recycle() {
     	this.validity = null;

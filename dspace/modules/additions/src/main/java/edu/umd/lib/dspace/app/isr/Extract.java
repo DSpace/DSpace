@@ -14,8 +14,8 @@ import java.sql.Statement;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.dspace.core.ConfigurationManager;
-
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.helpers.AttributesImpl;
 
 import org.dom4j.io.OutputFormat;
@@ -31,21 +31,23 @@ public class Extract {
 
   public static Connection conn = null;
 
+  private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
   public static void main(String[] args) throws Exception {
 
     // dspace properties
-    String strDspace     = ConfigurationManager.getProperty("dspace.dir");
+    String strDspace     = configurationService.getProperty("dspace.dir");
 
     // Log4j configuration
     PropertyConfigurator.configure(strDspace + "/config/log4j-app.properties");
 
     // jdbc connection
     log.info("Setting up JDBC connection");
-    Class driverClass = Class.forName(ConfigurationManager.getProperty("db.driver"));
+    Class driverClass = Class.forName(configurationService.getProperty("db.driver"));
     Driver driver = (Driver) driverClass.newInstance();
     DriverManager.registerDriver(driver);
 
-    conn = DriverManager.getConnection(ConfigurationManager.getProperty("isr.url"), "dspace", null);
+    conn = DriverManager.getConnection(configurationService.getProperty("isr.url"), "dspace", null);
 
     // Setup the output xml
     FileOutputStream fos = new FileOutputStream(args[0]);
@@ -148,19 +150,19 @@ public class Extract {
 
       Statement st = conn.createStatement();
       String strQuery = 
-	"SELECT *"
-	+ " FROM users"
-	;
-      
-      ResultSet rs = st.executeQuery(strQuery);
+        "SELECT *"
+        + " FROM users"
+        ;
+            
+            ResultSet rs = st.executeQuery(strQuery);
 
-      while (rs.next()) {
-	String strUseridd = rs.getString("userid");
-	String strFname = rs.getString("fname");
-	String strLname = rs.getString("lname");
-	String strUserType = rs.getString("usertype");
+            while (rs.next()) {
+        String strUseridd = rs.getString("userid");
+        String strFname = rs.getString("fname");
+        String strLname = rs.getString("lname");
+        String strUserType = rs.getString("usertype");
 
-	hUser.put(strUseridd, new String[] {strFname, strLname, strUserType});
+        hUser.put(strUseridd, new String[] {strFname, strLname, strUserType});
       }
 
       rs.close();
@@ -194,27 +196,27 @@ public class Extract {
       String sCenter[] = new String[] {"caar","cdcss","cshcn","nextor","seil"};
       for (int i = 0; i < sCenter.length; i++) {
 
-	Statement st = conn.createStatement();
-	String strQuery = 
-	  "SELECT year,isrnum,papertype,centernum"
-	  + " FROM " + sCenter[i]
-	  ;
+        Statement st = conn.createStatement();
+        String strQuery = 
+          "SELECT year,isrnum,papertype,centernum"
+          + " FROM " + sCenter[i]
+          ;
 
-	ResultSet rs = st.executeQuery(strQuery);
+        ResultSet rs = st.executeQuery(strQuery);
 
-	while (rs.next()) {
-	  String strKey = 
-	    sCenter[i]
-	    + rs.getString(1)
-	    + rs.getString(2)
-	    + rs.getString(3)
-	    ;
+        while (rs.next()) {
+          String strKey = 
+            sCenter[i]
+            + rs.getString(1)
+            + rs.getString(2)
+            + rs.getString(3)
+            ;
 
-	  hCenter.put(strKey, rs.getString(4));
-	}
+          hCenter.put(strKey, rs.getString(4));
+        }
 
-	rs.close();
-	st.close();
+        rs.close();
+        st.close();
       }
     }
 

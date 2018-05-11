@@ -43,15 +43,11 @@ import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
+import org.dspace.content.*;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCDate;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
 
@@ -185,7 +181,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
                 if (dso != null)
                 {
-                    newValidity.add(dso);
+                    newValidity.add(context, dso);
                 }
 
                 BrowseInfo info = getBrowseInfo();
@@ -193,9 +189,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 newValidity.add("start:"+info.getStart());
 
                     // Add the browse items to the validity
-                    for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+                    for (Item item : info.getResults())
                     {
-                        newValidity.add(item);
+                        newValidity.add(context, item);
                     }
 
                 validity = newValidity.complete();
@@ -223,8 +219,6 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         BrowseInfo info = getBrowseInfo();
 
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
-
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
 
@@ -271,7 +265,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 	        ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type, ReferenceSet.TYPE_SUMMARY_LIST, type, null);
 
 	        // Add the items to the browse results
-	        for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+	        for (Item item : info.getResults())
 	        {
 		        referenceSet.addReference(item);
 	        }
@@ -704,7 +698,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             if (params.etAl < 0)
             {
                 // there is no limit, or the UI says to use the default
-                int etAl = ConfigurationManager.getIntProperty("webui.browse.author-limit");
+                int etAl = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("webui.browse.author-limit");
                 if (etAl != 0)
                 {
                     this.browseInfo.setEtAl(etAl);

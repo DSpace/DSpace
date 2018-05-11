@@ -9,6 +9,8 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -17,12 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -70,6 +69,8 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
     protected boolean willRemoveFiles = false;
 
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)
@@ -93,6 +94,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
+    @Override
     public int doProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
@@ -105,8 +107,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
                 "published_before");
         boolean multipleFiles = Util.getBoolParameter(request,
                 "multiple_files");
-        boolean isThesis = ConfigurationManager
-                .getBooleanProperty("webui.submit.blocktheses")
+        boolean isThesis = configurationService.getBooleanProperty("webui.submit.blocktheses")
                 && Util.getBoolParameter(request, "is_thesis");
 
         if (subInfo.isInWorkflow())
@@ -123,7 +124,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
         if (isThesis)
         {
             WorkspaceItem wi = (WorkspaceItem) subInfo.getSubmissionItem();
-            wi.deleteAll();
+            workspaceItemService.deleteAll(context, wi);
             subInfo.setSubmissionItem(null);
 
             // Remember that we've removed a thesis in the session
@@ -135,6 +136,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
         }
 
         // Next, check if we are pruning some existing metadata
+        Item item = subInfo.getSubmissionItem().getItem();
         if (request.getParameter("do_not_prune") != null)
         {
             return STATUS_CANCEL_PRUNE; // cancelled pruning!
@@ -155,37 +157,37 @@ public class InitialQuestionsStep extends AbstractProcessingStep
                 // shouldn't need to check if submission is null, but just in case!
                 if (!multipleTitles)
                 {
-                    Metadatum[] altTitles = subInfo.getSubmissionItem().getItem()
-                            .getDC("title", "alternative", Item.ANY);
+                    List<MetadataValue> altTitles = itemService
+                            .getMetadata(item, MetadataSchema.DC_SCHEMA, "title", "alternative", Item.ANY);
 
-                    willRemoveTitles = altTitles.length > 0;
+                    willRemoveTitles = altTitles.size() > 0;
                 }
 
                 if (!publishedBefore)
                 {
-                    Metadatum[] dateIssued = subInfo.getSubmissionItem().getItem()
-                            .getDC("date", "issued", Item.ANY);
-                    Metadatum[] citation = subInfo.getSubmissionItem().getItem()
-                            .getDC("identifier", "citation", Item.ANY);
-                    Metadatum[] publisher = subInfo.getSubmissionItem().getItem()
-                            .getDC("publisher", null, Item.ANY);
+                    List<MetadataValue> dateIssued = itemService
+                            .getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+                    List<MetadataValue> citation = itemService
+                            .getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "citation", Item.ANY);
+                    List<MetadataValue> publisher = itemService
+                            .getMetadata(item, MetadataSchema.DC_SCHEMA, "publisher", null, Item.ANY);
 
-                    willRemoveDate = (dateIssued.length > 0)
-                            || (citation.length > 0) || (publisher.length > 0);
+                    willRemoveDate = (dateIssued.size() > 0)
+                            || (citation.size() > 0) || (publisher.size() > 0);
                 }
 
                 if (!multipleFiles)
                 {
                     // see if number of bitstreams in "ORIGINAL" bundle > 1
                     // FIXME: Assumes multiple bundles, clean up someday...
-                    Bundle[] bundles = subInfo.getSubmissionItem().getItem()
-                            .getBundles("ORIGINAL");
+                    List<Bundle> bundles = itemService
+                            .getBundles(item, "ORIGINAL");
 
-                    if (bundles.length > 0)
+                    if (bundles.size() > 0)
                     {
-                        Bitstream[] bitstreams = bundles[0].getBitstreams();
+                        List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
 
-                        willRemoveFiles = bitstreams.length > 1;
+                        willRemoveFiles = bitstreams.size() > 1;
                     }
                 }
             }
@@ -219,18 +221,18 @@ public class InitialQuestionsStep extends AbstractProcessingStep
         // (This logic is necessary since the date field is hidden on DescribeStep when publishedBefore==false)
         if(!publishedBefore)
         {
-            Metadatum[] dateIssued = subInfo.getSubmissionItem().getItem()
-                            .getDC("date", "issued", Item.ANY);
-            if(dateIssued.length==0)
+            List<MetadataValue> dateIssued = itemService
+                            .getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+            if(dateIssued.size()==0)
             {
                 //Set issued date to "today" (NOTE: InstallItem will determine the actual date for us)
-                subInfo.getSubmissionItem().getItem().addDC("date", "issued", null, "today");
+                itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "issued", null, "today");
             }
         }
 
         // commit all changes to DB
-        subInfo.getSubmissionItem().update();
-        context.commit();
+        ContentServiceFactory.getInstance().getInProgressSubmissionService(subInfo.getSubmissionItem()).update(context, subInfo.getSubmissionItem());
+        context.dispatchEvents();
 
         return STATUS_COMPLETE; // no errors!
     }
@@ -257,6 +259,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
      * 
      * @return the number of pages in this step
      */
+    @Override
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {
@@ -294,14 +297,14 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
         if (!multipleTitles && subInfo.getSubmissionItem().hasMultipleTitles())
         {
-            item.clearDC("title", "alternative", Item.ANY);
+            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "title", "alternative", Item.ANY);
         }
 
         if (!publishedBefore && subInfo.getSubmissionItem().isPublishedBefore())
         {
-            item.clearDC("date", "issued", Item.ANY);
-            item.clearDC("identifier", "citation", Item.ANY);
-            item.clearDC("publisher", null, Item.ANY);
+            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "citation", Item.ANY);
+            itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "publisher", null, Item.ANY);
         }
 
         if (!multipleFiles && subInfo.getSubmissionItem().hasMultipleFiles())
@@ -309,16 +312,22 @@ public class InitialQuestionsStep extends AbstractProcessingStep
             // remove all but first bitstream from bundle[0]
             // FIXME: Assumes multiple bundles, clean up someday...
             // (only messes with the first bundle.)
-            Bundle[] bundles = item.getBundles("ORIGINAL");
+            List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
 
-            if (bundles.length > 0)
+            if (bundles.size() > 0)
             {
-                Bitstream[] bitstreams = bundles[0].getBitstreams();
-
-                // Remove all but the first bitstream
-                for (int i = 1; i < bitstreams.length; i++)
+                Iterator<Bitstream> bitstreams = bundles.get(0).getBitstreams().iterator();
+                //Do NOT remove the first one
+                if(bitstreams.hasNext())
                 {
-                    bundles[0].removeBitstream(bitstreams[i]);
+                    bitstreams.next();
+                }
+
+                while (bitstreams.hasNext())
+                {
+                    //TODO: HIBERNATE, write unit test for this
+                    Bitstream bitstream = bitstreams.next();
+                    bundleService.removeBitstream(context, bundles.get(0), bitstream);
                 }
             }
         }

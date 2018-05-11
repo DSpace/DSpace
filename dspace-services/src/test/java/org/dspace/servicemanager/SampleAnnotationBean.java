@@ -58,7 +58,7 @@ public class SampleAnnotationBean implements InitializedService, ShutdownService
     }
 
     private String value = null;
-    public void setTestName(String value) {
+    public void setSampleValue(String value) {
         this.value = value;
     }
 

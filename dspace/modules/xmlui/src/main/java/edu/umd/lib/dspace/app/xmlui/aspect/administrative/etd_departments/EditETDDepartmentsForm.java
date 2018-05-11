@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -22,6 +24,9 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
 import org.dspace.content.EtdUnit;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.EtdUnitService;
 
 import edu.umd.lib.dspace.app.xmlui.aspect.administrative.FlowETDDepartmentUtils;
 
@@ -41,51 +46,34 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
     private static final Message T_etd_department_trail = message("xmlui.administrative.etd_departments.general.etd_department_trail");
 
     private static final Message T_title = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.title");
-
     private static final Message T_trail = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.trail");
 
     private static final Message T_main_head = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.main_head");
-
     private static final Message T_label_name = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.label_name");
-
     private static final Message T_label_search = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.label_search");
-
     private static final Message T_submit_search_collections = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_search_collections");
-
     private static final Message T_no_results = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.no_results");
-
     private static final Message T_main_head_new = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.main_head_new");
-
-    private static final Message T_submit_clear = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_clear");
-
-    private static final Message T_submit_save = message("xmlui.general.save");
-
-    private static final Message T_submit_cancel = message("xmlui.general.cancel");
-
     private static final Message T_member = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.member");
 
+    private static final Message T_submit_clear = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_clear");
+    private static final Message T_submit_save = message("xmlui.general.save");
+    private static final Message T_submit_cancel = message("xmlui.general.cancel");
+
     private static final Message T_pending = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.pending");
-
     private static final Message T_pending_warn = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.pending_warn");
-
     private static final Message T_submit_add = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_add");
-
     private static final Message T_submit_remove = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_remove");
 
     // Collections Search
     private static final Message T_collections_column1 = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.collections_column1");
-
     private static final Message T_collections_column2 = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.collections_column2");
 
     // Members
     private static final Message T_members_head = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_head");
-
     private static final Message T_members_column1 = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column1");
-
     private static final Message T_members_column2 = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column2");
-
     private static final Message T_members_pending = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_pending");
-
     private static final Message T_members_none = message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_none");
 
     // How many results to show on a page.
@@ -93,6 +81,10 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
 
     /** The maximum size of a collection name allowed */
     private static final int MAX_COLLECTION_NAME = 15;
+    
+    private static EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
+    
+    private static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -108,24 +100,24 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
     public void addBody(Body body) throws WingException, SQLException
     {
         // Find the department in question
-        int etd_departmentID = parameters.getParameterAsInteger(
-                "etd_departmentID", -1);
+        String etd_departmentID = parameters.getParameter(
+                "etd_departmentID", null);
         String currentName = decodeFromURL(parameters.getParameter(
                 "etd_departmentName", null));
         if (currentName == null || currentName.length() == 0)
         {
             currentName = FlowETDDepartmentUtils.getName(context,
-                    etd_departmentID);
+                    UUID.fromString(etd_departmentID));
         }
 
         EtdUnit etd_department = null;
-        if (etd_departmentID >= 0)
+        if (StringUtils.isNotBlank(etd_departmentID))
         {
-            etd_department = EtdUnit.find(context, etd_departmentID);
+            etd_department = etdunitService.find(context, UUID.fromString(etd_departmentID));
         }
 
         // Get list of member collections from url
-        List<Integer> memberCollectionIDs = new ArrayList<Integer>();
+        List<UUID> memberCollectionIDs = new ArrayList<UUID>();
         String memberCollectionIDsString = parameters.getParameter(
                 "memberCollectionIDs", null);
         if (memberCollectionIDsString != null)
@@ -134,13 +126,16 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
             {
                 if (id.length() > 0)
                 {
-                    memberCollectionIDs.add(Integer.valueOf(id));
+                    memberCollectionIDs.add(UUID.fromString(id));
                 }
             }
         }
 
-        int highlightCollectionID = parameters.getParameterAsInteger(
-                "highlightCollectionID", -1);
+        String highlightCollectionIDString = parameters.getParameter("highlightCollectionID", null);
+        UUID highlightCollectionID = null;
+        if (StringUtils.isNotBlank(highlightCollectionIDString)) {
+            highlightCollectionID = UUID.fromString(highlightCollectionIDString);
+        }
 
         // Get search parameters
         String query = decodeFromURL(parameters.getParameter("query", null));
@@ -203,8 +198,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         boolean changes = false;
         if (etd_department != null)
         {
-            changes = addMemberList(main, etd_department, memberCollectionIDs,
-                    highlightCollectionID);
+            changes = addMemberList(main, etd_department, memberCollectionIDs, highlightCollectionID);
         }
 
         Para buttons = main.addPara();
@@ -223,12 +217,12 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
      * Search for collections to add to this etd_department.
      */
     private void addCollectionsSearch(Division div, String query, int page,
-            EtdUnit etd_department, List<Integer> memberCollectionIDs)
+            EtdUnit etd_department, List<UUID> memberCollectionIDs)
                     throws SQLException, WingException
     {
-        Collection[] collections = Collection.search(context, query, page
+        List<Collection> collections = collectionService.search(context, query, page
                 * RESULTS_PER_PAGE, RESULTS_PER_PAGE);
-        int resultCount = Collection.searchResultCount(context, query);
+        int resultCount = collectionService.searchResultCount(context, query);
 
         Division results = div.addDivision("results");
 
@@ -239,7 +233,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
                     + "/admin/etd_departments?administrative-continue="
                     + knot.getId();
             int firstIndex = page * RESULTS_PER_PAGE + 1;
-            int lastIndex = page * RESULTS_PER_PAGE + collections.length;
+            int lastIndex = page * RESULTS_PER_PAGE + collections.size();
 
             String nextURL = null, prevURL = null;
             if (page < (resultCount / RESULTS_PER_PAGE))
@@ -257,7 +251,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
 
         /* Set up a table with search results (if there are any). */
         Table table = results.addTable("group-edit-search-collections",
-                collections.length + 1, 2);
+                collections.size() + 1, 2);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_collections_column1);
         header.addCell().addContent(T_collections_column2);
@@ -269,7 +263,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
 
             Row collectionData = table.addRow();
 
-            collectionData.addCell().addContent(collection.getID());
+            collectionData.addCell().addContent(collection.getID().toString());
             collectionData.addCell().addContent(name);
 
             // check if they are already a member of the group
@@ -295,7 +289,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
             }
         }
 
-        if (collections.length <= 0)
+        if (collections.isEmpty())
         {
             table.addRow().addCell(1, 2).addContent(T_no_results);
         }
@@ -308,7 +302,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
      * @throws SQLException
      */
     private boolean addMemberList(Division div, EtdUnit parent,
-            List<Integer> memberCollectionIDs, int highlightCollectionID)
+            List<UUID> memberCollectionIDs, UUID highlightCollectionID)
                     throws WingException, SQLException
     {
         // Flag to remember if there are any pending changes.
@@ -326,7 +320,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
 
         // get all member collections, pend or actual
         // the cast is correct
-        List<Integer> allMemberCollectionIDs = new ArrayList<Integer>(
+        List<UUID> allMemberCollectionIDs = new ArrayList<UUID>(
                 memberCollectionIDs);
 
         for (Collection collection : parent.getCollections())
@@ -339,10 +333,10 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         // Sort them to a consistent ordering
         Collections.sort(allMemberCollectionIDs);
 
-        for (Integer collectionID : allMemberCollectionIDs)
+        for (UUID collectionID : allMemberCollectionIDs)
         {
-            Collection collection = Collection.find(context, collectionID);
-            boolean highlight = (collection.getID() == highlightCollectionID);
+            Collection collection = collectionService.find(context, collectionID);
+            boolean highlight = (collection.getID().equals(highlightCollectionID));
             boolean pendingAddition = !parent.isMember(collection);
             boolean pendingRemoval = !memberCollectionIDs
                     .contains(collectionID);
@@ -386,7 +380,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         Row collectionData = table.addRow(null, null, highlight ? "highlight"
                 : null);
 
-        collectionData.addCell().addContent(collection.getID());
+        collectionData.addCell().addContent(collection.getID().toString());
 
         Cell nameCell = collectionData.addCell();
         nameCell.addContent(fullName);

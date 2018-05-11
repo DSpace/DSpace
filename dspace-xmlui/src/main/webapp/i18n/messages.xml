@@ -78,55 +78,30 @@
 
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-		             ArtifactBrowser Aspect
-
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
-
-
-
-
-
-
-
-	<!-- org.dspace.app.xmlui.artifactbrowser.AbstractSearch.java -->
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.head1_community">Search Results for Community: {0}</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.head1_collection">Search Results for Collection: {0}</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.head1_none">Search Results</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.result_query">Your query "{0}" produced {1} result(s).</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Communities or Collections matching your query</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Items matching your query</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">Search produced no results.</message>
+		          ArtifactBrowser Aspect
+        NOTE: As of DSpace 6.0, the ArtifactBrowser Aspect was removed (in favor
+        of the ViewArtifacts, BrowseArtifacts and SearchArtifacts aspects). 
+        However, many of its classes and corresponding i18n keys still exist as 
+        they are used by other aspects.
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
+        <!-- Note: As of DSpace 6.0, org.dspace.app.xmlui.aspect.artifactbrowser.AbstractSearch has been removed. -->
+        <!-- The following keys are still in use by Discovery's AbstractSearch -->
+        <message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">Search produced no results.</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">All of DSpace</message>
 
-   <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.title">title</message>
-   <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateissued">issue date</message>
-   <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateaccessioned">submit date</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.relevance">relevance</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by">Sort items by</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.order">in order</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.asc">ascending</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.desc">descending</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Results/page</message>
-
     <!-- org.dspace.app.xmlui.artifactbrowser.AdvancedSearch.java -->
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.title">Advanced Search</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.trail">Advanced Search</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.head">Advanced Search</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_scope">Search scope</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_scope_help">Limit your search to a community or collection.</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.conjunction">Conjunction</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_type">Search type</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_for">Search for</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author">Author</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Title</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_abstract">Abstract</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_series">Series</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_sponsor">Sponsor</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_identifier">Identifier</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_language">Language (ISO)</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keyword">Keyword</message>
+    <!-- Note: As of DSpace 6.0, org.dspace.app.xmlui.aspect.artifactbrowser.AdvancedSearch has been removed. -->
+    <!-- The following "type_*" i18n keys will be left as is as they're referenced by the Discovery's SidebarFacetsTransformer
+         but in future, they should be refactored to a more relevant key prefix -->
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author">Author</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Title</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_abstract">Abstract</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_series">Series</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_sponsor">Sponsor</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_identifier">Identifier</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_language">Language (ISO)</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keyword">Keyword</message>
 
    <!--  some common other possibilities for Advanced Search Fields -->
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contributor">Contributor</message>
@@ -139,10 +114,6 @@
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_department">Department</message>
 
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_ANY">Full Text</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.and">AND</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.or">OR</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.not">NOT</message>
-
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.ConfigureableBrowse.java -->
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with">Or enter first few letters:</message>
@@ -271,6 +242,9 @@
         <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
+        <!-- Note: As of DSpace 6.0, org.dspace.app.xmlui.aspect.artifactbrowser.Navigation has been removed. -->
+        <!-- The following i18n keys will be left as is as they're referenced by the Discovery's Navigation
+         but in future, they should be refactored to a more relevant key prefix -->
 	<message key="xmlui.ArtifactBrowser.Navigation.head_browse">Browse</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_all_of_dspace">All of DSpace</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.communities_and_collections">Communities &amp; Collections</message>
@@ -283,6 +257,9 @@
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_community">This Community</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.SimpleSearch.java -->
+        <!-- Note: As of DSpace 6.0, org.dspace.app.xmlui.aspect.artifactbrowser.SimpleSearch has been removed. -->
+        <!-- The following i18n keys will be left as is as they're referenced by the Discovery's SimpleSearch
+         but in future, they should be refactored to a more relevant key prefix -->
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.title">Search</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.trail">Search</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.head">Search</message>
@@ -808,7 +785,8 @@
     <message key="xmlui.Submission.submit.AccessStep.column4">End Date</message>
     <message key="xmlui.Submission.submit.AccessStep.table_edit_button">Edit</message>
     <message key="xmlui.Submission.submit.AccessStep.table_delete_button">Remove</message>
-    <message key="xmlui.administrative.authorization.AccessStep.label_date_help">The first day from which access is allowed. Accepted format: yyyy, yyyy-mm, yyyy-mm-dd</message>
+	<message key="xmlui.administrative.authorization.AccessStep.label_date_help">The first day from which access is allowed. Accepted format: yyyy, yyyy-mm, yyyy-mm-dd</message>
+    <message key="xmlui.administrative.authorization.AccessStep.label_date_displayonly_help">The first day from which access is allowed. <b>This date cannot be modified on this form.</b> To set an embargo date for a bitstream, go to the <i>Item Status</i> tab, click <i>Authorizations...</i>, create or edit the bitstream's <i>READ</i> policy, and set the <i>Start Date</i> as desired.</message>
     <message key="xmlui.Submission.submit.AccessStep.review_policy_line">Name: {0}; action: {1}, group: {2}, start date: {3}, end date: {4}</message>
     <message key="xmlui.Submission.submit.AccessStep.review_public_item">The item will be searchable</message>
     <message key="xmlui.Submission.submit.AccessStep.review_private_item">The item will not be searchable</message>
@@ -1021,9 +999,10 @@
 	<message key="xmlui.administrative.Navigation.context_create_subcommunity">Create Sub-community</message>
 	<message key="xmlui.administrative.Navigation.context_create_community">Create Community</message>
 	<message key="xmlui.administrative.Navigation.context_export_item">Export Item</message>
-        <message key="xmlui.administrative.Navigation.context_export_collection">Export Collection</message>
-        <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>
-        <message key="xmlui.administrative.Navigation.context_export_metadata">Export Metadata</message>
+    <message key="xmlui.administrative.Navigation.context_export_collection">Export Collection</message>
+    <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>
+    <message key="xmlui.administrative.Navigation.context_export_metadata">Export Metadata</message>
+    <message key="xmlui.administrative.Navigation.context_search_export_metadata">Export Search Metadata</message>
 
 	<!-- Site administrator options -->
 	<message key="xmlui.administrative.Navigation.administrative_head">Administrative</message>
@@ -1041,8 +1020,8 @@
     <message key="xmlui.administrative.Navigation.administrative_control_panel">Control Panel</message>
     <message key="xmlui.administrative.Navigation.statistics">Statistics</message>
     <message key="xmlui.administrative.Navigation.administrative_batch_import">Batch Import (ZIP)</message>
-        <message key="xmlui.administrative.Navigation.administrative_import_metadata">Import Metadata</message>
-        <message key="xmlui.administrative.Navigation.administrative_curation">Curation Tasks</message>
+    <message key="xmlui.administrative.Navigation.administrative_import_metadata">Import Metadata</message>
+    <message key="xmlui.administrative.Navigation.administrative_curation">Curation Tasks</message>
 
     <!-- my account items -->
 	<message key="xmlui.administrative.Navigation.account_export">My Exports</message>
@@ -1877,6 +1856,7 @@
 	<message key="xmlui.administrative.ControlPanel.option_harvest">Harvesting</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_scheduler_head">Harvest Scheduler Controls</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_label_status">Status</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_status_refresh">(refresh)</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_label_actions">Actions</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_submit_start">Start Harvester</message>
 	<message key="xmlui.administrative.ControlPanel.harvest_submit_reset">Reset Harvest Status</message>
@@ -2037,8 +2017,20 @@
 	<message key="xmlui.administrative.ControlPanel.activity_sort_Agent">User-Agent</message>
 	<message key="xmlui.administrative.ControlPanel.activity_anonymous">Anonymous {0}</message>
 	<message key="xmlui.administrative.ControlPanel.activity_none">No page views have been recorded.</message>
+	<message key="xmlui.administrative.ControlPanel.detail">Detail</message>
+	<message key="xmlui.administrative.ControlPanel.show_hide">show/hide</message>
+	<message key="xmlui.administrative.ControlPanel.host">Host: {0}</message>
+	<message key="xmlui.administrative.ControlPanel.puser">Principal user: {0}</message>
+	<message key="xmlui.administrative.ControlPanel.headers">Headers: {0}</message>
+	<message key="xmlui.administrative.ControlPanel.cookies">Cookies: {0}</message>
 
 	<message key="xmlui.administrative.ControlPanel.select_panel">Use the tabs above to select the information to display</message>
+
+	<message key="xmlui.administrative.ControlPanel.tabs.Java Information">Java Information</message>
+	<message key="xmlui.administrative.ControlPanel.tabs.Configuration">Configuration</message>
+	<message key="xmlui.administrative.ControlPanel.tabs.SystemWide Alerts">SystemWide Alerts</message>
+	<message key="xmlui.administrative.ControlPanel.tabs.Harvesting">Harvesting</message>
+	<message key="xmlui.administrative.ControlPanel.tabs.Current Activity">Current Activity</message>
 
 	<!-- org.dspace.app.xmlui.administrative.SystemwideAlerts -->
 	<message key="xmlui.administrative.SystemwideAlerts.countdown"><strong>In {0} minutes</strong>: </message>
@@ -2502,4 +2494,14 @@
     <message key="xmlui.mirage2.choice-authority-control.loading">Loading...</message>
 
     <message key="xmlui.mirage2.item-list.thumbnail">Thumbnail</message>
+
+
+    <!-- org.dspace.app.xmlui.Submission.submit.StartSubmissionLookupStep -->
+    <message key="xmlui.Submission.submit.StartSubmissionLookupStep.submit_lookup">Search</message>
+    <message key="xmlui.Submission.submit.StartSubmissionLookupStep.title">Publication Search</message>
+    <message key="xmlui.Submission.submit.StartSubmissionLookupStep.lookup_help">Fill in a publication ID, DOI, Title or Author and then press "Search".  A list of all matching publications will be shown to you to select in order to proceed with the submission process.</message>
+    <message key="xmlui.Submission.submit.StartSubmissionLookupStep.submit_publication_item">Imported publication Record</message>
+    <message key="xmlui.Submission.submit.progressbar.lookup">Lookup</message>
+
+
 </catalogue>

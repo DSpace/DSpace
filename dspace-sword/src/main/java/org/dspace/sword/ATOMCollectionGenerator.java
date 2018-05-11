@@ -12,30 +12,31 @@ import org.dspace.content.DSpaceObject;
 
 /**
  * @author Richard Jones
- * 
+ *
  * Define an abstract interface for classes wishing to generate ATOM Collections
  * for SWORD service documents
  */
 public abstract class ATOMCollectionGenerator
 {
-	/** the sword service definition */
-	protected SWORDService swordService;
+    /** the sword service definition */
+    protected SWORDService swordService;
 
-	/**
-	 * Create a new ATOM collection generator using the given sword service.
-	 *
-	 * @param service
-	 */
-	public ATOMCollectionGenerator(SWORDService service)
-	{
-		this.swordService = service;
-	}
+    /**
+     * Create a new ATOM collection generator using the given sword service.
+     *
+     * @param service
+     */
+    public ATOMCollectionGenerator(SWORDService service)
+    {
+        this.swordService = service;
+    }
 
-	/**
-	 * Build the ATOM Collection which represents the given DSpace Object.
-	 * 
-	 * @param dso
-	 * @throws DSpaceSWORDException
-	 */
-	public abstract Collection buildCollection(DSpaceObject dso) throws DSpaceSWORDException;
+    /**
+     * Build the ATOM Collection which represents the given DSpace Object.
+     *
+     * @param dso
+     * @throws DSpaceSWORDException
+     */
+    public abstract Collection buildCollection(DSpaceObject dso)
+            throws DSpaceSWORDException;
 }

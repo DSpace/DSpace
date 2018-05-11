@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
@@ -31,7 +32,9 @@ import org.dspace.browse.ItemCounter;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -63,6 +66,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
     /** Cached validity object */
     private SourceValidity validity;
+
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+
 
     /**
      * Generate the unique caching key.
@@ -114,17 +120,17 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            community = (Community) dso;
 	            
 	            DSpaceValidity validity = new DSpaceValidity();
-	            validity.add(community);
+	            validity.add(context, community);
 	            
-	            Community[] subCommunities = community.getSubcommunities();
-	            Collection[] collections = community.getCollections();
+	            List<Community> subCommunities = community.getSubcommunities();
+	            List<Collection> collections = community.getCollections();
 	            // Sub communities
 	            for (Community subCommunity : subCommunities)
 	            {
-	                validity.add(subCommunity);
+	                validity.add(context, subCommunity);
 	                
 	                // Include the item count in the validity, only if the value is shown.
-	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
 	                if (showCount)
 	        		{
 	                    try {	
@@ -136,10 +142,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            // Sub collections
 	            for (Collection collection : collections)
 	            {
-	                validity.add(collection);
+	                validity.add(context, collection);
 	                
 	                // Include the item count in the validity, only if the value is shown.
-	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
 	                if (showCount)
 	        		{
 	                    try {
@@ -177,7 +183,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         // Set up the major variables
         Community community = (Community) dso;
         // Set the page title
-        String name = community.getMetadata("name");
+        String name = community.getName();
         if (name == null || name.length() == 0)
         {
             pageMeta.addMetadata("title").addContent(T_untitled);
@@ -189,13 +195,13 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
         // Add the trail back to the repository root.
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(community, pageMeta,contextPath);
+        HandleUtil.buildHandleTrail(context, community, pageMeta,contextPath);
         
         // Add RSS links if available
-        String formats = ConfigurationManager.getProperty("webui.feed.formats");
+        String[] formats = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.formats");
 		if ( formats != null )
 		{
-			for (String format : formats.split(","))
+			for (String format : formats)
 			{
 				// Remove the protocol number, i.e. just list 'rss' or' atom'
 				String[] parts = format.split("_");
@@ -228,12 +234,12 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
         // Set up the major variables
         Community community = (Community) dso;
-        Community[] subCommunities = community.getSubcommunities();
-        Collection[] collections = community.getCollections();
+        List<Community> subCommunities = community.getSubcommunities();
+        List<Collection> collections = community.getCollections();
 
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
-        String name = community.getMetadata("name");
+        String name = community.getName();
         if (name == null || name.length() == 0)
         {
             home.setHead(T_untitled);
@@ -258,7 +264,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             Reference communityInclude = referenceSet.addReference(community);
 
             // If the community has any children communities also reference them.
-            if (subCommunities != null && subCommunities.length > 0)
+            if (subCommunities != null && subCommunities.size() > 0)
             {
                 ReferenceSet communityReferenceSet = communityInclude
                         .addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
@@ -271,7 +277,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
                     communityReferenceSet.addReference(subCommunity);
                 }
             }
-            if (collections != null && collections.length > 0)
+            if (collections != null && collections.size() > 0)
             {
                 ReferenceSet communityReferenceSet = communityInclude
                         .addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");

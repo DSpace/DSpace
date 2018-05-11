@@ -10,16 +10,22 @@ package org.dspace.rdf;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import java.sql.SQLException;
-import java.util.logging.Level;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.rdf.factory.RDFFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  *
@@ -27,7 +33,56 @@ import org.dspace.core.Context;
  */
 public class RDFUtil {
     private static final Logger log = Logger.getLogger(RDFUtil.class);
-        
+    private static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    
+    public static final String CONTENT_NEGOTIATION_KEY = "rdf.contentNegotiation.enable";
+    /**
+     * Key of the Property to load the types of DSpaceObjects that should get
+     * converted.
+     */
+    public static final String CONVERTER_DSOTYPES_KEY = "rdf.converter.DSOtypes";
+    /**
+     * Property key to load the password if authentication for the graph store
+     * endpoint is required.
+     */
+    public static final String STORAGE_GRAPHSTORE_PASSWORD_KEY = "rdf.storage.graphstore.password";
+    /**
+     * Property key to load the URL of the dspace-rdf module. This is necessary
+     * to create links from the jspui or xmlui to RDF representation of
+     * DSpaceObjects.
+     */
+    public static final String CONTEXT_PATH_KEY = "rdf.contextPath";
+    /**
+     * Property key to load the public address of the SPARQL endpoint.
+     */
+    public static final String SPARQL_ENDPOINT_KEY = "rdf.public.sparql.endpoint";
+    /**
+     * Property key to load the username if authentication for the internal
+     * SPARQL endpoint is required.
+     */
+    public static final String STORAGE_SPARQL_LOGIN_KEY = "rdf.storage.sparql.login";
+    /**
+     * Property key to load the password if authentication for the internal
+     * SPARQL endpoint is required.
+     */
+    public static final String STORAGE_SPARQL_PASSWORD_KEY = "rdf.storage.sparql.password";
+    /**
+     * Property key to load the address of the SPARQL 1.1 GRAPH STORE HTTP
+     * PROTOCOL endpoint.
+     */
+    public static final String STORAGE_GRAPHSTORE_ENDPOINT_KEY = "rdf.storage.graphstore.endpoint";
+    /**
+     * Property key to load the address of the SPARQL endpoint to use within
+     * DSpace. If the property is empty or does not exist, the public SPARQL
+     * endpoint will be used.
+     */
+    public static final String STORAGE_SPARQL_ENDPOINT_KEY = "rdf.storage.sparql.endpoint";
+    /**
+     * Property key to load the username if authentication for the graph store
+     * endpoint is required.
+     */
+    public static final String STORAGE_GRAPHSTORE_LOGIN_KEY = "rdf.storage.graphstore.login";
+
     /**
      * Loads converted data of a DSpaceObject identified by the URI provided
      * as {@code identifier}. This method uses the RDFStorage configurated in
@@ -40,7 +95,7 @@ public class RDFUtil {
      */
     public static Model loadModel(String identifier)
     {
-        return RDFConfiguration.getRDFStorage().load(identifier);
+        return RDFFactory.getInstance().getRDFStorage().load(identifier);
     }
     
     /**
@@ -60,7 +115,7 @@ public class RDFUtil {
     public static String generateIdentifier(Context context, DSpaceObject dso)
             throws SQLException
     {
-        return RDFConfiguration.getURIGenerator().generateIdentifier(context, dso);
+        return RDFFactory.getInstance().getURIGenerator().generateIdentifier(context, dso);
     }
     
     /**
@@ -71,20 +126,20 @@ public class RDFUtil {
      * type SITE, COMMUNITY, COLLECTION or ITEM only. Currently dspace-rdf 
      * doesn't support Bundles or Bitstreams as independent entity.
      * @param context DSpace Context.
-     * @param type Type of the DSpaceObject you want to generate a URI for (g.e. 
+     * @param type Type of the DSpaceObject you want to generate a URI for (e.g. 
      *             {@link org.dspace.core.Constants#ITEM Constants.ITEM}.
-     * @param id ID of the DSpaceObject you want to generate a URI for.
+     * @param id UUID of the DSpaceObject you want to generate a URI for.
      * @param handle Handle of the DSpaceObject you want to generate a URI for.
      * @return URI to identify the DSO or null if no URI could be generated.
      *         This can happen f.e. if you use a URIGenerator that uses
      *         persistent identifier like DOIs or Handles but there is no such
      *         identifier assigned to the provided DSO.
      */
-    public static String generateIdentifier(Context context, int type, int id,
-            String handle, String[] identifier)
+    public static String generateIdentifier(Context context, int type, UUID id,
+            String handle, List<String> identifier)
             throws SQLException
     {
-        return RDFConfiguration.getURIGenerator().generateIdentifier(context, 
+        return RDFFactory.getInstance().getURIGenerator().generateIdentifier(context, 
                 type, id, handle, identifier);
     }
     /**
@@ -102,7 +157,7 @@ public class RDFUtil {
      * @return The converted data or null if the conversion result is empty.
      *         Remember to close the model as soon as you don't need it anymore.
      * @throws RDFMissingIdentifierException If no identifier could be generated.
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      * @throws ItemNotArchivedException If you want to convert an Item that is
      *                                  not archived.
      * @throws ItemWithdrawnException If you want to convert an Item that is 
@@ -119,22 +174,33 @@ public class RDFUtil {
             ItemWithdrawnException, ItemNotDiscoverableException, 
             AuthorizeException, IllegalArgumentException
     {
-        if (dso.getType() != Constants.SITE
-                && dso.getType() != Constants.COMMUNITY
-                && dso.getType() != Constants.COLLECTION
-                && dso.getType() != Constants.ITEM)
+        String[] dsoTypes = DSpaceServicesFactory.getInstance()
+                .getConfigurationService()
+                .getArrayProperty(CONVERTER_DSOTYPES_KEY);
+        if (dsoTypes == null || dsoTypes.length == 0)
         {
-            throw new IllegalArgumentException(dso.getTypeText()
-                    + " is currently not supported as independent entity.");
+            log.warn("Property rdf." + CONVERTER_DSOTYPES_KEY + " was not found "
+                    + "or is empty. Will convert all type of DSpace Objects.");
+        } else {
+            boolean found = false;
+            for (String type : dsoTypes)
+            {
+                if (StringUtils.equalsIgnoreCase(Constants.typeText[dso.getType()], type.trim()))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                log.warn("Configuration of DSpaceObjects of type " 
+                        + Constants.typeText[dso.getType()] 
+                        + " prohibitted by configuration.");
+                return null;
+            }
         }
-        
-        if (!RDFConfiguration.isConvertType(dso.getTypeText()))
-        {
-            return null;
-        }
-        
         isPublic(context, dso);
-        return RDFConfiguration.getRDFConverter().convert(context, dso);
+        return RDFFactory.getInstance().getRDFConverter().convert(context, dso);
     }
     
     /**
@@ -153,7 +219,7 @@ public class RDFUtil {
      * @return The converted data or null if the conversion result is empty.
      *         Remember to close the model as soon as you don't need it anymore.
      * @throws RDFMissingIdentifierException If no identifier could be generated.
-     * @throws java.sql.SQLException
+     * @throws SQLException if database error
      * @throws ItemNotArchivedException If you want to convert an Item that is
      *                                  not archived.
      * @throws ItemWithdrawnException If you want to convert an Item that is 
@@ -176,7 +242,7 @@ public class RDFUtil {
         if (StringUtils.isEmpty(identifier))
         {
             log.error("Cannot generate identifier for dso from type " 
-                    + dso.getTypeText() + " (id: " + dso.getID() + ").");
+                    + ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getTypeText(dso) + " (id: " + dso.getID() + ").");
             if (convertedData != null) convertedData.close();
             throw new RDFMissingIdentifierException(dso.getType(), dso.getID());
         }
@@ -185,11 +251,11 @@ public class RDFUtil {
         {
             // if data about this dso is stored in the triplestore already, we 
             // should remove it as a conversion currently result in no data
-            RDFConfiguration.getRDFStorage().delete(identifier);
+            RDFFactory.getInstance().getRDFStorage().delete(identifier);
             return null;
         }
         
-        RDFConfiguration.getRDFStorage().store(identifier, convertedData);
+        RDFFactory.getInstance().getRDFStorage().store(identifier, convertedData);
         return convertedData;
     }
     
@@ -205,7 +271,7 @@ public class RDFUtil {
      *                anonymous user here, as the triple store probably provides 
      *                a public SPARQL endpoint.
      * @param dso The DSpaceObjet to check.
-     * @throws SQLException
+     * @throws SQLException if database error
      * @throws ItemNotArchivedException If {@code dso} is an Item and is not
      *                                  archived.
      * @throws ItemWithdrawnException If {@code dso} is an Item and is withdrawn.
@@ -225,7 +291,7 @@ public class RDFUtil {
         {
             return;
         }
-        AuthorizeManager.authorizeAction(context, dso, Constants.READ);
+        authorizeService.authorizeAction(context, dso, Constants.READ);
         if (dso instanceof Item)
         {
             Item item = (Item) dso;
@@ -249,7 +315,7 @@ public class RDFUtil {
      * @return true if {@link #isPublic(Context, DSpaceObject) 
      * isPublic(Context, DSpaceObject)} doesn't throw an exception, false if it 
      * did.
-     * @throws SQLException 
+     * @throws SQLException if database error
      */
     public static boolean isPublicBoolean(Context context, DSpaceObject dso) 
             throws SQLException
@@ -269,27 +335,27 @@ public class RDFUtil {
      */
     public static void delete(String uri)
     {
-        RDFConfiguration.getRDFStorage().delete(uri);
+        RDFFactory.getInstance().getRDFStorage().delete(uri);
     }
     
     /**
      * This is a shortcut to generate an RDF identifier for a DSpaceObject and
      * to delete the identified data from the named graph.
      * @param ctx
-     * @param type DSpaceObject type (g.e. {@link Constants#ITEM Constants.ITEM}).
+     * @param type DSpaceObject type (e.g. {@link Constants#ITEM Constants.ITEM}).
      * @param id Id of the DspaceObject.
      * @param handle Handle of the DSpaceObject.
-     * @throws SQLException
+     * @throws SQLException if database error
      * @throws RDFMissingIdentifierException In case that no Identifier could be generated.
      */
-    public static void delete(Context ctx, int type, int id, String handle, String[] identifiers)
+    public static void delete(Context ctx, int type, UUID id, String handle, List<String> identifiers)
             throws SQLException, RDFMissingIdentifierException
     {
-        String uri = RDFConfiguration.getURIGenerator().generateIdentifier(ctx,
-                        type, id, handle, identifiers);
+        String uri = RDFFactory.getInstance().getURIGenerator()
+                .generateIdentifier(ctx, type, id, handle, identifiers);
         if (uri != null)
         {
-            RDFConfiguration.getRDFStorage().delete(uri);
+            RDFFactory.getInstance().getRDFStorage().delete(uri);
         } else {
             throw new RDFMissingIdentifierException(type, id);
         }

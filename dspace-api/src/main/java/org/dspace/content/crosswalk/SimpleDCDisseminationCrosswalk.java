@@ -14,10 +14,11 @@ import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -53,13 +54,16 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
         { DC_NS, XSI_NS };
 
     private static final String aliases[] = { "SimpleDC", "DC" };
+    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    
 
     public static String[] getPluginNames()
     {
         return (String[]) ArrayUtils.clone(aliases);
     }
 
-    public Element disseminateElement(DSpaceObject dso)
+    @Override
+    public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -73,8 +77,14 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
      * Returns object's metadata as XML elements.
      * Simple-minded copying of elements: convert contributor.author to
      * "creator" but otherwise just grab element name without qualifier.
+     * @param context context
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    public List<Element> disseminateList(DSpaceObject dso)
+    @Override
+    public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -91,33 +101,28 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
         }
 
         Item item = (Item)dso;
-        Metadatum[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);
+        List<MetadataValue> allDC = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
 
-        List<Element> dcl = new ArrayList<Element>(allDC.length);
+        List<Element> dcl = new ArrayList<Element>(allDC.size());
 
-        for (int i = 0; i < allDC.length; i++)
-        {
+        for (MetadataValue metadataValue : allDC) {
             // Do not include description.provenance
-            if (!(allDC[i].element.equals("description") &&
-                  (allDC[i].qualifier != null && allDC[i].qualifier.equals("provenance"))))
-            {
+            MetadataField metadataField = metadataValue.getMetadataField();
+            if (!(metadataField.getElement().equals("description") &&
+                    (metadataField.getQualifier() != null && metadataField.getQualifier().equals("provenance")))) {
                 String element;
 
                 // contributor.author exposed as 'creator'
-                if (allDC[i].element.equals("contributor")
-                        && (allDC[i].qualifier != null)
-                        && allDC[i].qualifier.equals("author"))
-                {
+                if (metadataField.getElement().equals("contributor")
+                        && (metadataField.getQualifier() != null)
+                        && metadataField.getQualifier().equals("author")) {
                     element = "creator";
-                }
-                else
-                {
-                    element = allDC[i].element;
+                } else {
+                    element = metadataField.getElement();
                 }
                 Element field = new Element(element, DC_NS);
-                field.addContent(allDC[i].value);
-                if (addSchema)
-                {
+                field.addContent(metadataValue.getValue());
+                if (addSchema) {
                     field.setAttribute("schemaLocation", schemaLocation, XSI_NS);
                 }
                 dcl.add(field);
@@ -126,21 +131,25 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
         return dcl;
     }
 
+    @Override
     public Namespace[] getNamespaces()
     {
         return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
+    @Override
     public String getSchemaLocation()
     {
         return schemaLocation;
     }
 
+    @Override
     public boolean canDisseminate(DSpaceObject dso)
     {
         return dso.getType() == Constants.ITEM;
     }
 
+    @Override
     public boolean preferList()
     {
         return true;

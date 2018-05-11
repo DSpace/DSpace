@@ -12,13 +12,19 @@ import java.util.*;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 
 /**
  * Utility class for lists of collections.
  */
 
 public class CollectionDropDown {
+
+
+	private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
     /**
      * Get full path starting from a top-level community via subcommunities down to a collection.
@@ -27,10 +33,11 @@ public class CollectionDropDown {
      * @param col 
      *            Get full path for this collection
      * @return Full path to the collection
+     * @throws SQLException if database error
      */
-    public static String collectionPath(Collection col) throws SQLException
+    public static String collectionPath(Context context, Collection col) throws SQLException
     {
-        return CollectionDropDown.collectionPath(col, 0);
+        return CollectionDropDown.collectionPath(context, col, 0);
     }
     
     /**
@@ -42,8 +49,9 @@ public class CollectionDropDown {
      * @param maxchars 
      *            Truncate the full path to maxchar characters. 0 means do not truncate.
      * @return Full path to the collection (truncated)
+     * @throws SQLException if database error
      */
-    public static String collectionPath(Collection col, int maxchars) throws SQLException
+    public static String collectionPath(Context context, Collection col, int maxchars) throws SQLException
     {
         String separator = ConfigurationManager.getProperty("subcommunity.separator");
         if (separator == null)
@@ -51,15 +59,15 @@ public class CollectionDropDown {
             separator = " > ";
         }
         
-        Community[] getCom = null;
+        List<Community> getCom = null;
         StringBuffer name = new StringBuffer("");
-        getCom = col.getCommunities(); // all communities containing given collection
+        getCom = communityService.getAllParents(context, col); // all communities containing given collection
         for (Community com : getCom)
         {
-            name.insert(0, com.getMetadata("name") + separator);
+            name.insert(0, com.getName() + separator);
         }
 
-        name.append(col.getMetadata("name"));
+        name.append(col.getName());
 
         if (maxchars != 0)
         {
@@ -81,13 +89,13 @@ public class CollectionDropDown {
 	 * @return A sorted array of collection path entries (essentially collection/path pairs).
 	 * @throws SQLException In case there are problems annotating a collection with its path.
 	 */
-	public static CollectionPathEntry[] annotateWithPaths(Collection[] collections) throws SQLException
+	public static CollectionPathEntry[] annotateWithPaths(Context context, List<Collection> collections) throws SQLException
 	{
-		CollectionPathEntry[] result = new CollectionPathEntry[collections.length];
-		for (int i = 0; i < collections.length; i++)
+		CollectionPathEntry[] result = new CollectionPathEntry[collections.size()];
+		for (int i = 0; i < collections.size(); i++)
 		{
-			Collection collection = collections[i];
-			CollectionPathEntry entry = new CollectionPathEntry(collection, collectionPath(collection));
+			Collection collection = collections.get(i);
+			CollectionPathEntry entry = new CollectionPathEntry(collection, collectionPath(context, collection));
 			result[i] = entry;
 		}
 		Arrays.sort(result);
@@ -117,7 +125,7 @@ public class CollectionDropDown {
 			{
 				return this.path.compareTo(other.path);
 			}
-			return Integer.compare(this.collection.getID(), other.collection.getID());
+			return this.collection.getID().compareTo(other.collection.getID());
 		}
 
 		@Override

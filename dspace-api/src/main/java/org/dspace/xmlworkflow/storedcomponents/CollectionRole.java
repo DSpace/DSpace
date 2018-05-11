@@ -7,16 +7,13 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import org.dspace.content.Collection;
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.Group;
 
+import javax.persistence.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
 /*
@@ -30,133 +27,64 @@ import java.util.List;
  * @author Mark Diggory (markd at atmire dot com)
 
  */
-public class CollectionRole {
-    /** Our context */
-    private Context myContext;
+@Entity
+@Table(name="cwf_collectionrole")
+public class CollectionRole implements ReloadableEntity<Integer> {
 
-    /** The row in the table representing this object */
-    private TableRow myRow;
+    @Id
+    @Column(name="collectionrole_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="cwf_collectionrole_seq")
+    @SequenceGenerator(name="cwf_collectionrole_seq", sequenceName="cwf_collectionrole_seq", allocationSize = 1)
+    private Integer id;
+
+//    @Column(name = "role_id")
+//    @Lob
+    @Column(name="role_id", columnDefinition = "text")
+    private String roleId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "collection_id")
+    private Collection collection;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private Group group;
 
     /**
-     * Construct an ResourcePolicy
+     * Protected constructor, create object using:
+     * {@link org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService#create(Context, Collection, String, Group)}
      *
-     * @param context
-     *            the context this object exists in
-     * @param row
-     *            the corresponding row in the table
      */
-    CollectionRole(Context context, TableRow row)
+    protected CollectionRole()
     {
-        myContext = context;
-        myRow = row;
-    }
 
-    public static CollectionRole find(Context context, int id)
-            throws SQLException
-    {
-        TableRow row = DatabaseManager.find(context, "cwf_collectionrole", id);
-
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
-            return new CollectionRole(context, row);
-        }
-    }
-
-    public static CollectionRole find(Context context, int collection, String role) throws SQLException {
-         TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_collectionrole",
-                "SELECT * FROM cwf_collectionrole WHERE collection_id="+collection+" AND role_id= ? ",
-                role);
-
-        TableRow row = null;
-        if (tri.hasNext())
-        {
-            row = tri.next();
-        }
-
-        // close the TableRowIterator to free up resources
-        tri.close();
-
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
-            return new CollectionRole(context, row);
-        }
-    }
-
-    public static CollectionRole[] findByCollection(Context context, int collection) throws SQLException {
-         TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_collectionrole",
-                "SELECT * FROM cwf_collectionrole WHERE collection_id=?", collection);
-
-        List<CollectionRole> collectionRoles = new ArrayList<CollectionRole>();
-
-        try
-        {
-            while (tri.hasNext())
-            {
-                TableRow row = tri.next();
-
-                collectionRoles.add(new CollectionRole(context, row));
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-                tri.close();
-        }
-
-        return collectionRoles.toArray(new CollectionRole[collectionRoles.size()]);
-    }
-
-    public static CollectionRole create(Context context) throws SQLException,
-            AuthorizeException {
-
-        TableRow row = DatabaseManager.create(context, "cwf_collectionrole");
-
-        return new CollectionRole(context, row);
-    }
-
-
-    public void delete() throws SQLException
-    {
-        DatabaseManager.delete(myContext, myRow);
-    }
-
-
-    public void update() throws SQLException
-    {
-        DatabaseManager.update(myContext, myRow);
     }
 
     public void setRoleId(String id){
-        myRow.setColumn("role_id",id);
+        this.roleId = id;
     }
 
     public String getRoleId(){
-        return myRow.getStringColumn("role_id");
+        return roleId;
     }
 
-    public void setCollectionId(int id){
-        myRow.setColumn("collection_id", id);
+    public void setCollection(Collection collection){
+        this.collection = collection;
     }
 
-    public int getCollectionId(){
-        return myRow.getIntColumn("collection_id");
+    public Collection getCollection(){
+        return collection;
     }
 
-    public void setGroupId(Group group){
-        myRow.setColumn("group_id", group.getID());
+    public void setGroup(Group group){
+        this.group = group;
     }
 
     public Group getGroup() throws SQLException {
-        return Group.find(myContext, myRow.getIntColumn("group_id"));
+        return group;
     }
 
+    public Integer getID() {
+        return id;
+    }
 }

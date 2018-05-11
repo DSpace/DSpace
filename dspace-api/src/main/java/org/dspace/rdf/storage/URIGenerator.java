@@ -8,6 +8,9 @@
 package org.dspace.rdf.storage;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
@@ -20,12 +23,12 @@ import org.dspace.core.Context;
  * type SITE, COMMUNITY, COLLECTION or ITEM only. Currently dspace-rdf 
  * doesn't support Bundles or Bitstreams as independent entity.
  * 
- * @class{org.dspace.rdf.RDFizer} uses a URIGenerator to generate URIs to
+ * {@link org.dspace.rdf.RDFizer#RDFizer} uses a URIGenerator to generate URIs to
  * Identify DSpaceObjects in RDF. You can configure which URIGenerator should be
  * used. See DSpace documentation on how to configure RDFizer.
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
- * @see org.dspace.rdf.RDFizer
- * @see org.dspace.rdf.RDFUtil
+ * @see org.dspace.rdf.RDFizer#RDFizer
+ * @see org.dspace.rdf.RDFUtil#RDFUtil
  */
 public interface URIGenerator {
     
@@ -36,16 +39,18 @@ public interface URIGenerator {
      * doesn't support Bundles or Bitstreams as independent entity. This method
      * should work even if the DSpaceObject does not exist anymore.
      * @param context
-     * @param dso
+     * @param type
+     * @param id
+     * @param handle
+     * @param identifiers
      * @return May return null, if no URI could be generated.
      * @see org.dspace.rdf.RDFUtil#generateIdentifier(Context, DSpaceObject)
      */
-    public String generateIdentifier(Context context, int type, int id, String handle, String[] identifiers)
+    public String generateIdentifier(Context context, int type, UUID id, String handle, List<String> identifiers)
             throws SQLException;
     
     /**
-     * Shortcut for {@code generateIdentifier(context, dso.getType(), 
-     * dso.getID(), dso.getHandle())}.
+     * Shortcut for {@code generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle())}.
      * 
      * @param context
      * @param dso

@@ -11,7 +11,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import java.util.*;
 
@@ -25,14 +25,14 @@ public class DiscoveryUIUtils {
     private static SearchService searchService = null;
 
     static {
-        DSpace dspace = new DSpace();
-        searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
+        searchService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
     }
 
 
 
     /**
      * Returns a list of the filter queries for use in rendering pages, creating page more urls, ....
+     * @param request user's request.
      * @return an array containing the filter queries
      */
     public static Map<String, String[]> getParameterFilterQueries(Request request) {
@@ -56,6 +56,8 @@ public class DiscoveryUIUtils {
 
     /**
      * Returns all the filter queries for use by discovery
+     * @param request user's request.
+     * @param context session context.
      * @return an array containing the filter queries
      */
     public static String[] getFilterQueries(Request request, Context context) {

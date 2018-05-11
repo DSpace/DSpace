@@ -14,7 +14,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,10 +38,9 @@ public class IndexEventConsumer implements Consumer {
     // handles to delete since IDs are not useful by now.
     private Set<String> handlesToDelete = null;
 
-    DSpace dspace = new DSpace();
+    IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
 
-    IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
-
+    @Override
     public void initialize() throws Exception {
 
     }
@@ -53,6 +52,7 @@ public class IndexEventConsumer implements Consumer {
      * @param ctx   DSpace context
      * @param event Content event
      */
+    @Override
     public void consume(Context ctx, Event event) throws Exception {
 
         if (objectsToUpdate == null) {
@@ -84,7 +84,7 @@ public class IndexEventConsumer implements Consumer {
                     && ((Bundle) subject).getName().equals("TEXT")) {
                 st = Constants.ITEM;
                 et = Event.MODIFY;
-                subject = ((Bundle) subject).getItems()[0];
+                subject = ((Bundle) subject).getItems().get(0);
                 if (log.isDebugEnabled())
                 {
                     log.debug("Transforming Bundle event into MODIFY of Item "
@@ -154,16 +154,18 @@ public class IndexEventConsumer implements Consumer {
      * interactions between the sets -- e.g. objects which were deleted do not
      * need to be added or updated, new objects don't also need an update, etc.
      */
+    @Override
     public void end(Context ctx) throws Exception {
 
         if (objectsToUpdate != null && handlesToDelete != null) {
 
             // update the changed Items not deleted because they were on create list
-            for (DSpaceObject iu : objectsToUpdate) {
+            for (DSpaceObject o : objectsToUpdate) {
                 /* we let all types through here and 
-                 * allow the search DSIndexer to make 
+                 * allow the search indexer to make 
                  * decisions on indexing and/or removal
                  */
+                DSpaceObject iu = ctx.reloadEntity(o);
                 String hdl = iu.getHandle();
                 if (hdl != null && !handlesToDelete.contains(hdl)) {
                     try {
@@ -200,6 +202,7 @@ public class IndexEventConsumer implements Consumer {
         handlesToDelete = null;
     }
 
+    @Override
     public void finish(Context ctx) throws Exception {
         // No-op
 

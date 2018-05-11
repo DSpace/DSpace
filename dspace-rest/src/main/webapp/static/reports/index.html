@@ -1,0 +1,67 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
+    <!-- sortable.js can be obtained at http://www.kryogenix.org/code/browser/sorttable/ -->
+    <!-- <script src="sorttable.js"></script> -->
+
+    <script src="restReport.js"></script>
+    <script src="restCollReport.js"></script>
+    <script src="spin.js"></script>
+    <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css"></link>
+    <link rel="stylesheet" type="text/css" href="restClient.css"></link>
+    <title>DSpace REST QC Client</title>
+</head>
+<body>
+<a href="query.html">Query Tool</a>
+<span id="currentUser"></span>
+<hr/>
+<h1>DSpace REST QC Client</h1>
+<div id='metadatadiv'>
+    <h3>Filters</h3>
+    <div>
+      <div>
+        <button disabled="disabled" class="activate showCollections">Show Collections</button>
+      </div>
+      <div id='filterdiv'>
+      </div>
+      <div>
+        <button disabled="disabled" class="activate showCollections">Show Collections</button>
+      </div>
+    </div>
+    <h3>Collection Report</h3>
+    <div>
+      <div><a class="this-search" href="#">URL to current search</a></div>
+      <div id="report">..</div> 
+    </div>
+    <h3>Item Results</h3>
+    <div id="itemResults">
+      <h3>Additional data to return</h3>
+      <div id="queries-aux">
+        <button id="refresh-fields">Refresh Items</button>
+        <div id="show-fields"></div>
+      </div>
+      <h3>Results</h3>
+      <div id='itemdiv'>
+        <h3></h3>
+        <div><a class="this-search" href="#">URL to current search</a></div>
+        <div><button id="prev">Prev Page</button><button id="next">Next Page</button><button id="export">Export for Metadata Update</button></div>
+        <input type="hidden" id="ifilter"/>
+        <input type="hidden" id="icollection"/>
+        <table id="itemtable" class="sortable"></table>
+      </div>
+    </div>
+</div>
+</body>
+</html>

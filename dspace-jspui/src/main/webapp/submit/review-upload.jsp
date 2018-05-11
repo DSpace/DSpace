@@ -16,7 +16,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@page import="org.dspace.core.ConfigurationManager"%>
-<%@page import="org.dspace.authorize.AuthorizeManager"%>
+<%@page import="org.dspace.authorize.AuthorizeServiceImpl"%>
 <%@page import="org.dspace.authorize.ResourcePolicy"%>
 <%@page import="java.util.List"%>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
@@ -30,6 +30,8 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="javax.servlet.jsp.PageContext" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
+<%@ page import="org.dspace.authorize.factory.AuthorizeServiceFactory" %>
 
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -66,24 +68,24 @@
 <div class="col-md-10">
                                     <div class="row">
                                         <span class="metadataFieldLabel col-md-4"><%= (subInfo.getSubmissionItem().hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload2")) %></span>
-                                        <span class="metadataFieldValue col-md-8">
+                                        <span class="metadataFieldValue col-md-8 break-all">
 <%
-    Bitstream[] bitstreams = item.getNonInternalBitstreams();
+    List<Bitstream> bitstreams = ContentServiceFactory.getInstance().getItemService().getNonInternalBitstreams(context, item);
 
-	if(bitstreams.length > 0)
+	if(bitstreams.size() > 0)
 	{
-	    for (int i = 0; i < bitstreams.length ; i++)
+	    for (int i = 0; i < bitstreams.size() ; i++)
 	    {
 	        // Work out whether to use /retrieve link for simple downloading,
 	        // or /html link for HTML files
-	        BitstreamFormat format = bitstreams[i].getFormat();
-	        String downloadLink = "retrieve/" + bitstreams[i].getID();
+	        BitstreamFormat format = bitstreams.get(i).getFormat(context);
+	        String downloadLink = "retrieve/" + bitstreams.get(i).getID();
 	        if (format != null && format.getMIMEType().equals("text/html"))
 	        {
 	            downloadLink = "html/db-id/" + item.getID();
 	        }
 %>
-	                                            <a href="<%= request.getContextPath() %>/<%= downloadLink %>/<%= UIUtil.encodeBitstreamName(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></a> - <%= bitstreams[i].getFormatDescription() %>
+	                                            <a href="<%= request.getContextPath() %>/<%= downloadLink %>/<%= UIUtil.encodeBitstreamName(bitstreams.get(i).getName()) %>" target="_blank"><%= bitstreams.get(i).getName() %></a> - <%= bitstreams.get(i).getFormatDescription(context) %>
 <%
 	        switch (format.getSupportLevel())
 	        {
@@ -99,7 +101,7 @@
 %>    
 <%
 if(isUploadWithEmbargo) {
-List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, bitstreams[i], ResourcePolicy.TYPE_CUSTOM); %>
+List<ResourcePolicy> rpolicies = AuthorizeServiceFactory.getInstance().getAuthorizeService().findPoliciesByDSOAndType(context, bitstreams.get(i), ResourcePolicy.TYPE_CUSTOM); %>
 <% if(rpolicies!=null && !rpolicies.isEmpty()) { %>
 		<% int countPolicies = 0;
 		   //show information about policies setting only in the case of advanced embargo form

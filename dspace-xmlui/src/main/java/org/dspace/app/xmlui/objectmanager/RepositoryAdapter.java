@@ -15,10 +15,13 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.xml.sax.SAXException;
 
 /**
@@ -26,10 +29,10 @@ import org.xml.sax.SAXException;
  * document. Unfortunately, there is no real definition of what this is. So
  * we just kind of made it up based upon what we saw for the item profile.
  * 
- * The basic structure is simply two parts, the descriptive metadata and a 
+ * The basic structure is simply two parts:  the descriptive metadata and a
  * structural map. The descriptive metadata is a place to put metadata about 
  * the whole repository. The structural map is used to map relationships
- * between communities & collections in dspace. 
+ * between communities and collections in DSpace.
  * 
  * @author Scott Phillips
  */
@@ -45,8 +48,11 @@ public class RepositoryAdapter extends AbstractAdapter
     private String dmdSecIDS;
     
     /** Dspace context to be able to look up additional objects */
-    private Context context;
-    
+    private final Context context;
+
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
     /**
      * Construct a new RepositoryAdapter
      * 
@@ -54,7 +60,7 @@ public class RepositoryAdapter extends AbstractAdapter
      *            The DSpace context to look up communities / collections.
      * 
      * @param contextPath
-     *            The contextPath of this webapplication.
+     *            The context Path of this web application.
      */
     public RepositoryAdapter(Context context, String contextPath)
     {
@@ -73,17 +79,21 @@ public class RepositoryAdapter extends AbstractAdapter
      */
 
     /**
-     * Return the handle prefix as the identifier.
+     * @return the handle prefix as the identifier.
      */
+    @Override
     protected String getMETSID()
     {
-        return HandleManager.getPrefix();
+        return handleService.getPrefix();
     }
     
 	/**
 	 * The OBJID is used to encode the URL to the object, in this
 	 * case the repository which is just at the contextPath.
+     * @return local path to the object.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
 	 */
+    @Override
 	protected String getMETSOBJID() throws WingException {
 		
 		if (contextPath == null)
@@ -99,25 +109,28 @@ public class RepositoryAdapter extends AbstractAdapter
     /**
      * @return  Return the URL for editing this item
      */
+    @Override
     protected String getMETSOBJEDIT()
     {
         return null;
     }
 
     /**
-     * Return the profile this METS document conforms to...
-     * 
+     * @return the profile this METS document conforms to...
+     *
      * FIXME: It doesn't conform to a profile. This needs to be fixed.
      */
+    @Override
     protected String getMETSProfile()
     {
         return "DRI DSPACE Repository Profile 1.0";
     }
 
     /**
-     * Return a friendly label for the METS document stating that this is a
+     * @return a friendly label for the METS document stating that this is a
      * DSpace repository.
      */
+    @Override
     protected String getMETSLabel()
     {
         return "DSpace Repository";
@@ -142,7 +155,9 @@ public class RepositoryAdapter extends AbstractAdapter
      * section, such as the name, hostname, handle prefix, and 
      * default language.
      * 
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
 	protected void renderDescriptiveSection() throws SAXException
     {
     	AttributeMap attributes;
@@ -180,7 +195,7 @@ public class RepositoryAdapter extends AbstractAdapter
 		attributes.put("mdschema","dspace");
 		attributes.put("element", "name");
 		startElement(DIM,"field",attributes);
-		sendCharacters(ConfigurationManager.getProperty("dspace.name"));
+		sendCharacters(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.name"));
 		endElement(DIM,"field");
 		
 		// Entry for dspace.hostname
@@ -188,7 +203,7 @@ public class RepositoryAdapter extends AbstractAdapter
 		attributes.put("mdschema","dspace");
 		attributes.put("element", "hostname");
 		startElement(DIM,"field",attributes);
-		sendCharacters(ConfigurationManager.getProperty("dspace.hostname"));
+		sendCharacters(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname"));
 		endElement(DIM,"field");
 		
 		// Entry for handle.prefix
@@ -196,7 +211,7 @@ public class RepositoryAdapter extends AbstractAdapter
 		attributes.put("mdschema","dspace");
 		attributes.put("element", "handle");
 		startElement(DIM,"field",attributes);
-		sendCharacters(HandleManager.getPrefix());
+		sendCharacters(handleService.getPrefix());
 		endElement(DIM,"field");
 		
 		// Entry for default.language
@@ -205,7 +220,7 @@ public class RepositoryAdapter extends AbstractAdapter
 		attributes.put("element", "default");
 		attributes.put("qualifier", "language");
 		startElement(DIM,"field",attributes);
-		sendCharacters(ConfigurationManager.getProperty("default.language"));
+		sendCharacters(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("default.language"));
 		endElement(DIM,"field");
 		
         // ///////////////////////////////
@@ -225,7 +240,10 @@ public class RepositoryAdapter extends AbstractAdapter
      * Render the repository's structure map. This map will include a reference to
      * all the community and collection objects showing how they are related to
      * one another. 
+     * @throws java.sql.SQLException passed through.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
 	protected void renderStructureMap() throws SQLException, SAXException
     {
     	AttributeMap attributes;
@@ -249,7 +267,7 @@ public class RepositoryAdapter extends AbstractAdapter
         startElement(METS,"div",attributes);
 
         // Put each root level node into the document.
-        for (Community community : Community.findAllTop(context))
+        for (Community community : communityService.findAllTop(context))
         {
             renderStructuralDiv(community);
         }

@@ -26,6 +26,8 @@
 <%
     Item item = (Item) request.getAttribute("item");
     request.setAttribute("LanguageSwitch", "hide");
+    Boolean noFileSelected = (Boolean) request.getAttribute("noFileSelected");
+    boolean isNoFileSelected = (noFileSelected == null ? false : noFileSelected.booleanValue());
 %>
 
 <dspace:layout style="submission" titlekey="jsp.tools.upload-bitstream.title"
@@ -39,8 +41,11 @@
 	<h1><fmt:message key="jsp.tools.upload-bitstream.title"/></h1>
     
     <%-- <p>Select the bitstream to upload</p> --%>
+    <% if(isNoFileSelected){ %>
+        <p class="alert alert-warning"><fmt:message key="jsp.tools.upload-bitstream.select.file.msg"/></p>
+    <%} else {%>
 	<p class="alert alert-info"><fmt:message key="jsp.tools.upload-bitstream.info"/></p>
-    
+    <%}%>
     <form method="post" enctype="multipart/form-data" action="">
         <div class="container row">        	
             <input class="form-control" type="file" size="40" name="file"/>

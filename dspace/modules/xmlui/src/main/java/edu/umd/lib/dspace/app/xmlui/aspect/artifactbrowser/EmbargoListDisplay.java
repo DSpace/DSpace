@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -19,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.statistics.StatisticsLoader;
 import org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -30,10 +30,15 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
+
+import edu.umd.lib.dspace.content.EmbargoDTO;
+import edu.umd.lib.dspace.content.factory.DrumServiceFactory;
+import edu.umd.lib.dspace.content.service.EmbargoDTOService;
 
 /**
  * Transformer to display Embargo List data in XML UI.
@@ -61,6 +66,11 @@ CacheableProcessingComponent
 
     private SourceValidity validity;
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    
+    protected EmbargoDTOService embargoDTOService = DrumServiceFactory.getInstance().getEmbargoDTOService();
+
+    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     /**
      * Get the caching key for this report.
      */
@@ -88,7 +98,7 @@ CacheableProcessingComponent
             try
             {
                 initialise();
-                boolean showReport = ConfigurationManager
+                boolean showReport = configurationService
                         .getBooleanProperty("report.public");
 
                 // If the report isn't public
@@ -97,7 +107,7 @@ CacheableProcessingComponent
                     try
                     {
                         // Administrators can always view reports
-                        showReport = AuthorizeManager.isAdmin(context);
+                        showReport = authorizeService.isAdmin(context);
                     }
                     catch (SQLException sqle)
                     {
@@ -216,11 +226,11 @@ CacheableProcessingComponent
     UIException, SQLException, IOException, AuthorizeException
     {
         initialise();
-        boolean publicise = ConfigurationManager
+        boolean publicise = configurationService
                 .getBooleanProperty("report.public");
 
         // Check that the reports are either public, or user is an administrator
-        if (!publicise && !AuthorizeManager.isAdmin(context))
+        if (!publicise && !authorizeService.isAdmin(context))
         {
             throw new AuthorizeException();
         }
@@ -231,10 +241,11 @@ CacheableProcessingComponent
         List download = div.addList("download");
         download.addItemXref(contextPath + "/embargo-list/csv", "Download CSV");
 
-        Request request = ObjectModelHelper.getRequest(objectModel);
+        if (context == null) {
+            context = ContextUtil.obtainContext(objectModel);
+        }
 
-        ArrayList<TableRow> rowList = (ArrayList<TableRow>) EmbargoListHelper
-                .getEmbargoList(request);
+        java.util.List<EmbargoDTO> embargoDTOs = embargoDTOService.getEmbargoList(context);
         Table table = div.addTable("list-of-embargoes", 22, 9);
 
         Row header = table.addRow(Row.ROLE_HEADER);
@@ -249,35 +260,23 @@ CacheableProcessingComponent
         header.addCell().addContent("Type");
         header.addCell().addContent("End Date");
 
-        for (TableRow row : rowList)
-            // for (int i = 0; i < 20; i++)
+        for (EmbargoDTO embargoETO : embargoDTOs)
         {
-            // TableRow row = rowList.get(i);
-
             Row tableRow = table.addRow();
 
             tableRow.addCell().addXref(
-                    contextPath + "/handle/" + row.getStringColumn("handle"),
-                    row.getStringColumn("handle"));
-            tableRow.addCell().addContent(row.getIntColumn("item_id"));
-            tableRow.addCell().addContent(row.getIntColumn("bitstream_id"));
-            tableRow.addCell().addContent(row.getStringColumn("title"));
-            tableRow.addCell().addContent(row.getStringColumn("advisor"));
-            tableRow.addCell().addContent(row.getStringColumn("author"));
-            tableRow.addCell().addContent(row.getStringColumn("department"));
-            tableRow.addCell().addContent(row.getStringColumn("type"));
-            try
-            {
-                tableRow.addCell().addContent(
-                        row.getDateColumn("end_date").toString());
-            }
-            catch (NullPointerException e)
-            {
-                tableRow.addCell().addContent("null");
-            }
+                    contextPath + "/handle/" + embargoETO.getHandle(),
+                    embargoETO.getHandle());
+            tableRow.addCell().addContent(embargoETO.getItemIdString());
+            tableRow.addCell().addContent(embargoETO.getBitstreamIdString());
+            tableRow.addCell().addContent(embargoETO.getTitle());
+            tableRow.addCell().addContent(embargoETO.getAdvisor());
+            tableRow.addCell().addContent(embargoETO.getAuthor());
+            tableRow.addCell().addContent(embargoETO.getDepartment());
+            tableRow.addCell().addContent(embargoETO.getType());
+            tableRow.addCell().addContent(embargoETO.getEndDateString());
 
         }
-        // tri.close();
 
     }
 

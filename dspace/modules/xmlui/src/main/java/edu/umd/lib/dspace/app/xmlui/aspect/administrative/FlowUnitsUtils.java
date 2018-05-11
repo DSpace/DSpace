@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.apache.cocoon.environment.Request;
@@ -22,6 +23,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.UnitService;
 
 /**
  * Utility methods to processes actions on Units. These methods are used
@@ -41,6 +45,10 @@ public class FlowUnitsUtils
             "default",
             "xmlui.administrative.FlowUnitsUtils.delete_unit_success_notice");
 
+    private static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
+
+    private static GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
     /**
      * Return the current name for the given group ID.
      *
@@ -50,15 +58,15 @@ public class FlowUnitsUtils
      *            The group id.
      * @return The group's name.
      */
-    public static String getName(Context context, int unitID)
+    public static String getName(Context context, UUID unitID)
             throws SQLException
     {
-        if (unitID < 0)
+        if (unitID == null)
         {
             return "New Unit";
         }
 
-        Unit unit = Unit.find(context, unitID);
+        Unit unit = unitService.find(context, unitID);
 
         if (unit == null)
         {
@@ -77,27 +85,27 @@ public class FlowUnitsUtils
      *            The group's id.
      * @return An array of ids.
      */
-    public static String[] getUnitMembers(Context context, int unitID)
+    public static String[] getUnitMembers(Context context, UUID unitID)
             throws SQLException
     {
-        if (unitID < 0)
+        if (unitID == null)
         {
             return new String[0];
         }
 
-        Unit unit = Unit.find(context, unitID);
+        Unit unit = unitService.find(context, unitID);
 
         if (unit == null)
         {
             return new String[0];
         }
 
-        Group[] groups = unit.getGroups();
+        List<Group> groups = unit.getGroups();
 
-        String[] groupIDs = new String[groups.length];
-        for (int i = 0; i < groups.length; i++)
+        String[] groupIDs = new String[groups.size()];
+        for (int i = 0; i < groups.size(); i++)
         {
-            groupIDs[i] = String.valueOf(groups[i].getID());
+            groupIDs[i] = String.valueOf(groups.get(i).getID());
         }
 
         return groupIDs;
@@ -155,7 +163,7 @@ public class FlowUnitsUtils
      *            All group members.
      * @return A result
      */
-    public static FlowResult processSaveUnits(Context context, int unitID,
+    public static FlowResult processSaveUnits(Context context, UUID unitID,
             String newName, String[] newGroupIDsArray, Request request)
             throws SQLException, AuthorizeException, UIException
     {
@@ -173,7 +181,7 @@ public class FlowUnitsUtils
         }
 
         Unit unit = null;
-        if (unitID == -1)
+        if (unitID == null)
         {
             // First, check if the name is blank.
             if (newName == null || newName.length() == 0)
@@ -189,12 +197,12 @@ public class FlowUnitsUtils
             }
 
             // Create a new unit, check if the newName is already in use.
-            Unit potentialDuplicate = Unit.findByName(context, newName);
+            Unit potentialDuplicate = unitService.findByName(context, newName);
 
             if (potentialDuplicate == null)
             {
                 // All good, create the new unit.
-                unit = Unit.create(context);
+                unit = unitService.create(context);
                 unit.setName(newName);
             }
 
@@ -213,7 +221,7 @@ public class FlowUnitsUtils
         }
         else
         {
-            unit = Unit.find(context, unitID);
+            unit = unitService.find(context, unitID);
             String name = unit.getName();
 
             // Only update the name if there has been a change.
@@ -222,7 +230,7 @@ public class FlowUnitsUtils
             {
                 // The unit name is to be updated, check if the newName is
                 // already in use.
-                Unit potentialDuplicate = Unit.findByName(context, newName);
+                Unit potentialDuplicate = unitService.findByName(context, newName);
 
                 if (potentialDuplicate == null)
                 {
@@ -245,10 +253,10 @@ public class FlowUnitsUtils
         }
 
         // Second, prepare to check members by turning arrays into lists
-        List<Integer> newGroupIDs = new ArrayList<Integer>();
+        List<UUID> newGroupIDs = new ArrayList<UUID>();
         for (String _groupID : newGroupIDsArray)
         {
-            newGroupIDs.add(Integer.valueOf(_groupID));
+            newGroupIDs.add(UUID.fromString(_groupID));
         }
 
         // Third, check if there are any members to remove
@@ -258,7 +266,7 @@ public class FlowUnitsUtils
             if (!newGroupIDs.contains(groupMember.getID()))
             {
                 // The current group is not contained in the new list.
-                unit.removeGroup(groupMember);
+                unitService.removeGroup(context, unit, groupMember);
             }
             else
             {
@@ -271,18 +279,18 @@ public class FlowUnitsUtils
         // Fourth, check if there are any members to add
         // i.e. scan the list of ids against the unit.
 
-        for (Integer groupID : newGroupIDs)
+        for (UUID groupID : newGroupIDs)
         {
-            Group group = Group.find(context, groupID);
+            Group group = groupService.find(context, groupID);
 
-            unit.addGroup(group);
+            unitService.addGroup(context, unit, group);
         }
 
         // Fifth, update the faculty_only flag for the Unit.
         unit.setFacultyOnly(facultyOnly);
 
         // Last, create the result flow
-        unit.update();
+        unitService.update(context, unit);
         context.commit();
 
         // Let's record our group id in case we created a new one.
@@ -313,8 +321,8 @@ public class FlowUnitsUtils
 
         for (String id : unitIDs)
         {
-            Unit unitDeleted = Unit.find(context, Integer.valueOf(id));
-            unitDeleted.delete();
+            Unit unitDeleted = unitService.find(context, UUID.fromString(id));
+            unitService.delete(context, unitDeleted);
         }
 
         result.setOutcome(true);

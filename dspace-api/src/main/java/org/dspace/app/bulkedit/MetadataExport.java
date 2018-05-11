@@ -7,15 +7,19 @@
  */
 package org.dspace.app.bulkedit;
 
+import com.google.common.collect.Iterators;
 import org.apache.commons.cli.*;
 
 import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
 
 import java.util.ArrayList;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -26,10 +30,18 @@ import java.util.List;
 public class MetadataExport
 {
     /** The items to export */
-    private ItemIterator toExport;
+    protected Iterator<Item> toExport;
+
+    protected ItemService itemService;
+
+    protected Context context;
 
     /** Whether to export all metadata, or just normally edited metadata */
-    private boolean exportAll;
+    protected boolean exportAll;
+
+    protected MetadataExport() {
+        itemService = ContentServiceFactory.getInstance().getItemService();
+    }
 
     /**
      * Set up a new metadata export
@@ -38,11 +50,14 @@ public class MetadataExport
      * @param toExport The ItemIterator of items to export
      * @param exportAll whether to export all metadata or not (include handle, provenance etc)
      */
-    public MetadataExport(Context c, ItemIterator toExport, boolean exportAll)
+    public MetadataExport(Context c, Iterator<Item> toExport, boolean exportAll)
     {
+        itemService = ContentServiceFactory.getInstance().getItemService();
+
         // Store the export settings
         this.toExport = toExport;
         this.exportAll = exportAll;
+        this.context = c;
     }
 
     /**
@@ -54,11 +69,14 @@ public class MetadataExport
      */
     public MetadataExport(Context c, Community toExport, boolean exportAll)
     {
+        itemService = ContentServiceFactory.getInstance().getItemService();
+
         try
         {
             // Try to export the community
-            this.toExport = new ItemIterator(c, buildFromCommunity(toExport, new ArrayList<Integer>(), 0));
+            this.toExport = buildFromCommunity(c, toExport, 0);
             this.exportAll = exportAll;
+            this.context = c;
         }
         catch (SQLException sqle)
         {
@@ -72,17 +90,18 @@ public class MetadataExport
     /**
      * Build an array list of item ids that are in a community (include sub-communities and collections)
      *
+     * @param context DSpace context
      * @param community The community to build from
-     * @param itemIDs The itemID (used for recursion - use an empty ArrayList)
      * @param indent How many spaces to use when writing out the names of items added
      * @return The list of item ids
-     * @throws SQLException
+     * @throws SQLException if database error
      */
-    private List<Integer> buildFromCommunity(Community community, List<Integer> itemIDs, int indent)
+    protected Iterator<Item> buildFromCommunity(Context context, Community community, int indent)
                                                                                throws SQLException
     {
         // Add all the collections
-        Collection[] collections = community.getCollections();
+        List<Collection> collections = community.getCollections();
+        Iterator<Item> result = null;
         for (Collection collection : collections)
         {
             for (int i = 0; i < indent; i++)
@@ -90,30 +109,34 @@ public class MetadataExport
                 System.out.print(" ");
             }
 
-            ItemIterator items = collection.getAllItems();
-            while (items.hasNext())
-            {
-                int id = items.next().getID();
-                // Only add if not already included (so mapped items only appear once)
-                if (!itemIDs.contains(id))
-                {
-                    itemIDs.add(id);
-                }
-            }
-        }
+            Iterator<Item> items = itemService.findByCollection(context, collection);
+            result = addItemsToResult(result,items);
 
+        }
         // Add all the sub-communities
-        Community[] communities = community.getSubcommunities();
+        List<Community> communities = community.getSubcommunities();
         for (Community subCommunity : communities)
         {
             for (int i = 0; i < indent; i++)
             {
                 System.out.print(" ");
             }
-            buildFromCommunity(subCommunity, itemIDs, indent + 1);
+            Iterator<Item> items = buildFromCommunity(context, subCommunity, indent + 1);
+            result = addItemsToResult(result,items);
         }
 
-        return itemIDs;
+        return result;
+    }
+
+    private Iterator<Item> addItemsToResult(Iterator<Item> result, Iterator<Item> items) {
+        if(result == null)
+        {
+            result = items;
+        }else{
+            result = Iterators.concat(result, items);
+        }
+
+        return result;
     }
 
     /**
@@ -125,13 +148,19 @@ public class MetadataExport
     {
         try
         {
+            Context.Mode originalMode = context.getCurrentMode();
+            context.setMode(Context.Mode.READ_ONLY);
+
             // Process each item
             DSpaceCSV csv = new DSpaceCSV(exportAll);
             while (toExport.hasNext())
             {
-                csv.addItem(toExport.next());
+                Item item = toExport.next();
+                csv.addItem(item);
+                context.uncacheEntity(item);
             }
 
+            context.setMode(originalMode);
             // Return the results
             return csv;
         }
@@ -164,6 +193,7 @@ public class MetadataExport
 	 * main method to run the metadata exporter
 	 *
 	 * @param argv the command line arguments given
+         * @throws Exception if error occurs
 	 */
     public static void main(String[] argv) throws Exception
     {
@@ -204,26 +234,28 @@ public class MetadataExport
         String filename = line.getOptionValue('f');
 
         // Create a context
-        Context c = new Context();
+        Context c = new Context(Context.Mode.READ_ONLY);
         c.turnOffAuthorisationSystem();
 
         // The things we'll export
-        ItemIterator toExport = null;
+        Iterator<Item> toExport = null;
         MetadataExport exporter = null;
 
         // Export everything?
         boolean exportAll = line.hasOption('a');
 
+        ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
         // Check we have an item OK
+        ItemService itemService = contentServiceFactory.getItemService();
         if (!line.hasOption('i'))
         {
             System.out.println("Exporting whole repository WARNING: May take some time!");
-            exporter = new MetadataExport(c, Item.findAll(c), exportAll);
+            exporter = new MetadataExport(c, itemService.findAll(c), exportAll);
         }
         else
         {
             String handle = line.getOptionValue('i');
-            DSpaceObject dso = HandleManager.resolveToObject(c, handle);
+            DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(c, handle);
             if (dso == null)
             {
                 System.err.println("Item '" + handle + "' does not resolve to an item in your repository!");
@@ -233,15 +265,15 @@ public class MetadataExport
             if (dso.getType() == Constants.ITEM)
             {
                 System.out.println("Exporting item '" + dso.getName() + "' (" + handle + ")");
-                List<Integer> item = new ArrayList<Integer>();
-                item.add(dso.getID());
-                exporter = new MetadataExport(c, new ItemIterator(c, item), exportAll);
+                List<Item> item = new ArrayList<>();
+                item.add((Item) dso);
+                exporter = new MetadataExport(c, item.iterator(), exportAll);
             }
             else if (dso.getType() == Constants.COLLECTION)
             {
                 System.out.println("Exporting collection '" + dso.getName() + "' (" + handle + ")");
                 Collection collection = (Collection)dso;
-                toExport = collection.getAllItems();
+                toExport = itemService.findByCollection(c, collection);
                 exporter = new MetadataExport(c, toExport, exportAll);
             }
             else if (dso.getType() == Constants.COMMUNITY)

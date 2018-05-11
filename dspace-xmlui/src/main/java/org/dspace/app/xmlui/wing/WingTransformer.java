@@ -29,18 +29,32 @@ import org.dspace.app.xmlui.wing.element.UserMeta;
 public interface WingTransformer
 {
 
-    /** What to add at the end of the body */
+    /** What to add at the end of the body
+     * @param body to be added.
+     * @throws java.lang.Exception on error.
+     */
     public void addBody(Body body) throws Exception;
 
-    /** What to add to the options list */
+    /** What to add to the options list
+     * @param options to be added.
+     * @throws java.lang.Exception on error.
+     */
     public void addOptions(Options options) throws Exception;
 
-    /** What user metadata to add to the document */
+    /** What user metadata to add to the document
+     * @param userMeta to be added.
+     * @throws java.lang.Exception on error.
+     */
     public void addUserMeta(UserMeta userMeta) throws Exception;
 
-    /** What page metadata to add to the document */
+    /** What page metadata to add to the document
+     * @param pageMeta to be added.
+     * @throws java.lang.Exception on error.
+     */
     public void addPageMeta(PageMeta pageMeta) throws Exception;
 
-    /** What is a unique name for this component? */
+    /** What is a unique name for this component?
+     * @return the name.
+     */
     public String getComponentName();
 }

@@ -7,13 +7,13 @@
  */
 package org.dspace.app.statistics;
 
-import org.dspace.content.MetadataSchema;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.SearchUtils;
 
 import java.sql.SQLException;
 
@@ -70,6 +70,9 @@ public class LogAnalyser
     
     /** warning counter */
     private static int warnCount = 0;
+
+    /** exception counter */
+    private static int excCount = 0;
     
     /** log line counter */
     private static int lineCount = 0;
@@ -147,7 +150,10 @@ public class LogAnalyser
    
    /** a pattern to match a valid version 1.3 log file line */
    private static Pattern valid13 = null;
-   
+
+  /** basic log line */
+   private static Pattern validBase = null;
+
    /** a pattern to match a valid version 1.4 log file line */
    private static Pattern valid14 = null;
    
@@ -178,8 +184,8 @@ public class LogAnalyser
    ////////////////////////
    
    /** the log directory to be analysed */
-   private static String logDir = ConfigurationManager.getProperty("log.dir");  
-        
+   private static String logDir = ConfigurationManager.getProperty("log.report.dir");
+
    /** the regex to describe the file name format */
    private static String fileTemplate = "dspace\\.log.*";
         
@@ -189,7 +195,7 @@ public class LogAnalyser
                             "dstat.cfg";
    
    /** the output file to which to write aggregation data */
-   private static String outFile = ConfigurationManager.getProperty("log.dir") + File.separator + "dstat.dat";
+   private static String outFile = ConfigurationManager.getProperty("log.report.dir") + File.separator + "dstat.dat";
    
    /** the starting date of the report */
    private static Date startDate = null;
@@ -206,6 +212,9 @@ public class LogAnalyser
     /**
      * main method to be run from command line.  See usage information for
      * details as to how to use the command line flags (-help)
+     * @param argv arguments
+     * @throws Exception if error
+     * @throws SQLException if database error
      */
     public static void main(String [] argv)
         throws Exception, SQLException
@@ -287,13 +296,16 @@ public class LogAnalyser
      * @param   myStartDate     the desired start of the analysis.  Starts from the beginning otherwise
      * @param   myEndDate       the desired end of the analysis.  Goes to the end otherwise
      * @param   myLookUp        force a lookup of the database
+     * @return aggregate output
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws SearchServiceException if search error
      */
-    public static void processLogs(Context context, String myLogDir, 
+    public static String processLogs(Context context, String myLogDir, 
                                     String myFileTemplate, String myConfigFile, 
                                     String myOutFile, Date myStartDate, 
                                     Date myEndDate, boolean myLookUp)
-        throws IOException, SQLException
-    {
+            throws IOException, SQLException, SearchServiceException {
         // FIXME: perhaps we should have all parameters and aggregators put 
         // together in a single aggregating object
         
@@ -369,7 +381,7 @@ public class LogAnalyser
                 {
                     // get the log line object
                     LogLine logLine = getLogLine(line);
-                    
+
                     // if there are line segments get on with the analysis
                     if (logLine != null)
                     {
@@ -420,13 +432,22 @@ public class LogAnalyser
                                 logEndDate = logLine.getDate();
                             }
                         }
-                        
+
                         // count the warnings
                         if (logLine.isLevel("WARN"))
                         {
                             // FIXME: really, this ought to be some kind of level
                             // aggregator
                             warnCount++;
+                        }
+                        // count the exceptions
+                        if (logLine.isLevel("ERROR"))
+                        {
+                            excCount++;
+                        }
+
+                        if ( null == logLine.getAction() ) {
+                            continue;
                         }
 
                         // is the action a search?
@@ -513,9 +534,7 @@ public class LogAnalyser
         }
         
         // finally, write the output
-        createOutput();
-
-        return;
+        return createOutput();
     }
    
     
@@ -542,7 +561,7 @@ public class LogAnalyser
         {
             logDir = myLogDir;
         }
-        
+
         if (myFileTemplate != null)
         {
             fileTemplate = myFileTemplate;
@@ -574,8 +593,9 @@ public class LogAnalyser
     
     /**
      * generate the analyser's output to the specified out file
+     * @return output
      */
-    public static void createOutput()
+    public static String createOutput()
     {
         // start a string buffer to hold the final output
         StringBuffer summary = new StringBuffer();
@@ -588,6 +608,7 @@ public class LogAnalyser
         
         // output the number of warnings encountered
         summary.append("warnings=" + Integer.toString(warnCount) + "\n");
+        summary.append("exceptions=" + Integer.toString(excCount) + "\n");
         
         // set the general summary config up in the aggregator file
         for (int i = 0; i < generalSummary.size(); i++)
@@ -725,7 +746,7 @@ public class LogAnalyser
             System.exit(0);
         }
         
-        return;
+        return summary.toString();
     }
     
     
@@ -796,10 +817,12 @@ public class LogAnalyser
         singleRX = Pattern.compile("( . |^. | .$)");
         
         // set up the standard log file line regular expression
+        String logLineBase = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ (.*)"; //date time LEVEL class @ whatever
         String logLine13 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:([^:]+):(.*)";
         String logLine14 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:[^:]+:([^:]+):(.*)";
         valid13 = Pattern.compile(logLine13);
         valid14 = Pattern.compile(logLine14);
+        validBase = Pattern.compile(logLineBase);
         
         // set up the pattern for validating log file names
         logRegex = Pattern.compile(fileTemplate);
@@ -850,6 +873,7 @@ public class LogAnalyser
 
     /**
      * Read in the current config file and populate the class globals.
+     * @throws IOException if IO error
      */
     public static void readConfig() throws IOException
     {
@@ -860,6 +884,7 @@ public class LogAnalyser
      * Read in the given config file and populate the class globals.
      *
      * @param   configFile  the config file to read in
+     * @throws IOException if IO error
      */
     public static void readConfig(String configFile) throws IOException
     {
@@ -1126,6 +1151,16 @@ public class LogAnalyser
         }
         else
         {
+            match = validBase.matcher(line);
+            if ( match.matches() ) {
+                LogLine logLine = new LogLine(parseDate(match.group(1).trim()),
+                    LogManager.unescapeLogField(match.group(2)).trim(),
+                    null,
+                    null,
+                    null
+                );
+                return logLine;
+            }
             return null;
         }
     }
@@ -1140,134 +1175,47 @@ public class LogAnalyser
      * @param   type        value for DC field 'type' (unqualified)
      *
      * @return              an integer containing the relevant count
+     * @throws SQLException if database error
+     * @throws SearchServiceException if search error
      */
     public static Integer getNumItems(Context context, String type)
-        throws SQLException
-    {
-        boolean oracle = DatabaseManager.isOracle();
-
+            throws SQLException, SearchServiceException {
         // FIXME: this method is clearly not optimised
         
         // FIXME: we don't yet collect total statistics, such as number of items
         // withdrawn, number in process of submission etc.  We should probably do
         // that
-        
-        // start the type constraint
-        String typeQuery = null;
-        
-        if (type != null)
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        if(StringUtils.isNotBlank(type))
         {
-            typeQuery = "SELECT resource_id " +
-                        "FROM metadatavalue " +
-                        "WHERE text_value LIKE '%" + type + "%' " + " AND resource_type_id="+ Constants.ITEM +
-                        " AND metadata_field_id = (" +
-                        " SELECT metadata_field_id " +
-                        " FROM metadatafieldregistry " +
-                        " WHERE metadata_schema_id = (" +
-                        "  SELECT metadata_schema_id" +
-                        "   FROM MetadataSchemaRegistry" +
-                        "   WHERE short_id = '" + MetadataSchema.DC_SCHEMA + "')" +
-                        "  AND element = 'type' " +
-                        "  AND qualifier IS NULL) ";
+            discoverQuery.addFilterQueries("dc.type=" + type +"*");
         }
-        
-        // start the date constraint query buffer
-        StringBuffer dateQuery = new StringBuffer();
-        if (oracle)
+        StringBuilder accessionedQuery = new StringBuilder();
+        accessionedQuery.append("dc.date.accessioned_dt:[");
+        if(startDate != null)
         {
-            dateQuery.append("SELECT /*+ ORDERED_PREDICATES */ resource_id ");
+            accessionedQuery.append(unParseDate(startDate));
         }
         else
         {
-            dateQuery.append("SELECT resource_id ");
+            accessionedQuery.append("*");
         }
-
-        dateQuery.append("FROM metadatavalue " +
-                          "WHERE " + "resource_type_id="+ Constants.ITEM +  " AND metadata_field_id = (" +
-                          " SELECT metadata_field_id " +
-                          " FROM metadatafieldregistry " +
-                          " WHERE metadata_schema_id = (" +
-                          "  SELECT metadata_schema_id" +
-                          "   FROM MetadataSchemaRegistry" +
-                          "   WHERE short_id = '" + MetadataSchema.DC_SCHEMA + "')" +
-                          "  AND element = 'date' " +
-                          "  AND qualifier = 'accessioned') ");
-
-        // Verifies that the metadata contains a valid date, otherwise the
-        // postgres queries blow up when doing the ::timestamp cast.
-        if (!oracle && (startDate != null || endDate != null)) {
-        	dateQuery.append(" AND text_value LIKE '____-__-__T__:__:__Z' ");
-        }
-        
-        if (startDate != null)
+        accessionedQuery.append(" TO ");
+        if(endDate != null)
         {
-            if (oracle)
-            {
-                dateQuery.append(" AND TO_TIMESTAMP( TO_CHAR(text_value), "+
-                        "'yyyy-mm-dd\"T\"hh24:mi:ss\"Z\"' ) >= TO_DATE('" +
-                        unParseDate(startDate) + "', 'yyyy-MM-dd\"T\"hh24:mi:ss\"Z\"') ");
-            }
-            else
-            {
-                dateQuery.append(" AND text_value::timestamp >= '" +
-                        unParseDate(startDate) + "'::timestamp ");
-            }
-        }
-
-        if (endDate != null)
-        {
-            // adjust end date to account for timestamp comparison
-            GregorianCalendar realEndDate = new GregorianCalendar();
-            realEndDate.setTime(endDate);
-            realEndDate.add(Calendar.DAY_OF_MONTH, 1);
-            Date queryEndDate = realEndDate.getTime();
-            if (oracle)
-            {
-                dateQuery.append(" AND TO_TIMESTAMP( TO_CHAR(text_value), "+
-                        "'yyyy-mm-dd\"T\"hh24:mi:ss\"Z\"' ) < TO_DATE('" +
-                        unParseDate(queryEndDate) + "', 'yyyy-MM-dd\"T\"hh24:mi:ss\"Z\"') ");
-            }
-            else
-            {
-                dateQuery.append(" AND text_value::timestamp < '" +
-                        unParseDate(queryEndDate) + "'::timestamp ");
-            }
-        }
-        
-        // build the final query
-        StringBuffer query = new StringBuffer();
-        
-        query.append("SELECT COUNT(*) AS num " +
-                  "FROM item " +
-                  "WHERE in_archive = " + (oracle ? "1 " : "true ") +
-                  "AND withdrawn = " + (oracle ? "0 " : "false "));
-        
-        if (startDate != null || endDate != null)
-        {
-            query.append(" AND item_id IN ( " +
-                         dateQuery.toString() + ") ");
-        }
-
-        if (type != null)
-        {
-            query.append(" AND item_id IN ( " +
-                         typeQuery + ") ");
-        }
-        
-        TableRow row = DatabaseManager.querySingle(context, query.toString());
-
-        Integer numItems;
-        if (oracle)
-        {
-            numItems = Integer.valueOf(row.getIntColumn("num"));
+            accessionedQuery.append(unParseDate(endDate));
         }
         else
         {
-            // for some reason the number column is of "long" data type!
-            Long count = Long.valueOf(row.getLongColumn("num"));
-            numItems = Integer.valueOf(count.intValue());
+            accessionedQuery.append("*");
         }
-        return numItems;
+        accessionedQuery.append("]");
+        discoverQuery.addFilterQueries(accessionedQuery.toString());
+        discoverQuery.addFilterQueries("withdrawn: false");
+        discoverQuery.addFilterQueries("archived: true");
+
+        return (int)SearchUtils.getSearchService().search(context, discoverQuery).getTotalSearchResults();
     }
     
     
@@ -1279,10 +1227,11 @@ public class LogAnalyser
      *
      * @return              an Integer containing the number of items in the
      *                      archive
+     * @throws SQLException if database error
+     * @throws SearchServiceException if search error
      */
     public static Integer getNumItems(Context context)
-        throws SQLException
-    {
+            throws SQLException, SearchServiceException {
         return getNumItems(context, null);
     }
     

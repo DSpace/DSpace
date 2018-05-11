@@ -9,6 +9,13 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
@@ -33,6 +40,19 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest
      */
     protected DSpaceObject dspaceObject;
 
+
+    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+
+
     /**
      * This method will be run after every test as per @After. It will
      * clean resources initialized by the @Before methods.
@@ -42,8 +62,7 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest
      */
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         dspaceObject = null;
         super.destroy();
     }
@@ -73,6 +92,7 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest
     @Test
     public void testAddDetails()
     {
+        dspaceObject.clearDetails();
         String[] testData = new String[] {"details 1", "details 2", "details 3"};
         for(String s: testData)
         {
@@ -88,6 +108,7 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest
     @Test
     public void testGetDetails()
     {
+        dspaceObject.clearDetails();
         assertThat("testGetDetails 0", dspaceObject.getDetails(), nullValue());
 
         String[] testData = new String[] {"details 1", "details 2", "details 3"};
@@ -104,49 +125,50 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest
     @Test
     public void testFind() throws SQLException
     {
+        DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dspaceObject.getType());
         if(this.dspaceObject instanceof Bitstream)
         {
-            assertThat("BITSTREAM type", DSpaceObject.find(context,
-                Constants.BITSTREAM, dspaceObject.getID()), notNullValue());
+            assertThat("BITSTREAM type", dSpaceObjectService.find(context,
+                dspaceObject.getID()), notNullValue());
         }
         else if(this.dspaceObject instanceof Bundle)
         {
-            assertThat("BUNDLE type", DSpaceObject.find(context,
-                Constants.BUNDLE, dspaceObject.getID()), notNullValue());
+            assertThat("BUNDLE type", dSpaceObjectService.find(context,
+                dspaceObject.getID()), notNullValue());
         }
         else if(this.dspaceObject instanceof Item)
         {
-            assertThat("ITEM type", DSpaceObject.find(context,
-                Constants.ITEM, dspaceObject.getID()), notNullValue());
+            assertThat("ITEM type", dSpaceObjectService.find(context,
+                dspaceObject.getID()), notNullValue());
         }
         else if(this.dspaceObject instanceof Collection)
         {
-            assertThat("COLLECTION type", DSpaceObject.find(context,
-                Constants.COLLECTION, dspaceObject.getID()), notNullValue());
+            assertThat("COLLECTION type", dSpaceObjectService.find(context,
+                dspaceObject.getID()), notNullValue());
         }
         else if(this.dspaceObject instanceof Community)
         {
-            assertThat("COMMUNITY type", DSpaceObject.find(context,
-                Constants.COMMUNITY, dspaceObject.getID()), notNullValue());
+            assertThat("COMMUNITY type", dSpaceObjectService.find(context,
+                dspaceObject.getID()), notNullValue());
         }
         else if(this.dspaceObject instanceof Group)
         {
-            assertThat("GROUP type", DSpaceObject.find(context,
-                Constants.GROUP, dspaceObject.getID()), notNullValue());
+            assertThat("GROUP type", dSpaceObjectService.find(context,
+                dspaceObject.getID()), notNullValue());
         }
         else if(this.dspaceObject instanceof EPerson)
         {
-            assertThat("EPERSON type", DSpaceObject.find(context,
-                Constants.EPERSON, dspaceObject.getID()), notNullValue());
+            assertThat("EPERSON type", dSpaceObjectService.find(context,
+                dspaceObject.getID()), notNullValue());
         }
         else if(this.dspaceObject instanceof Site)
         {
-            assertThat("SITE type", DSpaceObject.find(context,
-                Constants.SITE, dspaceObject.getID()), notNullValue());
+            assertThat("SITE type", dSpaceObjectService.find(context,
+                dspaceObject.getID()), notNullValue());
         }
         else
         {
-            assertThat("Unknown type", DSpaceObject.find(context, -99, 1),
+            assertThat("Unknown type", dSpaceObjectService,
                 nullValue());
         }
     }
@@ -157,27 +179,28 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest
     @Test
     public void testGetAdminObject() throws SQLException
     {
-        assertThat("READ action", dspaceObject.getAdminObject(Constants.READ), is(equalTo(dspaceObject)));
+        DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dspaceObject.getType());
+        assertThat("READ action", dSpaceObjectService.getAdminObject(context, dspaceObject,Constants.READ), is(equalTo(dspaceObject)));
 
-        assertThat("WRITE action", dspaceObject.getAdminObject(Constants.WRITE), is(equalTo(dspaceObject)));
+        assertThat("WRITE action", dSpaceObjectService.getAdminObject(context, dspaceObject,Constants.WRITE), is(equalTo(dspaceObject)));
 
-        assertThat("DELETE action", dspaceObject.getAdminObject(Constants.DELETE), is(equalTo(dspaceObject)));
+        assertThat("DELETE action", dSpaceObjectService.getAdminObject(context, dspaceObject,Constants.DELETE), is(equalTo(dspaceObject)));
 
-        assertThat("ADD action", dspaceObject.getAdminObject(Constants.ADD), is(equalTo(dspaceObject)));
+        assertThat("ADD action", dSpaceObjectService.getAdminObject(context, dspaceObject,Constants.ADD), is(equalTo(dspaceObject)));
 
-        assertThat("REMOVE action", dspaceObject.getAdminObject(Constants.REMOVE), is(equalTo(dspaceObject)));
+        assertThat("REMOVE action", dSpaceObjectService.getAdminObject(context, dspaceObject,Constants.REMOVE), is(equalTo(dspaceObject)));
 
-        assertThat("WORKFLOW_STEP_1 action", dspaceObject.getAdminObject(Constants.WORKFLOW_STEP_1), is(equalTo(dspaceObject)));
+        assertThat("WORKFLOW_STEP_1 action", dSpaceObjectService.getAdminObject(context, dspaceObject,Constants.WORKFLOW_STEP_1), is(equalTo(dspaceObject)));
 
-        assertThat("WORKFLOW_STEP_2 action", dspaceObject.getAdminObject(Constants.WORKFLOW_STEP_2), is(equalTo(dspaceObject)));
+        assertThat("WORKFLOW_STEP_2 action", dSpaceObjectService.getAdminObject(context, dspaceObject,Constants.WORKFLOW_STEP_2), is(equalTo(dspaceObject)));
 
-        assertThat("WORKFLOW_STEP_3 action", dspaceObject.getAdminObject(Constants.WORKFLOW_STEP_3), is(equalTo(dspaceObject)));
+        assertThat("WORKFLOW_STEP_3 action", dSpaceObjectService.getAdminObject(context, dspaceObject,Constants.WORKFLOW_STEP_3), is(equalTo(dspaceObject)));
 
-        assertThat("WORKFLOW_ABORT action", dspaceObject.getAdminObject(Constants.WORKFLOW_ABORT), is(equalTo(dspaceObject)));
+        assertThat("WORKFLOW_ABORT action", dSpaceObjectService.getAdminObject(context, dspaceObject,Constants.WORKFLOW_ABORT), is(equalTo(dspaceObject)));
 
-        assertThat("DEFAULT_BITSTREAM_READ action", dspaceObject.getAdminObject(Constants.DEFAULT_BITSTREAM_READ), is(equalTo(dspaceObject)));
+        assertThat("DEFAULT_BITSTREAM_READ action", dSpaceObjectService.getAdminObject(context, dspaceObject, Constants.DEFAULT_BITSTREAM_READ), is(equalTo(dspaceObject)));
 
-        assertThat("DEFAULT_ITEM_READ action", dspaceObject.getAdminObject(Constants.DEFAULT_ITEM_READ), is(equalTo(dspaceObject)));
+        assertThat("DEFAULT_ITEM_READ action", dSpaceObjectService.getAdminObject(context, dspaceObject,Constants.DEFAULT_ITEM_READ), is(equalTo(dspaceObject)));
     }
 
     /**
@@ -198,7 +221,8 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest
         }
         else
         {
-            dspaceObject.getAdminObject(Constants.ADMIN);
+            DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dspaceObject.getType());
+            dSpaceObjectService.getAdminObject(context, dspaceObject, Constants.ADMIN);
             fail("Exception should have been thrown");
         }
     }
@@ -209,7 +233,8 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest
     @Test
     public void testGetParentObject() throws SQLException
     {
-        assertThat("testGetParentObject 0", dspaceObject.getParentObject(), nullValue());
+        DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dspaceObject.getType());
+        assertThat("testGetParentObject 0", dSpaceObjectService.getParentObject(context, dspaceObject), nullValue());
     }
 
     /**

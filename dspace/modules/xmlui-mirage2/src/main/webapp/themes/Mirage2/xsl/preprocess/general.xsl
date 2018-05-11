@@ -100,6 +100,8 @@
         </field>
     </xsl:template>
 
+    <!-- Begin UMD Customization -->
+    <!-- Custom static page rendering from files -->
     <xsl:template match="dri:pageMeta[starts-with(dri:metadata[@element = 'request'][@qualifier = 'URI']/text(), 'page/')]">
         <pageMeta>
             <xsl:call-template name="copy-attributes"/>
@@ -142,6 +144,7 @@
             </trail>
         </pageMeta>
     </xsl:template>
+    <!-- End UMD Customization -->
 
     <xsl:template match="dri:pageMeta">
     <pageMeta>

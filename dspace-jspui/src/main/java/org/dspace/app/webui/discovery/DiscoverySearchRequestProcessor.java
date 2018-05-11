@@ -29,18 +29,22 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.MetadataExport;
-import org.dspace.app.util.OpenSearch;
 import org.dspace.app.util.SyndicationFeed;
+import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.webui.search.SearchProcessorException;
 import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -70,6 +74,14 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
 
     private List<String> searchIndices = null;
     
+    private OpenSearchService openSearchService;
+    
+    private CommunityService communityService;
+    
+    private CollectionService collectionService;
+    
+    private AuthorizeService authorizeService;
+    
     public synchronized void init()
     {
         if (localeLabels == null)
@@ -88,6 +100,10 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
                 searchIndices.add(sFilter.getIndexFieldName());
             }
         }
+        openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
+        communityService = ContentServiceFactory.getInstance().getCommunityService();
+        collectionService = ContentServiceFactory.getInstance().getCollectionService();
+        authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     }
 
     public void doOpenSearch(Context context, HttpServletRequest request,
@@ -105,8 +121,8 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         String path = request.getPathInfo();
         if (path != null && path.endsWith("description.xml"))
         {
-            String svcDescrip = OpenSearch.getDescription(scope);
-            response.setContentType(OpenSearch
+            String svcDescrip = openSearchService.getDescription(scope);
+            response.setContentType(openSearchService
                     .getContentType("opensearchdescription"));
             response.setContentLength(svcDescrip.length());
             response.getWriter().write(svcDescrip);
@@ -122,7 +138,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         }
 
         // do some sanity checking
-        if (!OpenSearch.getFormats().contains(format))
+        if (!openSearchService.getFormats().contains(format))
         {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -166,16 +182,14 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
 
         // format and return results
         Map<String, String> labelMap = getLabels(request);
-        DSpaceObject[] dsoResults = new DSpaceObject[qResults
-                .getDspaceObjects().size()];
-        qResults.getDspaceObjects().toArray(dsoResults);
-        Document resultsDoc = OpenSearch.getResultsDoc(format, query,
-                (int)qResults.getTotalSearchResults(), qResults.getStart(),
+        List<DSpaceObject> dsoResults = qResults.getDspaceObjects();
+        Document resultsDoc = openSearchService.getResultsDoc(context, format, query,
+                (int) qResults.getTotalSearchResults(), qResults.getStart(),
                 qResults.getMaxResults(), container, dsoResults, labelMap);
         try
         {
             Transformer xf = TransformerFactory.newInstance().newTransformer();
-            response.setContentType(OpenSearch.getContentType(format));
+            response.setContentType(openSearchService.getContentType(format));
             xf.transform(new DOMSource(resultsDoc),
                     new StreamResult(response.getWriter()));
         }
@@ -217,9 +231,10 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             HttpServletResponse response) throws SearchProcessorException,
             IOException, ServletException
     {
-        Item[] resultsItems;
-        Collection[] resultsCollections;
-        Community[] resultsCommunities;
+        init();
+        List<Item> resultsItems;
+        List<Collection> resultsCollections;
+        List<Community> resultsCommunities;
         DSpaceObject scope;
         try
         {
@@ -287,10 +302,10 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         List<DSpaceObject> scopes = new ArrayList<DSpaceObject>();
         if (scope == null)
         {
-            Community[] topCommunities;
+            List<Community> topCommunities;
             try
             {
-                topCommunities = Community.findAllTop(context);
+                topCommunities = communityService.findAllTop(context);
             }
             catch (SQLException e)
             {
@@ -305,22 +320,24 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         {
             try
             {
-                DSpaceObject pDso = scope.getParentObject();
+				DSpaceObject pDso = ContentServiceFactory.getInstance().getDSpaceObjectService(scope)
+						.getParentObject(context, scope);
                 while (pDso != null)
                 {
                     // add to the available scopes in reverse order
                     scopes.add(0, pDso);
-                    pDso = pDso.getParentObject();
+                    pDso = ContentServiceFactory.getInstance().getDSpaceObjectService(pDso)
+    						.getParentObject(context, pDso);
                 }
                 scopes.add(scope);
                 if (scope instanceof Community)
                 {
-                    Community[] comms = ((Community) scope).getSubcommunities();
+                    List<Community> comms = ((Community) scope).getSubcommunities();
                     for (Community com : comms)
                     {
                         scopes.add(com);
                     }
-                    Collection[] colls = ((Community) scope).getCollections();
+                    List<Collection> colls = ((Community) scope).getCollections();
                     for (Collection col : colls)
                     {
                         scopes.add(col);
@@ -363,20 +380,11 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
                 }
             }
 
-            // Make objects from the handles - make arrays, fill them out
-            resultsCommunities = new Community[resultsListComm.size()];
-            resultsCollections = new Collection[resultsListColl.size()];
-            resultsItems = new Item[resultsListItem.size()];
-
-            resultsCommunities = resultsListComm.toArray(resultsCommunities);
-            resultsCollections = resultsListColl.toArray(resultsCollections);
-            resultsItems = resultsListItem.toArray(resultsItems);
-
             // Log
             log.info(LogManager.getHeader(context, "search", "scope=" + scope
                     + ",query=\"" + query + "\",results=("
-                    + resultsCommunities.length + ","
-                    + resultsCollections.length + "," + resultsItems.length
+                    + resultsListComm.size() + ","
+                    + resultsListColl.size() + "," + resultsListItem.size()
                     + ")"));
 
             // Pass in some page qualities
@@ -396,9 +404,9 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             long pageFirst = ((pageCurrent - 3) > 1) ? (pageCurrent - 3) : 1;
 
             // Pass the results to the display JSP
-            request.setAttribute("items", resultsItems);
-            request.setAttribute("communities", resultsCommunities);
-            request.setAttribute("collections", resultsCollections);
+            request.setAttribute("items", resultsListItem);
+            request.setAttribute("communities", resultsListComm);
+            request.setAttribute("collections", resultsListColl);
 
             request.setAttribute("pagetotal", new Long(pageTotal));
             request.setAttribute("pagecurrent", new Long(pageCurrent));
@@ -410,7 +418,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
 
             try
             {
-                if (AuthorizeManager.isAdmin(context))
+                if (authorizeService.isAdmin(context))
                 {
                     // Set a variable to create admin buttons
                     request.setAttribute("admin_button", new Boolean(true));
@@ -423,7 +431,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             if ("submit_export_metadata".equals(UIUtil.getSubmitButton(request,
                     "submit")))
             {
-                exportMetadata(context, response, resultsItems);
+                exportMetadata(context, response, resultsListItem);
             }
         }
         catch (SearchServiceException e)
@@ -452,7 +460,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
      * @throws ServletException
      */
     protected void exportMetadata(Context context,
-            HttpServletResponse response, Item[] items) throws IOException,
+            HttpServletResponse response, List<Item> items) throws IOException,
             ServletException
     {
         // Log the attempt
@@ -460,13 +468,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
                 "exporting_search"));
 
         // Export a search view
-        ArrayList iids = new ArrayList();
-        for (Item item : items)
-        {
-            iids.add(item.getID());
-        }
-        ItemIterator ii = new ItemIterator(context, iids);
-        MetadataExport exporter = new MetadataExport(context, ii, false);
+        MetadataExport exporter = new MetadataExport(context, items.iterator(), false);
 
         // Perform the export
         DSpaceCSV csv = exporter.export();
@@ -511,6 +513,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     public void doItemMapSearch(Context context, HttpServletRequest request,
             HttpServletResponse response) throws SearchProcessorException, ServletException, IOException
     {
+        init();
         String queryString = (String) request.getParameter("query");
         Collection collection = (Collection) request.getAttribute("collection");
         int page = UIUtil.getIntParameter(request, "page")-1;
@@ -536,7 +539,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             throw new SearchProcessorException(e.getMessage(), e);
         }
 
-        Map<Integer, Item> items = new HashMap<Integer, Item>();
+        Map<String, Item> items = new HashMap<String, Item>();
 
         List<DSpaceObject> resultDSOs = results.getDspaceObjects();
         for (DSpaceObject dso : resultDSOs)
@@ -545,7 +548,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             {
                 // no authorization check is required as discovery is right aware
                 Item item = (Item) dso;
-                items.put(Integer.valueOf(item.getID()), item);
+                items.put(item.getID().toString(), item);
             }
         }
 

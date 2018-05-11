@@ -21,8 +21,8 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@ page import="org.dspace.app.webui.servlet.RequestItemServlet"%>
-<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="java.util.*"%>
+<%@ page import="org.dspace.app.webui.servlet.*" %>
 
 <%
 	request.setCharacterEncoding("UTF-8");
@@ -48,8 +48,8 @@
     String coment = (String) request.getAttribute("coment");
     if (coment == null)
         coment = "";
-    
-    String bitstream_id = (String) request.getAttribute("bitstream-id");
+
+    UUID bitstream_id = (UUID) request.getAttribute("bitstream-id");
     boolean allfiles = (request.getAttribute("allfiles") != null);
 
 %>

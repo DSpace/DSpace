@@ -13,33 +13,33 @@ import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.StringUtils;
 
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.SubmissionInfo;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.workflow.WorkflowManager;
-import org.dspace.xmlworkflow.XmlWorkflowManager;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * This is the class which defines what happens once a submission completes!
  * <P>
  * This class performs all the behind-the-scenes processing that
- * this particular step requires.  This class's methods are utilized 
+ * this particular step requires.  This class's methods are utilized
  * by both the JSP-UI and the Manakin XML-UI
  * <P>
  * This step is non-interactive (i.e. no user interface), and simply performs
  * the processing that is necessary after a submission has been completed!
- * 
+ *
  * @see org.dspace.app.util.SubmissionConfig
  * @see org.dspace.app.util.SubmissionStepConfig
  * @see org.dspace.submit.AbstractProcessingStep
- * 
+ *
  * @author Tim Donohue
  * @version $Revision$
  */
@@ -58,7 +58,7 @@ public class CompleteStep extends AbstractProcessingStep
      * <P>
      * NOTE: If this step is a non-interactive step (i.e. requires no UI), then
      * it should perform *all* of its processing in this method!
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -71,6 +71,7 @@ public class CompleteStep extends AbstractProcessingStep
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
+    @Override
     public int doProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
@@ -81,20 +82,12 @@ public class CompleteStep extends AbstractProcessingStep
                 "Completed submission with id="
                         + subInfo.getSubmissionItem().getID()));
 
+        WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
         // Start the workflow for this Submission
         boolean success = false;
         try
         {
-            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
-                try{
-                    XmlWorkflowManager.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
-                }catch (Exception e){
-                    log.error(LogManager.getHeader(context, "Error while starting xml workflow", "Item id: " + subInfo.getSubmissionItem().getItem().getID()), e);
-                    throw new ServletException(e);
-                }
-            }else{
-                WorkflowManager.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
-            }
+            workflowService.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
             success = true;
         }
         catch (Exception e)
@@ -108,10 +101,6 @@ public class CompleteStep extends AbstractProcessingStep
             if (success)
             {
                 context.commit();
-            }
-            else
-            {
-                context.getDBConnection().rollback();
             }
         }
         return STATUS_COMPLETE;
@@ -131,14 +120,15 @@ public class CompleteStep extends AbstractProcessingStep
      * Steps which are non-interactive (i.e. they do not display an interface to
      * the user) should return a value of 1, so that they are only processed
      * once!
-     * 
+     *
      * @param request
      *            The HTTP Request
      * @param subInfo
      *            The current submission information object
-     * 
+     *
      * @return the number of pages in this step
      */
+    @Override
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {

@@ -17,17 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.DCDate;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.InstallItem;
-import org.dspace.content.Item;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.InstallItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 
 /**
  * 	 Action to add bitstreams listed in item contents file to the item in DSpace	
@@ -36,25 +35,31 @@ import org.dspace.eperson.Group;
  */
 public class AddBitstreamsAction extends UpdateBitstreamsAction {
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+
 	public AddBitstreamsAction()
 	{
 		//empty	
 	}
 	
 	/**
-	 * 	Adds bitstreams from the archive as listed in the contents file.
+	 * Adds bitstreams from the archive as listed in the contents file.
 	 * 
-	 *  @param context
-	 *  @param itarch
-	 *  @param isTest
-	 *  @param suppressUndo
-	 *  @throws IllegalArgumentException
-	 *  @throws ParseException
-	 *  @throws IOException
-	 *  @throws AuthorizeException
-	 *  @throws SQLException
+	 * @param context DSpace Context
+	 * @param itarch Item Archive
+	 * @param isTest test flag
+	 * @param suppressUndo undo flag
+	 * @throws IOException if IO error
+         * @throws IllegalArgumentException if arg exception
+         * @throws SQLException if database error
+         * @throws AuthorizeException if authorization error
+         * @throws ParseException if parse error
 	 */
-	public void execute(Context context, ItemArchive itarch, boolean isTest,
+	@Override
+    public void execute(Context context, ItemArchive itarch, boolean isTest,
             boolean suppressUndo) throws IllegalArgumentException,
             ParseException, IOException, AuthorizeException, SQLException 
 	{
@@ -107,12 +112,28 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 	        
 	        	String append = ". Added " + Integer.toString(bitstream_bundles_updated)
 	        	                + " bitstream(s) on " + DCDate.getCurrent() + " : "
-	        	                + InstallItem.getBitstreamProvenanceMessage(item);
-	        	MetadataUtilities.appendMetadata(item, dtom, false, append);
+	        	                + installItemService.getBitstreamProvenanceMessage(context, item);
+	        	MetadataUtilities.appendMetadata(context, item, dtom, false, append);
 	        }
 	}
 		
-	private String addBitstream(Context context, ItemArchive itarch, Item item, File dir, 
+        /**
+         * Add bitstream
+         * @param context DSpace Context
+         * @param itarch Item Archive
+         * @param item DSpace Item
+         * @param dir directory
+         * @param ce contents entry for bitstream
+         * @param suppressUndo undo flag
+         * @param isTest test flag
+         * @return bundle name
+         * @throws IOException if IO error
+         * @throws IllegalArgumentException if arg exception
+         * @throws SQLException if database error
+         * @throws AuthorizeException if authorization error
+         * @throws ParseException if parse error
+         */
+	protected String addBitstream(Context context, ItemArchive itarch, Item item, File dir,
 			                  ContentsEntry ce, boolean suppressUndo, boolean isTest)
 	throws IOException, IllegalArgumentException, SQLException, AuthorizeException, ParseException
 	{
@@ -141,23 +162,23 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
         if (!isTest)
         {
 	        // find the bundle
-	        Bundle[] bundles = item.getBundles(newBundleName);
+	        List<Bundle> bundles = itemService.getBundles(item, newBundleName);
 	        Bundle targetBundle = null;
 	
-	        if (bundles.length < 1)
+	        if (bundles.size() < 1)
 	        {
 	            // not found, create a new one
-	            targetBundle = item.createBundle(newBundleName);
+	            targetBundle = bundleService.create(context, item, newBundleName);
 	        }
 	        else
 	        {
 	    		//verify bundle + name are not duplicates
 	        	for (Bundle b : bundles)
 	        	{
-	        		Bitstream[] bitstreams = b.getBitstreams();
+	        		List<Bitstream> bitstreams = b.getBitstreams();
 	        		for (Bitstream bsm : bitstreams)
 	        		{
-	        			if (bsm.getName().equals(ce.filename))
+                        if (bsm.getName().equals(ce.filename))
 	        			{
 	        				throw new IllegalArgumentException("Duplicate bundle + filename cannot be added: " 
 	        						+ b.getName() + " + " + bsm.getName());
@@ -166,39 +187,35 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 	        	}
 
 	            // select first bundle
-	            targetBundle = bundles[0];
+	            targetBundle = bundles.iterator().next();
 	        }
 	
-	        bs = targetBundle.createBitstream(bis);	
-	        bs.setName(ce.filename);
+	        bs = bitstreamService.create(context, targetBundle, bis);
+	        bs.setName(context, ce.filename);
 	
 	        // Identify the format
 	        // FIXME - guessing format guesses license.txt incorrectly as a text file format!
-	        BitstreamFormat fmt = FormatIdentifier.guessFormat(context, bs);
-	    	bs.setFormat(fmt);
-	    	
+	        BitstreamFormat fmt = bitstreamFormatService.guessFormat(context, bs);
+	    	bitstreamService.setFormat(context, bs, fmt);
+
 	        if (ce.description != null)
 	        {
-	        	bs.setDescription(ce.description);
+	        	bs.setDescription(context, ce.description);
 	        }
 	        	        
 	        if ((ce.permissionsActionId != -1) && (ce.permissionsGroupName != null))
 	        {
-				Group group = Group.findByName(context, ce.permissionsGroupName);
+				Group group = groupService.findByName(context, ce.permissionsGroupName);
 				
 				if (group != null)
 				{
-			        AuthorizeManager.removeAllPolicies(context, bs);  // remove the default policy
-			        ResourcePolicy rp = ResourcePolicy.create(context);
-			        rp.setResource(bs);
-			        rp.setAction(ce.permissionsActionId);
-			        rp.setGroup(group);		
-			        rp.update();
+                    authorizeService.removeAllPolicies(context, bs);  // remove the default policy
+                    authorizeService.createResourcePolicy(context, bs, group, null, ce.permissionsActionId, null);
 				}
 	        }
 	        
 	        //update after all changes are applied
-	        bs.update();
+            bitstreamService.update(context, bs);
         
 	        if (!suppressUndo)
 	        {

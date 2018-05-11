@@ -30,13 +30,14 @@
 <%@ page import="org.dspace.app.webui.util.CurateTaskResult" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="java.util.UUID" %>
 <%!
     private static final String TASK_QUEUE_NAME = ConfigurationManager.getProperty("curate", "ui.queuename");
 %>
 <%
     Community community = (Community) request.getAttribute("community");
-    int communityID = (community != null ? community.getID() : -1);
-    String title = (community != null ? community.getMetadata("name") : "Unknown Community");
+    UUID communityID = (community != null ? community.getID() : null);
+    String title = (community != null ? community.getName() : "Unknown Community");
     String groupOptions = (String)request.getAttribute("curate_group_options");
     String taskOptions = (String)request.getAttribute("curate_task_options");
 %>

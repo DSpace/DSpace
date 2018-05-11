@@ -16,6 +16,7 @@ import org.apache.poi.hslf.extractor.PowerPointExtractor;
 import org.apache.poi.POITextExtractor;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Item;
 
 /*
  * TODO: Allow user to configure extraction of only text or only notes
@@ -26,6 +27,7 @@ public class PowerPointFilter extends MediaFilter
 
     private static Logger log = Logger.getLogger(PowerPointFilter.class);
 
+    @Override
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".txt";
@@ -35,6 +37,7 @@ public class PowerPointFilter extends MediaFilter
      * @return String bundle name
      * 
      */
+    @Override
     public String getBundleName()
     {
         return "TEXT";
@@ -45,6 +48,7 @@ public class PowerPointFilter extends MediaFilter
      * 
      *         TODO: Check that this is correct
      */
+    @Override
     public String getFormatString()
     {
         return "Text";
@@ -53,18 +57,22 @@ public class PowerPointFilter extends MediaFilter
     /**
      * @return String description
      */
+    @Override
     public String getDescription()
     {
         return "Extracted text";
     }
 
     /**
-     * @param source
-     *            source input stream
+     * @param currentItem item
+     * @param source source input stream
+     * @param verbose verbose mode
      * 
      * @return InputStream the resulting input stream
+     * @throws Exception if error
      */
-    public InputStream getDestinationStream(InputStream source)
+    @Override
+    public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
             throws Exception
     {
 
@@ -101,7 +109,7 @@ public class PowerPointFilter extends MediaFilter
             {
                 // if verbose flag is set, print out extracted text
                 // to STDOUT
-                if (MediaFilterManager.isVerbose)
+                if (verbose)
                 {
                     System.out.println(extractedText);
                 }

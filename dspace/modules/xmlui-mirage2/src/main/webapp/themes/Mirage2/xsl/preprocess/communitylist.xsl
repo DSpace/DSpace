@@ -34,6 +34,9 @@
 
     <xsl:output indent="yes"/>
 
+
+    <!-- Begin UMD Customization -->
+    <!-- Display community list as two separte lists (dept & umd) -->
     <xsl:template match="dri:referenceSet[@id='aspect.artifactbrowser.CommunityBrowser.referenceSet.community-browser-dept']">
         <div id="{@id}" rend="community-browser-wrapper">
             <xsl:apply-templates mode="community-browser-dept"/>
@@ -255,6 +258,7 @@
 
 
     </xsl:template>
+    <!-- End UMD Customization -->
     
     <xsl:template name="get-handle-class-from-url">
         <xsl:param name="url"/>

@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.TreeMap;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
@@ -31,31 +30,23 @@ public class ScriptLauncher
     /** The service manager kernel */
     private static transient DSpaceKernelImpl kernelImpl;
 
-    /** Definitions of all commands. */
-    private static final Document commandConfigs = getConfig();
-
     /**
      * Execute the DSpace script launcher
      *
      * @param args Any parameters required to be passed to the scripts it executes
+     * @throws IOException if IO error
+     * @throws FileNotFoundException if file doesn't exist
      */
     public static void main(String[] args)
             throws FileNotFoundException, IOException
     {
-        // Check that there is at least one argument
-        if (args.length < 1)
-        {
-            System.err.println("You must provide at least one command argument");
-            display();
-            System.exit(1);
-        }
-
         // Initialise the service manager kernel
-        try {
+        try
+        {
             kernelImpl = DSpaceKernelInit.getKernel(null);
             if (!kernelImpl.isRunning())
             {
-                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                kernelImpl.start();
             }
         } catch (Exception e)
         {
@@ -68,14 +59,26 @@ public class ScriptLauncher
             {
                 // Nothing to do
             }
-            String message = "Failure during filter init: " + e.getMessage();
-            System.err.println(message + ":" + e);
+            String message = "Failure during kernel init: " + e.getMessage();
+            System.err.println(message);
+            e.printStackTrace();
             throw new IllegalStateException(message, e);
+        }
+
+        // Load up the ScriptLauncher's configuration
+        Document commandConfigs = getConfig();
+
+        // Check that there is at least one argument (if not display command options)
+        if (args.length < 1)
+        {
+            System.err.println("You must provide at least one command argument");
+            display(commandConfigs);
+            System.exit(1);
         }
 
         // Look up command in the configuration, and execute.
         int status;
-        status = runOneCommand(args);
+        status = runOneCommand(commandConfigs, args);
 
         // Destroy the service kernel if it is still alive
         if (kernelImpl != null)
@@ -89,10 +92,10 @@ public class ScriptLauncher
 
     /**
      * Recognize and execute a single command.
-     * @param doc
-     * @param args
+     * @param doc Document
+     * @param args arguments
      */
-    static int runOneCommand(String[] args)
+    static int runOneCommand(Document commandConfigs, String[] args)
     {
         String request = args[0];
         Element root = commandConfigs.getRootElement();
@@ -111,7 +114,7 @@ public class ScriptLauncher
         {
             // The command wasn't found
             System.err.println("Command not found: " + args[0]);
-            display();
+            display(commandConfigs);
             return 1;
         }
 
@@ -250,10 +253,10 @@ public class ScriptLauncher
      *
      * @return The XML configuration file Document
      */
-    private static Document getConfig()
+    protected static Document getConfig()
     {
         // Load the launcher configuration file
-        String config = ConfigurationManager.getProperty("dspace.dir") +
+        String config = kernelImpl.getConfigurationService().getProperty("dspace.dir") +
                         System.getProperty("file.separator") + "config" +
                         System.getProperty("file.separator") + "launcher.xml";
         SAXBuilder saxBuilder = new SAXBuilder();
@@ -266,6 +269,7 @@ public class ScriptLauncher
         {
             System.err.println("Unable to load the launcher configuration file: [dspace]/config/launcher.xml");
             System.err.println(e.getMessage());
+            e.printStackTrace();
             System.exit(1);
         }
         return doc;
@@ -273,8 +277,9 @@ public class ScriptLauncher
 
     /**
      * Display the commands that the current launcher config file knows about
+     * @param commandConfigs configs as Document
      */
-    private static void display()
+    private static void display(Document commandConfigs)
     {
         // List all command elements
         List<Element> commands = commandConfigs.getRootElement().getChildren("command");
