@@ -89,9 +89,9 @@ public class SolrAuthority implements ChoiceAuthority {
         String localSortField = "";
         if (StringUtils.isNotBlank(locale)) {
             localSortField = sortField + "_" + locale;
-            queryArgs.setSortField(localSortField, SolrQuery.ORDER.asc);
+            queryArgs.addSort(localSortField, SolrQuery.ORDER.asc);
         } else {
-            queryArgs.setSortField(sortField, SolrQuery.ORDER.asc);
+            queryArgs.addSort(sortField, SolrQuery.ORDER.asc);
         }
 
         Choices result;
@@ -100,14 +100,14 @@ public class SolrAuthority implements ChoiceAuthority {
             boolean hasMore = false;
             QueryResponse searchResponse = getSearchService().search(queryArgs);
             SolrDocumentList authDocs = searchResponse.getResults();
-            ArrayList<Choice> choices = new ArrayList<Choice>();
+            ArrayList<Choice> choices = new ArrayList<>();
             if (authDocs != null) {
                 max = (int) searchResponse.getResults().getNumFound();
                 int maxDocs = authDocs.size();
                 if (limit < maxDocs) {
                     maxDocs = limit;
                 }
-                List<AuthorityValue> alreadyPresent = new ArrayList<AuthorityValue>();
+                List<AuthorityValue> alreadyPresent = new ArrayList<>();
                 for (int i = 0; i < maxDocs; i++) {
                     SolrDocument solrDocument = authDocs.get(i);
                     if (solrDocument != null) {

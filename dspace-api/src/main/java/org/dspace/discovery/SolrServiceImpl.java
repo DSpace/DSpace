@@ -48,11 +48,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -167,14 +167,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Non-Static SolrServer for processing indexing events.
      */
-    protected SolrServer solr = null;
+    protected SolrClient solr = null;
 
 
     protected SolrServiceImpl() {
 
     }
 
-    protected SolrServer getSolr() {
+    protected SolrClient getSolr() {
         if (solr == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                       .getProperty("discovery.search.server");
@@ -184,7 +184,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 .getBooleanProperty("discovery", "solr.url.validation.enabled", true)) {
                 try {
                     log.debug("Solr URL: " + solrService);
-                    HttpSolrServer solrServer = new HttpSolrServer(solrService);
+                    HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
 
                     solrServer.setBaseURL(solrService);
                     solrServer.setUseMultiPartPost(true);
@@ -200,7 +200,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     DatabaseUtils.checkReindexDiscovery(this);
 
                     solr = solrServer;
-                } catch (SolrServerException e) {
+                } catch (SolrServerException | IOException e) {
                     log.error("Error while initializing solr server", e);
                 }
             } else {
@@ -262,7 +262,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     } else {
                         /**
                          * Make sure the item is not in the index if it is not in
-                         * archive or withwrawn.
+                         * archive or withdrawn.
                          */
                         unIndexContent(context, item);
                         log.info("Removed Item: " + handle + " from Index");
@@ -539,7 +539,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     @Override
-    public void buildSpellCheck() throws SearchServiceException {
+    public void buildSpellCheck()
+            throws SearchServiceException, IOException {
         try {
             if (getSolr() == null) {
                 return;
@@ -1666,7 +1667,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 order = SolrQuery.ORDER.desc;
             }
 
-            solrQuery.addSortField(discoveryQuery.getSortField(), order);
+            solrQuery.addSort(discoveryQuery.getSortField(), order);
         }
 
         for (String property : discoveryQuery.getProperties().keySet()) {
@@ -1758,7 +1759,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     @Override
     public InputStream searchJSON(Context context, DiscoverQuery discoveryQuery, String jsonIdentifier)
         throws SearchServiceException {
-        if (getSolr() == null || !(getSolr() instanceof HttpSolrServer)) {
+        if (getSolr() == null || !(getSolr() instanceof HttpSolrClient)) {
             return null;
         }
 
@@ -1769,11 +1770,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         solrQuery.setParam(CommonParams.WT, "json");
 
         StringBuilder urlBuilder = new StringBuilder();
-        //urlBuilder.append(getSolr().getBaseURL()).append("/select?");
-        //urlBuilder.append(solrQuery.toString());
-         // New url without any query params appended
-        urlBuilder.append(((HttpSolrServer)getSolr()).getBaseURL()).append("/select");
-         // Post setup
+        // New url without any query params appended
+        urlBuilder.append(((HttpSolrClient)getSolr()).getBaseURL()).append("/select");
+        // Post setup
         NamedList<Object> solrParameters = solrQuery.toNamedList();
         List<NameValuePair> postParameters = new ArrayList<>();
         for (Map.Entry<String, Object> solrParameter : solrParameters) {
@@ -1974,7 +1973,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrQuery.setStart(offset);
             solrQuery.setRows(max);
             if (orderfield != null) {
-                solrQuery.setSortField(orderfield, ascending ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
+                solrQuery.addSort(orderfield, ascending ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
             }
             if (filterquery != null) {
                 solrQuery.addFilterQuery(filterquery);
@@ -1983,7 +1982,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             SolrDocumentList docs = rsp.getResults();
 
             Iterator iter = docs.iterator();
-            List<DSpaceObject> result = new ArrayList<DSpaceObject>();
+            List<DSpaceObject> result = new ArrayList<>();
             while (iter.hasNext()) {
                 SolrDocument doc = (SolrDocument) iter.next();
 

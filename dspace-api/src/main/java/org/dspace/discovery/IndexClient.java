@@ -254,9 +254,10 @@ public class IndexClient {
      * @param line    the command line options
      * @param indexer the solr indexer
      * @throws SearchServiceException in case of a solr exception
+     * @throws java.io.IOException passed through
      */
     protected static void checkRebuildSpellCheck(CommandLine line, IndexingService indexer)
-        throws SearchServiceException {
+        throws SearchServiceException, IOException {
         if (line.hasOption("s")) {
             log.info("Rebuilding spell checker.");
             indexer.buildSpellCheck();

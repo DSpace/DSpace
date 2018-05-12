@@ -26,14 +26,14 @@
         <java.version>1.8</java.version>
         <poi-version>3.17</poi-version>
         <postgresql.driver.version>42.2.1</postgresql.driver.version>
-        <solr.version>4.10.4</solr.version>
-	<jena.version>2.13.0</jena.version>
-	<log4j.version>2.6.2</log4j.version>
+        <jena.version>2.13.0</jena.version>
         <slf4j.version>1.7.22</slf4j.version>
         <jackson.version>2.8.11</jackson.version>
         <jersey.version>2.26</jersey.version>
         <hibernate.version>5.2.8.Final</hibernate.version>
         <hibernate-validator.version>5.4.2.Final</hibernate-validator.version>
+        <solr.client.version>7.3.0</solr.client.version>
+        <solr.server.version>4.10.4</solr.server.version>
         <spring.version>4.3.6.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
@@ -1227,6 +1227,11 @@
                 <version>3.7</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.6</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>1.2</version>
@@ -1591,6 +1596,11 @@
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
                 <version>3.3.0.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.woodstox</groupId>
+                <artifactId>woodstox-core-asl</artifactId>
+                <version>4.4.1</version>
             </dependency>
             <dependency>
                 <groupId>xom</groupId>
