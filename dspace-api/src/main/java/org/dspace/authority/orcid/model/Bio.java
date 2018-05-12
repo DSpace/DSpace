@@ -34,6 +34,8 @@ public class Bio {
 
     protected String biography;
 
+    protected String email;
+
     public Bio() {
         this.name = new BioName();
         keywords = new LinkedHashSet<String>();
@@ -97,6 +99,14 @@ public class Bio {
         this.biography = biography;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public String toString() {
         return "Bio{" +
@@ -107,6 +117,7 @@ public class Bio {
                 ", bioExternalIdentifiers=" + bioExternalIdentifiers +
                 ", researcherUrls=" + researcherUrls +
                 ", biography='" + biography + '\'' +
+                ", email='" + email + '\'' +
                 '}';
     }
 }
