@@ -282,7 +282,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>4.1</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
@@ -320,28 +319,35 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-solr</artifactId>
             <classifier>classes</classifier>
             <scope>test</scope>
         </dependency>
+        -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-core</artifactId>
+            <version>${solr.client.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-icu</artifactId>
-            <version>${solr.version}</version>
+            <version>${solr.client.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-smartcn</artifactId>
-            <version>${solr.version}</version>
+            <version>${solr.client.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-stempel</artifactId>
-            <version>${solr.version}</version>
+            <version>${solr.client.version}</version>
             <scope>test</scope>
         </dependency>
 

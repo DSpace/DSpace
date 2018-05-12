@@ -33,7 +33,7 @@
 
     <properties>
         <!-- WARNING: When updating this dependency be sure to check the "zookeeper" pinned version !-->
-        <solr.version>4.10.4</solr.version>
+        <solr.server.version>4.10.4</solr.server.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}/..</root.basedir>
@@ -56,7 +56,7 @@
                             need to take precendence over the solr-core, the solr-core will still be loaded in the solr-core.jar
                             -->
                             <excludes>
-                                <exclude>WEB-INF/lib/apache-solr-core-${solr.version}.jar</exclude>
+                                <exclude>WEB-INF/lib/apache-solr-core-${solr.server.version}.jar</exclude>
                             </excludes>
                         </overlay>
                     </overlays>
@@ -108,13 +108,13 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>
-            <version>${solr.version}</version>
+            <version>${solr.server.version}</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <version>${solr.version}</version>
+            <version>${solr.server.version}</version>
             <type>jar</type>
             <exclusions>
                 <exclusion>
@@ -182,7 +182,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-cell</artifactId>
-            <version>${solr.version}</version>
+            <version>${solr.server.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>javax.servlet</artifactId>

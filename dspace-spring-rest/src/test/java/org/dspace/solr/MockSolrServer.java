@@ -13,8 +13,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+<<<<<<< HEAD
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
+=======
+import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
+>>>>>>> [DS-3695] Upgrade Solr *client* to 7.3.0.
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
@@ -26,13 +31,13 @@ import org.dspace.app.rest.test.AbstractDSpaceIntegrationTest;
 public class MockSolrServer {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MockSolrServer.class);
-    private static final ConcurrentMap<String, SolrServer> loadedCores = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, SolrClient> loadedCores = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, AtomicLong> usersPerCore = new ConcurrentHashMap<>();
     private static CoreContainer container = null;
 
-    private String coreName;
+    private final String coreName;
 
-    private SolrServer solrServer = null;
+    private SolrClient solrServer = null;
 
 
     public MockSolrServer(final String coreName) throws Exception {
@@ -40,7 +45,7 @@ public class MockSolrServer {
         initSolrServer();
     }
 
-    public SolrServer getSolrServer() {
+    public SolrClient getSolrServer() {
         return solrServer;
     }
 
@@ -54,8 +59,8 @@ public class MockSolrServer {
         usersPerCore.get(coreName).incrementAndGet();
     }
 
-    private static synchronized SolrServer initSolrServerForCore(final String coreName) {
-        SolrServer server = loadedCores.get(coreName);
+    private static synchronized SolrClient initSolrServerForCore(final String coreName) {
+        SolrClient server = loadedCores.get(coreName);
         if (server == null) {
             initSolrContainer();
 
@@ -66,7 +71,7 @@ public class MockSolrServer {
                 server.deleteByQuery("*:*");
                 server.commit();
             } catch (SolrServerException | IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(System.err);
             }
 
             loadedCores.put(coreName, server);
@@ -79,7 +84,7 @@ public class MockSolrServer {
         if (solrServer != null) {
             long remainingUsers = usersPerCore.get(coreName).decrementAndGet();
             if (remainingUsers <= 0) {
-                solrServer.shutdown();
+                solrServer.close();
                 usersPerCore.remove(coreName);
                 loadedCores.remove(coreName);
                 log.info("SOLR Server for core " + coreName + " destroyed");
