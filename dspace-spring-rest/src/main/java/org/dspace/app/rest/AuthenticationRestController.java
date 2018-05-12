@@ -91,11 +91,14 @@ public class AuthenticationRestController implements InitializingBean {
         //see org.dspace.app.rest.security.StatelessLoginFilter
 
         //If we don't have an EPerson here, this means authentication failed and we should return an error message.
-    	log.info("\n\n***n\nGot Here\n\n***\n\n");
-
         return getLoginResponse(request,
                                 "Authentication failed for user " + user + ": The credentials you provided are not " +
                                     "valid.");
+    }
+    
+    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE})
+    public ResponseEntity login() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for login requests.");
     }
 
     @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
