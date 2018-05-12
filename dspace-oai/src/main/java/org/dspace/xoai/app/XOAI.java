@@ -36,9 +36,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -146,7 +146,7 @@ public class XOAI {
             } else {
                 SolrQuery solrParams = new SolrQuery("*:*")
                     .addField("item.lastmodified")
-                    .addSortField("item.lastmodified", ORDER.desc).setRows(1);
+                    .addSort("item.lastmodified", ORDER.desc).setRows(1);
 
                 SolrDocumentList results = DSpaceSolrSearch.query(solrServerResolver.getServer(), solrParams);
                 if (results.getNumFound() == 0) {
@@ -283,7 +283,7 @@ public class XOAI {
         throws DSpaceSolrIndexerException {
         try {
             int i = 0;
-            SolrServer server = solrServerResolver.getServer();
+            SolrClient server = solrServerResolver.getServer();
             while (iterator.hasNext()) {
                 try {
                     Item item = iterator.next();
