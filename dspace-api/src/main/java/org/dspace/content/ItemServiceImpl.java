@@ -514,14 +514,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // Add suitable provenance - includes user, date, collections +
         // bitstream checksums
-        EPerson e = context.getCurrentUser();
+        //EPerson e = context.getCurrentUser();
 
         // Build some provenance data while we're at it.
         StringBuilder prov = new StringBuilder();
 
-        prov.append("Item withdrawn by ").append(e.getFullName()).append(" (")
-            .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
-            .append("Item was in collections:\n");
+//        prov.append("Item withdrawn by ").append(e.getFullName()).append(" (")
+//            .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
+//            .append("Item was in collections:\n");
 
         List<Collection> colls = item.getCollections();
 
@@ -555,8 +555,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         // Write log
-        log.info(LogManager.getHeader(context, "withdraw_item", "user="
-            + e.getEmail() + ",item_id=" + item.getID()));
+       // log.info(LogManager.getHeader(context, "withdraw_item", "user="
+        //    + e.getEmail() + ",item_id=" + item.getID()));
     }
 
     @Override
@@ -572,11 +572,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // Add suitable provenance - includes user, date, collections +
         // bitstream checksums
-        EPerson e = context.getCurrentUser();
+      //  EPerson e = context.getCurrentUser();
         StringBuilder prov = new StringBuilder();
-        prov.append("Item reinstated by ").append(e.getFullName()).append(" (")
-            .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
-            .append("Item was in collections:\n");
+       // prov.append("Item reinstated by ").append(e.getFullName()).append(" (")
+       //     .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
+       //     .append("Item was in collections:\n");
 
         for (Collection coll : colls) {
             prov.append(coll.getName()).append(" (ID: ").append(coll.getID()).append(")\n");
@@ -621,8 +621,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         // Write log
-        log.info(LogManager.getHeader(context, "reinstate_item", "user="
-            + e.getEmail() + ",item_id=" + item.getID()));
+       // log.info(LogManager.getHeader(context, "reinstate_item", "user="
+       //     + e.getEmail() + ",item_id=" + item.getID()));
     }
 
     @Override
