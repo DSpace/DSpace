@@ -1022,16 +1022,10 @@
         </lst>
   </requestHandler>
 
-  <!-- for back compat with clients using /update/json and /update/csv -->  
-  <requestHandler name="/update/json" class="solr.JsonUpdateRequestHandler">
+  <!-- for back compat with clients using /update/json -->
+  <requestHandler name="/update/json" class="solr.UpdateRequestHandler">
         <lst name="defaults">
          <str name="stream.contentType">application/json</str>
-         <str name="update.chain">uuid</str>
-       </lst>
-  </requestHandler>
-  <requestHandler name="/update/csv" class="solr.CSVRequestHandler">
-        <lst name="defaults">
-         <str name="stream.contentType">application/csv</str>
          <str name="update.chain">uuid</str>
        </lst>
   </requestHandler>
@@ -1113,22 +1107,20 @@
                   class="solr.DocumentAnalysisRequestHandler" 
                   startup="lazy" />
 
-  <!-- Admin Handlers
+  <!-- Admin Handlers -->
+  <requestHandler name="/admin/luke"
+                  class="solr.admin.LukeRequestHandler" />
+  <requestHandler name="/admin/system"
+                  class="solr.admin.SystemInfoHandler" />
+  <requestHandler name="/admin/plugins"
+                  class="solr.admin.PluginInfoHandler" />
+  <requestHandler name="/admin/threads"
+                  class="solr.admin.ThreadDumpHandler" />
+  <requestHandler name="/admin/properties"
+                  class="solr.admin.PropertiesRequestHandler" />
+  <requestHandler name="/admin/file"
+                  class="solr.admin.ShowFileRequestHandler" />
 
-       Admin Handlers - This will register all the standard admin
-       RequestHandlers.  
-    -->
-  <requestHandler name="/admin/" 
-                  class="solr.admin.AdminHandlers" />
-  <!-- This single handler is equivalent to the following... -->
-  <!--
-     <requestHandler name="/admin/luke"       class="solr.admin.LukeRequestHandler" />
-     <requestHandler name="/admin/system"     class="solr.admin.SystemInfoHandler" />
-     <requestHandler name="/admin/plugins"    class="solr.admin.PluginInfoHandler" />
-     <requestHandler name="/admin/threads"    class="solr.admin.ThreadDumpHandler" />
-     <requestHandler name="/admin/properties" class="solr.admin.PropertiesRequestHandler" />
-     <requestHandler name="/admin/file"       class="solr.admin.ShowFileRequestHandler" >
-    -->
   <!-- If you wish to hide files under ${solr.home}/conf, explicitly
        register the ShowFileRequestHandler using: 
     -->
