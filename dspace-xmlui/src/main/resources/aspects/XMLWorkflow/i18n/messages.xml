@@ -46,6 +46,7 @@
     <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.approve_submit">Approve item</message>
     <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.edit_help">Select this option to change the item's metadata.</message>
     <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.edit_submit">Edit metadata</message>
+    <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_help">Delete workflow item</message>
 
     <message key="xmlui.XMLWorkflow.step.unknown">Unknown state</message>
 
@@ -102,5 +103,7 @@
     <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep.claimaction">Score review</message>
     <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep.scorereviewaction">Score review</message>
     <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep">Score review</message>
+    
+    <message key="xmlui.XMLWorkflow.workflow.DeleteItemAction.info3">Are you sure do you want to delete the item?</message>
 
   </catalogue>
