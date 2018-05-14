@@ -19,11 +19,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -972,7 +974,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             Set<String> moreLikeThisFields = new HashSet<String>();
             for (DiscoveryConfiguration discoveryConfiguration : discoveryConfigurations) {
                 for (int i = 0; i < discoveryConfiguration.getSearchFilters().size(); i++) {
+
+                    List<MetadataValue> metadataValueList = new LinkedList<>();
+                    boolean shouldExposeMinMax = false;
                     DiscoverySearchFilter discoverySearchFilter = discoveryConfiguration.getSearchFilters().get(i);
+                    if (StringUtils.equalsIgnoreCase(discoverySearchFilter.getFilterType(), "facet")) {
+                        if (((DiscoverySearchFilterFacet) discoverySearchFilter).isExposeMinMax()) {
+                            shouldExposeMinMax = true;
+                        }
+                    }
                     for (int j = 0; j < discoverySearchFilter.getMetadataFields().size(); j++) {
                         String metadataField = discoverySearchFilter.getMetadataFields().get(j);
                         List<DiscoverySearchFilter> resultingList;
@@ -982,9 +992,38 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             //New metadata field, create a new list for it
                             resultingList = new ArrayList<DiscoverySearchFilter>();
                         }
+
+
+                        if (shouldExposeMinMax) {
+                            String[] splittedMetadataField = metadataField.split("\\.");
+                            String schema = splittedMetadataField[0];
+                            String element = splittedMetadataField.length > 1 ? splittedMetadataField[1] : null;
+                            String qualifier = splittedMetadataField.length > 2 ? splittedMetadataField[2] : null;
+
+                            metadataValueList.addAll(itemService.getMetadata(item, schema,
+                                                                             element, qualifier, Item.ANY));
+
+                        }
+
                         resultingList.add(discoverySearchFilter);
 
                         searchFilters.put(metadataField, resultingList);
+                    }
+
+                    if (!metadataValueList.isEmpty() && shouldExposeMinMax) {
+                        metadataValueList.sort(new Comparator<MetadataValue>() {
+                            public int compare(MetadataValue mdv1,MetadataValue mdv2) {
+                                return mdv1.getValue().compareTo(mdv2.getValue())  ;
+                            }
+                        });
+                        MetadataValue firstMetadataValue = metadataValueList.get(0);
+                        MetadataValue lastMetadataValue = metadataValueList.get(metadataValueList.size() - 1);
+
+                        doc.addField(discoverySearchFilter.getIndexFieldName() + "_min", firstMetadataValue.getValue());
+                        doc.addField(discoverySearchFilter.getIndexFieldName() + "_min_sort", firstMetadataValue.getValue());
+                        doc.addField(discoverySearchFilter.getIndexFieldName() + "_max", lastMetadataValue.getValue());
+                        doc.addField(discoverySearchFilter.getIndexFieldName() + "_max_sort", lastMetadataValue.getValue());
+
                     }
                 }
 
@@ -1244,6 +1283,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                         doc.addField(indexField + "_sort", yearUTC);
                                     }
                                 }
+
                             } else if (searchFilter.getType()
                                                    .equals(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)) {
                                 HierarchicalSidebarFacetConfiguration hierarchicalSidebarFacetConfiguration =

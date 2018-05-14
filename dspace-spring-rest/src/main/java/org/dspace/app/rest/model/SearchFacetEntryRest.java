@@ -29,6 +29,9 @@ public class SearchFacetEntryRest implements RestAddressableModel {
     private int facetLimit;
 
     @JsonIgnore
+    private boolean exposeMinMax = false;
+
+    @JsonIgnore
     private List<SearchFacetValueRest> values = new LinkedList<>();
 
     public SearchFacetEntryRest(final String name) {
@@ -86,5 +89,13 @@ public class SearchFacetEntryRest implements RestAddressableModel {
 
     public void setFacetLimit(final int facetLimit) {
         this.facetLimit = facetLimit;
+    }
+
+    public boolean isExposeMinMax() {
+        return exposeMinMax;
+    }
+
+    public void setExposeMinMax(boolean exposeMinMax) {
+        this.exposeMinMax = exposeMinMax;
     }
 }

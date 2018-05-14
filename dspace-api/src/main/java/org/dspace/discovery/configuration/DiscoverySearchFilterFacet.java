@@ -21,7 +21,7 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
     private DiscoveryConfigurationParameters.SORT sortOrderSidebar = DiscoveryConfigurationParameters.SORT.COUNT;
     private DiscoveryConfigurationParameters.SORT sortOrderFilterPage = DiscoveryConfigurationParameters.SORT.COUNT;
     public static final String FILTER_TYPE_FACET = "facet";
-
+    private boolean exposeMinMax = false;
 
     public int getFacetLimit() {
         if (facetLimit == -1) {
@@ -54,5 +54,13 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
     @Override
     public String getFilterType() {
         return FILTER_TYPE_FACET;
+    }
+
+    public boolean isExposeMinMax() {
+        return exposeMinMax;
+    }
+
+    public void setExposeMinMax(boolean exposeMinMax) {
+        this.exposeMinMax = exposeMinMax;
     }
 }

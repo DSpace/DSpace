@@ -378,6 +378,7 @@
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
         <property name="isOpenByDefault" value="true"/>
+        <property name="exposeMinMax" value="true"/>
 
     </bean>
 
@@ -407,6 +408,7 @@
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
         <property name="isOpenByDefault" value="false"/>
+        <property name="exposeMinMax" value="true"/>
 
     </bean>
     
