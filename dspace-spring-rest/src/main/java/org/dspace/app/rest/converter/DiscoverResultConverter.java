@@ -70,6 +70,7 @@ public class DiscoverResultConverter {
             facetEntry.setHasMore(false);
             facetEntry.setFacetLimit(field.getFacetLimit());
 
+            facetEntry.setExposeMinMax(field.isExposeMinMax());
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
                 //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
                 //more results available.
