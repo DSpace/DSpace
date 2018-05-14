@@ -7,18 +7,32 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.converter.ItemConverter;
+import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,6 +48,14 @@ import org.springframework.stereotype.Component;
 @Component(ItemRest.CATEGORY + "." + ItemRest.NAME)
 public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
+    private static final String OPERATION_PATH_WITHDRAW = "withdraw";
+
+    private static final String OPERATION_PATH_REINSTATE = "reinstate";
+
+    private static final String OPERATION_PATH_DISCOVERABLE = "discoverable";
+
+    private static final Logger log = Logger.getLogger(ItemRestRepository.class);
+
     @Autowired
     ItemService is;
 
@@ -47,6 +69,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
     @Override
     public ItemRest findOne(Context context, UUID id) {
+
         Item item = null;
         try {
             item = is.find(context, id);
@@ -76,6 +99,78 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         }
         Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(converter);
         return page;
+    }
+
+    @Override
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id, Patch
+            patch)
+            throws PatchUnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException {
+
+        List<Operation> operations = patch.getOperations();
+        for (Operation op : operations) {
+            if ("replace".equals(op.getOp())) {
+                String path = op.getPath();
+                switch (path) {
+                    case OPERATION_PATH_WITHDRAW:
+                        withdraw(context, id);
+                        break;
+                    case OPERATION_PATH_REINSTATE:
+                        reinstate(context, id);
+                        break;
+                    case OPERATION_PATH_DISCOVERABLE:
+                        setDiscoverable(context, id, (boolean) op.getValue());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        findOne(context, id);
+    }
+
+    private void withdraw(Context context, UUID id) throws PatchUnprocessableEntityException,
+            SQLException, AuthorizeException {
+
+        try {
+            Item item = is.find(context, id);
+            if (!item.isArchived()) {
+                throw new PatchUnprocessableEntityException("Item is not archived.  Cannot be withdrawn.");
+            }
+            context.turnOffAuthorisationSystem();
+            is.withdraw(context, item);
+            context.restoreAuthSystemState();
+        } catch (SQLException | AuthorizeException e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    private void reinstate(Context context, UUID id) throws PatchUnprocessableEntityException,
+            SQLException, AuthorizeException {
+
+        try {
+            Item item = is.find(context, id);
+            context.turnOffAuthorisationSystem();
+            is.reinstate(context, item);
+            context.restoreAuthSystemState();
+        } catch (SQLException | AuthorizeException e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    private void setDiscoverable(Context context, UUID id, boolean status) throws PatchUnprocessableEntityException,
+            SQLException {
+
+        try {
+            Item item = is.find(context, id);
+            context.turnOffAuthorisationSystem();
+            item.setDiscoverable(status);
+            context.restoreAuthSystemState();
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Override

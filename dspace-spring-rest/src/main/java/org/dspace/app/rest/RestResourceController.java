@@ -209,7 +209,7 @@ public class RestResourceController implements InitializingBean {
      * @param projection
      * @return
      */
-    @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD}, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     @SuppressWarnings("unchecked")
     public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable UUID uuid,
@@ -537,17 +537,17 @@ public class RestResourceController implements InitializingBean {
      * @param request
      * @param apiCategory
      * @param model
-     * @param id
+     * @param uuid
      * @param jsonNode
      * @return
      * @throws HttpRequestMethodNotSupportedException
      */
     @RequestMapping(method = RequestMethod.PATCH, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
-                                                 @PathVariable String model, @PathVariable UUID id,
+                                                 @PathVariable String model, @PathVariable UUID uuid,
                                                  @RequestBody(required = true) JsonNode jsonNode)
         throws HttpRequestMethodNotSupportedException {
-        return patchInternal(request, apiCategory, model, id, jsonNode);
+        return patchInternal(request, apiCategory, model, uuid, jsonNode);
     }
 
     /**

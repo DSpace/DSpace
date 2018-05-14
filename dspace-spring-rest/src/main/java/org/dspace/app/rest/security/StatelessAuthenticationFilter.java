@@ -77,6 +77,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             if (eperson != null) {
                 //Pass the eperson ID to the request service
                 requestService.setCurrentUserId(eperson.getID());
+                context.setCurrentUser(eperson);
 
                 //Get the Spring authorities for this eperson
                 List<GrantedAuthority> authorities = authenticationProvider.getGrantedAuthorities(context, eperson);
