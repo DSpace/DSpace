@@ -92,6 +92,8 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 
     @Override
     protected void delete(Context context, UUID id) {
+        // Workaround for authorisation problems
+        context.turnOffAuthorisationSystem();
         Bitstream bit = null;
         try {
             bit = bs.find(context, id);
@@ -101,8 +103,9 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         try {
             bs.delete(context, bit);
         } catch (SQLException | AuthorizeException | IOException e) {
-            // log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
+        context.restoreAuthSystemState();
     }
 
     public InputStream retrieve(UUID uuid) {
@@ -125,5 +128,4 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         context.abort();
         return is;
     }
-
 }
