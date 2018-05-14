@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.RequiredParameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.MissingParameterException;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +129,11 @@ public class RestRepositoryUtils {
 
             if (parameter == null) {
                 continue;
+            }
+
+            if (parameter.hasMethodAnnotation(RequiredParameter.class) && entry.getValue() == null) {
+                throw new MissingParameterException(String.format("Missing Parameter: %s",
+                        parameter.getParameterName()));
             }
 
             result.put(parameter.getParameterName(), entry.getValue());
