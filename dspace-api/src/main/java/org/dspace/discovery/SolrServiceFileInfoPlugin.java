@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.util.List;
+
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -34,8 +35,7 @@ import org.dspace.core.Context;
  *
  * @author Martin Walk
  */
-public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin
-{
+public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
     private static final String BUNDLE_NAME = "ORIGINAL";
     private static final String SOLR_FIELD_NAME_FOR_FILENAMES = "original_bundle_filenames";
     private static final String SOLR_FIELD_NAME_FOR_DESCRIPTIONS = "original_bundle_descriptions";
