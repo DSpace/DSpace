@@ -1550,6 +1550,14 @@
                 <artifactId>xom</artifactId>
                 <version>1.2.5</version>
             </dependency>
+
+            <!--This version is pinned on this one, since Solr introduces
+                both 3.4.5 & 3.4.6-->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.4.10</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

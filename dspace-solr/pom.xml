@@ -32,7 +32,8 @@
     <packaging>war</packaging>
 
     <properties>
-        <!-- WARNING: When updating this dependency be sure to check the "zookeeper" pinned version !-->
+        <!-- WARNING: When updating this dependency be sure to check the
+             "zookeeper" pinned version in dspace-parent:dependencyManagement !-->
         <solr.version>4.10.4</solr.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
@@ -57,6 +58,7 @@
                             -->
                             <excludes>
                                 <exclude>WEB-INF/lib/apache-solr-core-${solr.version}.jar</exclude>
+                                <exclude>WEB-INF/lib/zookeeper-*.jar</exclude>
                             </excludes>
                         </overlay>
                     </overlays>
@@ -223,10 +225,6 @@
                 <exclusion>
                     <artifactId>jetty-xml</artifactId>
                     <groupId>org.eclipse.jetty</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.zookeeper</groupId>
-                    <artifactId>zookeeper</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
