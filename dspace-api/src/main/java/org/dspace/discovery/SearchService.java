@@ -140,4 +140,6 @@ public interface SearchService {
 
     FacetYearRange getFacetYearRange(Context context, DSpaceObject scope, DiscoverySearchFilterFacet facet,
                                      List<String> filterQueries) throws SearchServiceException;
+
+    String calculateExtremeValue(Context context, String valueField, String sortField, DiscoverQuery.SORT_ORDER sortOrder)throws SearchServiceException;
 }

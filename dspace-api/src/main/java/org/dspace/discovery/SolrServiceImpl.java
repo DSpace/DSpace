@@ -1020,9 +1020,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         MetadataValue lastMetadataValue = metadataValueList.get(metadataValueList.size() - 1);
 
                         doc.addField(discoverySearchFilter.getIndexFieldName() + "_min", firstMetadataValue.getValue());
-                        doc.addField(discoverySearchFilter.getIndexFieldName() + "_min_sort", firstMetadataValue.getValue());
+                        doc.addField(discoverySearchFilter.getIndexFieldName()
+                                         + "_min_sort", firstMetadataValue.getValue());
                         doc.addField(discoverySearchFilter.getIndexFieldName() + "_max", lastMetadataValue.getValue());
-                        doc.addField(discoverySearchFilter.getIndexFieldName() + "_max_sort", lastMetadataValue.getValue());
+                        doc.addField(discoverySearchFilter.getIndexFieldName()
+                                         + "_max_sort", lastMetadataValue.getValue());
 
                     }
                 }
@@ -2255,5 +2257,30 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         FacetYearRange result = new FacetYearRange(facet);
         result.calculateRange(context, filterQueries, scope, this);
         return result;
+    }
+
+    @Override
+    public String calculateExtremeValue(Context context, String valueField,
+                                        String sortField,
+                                        DiscoverQuery.SORT_ORDER sortOrder)
+        throws SearchServiceException {
+
+        DiscoverQuery maxQuery = new DiscoverQuery();
+        maxQuery.setMaxResults(1);
+        //Set our query to anything that has this value
+        maxQuery.addFieldPresentQueries(valueField);
+        //Set sorting so our last value will appear on top
+        maxQuery.setSortField(sortField, sortOrder);
+        maxQuery.addSearchField(valueField);
+        DiscoverResult maxResult = this.search(context,maxQuery);
+        if (0 < maxResult.getDspaceObjects().size()) {
+            List<DiscoverResult.SearchDocument> searchDocuments = maxResult
+                .getSearchDocument(maxResult.getDspaceObjects().get(0));
+            if (0 < searchDocuments.size() && 0 < searchDocuments.get(0).getSearchFieldValues
+                (valueField).size()) {
+                return searchDocuments.get(0).getSearchFieldValues(valueField).get(0);
+            }
+        }
+        return null;
     }
 }

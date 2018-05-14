@@ -62,11 +62,7 @@ public class DiscoverFacetsConverter {
             facetEntry.setFacetLimit(field.getFacetLimit());
             facetEntry.setExposeMinMax(field.isExposeMinMax());
             if (field.isExposeMinMax()) {
-                try {
-                    calculateMinMaxValues(context, facetEntry, field);
-                } catch (SearchServiceException e) {
-                    e.printStackTrace();
-                }
+                handleExposeMinMaxValues(context,field,facetEntry);
             }
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
                 //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
@@ -89,56 +85,27 @@ public class DiscoverFacetsConverter {
         }
     }
 
-    private void calculateMinMaxValues(Context context,SearchFacetEntryRest facetEntry,DiscoverySearchFilterFacet field)
-        throws SearchServiceException {
+    private void handleExposeMinMaxValues(Context context,DiscoverySearchFilterFacet field,
+                                          SearchFacetEntryRest facetEntry) {
+        try {
+            String minValue = searchService.calculateExtremeValue(context,
+                                                                  field.getIndexFieldName() + "_min",
+                                                                  field.getIndexFieldName() + "_min_sort",
+                                                                  DiscoverQuery.SORT_ORDER.asc);
+            String maxValue = searchService.calculateExtremeValue(context,
+                                                                  field.getIndexFieldName() + "_max",
+                                                                  field.getIndexFieldName() + "_max_sort",
+                                                                  DiscoverQuery.SORT_ORDER.desc);
 
-        //TODO Move to searchService, only call to retrieve values (split logic)
-        int oldestYear = 0;
-        int newestYear = 0;
-
-        DiscoverQuery minQuery = new DiscoverQuery();
-        minQuery.setMaxResults(1);
-        //Set our query to anything that has this value
-        String indexFieldName = field.getIndexFieldName();
-        minQuery.addFieldPresentQueries(indexFieldName + "_min");
-        //Set sorting so our last value will appear on top
-        minQuery.setSortField(indexFieldName + "_min_sort",DiscoverQuery.SORT_ORDER.asc);
-        minQuery.addSearchField(indexFieldName + "_min");
-        DiscoverResult minResult = searchService.search(context, minQuery);
-
-        if (0 < minResult.getDspaceObjects().size()) {
-            List<DiscoverResult.SearchDocument> searchDocuments = minResult
-                .getSearchDocument(minResult.getDspaceObjects().get(0));
-            if (0 < searchDocuments.size() && 0 < searchDocuments.get(0).getSearchFieldValues
-                                                                     (indexFieldName).size()) {
-//                oldestYear = Integer.parseInt(searchDocuments.get(0)
-//                                                             .getSearchFieldValues(indexFieldName).get(0));
+            if (StringUtils.isNotBlank(minValue) && StringUtils.isNotBlank(maxValue)) {
+                facetEntry.setMinValue(minValue);
+                facetEntry.setMaxValue(maxValue);
             }
+        } catch (SearchServiceException e) {
+            e.printStackTrace();
         }
-        //Now get the first year
-
-        DiscoverQuery maxQuery = new DiscoverQuery();
-        maxQuery.setMaxResults(1);
-        //Set our query to anything that has this value
-        indexFieldName = field.getIndexFieldName();
-        maxQuery.addFieldPresentQueries(indexFieldName + "_max");
-        //Set sorting so our last value will appear on top
-        maxQuery.setSortField(indexFieldName + "_max_sort",DiscoverQuery.SORT_ORDER.desc);
-        maxQuery.addSearchField(indexFieldName + "_max");
-        DiscoverResult maxResult = searchService.search(context, maxQuery);
-        if (0 < maxResult.getDspaceObjects().size()) {
-            List<DiscoverResult.SearchDocument> searchDocuments = maxResult
-                .getSearchDocument(maxResult.getDspaceObjects().get(0));
-            if (0 < searchDocuments.size() && 0 < searchDocuments.get(0).getSearchFieldValues
-                                                                        (indexFieldName).size()) {
-//                newestYear = Integer.parseInt(searchDocuments.get(0).getSearchFieldValues
-//                                                                    (indexFieldName).get(0));
-            }
-        }
-
-
-
     }
+
 
     private void setRequestInformation(final Context context, final String query, final String dsoType,
                                        final String configurationName, final String scope,
