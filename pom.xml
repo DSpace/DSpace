@@ -1127,11 +1127,6 @@
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
-                <artifactId>jargon</artifactId>
-                <version>1.4.25</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
                 <artifactId>mets</artifactId>
                 <version>1.5.2</version>
             </dependency>
@@ -1314,7 +1309,10 @@
             <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
-                <version>2.7.2</version>
+                <!-- NOTE WELL:  OAI has trouble with newer versions.
+                     Do not upgrade this without testing!
+                     https://jira.duraspace.org/browse/DS-3733 -->
+                <version>2.7.0</version>
             </dependency>
             <dependency>
                 <groupId>xerces</groupId>

@@ -329,10 +329,6 @@
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>jargon</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
             <artifactId>mets</artifactId>
         </dependency>
         <dependency>
