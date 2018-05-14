@@ -35,7 +35,7 @@ public class BrowseEntryHalLinkFactory extends HalLinkFactory<BrowseEntryResourc
             BrowseIndexRest bix = data.getBrowseIndex();
 
             UriComponentsBuilder baseLink = uriBuilder(
-                getMethodOn(bix.getCategory(), bix.getType()).findRel(null, bix.getCategory(),
+                getMethodOn(bix.getCategory(), bix.getType()).findRel(null, null, bix.getCategory(),
                                                                       English.plural(bix.getType()), bix.getId(),
                                                                       BrowseIndexRest.ITEMS, null, null, null));
 

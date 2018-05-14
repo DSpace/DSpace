@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -261,12 +262,13 @@ public class RestResourceController implements InitializingBean {
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/{rel}")
-    public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
+    public ResourceSupport findRel(HttpServletRequest request, HttpServletResponse response,
+                                   @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable Integer id, @PathVariable String rel,
                                    Pageable page,
                                    PagedResourcesAssembler assembler,
                                    @RequestParam(required = false) String projection) {
-        return findRelInternal(request, apiCategory, model, id, rel, page, assembler, projection);
+        return findRelInternal(request, response, apiCategory, model, id, rel, page, assembler, projection);
     }
 
     /**
@@ -287,12 +289,13 @@ public class RestResourceController implements InitializingBean {
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
         "/{rel}")
-    public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
+    public ResourceSupport findRel(HttpServletRequest request, HttpServletResponse response,
+                                   @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable String id, @PathVariable String rel,
                                    Pageable page,
                                    PagedResourcesAssembler assembler,
                                    @RequestParam(required = false) String projection) {
-        return findRelInternal(request, apiCategory, model, id, rel, page, assembler, projection);
+        return findRelInternal(request, response, apiCategory, model, id, rel, page, assembler, projection);
     }
 
     /**
@@ -311,12 +314,13 @@ public class RestResourceController implements InitializingBean {
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/{rel}")
-    public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
+    public ResourceSupport findRel(HttpServletRequest request, HttpServletResponse response,
+                                   @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable UUID uuid, @PathVariable String rel,
                                    Pageable page,
                                    PagedResourcesAssembler assembler,
                                    @RequestParam(required = false) String projection) {
-        return findRelInternal(request, apiCategory, model, uuid, rel, page, assembler, projection);
+        return findRelInternal(request, response, apiCategory, model, uuid, rel, page, assembler, projection);
     }
 
     /**
@@ -354,12 +358,13 @@ public class RestResourceController implements InitializingBean {
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
         "/{rel}/{relid:[\\w+\\-]+}")
-    public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
+    public ResourceSupport findRel(HttpServletRequest request, HttpServletResponse response,
+                                   @PathVariable String apiCategory,
                                    @PathVariable String model, @PathVariable String id, @PathVariable String rel,
                                    @PathVariable String relid,
                                    Pageable page, PagedResourcesAssembler assembler,
                                    @RequestParam(required = false) String projection) {
-        return findRelEntryInternal(request, apiCategory, model, id, rel, relid, page, assembler, projection);
+        return findRelEntryInternal(request, response, apiCategory, model, id, rel, relid, page, assembler, projection);
     }
 
 
@@ -604,6 +609,7 @@ public class RestResourceController implements InitializingBean {
      * @return
      */
     private <ID extends Serializable> ResourceSupport findRelEntryInternal(HttpServletRequest request,
+                                                                           HttpServletResponse response,
                                                                            String apiCategory, String model,
                                                                            String id, String rel, String relid,
                                                                            Pageable page,
@@ -648,7 +654,8 @@ public class RestResourceController implements InitializingBean {
      * @param projection
      * @return
      */
-    private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request, String apiCategory,
+    private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request,
+                                                                      HttpServletResponse response, String apiCategory,
                                                                       String model, ID uuid, String rel, Pageable page,
                                                                       PagedResourcesAssembler assembler,
                                                                       String projection) {
@@ -675,6 +682,9 @@ public class RestResourceController implements InitializingBean {
                         Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
                                                                                .slash(rel).withSelfRel();
                         Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
+                        if (halResources.getSize() == 0) {
+                            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                        }
                         halResources.forEach(linkService::addLinks);
 
                         return assembler.toResource(halResources, link);
@@ -709,6 +719,7 @@ public class RestResourceController implements InitializingBean {
             EmbeddedPage ep = (EmbeddedPage) resource.getEmbeddedResources().get(rel);
             List<? extends RestAddressableModel> fullList = ep.getFullList();
             if (fullList == null || fullList.size() == 0) {
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 return null;
             }
             int start = page.getOffset();
@@ -718,6 +729,7 @@ public class RestResourceController implements InitializingBean {
             PageImpl<RestAddressableModel> pageResult = new PageImpl(fullList.subList(start, end), page,
                                                                      fullList.size());
             result = assembler.toResource(pageResult.map(resourceRepository::wrapResource));
+
             for (Resource subObj : result) {
                 if (subObj.getContent() instanceof HALResource) {
                     linkService.addLinks((HALResource) subObj.getContent());
@@ -727,6 +739,10 @@ public class RestResourceController implements InitializingBean {
 
 
         } else {
+            if (resource.getEmbeddedResources().get(rel) == null) {
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }
+
             return (ResourceSupport) resource.getEmbeddedResources().get(rel);
         }
 
@@ -749,15 +765,19 @@ public class RestResourceController implements InitializingBean {
                                                                                       Pageable page,
                                                                                       PagedResourcesAssembler assembler,
                                                                                       @RequestParam(required = false)
-                                                                                              String projection) {
+                                                                                              String projection,
+                                                                                      HttpServletResponse response) {
         DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
         Link link = linkTo(methodOn(this.getClass(), apiCategory, model).findAll(apiCategory, model,
-                                                                                 page, assembler, projection))
+                                                                                 page, assembler, projection, response))
             .withSelfRel();
 
         Page<DSpaceResource<T>> resources;
         try {
             resources = repository.findAll(page).map(repository::wrapResource);
+            if (resources.getSize() == 0) {
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }
             resources.forEach(linkService::addLinks);
         } catch (PaginationException pe) {
             resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
