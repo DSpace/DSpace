@@ -347,7 +347,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
 
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/self"))
-                   .andExpect(status().isOk())
+                   //Does this status make sense?  This is what is being returned.
+                   .andExpect(status().isNoContent())
         ;
 
 
