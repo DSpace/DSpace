@@ -95,8 +95,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
     public void findCollections() throws Exception {
         //Match only that a section exists with a submission configuration behind
         getClient().perform(get("/api/config/submissiondefinitions/traditional/collections"))
-                   //The status has to be 200 OK
-                   .andExpect(status().isOk());
+                   //Does this status change make sense?
+                   .andExpect(status().isNoContent());
     }
 
     @Test
