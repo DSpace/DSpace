@@ -31,18 +31,18 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dspace.version>5.9-SNAPSHOT</dspace.version>
-        <java.version>1.7</java.version>
+        <java.version>1.8</java.version>
         <lucene.version>4.10.2</lucene.version>
         <solr.version>4.10.2</solr.version>
         <jena.version>2.12.0</jena.version>
         <slf4j.version>1.6.1</slf4j.version>
-        <spring.version>4.1.6.RELEASE</spring.version>
+        <spring.version>4.2.9.RELEASE</spring.version>
         <ant.version>1.9.6</ant.version>
         <commons-cli.version>1.3.1</commons-cli.version>
         <commons-codec.version>1.10</commons-codec.version>
         <persistence-api.version>1.0.2</persistence-api.version>
         <jackson.version>2.5.1</jackson.version>
-        <hibernate.version>5.0.3.Final</hibernate.version>
+        <hibernate.version>5.2.17.Final</hibernate.version>
 
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
@@ -56,7 +56,7 @@
           <plugins>
               <plugin>
                   <artifactId>maven-compiler-plugin</artifactId>
-                  <version>3.1</version>
+                  <version>3.6.1</version>
                   <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -1308,12 +1308,7 @@
           <dependency>
               <groupId>org.springframework.data</groupId>
               <artifactId>spring-data-jpa</artifactId>
-              <version>1.9.1.RELEASE</version>
-          </dependency>
-          <dependency>
-              <groupId>javax.persistence</groupId>
-              <artifactId>persistence-api</artifactId>
-              <version>${persistence-api.version}</version>
+              <version>1.11.11.RELEASE</version>
           </dependency>
           <dependency>
               <groupId>com.fasterxml.jackson.core</groupId>
@@ -1339,6 +1334,12 @@
               <groupId>org.hibernate</groupId>
               <artifactId>hibernate-entitymanager</artifactId>
               <version>${hibernate.version}</version>
+          </dependency>
+
+          <dependency>
+              <groupId>org.hibernate.javax.persistence</groupId>
+              <artifactId>hibernate-jpa-2.1-api</artifactId>
+              <version>1.0.2.Final</version>
           </dependency>
       </dependencies>
    </dependencyManagement>

@@ -32,7 +32,7 @@
 
     <properties>
 
-        <solr.version>4.10.2</solr.version>
+        <solr.version>4.10.4</solr.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}/..</root.basedir>
