@@ -682,9 +682,6 @@ public class RestResourceController implements InitializingBean {
                         Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
                                                                                .slash(rel).withSelfRel();
                         Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
-                        if (halResources.getSize() == 0) {
-                            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                        }
                         halResources.forEach(linkService::addLinks);
 
                         return assembler.toResource(halResources, link);
@@ -775,9 +772,6 @@ public class RestResourceController implements InitializingBean {
         Page<DSpaceResource<T>> resources;
         try {
             resources = repository.findAll(page).map(repository::wrapResource);
-            if (resources.getSize() == 0) {
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            }
             resources.forEach(linkService::addLinks);
         } catch (PaginationException pe) {
             resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
