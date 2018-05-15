@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ * 
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
@@ -48,7 +48,7 @@ public class IdentifierRestController implements InitializingBean {
     private static final String REGEX_HANDLE = "^\\d+/\\d+$";
 
     private static final Logger log =
-        Logger.getLogger(IdentifierRestController.class);
+            Logger.getLogger(IdentifierRestController.class);
 
     @Autowired
     private List<DSpaceObjectConverter> converters;
@@ -66,19 +66,19 @@ public class IdentifierRestController implements InitializingBean {
     public void getDSObyIdentifier(HttpServletRequest request,
                                    HttpServletResponse response,
                                    @RequestParam("id") String id)
-        throws IOException, SQLException {
+            throws IOException, SQLException {
 
         DSpaceObject dso = null;
         Context context = ContextUtil.obtainContext(request);
         IdentifierService identifierService = IdentifierServiceFactory
-            .getInstance().getIdentifierService();
+                .getInstance().getIdentifierService();
         try {
             dso = identifierService.resolve(context, id);
             if (dso != null) {
                 DSpaceObjectRest dsor = convertDSpaceObject(dso);
                 URI link = linkTo(dsor.getController(), dsor.getCategory(),
-                    English.plural(dsor.getType()))
-                    .slash(dsor.getId()).toUri();
+                        English.plural(dsor.getType()))
+                        .slash(dsor.getId()).toUri();
                 response.setStatus(HttpServletResponse.SC_FOUND);
                 response.sendRedirect(link.toString());
             } else {
