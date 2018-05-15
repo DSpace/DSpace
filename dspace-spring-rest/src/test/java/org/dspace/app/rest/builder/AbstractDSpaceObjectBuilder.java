@@ -16,6 +16,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -98,6 +99,60 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                       null, startDate, Constants.READ,
                                                                       "Integration Test", dso);
             if (rp != null) {
+                resourcePolicyService.update(context, rp);
+            }
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return (B) this;
+    }
+
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B setRemovePermissionForEperson(DSpaceObject dso,
+                                                                                         EPerson eperson,
+                                                                                         Date startDate) {
+        try {
+
+            ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
+                eperson, startDate, Constants.REMOVE,
+                "Integration Test", dso);
+            if (rp != null) {
+                log.info("Updating resource policy with REMOVE for eperson: " + eperson.getEmail());
+                resourcePolicyService.update(context, rp);
+            }
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return (B) this;
+    }
+
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B setAddPermissionForEperson(DSpaceObject dso,
+                                                                                      EPerson eperson,
+                                                                                      Date startDate) {
+        try {
+
+            ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
+                eperson, startDate, Constants.ADD,
+                "Integration Test", dso);
+            if (rp != null) {
+                log.info("Updating resource policy with ADD for eperson: " + eperson.getEmail());
+                resourcePolicyService.update(context, rp);
+            }
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return (B) this;
+    }
+
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B setWritePermissionForEperson(DSpaceObject dso,
+                                                                                        EPerson eperson,
+                                                                                        Date startDate) {
+        try {
+
+            ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
+                eperson, startDate, Constants.WRITE,
+                "Integration Test", dso);
+            if (rp != null) {
+                log.info("Updating resource policy with WRITE for eperson: " + eperson.getEmail());
                 resourcePolicyService.update(context, rp);
             }
         } catch (Exception e) {
