@@ -393,7 +393,6 @@ function updateInformation(eperson)
     // Get the parameters from the form
     var lastName = cocoon.request.getParameter("last_name");
     var firstName = cocoon.request.getParameter("first_name");
-    var phone = cocoon.request.getParameter("phone");
     var language = cocoon.request.getParameter("language");
     var terms = (cocoon.request.getParameter("terms") == "true");
 
@@ -410,11 +409,6 @@ function updateInformation(eperson)
     {
         errors[idx++] = "last_name";
     }
-    if (phone == null || phone.equals(""))
-    {
-        errors[idx++] = "phone";
-    }
-
     if (terms == false)
     {
         errors[idx++] = "terms";
@@ -429,7 +423,6 @@ function updateInformation(eperson)
     eperson.setFirstName(firstName);
     eperson.setLastName(lastName);
 
-    eperson.setPhone(phone);
     eperson.setLanguage(language);
     eperson.setTerms(terms);
     eperson.update();
