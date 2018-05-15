@@ -462,7 +462,6 @@
             <artifactId>xalan</artifactId>
         </dependency>
         <dependency>
-        <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
             <exclusions>
