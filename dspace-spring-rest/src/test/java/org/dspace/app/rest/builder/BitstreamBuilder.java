@@ -16,6 +16,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -29,12 +31,30 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     public static final String ORIGINAL = "ORIGINAL";
 
     private Bitstream bitstream;
+    private Community community;
+    private Collection collection;
     private Item item;
     private Group readerGroup;
 
     protected BitstreamBuilder(Context context) {
         super(context);
 
+    }
+
+    public static BitstreamBuilder createLogoBitstream(Context context, Community community, InputStream is)
+        throws SQLException, AuthorizeException, IOException {
+        BitstreamBuilder builder = new BitstreamBuilder(context);
+        return builder.create_logo(context, community, is);
+    }
+
+    private BitstreamBuilder create_logo(Context context, Community community, InputStream is)
+        throws SQLException, AuthorizeException, IOException {
+        this.context = context;
+        this.community = community;
+
+        bitstream = bitstreamService.create(context, is);
+
+        return this;
     }
 
     public static BitstreamBuilder createBitstream(Context context, Item item, InputStream is)

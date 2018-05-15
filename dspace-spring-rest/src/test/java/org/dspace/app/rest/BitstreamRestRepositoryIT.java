@@ -424,4 +424,56 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
     }
 
+    @Test
+    public void deleteOne() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                                            createBitstream(context, publicItem1, is)
+                                        .withName("Bitstream")
+                                        .withDescription("Description")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        //Add a logo bitstream to a Community
+        Bitstream logo_bitstream = null;
+        try (InputStream is2 = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            logo_bitstream = BitstreamBuilder.
+                                            createLogoBitstream(context, child1, is2)
+                                        .withName("Bitstream")
+                                        .withDescription("Description")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        System.out.println(logo_bitstream.getCommunity());
+        getClient().perform(get("/api/core/bitstreams/" + UUID.randomUUID()))
+                   .andExpect(status().isNotFound());
+
+    }
 }
