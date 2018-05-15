@@ -458,6 +458,11 @@
             <artifactId>opensearch</artifactId>
         </dependency>
         <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+        </dependency>
+        <dependency>
+        <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
             <exclusions>
