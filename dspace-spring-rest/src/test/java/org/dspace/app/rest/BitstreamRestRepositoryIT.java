@@ -345,13 +345,6 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$", BitstreamFormatMatcher.matchBitstreamFormatMimeType("text/plain")))
         ;
 
-
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/self"))
-                   //Does this status make sense?  This is what is being returned.
-                   .andExpect(status().isNoContent())
-        ;
-
-
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
                    .andExpect(status().isOk())
                    .andExpect(content().string("ThisIsSomeDummyText"))
