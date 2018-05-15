@@ -45,7 +45,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
     BitstreamConverter converter;
 
     public BitstreamRestRepository() {
-        System.out.println("Bitstream Repository initialized by Spring");
+        System.out.println("Repository initialized by Spring");
     }
 
     @Override
@@ -97,6 +97,9 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         Bitstream bit = null;
         try {
             bit = bs.find(context, id);
+            if (bit.getCommunity() != null | bit.getCollection() != null) {
+                throw new RuntimeException();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -105,6 +108,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         } catch (SQLException | AuthorizeException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+        // Workaround for authorisation problems
         context.restoreAuthSystemState();
     }
 
