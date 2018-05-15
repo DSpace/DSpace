@@ -33,7 +33,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@gmail.com")
                                         .build();
 
-        getClient().perform(get("/api/eperson/eperson"))
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/eperson"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
@@ -47,6 +48,33 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findAllUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson newUser = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@gmail.com")
+                                        .build();
+
+        getClient().perform(get("/api/eperson/eperson"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findAllForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson newUser = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@gmail.com")
+                                        .build();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/eperson"))
+                            .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void findAllPaginationTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -55,8 +83,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@gmail.com")
                                         .build();
 
+        String authToken = getAuthToken(admin.getEmail(), password);
         // using size = 2 the first page will contains our test user and admin
-        getClient().perform(get("/api/eperson/eperson")
+        getClient(authToken).perform(get("/api/eperson/eperson")
                                 .param("size", "2"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -74,7 +103,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
 
         // using size = 2 the first page will contains our test user and admin
-        getClient().perform(get("/api/eperson/eperson")
+        getClient(authToken).perform(get("/api/eperson/eperson")
                                 .param("size", "2")
                                 .param("page", "1"))
                    .andExpect(status().isOk())
@@ -102,7 +131,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withEmail("janesmith@gmail.com")
                                          .build();
 
-        getClient().perform(get("/api/eperson/epersons/" + ePerson2.getID()))
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
@@ -130,7 +160,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withEmail("janesmith@gmail.com")
                                          .build();
 
-        getClient().perform(get("/api/eperson/epersons/" + ePerson2.getID()))
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
@@ -160,7 +191,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withEmail("janesmith@gmail.com")
                                          .build();
 
-        getClient().perform(get("/api/eperson/epersons/" + UUID.randomUUID()))
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/" + UUID.randomUUID()))
                    .andExpect(status().isNotFound());
 
     }
