@@ -9,10 +9,9 @@ package org.dspace.app.rest;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-import java.net.URI;
 import java.io.IOException;
+import java.net.URI;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
 
 import org.dspace.app.rest.converter.DSpaceObjectConverter;
-import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
@@ -35,7 +33,6 @@ import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
