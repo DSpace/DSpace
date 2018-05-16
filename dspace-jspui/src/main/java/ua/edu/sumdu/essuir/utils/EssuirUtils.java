@@ -158,7 +158,7 @@ public class EssuirUtils {
     }
 
     public static Integer getFacultyIdByChaidId(Integer chairId) {
-        return chairRepository.getOne(chairId).getFacultyEntityId();
+        return chairRepository.findOne(chairId).getFacultyEntityId();
     }
 
     public static List<AuthorLocalization> getAllAuthors(String startWith) {
@@ -166,6 +166,6 @@ public class EssuirUtils {
     }
 
     public static AuthorLocalization findAuthor(String surname, String initials) {
-        return authorsRepository.getOne(new AuthorsLocalizationPK().setSurname_en(surname).setInitials_en(initials));
+        return authorsRepository.findOne(new AuthorsLocalizationPK().setSurname_en(surname).setInitials_en(initials));
     }
 }
