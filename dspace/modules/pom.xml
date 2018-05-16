@@ -151,5 +151,16 @@
                 <module>xmlui-mirage2</module>
             </modules>
         </profile>
+        <profile>
+            <id>dspace-rs</id>
+            <activation>
+                <file>
+                    <exists>rs/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>rs</module>
+            </modules>
+        </profile>        
     </profiles>
 </project>

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one or more
  contributor license agreements.  See the NOTICE file distributed with
@@ -16,24 +15,17 @@
  limitations under the License.
 -->
 
-<!--
- All (relative) paths are relative to the installation path
-  
-  persistent: Save changes made via the API to this file
-  sharedLib: path to a lib directory that will be shared across all cores
--->
-<solr persistent="false">
+<!-- The content of this page will be statically included into the top
+of the admin page.  Uncomment this as an example to see there the content
+will show up.
 
-  <!--
-  adminPath: RequestHandler path to manage cores.  
-    If 'null' (or absent), cores will not be manageable via REST
-  -->
-  <cores adminPath="/admin/cores">
-    <core name="search" instanceDir="search" />
-    <core name="statistics" instanceDir="statistics" />
-    <core name="oai" instanceDir="oai" />
-    <core name="resourcesync" instanceDir="resourcesync" />
-    <core name="authority" instanceDir="authority" />
-  </cores>
-  
-</solr>
+<hr>
+<i>This line will appear before the first table</i>
+<tr>
+<td colspan="2">
+This row will be appended to the end of the first table
+</td>
+</tr>
+<hr>
+
+-->

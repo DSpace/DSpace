@@ -677,6 +677,20 @@
             </modules>
         </profile>
 
+        <!--
+           Builds ResourceSync WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-rs</id>
+            <activation>
+                <file>
+                    <exists>dspace-rs/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-rs</module>
+            </modules>
+        </profile>
 
       <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
@@ -702,6 +716,7 @@
              <module>dspace-swordv2</module>
              <module>dspace-xmlui-mirage2</module>
              <module>dspace-xmlui</module>
+             <module>dspace-rs</module>
          </modules>
       </profile>
 
@@ -727,7 +742,19 @@
             <artifactId>additions</artifactId>
             <version>5.9-SNAPSHOT</version>
          </dependency>
-
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-rs</artifactId>
+            <version>5.9-SNAPSHOT</version>
+            <type>war</type>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-rs</artifactId>
+            <version>5.9-SNAPSHOT</version>
+            <type>jar</type>
+            <classifier>classes</classifier>            
+         </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>

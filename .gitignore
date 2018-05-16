@@ -30,3 +30,6 @@ META-INF/
 
 ##Mac noise
 .DS_Store
+
+##Ignored third party configuration files
+rebel.xml

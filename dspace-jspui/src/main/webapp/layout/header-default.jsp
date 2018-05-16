@@ -40,6 +40,7 @@
     String dsVersion = Util.getSourceVersion();
     String generator = dsVersion == null ? "DSpace" : "DSpace "+dsVersion;
     String analyticsKey = ConfigurationManager.getProperty("jspui.google.analytics.key");
+    String resourceSyncBaseURL = ConfigurationManager.getProperty("resourcesync", "base-url");
 %>
 
 <!DOCTYPE html>
@@ -49,6 +50,8 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="Generator" content="<%= generator %>" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="resourcesync sitemap" href="<%= resourceSyncBaseURL %>/resourcesync.xml" type="application/xml"/>
+        <%-- vedere l'implementazione di richard per verificare come viene effettuata la richiesta della sitemap --%>
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.css" type="text/css" />
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css" />

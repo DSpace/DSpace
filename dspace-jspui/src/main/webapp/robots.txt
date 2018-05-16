@@ -3,6 +3,8 @@
 # XML sitemap is listed first as it is preferred by most search engines
 Sitemap: ${dspace.url}/sitemap
 Sitemap: ${dspace.url}/htmlmap
+Sitemap: ${resourcesync.base-url}
+
 
 ##########################
 # Default Access Group
