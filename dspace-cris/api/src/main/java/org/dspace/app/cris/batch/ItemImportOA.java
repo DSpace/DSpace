@@ -1112,12 +1112,14 @@ public class ItemImportOA
                 }
             }
 
+            int imp_bitstream_id = imp_bitstream.getIntColumn("imp_bitstream_id");
             String valueMD5 = imp_bitstream.getStringColumn("md5value");
             byte[] content = imp_bitstream.getBinaryData("imp_blob");
             Bitstream bs = processBitstreamEntry(c, i, filepath, bundleName,
                     description, primary_bitstream, name_file,
                     assetstore, embargoGroup, start_date, content,
-                    valueMD5);
+                    valueMD5,imp_bitstream_id);
+            
             // HACK: replace the bytea with a register like operation
             if (content != null)
             {
@@ -1162,7 +1164,7 @@ public class ItemImportOA
             String bitstreamPath, String bundleName,
             String description, Boolean primaryBitstream, String name_file,
             int alreadyInAssetstoreNr, Group embargoGroup, String start_date,
-            byte[] content, String valueMD5)
+            byte[] content, String valueMD5,int imp_bitstream_id)
                     throws SQLException, IOException, AuthorizeException
     {
         String fullpath = null;
@@ -1287,11 +1289,50 @@ public class ItemImportOA
         rp.setGroup(embargoGroup);
         rp.setStartDate(embargoDate);
         rp.update();
-        
+     
+        processBitstreamMetadata(c,bs,imp_bitstream_id);
         bs.update();
         return bs;
     }
 
+    private void processBitstreamMetadata(Context c,Bitstream b,int imp_bitstream_id) throws SQLException{
+    	String myQuery = "SELECT * FROM imp_bitstream_metadatavalue WHERE imp_bitstream_id = ? ORDER BY imp_bitstream_metadatavalue_id,imp_schema, imp_element, imp_qualifier, metadata_order";
+    	TableRowIterator tri= DatabaseManager.queryTable(c, "imp_bitstream_metadatavalue",myQuery, imp_bitstream_id);
+    	
+    	while(tri.hasNext()){
+    		TableRow tr = tri.next(c);
+    		String schema = tr.getStringColumn("imp_schema");
+    		String element = tr.getStringColumn("imp_element");
+    		String qualifier = tr.getStringColumn("imp_qualifier");
+    		String value = tr.getStringColumn("imp_value");
+    		String authority = tr.getStringColumn("imp_authority");
+    		int confidence = tr.getIntColumn("imp_confidence");
+            String language = tr.getStringColumn("text_lang");
+
+            System.out.println("\tSchema: " + schema + " Element: " + element
+                    + " Qualifier: " + qualifier + " Value: " + value);
+
+            if (!StringUtils.isNotBlank(qualifier) || StringUtils.equals("none",qualifier))
+            {
+                qualifier = null;
+            }
+
+            if(!StringUtils.isNotBlank(authority) || StringUtils.equalsIgnoreCase("N/A", authority)){
+            	authority= null;
+            	confidence=Choices.CF_UNSET;
+            }
+            // if language isn't set, use the system's default value
+            if (!StringUtils.isNotBlank(language))
+            {
+                language = Item.ANY;
+            }
+            
+    		b.addMetadata(schema, element, qualifier,language, value, authority, confidence);
+    	}
+    	
+    	tri.close();
+    }
+    
     public void setGoToWFStepOne(boolean goToWFStepOne)
     {
         this.goToWFStepOne = goToWFStepOne;
