@@ -70,7 +70,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
         return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
     }
 
-    public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
+    public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException {
         if(request.getParameter("submit_approve") != null){
             //Delete the tasks
             addApprovedProvenance(c, wfi);
@@ -130,40 +130,40 @@ public class AcceptEditRejectAction extends ProcessingAction {
     
     public ActionResult processDeleteItem(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
     	if(request.getParameter("submit_delete") != null){
-  
-    		    AuthorizeService authorizeService= AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    		    XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
-    		    WorkflowRequirementsService workflowRequirementsService=XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService();
-    		    WorkflowItemRoleService workflowItemRoleService=XmlWorkflowServiceFactory.getInstance().getWorkflowItemRoleService();
-    		    XmlWorkflowItemService xmlWorkflowItemService=XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
-    		    ItemService itemService= ContentServiceFactory.getInstance().getItemService(); 
-    		    
-    		    Item item =wfi.getItem();
-    		    //Chequeamos permisos
-    		    authorizeService.authorizeAction(c, item, Constants.DELETE);
+            AuthorizeService authorizeService= AuthorizeServiceFactory.getInstance().getAuthorizeService();
+            XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+            WorkflowRequirementsService workflowRequirementsService=XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService();
+            WorkflowItemRoleService workflowItemRoleService=XmlWorkflowServiceFactory.getInstance().getWorkflowItemRoleService();
+            XmlWorkflowItemService xmlWorkflowItemService=XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+            ItemService itemService= ContentServiceFactory.getInstance().getItemService();
 
-                //Removemos sus referencias de las tablas 'cwf_in_progress_user' y 'cwf_claimtask'
-                workflowRequirementsService.clearInProgressUsers(c, wfi);
-                xmlWorkflowService.deleteAllTasks(c,wfi);
-                // Remove (if any) the workflowItemroles for this item
-                workflowItemRoleService.deleteForWorkflowItem(c, wfi);
-                //Removemos el workflowItem
-    	        xmlWorkflowItemService.deleteWrapper(c, wfi);
-    	        //Apago el sistema de autorizaciones para que se pueda eliminar el item (ademas ya chequeamos permisos antes)
-    	        c.turnOffAuthorisationSystem();
-            	// Remove item
-    	        itemService.delete(c,item);
-    	        c.restoreAuthSystemState();
-    	        
+            Item item =wfi.getItem();
+            //Check for permission
+            authorizeService.authorizeAction(c, item, Constants.DELETE);
 
-    	        c.commit();
-        		return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE); 
+            //Remove references from 'cwf_in_progress_user' and 'cwf_claimtask' tables
+            workflowRequirementsService.clearInProgressUsers(c, wfi);
+            xmlWorkflowService.deleteAllTasks(c,wfi);
+
+            //Remove (if any) the workflowItemroles for this item
+            workflowItemRoleService.deleteForWorkflowItem(c, wfi);
+
+            //Remove the workflowItem
+            xmlWorkflowItemService.deleteWrapper(c, wfi);
+
+            //Shut down authorization system
+            c.turnOffAuthorisationSystem();
+            //Remove item
+            itemService.delete(c,item);
+            c.restoreAuthSystemState();
+
+            c.commit();
+            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
         }
+
         //Cancel, go back to the main task page
         request.setAttribute("page", MAIN_PAGE);
-
         return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
-
     }
 	
 }
