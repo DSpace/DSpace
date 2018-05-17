@@ -41,26 +41,16 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
 
     }
 
-    public static BitstreamBuilder createLogoBitstream(Context context, Community community, InputStream is)
-        throws SQLException, AuthorizeException, IOException {
-        BitstreamBuilder builder = new BitstreamBuilder(context);
-        return builder.create_logo(context, community, is);
-    }
-
-    private BitstreamBuilder create_logo(Context context, Community community, InputStream is)
-        throws SQLException, AuthorizeException, IOException {
-        this.context = context;
-        this.community = community;
-
-        bitstream = bitstreamService.create(context, is);
-
-        return this;
-    }
-
     public static BitstreamBuilder createBitstream(Context context, Item item, InputStream is)
         throws SQLException, AuthorizeException, IOException {
         BitstreamBuilder builder = new BitstreamBuilder(context);
         return builder.create(context, item, is);
+    }
+
+    public static BitstreamBuilder createLogo(Context context, Community community, InputStream is)
+        throws SQLException, AuthorizeException, IOException {
+        BitstreamBuilder builder = new BitstreamBuilder(context);
+        return builder.logo(context, community, is);
     }
 
     private BitstreamBuilder create(Context context, Item item, InputStream is)
@@ -71,6 +61,16 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         Bundle originalBundle = getOriginalBundle(item);
 
         bitstream = bitstreamService.create(context, originalBundle, is);
+
+        return this;
+    }
+
+    private BitstreamBuilder logo(Context context, Community community, InputStream is)
+        throws SQLException, AuthorizeException, IOException {
+        this.context = context;
+        this.community = community;
+
+        bitstream = communityService.setLogo(context, community, is);
 
         return this;
     }
@@ -134,6 +134,23 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
             indexingService.commit();
 
         } catch (Exception e) {
+            return null;
+        }
+
+        return bitstream;
+    }
+
+    public Bitstream buildLogo() {
+        try {
+            bitstreamService.update(context, bitstream);
+            communityService.update(context, community);
+
+            context.dispatchEvents();
+
+            indexingService.commit();
+
+        } catch (Exception e) {
+            System.out.println(e);
             return null;
         }
 
