@@ -118,7 +118,13 @@ public class ResourceSyncServlet extends HttpServlet
 	    			resp.setContentType("application/zip");
 	        		resp.setHeader("Content-Disposition","attachment;filename=\"" +  "changedump.zip" + "\"");
 	        		OutputStream servletOutputStream = resp.getOutputStream();
-	        		String date = req.getParameter("from"); 
+	        		String date = req.getParameter("from");
+	        		
+	        		if(StringUtils.isBlank(date)) {
+	        			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+	                    return;
+	        		}
+	        		
 	        		regex = "^\\d{4}-\\d{2}-\\d{2}-\\d{6}$";
 	        		pattern = Pattern.compile(regex);
 	        		matcher = pattern.matcher(date);
