@@ -315,7 +315,12 @@
             <artifactId>guava</artifactId>
             <version>19.0</version>
         </dependency>
-
+        <dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-rs</artifactId>
+           <type>jar</type>
+           <classifier>classes</classifier>
+        </dependency>
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->
     	<dependency>

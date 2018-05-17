@@ -818,6 +818,21 @@
         </profile>
 
         <!--
+           Builds ResourceSync WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-rs</id>
+            <activation>
+                <file>
+                    <exists>dspace-rs/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-rs</module>
+            </modules>
+        </profile>
+        
+        <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
          This profile contains settings which are ONLY enabled when performing
@@ -840,6 +855,7 @@
                 <module>dspace-sword</module>
                 <module>dspace-swordv2</module>
                 <module>dspace-spring-rest</module>
+                <module>dspace-rs</module>                
             </modules>
             <build>
                 <plugins>
@@ -925,7 +941,19 @@
                 <artifactId>additions</artifactId>
                 <version>7.0-SNAPSHOT</version>
             </dependency>
-
+	        <dependency>
+	           <groupId>org.dspace</groupId>
+	           <artifactId>dspace-rs</artifactId>
+	           <version>7.0-SNAPSHOT</version>
+	           <type>war</type>
+	        </dependency>
+	        <dependency>
+	           <groupId>org.dspace</groupId>
+	           <artifactId>dspace-rs</artifactId>
+	           <version>7.0-SNAPSHOT</version>
+	           <type>jar</type>
+	           <classifier>classes</classifier>            
+	        </dependency> 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
