@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 
@@ -53,6 +54,9 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         Bitstream bit = null;
         try {
             bit = bs.find(context, id);
+            if (bit.isDeleted() == true) {
+                throw new ResourceNotFoundException();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

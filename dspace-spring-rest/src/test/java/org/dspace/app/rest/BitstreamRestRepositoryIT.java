@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -460,20 +461,45 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
-        //Add a logo bitstream to a Community
-        Bitstream logo_bitstream = null;
-        try (InputStream is2 = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            logo_bitstream = BitstreamBuilder.
-                                            createLogoBitstream(context, child1, is2)
-                                        .withName("Bitstream")
-                                        .withDescription("Description")
-                                        .withMimeType("text/plain")
-                                        .build();
-        }
+        // Verify creation
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                    .andExpect(status().is2xxSuccessful());
 
-        System.out.println(logo_bitstream.getCommunity());
-        getClient().perform(get("/api/core/bitstreams/" + UUID.randomUUID()))
-                   .andExpect(status().isNotFound());
+        // Delete
+        getClient().perform(delete("/api/core/bitstreams/" + bitstream.getID()))
+                .andExpect(status().is2xxSuccessful());
 
+        // Verify 404 after delete
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteLogo() throws Exception {
+        // We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. A community with a logo
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").withLogo("logo_community")
+                                          .build();
+
+        // 2. A collection with a logo
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
+                                          .withLogo("logo_collection").build();
+        // Verify logo retreival
+        getClient().perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
+                   .andExpect(status().isOk());
+
+// Verify impossible deletion
+        getClient().perform(delete("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
+                   .andExpect(status().is(422));
+
+        // Verify logo retrieval
+        getClient().perform(get("/api/core/bitstreams/" + col.getLogo().getID())).andExpect(status().isOk());
+
+        // Verify impossible retrieval
+        getClient().perform(delete("/api/core/bitstreams/" + col.getLogo().getID()))
+                .andExpect(status().is(422));
     }
 }
