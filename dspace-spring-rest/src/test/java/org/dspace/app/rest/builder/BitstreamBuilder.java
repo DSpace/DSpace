@@ -16,8 +16,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -31,8 +29,6 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     public static final String ORIGINAL = "ORIGINAL";
 
     private Bitstream bitstream;
-    private Community community;
-    private Collection collection;
     private Item item;
     private Group readerGroup;
 
@@ -118,23 +114,6 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
             indexingService.commit();
 
         } catch (Exception e) {
-            return null;
-        }
-
-        return bitstream;
-    }
-
-    public Bitstream buildLogo() {
-        try {
-            bitstreamService.update(context, bitstream);
-            communityService.update(context, community);
-
-            context.dispatchEvents();
-
-            indexingService.commit();
-
-        } catch (Exception e) {
-            System.out.println(e);
             return null;
         }
 
