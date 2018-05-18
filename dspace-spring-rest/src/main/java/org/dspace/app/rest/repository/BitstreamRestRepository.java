@@ -54,14 +54,18 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         Bitstream bit = null;
         try {
             bit = bs.find(context, id);
-            if (bit.isDeleted() == true) {
-                throw new ResourceNotFoundException();
-            }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         if (bit == null) {
             return null;
+        }
+        try {
+            if (bit.isDeleted() == true) {
+                throw new ResourceNotFoundException();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
         return converter.fromModel(bit);
     }

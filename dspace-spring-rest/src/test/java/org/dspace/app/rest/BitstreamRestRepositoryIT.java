@@ -487,19 +487,20 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // 2. A collection with a logo
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection").build();
-        // Verify logo retreival
+        // Verify parentCommunity logo retreival
         getClient().perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
                    .andExpect(status().isOk());
 
-// Verify impossible deletion
+        // 422 error when trying to DELETE parentCommunity logo
         getClient().perform(delete("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
                    .andExpect(status().is(422));
 
-        // Verify logo retrieval
-        getClient().perform(get("/api/core/bitstreams/" + col.getLogo().getID())).andExpect(status().isOk());
+        // Verify collection logo retreival
+        getClient().perform(get("/api/core/bitstreams/" + col.getLogo().getID()))
+                   .andExpect(status().isOk());
 
-        // Verify impossible retrieval
+        // 422 error when trying to DELETE collection logo
         getClient().perform(delete("/api/core/bitstreams/" + col.getLogo().getID()))
-                .andExpect(status().is(422));
+                   .andExpect(status().is(422));
     }
 }
