@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -51,6 +52,17 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private CustomLogoutHandler customLogoutHandler;
 
     @Override
+    public void configure(WebSecurity webSecurity) throws Exception {
+        webSecurity
+            .ignoring()
+                .antMatchers(HttpMethod.GET, "/api/authn/login")
+                .antMatchers(HttpMethod.PUT, "/api/authn/login")
+                .antMatchers(HttpMethod.PATCH, "/api/authn/login")
+                .antMatchers(HttpMethod.DELETE, "/api/authn/login");
+    }
+
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.headers().cacheControl();
         http
@@ -81,8 +93,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
             //Configure the URL patterns with their authentication requirements
             .authorizeRequests()
-            //Allow GET and POST by anyone on the login endpoint
-            .antMatchers("/api/authn/login").permitAll()
+            //Allow POST by anyone on the login endpoint
+            .antMatchers(HttpMethod.POST,"/api/authn/login").permitAll()
+            //TRACE, CONNECT, OPTIONS, HEAD
             //Everyone can call GET on the status endpoint
             .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
             .and()

@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -219,7 +220,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         //Sleep so tokens are different
         sleep(1200);
 
-        String newToken = getClient(token).perform(get("/api/authn/login"))
+        String newToken = getClient(token).perform(post("/api/authn/login"))
                                           .andExpect(status().isOk())
                                           .andReturn().getResponse().getHeader("Authorization");
 
@@ -249,7 +250,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testFailedLoginResponseCode() throws Exception {
-        getClient().perform(get("/api/authn/login")
+        getClient().perform(post("/api/authn/login")
                                 .param("user", eperson.getEmail()).param("password", "fakePassword"))
 
                    .andExpect(status().isUnauthorized());
@@ -306,23 +307,31 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testLoginEmptyRequest() throws Exception {
-        getClient().perform(get("/api/authn/login"))
+        getClient().perform(post("/api/authn/login"))
                    .andExpect(status().isUnauthorized())
                    .andExpect(status().reason(containsString("Login failed")));
+    }
+
+    @Test
+    public void testLoginGetRequest() throws Exception {
+       getClient().perform(get("/api/authn/login")
+            .param("user", eperson.getEmail())
+            .param("password", password))
+            .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
     public void testShibbolethLoginRequest() throws Exception {
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
 
-        getClient().perform(get("/api/authn/login").header("Referer", "http://my.uni.edu"))
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("Location", "/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu"))
                 .andReturn().getResponse().getHeader("Location");
 
         //Simulate that a shibboleth authentication has happened
 
-        String token = getClient().perform(get("/api/authn/login")
+        String token = getClient().perform(post("/api/authn/login")
                 .requestAttr("SHIB-MAIL", eperson.getEmail()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
