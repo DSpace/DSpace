@@ -47,12 +47,6 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         return builder.create(context, item, is);
     }
 
-    public static BitstreamBuilder createLogo(Context context, Community community, InputStream is)
-        throws SQLException, AuthorizeException, IOException {
-        BitstreamBuilder builder = new BitstreamBuilder(context);
-        return builder.logo(context, community, is);
-    }
-
     private BitstreamBuilder create(Context context, Item item, InputStream is)
         throws SQLException, AuthorizeException, IOException {
         this.context = context;
@@ -61,16 +55,6 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         Bundle originalBundle = getOriginalBundle(item);
 
         bitstream = bitstreamService.create(context, originalBundle, is);
-
-        return this;
-    }
-
-    private BitstreamBuilder logo(Context context, Community community, InputStream is)
-        throws SQLException, AuthorizeException, IOException {
-        this.context = context;
-        this.community = community;
-
-        bitstream = communityService.setLogo(context, community, is);
 
         return this;
     }
