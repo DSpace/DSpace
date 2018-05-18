@@ -34,9 +34,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.TemplateVariable;
+import org.springframework.hateoas.TemplateVariable.VariableType;
 import org.springframework.hateoas.TemplateVariables;
 import org.springframework.hateoas.UriTemplate;
-import org.springframework.hateoas.TemplateVariable.VariableType;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,11 +46,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + IdentifierRestController.CATEGORY)
 public class IdentifierRestController implements InitializingBean {
-	public static final String CATEGORY = "pid";
+    public static final String CATEGORY = "pid";
 
-	public static final String ACTION = "find";
+    public static final String ACTION = "find";
 
-	public static final String PARAM = "id";
+    public static final String PARAM = "id";
 
     private static final Logger log =
             Logger.getLogger(IdentifierRestController.class);
