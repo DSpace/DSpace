@@ -84,17 +84,21 @@ public class AuthenticationRestController implements InitializingBean {
         return authenticationStatusResource;
     }
 
-    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/login", method = {RequestMethod.POST})
     public ResponseEntity login(HttpServletRequest request, @RequestParam(name = "user", required = false) String user,
                                 @RequestParam(name = "password", required = false) String password) {
         //If you can get here, you should be authenticated, the actual login is handled by spring security
         //see org.dspace.app.rest.security.StatelessLoginFilter
 
         //If we don't have an EPerson here, this means authentication failed and we should return an error message.
-
         return getLoginResponse(request,
                                 "Authentication failed for user " + user + ": The credentials you provided are not " +
                                     "valid.");
+    }
+    
+    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE})
+    public ResponseEntity login() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for login requests.");
     }
 
     @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
