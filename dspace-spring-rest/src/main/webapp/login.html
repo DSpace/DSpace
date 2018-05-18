@@ -88,6 +88,7 @@
 
         $.ajax({
           url : window.location.href.replace("login.html", "") + 'api/authn/login',
+          type : 'POST',
           success : successHandler,
           error : function(result, status, xhr) {
               if (xhr == 401) {
