@@ -52,6 +52,7 @@
     Locale[] supportedLocales = I18nUtil.getSupportedLocales();
     Locale sessionLocale = UIUtil.getSessionLocale(request);
     boolean isRtl = StringUtils.isNotBlank(LocaleUIHelper.ifLtr(request, "","rtl"));    
+    String resourceSyncBaseURL = ConfigurationManager.getProperty("resourcesync", "base-url");
 %>
 
 <!DOCTYPE html>
@@ -62,6 +63,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="Generator" content="<%= generator %>" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">		
+        <link rel="resourcesync sitemap" href="<%= resourceSyncBaseURL %>/resourcesync.xml" type="application/xml"/>
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.css" type="text/css" />
 	    <link href="<%= request.getContextPath() %>/css/researcher.css" type="text/css" rel="stylesheet" />

@@ -16,18 +16,16 @@ import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
-import org.dspace.utils.DSpace;
 
 import java.util.Date;
-import java.util.Map;
 import java.text.SimpleDateFormat;
 
-import com.maxmind.geoip.LookupService;
-import com.maxmind.geoip.Location;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.model.CityResponse;
+import java.io.File;
+import java.net.InetAddress;
 
 /**
  * Test class to generate random statistics data.
@@ -38,7 +36,6 @@ import com.maxmind.geoip.Location;
  * @author ben at atmire.com
  */
 public class StatisticsDataGenerator {
-
 	public static void main(String[] args) throws Exception {
 		CommandLineParser parser = new PosixParser();
 
@@ -204,14 +201,18 @@ public class StatisticsDataGenerator {
 		solr.commit();
 
 		String prevIp = null;
+
+		String dbPath = ConfigurationManager.getProperty("usage-statistics", "dbfile");
+        File dbFile = new File(dbPath);
+		DatabaseReader cl = new DatabaseReader.Builder(dbFile).build();
 		int countryErrors = 0;
 		for (int i = 0; i < nrLogs; i++) {
 			String ip = "";
 			Date time;
 			String continent;
 			String countryCode;
-			float longitude;
-			float latitude;
+			double longitude;
+			double latitude;
 			String city;
 
 			// 1. Generate an ip for our user
@@ -225,6 +226,42 @@ public class StatisticsDataGenerator {
 			}
             ip = ipBuilder.toString();
             
+
+			// 2 Depending on our ip get all the location info
+            InetAddress ipAddress;
+			CityResponse location;
+			try {
+                ipAddress = InetAddress.getByName(ip);
+				location = cl.city(ipAddress);
+			} catch (Exception e) {
+				location = null;
+			}
+			if (location == null) {
+				// If we haven't got a prev ip this is pretty useless so move on
+				// to the next one
+				if (prevIp == null)
+                {
+                    continue;
+                }
+				ip = prevIp;
+                ipAddress = InetAddress.getByName(ip);
+				location = cl.city(ipAddress);
+			}
+
+			city = location.getCity().getName();
+			countryCode = location.getCountry().getIsoCode();
+			longitude = location.getLocation().getLongitude();
+			latitude = location.getLocation().getLatitude();
+			try {
+				continent = LocationUtils.getContinentCode(countryCode);
+			} catch (Exception e) {
+				// We could get an error if our country == Europa this doesn't
+				// matter for generating statistics so ignore it
+				System.out.println("COUNTRY ERROR: " + countryCode);
+				countryErrors++;
+				continue;
+			}
+
 			// 3. Generate a date that the object was visited
 			time = new Date(getRandomNumberInRange(startDate, endDate));
 
@@ -321,6 +358,12 @@ public class StatisticsDataGenerator {
 			doc1.addField("id", dso.getID());
 			doc1.addField("time", DateFormatUtils.format(time,
 					SolrLogger.DATE_FORMAT_8601));
+			doc1.addField("continent", continent);
+			// doc1.addField("country", country);
+			doc1.addField("countryCode", countryCode);
+			doc1.addField("city", city);
+			doc1.addField("latitude", latitude);
+			doc1.addField("longitude", longitude);
 			if (epersonId > 0)
             {
                 doc1.addField("epersonid", epersonId);

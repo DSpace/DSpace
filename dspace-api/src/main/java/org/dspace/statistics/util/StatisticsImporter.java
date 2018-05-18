@@ -367,6 +367,7 @@ public class StatisticsImporter
         // Verbose option
         boolean verbose = line.hasOption('v');
 
+        // Find our solr server
         DSpace dspace = new DSpace();
 
         statsService = dspace.getServiceManager().getServiceByName(

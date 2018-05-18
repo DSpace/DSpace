@@ -34,6 +34,7 @@
 	<core name="pmc" instanceDir="pmc" />
 	<core name="network" instanceDir="network" />
     <core name="oai" instanceDir="oai" />
+    <core name="resourcesync" instanceDir="resourcesync" />
     <core name="dedup" instanceDir="dedup" />
     <!--  <core name="authority" instanceDir="authority" /> -->
   </cores>
