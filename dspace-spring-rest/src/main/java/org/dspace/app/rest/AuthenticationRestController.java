@@ -95,8 +95,9 @@ public class AuthenticationRestController implements InitializingBean {
                                 "Authentication failed for user " + user + ": The credentials you provided are not " +
                                     "valid.");
     }
-    
-    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE})
+
+	@RequestMapping(value = "/login", method = { RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH,
+            RequestMethod.DELETE })
     public ResponseEntity login() {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for login requests.");
     }
