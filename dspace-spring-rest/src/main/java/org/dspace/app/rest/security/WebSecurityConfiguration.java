@@ -52,8 +52,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private CustomLogoutHandler customLogoutHandler;
 
     @Override
-    public void configure(WebSecurity webSecurity) throws Exception
-    {
+    public void configure(WebSecurity webSecurity) throws Exception {
         webSecurity
             .ignoring()
                 .antMatchers(HttpMethod.GET, "/api/authn/login")
