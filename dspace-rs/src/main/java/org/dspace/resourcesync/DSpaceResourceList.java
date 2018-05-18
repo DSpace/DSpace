@@ -5,6 +5,12 @@
  */
 package org.dspace.resourcesync;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -18,15 +24,10 @@ import org.dspace.content.Item;
 import org.dspace.content.Site;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
+import org.dspace.utils.DSpace;
 import org.openarchives.resourcesync.ResourceList;
 import org.openarchives.resourcesync.ResourceSyncDocument;
 import org.openarchives.resourcesync.URL;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
 /**
  * @author Richard Jones
  * @author Andrea Bollini (andrea.bollini at 4science.it)
@@ -75,8 +76,26 @@ public class DSpaceResourceList extends DSpaceResourceDocument
         }
         
         try {
-			BrowseEngine be = new BrowseEngine(context);
-	        BrowserScope bs = new BrowserScope(context);
+        	
+        	BrowserScope bs = new BrowserScope(context);
+        	
+        	BrowseIndex bi = bs.getBrowseIndex();
+        	
+            boolean isMultilanguage = new DSpace()
+            .getConfigurationService()
+            .getPropertyAsType(
+                    "discovery.browse.authority.multilanguage."
+                            + bi.getName(),
+                    new DSpace()
+                            .getConfigurationService()
+                            .getPropertyAsType(
+                                    "discovery.browse.authority.multilanguage",
+                                    new Boolean(false)),
+                    false);
+			
+	        BrowseEngine be = new BrowseEngine(context, isMultilanguage? 
+                    bs.getUserLocale():null);
+	        
 	        bs.setBrowseIndex(BrowseIndex.getItemBrowseIndex());
 	        
 	        bs.setResultsPerPage(100);

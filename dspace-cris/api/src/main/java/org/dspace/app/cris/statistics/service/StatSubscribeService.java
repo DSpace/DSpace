@@ -286,13 +286,13 @@ public class StatSubscribeService
                     statsComponentsService = researcher.getDOStatsComponents();
                     break;
                 }
-                selectedObject.put(AStatComponentService._SELECTED_OBJECT, statsComponentsService.getSelectedObjectComponent().getStatsViewComponent().queryFacetDate(statsLogger, object, dateType, dateStart, dateEnd, gap));
-                selectedObject.get(AStatComponentService._SELECTED_OBJECT).putAll(statsComponentsService.getSelectedObjectComponent().getStatsDownloadComponent().queryFacetDate(statsLogger, object, dateType, dateStart, dateEnd, gap));                
+                selectedObject.put(AStatComponentService._SELECTED_OBJECT, statsComponentsService.getSelectedObjectComponent().getStatsViewComponent().queryFacetDate(statsLogger, object, dateType, dateStart, dateEnd, gap, context));
+                selectedObject.get(AStatComponentService._SELECTED_OBJECT).putAll(statsComponentsService.getSelectedObjectComponent().getStatsDownloadComponent().queryFacetDate(statsLogger, object, dateType, dateStart, dateEnd, gap, context));                
                 for(String key : statsComponentsService.getComponents().keySet()) {
                     IStatsComponent dual = statsComponentsService.getComponents().get(key).getStatsViewComponent();
-                    topObject.put(key, dual.queryFacetDate(statsLogger, object, dateType, dateStart, dateEnd, gap));
+                    topObject.put(key, dual.queryFacetDate(statsLogger, object, dateType, dateStart, dateEnd, gap, context));
                     dual = statsComponentsService.getComponents().get(key).getStatsDownloadComponent();
-                    topObject.get(key).putAll(dual.queryFacetDate(statsLogger, object, dateType, dateStart, dateEnd, gap));
+                    topObject.get(key).putAll(dual.queryFacetDate(statsLogger, object, dateType, dateStart, dateEnd, gap, context));
                 }
             }
             else 
@@ -317,7 +317,7 @@ public class StatSubscribeService
                     
                     StatComponentsService serviceItem = researcher.getItemStatsComponents();
                     retrieveResults(dateType, dateStart, dateEnd, gap,
-                            selectedObject, topObject, dso, serviceItem);
+                            selectedObject, topObject, dso, serviceItem, context);
                 
                     statBean.setStatURL(ConfigurationManager
                             .getProperty("dspace.url")
@@ -328,7 +328,7 @@ public class StatSubscribeService
 
                     StatComponentsService serviceColl = researcher.getCollectionStatsComponents();
                     retrieveResults(dateType, dateStart, dateEnd, gap,
-                            selectedObject, topObject, dso, serviceColl);
+                            selectedObject, topObject, dso, serviceColl, context);
                   
                     statBean.setStatURL(ConfigurationManager
                             .getProperty("dspace.url")
@@ -339,7 +339,7 @@ public class StatSubscribeService
                     
                     StatComponentsService serviceComm = researcher.getCommunityStatsComponents();
                     retrieveResults(dateType, dateStart, dateEnd, gap,
-                            selectedObject, topObject, dso, serviceComm);
+                            selectedObject, topObject, dso, serviceComm, context);
                     
                     statBean.setStatURL(ConfigurationManager
                             .getProperty("dspace.url")
@@ -362,17 +362,17 @@ public class StatSubscribeService
             String dateEnd, int gap,
             Map<String, Map<String, ObjectCount[]>> selectedObject,
             Map<String, Map<String, ObjectCount[]>> topObject,
-            DSpaceObject dso, StatComponentsService serviceItem)
+            DSpaceObject dso, StatComponentsService serviceItem, Context context)
             throws SolrServerException
     {
-        selectedObject.put(AStatComponentService._SELECTED_OBJECT, serviceItem.getSelectedObjectComponent().queryFacetDate(statsLogger, dso, dateType, dateStart, dateEnd, gap));
+        selectedObject.put(AStatComponentService._SELECTED_OBJECT, serviceItem.getSelectedObjectComponent().queryFacetDate(statsLogger, dso, dateType, dateStart, dateEnd, gap, context));
                 
         for(String key : serviceItem.getComponents().keySet()) {
             if(key.equals(AStatComponentService._SELECTED_OBJECT)) {
                 continue;
             }
             IStatsComponent dual = serviceItem.getComponents().get(key);
-            topObject.put(key, dual.queryFacetDate(statsLogger, dso, dateType, dateStart, dateEnd, gap));                        
+            topObject.put(key, dual.queryFacetDate(statsLogger, dso, dateType, dateStart, dateEnd, gap, context));                        
         }
     }
 

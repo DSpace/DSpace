@@ -7,26 +7,23 @@
  */
 package org.dspace.app.cris.statistics;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.app.cris.statistics.util.StatsConfig;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.statistics.SolrLogger;
 import org.dspace.statistics.StatisticsMetadataGenerator;
-import org.dspace.utils.DSpace;
 import org.dspace.statistics.util.LocationUtils;
-
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
@@ -149,12 +146,12 @@ public class GeoRefAdditionalStatisticsData implements
                 doc1.addField("city", location.getCity().getName());
                 doc1.addField("latitude", latitude);
                 doc1.addField("longitude", longitude);
-                doc1.addField("location", location.latitude + ","
-                        + location.longitude);
-                if (location.countryCode != null)
+                doc1.addField("location", latitude + ","
+                        + longitude);
+                if (countryCode != null)
                 {
                     String continentCode = getCountries2Continent()
-                            .getProperty(location.countryCode);
+                            .getProperty(countryCode);
                     if (continentCode == null)
                     {
                         continentCode = getCountries2Continent().getProperty("default");
@@ -166,7 +163,7 @@ public class GeoRefAdditionalStatisticsData implements
                 }
             }
         } catch (IOException | GeoIp2Exception e) {
-            log.error("Unable to get location of request:  {}", e.getMessage());
+            log.error("Unable to get location of request:  {}", e);
         }
     
     }

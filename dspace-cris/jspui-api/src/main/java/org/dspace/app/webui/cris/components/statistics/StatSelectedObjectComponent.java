@@ -101,14 +101,14 @@ public class StatSelectedObjectComponent<T extends DSpaceObject> extends
     @Override
     public Map<String, ObjectCount[]> queryFacetDate(SolrLogger statsLogger,
             DSpaceObject object, String dateType, String dateStart,
-            String dateEnd, int gap) throws SolrServerException
+            String dateEnd, int gap, Context context) throws SolrServerException
     {
         Map<String, ObjectCount[]> map = new HashMap<String, ObjectCount[]>();
         
         map.put(getMode(), statsLogger.queryFacetDate("search.uniqueid:" + object.getType()
                 + "-" + object.getID() + " AND time:[* TO NOW/" + dateType
                 + dateEnd + dateType + "]", null, 0, dateType, dateStart,
-                dateEnd, gap, true));
+                dateEnd, gap, true, context));
         return map;
     }
     

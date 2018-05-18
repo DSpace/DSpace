@@ -7,27 +7,36 @@
  */
 package org.dspace.statistics.util;
 
-import org.apache.commons.cli.*;
-import org.apache.commons.lang.time.DateFormatUtils;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Random;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
-import org.dspace.core.Context;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.core.Constants;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 import org.dspace.utils.DSpace;
-
-import java.text.*;
-import java.io.*;
-import java.util.*;
-
-import com.maxmind.geoip.LookupService;
-import com.maxmind.geoip.Location;
 
 /**
  * Class to load intermediate statistics files (produced from log files by <code>ClassicDSpaceLogConverter</code>) into Solr

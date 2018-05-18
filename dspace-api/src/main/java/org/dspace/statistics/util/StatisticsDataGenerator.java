@@ -7,25 +7,29 @@
  */
 package org.dspace.statistics.util;
 
-import org.apache.commons.cli.*;
+import java.io.File;
+import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.dspace.core.Context;
-import org.dspace.core.Constants;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.content.DSpaceObject;
+import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Bitstream;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
-
-import java.util.Date;
-import java.text.SimpleDateFormat;
+import org.dspace.utils.DSpace;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
-import java.io.File;
-import java.net.InetAddress;
 
 /**
  * Test class to generate random statistics data.

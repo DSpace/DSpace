@@ -185,7 +185,7 @@ public class StatisticsDataVisits extends StatisticsData
                     String query = dataSetQuery.getQueries().get(0).getQuery();
                     if(dataSetQuery.getMax() == -1){
                         // We are asking from our current query all the visits faceted by date
-                        ObjectCount[] results = indexer.queryFacetDate(query, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal);
+                        ObjectCount[] results = indexer.queryFacetDate(query, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal, context);
                         dataset = new Dataset(1, results.length);
                         //Now that we have our results put em in a matrix
                         for(int j = 0; j < results.length; j++){
@@ -202,7 +202,7 @@ public class StatisticsDataVisits extends StatisticsData
                         for (int j = 0; j < maxObjectCounts.length; j++) {
                             ObjectCount firstCount = maxObjectCounts[j];
                             String newQuery = dataSetQuery.getFacetField() + ": " + ClientUtils.escapeQueryChars(firstCount.getValue()) + " AND " + query;
-                            ObjectCount[] maxDateFacetCounts = indexer.queryFacetDate(newQuery, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal);
+                            ObjectCount[] maxDateFacetCounts = indexer.queryFacetDate(newQuery, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(), dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal, context);
 
 
                             //Make sure we have a dataSet

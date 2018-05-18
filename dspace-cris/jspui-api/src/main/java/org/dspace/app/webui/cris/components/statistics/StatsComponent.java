@@ -7,10 +7,10 @@
  */
 package org.dspace.app.webui.cris.components.statistics;
 
-import it.cilea.osd.jdyna.components.IBeanSubComponent;
-
 import org.dspace.app.cris.integration.statistics.IStatsComponent;
 import org.dspace.content.DSpaceObject;
+
+import it.cilea.osd.jdyna.components.IBeanSubComponent;
 
 public abstract class StatsComponent<T extends DSpaceObject> extends ASolrStatsConfigurerComponent implements IStatsComponent
 {
