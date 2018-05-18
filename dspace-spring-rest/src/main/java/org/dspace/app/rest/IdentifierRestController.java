@@ -12,7 +12,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,16 +33,23 @@ import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.TemplateVariable;
+import org.springframework.hateoas.TemplateVariables;
+import org.springframework.hateoas.UriTemplate;
+import org.springframework.hateoas.TemplateVariable.VariableType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/pid")
+@RequestMapping("/api/" + IdentifierRestController.CATEGORY)
 public class IdentifierRestController implements InitializingBean {
+	public static final String CATEGORY = "pid";
 
-    private static final String REGEX_HANDLE = "^\\d+/\\d+$";
+	public static final String ACTION = "find";
+
+	public static final String PARAM = "id";
 
     private static final Logger log =
             Logger.getLogger(IdentifierRestController.class);
@@ -50,15 +57,22 @@ public class IdentifierRestController implements InitializingBean {
     @Autowired
     private List<DSpaceObjectConverter> converters;
 
+    @Autowired
+    private DiscoverableEndpointsService discoverableEndpointsService;
+
     @Override
     public void afterPropertiesSet() throws Exception {
-        List<Link> links = new ArrayList<Link>();
-
-        Link l = new Link("/api/pid", "pid");
-        links.add(l);
+        discoverableEndpointsService
+            .register(this,
+                    Arrays.asList(
+                            new Link(
+                                    new UriTemplate("/api/" + CATEGORY + "/" + ACTION,
+                                            new TemplateVariables(
+                                                    new TemplateVariable(PARAM, VariableType.REQUEST_PARAM))),
+                                    CATEGORY)));
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/find", params = "id")
+    @RequestMapping(method = RequestMethod.GET, value = ACTION, params = PARAM)
     @SuppressWarnings("unchecked")
     public void getDSObyIdentifier(HttpServletRequest request,
                                    HttpServletResponse response,
@@ -91,7 +105,7 @@ public class IdentifierRestController implements InitializingBean {
     }
 
     /**
-     *
+     * Convert a DSpaceObject in its REST representation using a suitable converter
      */
     private DSpaceObjectRest convertDSpaceObject(DSpaceObject dspaceObject) {
         for (DSpaceObjectConverter converter : converters) {
