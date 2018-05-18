@@ -168,7 +168,7 @@ public class DiscoverQueryBuilderTest {
                                                               Arrays.asList(searchFilter), "item", page);
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
-        assertThat(discoverQuery.getQuery(), is(query));
+        assertThat(discoverQuery.getQuery(), is("\"" + query + "\""));
         assertThat(discoverQuery.getDSpaceObjectFilter(), is(Constants.ITEM));
         assertThat(discoverQuery.getSortField(), is("dc.title_sort"));
         assertThat(discoverQuery.getSortOrder(), is(DiscoverQuery.SORT_ORDER.asc));
@@ -292,7 +292,7 @@ public class DiscoverQueryBuilderTest {
                                                                    "subject");
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
-        assertThat(discoverQuery.getQuery(), is(query));
+        assertThat(discoverQuery.getQuery(), is("\"" + query + "\""));
         assertThat(discoverQuery.getDSpaceObjectFilter(), is(Constants.ITEM));
         assertThat(discoverQuery.getSortField(), isEmptyOrNullString());
         assertThat(discoverQuery.getMaxResults(), is(0));

@@ -180,7 +180,9 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
         //Set search query
         if (StringUtils.isNotBlank(query)) {
-            queryArgs.setQuery(searchService.escapeQueryChars(query));
+            //Note that these quotes are needed incase we try to query OR for example.
+            //If the quotes aren't present, it'll crash.
+            queryArgs.setQuery("\"" + searchService.escapeQueryChars(query) + "\"");
         }
 
         //Limit results to DSO type
