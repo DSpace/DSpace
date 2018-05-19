@@ -461,13 +461,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
-        // Verify creation
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
-                    .andExpect(status().is2xxSuccessful());
-
         // Delete
         getClient().perform(delete("/api/core/bitstreams/" + bitstream.getID()))
-                .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is(204));
 
         // Verify 404 after delete
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
@@ -487,7 +483,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // 2. A collection with a logo
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection").build();
-        // Verify parentCommunity logo retreival
+        // Verify get on parentCommunity logo
         getClient().perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
                    .andExpect(status().isOk());
 
@@ -495,7 +491,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(delete("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
                    .andExpect(status().is(422));
 
-        // Verify collection logo retreival
+        // Verify get on collection logo
         getClient().perform(get("/api/core/bitstreams/" + col.getLogo().getID()))
                    .andExpect(status().isOk());
 
