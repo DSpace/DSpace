@@ -10,11 +10,10 @@ package org.dspace.app.rest.utils;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.RequiredParameter;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.MissingParameterException;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -27,7 +26,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.core.AnnotationAttribute;
@@ -46,7 +44,7 @@ import org.springframework.util.ReflectionUtils;
  */
 @Component
 public class RestRepositoryUtils {
-    private static final AnnotationAttribute PARAM_ANNOTATION = new AnnotationAttribute(Param.class);
+    private static final AnnotationAttribute PARAM_ANNOTATION = new AnnotationAttribute(Parameter.class);
     private static final String NAME_NOT_FOUND = "Unable to detect parameter names for query method %s! Use @Param or" +
         " compile with -parameters on JDK 8.";
 
@@ -124,25 +122,22 @@ public class RestRepositoryUtils {
                                      Method method, Pageable pageable, Sort sort, PagedResourcesAssembler assembler) {
 
         MultiValueMap<String, Object> result = new LinkedMultiValueMap<String, Object>(parameters);
-        MethodParameters methodParameters = new MethodParameters(method, new AnnotationAttribute(Param.class));
+        MethodParameters methodParameters = new MethodParameters(method, PARAM_ANNOTATION);
 
-        for (MethodParameter mparam: methodParameters.getParameters()) {
-            if (mparam.hasParameterAnnotation(RequiredParameter.class)) {
-                if (!parameters.containsKey(mparam.getParameterName())) {
+        for (MethodParameter parameter : methodParameters.getParametersWith(Parameter.class)) {
+            final Parameter parameterAnnotation = parameter.getParameterAnnotation(Parameter.class);
+            final String paramName = parameter.getParameterName();
+            List<Object> value = parameters.get(paramName);
+            if (value == null) {
+                if (parameterAnnotation.required()) {
                     throw new MissingParameterException(
-                        String.format("Required Parameter[%s] Missing",
-                            mparam.getParameterName()));
+                            String.format("Required Parameter[%s] Missing",
+                                    parameter.getParameterName()));
                 }
-            }
-        }
-
-        for (Entry<String, List<Object>> entry : parameters.entrySet()) {
-            MethodParameter parameter = methodParameters.getParameter(entry.getKey());
-
-            if (parameter == null) {
                 continue;
             }
-            result.put(parameter.getParameterName(), entry.getValue());
+
+            result.put(paramName, value);
         }
 
         return invokeQueryMethod(repository, method, result, pageable, sort);

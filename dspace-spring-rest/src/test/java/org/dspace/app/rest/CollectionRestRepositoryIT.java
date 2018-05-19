@@ -231,11 +231,25 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
-        getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity"))
+        getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity")
+                                .param("uuid", parentCommunity.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.page.totalElements", is(0)))
                    .andExpect(jsonPath("$._embedded").doesNotExist());
+    }
+
+    @Test
+    public void findAuthorizedByCommunityWithoutUUIDTest() throws Exception {
+        getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity"))
+                   .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void findAuthorizedByCommunityWithUnexistentUUIDTest() throws Exception {
+        getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity")
+                                .param("uuid", UUID.randomUUID().toString()))
+                   .andExpect(status().isNotFound());
     }
 
     @Test
