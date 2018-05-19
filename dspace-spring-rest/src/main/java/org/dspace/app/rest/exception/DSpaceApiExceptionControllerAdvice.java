@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.authorize.AuthorizeException;
+import org.springframework.data.repository.support.QueryMethodParameterConversionException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -48,6 +50,30 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         sendErrorResponse(request, response, ex,
                           "An internal read or write operation failed (IO Exception)",
                           HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MissingParameterException.class)
+    protected void MissingParameterException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
+
+        //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
+        //Using the value from HttpStatus.
+        //Since this is a handled exception case, the stack trace will not be returned.
+        sendErrorResponse(request, response, null,
+                          ex.getMessage(),
+                          HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
+    @ExceptionHandler(QueryMethodParameterConversionException.class)
+    protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
+
+        //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
+        //Using the value from HttpStatus.
+        //Since this is a handled exception case, the stack trace will not be returned.
+        sendErrorResponse(request, response, null,
+                          ex.getMessage(),
+                          HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,

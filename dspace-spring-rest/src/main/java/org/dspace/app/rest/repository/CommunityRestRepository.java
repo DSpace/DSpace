@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.rest.RequiredParameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
+import org.dspace.app.rest.exception.MissingParameterException;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
 import org.dspace.content.Community;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -95,7 +98,9 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     // TODO: add method in dspace api to support direct query for subcommunities
     // with pagination and authorization check
     @SearchRestMethod(name = "subCommunities")
-    public Page<CommunityRest> findSubCommunities(@Param(value = "parent") UUID parentCommunity, Pageable pageable) {
+    public Page<CommunityRest> findSubCommunities(@RequiredParameter @Param(value = "parent") UUID parentCommunity,
+            Pageable pageable)
+            throws MissingParameterException, QueryMethodParameterConversionException {
         Context context = obtainContext();
         List<Community> subCommunities = new ArrayList<Community>();
         try {

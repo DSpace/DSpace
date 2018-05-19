@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.rest.RequiredParameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.MissingParameterException;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +49,8 @@ public class RestRepositoryUtils {
     private static final AnnotationAttribute PARAM_ANNOTATION = new AnnotationAttribute(Param.class);
     private static final String NAME_NOT_FOUND = "Unable to detect parameter names for query method %s! Use @Param or" +
         " compile with -parameters on JDK 8.";
+
+    private static final Logger log = Logger.getLogger(RestRepositoryUtils.class);
 
     @Autowired(required = true)
     @Qualifier(value = "mvcConversionService")
@@ -121,14 +126,22 @@ public class RestRepositoryUtils {
         MultiValueMap<String, Object> result = new LinkedMultiValueMap<String, Object>(parameters);
         MethodParameters methodParameters = new MethodParameters(method, new AnnotationAttribute(Param.class));
 
-        for (Entry<String, List<Object>> entry : parameters.entrySet()) {
+        for (MethodParameter mparam: methodParameters.getParameters()) {
+            if (mparam.hasParameterAnnotation(RequiredParameter.class)) {
+                if (!parameters.containsKey(mparam.getParameterName())) {
+                    throw new MissingParameterException(
+                        String.format("Required Parameter[%s] Missing",
+                            mparam.getParameterName()));
+                }
+            }
+        }
 
+        for (Entry<String, List<Object>> entry : parameters.entrySet()) {
             MethodParameter parameter = methodParameters.getParameter(entry.getKey());
 
             if (parameter == null) {
                 continue;
             }
-
             result.put(parameter.getParameterName(), entry.getValue());
         }
 
