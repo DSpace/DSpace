@@ -22,7 +22,6 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
@@ -376,9 +375,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ;
     }
 
-    //TODO The test fails, 404 resource not found. remove @Ignore when this is implemented
     @Test
-    @Ignore
     public void findAllSubCommunitiesWithoutUUID() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
