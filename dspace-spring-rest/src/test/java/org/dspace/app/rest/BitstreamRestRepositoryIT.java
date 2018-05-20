@@ -461,13 +461,109 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
+        makeUserAdmin();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
         // Delete
-        getClient().perform(delete("/api/core/bitstreams/" + bitstream.getID()))
+        getClient(token).perform(delete("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().is(204));
 
         // Verify 404 after delete
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteUnauthorized() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                                            createBitstream(context, publicItem1, is)
+                                        .withName("Bitstream")
+                                        .withDescription("Description")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Delete using an unauthorized user
+        getClient(token).perform(delete("/api/core/bitstreams/" + bitstream.getID()))
+                .andExpect(status().isForbidden());
+
+        // Verify the bitstream is still here
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteForbidden() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                                            createBitstream(context, publicItem1, is)
+                                        .withName("Bitstream")
+                                        .withDescription("Description")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        // Delete as anonymous
+        getClient().perform(delete("/api/core/bitstreams/" + bitstream.getID()))
+                .andExpect(status().isUnauthorized());
+
+        // Verify the bitstream is still here
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -483,20 +579,17 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // 2. A collection with a logo
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection").build();
-        // Verify get on parentCommunity logo
-        getClient().perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
-                   .andExpect(status().isOk());
+
+        makeUserAdmin();
+
+        String token = getAuthToken(eperson.getEmail(), password);
 
         // 422 error when trying to DELETE parentCommunity logo
-        getClient().perform(delete("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
+        getClient(token).perform(delete("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
                    .andExpect(status().is(422));
 
-        // Verify get on collection logo
-        getClient().perform(get("/api/core/bitstreams/" + col.getLogo().getID()))
-                   .andExpect(status().isOk());
-
         // 422 error when trying to DELETE collection logo
-        getClient().perform(delete("/api/core/bitstreams/" + col.getLogo().getID()))
+        getClient(token).perform(delete("/api/core/bitstreams/" + col.getLogo().getID()))
                    .andExpect(status().is(422));
     }
 }
