@@ -345,12 +345,6 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$", BitstreamFormatMatcher.matchBitstreamFormatMimeType("text/plain")))
         ;
 
-
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/self"))
-                   .andExpect(status().isOk())
-        ;
-
-
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
                    .andExpect(status().isOk())
                    .andExpect(content().string("ThisIsSomeDummyText"))

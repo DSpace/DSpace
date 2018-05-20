@@ -38,7 +38,7 @@ public class AuthorityEntryHalLinkFactory extends HalLinkFactory<AuthorityEntryR
             if (entry.getOtherInformation().containsKey(AuthorityUtils.RESERVED_KEYMAP_PARENT)) {
                 UriComponentsBuilder uriComponentsBuilder = linkTo(
                     getMethodOn(AuthorityRest.CATEGORY, AuthorityRest.NAME)
-                        .findRel(null, AuthorityRest.CATEGORY,
+                        .findRel(null, null, AuthorityRest.CATEGORY,
                                  English.plural(AuthorityRest.NAME),
                                  entry.getAuthorityName() + "/" + AuthorityRest.ENTRY,
                                  entry.getOtherInformation().get(AuthorityUtils.RESERVED_KEYMAP_PARENT), null, null,
