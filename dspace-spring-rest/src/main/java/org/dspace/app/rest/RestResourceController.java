@@ -866,9 +866,9 @@ public class RestResourceController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public ResponseEntity<ResourceSupport> delete(HttpServletRequest request, @PathVariable String apiCategory,
-                                                  @PathVariable String model, @PathVariable UUID id)
+                                                  @PathVariable String model, @PathVariable UUID uuid)
         throws HttpRequestMethodNotSupportedException {
-        return deleteInternal(apiCategory, model, id);
+        return deleteInternal(apiCategory, model, uuid);
     }
 
     /**
