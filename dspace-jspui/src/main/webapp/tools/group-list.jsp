@@ -27,6 +27,7 @@
 
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     Group[] groups =
@@ -72,7 +73,7 @@
             <tr>
                 <td class="<%= row %>RowOddCol"><%= groups[i].getID() %></td>
                 <td class="<%= row %>RowEvenCol">
-                    <%= groups[i].getName() %>
+                    <%= Utils.addEntities(groups[i].getName()) %>
                 </td>
                 <td class="<%= row %>RowOddCol">
 <%
