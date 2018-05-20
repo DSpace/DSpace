@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.rest.converter.BitstreamConverter;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.authorize.AuthorizeException;
@@ -99,25 +100,21 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
     }
 
     @Override
-    protected void delete(Context context, UUID id) {
-        // Workaround for authorisation problems
-        context.turnOffAuthorisationSystem();
+    protected void delete(Context context, UUID id) throws AuthorizeException {
         Bitstream bit = null;
         try {
             bit = bs.find(context, id);
             if (bit.getCommunity() != null | bit.getCollection() != null) {
-                throw new RuntimeException();
+                throw new UnprocessableEntityException("The bitstream cannot be deleted it is a logo");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         try {
             bs.delete(context, bit);
-        } catch (SQLException | AuthorizeException | IOException e) {
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        // Workaround for authorisation problems
-        context.restoreAuthSystemState();
     }
 
     public InputStream retrieve(UUID uuid) {

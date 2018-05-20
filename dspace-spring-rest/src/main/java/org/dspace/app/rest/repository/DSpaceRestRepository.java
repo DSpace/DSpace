@@ -13,8 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.PatchBadRequestException;
-import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
@@ -44,18 +45,22 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     @Override
     public <S extends T> S save(S entity) {
-        Context context = obtainContext();
-        return save(context, entity);
+        Context context = null;
+        try {
+            context = obtainContext();
+            S res = save(context, entity);
+            context.commit();
+            return res;
+        } catch (AuthorizeException ex) {
+            throw new RESTAuthorizationException(ex);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
     }
 
-    protected <S extends T> S save(Context context, S entity) {
-        try {
-            //nothing to do default implementation commit transaction
-            context.commit();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-        return entity;
+    protected <S extends T> S save(Context context, S entity) throws AuthorizeException,
+        RepositoryMethodNotImplementedException {
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
     @Override
@@ -100,12 +105,14 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         try {
             delete(context, id);
             context.commit();
-        } catch (Exception e) {
-            throw new PatchUnprocessableEntityException(e.getMessage());
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
         }
     }
 
-    protected void delete(Context context, ID id) throws RepositoryMethodNotImplementedException {
+    protected void delete(Context context, ID id) throws AuthorizeException, RepositoryMethodNotImplementedException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
@@ -144,19 +151,21 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     public abstract DSpaceResource<T> wrapResource(T model, String... rels);
 
     public T createAndReturn() {
-        Context context = obtainContext();
-        T entity = createAndReturn(context);
+        Context context = null;
         try {
+            context = obtainContext();
+            T entity = createAndReturn(context);
             context.commit();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return entity;
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
         }
-        return entity;
     }
 
-    protected T createAndReturn(Context context) {
-        //nothing default implementation
-        return null;
+    protected T createAndReturn(Context context) throws AuthorizeException, RepositoryMethodNotImplementedException {
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
     public <U extends UploadStatusResponse> U upload(HttpServletRequest request, String apiCategory, String model,
@@ -165,13 +174,15 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
-        throws HttpRequestMethodNotSupportedException, PatchUnprocessableEntityException, PatchBadRequestException {
+        throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, PatchBadRequestException {
         Context context = obtainContext();
         try {
             patch(context, request, apiCategory, model, id, patch);
             context.commit();
-        } catch (SQLException | AuthorizeException | DCInputsReaderException e) {
-            throw new PatchUnprocessableEntityException(e.getMessage());
+        } catch (AuthorizeException ae) {
+            throw new RESTAuthorizationException(ae);
+        } catch (SQLException | DCInputsReaderException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
         return findOne(id);
     }
