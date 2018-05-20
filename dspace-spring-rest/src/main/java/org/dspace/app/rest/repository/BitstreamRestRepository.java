@@ -26,7 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
+
 
 /**
  * This is the repository responsible to manage Bitstream Rest object
@@ -58,6 +60,13 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         if (bit == null) {
             return null;
         }
+        try {
+            if (bit.isDeleted() == true) {
+                throw new ResourceNotFoundException();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
         return converter.fromModel(bit);
     }
 
@@ -87,6 +96,28 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
     @Override
     public BitstreamResource wrapResource(BitstreamRest bs, String... rels) {
         return new BitstreamResource(bs, utils, rels);
+    }
+
+    @Override
+    protected void delete(Context context, UUID id) {
+        // Workaround for authorisation problems
+        context.turnOffAuthorisationSystem();
+        Bitstream bit = null;
+        try {
+            bit = bs.find(context, id);
+            if (bit.getCommunity() != null | bit.getCollection() != null) {
+                throw new RuntimeException();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        try {
+            bs.delete(context, bit);
+        } catch (SQLException | AuthorizeException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        // Workaround for authorisation problems
+        context.restoreAuthSystemState();
     }
 
     public InputStream retrieve(UUID uuid) {
