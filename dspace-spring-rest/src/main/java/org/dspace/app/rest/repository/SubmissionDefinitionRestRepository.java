@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.SubmissionDefinitionConverter;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
@@ -27,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
 /**
@@ -67,7 +67,8 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
     }
 
     @SearchRestMethod(name = "findByCollection")
-    public SubmissionDefinitionRest findByCollection(@Param(value = "uuid") UUID collectionUuid) throws SQLException {
+    public SubmissionDefinitionRest findByCollection(@Parameter(value = "uuid", required = true) UUID collectionUuid)
+            throws SQLException {
         Collection col = collectionService.find(obtainContext(), collectionUuid);
         if (col == null) {
             return null;
