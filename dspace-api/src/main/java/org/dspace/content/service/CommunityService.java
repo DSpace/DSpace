@@ -275,9 +275,7 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
             throws SQLException, AuthorizeException, IOException;
 
     /**
-     * Remove a subcommunity. If it only belongs to one parent community,
-     * then it is permanently deleted. If it has more than one parent community,
-     * it is simply unmapped from the current community.
+     * Remove a subcommunity. Deletes all subcommunities, collections and items within the community.
      *
      * @param context context
      * @param childCommunity
@@ -288,6 +286,21 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      * @throws IOException if IO error
      */
     public void removeSubcommunity(Context context, Community parentCommunity, Community childCommunity)
+            throws SQLException, AuthorizeException, IOException;
+
+    /**
+     * Remove a subcommunity with with its collections and items, or optionally just unmap from the current community.
+     *
+     * @param context context
+     * @param childCommunity
+     *            subcommunity to remove
+     * @param parentCommunity parent community
+     * @param mappingOnly if true, community is unmapped from parent (i.e. converted to a top-level community) but no data is deleted
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
+     */
+    public void removeSubcommunity(Context context, Community parentCommunity, Community childCommunity, boolean mappingOnly)
             throws SQLException, AuthorizeException, IOException;
 
     /**

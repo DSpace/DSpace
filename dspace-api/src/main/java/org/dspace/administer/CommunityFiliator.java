@@ -261,8 +261,7 @@ public class CommunityFiliator
 
         // OK remove the mappings - but leave the community, which will become
         // top-level
-        child.getParentCommunities().remove(parent);
-        parent.getSubcommunities().remove(child);
+        communityService.removeSubcommunity(c,parent,child,true);
         communityService.update(c, child);
         communityService.update(c, parent);
 
