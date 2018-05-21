@@ -79,8 +79,11 @@ public class OpenAIREProjectService {
 
 			String responseBody = method.getResponseBodyAsString();
 			JSONObject obj = new JSONObject(responseBody);
+			Integer total = (Integer) obj.getJSONObject("response").getJSONObject("header").getJSONObject("total").get("$");
 			JSONObject results = obj.getJSONObject("response").getJSONObject("results");
 			JSONArray resultArray = results.getJSONArray("result");
+			 
+			max =  total.intValue() < max? total.intValue(): max;
 			for (int x = 0; x < max; x++) {
 				System.out.println(x);
 				String funder = null;
@@ -96,8 +99,9 @@ public class OpenAIREProjectService {
 				code = oafProject.getJSONObject("code").getString("$");
 				
 				JSONObject funderObj = null;
-				if (!oafProject.isNull("fundingtree")) {
+				if (!oafProject.isNull("fundingtree") && oafProject.optJSONObject("fundingtree")!= null) {
 					JSONObject fundingTree = oafProject.getJSONObject("fundingtree");
+					
 					funderObj = fundingTree.getJSONObject("funder");
 					
 					String[] fundingLevels = JSONObject.getNames(fundingTree);
