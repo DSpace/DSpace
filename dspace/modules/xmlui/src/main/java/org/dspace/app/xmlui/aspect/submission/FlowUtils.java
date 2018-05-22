@@ -905,9 +905,8 @@ public class FlowUtils {
 
 
 
-    private static void finishSubmission(Request request, Context context, Item publication) throws SQLException, AuthorizeException, IOException, TransformerException, WorkflowException, SAXException, WorkflowConfigurationException, MessagingException, ParserConfigurationException {
-
-       try{
+    private static void finishSubmission(Request request, Context context, Item publication) throws SQLException {
+        try {
             //We have completed everything time to start our dataset
             WorkspaceItem wsPublication = WorkspaceItem.findByItemId(context, publication.getID());
 
@@ -942,14 +941,14 @@ public class FlowUtils {
 
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e){
             // adding an explicit rollback to save the integrity of the data
             // when an exception happens most likely spring doesn't throw it to
             // the Cocoon servlet that commit the transaction in every case.
             context.getDBConnection().rollback();
             log.error("Exception during CompleteSubmissionStep: ", e);
             throw new RuntimeException(e);
-       }
+        }
 
     }
 
