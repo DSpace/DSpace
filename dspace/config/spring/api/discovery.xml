@@ -167,11 +167,14 @@
                             <property name="maxSize" value="250"/>
                             <property name="snippets" value="2"/>
                         </bean>
+                        <!-- By default, full text snippets are disabled, as snippets of embargoed/restricted bitstreams
+                             may appear in search results when the Item is public. See DS-3498
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
                             <property name="field" value="fulltext"/>
                             <property name="maxSize" value="250"/>
                             <property name="snippets" value="2"/>
                         </bean>
+                        -->
                     </list>
                 </property>
             </bean>
@@ -266,11 +269,14 @@
                             <property name="maxSize" value="250"/>
                             <property name="snippets" value="2"/>
                         </bean>
+                        <!-- By default, full text snippets are disabled, as snippets of embargoed/restricted bitstreams
+                             may appear in search results when the Item is public. See DS-3498
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
                             <property name="field" value="fulltext"/>
                             <property name="maxSize" value="250"/>
                             <property name="snippets" value="2"/>
                         </bean>
+                        -->
                     </list>
                 </property>
             </bean>
