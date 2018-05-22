@@ -44,6 +44,8 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
+import org.datadryad.rest.models.Manuscript;
 import org.dspace.app.util.*;
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -939,6 +941,20 @@ public class FlowUtils {
                         workflowItem.update();
                     }
 
+                }
+            }
+
+            // look for stored manuscripts to see if its status has been updated since submission was started:
+            Manuscript storedManuscript = ApproveRejectReviewItem.getStoredManuscriptForWorkflowItem(context, wfPublication);
+            if (storedManuscript != null) {
+                if (storedManuscript.isAccepted()) {
+                    // if the ms is accepted, push the item into curation from review
+                    ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfPublication, storedManuscript);
+                } else if (storedManuscript.isRejected()) {
+                    // if it's rejected, keep it in the review queue, but move the manuscript number to former.
+                    DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(context, wfPublication.getID());
+                    dryadDataPackage.setFormerManuscriptNumber(dryadDataPackage.getManuscriptNumber());
+                    dryadDataPackage.setManuscriptNumber(null);
                 }
             }
         } catch (Exception e){
