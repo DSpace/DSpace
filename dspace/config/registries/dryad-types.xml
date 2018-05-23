@@ -23,10 +23,12 @@
     <dc-type>
     	<schema>dryad</schema>
       	<element>curatorNote</element>
+        <scope_note>Notes private to other curators</scope_note>
     </dc-type>
     <dc-type>
         <schema>dryad</schema>
         <element>curatorNotePublic</element>
+        <scope_note>Notes for public view</scope_note>
     </dc-type>
     <dc-type>
         <schema>dryad</schema>
