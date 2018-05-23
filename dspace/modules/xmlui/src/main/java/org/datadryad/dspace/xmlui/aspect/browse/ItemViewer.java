@@ -454,7 +454,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         if (!(dso instanceof Item)) return;
         Item item = (Item) dso;
 
-        if (AuthorizeManager.isCuratorOrAdmin(context)) {
+        if (AuthorizeManager.isCuratorOrAdmin(context) && showFullItem(objectModel)) {
             DCValue[] curatorNotes = item.getMetadata("dryad.curatorNote");
             if (curatorNotes != null && curatorNotes.length > 0) {
                 Division notes = body.addDivision("curator-notes", "curator-notes");

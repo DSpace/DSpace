@@ -251,7 +251,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 		String baseURL = contextPath + "/admin/item?administrative-continue="
 				+ knot.getId();
 
-		if (AuthorizeManager.isCuratorOrAdmin(context)) {
+		if (AuthorizeManager.isCuratorOrAdmin(context) && showFullItem) {
 			DCValue[] curatorNotes = item.getMetadata("dryad.curatorNote");
 			if (curatorNotes != null && curatorNotes.length > 0) {
 				Division notes = body.addDivision("curator-notes", "curator-notes");
