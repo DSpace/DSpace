@@ -128,6 +128,14 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
             }
         }
 
+        DCValue[] curatorNotes = item.getMetadata("dryad.curatorNote");
+        if (curatorNotes != null && curatorNotes.length > 0) {
+            Division notes = body.addDivision("curator-notes", "curator-notes");
+            for (DCValue curatorNote : curatorNotes) {
+                notes.addPara(curatorNote.value);
+            }
+        }
+
         // DIVISION: main
         Division main = body.addInteractiveDivision("edit-item-status", contextPath + "/admin/item", Division.METHOD_POST, "primary administrative item");
         if (editingTemplateItem) {
