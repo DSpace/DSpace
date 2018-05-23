@@ -1222,9 +1222,7 @@
             </a>
         </xsl:if>
     </xsl:template>
-    <!-- Override metadata field rendering to hide manuscript number -->
     <xsl:template match="dim:field" mode="itemDetailView-DIM">
-        <xsl:if test="not(./@qualifier = 'manuscriptNumber')">
             <tr>
                 <xsl:attribute name="class">
                     <xsl:text>ds-table-row </xsl:text>
@@ -1250,7 +1248,6 @@
             </td>
                 <td><xsl:value-of select="./@language"/></td>
             </tr>
-        </xsl:if>
     </xsl:template>
 
     <xsl:template name="format-json-ld-metadata">
