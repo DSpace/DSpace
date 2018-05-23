@@ -44,6 +44,8 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
+import org.datadryad.rest.models.Manuscript;
 import org.dspace.app.util.*;
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -905,9 +907,8 @@ public class FlowUtils {
 
 
 
-    private static void finishSubmission(Request request, Context context, Item publication) throws SQLException, AuthorizeException, IOException, TransformerException, WorkflowException, SAXException, WorkflowConfigurationException, MessagingException, ParserConfigurationException {
-
-       try{
+    private static void finishSubmission(Request request, Context context, Item publication) throws SQLException {
+        try {
             //We have completed everything time to start our dataset
             WorkspaceItem wsPublication = WorkspaceItem.findByItemId(context, publication.getID());
 
@@ -942,14 +943,28 @@ public class FlowUtils {
 
                 }
             }
-        }catch (Exception e){
+
+            // look for stored manuscripts to see if its status has been updated since submission was started:
+            Manuscript storedManuscript = ApproveRejectReviewItem.getStoredManuscriptForWorkflowItem(context, wfPublication);
+            if (storedManuscript != null) {
+                if (storedManuscript.isAccepted()) {
+                    // if the ms is accepted, push the item into curation from review
+                    ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfPublication, storedManuscript);
+                } else if (storedManuscript.isRejected()) {
+                    // if it's rejected, keep it in the review queue, but move the manuscript number to former.
+                    DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(context, wfPublication.getID());
+                    dryadDataPackage.setFormerManuscriptNumber(dryadDataPackage.getManuscriptNumber());
+                    dryadDataPackage.setManuscriptNumber(null);
+                }
+            }
+        } catch (Exception e){
             // adding an explicit rollback to save the integrity of the data
             // when an exception happens most likely spring doesn't throw it to
             // the Cocoon servlet that commit the transaction in every case.
             context.getDBConnection().rollback();
             log.error("Exception during CompleteSubmissionStep: ", e);
             throw new RuntimeException(e);
-       }
+        }
 
     }
 
