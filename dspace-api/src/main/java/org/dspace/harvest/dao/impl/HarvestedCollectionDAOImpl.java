@@ -40,9 +40,6 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
     @Override
     public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedDesc(Context context, int status, int type,
                                                                                   int limit) throws SQLException {
-//      Old query: "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ?
-// order by last_harvested desc limit 1";
-
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
@@ -59,9 +56,6 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
     @Override
     public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedAsc(Context context, int status, int type,
                                                                                  int limit) throws SQLException {
-//        Old query: "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ?
-// order by last_harvested asc limit 1";
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
@@ -106,14 +100,6 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
                                                                            int expirationStatus,
                                                                            Date expirationTime)
         throws SQLException {
-//      Old query: "SELECT * FROM harvested_collection WHERE
-// (last_harvested < ? or last_harvested is null) and harvest_type > ? and (harvest_status = ? or harvest_status = ?
-// or (harvest_status=? and harvest_start_time < ?)) ORDER BY last_harvested",
-//                new java.sql.Timestamp(startTime.getTime()), 0, HarvestedCollection.STATUS_READY,
-// HarvestedCollection.STATUS_OAI_ERROR, HarvestedCollection.STATUS_BUSY, new java.sql.Timestamp(expirationTime
-// .getTime()));
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);

@@ -47,9 +47,6 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
     @Override
     public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude)
         throws SQLException {
-        //SELECT * FROM Doi WHERE resource_type_id = ? AND resource_id = ? AND resource_id = ? AND ((status != ? AND
-        // status != ?) OR status IS NULL)
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
@@ -90,9 +87,6 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
     public List<DOI> findSimilarNotInState(Context context, String doi, List<Integer> excludedStatuses,
                                            boolean dsoNotNull)
         throws SQLException {
-        // SELECT * FROM Doi WHERE doi LIKE ? AND resource_type_id = ? AND resource_id IS NOT NULL AND status != ?
-        // AND status != ?
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);

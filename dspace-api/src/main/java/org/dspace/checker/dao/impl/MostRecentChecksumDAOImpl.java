@@ -45,15 +45,6 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
     @Override
     public List<MostRecentChecksum> findByNotProcessedInDateRange(Context context, Date startDate, Date endDate)
         throws SQLException {
-//                    + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
-//                    + "most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, "
-//                    + "result_description "
-//                    + "from checksum_results, most_recent_checksum "
-//                    + "where most_recent_checksum.to_be_processed = false "
-//                    + "and most_recent_checksum.result = checksum_results.result_code "
-//                    + "and most_recent_checksum.last_process_start_date >= ? "
-//                    + "and most_recent_checksum.last_process_start_date < ? "
-//                    + "order by most_recent_checksum.bitstream_id
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
@@ -88,14 +79,6 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
     @Override
     public List<MostRecentChecksum> findByResultTypeInDateRange(Context context, Date startDate, Date endDate,
                                                                 ChecksumResultCode resultCode) throws SQLException {
-//        "select bitstream_id, last_process_start_date, last_process_end_date, "
-//                    + "expected_checksum, current_checksum, result_description "
-//                    + "from most_recent_checksum, checksum_results "
-//                    + "where most_recent_checksum.result = checksum_results.result_code "
-//                    + "and most_recent_checksum.result= ? "
-//                    + "and most_recent_checksum.last_process_start_date >= ? "
-//                    + "and most_recent_checksum.last_process_start_date < ? "
-//                    + "order by bitstream_id";
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
@@ -123,12 +106,6 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 
     @Override
     public MostRecentChecksum getOldestRecord(Context context) throws SQLException {
-        //        "select bitstream_id  "
-        //        + "from most_recent_checksum " + "where to_be_processed = true "
-        //        + "order by date_trunc('milliseconds', last_process_end_date), "
-        //        + "bitstream_id " + "ASC LIMIT 1";
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
@@ -143,14 +120,6 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
 
     @Override
     public MostRecentChecksum getOldestRecord(Context context, Date lessThanDate) throws SQLException {
-//                "select bitstream_id  "
-//                + "from most_recent_checksum "
-//                + "where to_be_processed = true "
-//                + "and last_process_start_date < ? "
-//                + "order by date_trunc('milliseconds', last_process_end_date), "
-//                + "bitstream_id " + "ASC LIMIT 1";
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);

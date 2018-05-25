@@ -149,22 +149,6 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     @Override
     public List<Community> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions)
         throws SQLException {
-//        "SELECT \n" +
-//                "  * \n" +
-//                "FROM \n" +
-//                "  public.eperson, \n" +
-//                "  public.epersongroup2eperson, \n" +
-//                "  public.epersongroup, \n" +
-//                "  public.community, \n" +
-//                "  public.resourcepolicy\n" +
-//                "WHERE \n" +
-//                "  epersongroup2eperson.eperson_id = eperson.eperson_id AND\n" +
-//                "  epersongroup.eperson_group_id = epersongroup2eperson.eperson_group_id AND\n" +
-//                "  resourcepolicy.epersongroup_id = epersongroup.eperson_group_id AND\n" +
-//                "  resourcepolicy.resource_id = community.community_id AND\n" +
-//                " ( resourcepolicy.action_id = 3 OR \n" +
-//                "  resourcepolicy.action_id = 11) AND \n" +
-//                "  resourcepolicy.resource_type_id = 4 AND eperson.eperson_id = ?", context.getCurrentUser().getID());
         StringBuilder query = new StringBuilder();
         query.append("select c from Community c join c.resourcePolicies rp join rp.epersonGroup rpGroup WHERE ");
         for (int i = 0; i < actions.size(); i++) {

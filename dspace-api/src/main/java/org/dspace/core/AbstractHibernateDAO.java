@@ -48,6 +48,13 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         //Isn't required, is just here for other DB implementation. Hibernate auto keeps track of changes.
     }
 
+   /**
+    * The Session used to manipulate entities of this type.
+    *
+    * @param context current DSpace context.
+    * @return the current Session.
+    * @throws SQLException
+    */
     protected Session getHibernateSession(Context context) throws SQLException {
         return ((Session) context.getDBConnection().getSession());
     }
@@ -112,14 +119,14 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         return result;
     }
 
-//    public Criteria createCriteria(Context context, Class<T> persistentClass) throws SQLException {
-//        return getHibernateSession(context).createCriteria(persistentClass);
-//    }
-//
-//    public Criteria createCriteria(Context context, Class<T> persistentClass, String alias) throws SQLException {
-//        return getHibernateSession(context).createCriteria(persistentClass, alias);
-//    }
-
+    /**
+     * Create a parsed query from a query expression.
+     *
+     * @param context current DSpace context.
+     * @param query   textual form of the query.
+     * @return parsed form of the query.
+     * @throws SQLException
+     */
     public Query createQuery(Context context, String query) throws SQLException {
         return getHibernateSession(context).createQuery(query);
     }
@@ -174,14 +181,6 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @return a DAO specified by the criteria
      */
     public T singleResult(Context context, CriteriaQuery criteriaQuery) throws SQLException {
-//        List<T> list = list(context, criteriaQuery, cacheable, clazz, maxResults, offset);
-//        if(CollectionUtils.isNotEmpty(list))
-//        {
-//            return list.get(0);
-//        }else{
-//            return null;
-//        }
-//
         Query query = this.getHibernateSession(context).createQuery(criteriaQuery);
         return singleResult(query);
 
@@ -237,12 +236,9 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
     public List<T> executeCriteriaQuery(Context context, CriteriaQuery<T> criteriaQuery, boolean cacheable,
                                         Class<T> clazz, int maxResults, int offset) throws SQLException {
-        //This has to be here, otherwise a 500 gets thrown
         Query query = this.getHibernateSession(context).createQuery(criteriaQuery);
 
-        //TODO Check if this works and is desireable
         query.setHint("org.hibernate.cacheable", cacheable);
-//        query.setCacheable(cacheable);
         if (maxResults != -1) {
             query.setMaxResults(maxResults);
         }
@@ -260,12 +256,10 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         Root root = criteria.from(clazz);
         criteria.select(root);
 
-        //TODO Maybe one big where, test this;;;; seems to not be necessary
         for (Map.Entry<String, Object> entry : equals.entrySet()) {
             criteria.where(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
         }
         return executeCriteriaQuery(context, criteria, cacheable, clazz, maxResults, offset);
     }
 
-    //TODO find alternative for uniqueResult
 }
