@@ -122,7 +122,6 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
 
     public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups,
                                                                int action, int type_id) throws SQLException {
-        //TODO Make sure you double check this
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
@@ -133,7 +132,9 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                 criteriaBuilder
                                     .or(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), e),
                                         criteriaBuilder
-                                            .in(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups)))));
+                                            .in(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups)))
+            )
+        );
         return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
     }
 

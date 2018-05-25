@@ -67,16 +67,6 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public List<Bitstream> findBitstreamsWithNoRecentChecksum(Context context) throws SQLException {
-//        "select bitstream.deleted, bitstream.store_number, bitstream.size_bytes, "
-//                    + "bitstreamformatregistry.short_description, bitstream.bitstream_id,  "
-//                    + "bitstream.user_format_description, bitstream.internal_id, "
-//                    + "bitstream.source, bitstream.checksum_algorithm, bitstream.checksum, "
-//                    + "bitstream.name, bitstream.description "
-//                    + "from bitstream left outer join bitstreamformatregistry on "
-//                    + "bitstream.bitstream_format_id = bitstreamformatregistry.bitstream_format_id "
-//                    + "where not exists( select 'x' from most_recent_checksum "
-//                    + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )"
-
         Query query = createQuery(context,
                                   "select b from Bitstream b where b not in (select c.bitstream from " +
                                       "MostRecentChecksum c)");
@@ -173,7 +163,6 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
     @Override
     public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException {
         Map<String, Object> map = new HashMap<>();
-//        map.put("sizeBytes", 12);
         return findByX(context, Bitstream.class, map, true, limit, offset).iterator();
 
     }

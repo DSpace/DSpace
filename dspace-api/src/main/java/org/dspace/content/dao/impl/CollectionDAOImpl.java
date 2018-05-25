@@ -85,7 +85,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
         Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
-        //TODO Used to be template_item, may be wrong
         criteriaQuery.select(collectionRoot);
         criteriaQuery.where(criteriaBuilder.equal(collectionRoot.get(Collection_.template), item));
         return uniqueResult(context, criteriaQuery, false, Collection.class, -1, -1);
@@ -111,14 +110,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
     @Override
     public List<Collection> findAuthorized(Context context, EPerson ePerson, List<Integer> actions)
         throws SQLException {
-        //        TableRowIterator tri = DatabaseManager.query(context,
-//                "SELECT * FROM collection, resourcepolicy, eperson " +
-//                        "WHERE resourcepolicy.resource_id = collection.collection_id AND " +
-//                        "eperson.eperson_id = resourcepolicy.eperson_id AND "+
-//                        "resourcepolicy.resource_type_id = 3 AND "+
-//                        "( resourcepolicy.action_id = 3 OR resourcepolicy.action_id = 11 ) AND "+
-//                        "eperson.eperson_id = ?", context.getCurrentUser().getID());
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
         Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
@@ -139,26 +130,6 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
     @Override
     public List<Collection> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions)
         throws SQLException {
-        //        TableRowIterator tri = DatabaseManager.query(context,
-        //                "SELECT \n" +
-        //                        "  * \n" +
-        //                        "FROM \n" +
-        //                        "  public.eperson, \n" +
-        //                        "  public.epersongroup2eperson, \n" +
-        //                        "  public.epersongroup, \n" +
-        //                        "  public.group2group, \n" +
-        //                        "  public.resourcepolicy rp_parent, \n" +
-        //                        "  public.collection\n" +
-        //                        "WHERE \n" +
-        //                        "  epersongroup2eperson.eperson_id = eperson.eperson_id AND\n" +
-        //                        "  epersongroup.eperson_group_id = epersongroup2eperson.eperson_group_id AND\n" +
-        //                        "  group2group.child_id = epersongroup.eperson_group_id AND\n" +
-        //                        "  rp_parent.epersongroup_id = group2group.parent_id AND\n" +
-        //                        "  collection.collection_id = rp_parent.resource_id AND\n" +
-        //                        "  eperson.eperson_id = ? AND \n" +
-        //                        "  (rp_parent.action_id = 3 OR \n" +
-        //                        "  rp_parent.action_id = 11  \n" +
-        //                        "  )  AND rp_parent.resource_type_id = 3;", context.getCurrentUser().getID());
         StringBuilder query = new StringBuilder();
         query.append("select c from Collection c join c.resourcePolicies rp join rp.epersonGroup rpGroup WHERE ");
         for (int i = 0; i < actions.size(); i++) {
