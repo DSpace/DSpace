@@ -7,22 +7,20 @@
  */
 package org.dspace.workflowbasic.dao.impl;
 
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.eperson.EPerson;
-import org.dspace.harvest.HarvestedItem;
-import org.dspace.workflowbasic.BasicWorkflowItem;
-import org.dspace.workflowbasic.TaskListItem;
-import org.dspace.workflowbasic.TaskListItem_;
-import org.dspace.workflowbasic.dao.TaskListItemDAO;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import java.sql.SQLException;
+import java.util.List;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.sql.SQLException;
-import java.util.List;
+
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.workflowbasic.BasicWorkflowItem;
+import org.dspace.workflowbasic.TaskListItem;
+import org.dspace.workflowbasic.TaskListItem_;
+import org.dspace.workflowbasic.dao.TaskListItemDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the TaskListItem object.
@@ -31,10 +29,8 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class TaskListItemDAOImpl extends AbstractHibernateDAO<TaskListItem> implements TaskListItemDAO
-{
-    protected TaskListItemDAOImpl()
-    {
+public class TaskListItemDAOImpl extends AbstractHibernateDAO<TaskListItem> implements TaskListItemDAO {
+    protected TaskListItemDAOImpl() {
         super();
     }
 

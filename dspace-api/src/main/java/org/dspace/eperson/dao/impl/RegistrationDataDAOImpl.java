@@ -7,19 +7,17 @@
  */
 package org.dspace.eperson.dao.impl;
 
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.eperson.Group2GroupCache;
-import org.dspace.eperson.RegistrationData;
-import org.dspace.eperson.RegistrationData_;
-import org.dspace.eperson.dao.RegistrationDataDAO;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import java.sql.SQLException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.sql.SQLException;
+
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
+import org.dspace.eperson.RegistrationData;
+import org.dspace.eperson.RegistrationData_;
+import org.dspace.eperson.dao.RegistrationDataDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the RegistrationData object.
@@ -28,11 +26,9 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationData> implements RegistrationDataDAO
-{
+public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationData> implements RegistrationDataDAO {
 
-    protected RegistrationDataDAOImpl()
-    {
+    protected RegistrationDataDAOImpl() {
         super();
     }
 

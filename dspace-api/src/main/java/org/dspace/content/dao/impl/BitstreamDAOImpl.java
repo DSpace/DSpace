@@ -7,18 +7,25 @@
  */
 package org.dspace.content.dao.impl;
 
-import org.dspace.content.*;
-import org.dspace.content.Collection;
-import org.dspace.content.dao.BitstreamDAO;
-import org.dspace.core.AbstractHibernateDSODAO;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.sql.SQLException;
-import java.util.*;
+
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bitstream_;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.dao.BitstreamDAO;
+import org.dspace.core.AbstractHibernateDSODAO;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Bitstream object.
@@ -27,11 +34,9 @@ import java.util.*;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> implements BitstreamDAO
-{
+public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> implements BitstreamDAO {
 
-    protected BitstreamDAOImpl()
-    {
+    protected BitstreamDAOImpl() {
         super();
     }
 
@@ -52,10 +57,11 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Bitstream.class);
         Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
         criteriaQuery.select(bitstreamRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.internalId), bitstream.getInternalId()),
-                                                criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.id), bitstream.getID())
-                                                )
-                            );
+        criteriaQuery.where(criteriaBuilder.and(
+            criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.internalId), bitstream.getInternalId()),
+            criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.id), bitstream.getID())
+                            )
+        );
         return list(context, criteriaQuery, false, Bitstream.class, -1, -1);
     }
 
@@ -71,18 +77,20 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 //                    + "where not exists( select 'x' from most_recent_checksum "
 //                    + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )"
 
-        Query query = createQuery(context, "select b from Bitstream b where b not in (select c.bitstream from MostRecentChecksum c)");
+        Query query = createQuery(context,
+                                  "select b from Bitstream b where b not in (select c.bitstream from " +
+                                      "MostRecentChecksum c)");
         return query.getResultList();
     }
 
     @Override
     public Iterator<Bitstream> findByCommunity(Context context, Community community) throws SQLException {
         Query query = createQuery(context, "select b from Bitstream b " +
-                "join b.bundles bitBundles " +
-                "join bitBundles.items item " +
-                "join item.collections itemColl " +
-                "join itemColl.communities community " +
-                "WHERE :community IN community");
+            "join b.bundles bitBundles " +
+            "join bitBundles.items item " +
+            "join item.collections itemColl " +
+            "join itemColl.communities community " +
+            "WHERE :community IN community");
 
         query.setParameter("community", community);
 
@@ -92,10 +100,10 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
     @Override
     public Iterator<Bitstream> findByCollection(Context context, Collection collection) throws SQLException {
         Query query = createQuery(context, "select b from Bitstream b " +
-                "join b.bundles bitBundles " +
-                "join bitBundles.items item " +
-                "join item.collections c " +
-                "WHERE :collection IN c");
+            "join b.bundles bitBundles " +
+            "join bitBundles.items item " +
+            "join item.collections c " +
+            "WHERE :collection IN c");
 
         query.setParameter("collection", collection);
 
@@ -105,9 +113,9 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
     @Override
     public Iterator<Bitstream> findByItem(Context context, Item item) throws SQLException {
         Query query = createQuery(context, "select b from Bitstream b " +
-                "join b.bundles bitBundles " +
-                "join bitBundles.items item " +
-                "WHERE :item IN item");
+            "join b.bundles bitBundles " +
+            "join bitBundles.items item " +
+            "WHERE :item IN item");
 
         query.setParameter("item", item);
 
@@ -145,19 +153,21 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public int countWithNoPolicy(Context context) throws SQLException {
-        Query query = createQuery(context,"SELECT count(bit.id) from Bitstream bit where bit.deleted<>true and bit.id not in" +
-                " (select res.dSpaceObject from ResourcePolicy res where res.resourceTypeId = :typeId )" );
+        Query query = createQuery(context,
+                                  "SELECT count(bit.id) from Bitstream bit where bit.deleted<>true and bit.id not in" +
+                                      " (select res.dSpaceObject from ResourcePolicy res where res.resourceTypeId = " +
+                                      ":typeId )");
         query.setParameter("typeId", Constants.BITSTREAM);
         return count(query);
     }
 
     @Override
     public List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException {
-        return list(createQuery(context,"select bit from Bitstream bit where bit.deleted != true" +
-                " and bit.id not in (select bit2.id from Bundle bun join bun.bitstreams bit2)" +
-                " and bit.id not in (select com.logo.id from Community com)" +
-                " and bit.id not in (select col.logo.id from Collection col)" +
-                " and bit.id not in (select bun.primaryBitstream.id from Bundle bun)"));
+        return list(createQuery(context, "select bit from Bitstream bit where bit.deleted != true" +
+            " and bit.id not in (select bit2.id from Bundle bun join bun.bitstreams bit2)" +
+            " and bit.id not in (select com.logo.id from Community com)" +
+            " and bit.id not in (select col.logo.id from Collection col)" +
+            " and bit.id not in (select bun.primaryBitstream.id from Bundle bun)"));
     }
 
     @Override

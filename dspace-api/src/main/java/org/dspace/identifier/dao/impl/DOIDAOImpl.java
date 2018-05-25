@@ -7,25 +7,20 @@
  */
 package org.dspace.identifier.dao.impl;
 
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.identifier.DOI;
-import org.dspace.identifier.DOI_;
-import org.dspace.identifier.dao.DOIDAO;
-import org.dspace.workflowbasic.BasicWorkflowItem;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Conjunction;
-import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Restrictions;
-
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
+
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
+import org.dspace.identifier.DOI;
+import org.dspace.identifier.DOI_;
+import org.dspace.identifier.dao.DOIDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the DOI object.
@@ -34,10 +29,8 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
-{
-    protected DOIDAOImpl()
-    {
+public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
+    protected DOIDAOImpl() {
         super();
     }
 
@@ -52,8 +45,10 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
     }
 
     @Override
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude) throws SQLException {
-        //SELECT * FROM Doi WHERE resource_type_id = ? AND resource_id = ? AND resource_id = ? AND ((status != ? AND status != ?) OR status IS NULL)
+    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude)
+        throws SQLException {
+        //SELECT * FROM Doi WHERE resource_type_id = ? AND resource_id = ? AND resource_id = ? AND ((status != ? AND
+        // status != ?) OR status IS NULL)
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
@@ -62,17 +57,17 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
 
         List<Predicate> listToIncludeInOrPredicate = new LinkedList<>();
 
-        for(Integer status : statusToExclude){
+        for (Integer status : statusToExclude) {
             listToIncludeInOrPredicate.add(criteriaBuilder.notEqual(doiRoot.get(DOI_.status), status));
         }
         listToIncludeInOrPredicate.add(criteriaBuilder.isNull(doiRoot.get(DOI_.status)));
 
-        Predicate orPredicate = criteriaBuilder.or(listToIncludeInOrPredicate.toArray(new Predicate[]{}));
+        Predicate orPredicate = criteriaBuilder.or(listToIncludeInOrPredicate.toArray(new Predicate[] {}));
 
         criteriaQuery.where(criteriaBuilder.and(orPredicate,
                                                 criteriaBuilder.equal(doiRoot.get(DOI_.dSpaceObject), dso)
-                                                )
-                            );
+                            )
+        );
 
         return singleResult(context, criteriaQuery);
     }
@@ -84,18 +79,19 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
         List<Predicate> orPredicates = new LinkedList<>();
-        for( Integer status : statuses){
+        for (Integer status : statuses) {
             orPredicates.add(criteriaBuilder.equal(doiRoot.get(DOI_.status), status));
         }
-        criteriaQuery.where(criteriaBuilder.or(orPredicates.toArray(new Predicate[]{})));
+        criteriaQuery.where(criteriaBuilder.or(orPredicates.toArray(new Predicate[] {})));
         return list(context, criteriaQuery, false, DOI.class, -1, -1);
     }
-    
+
     @Override
-    public List<DOI> findSimilarNotInState(Context context, String doi, List<Integer> excludedStatuses, boolean dsoNotNull)
-            throws SQLException
-    {
-        // SELECT * FROM Doi WHERE doi LIKE ? AND resource_type_id = ? AND resource_id IS NOT NULL AND status != ? AND status != ?
+    public List<DOI> findSimilarNotInState(Context context, String doi, List<Integer> excludedStatuses,
+                                           boolean dsoNotNull)
+        throws SQLException {
+        // SELECT * FROM Doi WHERE doi LIKE ? AND resource_type_id = ? AND resource_id IS NOT NULL AND status != ?
+        // AND status != ?
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
@@ -104,20 +100,19 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO
 
         List<Predicate> listToIncludeInOrPredicate = new LinkedList<>();
 
-        for(Integer status: excludedStatuses){
+        for (Integer status : excludedStatuses) {
             listToIncludeInOrPredicate.add(criteriaBuilder.notEqual(doiRoot.get(DOI_.status), status));
         }
 
         List<Predicate> listToIncludeInAndPredicate = new LinkedList<>();
 
         listToIncludeInAndPredicate.add(criteriaBuilder.like(doiRoot.get(DOI_.doi), doi));
-        listToIncludeInAndPredicate.add(criteriaBuilder.or(listToIncludeInOrPredicate.toArray(new Predicate[]{})));
-        if(dsoNotNull){
+        listToIncludeInAndPredicate.add(criteriaBuilder.or(listToIncludeInOrPredicate.toArray(new Predicate[] {})));
+        if (dsoNotNull) {
             listToIncludeInAndPredicate.add(criteriaBuilder.isNotNull(doiRoot.get(DOI_.dSpaceObject)));
         }
-        criteriaQuery.where(listToIncludeInAndPredicate.toArray(new Predicate[]{}));
+        criteriaQuery.where(listToIncludeInAndPredicate.toArray(new Predicate[] {}));
         return list(context, criteriaQuery, false, DOI.class, -1, -1);
-
 
 
     }

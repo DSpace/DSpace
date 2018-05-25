@@ -43,8 +43,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @return
      * @throws SQLException
      */
-    public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException
-    {
+    public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, clazz);
         Root<T> root = criteriaQuery.from(clazz);
@@ -114,7 +113,8 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * @param metadataSortFields fields on which to sort -- use this OR columnSortFields.
      * @param columnSortFields columns on which to sort -- use this OR metadataSortFields.
      */
-    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields, List<String> columnSortFields) {
+    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields,
+                                        List<String> columnSortFields) {
         addMetadataSortQuery(query, metadataSortFields, columnSortFields, ListUtils.EMPTY_LIST);
     }
 

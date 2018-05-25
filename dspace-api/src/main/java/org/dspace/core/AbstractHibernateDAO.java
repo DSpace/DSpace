@@ -124,22 +124,23 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         return getHibernateSession(context).createQuery(query);
     }
 
-    public List<T> list(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz, int maxResults, int offset) throws SQLException
-    {
+    public List<T> list(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz, int maxResults,
+                        int offset) throws SQLException {
         criteriaQuery.distinct(true);
         @SuppressWarnings("unchecked")
         List<T> result = (List<T>) executeCriteriaQuery(context, criteriaQuery, cacheable, clazz, maxResults, offset);
         return result;
     }
-    public List<T> list(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz, int maxResults, int offset, boolean distinct) throws SQLException
-    {
+
+    public List<T> list(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz, int maxResults,
+                        int offset, boolean distinct) throws SQLException {
         criteriaQuery.distinct(distinct);
         @SuppressWarnings("unchecked")
-        List<T> result = (List<T>) executeCriteriaQuery(context,criteriaQuery,cacheable, clazz, maxResults, offset);
+        List<T> result = (List<T>) executeCriteriaQuery(context, criteriaQuery, cacheable, clazz, maxResults, offset);
         return result;
     }
-    public List<T> list(Query query)
-    {
+
+    public List<T> list(Query query) {
         @SuppressWarnings("unchecked")
         List<T> result = (List<T>) query.getResultList();
         return result;
@@ -245,7 +246,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         if (maxResults != -1) {
             query.setMaxResults(maxResults);
         }
-        if(offset != -1){
+        if (offset != -1) {
             query.setFirstResult(offset);
         }
         return query.getResultList();
