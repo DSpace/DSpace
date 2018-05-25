@@ -44,8 +44,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     }
 
     @Override
-    public EPerson findByEmail(Context context, String email) throws SQLException
-    {
+    public EPerson findByEmail(Context context, String email) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EPerson.class);
         Root<EPerson> ePersonRoot = criteriaQuery.from(EPerson.class);
@@ -56,8 +55,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
 
 
     @Override
-    public EPerson findByNetid(Context context, String netid) throws SQLException
-    {
+    public EPerson findByNetid(Context context, String netid) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EPerson.class);
         Root<EPerson> ePersonRoot = criteriaQuery.from(EPerson.class);

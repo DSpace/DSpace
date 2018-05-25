@@ -7,26 +7,21 @@
  */
 package org.dspace.eperson.dao.impl;
 
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.Group2GroupCache;
-import org.dspace.eperson.Group2GroupCache_;
-import org.dspace.eperson.dao.Group2GroupCacheDAO;
-import org.dspace.xmlworkflow.storedcomponents.PoolTask;
-import org.hibernate.Criteria;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 import javax.persistence.Query;
-import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Restrictions;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.Group2GroupCache;
+import org.dspace.eperson.Group2GroupCache_;
+import org.dspace.eperson.dao.Group2GroupCacheDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Group2GroupCache object.
@@ -35,10 +30,8 @@ import java.util.Set;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCache> implements Group2GroupCacheDAO
-{
-    protected Group2GroupCacheDAOImpl()
-    {
+public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCache> implements Group2GroupCacheDAO {
+    protected Group2GroupCacheDAOImpl() {
         super();
     }
 
@@ -58,10 +51,10 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Group2GroupCache.class);
         Root<Group2GroupCache> group2GroupCacheRoot = criteriaQuery.from(Group2GroupCache.class);
         List<Predicate> eqPredicates = new LinkedList<>();
-        for(Group group : groups){
+        for (Group group : groups) {
             eqPredicates.add(criteriaBuilder.equal(group2GroupCacheRoot.get(Group2GroupCache_.child), group));
         }
-        Predicate orPredicate = criteriaBuilder.or(eqPredicates.toArray(new Predicate[]{}));
+        Predicate orPredicate = criteriaBuilder.or(eqPredicates.toArray(new Predicate[] {}));
         criteriaQuery.select(group2GroupCacheRoot);
         criteriaQuery.where(orPredicate);
         return list(context, criteriaQuery, true, Group2GroupCache.class, -1, -1);
@@ -70,7 +63,7 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
     @Override
     public Group2GroupCache findByParentAndChild(Context context, Group parent, Group child) throws SQLException {
         Query query = createQuery(context,
-                "FROM Group2GroupCache g WHERE g.parent = :parentGroup AND g.child = :childGroup");
+                                  "FROM Group2GroupCache g WHERE g.parent = :parentGroup AND g.child = :childGroup");
 
         query.setParameter("parentGroup", parent);
         query.setParameter("childGroup", child);
@@ -85,10 +78,11 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Group2GroupCache.class);
         Root<Group2GroupCache> group2GroupCacheRoot = criteriaQuery.from(Group2GroupCache.class);
         criteriaQuery.select(group2GroupCacheRoot);
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(group2GroupCacheRoot.get(Group2GroupCache_.parent), parent),
-                                                criteriaBuilder.equal(group2GroupCacheRoot.get(Group2GroupCache_.child), child)
-                                                )
-                            );
+        criteriaQuery.where(
+            criteriaBuilder.and(criteriaBuilder.equal(group2GroupCacheRoot.get(Group2GroupCache_.parent), parent),
+                                criteriaBuilder.equal(group2GroupCacheRoot.get(Group2GroupCache_.child), child)
+            )
+        );
         return uniqueResult(context, criteriaQuery, true, Group2GroupCache.class, -1, -1);
     }
 

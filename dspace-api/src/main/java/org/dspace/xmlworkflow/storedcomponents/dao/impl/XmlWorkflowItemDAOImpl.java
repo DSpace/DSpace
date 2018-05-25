@@ -7,25 +7,23 @@
  */
 package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.Item_;
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.eperson.EPerson;
-import org.dspace.harvest.HarvestedCollection;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem_;
-import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
+import java.sql.SQLException;
+import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
-import java.sql.SQLException;
-import java.util.List;
+
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.content.Item_;
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem_;
+import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the XmlWorkflowItem object.
@@ -34,27 +32,28 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem> implements XmlWorkflowItemDAO
-{
+public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem> implements XmlWorkflowItemDAO {
 
-    protected XmlWorkflowItemDAOImpl()
-    {
+    protected XmlWorkflowItemDAOImpl() {
         super();
     }
 
     @Override
-    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer limit, Collection collection) throws SQLException {
+    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset,
+                                                     Integer limit,
+                                                     Collection collection) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, XmlWorkflowItem.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
         criteriaQuery.select(xmlWorkflowItemRoot);
-        if(collection!=null){
-            criteriaQuery.where(criteriaBuilder.equal(xmlWorkflowItemRoot.get(XmlWorkflowItem_.collection), collection));
+        if (collection != null) {
+            criteriaQuery.where(criteriaBuilder.equal(xmlWorkflowItemRoot.get(XmlWorkflowItem_.collection),
+                                                      collection));
         }
-        if(offset == null){
+        if (offset == null) {
             offset = -1;
         }
-        if(limit != null){
+        if (limit != null) {
             limit = -1;
         }
         return list(context, criteriaQuery, false, XmlWorkflowItem.class, limit, offset);
@@ -73,8 +72,9 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
-        if(collection != null){
-            criteriaQuery.where(criteriaBuilder.equal(xmlWorkflowItemRoot.get(XmlWorkflowItem_.collection), collection));
+        if (collection != null) {
+            criteriaQuery.where(criteriaBuilder.equal(xmlWorkflowItemRoot.get(XmlWorkflowItem_.collection),
+                                                      collection));
         }
         return count(context, criteriaQuery, criteriaBuilder, xmlWorkflowItemRoot);
     }

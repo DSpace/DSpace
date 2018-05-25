@@ -7,26 +7,23 @@
  */
 package org.dspace.workflowbasic.dao.impl;
 
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.Item_;
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.eperson.EPerson;
-import org.dspace.workflowbasic.BasicWorkflowItem;
-import org.dspace.workflowbasic.BasicWorkflowItem_;
-import org.dspace.workflowbasic.dao.BasicWorkflowItemDAO;
-import org.hibernate.Criteria;
+import java.sql.SQLException;
+import java.util.List;
 import javax.persistence.Query;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
-import java.sql.SQLException;
-import java.util.List;
+
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.content.Item_;
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.workflowbasic.BasicWorkflowItem;
+import org.dspace.workflowbasic.BasicWorkflowItem_;
+import org.dspace.workflowbasic.dao.BasicWorkflowItemDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the BasicWorkflowItem object.
@@ -35,10 +32,8 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflowItem> implements BasicWorkflowItemDAO
-{
-    protected BasicWorkflowItemDAOImpl()
-    {
+public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflowItem> implements BasicWorkflowItemDAO {
+    protected BasicWorkflowItemDAOImpl() {
         super();
     }
 
@@ -54,8 +49,7 @@ public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflow
     }
 
     @Override
-    public List<BasicWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException
-    {
+    public List<BasicWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException {
 
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
@@ -69,8 +63,7 @@ public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflow
     }
 
     @Override
-    public List<BasicWorkflowItem> findByCollection(Context context, Collection c) throws SQLException
-    {
+    public List<BasicWorkflowItem> findByCollection(Context context, Collection c) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BasicWorkflowItem.class);
         Root<BasicWorkflowItem> basicWorkflowItemRoot = criteriaQuery.from(BasicWorkflowItem.class);
@@ -80,9 +73,9 @@ public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflow
     }
 
     @Override
-    public List<BasicWorkflowItem> findByPooledTasks(Context context, EPerson ePerson) throws SQLException
-    {
-        String queryString = "select wf from TaskListItem as tli join tli.workflowItem wf where tli.ePerson = :eperson ORDER BY wf.workflowitemId";
+    public List<BasicWorkflowItem> findByPooledTasks(Context context, EPerson ePerson) throws SQLException {
+        String queryString = "select wf from TaskListItem as tli join tli.workflowItem wf where tli.ePerson = " +
+            ":eperson ORDER BY wf.workflowitemId";
         Query query = createQuery(context, queryString);
         query.setParameter("eperson", ePerson);
         return list(query);

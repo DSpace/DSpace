@@ -7,19 +7,16 @@
  */
 package org.dspace.app.requestitem.dao.impl;
 
-import org.dspace.app.requestitem.RequestItem;
-import org.dspace.app.requestitem.RequestItem_;
-import org.dspace.app.requestitem.dao.RequestItemDAO;
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
-
+import java.sql.SQLException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.sql.SQLException;
+
+import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.RequestItem_;
+import org.dspace.app.requestitem.dao.RequestItemDAO;
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the RequestItem object.
@@ -28,10 +25,8 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implements RequestItemDAO
-{
-    protected RequestItemDAOImpl()
-    {
+public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implements RequestItemDAO {
+    protected RequestItemDAOImpl() {
         super();
     }
 

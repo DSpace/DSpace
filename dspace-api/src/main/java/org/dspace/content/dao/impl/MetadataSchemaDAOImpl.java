@@ -7,22 +7,19 @@
  */
 package org.dspace.content.dao.impl;
 
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchema_;
 import org.dspace.content.dao.MetadataSchemaDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-import org.dspace.eperson.Subscription;
-import org.dspace.eperson.Subscription_;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Order;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the MetadataSchema object.
@@ -31,10 +28,8 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> implements MetadataSchemaDAO
-{
-    protected MetadataSchemaDAOImpl()
-    {
+public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> implements MetadataSchemaDAO {
+    protected MetadataSchemaDAOImpl() {
         super();
     }
 
@@ -47,12 +42,11 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * @throws SQLException if database error
      */
     @Override
-    public MetadataSchema findByNamespace(Context context, String namespace) throws SQLException
-    {
+    public MetadataSchema findByNamespace(Context context, String namespace) throws SQLException {
         // Grab rows from DB
         Query query = createQuery(context,
-                "SELECT ms FROM MetadataSchema ms " +
-                "WHERE ms.namespace = :namespace ");
+                                  "SELECT ms FROM MetadataSchema ms " +
+                                      "WHERE ms.namespace = :namespace ");
 
         query.setParameter("namespace", namespace);
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
@@ -87,11 +81,10 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * @throws SQLException if database error
      */
     @Override
-    public boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace) throws SQLException
-    {
+    public boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace) throws SQLException {
         Query query = createQuery(context,
-                "SELECT ms FROM MetadataSchema ms " +
-                "WHERE ms.namespace = :namespace and ms.id != :id");
+                                  "SELECT ms FROM MetadataSchema ms " +
+                                      "WHERE ms.namespace = :namespace and ms.id != :id");
 
         query.setParameter("namespace", namespace);
         query.setParameter("id", metadataSchemaId);
@@ -110,11 +103,10 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * @throws SQLException if database error
      */
     @Override
-    public boolean uniqueShortName(Context context, int metadataSchemaId, String name) throws SQLException
-    {
+    public boolean uniqueShortName(Context context, int metadataSchemaId, String name) throws SQLException {
         Query query = createQuery(context,
-                "SELECT ms FROM MetadataSchema ms " +
-                "WHERE ms.name = :name and ms.id != :id");
+                                  "SELECT ms FROM MetadataSchema ms " +
+                                      "WHERE ms.name = :name and ms.id != :id");
 
         query.setParameter("name", name);
         query.setParameter("id", metadataSchemaId);
@@ -134,11 +126,10 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * @throws SQLException if database error
      */
     @Override
-    public MetadataSchema find(Context context, String shortName) throws SQLException
-    {
+    public MetadataSchema find(Context context, String shortName) throws SQLException {
         Query query = createQuery(context,
-                "SELECT ms FROM MetadataSchema ms " +
-                "WHERE ms.name = :name");
+                                  "SELECT ms FROM MetadataSchema ms " +
+                                      "WHERE ms.name = :name");
 
         query.setParameter("name", shortName);
 

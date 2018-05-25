@@ -7,37 +7,27 @@
  */
 package org.dspace.content.dao.impl;
 
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
-import org.dspace.content.WorkspaceItem_;
-import org.dspace.content.dao.WorkspaceItemDAO;
-import org.dspace.core.Context;
-import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.EPerson_;
-import org.dspace.eperson.Group;
-import org.dspace.harvest.HarvestedCollection_;
-import org.dspace.identifier.DOI;
-import org.dspace.workflow.WorkflowItem;
-import org.hibernate.Criteria;
-import javax.persistence.Query;
-
-import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.BasicTransformerAdapter;
-import org.springframework.jdbc.object.SqlQuery;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Root;
 import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Root;
+
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.WorkspaceItem_;
+import org.dspace.content.dao.WorkspaceItemDAO;
+import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.EPerson_;
+import org.dspace.eperson.Group;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the WorkspaceItem object.
@@ -46,25 +36,23 @@ import java.util.Map;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> implements WorkspaceItemDAO
-{
-    protected WorkspaceItemDAOImpl()
-    {
+public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> implements WorkspaceItemDAO {
+    protected WorkspaceItemDAOImpl() {
         super();
     }
 
 
     @Override
-    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep) throws SQLException
-    {
-        Query query = createQuery(context, "from WorkspaceItem ws where ws.item.submitter = :submitter order by workspaceItemId");
+    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep) throws SQLException {
+        Query query = createQuery(context,
+                                  "from WorkspaceItem ws where ws.item.submitter = :submitter order by " +
+                                      "workspaceItemId");
         query.setParameter("submitter", ep);
         return list(query);
     }
 
     @Override
-    public List<WorkspaceItem> findByCollection(Context context, Collection c) throws SQLException
-    {
+    public List<WorkspaceItem> findByCollection(Context context, Collection c) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
@@ -75,8 +63,7 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     }
 
     @Override
-    public WorkspaceItem findByItem(Context context, Item i) throws SQLException
-    {
+    public WorkspaceItem findByItem(Context context, Item i) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
@@ -86,8 +73,7 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     }
 
     @Override
-    public List<WorkspaceItem> findAll(Context context) throws SQLException
-    {
+    public List<WorkspaceItem> findAll(Context context) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
@@ -101,10 +87,9 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
 
         return list(context, criteriaQuery, false, WorkspaceItem.class, -1, -1);
     }
-    
+
     @Override
-    public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException
-    {
+    public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
@@ -159,12 +144,13 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     @Override
     @SuppressWarnings("unchecked")
     public List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException {
-        Query query = createQuery(context,"SELECT wi.stageReached as stage_reached, count(*) as cnt from WorkspaceItem wi" +
-                " group by wi.stageReached order by wi.stageReached");
+        Query query = createQuery(context,
+                                  "SELECT wi.stageReached as stage_reached, count(*) as cnt from WorkspaceItem wi" +
+                                      " group by wi.stageReached order by wi.stageReached");
 
         List<Object[]> list = query.getResultList();
         List<Map.Entry<Integer, Long>> returnList = new LinkedList<>();
-        for(Object[] o : list) {
+        for (Object[] o : list) {
             returnList.add(new AbstractMap.SimpleEntry<>((Integer) o[0], (Long) o[1]));
         }
         return returnList;
