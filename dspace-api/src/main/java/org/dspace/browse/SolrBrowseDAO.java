@@ -18,7 +18,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -298,7 +297,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverResult resp = getSolrResponse();
 
         List<Item> bitems = new ArrayList<>();
-        for (DSpaceObject solrDoc : resp.getDspaceObjects()) {
+        for (BrowsableDSpaceObject<UUID> solrDoc : resp.getDspaceObjects()) {
             // FIXME introduce project, don't retrieve Item immediately when
             // processing the query...
             Item item = (Item) solrDoc;

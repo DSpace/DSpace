@@ -10,7 +10,11 @@ package org.dspace.content;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -24,8 +28,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
@@ -41,7 +50,11 @@ import org.hibernate.proxy.HibernateProxyHelper;
  */
 @Entity
 @Table(name = "workspaceitem")
-public class WorkspaceItem implements InProgressSubmission, Serializable, ReloadableEntity<Integer> {
+public class WorkspaceItem
+    implements InProgressSubmission<Integer>, Serializable, ReloadableEntity<Integer>, BrowsableDSpaceObject<Integer> {
+
+    @Transient
+    public transient Map<String, Object> extraInfo = new HashMap<String, Object>();
 
     @Id
     @Column(name = "workspace_item_id", unique = true, nullable = false)
@@ -237,5 +250,74 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
 
     void addSupervisorGroup(Group group) {
         supervisorGroups.add(group);
+    }
+
+    @Override
+    public void update() throws SQLException, AuthorizeException {
+
+        Context context = null;
+        try {
+            context = new Context();
+            ContentServiceFactory.getInstance().getWorkspaceItemService().update(context, this);
+        } finally {
+            if (context != null && context.isValid()) {
+                context.abort();
+            }
+        }
+    }
+
+    @Override
+    public String getHandle() {
+        return getType() + "-" + getID();
+    }
+
+    @Override
+    public String getTypeText() {
+        return "workspaceitem";
+    }
+
+    @Override
+    public int getType() {
+        return Constants.WORKSPACEITEM;
+    }
+
+    @Override
+    public Map<String, Object> getExtraInfo() {
+        return extraInfo;
+    }
+
+    @Override
+    public boolean isArchived() {
+        return false;
+    }
+
+    @Override
+    public boolean isDiscoverable() {
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return item.getName();
+    }
+
+    @Override
+    public String findHandle(Context context) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public boolean haveHierarchy() {
+        return false;
+    }
+
+    @Override
+    public BrowsableDSpaceObject getParentObject() {
+        return null;
+    }
+
+    @Override
+    public Date getLastModified() {
+        return item.getLastModified();
     }
 }

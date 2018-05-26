@@ -11,8 +11,8 @@ import java.util.List;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -36,7 +36,7 @@ public class BitstreamMetadataValueMovePatchOperation extends MetadataValueMoveP
     ItemService itemService;
 
     @Override
-    void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
+    void move(Context context, Request currentRequest, InProgressSubmission source, String path, String from)
         throws Exception {
         //"path": "/sections/upload/files/0/metadata/dc.title/2"
         //"abspath": "/files/0/metadata/dc.title/2"

@@ -28,7 +28,7 @@ import org.dspace.core.Context;
  * @param <T> class type
  * @author kevinvandevelde at atmire.com
  */
-public interface DSpaceObjectService<T extends DSpaceObject> {
+public interface DSpaceObjectService<T extends DSpaceObject> extends RootEntityService<T> {
 
 
     /**
@@ -249,10 +249,16 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
-                            List<String> authorities, List<Integer> confidences) throws SQLException;
+            List<String> authorities, List<Integer> confidences) throws SQLException;
+
+    public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
+            List<String> authorities, List<Integer> confidences, List<Integer> places) throws SQLException;
 
     public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value,
-                            String authority, int confidence) throws SQLException;
+            String authority, int confidence) throws SQLException;
+
+    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value,
+            String authority, int confidence, int place) throws SQLException;
 
     public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
         throws SQLException;

@@ -37,6 +37,9 @@ import org.dspace.eperson.Group;
  * @author kevinvandevelde at atmire.com
  */
 public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLegacySupportService<Item> {
+
+    public Item find(Context context, UUID id) throws SQLException;
+
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException;
 
     /**
@@ -611,6 +614,8 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      */
     int countNotArchivedItems(Context context) throws SQLException;
 
+    int countArchivedItems(Context context) throws SQLException;
+
     /**
      * counts all withdrawn items
      *
@@ -629,4 +634,12 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
+
+    List<Bundle> getBundles(Context context, Item item, String name) throws SQLException;
+
+    public List<Item> findBySubmitter(Context context, EPerson ep, Integer pageSize, Integer offset)
+        throws SQLException;
+
+    public int countBySubmitter(Context context, EPerson ep) throws SQLException;
+
 }

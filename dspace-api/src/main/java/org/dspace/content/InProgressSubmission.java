@@ -7,8 +7,10 @@
  */
 package org.dspace.content;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -18,13 +20,18 @@ import org.dspace.eperson.EPerson;
  * @author Robert Tansley
  * @version $Revision$
  */
-public interface InProgressSubmission {
+public interface InProgressSubmission<ID extends Serializable> {
     /**
      * Get the internal ID of this submission
      *
      * @return the internal identifier
      */
-    Integer getID();
+    ID getID();
+
+    /**
+     * Update the submission, including the unarchived item.
+     */
+    void update() throws SQLException, AuthorizeException;
 
     /**
      * Get the incomplete item object

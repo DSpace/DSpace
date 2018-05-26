@@ -113,8 +113,7 @@ public class HandleServiceImpl implements HandleService {
     }
 
     @Override
-    public String getCanonicalForm(String handle) {
-
+    public String getCanonicalPrefix() {
         // Let the admin define a new prefix, if not then we'll use the
         // CNRI default. This allows the admin to use "hdl:" if they want to or
         // use a locally branded prefix handle.myuni.edu.
@@ -123,7 +122,12 @@ public class HandleServiceImpl implements HandleService {
             handlePrefix = "http://hdl.handle.net/";
         }
 
-        return handlePrefix + handle;
+        return handlePrefix;
+    }
+
+    @Override
+    public String getCanonicalForm(String handle) {
+        return getCanonicalPrefix() + handle;
     }
 
     @Override

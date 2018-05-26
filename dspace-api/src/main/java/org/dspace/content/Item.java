@@ -7,12 +7,17 @@
  */
 package org.dspace.content;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,12 +32,15 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.apache.log4j.Logger;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 /**
@@ -51,11 +59,20 @@ import org.hibernate.proxy.HibernateProxyHelper;
  */
 @Entity
 @Table(name = "item")
-public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Item extends DSpaceObject implements DSpaceObjectLegacySupport, BrowsableDSpaceObject<UUID> {
+
+    /**
+     * log4j logger
+     */
+    private static Logger log = Logger.getLogger(Item.class);
+
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
      */
     public static final String ANY = "*";
+
+    @Transient
+    public transient Map<String, Object> extraInfo = new HashMap<String, Object>();
 
     @Column(name = "item_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -346,5 +363,35 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
             itemService = ContentServiceFactory.getInstance().getItemService();
         }
         return itemService;
+    }
+
+    public String getTypeText() {
+        return getItemService().getTypeText(this);
+    }
+
+    @Override
+    public Map<String, Object> getExtraInfo() {
+        return extraInfo;
+    }
+
+    @Override
+    public String findHandle(Context context) throws SQLException {
+        return HandleServiceFactory.getInstance().getHandleService().findHandle(context, this);
+    }
+
+    @Override
+    public boolean haveHierarchy() {
+        return true;
+    }
+
+    @Override
+    public BrowsableDSpaceObject getParentObject() {
+        Context context = new Context();
+        try {
+            return (BrowsableDSpaceObject) (getItemService().getParentObject(context, this));
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
     }
 }

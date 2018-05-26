@@ -435,6 +435,13 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         return bitstreamDAO.getNotReferencedBitstreams(context);
     }
 
+    @Override
+    public void addMetadata(Context context, Bitstream dso, MetadataField metadataField, String lang,
+                            List<String> values, List<String> authorities, List<Integer> confidences)
+        throws SQLException {
+        addMetadata(context, dso, metadataField, lang, values, authorities, confidences, null);
+    }
+
     public Long getLastModified(Bitstream bitstream) {
         return bitstreamStorageService.getLastModified(bitstream);
     }

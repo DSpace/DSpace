@@ -471,6 +471,18 @@ public class Util {
         return toReturn;
     }
 
+    public static <T> List<T>[] splitList(List<T> idsList, int i) {
+        int setmin = idsList.size() / i;
+        List<T>[] result = new List[i];
+        int offset = 0;
+        for (int idx = 0; idx < i - 1; idx++) {
+            result[idx] = idsList.subList(offset, offset + setmin);
+            offset += setmin;
+        }
+        result[i - 1] = idsList.subList(offset, idsList.size());
+        return result;
+    }
+
     public static List<String> differenceInSubmissionFields(Collection fromCollection, Collection toCollection)
         throws DCInputsReaderException {
         DCInputsReader reader = new DCInputsReader();

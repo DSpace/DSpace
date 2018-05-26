@@ -28,21 +28,21 @@ public class DiscoverFacetsConverter {
     private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
 
 
-    public SearchResultsRest convert(Context context, String query, String dsoType, String configurationName,
+    public SearchResultsRest convert(Context context, String query, String dsoType, String configuration,
                                      String dsoScope, List<SearchFilter> searchFilters, final Pageable page,
-                                     DiscoveryConfiguration configuration, DiscoverResult searchResult) {
+                                     DiscoveryConfiguration discoveryConfiguration, DiscoverResult searchResult) {
 
         SearchResultsRest searchResultsRest = new SearchResultsRest();
 
-        setRequestInformation(context, query, dsoType, configurationName, dsoScope, searchFilters, page,
+        setRequestInformation(context, query, dsoType, configuration, dsoScope, searchFilters, page,
                               searchResultsRest);
-        addFacetValues(searchResult, searchResultsRest, configuration);
+        addFacetValues(searchResult, searchResultsRest, discoveryConfiguration);
 
         return searchResultsRest;
     }
 
 
-    private void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest searchResultsRest,
+    public void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest searchResultsRest,
                                 final DiscoveryConfiguration configuration) {
 
         List<DiscoverySearchFilterFacet> facets = configuration.getSidebarFacets();
@@ -53,7 +53,7 @@ public class DiscoverFacetsConverter {
             SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(field.getIndexFieldName());
             int valueCount = 0;
             facetEntry.setFacetLimit(field.getFacetLimit());
-
+            facetEntry.setFacetType(field.getType());
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
                 //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
                 //more results available.
@@ -76,11 +76,11 @@ public class DiscoverFacetsConverter {
     }
 
     private void setRequestInformation(final Context context, final String query, final String dsoType,
-                                       final String configurationName, final String scope,
+                                       final String configuration, final String scope,
                                        final List<SearchFilter> searchFilters, final Pageable page,
                                        final SearchResultsRest resultsRest) {
         resultsRest.setQuery(query);
-        resultsRest.setConfigurationName(configurationName);
+        resultsRest.setConfiguration(configuration);
         resultsRest.setDsoType(dsoType);
         resultsRest.setSort(SearchResultsRest.Sorting.fromPage(page));
 

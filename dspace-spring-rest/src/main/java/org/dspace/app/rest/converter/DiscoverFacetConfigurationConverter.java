@@ -21,15 +21,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DiscoverFacetConfigurationConverter {
-    public FacetConfigurationRest convert(final String configurationName, final String scope,
-                                          DiscoveryConfiguration configuration) {
+    public FacetConfigurationRest convert(final String configuration, final String scope,
+                                          DiscoveryConfiguration discoveryConfiguration) {
         FacetConfigurationRest facetConfigurationRest = new FacetConfigurationRest();
 
-        facetConfigurationRest.setConfigurationName(configurationName);
+        facetConfigurationRest.setConfigurationName(configuration);
         facetConfigurationRest.setScope(scope);
 
         if (configuration != null) {
-            addSidebarFacets(facetConfigurationRest, configuration.getSidebarFacets());
+            addSidebarFacets(facetConfigurationRest, discoveryConfiguration.getSidebarFacets());
         }
 
         return facetConfigurationRest;

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.ListUtils;
-import org.dspace.content.DSpaceObject;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
@@ -28,8 +28,11 @@ public class DiscoverResult {
 
     private long totalSearchResults;
     private int start;
-    private List<DSpaceObject> dspaceObjects;
+    private List<BrowsableDSpaceObject> dspaceObjects;
     private Map<String, List<FacetResult>> facetResults;
+    private Map<String, List<FacetResult>> facetQueryResults;
+    private Map<String, List<FacetResult>> facetFieldResults;
+
     /**
      * A map that contains all the documents sougth after, the key is a string representation of the DSpace object
      */
@@ -39,20 +42,20 @@ public class DiscoverResult {
     private Map<String, DSpaceObjectHighlightResult> highlightedResults;
     private String spellCheckQuery;
 
-
     public DiscoverResult() {
-        dspaceObjects = new ArrayList<DSpaceObject>();
+        dspaceObjects = new ArrayList<BrowsableDSpaceObject>();
         facetResults = new LinkedHashMap<String, List<FacetResult>>();
+        facetQueryResults = new LinkedHashMap<String, List<FacetResult>>();
+        facetFieldResults = new LinkedHashMap<String, List<FacetResult>>();
         searchDocuments = new LinkedHashMap<String, List<SearchDocument>>();
         highlightedResults = new HashMap<String, DSpaceObjectHighlightResult>();
     }
 
-
-    public void addDSpaceObject(DSpaceObject dso) {
+    public void addDSpaceObject(BrowsableDSpaceObject dso) {
         this.dspaceObjects.add(dso);
     }
 
-    public List<DSpaceObject> getDspaceObjects() {
+    public List<BrowsableDSpaceObject> getDspaceObjects() {
         return dspaceObjects;
     }
 
@@ -101,24 +104,58 @@ public class DiscoverResult {
         return facetResults;
     }
 
+    public List<FacetResult> getFacetQueryResult(String facet) {
+        return facetQueryResults.get(facet) == null ? new ArrayList<FacetResult>() : facetQueryResults.get(facet);
+    }
+
+    public void addFacetQueryResult(String facetField, FacetResult... facetResults) {
+        List<FacetResult> facetValues = this.facetQueryResults.get(facetField);
+        if (facetValues == null) {
+            facetValues = new ArrayList<FacetResult>();
+        }
+        facetValues.addAll(Arrays.asList(facetResults));
+        this.facetQueryResults.put(facetField, facetValues);
+    }
+
+    public Map<String, List<FacetResult>> getFacetQueryResults() {
+        return facetQueryResults;
+    }
+
+    public List<FacetResult> getFacetFieldResult(String facet) {
+        return facetFieldResults.get(facet) == null ? new ArrayList<FacetResult>() : facetFieldResults.get(facet);
+    }
+
+    public void addFacetFieldResult(String facetField, FacetResult... facetResults) {
+        List<FacetResult> facetValues = this.facetFieldResults.get(facetField);
+        if (facetValues == null) {
+            facetValues = new ArrayList<FacetResult>();
+        }
+        facetValues.addAll(Arrays.asList(facetResults));
+        this.facetFieldResults.put(facetField, facetValues);
+    }
+
+    public Map<String, List<FacetResult>> getFacetFieldResults() {
+        return facetFieldResults;
+    }
+
     public List<FacetResult> getFacetResult(String facet) {
         return ListUtils.emptyIfNull(facetResults.get(facet));
     }
 
     public List<FacetResult> getFacetResult(DiscoverySearchFilterFacet field) {
         List<DiscoverResult.FacetResult> facetValues = getFacetResult(field.getIndexFieldName());
-        //Check if we are dealing with a date, sometimes the facet values arrive as dates !
+        // Check if we are dealing with a date, sometimes the facet values arrive as dates !
         if (facetValues.size() == 0 && field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             facetValues = getFacetResult(field.getIndexFieldName() + ".year");
         }
         return ListUtils.emptyIfNull(facetValues);
     }
 
-    public DSpaceObjectHighlightResult getHighlightedResults(DSpaceObject dso) {
+    public DSpaceObjectHighlightResult getHighlightedResults(BrowsableDSpaceObject dso) {
         return highlightedResults.get(dso.getHandle());
     }
 
-    public void addHighlightedResult(DSpaceObject dso, DSpaceObjectHighlightResult highlightedResult) {
+    public void addHighlightedResult(BrowsableDSpaceObject dso, DSpaceObjectHighlightResult highlightedResult) {
         this.highlightedResults.put(dso.getHandle(), highlightedResult);
     }
 
@@ -131,7 +168,7 @@ public class DiscoverResult {
         private String fieldType;
 
         public FacetResult(String asFilterQuery, String displayedValue, String authorityKey, String sortValue,
-                           long count, String fieldType) {
+                long count, String fieldType) {
             this.asFilterQuery = asFilterQuery;
             this.displayedValue = displayedValue;
             this.authorityKey = authorityKey;
@@ -141,6 +178,10 @@ public class DiscoverResult {
         }
 
         public String getAsFilterQuery() {
+            if (asFilterQuery == null) {
+                // missing facet filter query
+                return "[* TO *]";
+            }
             return asFilterQuery;
         }
 
@@ -161,7 +202,7 @@ public class DiscoverResult {
         }
 
         public String getFilterType() {
-            return authorityKey != null ? "authority" : "equals";
+            return authorityKey != null ? "authority" : asFilterQuery != null ? "equals" : "notequals";
         }
 
         public String getFieldType() {
@@ -178,15 +219,18 @@ public class DiscoverResult {
     }
 
     public static final class DSpaceObjectHighlightResult {
-        private DSpaceObject dso;
+        private BrowsableDSpaceObject dso;
         private Map<String, List<String>> highlightResults;
+        private Map<String, List<String[]>> highlightResultsWithAuthority;
 
-        public DSpaceObjectHighlightResult(DSpaceObject dso, Map<String, List<String>> highlightResults) {
+        public DSpaceObjectHighlightResult(BrowsableDSpaceObject dso, Map<String, List<String>> highlightResults,
+                Map<String, List<String[]>> highlightResultsWithAuthority) {
             this.dso = dso;
             this.highlightResults = highlightResults;
+            this.highlightResultsWithAuthority = highlightResultsWithAuthority;
         }
 
-        public DSpaceObject getDso() {
+        public BrowsableDSpaceObject getDso() {
             return dso;
         }
 
@@ -194,12 +238,16 @@ public class DiscoverResult {
             return highlightResults.get(metadataKey);
         }
 
+        public List<String[]> getHighlightResultsWithAuthority(String metadataKey) {
+            return highlightResultsWithAuthority.get(metadataKey);
+        }
+
         public Map<String, List<String>> getHighlightResults() {
             return highlightResults;
         }
     }
 
-    public void addSearchDocument(DSpaceObject dso, SearchDocument searchDocument) {
+    public void addSearchDocument(BrowsableDSpaceObject dso, SearchDocument searchDocument) {
         String dsoString = SearchDocument.getDspaceObjectStringRepresentation(dso);
         List<SearchDocument> docs = searchDocuments.get(dsoString);
         if (docs == null) {
@@ -212,10 +260,11 @@ public class DiscoverResult {
     /**
      * Returns all the sought after search document values
      *
-     * @param dso the dspace object we want our search documents for
+     * @param dso
+     *            the dspace object we want our search documents for
      * @return the search documents list
      */
-    public List<SearchDocument> getSearchDocument(DSpaceObject dso) {
+    public List<SearchDocument> getSearchDocument(BrowsableDSpaceObject dso) {
         String dsoString = SearchDocument.getDspaceObjectStringRepresentation(dso);
         List<SearchDocument> result = searchDocuments.get(dsoString);
         if (result == null) {
@@ -256,7 +305,7 @@ public class DiscoverResult {
             }
         }
 
-        public static String getDspaceObjectStringRepresentation(DSpaceObject dso) {
+        public static String getDspaceObjectStringRepresentation(BrowsableDSpaceObject dso) {
             return dso.getType() + ":" + dso.getID();
         }
     }

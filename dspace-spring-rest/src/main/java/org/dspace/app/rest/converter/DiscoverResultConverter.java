@@ -12,18 +12,14 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import org.dspace.app.rest.model.DSpaceObjectRest;
-import org.dspace.app.rest.model.SearchFacetEntryRest;
-import org.dspace.app.rest.model.SearchFacetValueRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.content.DSpaceObject;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -36,22 +32,24 @@ import org.springframework.stereotype.Component;
 public class DiscoverResultConverter {
 
     @Autowired
-    private List<DSpaceObjectConverter> converters;
-
-    private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
+    private List<BrowsableDSpaceObjectConverter> converters;
+    @Autowired
+    private DiscoverFacetsConverter facetConverter;
+    @Autowired
+    private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
     public SearchResultsRest convert(final Context context, final String query, final String dsoType,
-                                     final String configurationName, final String scope,
+                                     final String configuration, final String scope,
                                      final List<SearchFilter> searchFilters, final Pageable page,
-                                     final DiscoverResult searchResult, final DiscoveryConfiguration configuration) {
+            final DiscoverResult searchResult, final DiscoveryConfiguration discoveryConfiguration) {
 
         SearchResultsRest resultsRest = new SearchResultsRest();
 
-        setRequestInformation(context, query, dsoType, configurationName, scope, searchFilters, page, resultsRest);
+        setRequestInformation(context, query, dsoType, configuration, scope, searchFilters, page, resultsRest);
 
         addSearchResults(searchResult, resultsRest);
 
-        addFacetValues(searchResult, resultsRest, configuration);
+        addFacetValues(searchResult, resultsRest, discoveryConfiguration);
 
         resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
 
@@ -59,45 +57,16 @@ public class DiscoverResultConverter {
     }
 
     private void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest resultsRest,
-                                final DiscoveryConfiguration configuration) {
-
-        List<DiscoverySearchFilterFacet> facets = configuration.getSidebarFacets();
-        for (DiscoverySearchFilterFacet field : CollectionUtils.emptyIfNull(facets)) {
-            List<DiscoverResult.FacetResult> facetValues = searchResult.getFacetResult(field);
-
-            SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(field.getIndexFieldName());
-            int valueCount = 0;
-            facetEntry.setHasMore(false);
-            facetEntry.setFacetLimit(field.getFacetLimit());
-
-            for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
-                //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
-                //more results available.
-                if (valueCount < field.getFacetLimit()) {
-                    SearchFacetValueRest valueRest = facetValueConverter.convert(value);
-
-                    facetEntry.addValue(valueRest);
-                } else {
-                    facetEntry.setHasMore(true);
-                }
-
-                if (StringUtils.isBlank(facetEntry.getFacetType())) {
-                    facetEntry.setFacetType(value.getFieldType());
-                }
-
-                valueCount++;
-            }
-
-            resultsRest.addFacetEntry(facetEntry);
-        }
+            final DiscoveryConfiguration configuration) {
+        facetConverter.addFacetValues(searchResult, resultsRest, configuration);
     }
 
     private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
-        for (DSpaceObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getDspaceObjects())) {
+        for (BrowsableDSpaceObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getDspaceObjects())) {
             SearchResultEntryRest resultEntry = new SearchResultEntryRest();
 
             //Convert the DSpace Object to its REST model
-            resultEntry.setDspaceObject(convertDSpaceObject(dspaceObject));
+            resultEntry.setRObject(convertDSpaceObject(dspaceObject));
 
             //Add hit highlighting for this DSO if present
             DiscoverResult.DSpaceObjectHighlightResult highlightedResults = searchResult
@@ -113,21 +82,21 @@ public class DiscoverResultConverter {
         }
     }
 
-    private DSpaceObjectRest convertDSpaceObject(final DSpaceObject dspaceObject) {
-        for (DSpaceObjectConverter converter : converters) {
+    private RestAddressableModel convertDSpaceObject(final Object dspaceObject) {
+        for (BrowsableDSpaceObjectConverter<Object, RestAddressableModel> converter : converters) {
             if (converter.supportsModel(dspaceObject)) {
-                return converter.fromModel(dspaceObject);
+                return converter.convert(dspaceObject);
             }
         }
         return null;
     }
 
     private void setRequestInformation(final Context context, final String query, final String dsoType,
-                                       final String configurationName, final String scope,
+                                       final String configuration, final String scope,
                                        final List<SearchFilter> searchFilters, final Pageable page,
                                        final SearchResultsRest resultsRest) {
         resultsRest.setQuery(query);
-        resultsRest.setConfigurationName(configurationName);
+        resultsRest.setConfiguration(configuration);
         resultsRest.setDsoType(dsoType);
 
         resultsRest.setScope(scope);

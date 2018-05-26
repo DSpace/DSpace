@@ -8,7 +8,9 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,12 +19,12 @@ import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.utils.ScopeResolver;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.sort.SortException;
@@ -71,7 +73,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         BrowseEngine be = new BrowseEngine(context);
         BrowserScope bs = new BrowserScope(context);
 
-        DSpaceObject scopeObj = scopeResolver.resolveScope(context, scope);
+        BrowsableDSpaceObject scopeObj = scopeResolver.resolveScope(context, scope);
 
         // process the input, performing some inline validation
         BrowseIndex bi = null;
@@ -145,10 +147,13 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 
         BrowseInfo binfo = be.browse(bs);
 
-        Pageable pageResultInfo = new PageRequest((binfo.getStart() - 1) / binfo.getResultsPerPage(),
-                                                  binfo.getResultsPerPage());
-        Page<ItemRest> page = new PageImpl<Item>(binfo.getBrowseItemResults(), pageResultInfo, binfo.getTotal())
-            .map(converter);
+        Pageable pageResultInfo =
+                new PageRequest((binfo.getStart() - 1) / binfo.getResultsPerPage(), binfo.getResultsPerPage());
+        List<Item> tmpResult = new ArrayList<Item>();
+        for (BrowsableDSpaceObject bb : binfo.getBrowseItemResults()) {
+            tmpResult.add((Item) bb);
+        }
+        Page<ItemRest> page = new PageImpl<Item>(tmpResult, pageResultInfo, binfo.getTotal()).map(converter);
         return page;
     }
 

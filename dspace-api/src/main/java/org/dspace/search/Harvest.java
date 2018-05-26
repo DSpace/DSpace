@@ -13,10 +13,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
@@ -133,9 +135,9 @@ public class Harvest {
             DiscoverResult discoverResult = SearchUtils.getSearchService().search(context, discoverQuery);
 
             // Process results of query into HarvestedItemInfo objects
-            Iterator<DSpaceObject> dsoIterator = discoverResult.getDspaceObjects().iterator();
+            Iterator<BrowsableDSpaceObject> dsoIterator = discoverResult.getDspaceObjects().iterator();
             while (dsoIterator.hasNext() && ((limit == 0) || (itemCounter < limit))) {
-                DSpaceObject dso = dsoIterator.next();
+                BrowsableDSpaceObject<UUID> dso = (BrowsableDSpaceObject<UUID>) dsoIterator.next();
                 HarvestedItemInfo itemInfo = new HarvestedItemInfo();
                 itemInfo.context = context;
                 itemInfo.handle = dso.getHandle();

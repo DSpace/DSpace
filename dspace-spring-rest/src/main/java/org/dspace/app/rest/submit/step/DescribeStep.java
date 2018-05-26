@@ -23,8 +23,8 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.services.model.Request;
@@ -45,7 +45,8 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
     }
 
     @Override
-    public DataDescribe getData(SubmissionService submissionService, WorkspaceItem obj, SubmissionStepConfig config) {
+    public DataDescribe getData(SubmissionService submissionService, InProgressSubmission obj,
+            SubmissionStepConfig config) {
         DataDescribe data = new DataDescribe();
         try {
             DCInputSet inputConfig = inputReader.getInputsByFormName(config.getId());
@@ -100,7 +101,7 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, Operation op)
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
         throws Exception {
 
         PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
