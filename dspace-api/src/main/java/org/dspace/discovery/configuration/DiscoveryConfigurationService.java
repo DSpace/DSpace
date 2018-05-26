@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.content.DSpaceObject;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -20,8 +20,17 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class DiscoveryConfigurationService {
 
+    private Map<String, List<String>> extraConfigurationMapping = new HashMap<String, List<String>>();
     private Map<String, DiscoveryConfiguration> map;
     private Map<Integer, List<String>> toIgnoreMetadataFields = new HashMap<>();
+
+    public void setExtraConfigurationMapping(Map<String, List<String>> extraConfigurationMapping) {
+        this.extraConfigurationMapping = extraConfigurationMapping;
+    }
+
+    public Map<String, List<String>> getExtraConfigurationMapping() {
+        return extraConfigurationMapping;
+    }
 
     public Map<String, DiscoveryConfiguration> getMap() {
         return map;
@@ -39,7 +48,7 @@ public class DiscoveryConfigurationService {
         this.toIgnoreMetadataFields = toIgnoreMetadataFields;
     }
 
-    public DiscoveryConfiguration getDiscoveryConfiguration(DSpaceObject dso) {
+    public DiscoveryConfiguration getDiscoveryConfiguration(BrowsableDSpaceObject dso) {
         String name;
         if (dso == null) {
             name = "site";
@@ -64,7 +73,7 @@ public class DiscoveryConfigurationService {
     }
 
     public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName,
-                                                                       final DSpaceObject dso) {
+                                                                       final BrowsableDSpaceObject dso) {
         if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
             return getMap().get(configurationName);
         } else {

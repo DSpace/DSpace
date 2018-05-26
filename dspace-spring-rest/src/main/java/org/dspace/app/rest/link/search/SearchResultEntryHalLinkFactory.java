@@ -33,8 +33,8 @@ public class SearchResultEntryHalLinkFactory extends DiscoveryRestHalLinkFactory
         throws Exception {
         SearchResultEntryRest data = halResource.getContent();
 
-        if (data != null && data.getDspaceObject() != null) {
-            list.add(utils.linkToSingleResource(data.getDspaceObject(), SearchResultEntryResource.DSPACE_OBJECT_LINK));
+        if (data != null && data.getRObject() != null) {
+            list.add(utils.linkToSingleResource(data.getRObject(), SearchResultEntryResource.R_OBJECT_LINK));
         }
     }
 

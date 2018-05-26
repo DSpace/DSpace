@@ -27,8 +27,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY, reason = "Unprocessable request")
 public class UnprocessableEntityException extends RuntimeException {
 
+    public UnprocessableEntityException() {
+        super("Error during request process or missed a mandatory field");
+    }
+
     public UnprocessableEntityException(String message) {
         super(message);
     }
-
 }

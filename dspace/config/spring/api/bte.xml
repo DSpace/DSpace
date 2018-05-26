@@ -24,6 +24,7 @@
 				<entry key="csv" value-ref="csvDataLoader" />
 				<entry key="tsv" value-ref="tsvDataLoader" />
 				<entry key="oai" value-ref="oaipmhDataLoader" />
+				<!-- <entry key="grobid" value-ref="grobidDataLoader" /> -->
 			</map>
 		</property>
 		
@@ -55,7 +56,7 @@
 	<!-- **************************************************************************************************** -->
 
 	<bean class="org.dspace.submit.lookup.SubmissionLookupService"
-		name="org.dspace.submit.lookup.SubmissionLookupService">
+		name="org.dspace.submit.lookup.SubmissionLookupService" scope="prototype">
 		<property name="phase1TransformationEngine" ref="phase1TransformationEngine" />
 		<property name="phase2TransformationEngine" ref="phase2TransformationEngine" />
 		<!-- Uncomment the following property if you want specific fields to appear in the detail presentation
@@ -100,7 +101,7 @@
     	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
   	</bean>
 
-	<bean name="multipleDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	<bean name="multipleDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader" scope="prototype">
 	    <property name="dataloadersMap">
 	        <map>
 	            <!-- Specify here any data loaders you want to include in the submission lookup process.
@@ -119,14 +120,15 @@
 	            <entry key="endnote" value-ref="endnoteDataLoader"/>
 	            <entry key="csv" value-ref="csvDataLoader"/>
 	            <entry key="tsv" value-ref="tsvDataLoader"/>
+	            <!-- <entry key="grobid" value-ref="grobidDataLoader" /> -->
 			</map>
 	    </property>
 	</bean>
 
-	<bean name="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" class="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+	<bean name="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" class="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" scope="prototype"/>
 	
 	<!-- Specify here any filters or modifiers to run before the output -->
-	<bean name="phase1LinearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
+	<bean name="phase1LinearWorkflow" class="gr.ekt.bte.core.LinearWorkflow" scope="prototype">
 	    <property name="process">
 			<list>
 			    <ref bean="mapConverter_arxivSubject"/>
@@ -222,7 +224,7 @@
 
         <bean name="languageCodeModifier" class="org.dspace.submit.lookup.LanguageCodeModifier"/>
 
-	<bean name="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" class="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator">
+	<bean name="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" class="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" scope="prototype">
 	    <property name="outputMap" ref="outputMap"/>
 
 	    <property name="extraMetadataToKeep">
@@ -574,4 +576,21 @@
 		</constructor-arg>
 	</bean>
 
+	<bean id="grobidDataLoader" class="org.dspace.submit.extraction.GrobidFileDataLoader">
+		<property name="url" value="${metadata.extraction.grobid.url}"/>
+		<property name="fieldMap">
+			<map>
+				<entry key="analytictitle" value="title" />
+				<entry key="analyticname" value="authors" />
+				<entry key="monogrtitle" value="journal" />
+				<entry key="publicationstmtdatepublished" value="issued" />
+				<entry key="ISSN" value="jissn" />
+				<entry key="ISBN" value="pisbn" />
+				<entry key="DOI" value="doi" />
+				<entry key="profiledescabstractparagraph" value="abstract" />
+				<entry key="profiledesckeywordsterm" value="allkeywords" />
+			</map>
+		</property>
+	</bean>
+	
 </beans>

@@ -28,7 +28,7 @@ import org.dspace.app.rest.exception.InvalidSearchFacetException;
 import org.dspace.app.rest.exception.InvalidSearchFilterException;
 import org.dspace.app.rest.exception.InvalidSortingException;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.content.DSpaceObject;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
@@ -75,7 +75,7 @@ public class DiscoverQueryBuilderTest {
     private Context context;
 
     @Mock
-    private DSpaceObject scope;
+    private BrowsableDSpaceObject scope;
 
     private DiscoveryConfiguration discoveryConfiguration;
     private String query;
@@ -91,8 +91,8 @@ public class DiscoverQueryBuilderTest {
         when(searchService.toSortFieldIndex(any(String.class), any(String.class)))
             .then(invocation -> invocation.getArguments()[0] + "_sort");
 
-        when(searchService
-                 .getFacetYearRange(eq(context), any(DSpaceObject.class), any(DiscoverySearchFilterFacet.class), any()))
+        when(searchService.getFacetYearRange(eq(context), any(BrowsableDSpaceObject.class),
+                any(DiscoverySearchFilterFacet.class), any()))
             .then(invocation
                       -> new FacetYearRange((DiscoverySearchFilterFacet) invocation.getArguments()[2]));
 

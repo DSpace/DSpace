@@ -70,10 +70,9 @@ public interface HandleService {
      * Transforms handle into a URI using http://hdl.handle.net if not
      * overridden by the configuration property handle.canonical.prefix.
      *
-     * No attempt is made to verify that handle is in fact valid.
+     * No attempt is made to verify that prefix is in fact valid.
      *
-     * @param handle The handle
-     * @return The canonical form
+     * @return The canonical prefix
      */
     public String getCanonicalForm(String handle);
 

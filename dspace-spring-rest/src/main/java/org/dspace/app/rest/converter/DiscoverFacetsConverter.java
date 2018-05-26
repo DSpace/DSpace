@@ -51,27 +51,28 @@ public class DiscoverFacetsConverter {
     }
 
 
-    private void addFacetValues(Context context, final DiscoverResult searchResult,
-                                final SearchResultsRest searchResultsRest,
+    void addFacetValues(Context context, final DiscoverResult searchResult,
+                                final SearchResultsRest resultsRest,
                                 final DiscoveryConfiguration configuration) {
 
         List<DiscoverySearchFilterFacet> facets = configuration.getSidebarFacets();
         for (DiscoverySearchFilterFacet field : CollectionUtils.emptyIfNull(facets)) {
-
             List<DiscoverResult.FacetResult> facetValues = searchResult.getFacetResult(field);
 
             SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(field.getIndexFieldName());
             int valueCount = 0;
+            facetEntry.setHasMore(false);
             facetEntry.setFacetLimit(field.getFacetLimit());
-            facetEntry.setExposeMinMax(field.exposeMinAndMaxValue());
             if (field.exposeMinAndMaxValue()) {
                 handleExposeMinMaxValues(context,field,facetEntry);
             }
+            facetEntry.setExposeMinMax(field.exposeMinAndMaxValue());
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
                 //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
                 //more results available.
                 if (valueCount < field.getFacetLimit()) {
                     SearchFacetValueRest valueRest = facetValueConverter.convert(value);
+
                     facetEntry.addValue(valueRest);
                 } else {
                     facetEntry.setHasMore(true);
@@ -84,7 +85,7 @@ public class DiscoverFacetsConverter {
                 valueCount++;
             }
 
-            searchResultsRest.addFacetEntry(facetEntry);
+            resultsRest.addFacetEntry(facetEntry);
         }
     }
 

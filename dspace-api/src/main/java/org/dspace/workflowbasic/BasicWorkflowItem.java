@@ -8,6 +8,7 @@
 package org.dspace.workflowbasic;
 
 import java.sql.SQLException;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,11 +21,13 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * Class representing an item going through the workflow process in DSpace
@@ -145,7 +148,7 @@ public class BasicWorkflowItem implements WorkflowItem {
         return collection;
     }
 
-    void setCollection(Collection collection) {
+    public void setCollection(Collection collection) {
         this.collection = collection;
     }
 
@@ -182,5 +185,19 @@ public class BasicWorkflowItem implements WorkflowItem {
     @Override
     public void setPublishedBefore(boolean b) {
         this.publishedBefore = b;
+    }
+
+    @Override
+    public void update() throws SQLException, AuthorizeException {
+
+        Context context = null;
+        try {
+            context = new Context();
+            WorkflowServiceFactory.getInstance().getWorkflowItemService().update(context, this);
+        } finally {
+            if (context != null && context.isValid()) {
+                context.abort();
+            }
+        }
     }
 }

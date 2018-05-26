@@ -8,6 +8,10 @@
 package org.dspace.xmlworkflow.storedcomponents;
 
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,13 +23,18 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * Class representing an item going through the workflow process in DSpace
@@ -37,7 +46,10 @@ import org.dspace.workflow.WorkflowItem;
  */
 @Entity
 @Table(name = "cwf_workflowitem")
-public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> {
+public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>, BrowsableDSpaceObject<Integer> {
+
+    @Transient
+    public transient Map<String, Object> extraInfo = new HashMap<String, Object>();
 
     @Id
     @Column(name = "workflowitem_id")
@@ -132,6 +144,81 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> 
     @Override
     public void setPublishedBefore(boolean b) {
         this.publishedBefore = b;
+    }
+
+    @Override
+    public void update() throws SQLException, AuthorizeException {
+
+        Context context = null;
+        try {
+            context = new Context();
+            WorkflowServiceFactory.getInstance().getWorkflowItemService().update(context, this);
+        } finally {
+            if (context != null && context.isValid()) {
+                context.abort();
+            }
+        }
+    }
+
+    @Override
+    public int getState() {
+        // FIXME
+        return 0;
+    }
+
+    @Override
+    public String getHandle() {
+        return null;
+    }
+
+    @Override
+    public String getTypeText() {
+        return "workflowitem";
+    }
+
+    @Override
+    public int getType() {
+        return Constants.WORKFLOWITEM;
+    }
+
+    @Override
+    public Map<String, Object> getExtraInfo() {
+        return extraInfo;
+    }
+
+    @Override
+    public boolean isArchived() {
+        return false;
+    }
+
+    @Override
+    public boolean isDiscoverable() {
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return item.getName();
+    }
+
+    @Override
+    public String findHandle(Context context) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public boolean haveHierarchy() {
+        return false;
+    }
+
+    @Override
+    public BrowsableDSpaceObject getParentObject() {
+        return getItem();
+    }
+
+    @Override
+    public Date getLastModified() {
+        return item.getLastModified();
     }
 
 }

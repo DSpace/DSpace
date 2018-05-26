@@ -10,6 +10,7 @@ package org.dspace.content.factory;
 import java.util.List;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.RootObject;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -22,6 +23,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.RootEntityService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -35,6 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ContentServiceFactoryImpl extends ContentServiceFactory {
 
+
+    @Autowired(required = true)
+    private List<RootEntityService<? extends RootObject>> rootObjectServices;
 
     @Autowired(required = true)
     private List<DSpaceObjectService<? extends DSpaceObject>> dSpaceObjectServices;
@@ -142,5 +147,10 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Override
     public SiteService getSiteService() {
         return siteService;
+    }
+
+    @Override
+    public List<RootEntityService<? extends RootObject>> getRootObjectServices() {
+        return rootObjectServices;
     }
 }

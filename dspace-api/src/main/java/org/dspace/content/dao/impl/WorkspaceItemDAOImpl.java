@@ -47,6 +47,20 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     }
 
     @Override
+    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
+        throws SQLException {
+        Criteria criteria = createCriteria(context, WorkspaceItem.class, "wi");
+        criteria.addOrder(Order.asc("workspaceItemId"));
+        criteria.createAlias("wi.item", "item");
+        criteria.createAlias("item.submitter", "submitter");
+
+        criteria.add(Restrictions.eq("submitter.id", ep.getID()));
+        criteria.setFirstResult(offset);
+        criteria.setMaxResults(limit);
+        return list(criteria);
+    }
+
+    @Override
     public List<WorkspaceItem> findByCollection(Context context, Collection c) throws SQLException {
         Criteria criteria = createCriteria(context, WorkspaceItem.class);
         criteria.add(Restrictions.eq("collection", c));
@@ -97,6 +111,14 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) from WorkspaceItem"));
+    }
+
+    @Override
+    public int countRows(Context context, EPerson ep) throws SQLException {
+        Query query = createQuery(context,
+                                  "SELECT count(*) from WorkspaceItem ws where ws.item.submitter = :submitter");
+        query.setParameter("submitter", ep);
+        return count(query);
     }
 
     @Override

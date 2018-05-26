@@ -7,6 +7,11 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,7 +22,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.dspace.browse.BrowsableDSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
@@ -32,8 +40,10 @@ import org.dspace.eperson.EPerson;
  */
 @Entity
 @Table(name = "cwf_claimtask")
-public class ClaimedTask implements ReloadableEntity<Integer> {
+public class ClaimedTask implements ReloadableEntity<Integer>, BrowsableDSpaceObject<Integer> {
 
+    @Transient
+    public transient Map<String, Object> extraInfo = new HashMap<String, Object>();
 
     @Id
     @Column(name = "claimtask_id")
@@ -114,5 +124,60 @@ public class ClaimedTask implements ReloadableEntity<Integer> {
 
     public String getWorkflowID() {
         return workflowId;
+    }
+
+    @Override
+    public String getHandle() {
+        return null;
+    }
+
+    @Override
+    public String getTypeText() {
+        return "claimedtask";
+    }
+
+    @Override
+    public int getType() {
+        return Constants.WORKFLOW_CLAIMED;
+    }
+
+    @Override
+    public Map<String, Object> getExtraInfo() {
+        return extraInfo;
+    }
+
+    @Override
+    public boolean isArchived() {
+        return false;
+    }
+
+    @Override
+    public boolean isDiscoverable() {
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return workflowItem.getItem().getName();
+    }
+
+    @Override
+    public String findHandle(Context context) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public boolean haveHierarchy() {
+        return false;
+    }
+
+    @Override
+    public BrowsableDSpaceObject getParentObject() {
+        return getWorkflowItem();
+    }
+
+    @Override
+    public Date getLastModified() {
+        return workflowItem.getItem().getLastModified();
     }
 }

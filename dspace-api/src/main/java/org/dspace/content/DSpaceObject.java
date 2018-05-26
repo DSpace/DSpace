@@ -36,7 +36,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "dspaceobject")
-public abstract class DSpaceObject implements Serializable, ReloadableEntity<java.util.UUID> {
+public abstract class DSpaceObject implements Serializable, ReloadableEntity<java.util.UUID>, RootObject {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid2")
@@ -199,4 +199,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
         this.modified = true;
     }
 
+    public String getUniqueIndexID() {
+        return getType() + "-" + getID().toString();
+    }
 }

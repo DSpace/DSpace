@@ -7,9 +7,16 @@
  */
 package org.dspace.discovery;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -17,12 +24,13 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -58,8 +66,8 @@ public class IndexClient {
         Context context = new Context(Context.Mode.READ_ONLY);
         context.turnOffAuthorisationSystem();
 
-        String usage = "org.dspace.discovery.IndexClient [-cbhf] | [-r <handle>] | [-i <handle>] or nothing to " +
-            "update/clean an existing index.";
+        String usage = "org.dspace.discovery.IndexClient [-cbhf] | [-r <handle>] | [-i <handle>] | [-item_uuid " +
+            "<uuid>] or nothing to update/clean an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
@@ -71,12 +79,20 @@ public class IndexClient {
                                   "remove an Item, Collection or Community from index based on its handle")
                               .create("r"));
 
+        options.addOption(OptionBuilder.withArgName("item uuid to index").hasArg(true)
+                .withDescription("add an Item based on its uuid").create("item_uuid"));
+
         options.addOption(OptionBuilder
                               .withArgName("handle to add or update")
                               .hasArg(true)
                               .withDescription(
                                   "add or update an Item, Collection or Community based on its handle")
                               .create("i"));
+
+        options.addOption(OptionBuilder.isRequired(false).hasArg(true)
+                .withDescription("update an Item, Collection or Community from index based on its handle, use with -f "
+                        + "to force clean")
+                .create("u"));
 
         options.addOption(OptionBuilder
                               .isRequired(false)
@@ -110,6 +126,8 @@ public class IndexClient {
 
         options.addOption(OptionBuilder.isRequired(false).withDescription(
             "optimize search core").create("o"));
+
+        options.addOption("e", "readfile", true, "Read the identifier from a file");
 
         try {
             line = new PosixParser().parse(options, args);
@@ -150,10 +168,55 @@ public class IndexClient {
             indexer.optimize();
         } else if (line.hasOption('s')) {
             checkRebuildSpellCheck(line, indexer);
+        } else if (line.hasOption("item_uuid")) {
+            String itemUUID = line.getOptionValue("item_uuid");
+            Item item = ContentServiceFactory.getInstance().getItemService().find(context, UUID.fromString(itemUUID));
+            indexer.indexContent(context, item, line.hasOption("f"));
+        } else if (line.hasOption("u")) {
+            String optionValue = line.getOptionValue("u");
+            String[] identifiers = optionValue.split("\\s*,\\s*");
+            for (String id : identifiers) {
+                if (id.startsWith(ConfigurationManager.getProperty("handle.prefix")) || id.startsWith("123456789/")) {
+                    BrowsableDSpaceObject dso = (BrowsableDSpaceObject) HandleServiceFactory.getInstance()
+                            .getHandleService().resolveToObject(context, id);
+                    indexer.indexContent(context, dso, line.hasOption("f"));
+                }
+            }
+        } else if (line.hasOption('e')) {
+            try {
+                String filename = line.getOptionValue('e');
+                FileInputStream fstream = new FileInputStream(filename);
+                // Get the object of DataInputStream
+                DataInputStream in = new DataInputStream(fstream);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                String strLine;
+                // Read File Line By Line
+
+                UUID item_id = null;
+                List<UUID> ids = new ArrayList<UUID>();
+
+                while ((strLine = br.readLine()) != null) {
+                    item_id = UUID.fromString(strLine.trim());
+                    ids.add(item_id);
+                }
+
+                in.close();
+
+                int type = -1;
+                if (line.hasOption('t')) {
+                    type = Integer.parseInt(line.getOptionValue("t"));
+                } else {
+                    // force to item
+                    type = Constants.ITEM;
+                }
+                indexer.updateIndex(context, ids, line.hasOption("f"), type);
+            } catch (Exception e) {
+                log.error("Error: " + e.getMessage());
+            }
         } else if (line.hasOption('i')) {
             final String handle = line.getOptionValue('i');
-            final DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
-                                                         .resolveToObject(context, handle);
+            final BrowsableDSpaceObject dso = (BrowsableDSpaceObject) HandleServiceFactory.getInstance()
+                    .getHandleService().resolveToObject(context, handle);
             if (dso == null) {
                 throw new IllegalArgumentException("Cannot resolve " + handle + " to a DSpace object");
             }
@@ -186,7 +249,7 @@ public class IndexClient {
     private static long indexAll(final IndexingService indexingService,
                                  final ItemService itemService,
                                  final Context context,
-                                 final DSpaceObject dso)
+                                 final BrowsableDSpaceObject dso)
         throws IOException, SearchServiceException, SQLException {
         long count = 0;
 

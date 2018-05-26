@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.RootObject;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -25,6 +26,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.RootEntityService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -40,6 +42,8 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 public abstract class ContentServiceFactory {
 
     public abstract List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices();
+
+    public abstract List<RootEntityService<? extends RootObject>> getRootObjectServices();
 
     public abstract List<DSpaceObjectLegacySupportService<? extends DSpaceObject>>
         getDSpaceObjectLegacySupportServices();
@@ -76,6 +80,24 @@ public abstract class ContentServiceFactory {
         } else {
             return WorkflowServiceFactory.getInstance().getWorkflowItemService();
         }
+    }
+
+    public <T extends RootObject> RootEntityService<T> getRootObjectService(T dso) {
+        // No need to worry when supressing, as long as our "getDSpaceObjectManager" method is properly implemented
+        // no casting issues should occur
+        @SuppressWarnings("unchecked")
+        RootEntityService<T> manager = getRootObjectService(dso.getType());
+        return manager;
+    }
+
+    public RootEntityService getRootObjectService(int type) {
+        for (int i = 0; i < getRootObjectServices().size(); i++) {
+            RootEntityService objectService = getRootObjectServices().get(i);
+            if (objectService.isSupportsTypeConstant(type)) {
+                return objectService;
+            }
+        }
+        throw new UnsupportedOperationException("Unknown DSpace type: " + type);
     }
 
     public <T extends DSpaceObject> DSpaceObjectService<T> getDSpaceObjectService(T dso) {
