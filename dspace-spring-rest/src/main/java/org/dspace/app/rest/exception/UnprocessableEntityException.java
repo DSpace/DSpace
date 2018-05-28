@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY, reason = "Unprocessable request")
-public class PatchUnprocessableEntityException extends RuntimeException {
+public class UnprocessableEntityException extends RuntimeException {
 
-    public PatchUnprocessableEntityException(String message) {
+    public UnprocessableEntityException(String message) {
         super(message);
     }
 

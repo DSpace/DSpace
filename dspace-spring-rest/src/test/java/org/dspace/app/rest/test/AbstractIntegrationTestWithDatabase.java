@@ -20,8 +20,10 @@ import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.jdom.Document;
 import org.junit.After;
@@ -202,4 +204,12 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             setUp();
         }
     }
+
+    public void makeUserAdmin() throws Exception {
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group admin = groupService.findByName(context, Group.ADMIN);
+        groupService.addMember(context, admin, eperson);
+        context.commit();
+    }
+
 }
