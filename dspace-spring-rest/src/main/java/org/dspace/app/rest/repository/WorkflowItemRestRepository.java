@@ -123,7 +123,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     }
 
     @SearchRestMethod(name = "findBySubmitter")
-    public Page<WorkflowItemRest> findBySubmitter(@Param(value = "submitterID") UUID submitterID, Pageable pageable) {
+    public Page<WorkflowItemRest> findBySubmitter(@Param(value = "uuid") UUID submitterID, Pageable pageable) {
         List<XmlWorkflowItem> witems = null;
         try {
             Context context = obtainContext();
