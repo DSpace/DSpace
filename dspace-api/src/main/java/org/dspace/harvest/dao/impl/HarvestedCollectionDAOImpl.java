@@ -105,33 +105,36 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);
 
-        Predicate orPredicate = criteriaBuilder
+        Predicate wasNotHarvestedInCurrentRun = criteriaBuilder
             .or(criteriaBuilder.lessThan(harvestedCollectionRoot.get(HarvestedCollection_.lastHarvested), startTime),
                 criteriaBuilder.isNull(harvestedCollectionRoot.get(HarvestedCollection_.lastHarvested))
             );
 
-        List<Predicate> orPredicates = new LinkedList<>();
+        List<Predicate> hasCorrectStatusOrIsExpiredRestrictions = new LinkedList<>();
 
         for (int status : statuses) {
-            orPredicates
+            hasCorrectStatusOrIsExpiredRestrictions
                 .add(criteriaBuilder.equal(harvestedCollectionRoot.get(HarvestedCollection_.harvestStatus), status));
         }
 
-        Predicate andPredicate = criteriaBuilder.and(
+        Predicate harvestExpiredRestriction = criteriaBuilder.and(
             criteriaBuilder.equal(harvestedCollectionRoot.get(HarvestedCollection_.harvestStatus), expirationStatus),
             criteriaBuilder
                 .greaterThan(harvestedCollectionRoot.get(HarvestedCollection_.harvestStartTime), expirationTime)
         );
 
-        orPredicates.add(andPredicate);
+        hasCorrectStatusOrIsExpiredRestrictions.add(harvestExpiredRestriction);
 
-        Predicate secondPredicate = criteriaBuilder.or(orPredicates.toArray(new Predicate[] {}));
+        Predicate hasCorrectStatusOrIsExpiredPredicate = criteriaBuilder.or(hasCorrectStatusOrIsExpiredRestrictions
+                                                                                .toArray(new Predicate[] {}));
 
-        criteriaQuery.where(criteriaBuilder.and(orPredicate,
-                                                criteriaBuilder.greaterThan(
-                                                    harvestedCollectionRoot.get(HarvestedCollection_.harvestType),
-                                                    minimalType),
-                                                secondPredicate
+        Predicate hasMinimalType = criteriaBuilder.greaterThan(
+            harvestedCollectionRoot.get(HarvestedCollection_.harvestType),
+            minimalType);
+
+        criteriaQuery.where(criteriaBuilder.and(wasNotHarvestedInCurrentRun,
+                                                hasMinimalType,
+                                                hasCorrectStatusOrIsExpiredPredicate
                             )
         );
 

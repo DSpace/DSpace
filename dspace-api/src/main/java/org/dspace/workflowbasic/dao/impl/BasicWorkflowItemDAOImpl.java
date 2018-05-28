@@ -8,6 +8,7 @@
 package org.dspace.workflowbasic.dao.impl;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -58,6 +59,12 @@ public class BasicWorkflowItemDAOImpl extends AbstractHibernateDAO<BasicWorkflow
         Join<BasicWorkflowItem, Item> join = basicWorkflowItemRoot.join("item");
         criteriaQuery.select(basicWorkflowItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(join.get(Item_.submitter), ep));
+
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(basicWorkflowItemRoot.get(BasicWorkflowItem_.workflowitemId)));
+        criteriaQuery.orderBy(orderList);
+
+
         return list(context, criteriaQuery, false, BasicWorkflowItem.class, -1, -1);
 
     }
