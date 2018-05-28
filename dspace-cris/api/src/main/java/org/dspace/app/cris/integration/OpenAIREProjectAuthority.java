@@ -27,7 +27,7 @@ public class OpenAIREProjectAuthority extends ProjectAuthority {
 	private static Logger log = Logger.getLogger(OpenAIREProjectAuthority.class);
 	//Results of first page
 	private static final int DEFAULT_MAX_ROWS = 10;
-	private static final String OPENAIRE_PROJECT_PREFIX="info:eu-repo/semantics/";
+	private static final String OPENAIRE_PROJECT_PREFIX="info:eu-repo/grantAgreement/";
 	private static final String OPENAIRE_PROJECT_AUTHORITY_TYPE = "openAireProject";
 	
 	private OpenAIREProjectService openAIREProjectService = new DSpace().getServiceManager()
