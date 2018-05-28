@@ -656,14 +656,14 @@ public class RestResourceController implements InitializingBean {
      */
     private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request,
                                                                       HttpServletResponse response, String apiCategory,
-                                                                      String model, ID uuid, String rel, Pageable page,
-                                                                      PagedResourcesAssembler assembler,
+                                                                      String model, ID uuid, String subpath,
+                                                                      Pageable page, PagedResourcesAssembler assembler,
                                                                       String projection) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
 
-        LinkRest linkRest = utils.getLinkRest(rel, domainClass);
+        LinkRest linkRest = utils.getLinkRest(subpath, domainClass);
         PagedResources<? extends HALResource> result;
 
         if (linkRest != null) {
@@ -673,23 +673,23 @@ public class RestResourceController implements InitializingBean {
             if (linkMethod == null) {
                 // TODO custom exception
                 throw new RuntimeException(
-                    "Method for relation " + rel + " not found: " + linkRest.name() + ":" + linkRest.method());
+                        "Method for relation " + subpath + " not found: " + linkRest.name() + ":" + linkRest.method());
             } else {
                 try {
                     if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
                         Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                            .invoke(linkRepository, request, uuid, page, projection);
-                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
-                                                                               .slash(rel).withSelfRel();
+                                .invoke(linkRepository, request, uuid, page, projection);
+                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
+                                .withSelfRel();
                         Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
                         halResources.forEach(linkService::addLinks);
 
                         return assembler.toResource(halResources, link);
                     } else {
                         RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
-                                                                         projection);
-                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(rel)
-                                                                               .withSelfRel();
+                                projection);
+                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
+                                .withSelfRel();
                         HALResource tmpresult = linkRepository.wrapResource(object);
                         tmpresult.add(link);
                         return tmpresult;
@@ -700,8 +700,29 @@ public class RestResourceController implements InitializingBean {
             }
         }
         RestAddressableModel modelObject = repository.findOne(uuid);
-        DSpaceResource resource = repository.wrapResource(modelObject, rel);
+
+        if (modelObject == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
+        }
+
+        DSpaceResource resource = repository.wrapResource(modelObject, subpath);
         linkService.addLinks(resource);
+
+        String rel = null;
+
+        for (Link l : resource.getLinks()) {
+            if (l.isTemplated()) {
+                if (l.getHref().substring(0, l.getHref().indexOf("?")).contentEquals(request.getRequestURL())) {
+                    rel = l.getRel();
+                }
+            } else if (l.getHref().contentEquals(request.getRequestURL())) {
+                rel = l.getRel();
+            }
+        }
+
+        if (rel == null) {
+            throw new ResourceNotFoundException(rel + " undefined for " + model);
+        }
 
         if (resource.getLink(rel) == null) {
             // TODO create a custom exception
