@@ -21,7 +21,6 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
-import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.app.rest.model.patch.Operation;
@@ -306,16 +305,12 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     }
 
     @Override
-    protected void delete(Context context, Integer id) throws RepositoryMethodNotImplementedException {
+    protected void delete(Context context, Integer id) throws AuthorizeException {
         WorkspaceItem witem = null;
         try {
             witem = wis.find(context, id);
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        try {
             wis.deleteAll(context, witem);
-        } catch (SQLException | AuthorizeException | IOException e) {
+        } catch (SQLException | IOException e) {
             log.error(e.getMessage(), e);
         }
     }

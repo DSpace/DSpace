@@ -28,11 +28,11 @@ import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.PatchBadRequestException;
-import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
@@ -579,7 +579,7 @@ public class RestResourceController implements InitializingBean {
             JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
             Patch patch = patchConverter.convert(jsonNode);
             modelObject = repository.patch(request, apiCategory, model, id, patch);
-        } catch (RepositoryMethodNotImplementedException | PatchUnprocessableEntityException |
+        } catch (RepositoryMethodNotImplementedException | UnprocessableEntityException |
             PatchBadRequestException e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -880,9 +880,9 @@ public class RestResourceController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public ResponseEntity<ResourceSupport> delete(HttpServletRequest request, @PathVariable String apiCategory,
-                                                  @PathVariable String model, @PathVariable UUID id)
+                                                  @PathVariable String model, @PathVariable UUID uuid)
         throws HttpRequestMethodNotSupportedException {
-        return deleteInternal(apiCategory, model, id);
+        return deleteInternal(apiCategory, model, uuid);
     }
 
     /**
