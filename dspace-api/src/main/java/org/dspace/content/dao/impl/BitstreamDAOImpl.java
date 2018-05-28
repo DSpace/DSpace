@@ -59,7 +59,7 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
         criteriaQuery.select(bitstreamRoot);
         criteriaQuery.where(criteriaBuilder.and(
             criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.internalId), bitstream.getInternalId()),
-            criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.id), bitstream.getID())
+            criteriaBuilder.notEqual(bitstreamRoot.get(Bitstream_.id), bitstream.getID())
                             )
         );
         return list(context, criteriaQuery, false, Bitstream.class, -1, -1);

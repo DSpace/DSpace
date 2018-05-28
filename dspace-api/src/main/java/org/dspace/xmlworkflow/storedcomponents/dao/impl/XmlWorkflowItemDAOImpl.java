@@ -53,7 +53,7 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
         if (offset == null) {
             offset = -1;
         }
-        if (limit != null) {
+        if (limit == null) {
             limit = -1;
         }
         return list(context, criteriaQuery, false, XmlWorkflowItem.class, limit, offset);

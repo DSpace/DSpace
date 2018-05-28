@@ -16,6 +16,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataField_;
 import org.dspace.content.MetadataSchema;
@@ -80,7 +81,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         throws SQLException {
         Query query;
 
-        if (qualifier != null) {
+        if (StringUtils.isNotBlank(qualifier)) {
             query = createQuery(context, "SELECT mf " +
                 "FROM MetadataField mf " +
                 "JOIN FETCH mf.metadataSchema ms " +
@@ -97,7 +98,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         query.setParameter("name", metadataSchema);
         query.setParameter("element", element);
 
-        if (qualifier != null) {
+        if (StringUtils.isNotBlank(qualifier)) {
             query.setParameter("qualifier", qualifier);
         }
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);

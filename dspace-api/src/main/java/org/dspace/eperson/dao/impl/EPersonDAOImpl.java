@@ -147,7 +147,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EPerson.class);
         Root<EPerson> ePersonRoot = criteriaQuery.from(EPerson.class);
         criteriaQuery.select(ePersonRoot);
-        criteriaQuery.where(criteriaBuilder.lessThanOrEqualTo(ePersonRoot.<Date>get(EPerson_.lastActive), date));
+        criteriaQuery.where(criteriaBuilder.lessThanOrEqualTo(ePersonRoot.get(EPerson_.lastActive), date));
         return list(context, criteriaQuery, false, EPerson.class, -1, -1);
     }
 
