@@ -169,13 +169,17 @@
         <%
         } else {
             AuthorLocalization author = EssuirUtils.findAuthor(surname, initials);
+            surname_uk = author.getSurname_uk();
+            initials_uk = author.getInitials_uk();
+            surname_ru = author.getSurname_ru();
+            initials_ru = author.getInitials_ru();
         %>
         <p>
             <strong>Edit author: </strong><%=surname %>, <%=initials %>
 
             <input type="hidden" name="old_surname_en" value="<%=surname %>"/>
             <input type="hidden" name="old_initials_en" value="<%=initials %>"/>
-            <input type="hidden" name="old_surname_uk" value="<%= author.getSurname_ru() %>"/>
+            <input type="hidden" name="old_surname_uk" value="<%= author.getSurname_uk() %>"/>
             <input type="hidden" name="old_initials_uk" value="<%= author.getInitials_uk() %>"/>
             <input type="hidden" name="old_surname_ru" value="<%= author.getSurname_ru() %>"/>
             <input type="hidden" name="old_initials_ru" value="<%= author.getInitials_ru() %>"/>
@@ -187,9 +191,9 @@
         <table align="center" width="95%">
             <tr>
                 <td>Surname EN</td>
-                <td><input type="text" name="surname_en" value="<%=surname_en %>"/></td>
+                <td><input type="text" name="surname_en" value="<%= surname %>"/></td>
                 <td>Initials EN</td>
-                <td><input type="text" name="initials_en" size="35" value="<%=initials_en %>"/></td>
+                <td><input type="text" name="initials_en" size="35" value="<%= initials %>"/></td>
             </tr>
             <tr>
                 <td>Surname UK</td>
