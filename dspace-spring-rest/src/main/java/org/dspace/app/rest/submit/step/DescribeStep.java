@@ -10,6 +10,7 @@ package org.dspace.app.rest.submit.step;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
@@ -50,13 +51,29 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
         DataDescribe data = new DataDescribe();
         try {
             DCInputSet inputConfig = inputReader.getInputsByFormName(config.getId());
-            for (DCInput input : inputConfig.getFields()) {
+            readField(obj, config, data, inputConfig);
+        } catch (DCInputsReaderException e) {
+            log.error(e.getMessage(), e);
+        }
+        return data;
+    }
+
+    private void readField(InProgressSubmission obj, SubmissionStepConfig config, DataDescribe data,
+                           DCInputSet inputConfig) throws DCInputsReaderException {
+        for (DCInput[] row : inputConfig.getFields()) {
+            for (DCInput input : row) {
 
                 List<String> fieldsName = new ArrayList<String>();
                 if (input.isQualdropValue()) {
                     for (Object qualifier : input.getPairs()) {
                         fieldsName.add(input.getFieldName() + "." + (String) qualifier);
                     }
+                } else if (StringUtils.equalsIgnoreCase(input.getInputType(), "group")) {
+                    log.info("Called child form:" + config.getId() + "-" +
+                             Utils.standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    DCInputSet inputConfigChild = inputReader.getInputsByFormName(config.getId() + "-" + Utils
+                        .standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    readField(obj, config, data, inputConfigChild);
                 } else {
                     fieldsName.add(input.getFieldName());
                 }
@@ -94,10 +111,7 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
                     }
                 }
             }
-        } catch (DCInputsReaderException e) {
-            log.error(e.getMessage(), e);
         }
-        return data;
     }
 
     @Override

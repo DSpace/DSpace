@@ -418,11 +418,12 @@ public class Util {
 
         List<DCInputSet> inputSets = inputsReader.getInputsByCollectionHandle(col_handle);
 
+        // Replace the values of Metadatum[] with the correct ones in case
+        // of
+        // controlled vocabularies
+        String currentField = Utils.standardize(schema, element, qualifier, ".");
+
         for (DCInputSet inputSet : inputSets) {
-            // Replace the values of Metadatum[] with the correct ones in case
-            // of
-            // controlled vocabularies
-            String currentField = Utils.standardize(schema, element, qualifier, ".");
 
             if (inputSet != null) {
 
@@ -430,19 +431,20 @@ public class Util {
 
                 for (int p = 0; p < fieldsNums; p++) {
 
-                    DCInput[] inputs = inputSet.getFields();
+                    DCInput[][] inputs = inputSet.getFields();
 
                     if (inputs != null) {
 
                         for (int i = 0; i < inputs.length; i++) {
-                            String inputField = Utils.standardize(inputs[i].getSchema(), inputs[i].getElement(),
-                                                                  inputs[i].getQualifier(), ".");
-                            if (currentField.equals(inputField)) {
-
-                                myInputs = inputs[i];
-                                myInputsFound = true;
-                                break;
-
+                            for (int j = 0; j < inputs[i].length; j++) {
+                                String inputField = Utils
+                                    .standardize(inputs[i][j].getSchema(), inputs[i][j].getElement(),
+                                                 inputs[i][j].getQualifier(), ".");
+                                if (currentField.equals(inputField)) {
+                                    myInputs = inputs[i][j];
+                                    myInputsFound = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -492,13 +494,17 @@ public class Util {
         Set<String> fromFieldName = new HashSet<>();
         Set<String> toFieldName = new HashSet<>();
         for (DCInputSet ff : from) {
-            for (DCInput fdc : ff.getFields()) {
-                fromFieldName.add(fdc.getFieldName());
+            for (DCInput[] fdcrow : ff.getFields()) {
+                for (DCInput fdc : fdcrow) {
+                    fromFieldName.add(fdc.getFieldName());
+                }
             }
         }
         for (DCInputSet tt : to) {
-            for (DCInput tdc : tt.getFields()) {
-                toFieldName.add(tdc.getFieldName());
+            for (DCInput[] tdcrow : tt.getFields()) {
+                for (DCInput tdc : tdcrow) {
+                    toFieldName.add(tdc.getFieldName());
+                }
             }
         }
 

@@ -11,8 +11,10 @@ package org.dspace.app.rest.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.dspace.submit.model.LanguageFormField;
 import org.dspace.submit.model.SelectableMetadata;
 
@@ -28,6 +30,12 @@ public class SubmissionFormFieldRest {
     private SubmissionFormInputTypeRest input;
     private ScopeEnum scope;
     private SubmissionVisibilityRest visibility;
+
+    @JsonInclude(Include.NON_NULL)
+    @JsonIgnoreProperties( { "name", "type", "id" })
+    @JsonUnwrapped
+    private SubmissionFormRest rows;
+
     private String label;
     private boolean mandatory;
     private boolean repeatable;
@@ -120,5 +128,13 @@ public class SubmissionFormFieldRest {
         if (visibility != null && (visibility.getMain() != null || visibility.getOther() != null)) {
             this.visibility = visibility;
         }
+    }
+
+    public SubmissionFormRest getRows() {
+        return rows;
+    }
+
+    public void setRows(SubmissionFormRest rows) {
+        this.rows = rows;
     }
 }
