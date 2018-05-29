@@ -24,8 +24,8 @@ public class ResourceTypeSolrIndexer implements SolrServiceIndexPlugin {
     public void additionalIndex(Context context, BrowsableDSpaceObject dso, SolrInputDocument document) {
 
         final String typeText = StringUtils.deleteWhitespace(dso.getTypeText().toLowerCase());
-        String acvalue = DSpaceServicesFactory.getInstance().getConfigurationService()
-                .getProperty("facet.type." + typeText, typeText);
+        String acvalue = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(
+                "discovery.facet.type." + typeText, typeText + SolrServiceImpl.AUTHORITY_SEPARATOR + typeText);
         String fvalue = acvalue;
         addResourceTypeIndex(document, acvalue, fvalue);
     }

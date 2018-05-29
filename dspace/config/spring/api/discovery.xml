@@ -13,6 +13,7 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
+    <bean id="solrServiceResourceTypePlugin" class="org.dspace.discovery.ResourceTypeSolrIndexer" scope="prototype"/>
     <bean id="solrServiceResourceIndexPlugin" class="org.dspace.discovery.SolrServiceResourceRestrictionPlugin" scope="prototype"/>
     <bean id="SolrServiceSpellIndexingPlugin" class="org.dspace.discovery.SolrServiceSpellIndexingPlugin" scope="prototype"/>
     <bean id="solrServiceMetadataBrowseIndexingPlugin" class="org.dspace.discovery.SolrServiceMetadataBrowseIndexingPlugin" scope="prototype"/>
