@@ -86,14 +86,14 @@ public class SubmissionService {
 
     public WorkspaceItem createWorkspaceItem(Context context, Request request) throws SQLException, AuthorizeException {
         WorkspaceItem wsi = null;
-        String collectionUUID = request.getHttpServletRequest().getParameter("collection");
-        if (StringUtils.isBlank(collectionUUID)) {
-            collectionUUID = configurationService.getProperty("submission.default.collection");
+        String uuid = request.getHttpServletRequest().getParameter("collection");
+        if (StringUtils.isBlank(uuid)) {
+            uuid = configurationService.getProperty("submission.default.collection");
         }
 
         Collection collection = null;
-        if (StringUtils.isNotBlank(collectionUUID)) {
-            collection = collectionService.find(context, UUID.fromString(collectionUUID));
+        if (StringUtils.isNotBlank(uuid)) {
+            collection = collectionService.find(context, UUID.fromString(uuid));
         } else {
             collection = collectionService.findAll(context, 1, 0).get(0);
         }
