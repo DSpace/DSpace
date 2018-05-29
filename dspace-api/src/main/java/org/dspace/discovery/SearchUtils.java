@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
@@ -54,11 +54,11 @@ public class SearchUtils {
         return getDiscoveryConfiguration(null, null);
     }
 
-    public static DiscoveryConfiguration getDiscoveryConfiguration(BrowsableDSpaceObject dso) {
+    public static DiscoveryConfiguration getDiscoveryConfiguration(DSpaceObject dso) {
         return getDiscoveryConfiguration(null, dso);
     }
 
-    public static DiscoveryConfiguration getDiscoveryConfiguration(String prefix, BrowsableDSpaceObject dso) {
+    public static DiscoveryConfiguration getDiscoveryConfiguration(String prefix, DSpaceObject dso) {
         if (prefix != null) {
             return getDiscoveryConfigurationByName(dso != null ? prefix + "." + dso.getHandle() : prefix);
         } else {

@@ -260,11 +260,6 @@ public class WorkspaceItem
     }
 
     @Override
-    public String getHandle() {
-        return getType() + "-" + getID();
-    }
-
-    @Override
     public String getTypeText() {
         return "workspaceitem";
     }
