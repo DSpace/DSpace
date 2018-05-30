@@ -49,6 +49,9 @@ public class DryadWorkflowUtils {
 
 
     public static Item getDataPackage(Context context, Item dataFile) {
+        if (dataFile == null) {
+            return null;
+        }
         // if this item is in fact a data package and not a data file, return the package (this item).
         try {
             if (dataFile.isIn(DryadDataPackage.getCollection(context))) {
