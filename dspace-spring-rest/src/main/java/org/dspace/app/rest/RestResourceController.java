@@ -542,17 +542,18 @@ public class RestResourceController implements InitializingBean {
      * @param request
      * @param apiCategory
      * @param model
-     * @param uuid
+     * @param id
      * @param jsonNode
      * @return
      * @throws HttpRequestMethodNotSupportedException
      */
     @RequestMapping(method = RequestMethod.PATCH, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
-                                                 @PathVariable String model, @PathVariable UUID uuid,
+                                                 @PathVariable String model,
+                                                 @PathVariable(name = "uuid") UUID id,
                                                  @RequestBody(required = true) JsonNode jsonNode)
         throws HttpRequestMethodNotSupportedException {
-        return patchInternal(request, apiCategory, model, uuid, jsonNode);
+        return patchInternal(request, apiCategory, model, id, jsonNode);
     }
 
     /**
@@ -580,7 +581,7 @@ public class RestResourceController implements InitializingBean {
             Patch patch = patchConverter.convert(jsonNode);
             modelObject = repository.patch(request, apiCategory, model, id, patch);
         } catch (RepositoryMethodNotImplementedException | UnprocessableEntityException |
-            PatchBadRequestException e) {
+            PatchBadRequestException | ResourceNotFoundException e) {
             log.error(e.getMessage(), e);
             throw e;
         } catch (Exception e) {

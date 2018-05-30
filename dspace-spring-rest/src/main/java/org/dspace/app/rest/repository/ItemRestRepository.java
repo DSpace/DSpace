@@ -17,11 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
-import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
-import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,12 +42,6 @@ import org.springframework.stereotype.Component;
 @Component(ItemRest.CATEGORY + "." + ItemRest.NAME)
 public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
-    private static final String OPERATION_PATH_WITHDRAW = "withdraw";
-
-    private static final String OPERATION_PATH_REINSTATE = "reinstate";
-
-    private static final String OPERATION_PATH_DISCOVERABLE = "discoverable";
-
     private static final Logger log = Logger.getLogger(ItemRestRepository.class);
 
     @Autowired
@@ -54,6 +49,12 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
     @Autowired
     ItemConverter converter;
+
+    /**
+     * Proposed helper class for Item patches.
+     */
+    @Autowired
+    ItemPatch itemPatch;
 
     public ItemRestRepository() {
         System.out.println("Repository initialized by Spring");
@@ -93,74 +94,16 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     }
 
     @Override
-    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id, Patch
-            patch)
-            throws PatchUnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException {
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid, Patch
+        patch)
+        throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException,
+        ResourceNotFoundException {
 
-        Item item;
-        try {
-            item = is.find(context, id);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+        ItemRest restModel = findOne(context, uuid);
+        if (restModel == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
         }
-
-        // temporarily turn off authorization
-        context.turnOffAuthorisationSystem();
-
-        List<Operation> operations = patch.getOperations();
-        for (Operation op : operations) {
-            if ("replace".equals(op.getOp())) {
-
-                String path = op.getPath();
-                switch (path) {
-                    case OPERATION_PATH_WITHDRAW:
-                        withdraw(context, item);
-                        break;
-                    case OPERATION_PATH_REINSTATE:
-                        reinstate(context, item);
-                        break;
-                    case OPERATION_PATH_DISCOVERABLE:
-                        item.setDiscoverable((boolean) op.getValue());
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        // restore authorization
-        context.restoreAuthSystemState();
-
-        // Do we want to return the updated item json? Something else?
-        findOne(context, id);
-    }
-
-    private void withdraw(Context context, Item item) throws PatchUnprocessableEntityException,
-            SQLException, AuthorizeException {
-
-        try {
-            if (!item.isArchived()) {
-                throw new PatchUnprocessableEntityException("Item is not in the archive. Cannot be withdrawn.");
-            }
-            is.withdraw(context, item);
-
-        } catch (SQLException | AuthorizeException e) {
-            log.error(e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    private void reinstate(Context context, Item item) throws PatchUnprocessableEntityException,
-            SQLException, AuthorizeException {
-
-        try {
-            is.reinstate(context, item);
-
-        } catch (SQLException | AuthorizeException e) {
-            log.error(e.getMessage(), e);
-            throw e;
-        }
+        itemPatch.patch(restModel, context, patch);
     }
 
     @Override

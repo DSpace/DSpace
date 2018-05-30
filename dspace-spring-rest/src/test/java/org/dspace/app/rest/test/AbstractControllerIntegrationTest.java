@@ -16,9 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 import javax.servlet.Filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Application;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.junit.Assert;
@@ -117,6 +120,16 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     public String getAuthToken(String user, String password) throws Exception {
         return getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER);
+    }
+
+    public String getPatchContent(List<Operation> ops) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(ops);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
