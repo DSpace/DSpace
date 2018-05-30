@@ -242,13 +242,11 @@ public class Manuscript {
     }
 
     public Manuscript(Item item) {
-        String journalName = "";
         DCValue[] journalNames = item.getMetadata(journalMetadata.getProperty(JOURNAL));
         if (journalNames != null && journalNames.length > 0) {
-            journalName = journalNames[0].value;
+            journalConcept = JournalUtils.getJournalConceptByJournalName(journalNames[0].value);
         }
 
-        journalConcept = JournalUtils.getJournalConceptByJournalName(journalName);
         DCValue[] msids = item.getMetadata(journalMetadata.getProperty(MANUSCRIPT));
         if (msids != null && msids.length > 0) {
             setManuscriptId(msids[0].value);
@@ -257,6 +255,21 @@ public class Manuscript {
         if (pubDOIs != null && pubDOIs.length > 0) {
             setPublicationDOI(pubDOIs[0].value);
         }
+        String title = "";
+        DCValue[] titles = item.getMetadata(journalMetadata.getProperty(ARTICLE_TITLE));
+        if (titles != null && titles.length > 0) {
+            title = titles[0].value.replaceAll("Data from: ", "");
+        }
+        setTitle(title);
+
+        AuthorsList authorsList = new AuthorsList();
+        List<DCValue> authorList = Arrays.asList(item.getMetadata(journalMetadata.getProperty(AUTHORS)));
+        for (DCValue a : authorList) {
+            String lastName = StringUtils.substringBefore(a.value, ",");
+            String givenNames = StringUtils.substringAfter(a.value, ",").trim();
+            authorsList.author.add(new Author(lastName, givenNames));
+        }
+        setAuthors(authorsList);
     }
 
     public String getManuscriptId() {
