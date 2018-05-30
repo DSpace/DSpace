@@ -322,7 +322,7 @@
 				<descriptions>
 					<description descriptionType="Other">
 					        <!-- Exclude provenance fields, since these often contain private information -->
-						<xsl:value-of select="dspace:field[@element='description']"/>
+						<xsl:value-of select="dspace:field[@element='description' and not(@qualifier='provenance')]"/>
 					</description>
 				</descriptions>
 			</xsl:if>
