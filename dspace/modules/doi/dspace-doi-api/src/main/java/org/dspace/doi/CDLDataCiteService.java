@@ -35,7 +35,7 @@ public class CDLDataCiteService {
 
     private static final Logger log = Logger.getLogger(CDLDataCiteService.class);
 
-    private static final String BASEURL = "https://ezid.cdlib.org";
+    private static final String DEFAULT_BASEURL = "https://ezid.cdlib.org";
 
     private String myUsername;
     private String myPassword;
@@ -104,7 +104,14 @@ public class CDLDataCiteService {
         if (aDOI.toUpperCase().startsWith("DOI")) {
             aDOI = aDOI.substring(4);
         }
-        return BASEURL + "/id/doi%3A" + aDOI;
+
+        String baseUrl = DEFAULT_BASEURL;
+        String doiEnv = System.getenv("DOI_SERVER");
+        if(doiEnv != null) {
+            baseUrl = doiEnv;
+        }  
+        
+        return baseUrl + "/id/doi%3A" + aDOI;
     }
 
     public String lookup(String aDOI) throws IOException {
