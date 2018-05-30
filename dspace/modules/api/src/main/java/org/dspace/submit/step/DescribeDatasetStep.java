@@ -35,11 +35,6 @@ public class DescribeDatasetStep extends DescribeStep {
 
         EventLogger.log(context, "submission-describe-dataset", "button_pressed=" + buttonPressed);
 
-        // get the item and current page
-        Item item = subInfo.getSubmissionItem().getItem();
-        int currentPage = getCurrentPage(request);
-
-
         // CANCEL: remove dataFile and redirect to the Overview Step...
         if(buttonPressed.equals("submit_cancel")){
             EventLogger.log(context, "submission-describe-dataset", "status=cancelled");
@@ -50,6 +45,9 @@ public class DescribeDatasetStep extends DescribeStep {
             return STATUS_COMPLETE;
         }
 
+        // get the item and current page
+        Item item = subInfo.getSubmissionItem().getItem();
+        int currentPage = getCurrentPage(request);
 
 
         Collection c = subInfo.getSubmissionItem().getCollection();
