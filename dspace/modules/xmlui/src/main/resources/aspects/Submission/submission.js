@@ -692,7 +692,8 @@ function processPage(workspaceID, stepConfig, page)
     try{
 	    response_flag = stepClass.doProcessing(getDSContext(), getHttpRequest(), getHttpResponse(), submissionInfo);
     }catch(exception){
-        sendPage("handle/"+handle+"/workflow_new/workflowexception",{"error":exception.toString()});
+        throw exception;
+        // sendPage("handle/"+handle+"/workflow_new/workflowexception",{"error":exception.toString()});
         cocoon.exit();
 
     }
@@ -993,7 +994,8 @@ function doWorkflow()
             try{
                 action = WorkflowManager.doState(getDSContext(), getDSContext().getCurrentUser(), getHttpRequest(), workflowItemId, workflow, action);
             }catch(exception){
-                sendPage("handle/"+handle+"/workflow_new/workflowexception",{"error":exception.toString()});
+                throw exception;
+                // sendPage("handle/"+handle+"/workflow_new/workflowexception",{"error":exception.toString()});
                 cocoon.exit();
             }
             if(action == null){
