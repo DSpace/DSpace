@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -15,11 +16,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
+import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
@@ -330,6 +337,106 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byName"))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void deleteOne() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete
+        getClient(token).perform(delete("/api/eperson/epersons/" + ePerson.getID()))
+                .andExpect(status().is(204));
+
+        // Verify 404 after delete
+        getClient().perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteUnauthorized() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        // login as a basic user
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Delete using an unauthorized user
+        getClient(token).perform(delete("/api/eperson/epersons/" + ePerson.getID()))
+                .andExpect(status().isForbidden());
+
+        // login as admin
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // Verify the eperson is still here
+        getClient(adminToken).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteForbidden() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        // Delete as anonymous user
+        getClient().perform(delete("/api/eperson/epersons/" + ePerson.getID()))
+                .andExpect(status().isUnauthorized());
+
+        // login as admin
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // Verify the eperson is still here
+        getClient(adminToken).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                .andExpect(status().isOk());
+    }
+
+    @Ignore
+    @Test
+    public void deleteViolatingConstraints() throws Exception {
+        // We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Sample", "Submitter")
+                .withEmail("submitter@fake-email.com")
+                .build();
+
+        // force the use of the new user for subsequent operation
+        context.setCurrentUser(ePerson);
+
+        // ** GIVEN **
+        // 1. A community with a logo
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").withLogo("logo_community")
+                                          .build();
+
+        // 2. A collection with a logo
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
+                                          .withLogo("logo_collection").build();
+
+
+        // 3. Create an item that will prevent the deletation of the eperson account (it is the submitter)
+        Item item = ItemBuilder.createItem(context, col).build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // 422 error when trying to DELETE the eperson=submitter
+        getClient(token).perform(delete("/api/eperson/epersons/" + ePerson.getID()))
+                   .andExpect(status().is(422));
+
+        // Verify the eperson is still here
+        getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                .andExpect(status().isOk());
     }
 
 }
