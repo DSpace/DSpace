@@ -79,12 +79,32 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     @SearchRestMethod(name = "byName")
     public Page<EPersonRest> findByName(@Parameter(value = "q", required = true) String q,
             Pageable pageable) {
-        return null;
+        List<EPerson> epersons = null;
+        int total = 0;
+        try {
+            Context context = obtainContext();
+            epersons = es.search(context, q, pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
+            total = es.searchResultCount(context, q);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(converter);
+        return page;
     }
 
     @SearchRestMethod(name = "byEmail")
     public EPersonRest findByEmail(@Parameter(value = "email", required = true) String email) {
-        return null;
+        EPerson eperson = null;
+        try {
+            Context context = obtainContext();
+            eperson = es.findByEmail(context, email);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (eperson == null) {
+            return null;
+        }
+        return converter.fromModel(eperson);
     }
 
     @Override
