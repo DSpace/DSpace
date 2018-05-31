@@ -117,9 +117,12 @@ public abstract class AVisualizationGraphModeOne extends AVisualizationGraph
                         
                         int i = 0;
                         Set<String> authArrays = new HashSet<String>();
+                        Set<String> bAuthArrays = new HashSet<String>();
                         for(String elementInListAuth : authListArrays) {
                             authArrays.add(elementInListAuth);
+                            bAuthArrays.add(elementInListAuth);
                         }
+                        
                         
                         for (String aaa : authArrays)
                         {
@@ -149,7 +152,8 @@ public abstract class AVisualizationGraphModeOne extends AVisualizationGraph
                                 
                             }
                             int j = i;
-                            for (String bbb : authArrays)
+                            
+                            for (String bbb : bAuthArrays)
                             {                                
                                 String extra = handle;
 
@@ -203,6 +207,7 @@ public abstract class AVisualizationGraphModeOne extends AVisualizationGraph
                                 }
                                 j++;
                             }
+                            bAuthArrays.remove(aaa);
                             i++;
                         }
                     }
