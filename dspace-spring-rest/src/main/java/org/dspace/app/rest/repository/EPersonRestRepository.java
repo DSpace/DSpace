@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.model.EPersonRest;
@@ -35,7 +37,7 @@ import org.springframework.stereotype.Component;
 @Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME)
 public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUID> {
     EPersonService es = EPersonServiceFactory.getInstance().getEPersonService();
-    
+
     @Autowired
     AuthorizeService authorizeService;
 
@@ -72,6 +74,17 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         }
         Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(converter);
         return page;
+    }
+
+    @SearchRestMethod(name = "byName")
+    public Page<EPersonRest> findByName(@Parameter(value = "q") String q,
+            Pageable pageable) {
+        return null;
+    }
+
+    @SearchRestMethod(name = "byEmail")
+    public EPersonRest findByEmail(@Parameter(value = "email") String email) {
+       return null;
     }
 
     @Override
