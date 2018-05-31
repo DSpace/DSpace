@@ -77,14 +77,14 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     }
 
     @SearchRestMethod(name = "byName")
-    public Page<EPersonRest> findByName(@Parameter(value = "q") String q,
+    public Page<EPersonRest> findByName(@Parameter(value = "q", required = true) String q,
             Pageable pageable) {
         return null;
     }
 
     @SearchRestMethod(name = "byEmail")
-    public EPersonRest findByEmail(@Parameter(value = "email") String email) {
-       return null;
+    public EPersonRest findByEmail(@Parameter(value = "email", required = true) String email) {
+        return null;
     }
 
     @Override
