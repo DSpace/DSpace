@@ -7,16 +7,21 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -105,6 +110,27 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
             return null;
         }
         return converter.fromModel(eperson);
+    }
+
+    @Override
+    protected void delete(Context context, UUID id) throws AuthorizeException, RepositoryMethodNotImplementedException {
+        EPerson eperson = null;
+        try {
+            eperson = es.find(context, id);
+            List<String> constraints = es.getDeleteConstraints(context, eperson);
+            if (constraints != null && constraints.size() > 0) {
+                throw new UnprocessableEntityException(
+                        "The eperson cannot be deleted due to the following constraints: "
+                                + StringUtils.join(constraints, ", "));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        try {
+            es.delete(context, eperson);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override
