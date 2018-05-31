@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.rest.converter.EPersonConverter;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -33,6 +35,9 @@ import org.springframework.stereotype.Component;
 @Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME)
 public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUID> {
     EPersonService es = EPersonServiceFactory.getInstance().getEPersonService();
+    
+    @Autowired
+    AuthorizeService authorizeService;
 
     @Autowired
     EPersonConverter converter;
@@ -56,6 +61,10 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         List<EPerson> epersons = null;
         int total = 0;
         try {
+            if (!authorizeService.isAdmin(context)) {
+                throw new RESTAuthorizationException(
+                        "The EPerson collection endpoint is reserved to system administrators");
+            }
             total = es.countTotal(context);
             epersons = es.findAll(context, EPerson.ID, pageable.getPageSize(), pageable.getOffset());
         } catch (SQLException e) {
