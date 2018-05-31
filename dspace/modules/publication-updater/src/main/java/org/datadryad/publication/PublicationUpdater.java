@@ -253,7 +253,6 @@ public class PublicationUpdater extends HttpServlet {
                     }
                     StringBuilder message = new StringBuilder();
                     Item item = wfi.getItem();
-                    Manuscript queryManuscript = manuscriptFromItem(item);
                     LOGGER.debug(">>> processing workflow item with internal ID " + item.getID());
                     // First, compare this item with anything in manuscript metadata storage:
                     // If this workflow item does not have a msid, it might have come from a submitter
@@ -319,7 +318,7 @@ public class PublicationUpdater extends HttpServlet {
 
     private StringBuilder matchItemToCrossref(Context context, Item item) {
         StringBuilder message = new StringBuilder();
-        Manuscript queryManuscript = manuscriptFromItem(item);
+        Manuscript queryManuscript = new Manuscript(item);
 
         // look for this item in crossref:
         StringBuilder resultString = new StringBuilder();
@@ -487,44 +486,6 @@ public class PublicationUpdater extends HttpServlet {
             title = titles[0].value;
         }
         return "Item " + item.getID() + " with DOI " + dryadDOI + " and title \"" + title + "\":";
-    }
-
-    private Manuscript manuscriptFromItem(Item item) {
-        // get metadata from item:
-        Manuscript queryManuscript = new Manuscript();
-        String journalName = "";
-        DCValue[] journalNames = item.getMetadata(PUBLICATION_NAME);
-        if (journalNames != null && journalNames.length > 0) {
-            DryadJournalConcept dryadJournalConcept = JournalUtils.getJournalConceptByJournalName(journalNames[0].value);
-            queryManuscript.setJournalConcept(dryadJournalConcept);
-        }
-
-        String title = "";
-        DCValue[] titles = item.getMetadata(TITLE);
-        if (titles != null && titles.length > 0) {
-            title = titles[0].value.replaceAll("Data from: ", "");
-        }
-        queryManuscript.setTitle(title);
-
-        AuthorsList authorsList = new AuthorsList();
-        List<DCValue> authorList = Arrays.asList(item.getMetadata(AUTHOR));
-        for (DCValue a : authorList) {
-            String lastName = StringUtils.substringBefore(a.value, ",");
-            String givenNames = StringUtils.substringAfter(a.value, ",").trim();
-            authorsList.author.add(new Author(lastName, givenNames));
-        }
-        queryManuscript.setAuthors(authorsList);
-
-        DCValue[] msids = item.getMetadata(MANUSCRIPT_NUMBER);
-        if (msids != null && msids.length > 0 && !"".equals(msids[0].value)) {
-            queryManuscript.setManuscriptId(msids[0].value);
-        }
-
-        DCValue[] itemPubDOIs = item.getMetadata(PUBLICATION_DOI);
-        if (itemPubDOIs != null && itemPubDOIs.length > 0 && !"".equals(itemPubDOIs[0].value)) {
-            queryManuscript.setPublicationDOI(itemPubDOIs[0].value);
-        }
-        return queryManuscript;
     }
 
     private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context, StringBuilder provenance) {

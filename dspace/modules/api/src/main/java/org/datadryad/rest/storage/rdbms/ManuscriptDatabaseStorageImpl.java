@@ -214,6 +214,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                 }
             }
         }
+        finalRows.sort((a,b) -> {return b.getDateColumn("date_added").compareTo(a.getDateColumn("date_added"));});
         return finalRows;
     }
 
