@@ -54,6 +54,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -249,6 +250,16 @@ public class ViewItem extends AbstractDSpaceTransformer {
 		Item item = Item.find(context, itemID);
 		String baseURL = contextPath + "/admin/item?administrative-continue="
 				+ knot.getId();
+
+		if (AuthorizeManager.isCuratorOrAdmin(context) && showFullItem) {
+			DCValue[] curatorNotes = item.getMetadata("dryad.curatorNote");
+			if (curatorNotes != null && curatorNotes.length > 0) {
+				Division notes = body.addDivision("curator-notes", "curator-notes");
+				for (DCValue curatorNote : curatorNotes) {
+					notes.addPara(curatorNote.value);
+				}
+			}
+		}
 
 		String link = baseURL + "&view_item"
 				+ (showFullItem ? "" : "&show=full");

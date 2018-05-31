@@ -335,6 +335,13 @@ div.ds-option-set {
     border-color: #1f2a6f;
 }
 
+.curator-notes {
+    background-color: #c4c4ff;
+    color: #1f2a6f;
+    border-color: #1f2a6f;
+    margin-bottom: 10px;
+}
+
 #submit-data-feature-box h1 {
     background-color: #87C033;
     border-bottom: none;
