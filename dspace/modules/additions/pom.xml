@@ -110,6 +110,29 @@
 			</dependencies>		                    
 	    </profile>
 	
+	        <profile>
+            <id>addon-woocommerce</id>
+            <activation>
+                <property>
+                    <name>woocommerce.on</name>
+                </property>
+            </activation>
+			<dependencies>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-woocommerce-api</artifactId>
+					<version>${woocommerce.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-woocommerce-jspui</artifactId>
+					<version>${woocommerce.addon.modules}</version>
+					<type>war</type>
+				</dependency>
+			</dependencies>		                    
+	    </profile>
+	
 		<profile>
 			<id>addon-ocr</id>
             <activation>

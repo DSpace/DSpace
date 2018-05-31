@@ -241,6 +241,30 @@ it, please enter the types and the actual numbers or codes.</hint>
          <required></required>
        </field>
      </page>
+<!--      <page number="3">
+       <field>
+		 <dc-schema>ec</dc-schema>
+         <dc-element>sale</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Sale availability</label>
+		 <input-type value-pairs-name="sale_info">dropdown</input-type>
+         <hint>Enter the appropriate group to sale the item or empty to open access. </hint>
+         <required></required>
+       </field>
+       <field>
+		 <dc-schema>ec</dc-schema>
+         <dc-element>product</dc-element>
+         <dc-qualifier>price</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Product price</label>
+		 <input-type >onebox</input-type>
+         <hint>Enter the price of the product. </hint>
+         <required></required>
+         <validation>^[1-9]\d*(\.\d+)?$</validation>
+       </field>
+     </page>
+      -->
    </form>
 
    <form name="articles">

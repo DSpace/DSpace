@@ -43,6 +43,7 @@
 		
 		<ckan.addon.modules>[5.1-SNAPSHOT,6.0-SNAPSHOT)</ckan.addon.modules>
 		<iiif.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</iiif.addon.modules>
+		<woocommerce.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</woocommerce.addon.modules>
 		<commons.addon.modules>[5.1-SNAPSHOT,6.0-SNAPSHOT)</commons.addon.modules>
 		<annoiiif.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</annoiiif.addon.modules>
 		<ocr.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</ocr.addon.modules>
@@ -789,6 +790,29 @@
 		        </dependencies>		                    
             </dependencyManagement>
         </profile>
+        
+        <profile>
+            <id>addon-woocommerce</id>
+			<activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>            
+            <dependencyManagement>
+            	<dependencies>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-woocommerce-api</artifactId>
+						 <version>${woocommerce.addon.modules}</version>
+						 <type>jar</type>
+			        </dependency>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-woocommerce-jspui</artifactId>
+						 <version>${woocommerce.addon.modules}</version>
+						 <type>war</type>
+			        </dependency>
+		        </dependencies>		                    
+            </dependencyManagement>
+        </profile>
 
         <profile>
             <id>addon-ocr</id>
@@ -934,6 +958,14 @@
 				<exclusion>
 					<groupId>it.4science.dspace</groupId>
 					<artifactId>addon-iiif-jspui</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-woocommerce-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-woocommerce-jspui</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>it.4science.dspace</groupId>
