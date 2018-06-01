@@ -12,6 +12,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -20,6 +23,7 @@ import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -32,6 +36,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
 
 /**
  * This is the repository responsible to manage EPerson Rest object
@@ -48,6 +53,46 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
 
     @Autowired
     EPersonConverter converter;
+
+    @Override
+    protected EPersonRest createAndReturn(Context context)
+            throws AuthorizeException {
+        // this need to be revisited we should receive a mock EPersonRest as input
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ObjectMapper mapper = new ObjectMapper();
+        EPersonRest mock = null;
+        try {
+            mock = mapper.readValue(req.getInputStream(), EPersonRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("error parsing the body... maybe this is not the right error code");
+        }
+
+        EPerson eperson = null;
+        try {
+            eperson = es.create(context);
+
+            // this should be probably moved to the converter (a merge method?)
+            eperson.setCanLogIn(mock.isCanLogIn());
+            eperson.setRequireCertificate(mock.isRequireCertificate());
+            eperson.setEmail(mock.getEmail());
+            eperson.setNetid(mock.getNetid());
+            if (mock.getPassword() != null) {
+                es.setPassword(eperson, mock.getPassword());
+            }
+            es.update(context, eperson);
+            if (mock.getMetadata() != null) {
+                for (MetadataEntryRest mer : mock.getMetadata()) {
+                    String[] metadatakey = mer.getKey().split("\\.");
+                    es.addMetadata(context, eperson, metadatakey[0], metadatakey[1],
+                            metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        return converter.convert(eperson);
+    }
 
     @Override
     public EPersonRest findOne(Context context, UUID id) {

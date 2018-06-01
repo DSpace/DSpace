@@ -7,20 +7,29 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Arrays;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.EPersonMetadataMatcher;
+import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -29,7 +38,47 @@ import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
+
+
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Test
+    public void createTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // we should check how to get it from Spring
+        ObjectMapper mapper = new ObjectMapper();
+        EPersonRest data = new EPersonRest();
+        data.setEmail("createtest@fake-email.com");
+        data.setCanLogIn(true);
+        MetadataEntryRest surname = new MetadataEntryRest();
+        surname.setKey("eperson.lastname");
+        surname.setValue("Doe");
+        MetadataEntryRest firstname = new MetadataEntryRest();
+        firstname.setKey("eperson.firstname");
+        firstname.setValue("John");
+        data.setMetadata(Arrays.asList(surname, firstname));
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/eperson/epersons")
+                                        .content(mapper.writeValueAsBytes(data))
+                                        .contentType(contentType))
+                   .andExpect(status().isCreated())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                               hasJsonPath("$.uuid", not(empty())),
+                               // is it what you expect? EPerson.getName() returns the email...
+                               //hasJsonPath("$.name", is("Doe John")),
+                               hasJsonPath("$.email", is("createtest@fake-email.com")),
+                               hasJsonPath("$.type", is("eperson")),
+                               hasJsonPath("$.canLogIn", is(true)),
+                               hasJsonPath("$.requireCertificate", is(false)),
+                               hasJsonPath("$._links.self.href", not(empty())),
+                               hasJsonPath("$.metadata", Matchers.containsInAnyOrder(
+                                   EPersonMetadataMatcher.matchFirstName("John"),
+                                   EPersonMetadataMatcher.matchLastName("Doe")
+                               )))));
+        // TODO cleanup the context!!!
+    }
 
     @Test
     public void findAllTest() throws Exception {
