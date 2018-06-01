@@ -30,6 +30,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.submit.step.VerifyStep;
 
 /**
  * Verify step for DSpace. Presents the user with a verification screen for all
@@ -210,7 +211,13 @@ public class JSPVerifyStep extends JSPStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        // nothing to do from the Verify Step.
+    	
+    	// this shouldn't happen...but just in case!
+        if (status == VerifyStep.VALIDATION_ERROR)
+        {
+        	doPreProcessing(context, request, response, subInfo);
+        }
+
     }
     
     /**

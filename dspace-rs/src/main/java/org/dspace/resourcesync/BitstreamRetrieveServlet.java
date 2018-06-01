@@ -32,10 +32,7 @@ import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
 /**
- * Servlet for retrieving bitstreams in a UI indipendent way. The bits are simply piped to the user.
- * Taken from org.dspace.app.webui.servlet.RetrieveServlet
- * <P>
- * <code>/bitstreams/bitstream-id</code>
+ * Servlet for adding bitstream's resource policy to the EPerson which buys the item
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Andrea Petrucci (andrea.petrucci at 4science.it)

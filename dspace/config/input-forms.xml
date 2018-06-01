@@ -1288,6 +1288,22 @@ it, please enter the types and the actual numbers or codes.</hint>
  <!-- stores the associated stored-values in the database.                  -->
 
  <form-value-pairs>
+<value-pairs value-pairs-name="sale_info" dc-term="sale">
+ 	<pair>
+       <displayed-value>Free</displayed-value>
+       <stored-value></stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Anonymous (anybody can buy)</displayed-value>
+       <stored-value>Anonymous</stored-value>
+     </pair>
+     <!-- 
+     <pair>
+       <displayed-value>Group01</displayed-value>
+       <stored-value>Group01</stored-value>
+     </pair>
+      -->
+   	</value-pairs>
    <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
      <pair>
        <displayed-value>DOI</displayed-value>

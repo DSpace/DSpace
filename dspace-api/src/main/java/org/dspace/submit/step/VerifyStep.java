@@ -42,6 +42,7 @@ import org.dspace.utils.DSpace;
  */
 public class VerifyStep extends AbstractProcessingStep
 {
+	public final static int VALIDATION_ERROR = -1;
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)
