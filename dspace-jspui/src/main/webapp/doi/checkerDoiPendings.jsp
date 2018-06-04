@@ -234,7 +234,13 @@ j('input[name="pendingdoi"]').each(function(index) {
 			j('#' + (j(this).attr('id')) + "real").click();
 		}		
 	);
-	
+
+	j(window).keydown(function(event) {
+		if (event.keyCode == 13) {
+			event.preventDefault();
+			return false;
+		}
+	});
 </script>	
 <% } else { %>	
 	<fmt:message key="jsp.search.doi.form.button.nopending.found"/>

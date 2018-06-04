@@ -200,6 +200,13 @@ j('.submitbutton').click(
 		}		
 );
 
+j(window).keydown(function(event) {
+	if (event.keyCode == 13) {
+		event.preventDefault();
+		return false;
+	}
+});
+
 j('.btndoi').click(function() {
 	j('#divdoi_'+ this.id).toggle();
 	var id = this.id;

@@ -262,28 +262,34 @@ if (pageTotal > 1)
 		}		
 	);	
 
+
+	jQuery(window).keydown(function(event) {
+		if (event.keyCode == 13) {
+			event.preventDefault();
+			return false;
+		}
+	});
+
 	jQuery('.btndoi').click(function() {
-		jQuery('#divdoi_'+ this.id).toggle();
+		jQuery('#divdoi_' + this.id).toggle();
 		var id = this.id;
 		var index = id.indexOf("_");
-		var suffixID = id.substr(index+1);
-		if(jQuery('#custombuilddoiid_'+ suffixID).val().length == 0) {
-			jQuery('#spandoi_'+ suffixID).removeClass("strike");	
+		var suffixID = id.substr(index + 1);
+		if (jQuery('#custombuilddoiid_' + suffixID).val().length == 0) {
+			jQuery('#spandoi_' + suffixID).removeClass("strike");
 		}
 	});
 
 	jQuery('.doitext').change(function() {
 		var id = this.name;
 		var index = id.indexOf("_");
-		var suffixID = id.substr(index+1);		
-		if(jQuery('#custombuilddoiid_'+ suffixID).val().length == 0) {
-			jQuery('#spandoi_'+ suffixID).removeClass("strike");	
-		}
-		else { 
-			jQuery('#spandoi_'+ suffixID).addClass("strike");
+		var suffixID = id.substr(index + 1);
+		if (jQuery('#custombuilddoiid_' + suffixID).val().length == 0) {
+			jQuery('#spandoi_' + suffixID).removeClass("strike");
+		} else {
+			jQuery('#spandoi_' + suffixID).addClass("strike");
 		}
 	});
-	
 </script>
 <% } else { %>	
 	<fmt:message key="jsp.search.doi.form.button.noresult.found"/>

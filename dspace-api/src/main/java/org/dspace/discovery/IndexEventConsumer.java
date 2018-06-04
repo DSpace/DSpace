@@ -112,7 +112,14 @@ public class IndexEventConsumer implements Consumer {
                     objectsToUpdate.add(subject);
                 }
                 break;
-
+            case Event.UPDATE_FORCE:
+                if (subject != null)
+                {
+                    log.debug("consume() update_force event to update queue:"
+                            + event.toString());
+                    objectsToUpdate.add(subject);
+                }
+                break;
             case Event.REMOVE:
             case Event.ADD:
                 if (object == null)
