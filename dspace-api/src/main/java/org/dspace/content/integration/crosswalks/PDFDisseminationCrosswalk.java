@@ -39,7 +39,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.SelfNamedPlugin;
 
 public class PDFDisseminationCrosswalk extends SelfNamedPlugin
-		implements StreamGenericDisseminationCrosswalk, FileNameDisseminator {
+implements StreamGenericDisseminationCrosswalk, FileNameDisseminator {
 	private static Logger log = Logger.getLogger(PDFDisseminationCrosswalk.class);
 
 	public static final String FILE_NAME_EXPORT_PDF = "pdf.export.filename";
@@ -144,51 +144,24 @@ public class PDFDisseminationCrosswalk extends SelfNamedPlugin
 					label = I18nUtil.getMessage("metadata." + field, context);
 				}
 
-				int size = (int) (fontSize * font.getStringWidth(label + PLACEHOLDER_SPACING) / 1000);
-
 				List<String> lines = new ArrayList<String>();
-
+				lines.addAll(createAndGetLines(label,startX,fontSize,font,width));
+				int labelSize = lines.size();
 				for (Metadatum mm : values) {
-					String text = mm.value;
-
-					int lastSpace = -1;
-					while (text.length() > 0) {
-						int spaceIndex = text.indexOf(' ', lastSpace + 1);
-						if (spaceIndex < 0)
-							spaceIndex = text.length();
-						String subString = text.substring(0, spaceIndex);
-						float sizeWord = startX + size + (fontSize * font.getStringWidth(subString) / 1000);
-						if (sizeWord > width) {
-							if (lastSpace < 0)
-								lastSpace = spaceIndex;
-							subString = text.substring(0, lastSpace);
-							lines.add(subString);
-							text = text.substring(lastSpace).trim();
-							lastSpace = -1;
-						} else if (spaceIndex == text.length()) {
-							lines.add(text);
-							text = "";
-						} else {
-							lastSpace = spaceIndex;
-						}
-					}
+					lines.addAll(createAndGetLines(mm.value,startX,fontSize,font,width));
 				}
 
 				internal: for (int index = alreadyWrote.get(field); index < lines.size(); index++) {
-					if (height > 0 && index == 0) {
-						// Define a text content stream using the selected font, moving the cursor and
-						// drawing the text "Hello World"
+
+					if (index < labelSize)
+					{
 						contentStream.beginText();
 						contentStream.setFont(fontBold, fontSize);
-						contentStream.moveTextPositionByAmount(startX, yCordinate);
-						contentStream.drawString(label);
-						contentStream.endText();
-
+					}else {
+						contentStream.beginText();
+						contentStream.setFont(font, fontSize);
 					}
-
-					contentStream.beginText();
-					contentStream.setFont(font, fontSize);
-					contentStream.moveTextPositionByAmount(startX + size, yCordinate);
+					contentStream.moveTextPositionByAmount(startX, yCordinate);
 					if (height <= 0) {
 						PDPage pdPage = new PDPage();
 						document.addPage(pdPage);
@@ -202,7 +175,7 @@ public class PDFDisseminationCrosswalk extends SelfNamedPlugin
 
 					contentStream.endText();
 					alreadyWrote.put(field, index+1);
-					
+
 					if (height > 0 && index==lines.size()-1) {
 						yCordinate -= fontHeight;
 						height -= fontHeight;
@@ -210,7 +183,7 @@ public class PDFDisseminationCrosswalk extends SelfNamedPlugin
 						contentStream.moveTo(startX, yCordinate);
 						contentStream.lineTo(endX, yCordinate);
 						contentStream.stroke();
-						
+
 						yCordinate -= leading;
 						height -= leading;
 					}
@@ -221,6 +194,34 @@ public class PDFDisseminationCrosswalk extends SelfNamedPlugin
 		}
 		// Make sure that the content stream is closed:
 		contentStream.close();
+	}
+
+	private List<String> createAndGetLines(String text, float startX, float fontSize, PDFont font, float width) throws IOException {
+		List<String> lines = new ArrayList<String>();
+
+		int lastSpace = -1;
+		while (text.length() > 0) {
+			int spaceIndex = text.indexOf(' ', lastSpace + 1);
+			if (spaceIndex < 0)
+				spaceIndex = text.length();
+			String subString = text.substring(0, spaceIndex);
+			float sizeWord = startX + (fontSize * font.getStringWidth(subString) / 1000);
+			if (sizeWord > width) {
+				if (lastSpace < 0)
+					lastSpace = spaceIndex;
+				subString = text.substring(0, lastSpace);
+				lines.add(subString);
+				text = text.substring(lastSpace).trim();
+				lastSpace = -1;
+			} else if (spaceIndex == text.length()) {
+				lines.add(text);
+				text = "";
+			} else {
+				lastSpace = spaceIndex;
+			}
+		}
+		return lines;
+		
 	}
 
 	@Override
