@@ -35,7 +35,7 @@ public class CDLDataCiteService {
 
     private static final Logger log = Logger.getLogger(CDLDataCiteService.class);
 
-    private static final String DEFAULT_BASEURL = "https://ezid.cdlib.org";
+    private static final String DEFAULT_BASEURL = "https://ez.datacite.org";
 
     private String myUsername;
     private String myPassword;
