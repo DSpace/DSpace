@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Ecommerce</title>
+        <contributor.author>Andrea Bollini</contributor.author>
+        <contributor.author>Luigi Andrea Pascarelli</contributor.author>
+        <contributor.author>Andrea Petrucci</contributor.author>
+    </dspace-header>
+
+    <dc-schema>
+        <name>ec</name>
+        <namespace>http://dspace.org/ecommerce</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>ec</schema>
+        <element>sale</element>
+        <qualifier></qualifier>
+        <scope_note>Metadata field used to register avalaibility to sale objects</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>ec</schema>
+        <element>product</element>
+        <qualifier>ean</qualifier>
+        <scope_note>Metadata field used to register product EAN</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>ec</schema>
+        <element>product</element>
+        <qualifier>price</qualifier>
+        <scope_note>Metadata field used to register product price</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>ec</schema>
+        <element>product</element>
+        <qualifier>permalink</qualifier>
+        <scope_note>Metadata field used to register product permalink</scope_note>
+    </dc-type>
+    
+</dspace-dc-types>
