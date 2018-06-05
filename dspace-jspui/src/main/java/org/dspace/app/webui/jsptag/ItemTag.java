@@ -593,48 +593,74 @@ public class ItemTag extends TagSupport {
 
 								boolean authorizedToVew = AuthorizeManager.authorizeActionBoolean(context,
 										bitstreams[k], Constants.READ);
-								String saleSchema = ConfigurationManager.getProperty("ecommerce", "ecommerce.sale");
-								String eanSchema = ConfigurationManager.getProperty("ecommerce", "ecommerce.ean");
+								
+								boolean ecommerceEnabled = ConfigurationManager.getBooleanProperty("ecommerce", "ecommerce.enabled", false);
+								
+                                boolean canBuy = false;
+                                boolean isSale = false;
+                                String ean = "";
+                                if (ecommerceEnabled)
+                                {
+                                    String saleSchema = ConfigurationManager
+                                            .getProperty("ecommerce",
+                                                    "ecommerce.sale");
+                                    String eanSchema = ConfigurationManager
+                                            .getProperty("ecommerce",
+                                                    "ecommerce.ean");
 
-								String[] sale = null;
-								try {
-									sale = MetadataUtilities.parseCompoundForm(saleSchema);
-								} catch (ParseException e) {
-									log.error(e.getMessage(), e);
-								}
-								Metadatum[] metadatumArray = null;
-								if (sale.length == 3) {
-									metadatumArray = item.getMetadata(sale[0], sale[1], sale[2], Item.ANY);
-								} else if (sale.length == 2) {
-									metadatumArray = item.getMetadata(sale[0], sale[1], null, Item.ANY);
-								}
-								String ean = item.getMetadata(eanSchema);
-								boolean canBuy = false;
-								boolean isSale = false;
-								if (metadatumArray.length >= 0 && metadatumArray != null)
-								{
-									isSale = true;
-								}
-								EPerson user = context.getCurrentUser();
-								Group[] groupList;
-								groupList = Group.allMemberGroups(context, user);
-								for (Metadatum m : metadatumArray) {
-									String val = m.value;
-									Group g;
-									if (StringUtils.isNumeric(val)) {
-										g = Group.find(context, Integer.parseInt(val));
-									} else {
-										g = Group.findByName(context, val);
-									}
-									if (StringUtils.equals(val, "Anonymous")) {
-										canBuy = true;
-										break;
-									} else if (ArrayUtils.contains(groupList, g)) {
-										canBuy = true;
-										break;
-									}
-								}
+                                    ean = item.getMetadata(eanSchema);
+                                    
+                                    String[] sale = Utils.tokenize(saleSchema);
+                                    Metadatum[] metadatumArray = null;
+                                    if (sale.length == 3)
+                                    {
+                                        metadatumArray = item.getMetadata(
+                                                sale[0], sale[1], sale[2],
+                                                Item.ANY);
+                                    }
+                                    else if (sale.length == 2)
+                                    {
+                                        metadatumArray = item.getMetadata(
+                                                sale[0], sale[1], null,
+                                                Item.ANY);
+                                    }
 
+                                    if (metadatumArray.length >= 0
+                                            && metadatumArray != null)
+                                    {
+                                        isSale = true;
+                                    }
+                                    EPerson user = context.getCurrentUser();
+                                    Group[] groupList;
+                                    groupList = Group.allMemberGroups(context,
+                                            user);
+                                    for (Metadatum m : metadatumArray)
+                                    {
+                                        String val = m.value;
+                                        Group g;
+                                        if (StringUtils.isNumeric(val))
+                                        {
+                                            g = Group.find(context,
+                                                    Integer.parseInt(val));
+                                        }
+                                        else
+                                        {
+                                            g = Group.findByName(context, val);
+                                        }
+                                        if (StringUtils.equals(val,
+                                                "Anonymous"))
+                                        {
+                                            canBuy = true;
+                                            break;
+                                        }
+                                        else if (ArrayUtils.contains(groupList,
+                                                g))
+                                        {
+                                            canBuy = true;
+                                            break;
+                                        }
+                                    }
+                                }
 								if (authorizedToVew) {
 									if (viewOptions.size() == 1) {
 										out.print("<a class=\"btn btn-primary\" ");
