@@ -78,6 +78,14 @@ public class CuratorEditMetadataForm extends AbstractDSpaceTransformer {
         String previousFieldID = request.getParameter("field");
         Map<Integer, String> confOptions = Choices.getConfidenceOptions();
 
+        DCValue[] curatorNotes = item.getMetadata("dryad.curatorNote");
+        if (curatorNotes != null && curatorNotes.length > 0) {
+            Division notes = body.addDivision("curator-notes", "curator-notes");
+            for (DCValue curatorNote : curatorNotes) {
+                notes.addPara(curatorNote.value);
+            }
+        }
+
         Division main = body.addInteractiveDivision("edit-item-status", actionURL, Division.METHOD_POST,"primary administrative item");
         main.setHead(T_main_head);
 
