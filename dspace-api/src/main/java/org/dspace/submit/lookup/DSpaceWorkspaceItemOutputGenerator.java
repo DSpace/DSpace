@@ -30,6 +30,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.util.ItemUtils;
@@ -91,8 +92,9 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
         {
             try
             {
+            	boolean templateItem = ConfigurationManager.getBooleanProperty(null, "bte.applytemplateitem",false);
                 WorkspaceItem wi = WorkspaceItem.create(context, collection,
-                        true);
+                        templateItem);
                 merge(formName, wi.getItem(), rec);
 
                 witems.add(wi);
