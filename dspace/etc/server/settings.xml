@@ -30,7 +30,7 @@
 				<!-- PostgreSQL/Dryad username and password -->
 				<default.db.username>[PUT_DB_USERNAME_HERE]</default.db.username>
 				<default.db.password>[PUT_DB_PASSWORD_HERE]</default.db.password>
-				<!-- DOI registration (EZID currently) username and password -->
+				<!-- DOI registration username and password -->
 				<default.doi.username>[PUT_DOI_REG_USERNAME_HERE]</default.doi.username>
 				<default.doi.password>[PUT_DOI_REG_PASSWORD_HERE]</default.doi.password>
 				<!-- Dryad's DOI prefix -->
