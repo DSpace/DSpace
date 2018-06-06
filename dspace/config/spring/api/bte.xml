@@ -310,7 +310,7 @@
     <bean name="languageCodeModifier" class="org.dspace.submit.lookup.LanguageCodeModifier"/>
     
     <bean name="journalsModifier"
-		class="org.dspace.submit.lookup.AuthorityLookupModifier">
+		class="org.dspace.submit.lookup.JournalLookupModifier">
 		<property name="searchService" ref="org.dspace.discovery.SearchService" />
 		<property name="resourceTypeID" value="1001" />
 		<property name="metadataInputConfiguration">

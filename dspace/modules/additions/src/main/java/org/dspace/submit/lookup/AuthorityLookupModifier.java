@@ -1,13 +1,13 @@
 package org.dspace.submit.lookup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.ACrisObject;
-import org.dspace.app.util.Util;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
@@ -45,15 +45,13 @@ public class AuthorityLookupModifier<T extends ACrisObject>
     {
         try
         {
-
+            Map<String, Map<String, T>> results = new HashMap<String, Map<String, T>>();
             for (String mm : metadataInputConfiguration.keySet())
             {
-
+                Map<String, T> internalResults = new HashMap<String, T>();
                 List<String> values = new ArrayList<String>();
 
-                T rivista = null;
-
-                values.add(Util.normalizeISSN(getValue(rec, mm)));
+                values.addAll(normalize(getValue(rec, mm)));
                 for (String value : values)
                 {
                     if (StringUtils.isNotBlank(value))
@@ -64,49 +62,68 @@ public class AuthorityLookupModifier<T extends ACrisObject>
                                 + ":\"" + value + "\"");
                         DiscoverResult result = searchService.search(null,
                                 query, true);
+                        
+                        T rivista = null;
                         if (result.getTotalSearchResults() == 1)
                         {
                             rivista = (T) result.getDspaceObjects().get(0);
                         }
+                        internalResults.put(value, rivista);
+                    }
+                    else {
+                        internalResults.put(value, null);
                     }
                 }
-
-                if (rivista != null)
-                {
-                    for (String shortname : mappingOutputConfiguration.keySet())
-                    {
-                        List<String> valuesMetadata = rivista
-                                .getMetadataValue(shortname);
-                        if (valuesMetadata != null && !values.isEmpty())
-                        {
-                            rec.removeField(mappingOutputConfiguration
-                                    .get(shortname));
-                            for (String value : valuesMetadata)
+                results.put(mm, internalResults);
+            }
+            
+            for (String shortname : mappingOutputConfiguration.keySet())
+            {
+                rec.removeField(mappingOutputConfiguration.get(shortname));
+                
+                for(Map<String, T> mapInternal : results.values()) {
+                    
+                    for(String key : mapInternal.keySet()) {
+                        T object = mapInternal.get(key); 
+                        if(object!=null) {
+                            List<String> valuesMetadata = object
+                                    .getMetadataValue(shortname);
+                            if (valuesMetadata != null)
                             {
-                                if (mappingAuthorityConfiguration
-                                        .containsKey(shortname))
+
+                                for (String valueMetadata : valuesMetadata)
                                 {
-                                    rec.addValue(
-                                            mappingAuthorityConfiguration
-                                                    .get(shortname),
-                                            new StringValue(
-                                                    value + SubmissionLookupService.SEPARATOR_VALUE_REGEX
-                                                            + rivista
-                                                                    .getCrisID()
-                                                            + SubmissionLookupService.SEPARATOR_VALUE_REGEX
-                                                            + "600"));
-                                }
-                                else
-                                {
-                                    rec.addValue(
-                                            mappingOutputConfiguration
-                                                    .get(shortname),
-                                            new StringValue(value));
+                                    if (mappingAuthorityConfiguration
+                                            .containsKey(shortname))
+                                    {
+                                        rec.addValue(
+                                                mappingAuthorityConfiguration
+                                                        .get(shortname),
+                                                new StringValue(valueMetadata
+                                                        + SubmissionLookupService.SEPARATOR_VALUE_REGEX
+                                                        + object.getCrisID()
+                                                        + SubmissionLookupService.SEPARATOR_VALUE_REGEX
+                                                        + "600"));
+                                    }
+                                    else
+                                    {
+                                        rec.addValue(
+                                                mappingOutputConfiguration
+                                                        .get(shortname),
+                                                new StringValue(valueMetadata));
+                                    }
                                 }
                             }
                         }
+                        else
+                        {
+                            rec.addValue(mappingOutputConfiguration.get(shortname),
+                                    new StringValue(key));
+                        }
                     }
+                    
                 }
+
             }
 
             return rec;
@@ -118,18 +135,28 @@ public class AuthorityLookupModifier<T extends ACrisObject>
         }
     }
 
-    private String getValue(MutableRecord rec, String md)
+    public List<String> normalize(List<String> values)
     {
+        // overrided this method to perform any normalization
+        return values;
+    }
+
+    private List<String> getValue(MutableRecord rec, String md)
+    {
+        List<String> result = new ArrayList<String>();
         if (StringUtils.isNotBlank(md))
         {
             List<Value> vals = rec.getValues(md);
             if (vals != null && vals.size() > 0)
             {
-                return vals.get(0).getAsString();
+                for (Value val : vals)
+                {
+                    result.add(val.getAsString());
+                }
             }
         }
 
-        return null;
+        return result;
     }
 
     public void setSearchService(SearchService searchService)
