@@ -694,6 +694,9 @@ public class ItemTag extends TagSupport {
 										out.print("</ul> </div>");
 									}
 								} else if (canBuy) {
+									if (viewOptions.size() > 2) {
+										out.print("<li role=\"separator\" class=\"divider\"></li> ");
+									}
 									// see btn buy
 									String metadataPermalink = ConfigurationManager.getProperty("ecommerce",
 											"ecommerce.permalink");
