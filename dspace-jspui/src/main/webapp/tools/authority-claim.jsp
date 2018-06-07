@@ -30,6 +30,13 @@
 
 <h3><fmt:message key="jsp.dspace.authority-claim.info-heading" /></h3>
 
+<fmt:message key="jsp.dspace.authority-claim.info" />
+<ul>
+<fmt:message key="jsp.dspace.authority-claim.info.case1" />
+<fmt:message key="jsp.dspace.authority-claim.info.case2" />
+<fmt:message key="jsp.dspace.authority-claim.info.case3" />
+</ul>
+
 <form method="post">
 
 <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -46,8 +53,8 @@
 %>
         
 
-  <li class="nav-item">
-    <a class="nav-link <%= i==0?"active":""%>" id="<%= key %>-tab" data-toggle="tab" href="#<%= key %>" role="tab" aria-controls="<%= key %>" <%= i==0?"aria-selected=\"true\"":""%>><%= key %></a>
+  <li class="nav-item  <%= i==0?"active":""%>">
+    <a class="nav-link" id="<%= key %>-tab" data-toggle="tab" href="#<%= key %>" role="tab" aria-controls="<%= key %>" <%= i==0?"aria-selected=\"true\"":""%>><fmt:message key="<%= key %>" /></a>
   </li>
   
 <%
@@ -65,11 +72,20 @@ for (String key : result.keySet())
 
 %>
 
-  <div class="tab-pane <%= i==0?"show active":""%>" id="<%= key %>" role="tabpanel" aria-labelledby="<%= key %>-tab">
+  <div class="tab-pane <%= i==0?"active":""%>" id="<%= key %>" role="tabpanel" aria-labelledby="<%= key %>-tab">
     <div class="row">
-      <div class="col-sm-10">        
+      <div class="col-sm-10">
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="userchoice" id="none_<%= key %>" value="none_<%= key %>" <%= haveSimilar.get(key)?"":"checked" %>>
+          <input class="form-check-input" type="radio" name="userchoice_<%= key %>" id="dolater_<%= key %>" value="dolater_<%= key %>" <%= haveSimilar.get(key)?"":"checked" %>/>
+          
+          <label class="form-check-label" for="none_<%= key %>">
+            <fmt:message key="jsp.authority-claim.choice.dolater"/>
+          </label>
+        </div>       
+              
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="userchoice_<%= key %>" id="none_<%= key %>" value="none_<%= key %>"/>
+          
           <label class="form-check-label" for="none_<%= key %>">
             <fmt:message key="jsp.authority-claim.choice.none"/>
           </label>
@@ -118,7 +134,7 @@ for (String key : result.keySet())
 
 
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="userchoice" id="<%= option %>" value="<%= option %>" <%= value.equals(similar)?"checked":"" %>>
+          <input class="form-check-input" type="radio" name="userchoice_<%= key %>" id="<%= option %>" value="<%= option %>" <%= value.equals(similar)?"checked":"" %>/>
           <label class="form-check-label" for="<%= option %>">
             <%= value %>
           </label>
@@ -138,7 +154,6 @@ for (String key : result.keySet())
         <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit" value="<fmt:message key="jsp.tools.general.update"/>" />
         <%-- <input type="submit" name="submit_cancel" value="Cancel" /> --%>
 		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
-	</div>
 	
 </form>
 

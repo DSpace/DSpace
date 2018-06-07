@@ -158,149 +158,213 @@ public class AuthorityClaimServlet extends DSpaceServlet {
 			ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
 
 			// sequencenumber_schema.element.qualifier
-			String choice = request.getParameter("userchoice");
-
-			String[] arrayChoices = null;
-			if (StringUtils.isNotBlank(choice)) {
-				arrayChoices = choice.split("_", 2);
-			}
-
-			String sequenceChoice = arrayChoices[0];
-			String fieldChoice = arrayChoices[1];
+			List<String> choices = new ArrayList<String>();
 			
-			Set<Integer> itemRejectedIDs = new HashSet<Integer>();
-			if (StringUtils.isNotBlank(fieldChoice)) {
-				Item item = (Item) HandleManager.resolveToObject(context, handle);
-				String[] metadata = fieldChoice.split("_");
-				item.clearMetadata(metadata[0], metadata[1], metadata.length > 2 ? metadata[2] : null, Item.ANY);
+	        Enumeration e = request.getParameterNames();
 
-				// process update
-				Enumeration unsortedParamNames = request.getParameterNames();
+	        while (e.hasMoreElements())
+	        {
+	            String parameterName = (String) e.nextElement();
 
-				// Put them in a list
-				List<String> sortedParamNames = new LinkedList<String>();
+	            if (parameterName.startsWith("userchoice"))
+	            {
+	                choices.add(request.getParameter(parameterName));
+	            }
+	        }
 
-				while (unsortedParamNames.hasMoreElements()) {
-					sortedParamNames.add((String) unsortedParamNames.nextElement());
-				}
+	        
+            for (String choice : choices)
+            {
+                String[] arrayChoices = null;
+                if (StringUtils.isNotBlank(choice))
+                {
+                    arrayChoices = choice.split("_", 2);
+                }
+                
+                String sequenceChoice = arrayChoices[0];
+                String fieldChoice = arrayChoices[1];
 
-				// Sort the list
-				Collections.sort(sortedParamNames);
+                if(sequenceChoice.equals("dolater")) {
+                    continue;
+                }
+                    
+                Set<Integer> itemRejectedIDs = new HashSet<Integer>();
+                if (StringUtils.isNotBlank(fieldChoice))
+                {
+                    Item item = (Item) HandleManager.resolveToObject(context,
+                            handle);
+                    String[] metadata = fieldChoice.split("_");
+                    item.clearMetadata(metadata[0], metadata[1],
+                            metadata.length > 2 ? metadata[2] : null, Item.ANY);
 
-				for (String p : sortedParamNames) {
-					if (p.startsWith("value")) {
-						/*
-						 * It's a metadata value - it will be of the form value_element_1 OR
-						 * value_element_qualifier_2 (the number being the sequence number) We use a
-						 * StringTokenizer to extract these values
-						 */
-						StringTokenizer st = new StringTokenizer(p, "_");
+                    // process update
+                    Enumeration unsortedParamNames = request
+                            .getParameterNames();
 
-						st.nextToken(); // Skip "value"
+                    // Put them in a list
+                    List<String> sortedParamNames = new LinkedList<String>();
 
-						String schema = st.nextToken();
+                    while (unsortedParamNames.hasMoreElements())
+                    {
+                        sortedParamNames
+                                .add((String) unsortedParamNames.nextElement());
+                    }
 
-						String element = st.nextToken();
+                    // Sort the list
+                    Collections.sort(sortedParamNames);
 
-						String qualifier = null;
+                    for (String p : sortedParamNames)
+                    {
+                        if (p.startsWith("value"))
+                        {
+                            /*
+                             * It's a metadata value - it will be of the form
+                             * value_element_1 OR value_element_qualifier_2 (the
+                             * number being the sequence number) We use a
+                             * StringTokenizer to extract these values
+                             */
+                            StringTokenizer st = new StringTokenizer(p, "_");
 
-						if (st.countTokens() == 2) {
-							qualifier = st.nextToken();
-						}
+                            st.nextToken(); // Skip "value"
 
-						String sequenceNumber = st.nextToken();
+                            String schema = st.nextToken();
 
-						// Get a string with "element" for unqualified or
-						// "element_qualifier"
-						String key = MetadataField.formKey(schema, element, qualifier);
+                            String element = st.nextToken();
 
-						// Get the language
-						String language = request.getParameter("language_" + key + "_" + sequenceNumber);
+                            String qualifier = null;
 
-						// trim language and set empty string language = null
-						if (language != null) {
-							language = language.trim();
-							if (language.equals("")) {
-								language = null;
-							}
-						}
+                            if (st.countTokens() == 2)
+                            {
+                                qualifier = st.nextToken();
+                            }
 
-						// Get the authority key if any
-						String authority = request.getParameter("choice_" + key + "_authority_" + sequenceNumber);
+                            String sequenceNumber = st.nextToken();
 
-						// Get the authority confidence value, passed as symbolic name
-						String sconfidence = request.getParameter("choice_" + key + "_confidence_" + sequenceNumber);
-						int confidence = (StringUtils.isBlank(sconfidence)) ? Choices.CF_NOVALUE
-								: Integer.parseInt(sconfidence);
+                            // Get a string with "element" for unqualified or
+                            // "element_qualifier"
+                            String key = MetadataField.formKey(schema, element,
+                                    qualifier);
 
-						// Get the value
-						String value = request.getParameter(p).trim();
+                            // Get the language
+                            String language = request.getParameter(
+                                    "language_" + key + "_" + sequenceNumber);
 
-						if (StringUtils.isBlank(authority)) {
-							if (sequenceNumber.equals(sequenceChoice)) {
-								authority = crisID;
-								if (selfClaim) {
-									confidence = Choices.CF_ACCEPTED;									
-								} else {
-									confidence = Choices.CF_UNCERTAIN;
-									templateEmail = PUBLICATION_CLAIMED_UNCERTAIN;
-									templateEmailParam0 = key;
-									templateEmailParam1 = value;
-									templateEmailParam2 = authority;
-									templateEmailParam3 = ""+confidence;
-								}
-							} else {
-								authority = null;
-							}
-						} else {
-							if(authority.equals(crisID) && selfClaim) {
-								confidence = Choices.CF_ACCEPTED;
-							}
-							else if (sequenceNumber.equals(sequenceChoice)) {
-								templateEmail = PUBLICATION_REQUEST_FOR_CLAIM;
-								templateEmailParam0 = key;
-								templateEmailParam1 = value;
-								templateEmailParam2 = authority;
-								templateEmailParam3 = ""+confidence;
-							}
-						}
-						
-						if ("none".equalsIgnoreCase(sequenceChoice)) {
-							if (StringUtils.isNotBlank(authority) && crisID.equals(authority)) {
-								item.addMetadata(schema, element, qualifier, language, value, null, Choices.CF_REJECTED);
-								itemRejectedIDs.add(item.getID());
-							}
-							else {
-								item.addMetadata(schema, element, qualifier, language, value, authority, confidence);	
-							}
-						} else {
-							item.addMetadata(schema, element, qualifier, language, value, authority, confidence);
-						}
-					}
-				}
+                            // trim language and set empty string language =
+                            // null
+                            if (language != null)
+                            {
+                                language = language.trim();
+                                if (language.equals(""))
+                                {
+                                    language = null;
+                                }
+                            }
 
-				item.update();
+                            // Get the authority key if any
+                            String authority = request.getParameter("choice_"
+                                    + key + "_authority_" + sequenceNumber);
 
-			}
+                            // Get the authority confidence value, passed as
+                            // symbolic name
+                            String sconfidence = request.getParameter("choice_"
+                                    + key + "_confidence_" + sequenceNumber);
+                            int confidence = (StringUtils.isBlank(sconfidence))
+                                    ? Choices.CF_NOVALUE
+                                    : Integer.parseInt(sconfidence);
 
-			context.commit();
-			if (itemRejectedIDs.size() > 0) {
-				// notify reject
-				int[] ids = new int[itemRejectedIDs.size()];
-				Iterator<Integer> iter = itemRejectedIDs.iterator();
-				int i = 0;
-				while (iter.hasNext()) {
-					ids[i] = (Integer) iter.next();
-					i++;
-				}
+                            // Get the value
+                            String value = request.getParameter(p).trim();
 
-				String[] splitted = fieldChoice.split("_");
-				String schema = splitted[0];
-				String element = splitted[1];
-				String qualifier = (splitted.length == 3) ? splitted[2] : null;
-				cam.notifyReject(ids, schema, element, qualifier, crisID);
-			}
+                            if (StringUtils.isBlank(authority))
+                            {
+                                if (sequenceNumber.equals(sequenceChoice))
+                                {
+                                    authority = crisID;
+                                    if (selfClaim)
+                                    {
+                                        confidence = Choices.CF_ACCEPTED;
+                                    }
+                                    else
+                                    {
+                                        confidence = Choices.CF_UNCERTAIN;
+                                        templateEmail = PUBLICATION_CLAIMED_UNCERTAIN;
+                                        templateEmailParam0 = key;
+                                        templateEmailParam1 = value;
+                                        templateEmailParam2 = authority;
+                                        templateEmailParam3 = "" + confidence;
+                                    }
+                                }
+                                else
+                                {
+                                    authority = null;
+                                }
+                            }
+                            else
+                            {
+                                if (authority.equals(crisID) && selfClaim)
+                                {
+                                    confidence = Choices.CF_ACCEPTED;
+                                }
+                                else if (sequenceNumber.equals(sequenceChoice))
+                                {
+                                    templateEmail = PUBLICATION_REQUEST_FOR_CLAIM;
+                                    templateEmailParam0 = key;
+                                    templateEmailParam1 = value;
+                                    templateEmailParam2 = authority;
+                                    templateEmailParam3 = "" + confidence;
+                                }
+                            }
 
+                            if ("none".equalsIgnoreCase(sequenceChoice))
+                            {
+                                if (StringUtils.isNotBlank(authority)
+                                        && crisID.equals(authority))
+                                {
+                                    item.addMetadata(schema, element, qualifier,
+                                            language, value, null,
+                                            Choices.CF_REJECTED);
+                                    itemRejectedIDs.add(item.getID());
+                                }
+                                else
+                                {
+                                    item.addMetadata(schema, element, qualifier,
+                                            language, value, authority,
+                                            confidence);
+                                }
+                            }
+                            else
+                            {
+                                item.addMetadata(schema, element, qualifier,
+                                        language, value, authority, confidence);
+                            }
+                        }
+                    }
+
+                    item.update();
+
+                }
+
+                context.commit();
+                if (itemRejectedIDs.size() > 0)
+                {
+                    // notify reject
+                    int[] ids = new int[itemRejectedIDs.size()];
+                    Iterator<Integer> iter = itemRejectedIDs.iterator();
+                    int i = 0;
+                    while (iter.hasNext())
+                    {
+                        ids[i] = (Integer) iter.next();
+                        i++;
+                    }
+
+                    String[] splitted = fieldChoice.split("_");
+                    String schema = splitted[0];
+                    String element = splitted[1];
+                    String qualifier = (splitted.length == 3) ? splitted[2]
+                            : null;
+                    cam.notifyReject(ids, schema, element, qualifier, crisID);
+                }
+            }
 		}
 		
 		if(StringUtils.isNotBlank(templateEmail)) {
