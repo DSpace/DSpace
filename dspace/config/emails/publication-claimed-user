@@ -1,0 +1,17 @@
+# Email sent to DSpace user that make claim request
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Requested Authority Claim
+
+The system taking charge your request
+
+Metadata Field: {0}
+Value: {1}
+
+YOUR NOTE: {7}
+
+Click here to view the item page {5}  
+
+The DSpace Team
+

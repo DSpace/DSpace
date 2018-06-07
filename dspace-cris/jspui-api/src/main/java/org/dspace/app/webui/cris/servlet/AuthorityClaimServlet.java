@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,9 +49,14 @@ import org.dspace.handle.HandleManager;
 public class AuthorityClaimServlet extends DSpaceServlet
 {
 
+    private static final String[] METADATA_MESSAGE = new String[] { "local",
+            "message", "claim" };
+
     private static final String PUBLICATION_CLAIMED_UNCERTAIN = "publication-claimed-uncertain";
 
     private static final String PUBLICATION_REQUEST_FOR_CLAIM = "publication-claimed-requested";
+
+    private static final String PUBLICATION_CLAIMED_USER = "publication-claimed-user";
 
     private Logger log = Logger.getLogger(AuthorityClaimServlet.class);
 
@@ -155,6 +161,8 @@ public class AuthorityClaimServlet extends DSpaceServlet
     {
         context.turnOffAuthorisationSystem();
 
+        final Date now = new Date();
+        
         String templateEmail = null;
         String templateEmailParam0 = null;
         String templateEmailParam1 = null;
@@ -165,13 +173,17 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
         String handle = request.getParameter("handle");
 
-        boolean selfClaim = false;
+        // retrieve Group users to send notification; Default is Administrator
+        // Group
         String notifyGroupSelfClaim = ConfigurationManager.getProperty("cris",
                 "notify-publication.claim.group.name");
         if (StringUtils.isBlank(notifyGroupSelfClaim))
         {
             notifyGroupSelfClaim = "Administrator";
         }
+
+        // check if currentUser is member of the self claim group
+        boolean selfClaim = false;
         String nameGroupSelfClaim = ConfigurationManager.getProperty("cris",
                 "publication.claim.group.name");
         if (StringUtils.isNotBlank(nameGroupSelfClaim))
@@ -194,7 +206,6 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
             ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
 
-            // sequencenumber_schema.element.qualifier
             List<String> choices = new ArrayList<String>();
 
             Enumeration e = request.getParameterNames();
@@ -203,6 +214,8 @@ public class AuthorityClaimServlet extends DSpaceServlet
             {
                 String parameterName = (String) e.nextElement();
 
+                // sequencenumber_schema_element_qualifier ->
+                // 00_dc_contributor.author
                 if (parameterName.startsWith("userchoice"))
                 {
                     choices.add(request.getParameter(parameterName));
@@ -219,9 +232,10 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
                 String sequenceChoice = arrayChoices[0];
                 String fieldChoice = arrayChoices[1];
-                
-                String note = request.getParameter("requestNote_" + fieldChoice);
-                
+
+                String note = request
+                        .getParameter("requestNote_" + fieldChoice);
+
                 if (sequenceChoice.equals("dolater"))
                 {
                     continue;
@@ -417,25 +431,25 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                                         language, value,
                                                         authority, confidence);
                                             }
-                                            if(!note.isEmpty()) {
-                                                item.addMetadata("local",
-                                                        "message", "claim",
-                                                        Item.ANY, fieldChoice + ":" + note);                                        
-                                            }
+
                                         }
                                     }
 
-                                    item.update();
-
                                 }
-
-                                context.commit();
 
                             }
 
                         }
                     }
 
+                    if (!note.isEmpty())
+                    {
+                        item.addMetadata(METADATA_MESSAGE[0],
+                                METADATA_MESSAGE[1], METADATA_MESSAGE[2],
+                                Item.ANY, now + ":" + fieldChoice + ":" + note);
+                    }
+                    item.update();
+                    context.commit();
                     if (itemRejectedIDs.size() > 0)
                     {
                         // notify reject
@@ -457,24 +471,31 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                 crisID);
                     }
                 }
-                
+
                 if (StringUtils.isNotBlank(templateEmail))
                 {
                     sendEmail(context, templateEmail, notifyGroupSelfClaim,
-                            templateEmailParam0, templateEmailParam1,
-                            templateEmailParam2, templateEmailParam3, note, handle, crisID);
+                            null, templateEmailParam0, templateEmailParam1,
+                            templateEmailParam2, templateEmailParam3, note,
+                            handle, crisID);
                 }
+
+                sendEmail(context, PUBLICATION_CLAIMED_USER, null,
+                        context.getCurrentUser().getEmail(),
+                        templateEmailParam0, templateEmailParam1,
+                        templateEmailParam2, templateEmailParam3, note, handle,
+                        crisID);
             }
         }
-
 
         response.sendRedirect(request.getContextPath() + "/handle/" + handle);
         context.restoreAuthSystemState();
     }
 
     private void sendEmail(Context context, String templateEmail,
-            String groupName, String field, String value, String authority,
-            String confidence, String note, String handle, String crisId)
+            String groupName, String emailUser, String field, String value,
+            String authority, String confidence, String note, String handle,
+            String crisId)
     {
 
         org.dspace.core.Email email;
@@ -489,21 +510,27 @@ public class AuthorityClaimServlet extends DSpaceServlet
             }
             try
             {
-                Group group = Group.findByName(context, groupName);
-                if (group != null && !group.isEmpty())
+                if (StringUtils.isNotBlank(emailUser))
                 {
-                    for (EPerson eperson : group.getMembers())
-                    {
-                        email.addRecipient(eperson.getEmail());
-                    }
+                    email.addRecipient(emailUser);
                 }
                 else
                 {
-                    log.warn(
-                            "No get eperson from group (check notify-publication.claim.group.name configuration)");
-                    return;
+                    Group group = Group.findByName(context, groupName);
+                    if (group != null && !group.isEmpty())
+                    {
+                        for (EPerson eperson : group.getMembers())
+                        {
+                            email.addRecipient(eperson.getEmail());
+                        }
+                    }
+                    else
+                    {
+                        log.warn(
+                                "No get eperson from group (check notify-publication.claim.group.name configuration)");
+                        return;
+                    }
                 }
-
                 email.addArgument(field);
                 email.addArgument(value);
                 email.addArgument(authority);
@@ -521,7 +548,9 @@ public class AuthorityClaimServlet extends DSpaceServlet
                 log.error(e.getMessage(), e);
             }
         }
-        catch (IOException e)
+        catch (
+
+        IOException e)
         {
             log.error(e.getMessage(), e);
         }
