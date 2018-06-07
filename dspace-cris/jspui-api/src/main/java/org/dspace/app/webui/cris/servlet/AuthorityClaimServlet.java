@@ -417,14 +417,14 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                                         language, value,
                                                         authority, confidence);
                                             }
+                                            if(!note.isEmpty()) {
+                                                item.addMetadata("local",
+                                                        "message", "claim",
+                                                        Item.ANY, fieldChoice + ":" + note);                                        
+                                            }
                                         }
                                     }
-                                    
-                                    if(!note.isEmpty()) {
-                                        item.addMetadata("local",
-                                                "message", "claim",
-                                                Item.ANY, note);                                        
-                                    }
+
                                     item.update();
 
                                 }
