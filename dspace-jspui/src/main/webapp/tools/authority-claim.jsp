@@ -74,7 +74,9 @@ for (String key : result.keySet())
 
   <div class="tab-pane <%= i==0?"active":""%>" id="<%= key %>" role="tabpanel" aria-labelledby="<%= key %>-tab">
     <div class="row">
-      <div class="col-sm-10">
+      <div class="col-sm-12">
+      
+      	<div class="col-sm-5">
         <div class="form-check">
           <input class="form-check-input" type="radio" name="userchoice_<%= key %>" id="dolater_<%= key %>" value="dolater_<%= key %>" <%= haveSimilar.get(key)?"":"checked" %>/>
           
@@ -140,6 +142,13 @@ for (String key : result.keySet())
           </label>
         </div>
 	<% } %>
+		</div>
+		<div class="col-sm-5">
+			  <div class="form-group">
+			    <label for="requestNote_<%= key %>"><fmt:message key="jsp.authority-claim.label.requestnote"/></label>
+			    <textarea class="form-control" name="requestNote_<%= key %>" id="requestNote_<%= key %>" rows="3"></textarea>
+			  </div>
+		</div>
       </div>
     </div>
   </div>
