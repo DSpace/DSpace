@@ -63,7 +63,7 @@ public class DryadWorkflowUtils {
 
         DCValue[] dataPackageUrl = dataFile.getMetadata(MetadataSchema.DC_SCHEMA, "relation", "ispartof", Item.ANY);
 
-        if(0 < dataPackageUrl.length){
+        if(dataPackageUrl != null && dataPackageUrl.length > 0){
             try{
                 IdentifierService service = new DSpace().getSingletonService(IdentifierService.class);
                 Item dataPackage = (Item) service.resolve(context, dataPackageUrl[0].value);
