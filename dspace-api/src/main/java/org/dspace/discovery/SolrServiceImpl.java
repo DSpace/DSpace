@@ -2129,7 +2129,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try{
             SolrQuery solrQuery = new SolrQuery();
             //Set the query to handle since this is unique
-            solrQuery.setQuery(HANDLE_FIELD + ": " + item.getHandle());
+            solrQuery.setQuery(HANDLE_FIELD + ":" + item.getHandle());
             //Only return obj identifier fields in result doc
             solrQuery.setFields(HANDLE_FIELD, RESOURCE_TYPE_FIELD, RESOURCE_ID_FIELD);
             //Add the more like this parameters !
