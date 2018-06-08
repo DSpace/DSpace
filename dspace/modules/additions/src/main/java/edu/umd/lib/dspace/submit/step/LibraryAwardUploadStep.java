@@ -5,15 +5,17 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.submit.step;
+package edu.umd.lib.dspace.submit.step;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.UUID;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -29,7 +31,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.curate.Curator;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -45,9 +49,9 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.app.util.SubmissionStepConfig
  * @see org.dspace.submit.AbstractProcessingStep
  * 
- * @author Tim Donohue
+ * @author Ben Wallberg
  */
-public class UploadStep extends AbstractProcessingStep
+public class LibraryAwardUploadStep extends AbstractProcessingStep
 {
     /** Button to upload a file * */
     public static final String SUBMIT_UPLOAD_BUTTON = "submit_upload";
@@ -92,14 +96,27 @@ public class UploadStep extends AbstractProcessingStep
     // return from editing file information
     public static final int STATUS_EDIT_COMPLETE = 25;
 
-    /** log4j logger */
-    private static final Logger log = Logger.getLogger(UploadStep.class);
+    // error - missing required bitstreams
+    public static final int STATUS_MISSING_BITSTREAMS = 30;
 
-    /** is the upload required? */
-    protected boolean fileRequired = configurationService.getBooleanProperty("webui.submit.upload.required", true);
+    // error - not pdf
+    public static final int STATUS_NOT_PDF = 35;
+
+    // descriptions for required bitstreams
+    public static final List<String> requiredBitstreams = Arrays.asList(
+            "Application Form", "Essay", "Research Paper", "Bibliography",
+            "Letter of Support");
+
+    public static final List<String> hiddenBitstreams = Arrays.asList(
+            "Application Form", "Letter of Support");
+
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(LibraryAwardUploadStep.class);
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
+    private final static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)
@@ -161,7 +178,7 @@ public class UploadStep extends AbstractProcessingStep
         		buttonPressed.startsWith(PREVIOUS_BUTTON))
         {
             // check if a file is required to be uploaded
-            if (fileRequired && !itemService.hasUploadedFiles(item))
+            if (!itemService.hasUploadedFiles(item))
             {
                 return STATUS_NO_FILES_ERROR;
             }
@@ -359,13 +376,28 @@ public class UploadStep extends AbstractProcessingStep
         // files have been uploaded.
         // ---------------------------------------------------
         //check if a file is required to be uploaded
-        if (fileRequired && !itemService.hasUploadedFiles(item)
-                && !buttonPressed.equals(SUBMIT_MORE_BUTTON))
+        if (!itemService.hasUploadedFiles(item))
         {
             return STATUS_NO_FILES_ERROR;
         }
 
         context.dispatchEvents();
+        // ---------------------------------------------------
+        // Step #7: Determine if all required bitstreams are
+        // uploaded
+        // ---------------------------------------------------
+        if (getNeededBitstreams(context, request, subInfo).size() > 0)
+        {
+            return STATUS_MISSING_BITSTREAMS;
+        }
+
+        // ---------------------------------------------------
+        // Step #8: Determine if all bitstreams are pdf
+        // ---------------------------------------------------
+        if (!isAllPdf(context, request, subInfo))
+        {
+            return STATUS_NOT_PDF;
+        }
 
         return STATUS_COMPLETE;
     }
@@ -487,6 +519,8 @@ public class UploadStep extends AbstractProcessingStep
         boolean fileOK = false;
         BitstreamFormat bf = null;
         Bitstream b = null;
+
+        log.debug(LogManager.getHeader(context, "processUploadFile", "begin"));
  
         //NOTE: File should already be uploaded. 
         //Manakin does this automatically via Cocoon.
@@ -522,6 +556,8 @@ public class UploadStep extends AbstractProcessingStep
                 // with the upload
                 if (filePath == null || fileInputStream == null)
                 {
+                    log.info(LogManager.getHeader(context, "processUploadFile",
+                            "upload error: 0"));
                     return STATUS_UPLOAD_ERROR;
                 }
 
@@ -529,6 +565,8 @@ public class UploadStep extends AbstractProcessingStep
                 {
                     // In any event, if we don't have the submission info, the request
                     // was malformed
+                    log.error(LogManager.getHeader(context,
+                            "processUploadFile", "integrity error"));
                     return STATUS_INTEGRITY_ERROR;
                 }
 
@@ -536,13 +574,20 @@ public class UploadStep extends AbstractProcessingStep
                 // Create the bitstream
                 Item item = subInfo.getSubmissionItem().getItem();
 
+                String bundleName = "ORIGINAL";
+                    if (fileDescription != null
+                            && hiddenBitstreams.contains(fileDescription))
+                    {
+                        bundleName = "PRESERVATION";
+                    }
+
                 // do we already have a bundle?
-                List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+                List<Bundle> bundles = itemService.getBundles(item, bundleName);
 
                 if (bundles.size() < 1)
                 {
                     // set bundle's name to ORIGINAL
-                    b = itemService.createSingleBitstream(context, fileInputStream, item, "ORIGINAL");
+                    b = itemService.createSingleBitstream(context, fileInputStream, item, bundleName);
                 }
                 else
                 {
@@ -738,6 +783,128 @@ public class UploadStep extends AbstractProcessingStep
         }
 
         return STATUS_COMPLETE;
+    }
+
+    /**
+     * Get list of required bitstreams not yet loaded.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param subInfo
+     *            submission info object
+     * 
+     * @return List of still needed bitstreams
+     */
+    public static List<String> getNeededBitstreams(Context context,
+            HttpServletRequest request, SubmissionInfo subInfo)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
+    {
+        List<String> needed = new ArrayList<String>();
+
+        log.debug(LogManager.getHeader(context, "la_get_needed", "begin"));
+
+        // iterate over the required bitstreams
+        for (String required : requiredBitstreams)
+        {
+            log.debug(LogManager.getHeader(context, "la_get_needed", required
+                    + " is required"));
+
+            boolean alreadyPresent = false;
+
+            List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(context, subInfo.getSubmissionItem().getItem());
+
+            // iterate over already upload bitstreams
+            for (Bitstream b : bitstreams)
+            {
+                String desc = b.getDescription();
+
+                log.debug(LogManager.getHeader(context, "la_get_needed",
+                        "checking for match on " + desc));
+
+                if (desc != null && desc.equals(required))
+                {
+                    alreadyPresent = true;
+                    break;
+                }
+            }
+
+            log.debug(LogManager.getHeader(context, "la_get_needed", required
+                    + " is already present " + alreadyPresent));
+
+            if (!alreadyPresent)
+            {
+                needed.add(required);
+            }
+
+        }
+
+        log.debug(LogManager.getHeader(context, "la_get_needed", "returning "
+                + needed));
+
+        return needed;
+    }
+
+    /**
+     * Get display version of list of required bitstreams.
+     */
+    public static String listNeededBitstreams()
+    {
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < requiredBitstreams.size(); i++)
+        {
+            String next = requiredBitstreams.get(i);
+
+            if (i == requiredBitstreams.size() - 1)
+            {
+                result.append(", and ");
+            }
+            else if (i > 0)
+            {
+                result.append(", ");
+            }
+
+            result.append(next);
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * Determine if all uploaded bitstreams are pdf.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param subInfo
+     *            submission info object
+     * 
+     * @return boolean
+     */
+    public static boolean isAllPdf(Context context, HttpServletRequest request,
+            SubmissionInfo subInfo) throws ServletException, IOException,
+            SQLException, AuthorizeException
+    {
+        log.debug(LogManager.getHeader(context, "isAllPdf", "begin"));
+
+        List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(context, subInfo.getSubmissionItem().getItem());
+
+        // iterate over already upload bitstreams
+        for (Bitstream b : bitstreams)
+        {
+            BitstreamFormat bf = b.getFormat(context);
+
+            if (!bf.getMIMEType().equals("application/pdf"))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

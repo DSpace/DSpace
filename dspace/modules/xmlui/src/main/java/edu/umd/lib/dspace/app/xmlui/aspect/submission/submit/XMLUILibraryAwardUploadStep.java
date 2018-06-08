@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.submission.submit;
+package edu.umd.lib.dspace.app.xmlui.aspect.submission.submit;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -14,6 +14,8 @@ import java.util.*;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.sherpa.SHERPAJournal;
@@ -22,6 +24,8 @@ import org.dspace.app.sherpa.SHERPAResponse;
 import org.dspace.app.sherpa.submit.SHERPASubmitService;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import org.dspace.app.xmlui.aspect.submission.submit.EditFileStep;
+import org.dspace.app.xmlui.aspect.submission.submit.ReviewStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -33,8 +37,8 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.File;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Row;
+import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
@@ -44,6 +48,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
+
+import edu.umd.lib.dspace.submit.step.LibraryAwardUploadStep;
 
 /**
  * This is a step of the item submission processes. The upload
@@ -59,8 +65,9 @@ import org.xml.sax.SAXException;
  *
  * @author Scott Phillips
  * @author Tim Donohue (updated for Configurable Submission)
+ * @author Rohit Arora (customizations for handling library awards)
  */
-public class UploadStep extends AbstractSubmissionStep
+public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 {
     /** Language Strings for Uploading **/
     protected static final Message T_head =
@@ -117,6 +124,10 @@ public class UploadStep extends AbstractSubmissionStep
             message("xmlui.Submission.submit.UploadStep.checksum");
     protected static final Message T_submit_remove =
             message("xmlui.Submission.submit.UploadStep.submit_remove");
+    protected static final Message T_missing_bitstreams =
+            message("xmlui.Submission.submit.XMLUILibraryAwardUploadStep.missing_bitstreams");
+    protected static final Message T_not_pdf =
+            message("xmlui.Submission.submit.XMLUILibraryAwardUploadStep.not_pdf");;
 
 
     protected static final Message T_sherpa_consult =
@@ -148,7 +159,7 @@ public class UploadStep extends AbstractSubmissionStep
     /**
      * Establish our required parameters, abstractStep will enforce these.
      */
-    public UploadStep()
+    public XMLUILibraryAwardUploadStep()
     {
         this.requireSubmission = true;
         this.requireStep = true;
@@ -193,16 +204,16 @@ public class UploadStep extends AbstractSubmissionStep
             return;
         }
 
-        // Get a list of all files in the original bundle
+        // Get a list of all files
         Item item = submission.getItem();
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
         boolean disableFileEditing = (submissionInfo.isInWorkflow()) && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("workflow.reviewer.file-edit");
-        java.util.List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+        java.util.List<Bundle> bundles = item.getBundles();
         java.util.List<Bitstream> bitstreams = new ArrayList<>();
-        if (bundles.size() > 0)
+        for (Bundle bundle : bundles)
         {
-            bitstreams = bundles.get(0).getBitstreams();
+            bitstreams.addAll(bundle.getBitstreams());
         }
 
         // Part A:
@@ -218,9 +229,38 @@ public class UploadStep extends AbstractSubmissionStep
             upload = div.addList("submit-upload-new", List.TYPE_FORM);
             upload.setHead(T_head);
 
+            Request request = ObjectModelHelper.getRequest(objectModel);
+            String buttonPressed = Util.getSubmitButton(request,
+                    LibraryAwardUploadStep.NEXT_BUTTON);
+
+            // dropdown
+            Select selectDesc = upload.addItem().addSelect("description");
+            ArrayList<String> requiredBitstreams = new ArrayList<String>();
+            for (String desc : LibraryAwardUploadStep.requiredBitstreams)
+            {
+                requiredBitstreams.add(desc);
+            }
+
+            for (Bitstream bitstream : bitstreams)
+            {
+                try
+                {
+                    requiredBitstreams.remove(requiredBitstreams
+                            .indexOf(bitstream.getDescription()));
+                }
+                catch (IndexOutOfBoundsException e)
+                {
+                    continue;
+                }
+
+            }
+
+            for (String desc : requiredBitstreams)
+            {
+                selectDesc.addOption(desc).addContent(desc);
+            }
+
             File file = upload.addItem().addFile("file");
-            file.setLabel(T_file);
-            file.setHelp(T_file_help);
             file.setRequired();
 
             // if no files found error was thrown by processing class, display it!
@@ -247,12 +287,38 @@ public class UploadStep extends AbstractSubmissionStep
                 file.addError(T_virus_error);
             }
 
-            Text description = upload.addItem().addText("description");
-            description.setLabel(T_description);
-            description.setHelp(T_description_help);
-
             Button uploadSubmit = upload.addItem().addButton("submit_upload");
-            uploadSubmit.setValue(T_submit_upload);
+            uploadSubmit.setValue("Upload");
+
+            if (requiredBitstreams.isEmpty())
+            {
+                file.setDisabled();
+                uploadSubmit.setDisabled();
+            }
+
+            // Error Handling and Displaying the error messages.
+            if (this.errorFlag == LibraryAwardUploadStep.STATUS_NOT_PDF
+                    || this.errorFlag == LibraryAwardUploadStep.STATUS_UNKNOWN_FORMAT)
+            {
+                file.addError(T_not_pdf);
+            }
+            else if (buttonPressed.equals(LibraryAwardUploadStep.NEXT_BUTTON)
+                    || buttonPressed
+                            .startsWith(LibraryAwardUploadStep.PROGRESS_BAR_PREFIX)
+                    || buttonPressed
+                            .equals(LibraryAwardUploadStep.PREVIOUS_BUTTON))
+            {
+                if (this.errorFlag == LibraryAwardUploadStep.STATUS_MISSING_BITSTREAMS
+                        || this.errorFlag == LibraryAwardUploadStep.STATUS_INTEGRITY_ERROR
+                        || this.errorFlag == LibraryAwardUploadStep.STATUS_NO_FILES_ERROR)
+                {
+                    file.addError(T_missing_bitstreams);
+                }
+                else if (this.errorFlag == LibraryAwardUploadStep.STATUS_NOT_PDF)
+                {
+                    file.addError(T_not_pdf);
+                }
+            }
         }
 
         make_sherpaRomeo_submission(item, div);
@@ -468,11 +534,11 @@ public class UploadStep extends AbstractSubmissionStep
 
         // Review all uploaded files
         Item item = submission.getItem();
-        java.util.List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-        java.util.List<Bitstream> bitstreams = new ArrayList<>();
-        if (bundles.size() > 0)
+        java.util.List<Bundle> bundles = item.getBundles();
+        java.util.List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+        for (Bundle bundle : bundles)
         {
-            bitstreams = bundles.get(0).getBitstreams();
+            bitstreams.addAll(bundle.getBitstreams());
         }
 
         for (Bitstream bitstream : bitstreams)
