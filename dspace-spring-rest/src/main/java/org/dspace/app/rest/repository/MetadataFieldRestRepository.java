@@ -35,7 +35,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
     @Autowired
     MetadataFieldService metaFieldService;
-    
+
     @Autowired
     MetadataSchemaService metadataSchemaService;
 
@@ -70,7 +70,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable).map(converter);
         return page;
     }
-    
+
     @SearchRestMethod(name = "findBySchema")
     public Page<MetadataFieldRest> findBySchema(@Param(value = "name") String schemaName,
                                                           Pageable pageable) {
