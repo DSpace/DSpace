@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -86,7 +87,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             //Configure the logout entry point
             .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout"))
             //When logout is successful, return OK (200) status
-            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
             //Everyone can call this endpoint
             .permitAll()
             .and()
