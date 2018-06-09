@@ -10,6 +10,7 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataFieldConverter;
 import org.dspace.app.rest.model.MetadataFieldRest;
@@ -22,7 +23,6 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
 /**
@@ -72,7 +72,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     }
 
     @SearchRestMethod(name = "bySchema")
-    public Page<MetadataFieldRest> findBySchema(@Param(value = "schema") String schemaName,
+    public Page<MetadataFieldRest> findBySchema(@Parameter(value = "schema", required = true) String schemaName,
                                                           Pageable pageable) {
         Context context = obtainContext();
         List<MetadataField> metadataFields = null;

@@ -85,20 +85,22 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .createMetadataField(context, schema, "AnElement", "AQualifier", "AScopeNote").build();
 
         getClient().perform(get("/api/core/metadatafields/search/bySchema")
-                        .param("schema", "dc"))
+                        .param("schema", "dc")
+                        .param("size", String.valueOf(100)))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
                        MetadataFieldMatcher.matchMetadataFieldByKeys("dc","title", null),
                        MetadataFieldMatcher.matchMetadataFieldByKeys("dc","date", "issued"))
                    ))
-                   .andExpect(jsonPath("$.page.size", is(20)));
+                   .andExpect(jsonPath("$.page.size", is(100)));
 
         getClient().perform(get("/api/core/metadatafields/search/bySchema")
                 .param("schema", schema.getName()))
            .andExpect(status().isOk())
            .andExpect(content().contentType(contentType))
-           .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(metadataField)
+           .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                   MetadataFieldMatcher.matchMetadataField(metadataField))
            ))
            .andExpect(jsonPath("$.page.size", is(20)))
            .andExpect(jsonPath("$.page.totalElements", is(1)));
@@ -114,4 +116,12 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(jsonPath("$.page.size", is(20)))
                    .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
+
+    @Test
+    public void findByNullSchema() throws Exception {
+
+        getClient().perform(get("/api/core/metadatafields/search/bySchema"))
+                   .andExpect(status().isUnprocessableEntity());
+    }
+
 }
