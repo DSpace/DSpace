@@ -174,7 +174,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         getClient(token).perform(get("/api/authn/logout"))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isNoContent());
 
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
@@ -283,7 +283,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         //Logout
         getClient(token).perform(get("/api/authn/logout"))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isNoContent());
 
         //Check if we are actually logged out
         getClient(token).perform(get("/api/authn/status"))
