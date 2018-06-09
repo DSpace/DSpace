@@ -71,14 +71,16 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         return page;
     }
 
-    @SearchRestMethod(name = "findBySchema")
-    public Page<MetadataFieldRest> findBySchema(@Param(value = "name") String schemaName,
+    @SearchRestMethod(name = "bySchema")
+    public Page<MetadataFieldRest> findBySchema(@Param(value = "schema") String schemaName,
                                                           Pageable pageable) {
         Context context = obtainContext();
         List<MetadataField> metadataFields = null;
-        System.out.println("hello");
         try {
             MetadataSchema schema = metadataSchemaService.find(context, schemaName);
+            if (schema == null) {
+                return null;
+            }
             metadataFields = metaFieldService.findAllInSchema(context, schema);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
