@@ -117,7 +117,7 @@ public class OverviewStep extends AbstractStep {
             addCell.addButton("submit_adddataset").setValue(T_BUTTON_DATAFILE_ADD);
 
             if(datasets.length == 0)
-                noDatasets = true;
+                submissionNotFinished = true;
 
             if(publication.isArchived()){
                 //Add the current dataset, since our publication is archived this will probally be the only one !
@@ -226,6 +226,13 @@ public class OverviewStep extends AbstractStep {
 
         if(submission instanceof WorkspaceItem){
             finDiv.setHead(T_STEPS_HEAD_4);
+
+            // alert user if their submission is not finished:
+            if(submissionNotFinished)
+                finDiv.addPara("alert", "alert").addContent(T_ERROR_ALL_FILES);
+            else
+                finDiv.addPara("alert", "alert").addContent(T_ERROR_ONE_FILE);
+
             finDiv.addPara().addContent(T_FINALIZE_HELP);
 
             // add Delete and Continue to Checkout buttons
@@ -237,12 +244,8 @@ public class OverviewStep extends AbstractStep {
 
             Button finishButton = bottomButtonPara.addButton(AbstractProcessingStep.NEXT_BUTTON);
             finishButton.setValue(T_FINALIZE_BUTTON);
-            if(submissionNotFinished || noDatasets){
+            if(submissionNotFinished){
                 finishButton.setDisabled(true);
-                if(submissionNotFinished)
-                    finishButton.addError(T_ERROR_ALL_FILES);
-                else
-                    finishButton.addError(T_ERROR_ONE_FILE);
             }
         } else {
             //

@@ -3043,7 +3043,7 @@
 	<message key="xmlui.Submission.submit.OverviewStep.button.finalize">Continue to checkout</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.edit">Edit</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.delete">Delete</message>
-	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.continue">Continue submission</message>
+	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.continue">Verify</message>
 	<message key="xmlui.Submission.submit.OverviewStep.error.finalize.all-files">You cannot finish the
 		submission until all the data files are through the submission workflow.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.error.finalize.one-file">You cannot finish the
