@@ -7,10 +7,8 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
-import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
@@ -22,6 +20,8 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -78,29 +78,25 @@ public class OverviewStep extends AbstractStep {
 
         Division mainDiv = body.addInteractiveDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
 
-
-
         Division actionsDiv = mainDiv.addDivision("submit-completed-overview");
 
         //First of all add all the publication info
-        {
-            Division pubDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
+        Division pubDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
 
-            pubDiv.setHead(T_STEPS_HEAD_1);
-            //TODO: expand this !
+        pubDiv.setHead(T_STEPS_HEAD_1);
+        //TODO: expand this !
 
-            // display a formatted reference to the data package
-            ReferenceSet refSet = pubDiv.addReferenceSet("submission", ReferenceSet.TYPE_SUMMARY_LIST);
-            refSet.addReference(publication);
+        // display a formatted reference to the data package
+        ReferenceSet refSet = pubDiv.addReferenceSet("submission", ReferenceSet.TYPE_SUMMARY_VIEW);
+        refSet.addReference(publication);
 
-            //add an edit button for the publication (if we aren't archived)
-            if(!publication.isArchived()){
-                Para actionsPara = pubDiv.addPara();
-                actionsPara.addButton("submit_edit_publication").setValue(T_BUTTON_PUBLICATION_EDIT);
-                if(submission instanceof WorkflowItem){
-                    //For a curator add an edit metadata button
-                    actionsPara.addButton("submit_edit_metadata_" + submission.getID()).setValue(message("xmlui.Submission.Submissions.OverviewStep.edit-metadata-pub"));
-                }
+        //add an edit button for the publication (if we aren't archived)
+        if(!publication.isArchived()){
+            Para actionsPara = pubDiv.addPara();
+            actionsPara.addButton("submit_edit_publication").setValue(T_BUTTON_PUBLICATION_EDIT);
+            if(submission instanceof WorkflowItem){
+                //For a curator add an edit metadata button
+                actionsPara.addButton("submit_edit_metadata_" + submission.getID()).setValue(message("xmlui.Submission.Submissions.OverviewStep.edit-metadata-pub"));
             }
         }
 
@@ -116,7 +112,9 @@ public class OverviewStep extends AbstractStep {
             //First of all add the current one !
             dataDiv.setHead(T_STEPS_HEAD_2);
 
-            List dataSetList = dataDiv.addList("datasets");
+            Table dataSetList = dataDiv.addTable("datasets", 1, 3, "datasets");
+            Cell addCell = dataSetList.addRow().addCell("add_file", null, 1, 3, "add_file");
+            addCell.addButton("submit_adddataset").setValue(T_BUTTON_DATAFILE_ADD);
 
             if(datasets.length == 0)
                 noDatasets = true;
@@ -139,8 +137,6 @@ public class OverviewStep extends AbstractStep {
                 }
             }
 
-            Item addDataFileItem = dataSetList.addItem();
-            addDataFileItem.addButton("submit_adddataset").setValue(T_BUTTON_DATAFILE_ADD);
         }
         //Thirdly add the the upload data files to external repos (this is optional)
 	// Commented out because there is a bug somewhere in this code -- Clicking the checkbox for TreeBASE upload causes the Tomcat server to crash!
@@ -226,33 +222,31 @@ public class OverviewStep extends AbstractStep {
 //        }
 
         //Lastly add the finalize submission button
-        {
-            Division finDiv = actionsDiv.addDivision("finalizedivision", (submission instanceof WorkspaceItem ? "even" : "odd") + " subdiv");
+        Division finDiv = actionsDiv.addDivision("finalizedivision", (submission instanceof WorkspaceItem ? "even" : "odd") + " subdiv");
 
-            if(submission instanceof WorkspaceItem){
-                finDiv.setHead(T_STEPS_HEAD_4);
-                finDiv.addPara().addContent(T_FINALIZE_HELP);
+        if(submission instanceof WorkspaceItem){
+            finDiv.setHead(T_STEPS_HEAD_4);
+            finDiv.addPara().addContent(T_FINALIZE_HELP);
 
-                // add Delete and Continue to Checkout buttons
-                Para bottomButtonPara = finDiv.addPara();
-                if (!publication.isArchived() && submission instanceof WorkspaceItem) {
-                    WorkspaceItem pubWsItem = WorkspaceItem.findByItemId(context, publication.getID());
-                    bottomButtonPara.addButton("submit_delete_datapack_" + pubWsItem.getID()).setValue(T_BUTTON_PUBLICATION_DELETE);
-                }
-
-                Button finishButton = bottomButtonPara.addButton(AbstractProcessingStep.NEXT_BUTTON);
-                finishButton.setValue(T_FINALIZE_BUTTON);
-                if(submissionNotFinished || noDatasets){
-                    finishButton.setDisabled(true);
-                    if(submissionNotFinished)
-                        finishButton.addError(T_ERROR_ALL_FILES);
-                    else
-                        finishButton.addError(T_ERROR_ONE_FILE);
-                }
-            } else {
-                //
-                finDiv.addPara().addButton("submit_cancel").setValue(message("xmlui.general.return"));
+            // add Delete and Continue to Checkout buttons
+            Para bottomButtonPara = finDiv.addPara();
+            if (!publication.isArchived() && submission instanceof WorkspaceItem) {
+                WorkspaceItem pubWsItem = WorkspaceItem.findByItemId(context, publication.getID());
+                bottomButtonPara.addButton("submit_delete_datapack_" + pubWsItem.getID()).setValue(T_BUTTON_PUBLICATION_DELETE);
             }
+
+            Button finishButton = bottomButtonPara.addButton(AbstractProcessingStep.NEXT_BUTTON);
+            finishButton.setValue(T_FINALIZE_BUTTON);
+            if(submissionNotFinished || noDatasets){
+                finishButton.setDisabled(true);
+                if(submissionNotFinished)
+                    finishButton.addError(T_ERROR_ALL_FILES);
+                else
+                    finishButton.addError(T_ERROR_ONE_FILE);
+            }
+        } else {
+            //
+            finDiv.addPara().addButton("submit_cancel").setValue(message("xmlui.general.return"));
         }
     }
 
@@ -272,55 +266,87 @@ public class OverviewStep extends AbstractStep {
         return randomKey;
     }
 
-    private boolean renderDatasetItem(boolean submissionNotFinished, List dataSetList, org.dspace.content.Item dataset, InProgressSubmission wsDataset) throws WingException, SQLException {
-        DryadDataFile dryadDataFile = new DryadDataFile(dataset);
-        Item dataItem = dataSetList.addItem(String.valueOf(wsDataset.getID()), "dataset_overview");
-
-        if (AuthorizeManager.isCuratorOrAdmin(context)) {
-            String datasetTitle = XSLUtils.getShortFileName(wsDataset.getItem().getName(), 50);
-            if(datasetTitle == null)
-                datasetTitle = "Untitled";
-
-            dataItem.addXref(HandleManager.resolveToURL(context, dataset.getHandle()), datasetTitle);
-        } else {
-            try {
-                Bitstream mainFile = dryadDataFile.getFirstBitstream();
-                String fileInfo = mainFile.getName() + " (" + FileUtils.byteCountToDisplaySize(mainFile.getSize()) + ")";
-                dataItem.addHighlight("filename").addContent(fileInfo);
-            } catch (Exception e) {
-                dataItem.addHighlight("filename").addContent(dryadDataFile.getItem().getName());
-            }
-        }
-
-
-        Button editButton = dataItem.addButton("submit_edit_dataset_" + wsDataset.getID());
+    private boolean renderDatasetItem(boolean submissionNotFinished, Table table, org.dspace.content.Item dataset, InProgressSubmission wsDataset) throws WingException, SQLException {
+        // first row: buttons, title
+        Row row = table.addRow("dataset-row-top", null, "dataset-row-top");
+        Cell actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
+        Cell labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+        Cell dataCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+        Button editButton = actionCell.addButton("submit_edit_dataset_" + wsDataset.getID());
         //To determine which name our button is getting check if we are through submission with this
-        if(dataset.getMetadata("internal", "workflow", "submitted", org.dspace.content.Item.ANY).length == 0 && (wsDataset instanceof WorkspaceItem)){
+        if (dataset.getMetadata("internal", "workflow", "submitted", org.dspace.content.Item.ANY).length == 0 && (wsDataset instanceof WorkspaceItem)) {
             editButton.setValue(T_BUTTON_DATAFILE_CONTINUE);
             submissionNotFinished = true;
-        }
-        else
+        } else {
             editButton.setValue(T_BUTTON_DATAFILE_EDIT);
+        }
+        actionCell.addButton("submit_delete_dataset_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_DELETE);
 
-        if(wsDataset instanceof WorkflowItem){
-            dataItem.addButton("submit_edit_metadata_" + wsDataset.getID()).setValue(message("xmlui.Submission.Submissions.OverviewStep.edit-metadata-dataset"));
+        DryadDataFile dryadDataFile = new DryadDataFile(dataset);
+        String datasetTitle = XSLUtils.getShortFileName(wsDataset.getItem().getName(), 50);
+
+        labelCell.addContent("Title");
+        dataCell.addContent(datasetTitle);
+
+        // filename
+        row = table.addRow("dataset-row", null, "dataset-row");
+        actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
+        labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+        dataCell = row.addCell();
+
+        String fileInfo;
+        try {
+            Bitstream mainFile = dryadDataFile.getFirstBitstream();
+            fileInfo = mainFile.getName() + " (" + FileUtils.byteCountToDisplaySize(mainFile.getSize()) + ")";
+        } catch (Exception e) {
+            fileInfo = dryadDataFile.getItem().getName();
+        }
+        labelCell.addContent("Filename");
+        dataCell.addXref(HandleManager.resolveToURL(context, dataset.getHandle()), fileInfo);
+
+        // readme
+        Bitstream readme = dryadDataFile.getREADME();
+        if (readme != null) {
+            row = table.addRow("dataset-row", null, "dataset-row");
+            actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
+            labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+            dataCell = row.addCell();
+
+            String readmeFileInfo = readme.getName() + " (" + FileUtils.byteCountToDisplaySize(readme.getSize()) + ")";
+            labelCell.addContent("README");
+            dataCell.addContent(readmeFileInfo);
         }
 
-        dataItem.addButton("submit_delete_dataset_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_DELETE);
+        // description
+        DCValue[] descriptions = dataset.getMetadata("dc", "description", null, org.dspace.content.Item.ANY);
+        if (descriptions.length > 0) {
+            row = table.addRow("dataset-row", null, "dataset-row");
+            actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
+            labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+            dataCell = row.addCell("dataset-description",null, 0, 0, "dataset-description");
 
-        // curators don't care to see the READMEs or descriptions, just submitters
-        if (!AuthorizeManager.isCuratorOrAdmin(context)) {
-            Bitstream readme = dryadDataFile.getREADME();
-            if (readme != null) {
-                String readmeFileInfo = readme.getName() + " (" + FileUtils.byteCountToDisplaySize(readme.getSize()) + ")";
-                dataItem.addHighlight("dataset-description").addContent(readmeFileInfo);
+            labelCell.addContent("Description");
+            dataCell.addHighlight("dataset-description").addContent(descriptions[0].value);
+        }
+
+        // date added
+        DCValue[] provenances = dataset.getMetadata("dc", "description", "provenance", org.dspace.content.Item.ANY);
+        for (DCValue provenance : provenances) {
+            Matcher uploadMatcher = Pattern.compile("File was uploaded at (.+)").matcher(provenance.value);
+            if (uploadMatcher.matches()) {
+                String uploadDate = uploadMatcher.group(1);
+                row = table.addRow("dataset-row", null, "dataset-row");
+                actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
+                labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+                dataCell = row.addCell();
+
+                labelCell.addContent("Date added");
+                dataCell.addHighlight("dataset-date").addContent(uploadDate);
+                break;
             }
-            // add dc_description text if available
-            DCValue[] descriptions = dataset.getMetadata("dc", "description", org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
-            if (descriptions.length > 0)
-                dataItem.addHighlight("dataset-description").addContent(descriptions[0].value);
         }
-        
+
+
         return submissionNotFinished;
     }
 }
