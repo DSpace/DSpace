@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -267,17 +269,23 @@ public class FeedServlet extends DSpaceServlet
     private boolean itemsChanged(Context context, DSpaceObject dso, long timeStamp)
             throws SQLException
     {
-        // construct start and end dates
+        /*
+         * Construct start and end dates.
+         *
+         * According to the Solr DateField documentation: "date field shall be 
+         * of the form 1995-12-31T23:59:59Z The trailing "Z" designates UTC time
+         * and is mandatory (See below for an explanation of UTC). Optional
+         * fractional seconds are allowed, as long as they do not end in a
+         * trailing 0 (but any precision beyond milliseconds will be ignored).
+         * All other parts are mandatory." Therefore the Full ISO 8601 format
+         * is e.g. "2009-07-16T13:59:21Z" is maintained
+         */
         DCDate dcStartDate = new DCDate( new Date(timeStamp) );
         DCDate dcEndDate = new DCDate( new Date(System.currentTimeMillis()) );
-
-        // convert dates to ISO 8601, stripping the time
-        String startDate = dcStartDate.toString().substring(0, 10);
-        String endDate = dcEndDate.toString().substring(0, 10);
-        
+     
         // this invocation should return a non-empty list if even 1 item has changed
         try {
-            return (Harvest.harvest(context, dso, startDate, endDate,
+            return (Harvest.harvest(context, dso, dcStartDate.toString(), dcEndDate.toString(),
         		                0, 1, !includeAll, false, false, includeAll).size() > 0);
         }
         catch (ParseException pe)
