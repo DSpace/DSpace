@@ -45,6 +45,7 @@ import org.dspace.app.cris.model.orcid.OrcidHistory;
 import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.model.ws.User;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.app.util.Util;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
@@ -1055,8 +1056,10 @@ public class ApplicationService extends ExtendedTabService
 			if (DatabaseUtils.getRebuildCrisConfiguration()) {
 				try {
 					log.info("Post database migration, rebuild cris configuration");
+					String sourceVersion = Util.getSourceVersion();
+                    log.info("DSpace version: " + sourceVersion);
 					String file = ConfigurationManager.getProperty("dspace.dir") + File.separator + "etc"
-							+ File.separator + "configuration-tool-demo.xls";
+					        + File.separator + "upgrade" + File.separator + sourceVersion+"__DSpaceCRIS-Upgrade.xls";
 					String[] args = new String[] { "-f", file };
 					ImportCRISDataModelConfiguration.main(args);
 					log.info("Rebuild CRIS Configuration is complete");
