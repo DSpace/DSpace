@@ -9,10 +9,16 @@ package org.dspace.discovery;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +29,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -39,7 +48,16 @@ public class FullTextContentStreamsTest {
 
     @Mock
     private BitstreamService bitstreamService;
+    
+    @Mock
+    private BundleService bundleService;
+    
+    @Mock
+    private ResourcePolicyService resourcePolicyService;
 
+    @Mock
+    private ConfigurationService configurationService;
+    
     @Mock
     private Item item;
 
@@ -57,8 +75,15 @@ public class FullTextContentStreamsTest {
 
     @Mock
     private Bitstream textBitstream3;
-
-
+    
+    @Mock
+    private ResourcePolicy resourcePolicy;
+    
+    @Mock
+    private Group group;
+    
+    @Mock DSpaceObject dspaceObject;
+    
     @Before
     public void setUp() throws Exception {
         when(item.getHandle()).thenReturn(HANDLE);
@@ -77,7 +102,29 @@ public class FullTextContentStreamsTest {
         when(bitstreamService.retrieve(null, textBitstream2)).thenReturn(new ByteArrayInputStream("This is text 2".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
 
+        List<ResourcePolicy> resourcePolicies = new ArrayList<ResourcePolicy>();
+        resourcePolicies.add(resourcePolicy);
+
+        when(bundleService.getBitstreamPolicies(null, textBundle)).thenReturn(resourcePolicies);
+        when(resourcePolicyService.isDateValid(resourcePolicy)).thenReturn(true);
+        when(resourcePolicy.getGroup()).thenReturn(group);
+        when(resourcePolicy.getGroup().getName()).thenReturn("anonymous");
+        
+        UUID objectId = UUID.randomUUID();
+        
+        when(textBitstream1.getID()).thenReturn(objectId);
+        when(textBitstream2.getID()).thenReturn(objectId);
+        when(textBitstream3.getID()).thenReturn(objectId);
+        
+        when(resourcePolicy.getdSpaceObject()).thenReturn(dspaceObject);
+        when(resourcePolicy.getdSpaceObject().getID()).thenReturn(objectId);
+
+        when(configurationService.getBooleanProperty("discovery.fulltext.embargo")).thenReturn(false);
+        
         streams.bitstreamService = bitstreamService;
+        streams.bundleService = bundleService;
+        streams.resourcePolicyService = resourcePolicyService;
+        streams.configurationService = configurationService;
     }
 
     @Test
@@ -194,5 +241,5 @@ public class FullTextContentStreamsTest {
         assertTrue("The data should contain data on the exception that occurred",
                 content.contains("NOTFOUND"));
     }
-
+    
 }
