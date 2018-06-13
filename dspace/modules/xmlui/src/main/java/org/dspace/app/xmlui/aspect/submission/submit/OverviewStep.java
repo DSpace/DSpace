@@ -1,17 +1,13 @@
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import org.apache.commons.io.FileUtils;
-import org.datadryad.api.DryadDataFile;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
-import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
-import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
@@ -21,8 +17,6 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * User: kevin (kevin at atmire.com)
