@@ -49,6 +49,9 @@ public class DryadWorkflowUtils {
 
 
     public static Item getDataPackage(Context context, Item dataFile) {
+        if (dataFile == null) {
+            return null;
+        }
         // if this item is in fact a data package and not a data file, return the package (this item).
         try {
             if (dataFile.isIn(DryadDataPackage.getCollection(context))) {
@@ -60,7 +63,7 @@ public class DryadWorkflowUtils {
 
         DCValue[] dataPackageUrl = dataFile.getMetadata(MetadataSchema.DC_SCHEMA, "relation", "ispartof", Item.ANY);
 
-        if(0 < dataPackageUrl.length){
+        if(dataPackageUrl != null && dataPackageUrl.length > 0){
             try{
                 IdentifierService service = new DSpace().getSingletonService(IdentifierService.class);
                 Item dataPackage = (Item) service.resolve(context, dataPackageUrl[0].value);

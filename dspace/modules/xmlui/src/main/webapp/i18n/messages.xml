@@ -3255,7 +3255,7 @@
 
     <message key="xmlui.Submission.submit.OverviewStep.headgenbank">Genbank</message>
 	<message key="xmlui.Submission.submit.OverviewStep.genbankhelp"></message>
-    <message key="xmlui.general.cancel_delete">Cancel &amp; delete</message>
+    <message key="xmlui.general.cancel_delete">Cancel</message>
 
 
     <message key="xmlui.ArtifactBrowser.RestrictedItem.questions">If you have questions about the status of this item, please send them to the Dryad curation staff:</message>

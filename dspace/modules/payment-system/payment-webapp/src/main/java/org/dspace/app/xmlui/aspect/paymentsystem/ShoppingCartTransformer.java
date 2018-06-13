@@ -97,7 +97,7 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = null;
             //create new transaction or update transaction id with item
-            shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
+            shoppingCart = paymentSystemService.getShoppingCartByItemId(context,dataPackage.getID());
             shoppingCart.updateCartInternals(context);
 
             //add the order summary form (wrapped in div.ds-option-set for proper sidebar style)

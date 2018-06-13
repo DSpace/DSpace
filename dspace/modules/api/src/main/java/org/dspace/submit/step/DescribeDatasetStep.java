@@ -9,6 +9,7 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Context;
 import org.dspace.usagelogging.EventLogger;
 import org.dspace.workflow.DryadWorkflowUtils;
+import org.dspace.workflow.WorkflowItem;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,21 +36,31 @@ public class DescribeDatasetStep extends DescribeStep {
 
         EventLogger.log(context, "submission-describe-dataset", "button_pressed=" + buttonPressed);
 
-        // get the item and current page
-        Item item = subInfo.getSubmissionItem().getItem();
-        int currentPage = getCurrentPage(request);
-
-
         // CANCEL: remove dataFile and redirect to the Overview Step...
         if(buttonPressed.equals("submit_cancel")){
             EventLogger.log(context, "submission-describe-dataset", "status=cancelled");
-            Item publication = DryadWorkflowUtils.getDataPackage(context, subInfo.getSubmissionItem().getItem());
-            WorkspaceItem wi = WorkspaceItem.findByItem(context, publication);
-            ((WorkspaceItem)subInfo.getSubmissionItem()).deleteAll();
-            response.sendRedirect(request.getContextPath() + "/submit-overview?workspaceID=" + wi.getID());
+            if (subInfo != null) {
+                Item publication = DryadWorkflowUtils.getDataPackage(context, subInfo.getSubmissionItem().getItem());
+                WorkflowItem wfi = null;
+                if (publication != null) {
+                    wfi = WorkflowItem.findByItemId(context, publication.getID());
+                }
+                if (wfi != null) {
+                    // we're dealing with adding files to a package in review, so redirect to the review workflow
+                    ((WorkspaceItem) subInfo.getSubmissionItem()).deleteAll();
+                    response.sendRedirect(request.getContextPath() + "/handle/" + publication.getOwningCollection().getHandle() + "/workflow?workflowID=" + wfi.getID() + "&stepID=reviewStep&actionID=reviewAction");
+                } else {
+                    WorkspaceItem wi = WorkspaceItem.findByItem(context, publication);
+                    ((WorkspaceItem) subInfo.getSubmissionItem()).deleteAll();
+                    response.sendRedirect(request.getContextPath() + "/submit-overview?workspaceID=" + wi.getID());
+                }
+            }
             return STATUS_COMPLETE;
         }
 
+        // get the item and current page
+        Item item = subInfo.getSubmissionItem().getItem();
+        int currentPage = getCurrentPage(request);
 
 
         Collection c = subInfo.getSubmissionItem().getCollection();
