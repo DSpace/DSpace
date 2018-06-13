@@ -3045,7 +3045,7 @@
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.delete">Delete</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.continue">Verify</message>
 	<message key="xmlui.Submission.submit.OverviewStep.error.finalize.all-files">You cannot finish the
-		submission until all the data files are through the submission workflow.</message>
+		submission until all the data files are through the submission workflow. Please verify each file in the package.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.error.finalize.one-file">You cannot finish the
 		submission until at least one data file is attached to the publication.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.finalize.help">When you are satisfied with your submission, click the button below to proceed to checkout.<br /> 
