@@ -33,6 +33,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
+import org.dspace.submit.util.SubmissionLookupPublication;
 import org.dspace.util.ItemUtils;
 import org.dspace.utils.DSpace;
 
@@ -92,7 +93,13 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
         {
             try
             {
-            	boolean templateItem = ConfigurationManager.getBooleanProperty(null, "bte.applytemplateitem",false);
+                boolean templateItem = ConfigurationManager.getBooleanProperty(null, "bte.applytemplateitem",false);
+                if(rec instanceof SubmissionLookupPublication) {
+                    SubmissionLookupPublication dto = (SubmissionLookupPublication)rec;
+                    if(SubmissionLookupService.MANUAL_USER_INPUT.equals(dto.getProviderName())) {
+                        templateItem = true;
+                    }                    
+                }
                 WorkspaceItem wi = WorkspaceItem.create(context, collection,
                         templateItem);
                 merge(formName, wi.getItem(), rec);
