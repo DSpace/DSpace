@@ -348,8 +348,16 @@ public class CrisSearchService extends SolrServiceImpl
     {
         AValue value = meta.getValue();
 
-        if (value == null || meta.getVisibility() != VisibilityConstants.PUBLIC)
+        boolean storePrivate = ConfigurationManager.getBooleanProperty(CrisConstants.CFG_MODULE, "system.store.private.field", false);
+        if (meta.getVisibility() != VisibilityConstants.PUBLIC)
         {
+            if(value == null) {
+                return;    
+            }
+            
+            if(storePrivate) {
+                doc.addField(field + "_private", value);
+            }
             return;
         }
 
