@@ -2655,6 +2655,14 @@ td.dataset-label {
     vertical-align: top;
 }
 
+td.dataset-description {
+    width: 380px;
+}
+
+p.alert {
+    font-weight: bold;
+}
+
 /* membershipOverview.xhtml */
 ul.membership-overview {
     margin-bottom: 10px;
