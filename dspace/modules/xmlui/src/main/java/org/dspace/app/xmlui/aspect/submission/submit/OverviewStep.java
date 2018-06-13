@@ -3,6 +3,7 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import org.apache.commons.io.FileUtils;
 import org.datadryad.api.DryadDataFile;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
+import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -103,41 +104,46 @@ public class OverviewStep extends AbstractStep {
 
         //A boolean set to true if we have dataset that is not fully submitted, BUT has been linked to the publication
         boolean submissionNotFinished = false;
-        boolean noDatasets = false;
         org.dspace.content.Item[] datasets = DryadWorkflowUtils.getDataFiles(context, publication);
         //Second add info & edit/delete buttons for all our data files
-        {
-            Division dataDiv = actionsDiv.addDivision("dataoverviewdivision", "even subdiv");
+        Division dataDiv = actionsDiv.addDivision("dataoverviewdivision", "even subdiv");
 
-            //First of all add the current one !
-            dataDiv.setHead(T_STEPS_HEAD_2);
+        dataDiv.setHead(T_STEPS_HEAD_2);
 
-            Table dataSetList = dataDiv.addTable("datasets", 1, 3, "datasets");
-            Cell addCell = dataSetList.addRow().addCell("add_file", null, 1, 3, "add_file");
-            addCell.addButton("submit_adddataset").setValue(T_BUTTON_DATAFILE_ADD);
+        Table dataSetList = dataDiv.addTable("datasets", 1, 3, "datasets");
+        Cell addCell = dataSetList.addRow().addCell("add_file", null, 1, 3, "add_file");
+        addCell.addButton("submit_adddataset").setValue(T_BUTTON_DATAFILE_ADD);
 
-            if(datasets.length == 0)
-                submissionNotFinished = true;
+        if(datasets.length == 0)
+            submissionNotFinished = true;
 
-            if(publication.isArchived()){
-                //Add the current dataset, since our publication is archived this will probally be the only one !
-                submissionNotFinished = renderDatasetItem(submissionNotFinished, dataSetList, submission.getItem(), (WorkspaceItem) submission);
-            }
-
-            for (org.dspace.content.Item dataset : datasets) {
-                //Our current item has already been added
-                InProgressSubmission wsDataset;
-                if(submissionInfo.getSubmissionItem() instanceof WorkspaceItem)
-                    wsDataset = WorkspaceItem.findByItemId(context, dataset.getID());
-                else
-                    wsDataset = WorkflowItem.findByItemId(context, dataset.getID());
-                //Only add stuff IF we have a workspaceitem
-                if(wsDataset != null){
-                    submissionNotFinished = renderDatasetItem(submissionNotFinished, dataSetList, dataset, wsDataset);
-                }
-            }
-
+        if(publication.isArchived()){
+            //Add the current dataset, since our publication is archived this will probally be the only one !
+            Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, submission.getItem(), (WorkspaceItem) submission);
         }
+
+        for (org.dspace.content.Item dataset : datasets) {
+            //Our current item has already been added
+            InProgressSubmission wsDataset;
+            if(submissionInfo.getSubmissionItem() instanceof WorkspaceItem)
+                wsDataset = WorkspaceItem.findByItemId(context, dataset.getID());
+            else
+                wsDataset = WorkflowItem.findByItemId(context, dataset.getID());
+            //Only add stuff IF we have a workspaceitem
+            if(wsDataset != null){
+                Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, dataset, wsDataset);
+                Button editButton = actionCell.addButton("submit_edit_dataset_" + wsDataset.getID());
+                //To determine which name our button is getting check if we are through submission with this
+                if (dataset.getMetadata("internal", "workflow", "submitted", org.dspace.content.Item.ANY).length == 0 && (wsDataset instanceof WorkspaceItem)) {
+                    editButton.setValue(T_BUTTON_DATAFILE_CONTINUE);
+                    submissionNotFinished = true;
+                } else {
+                    editButton.setValue(T_BUTTON_DATAFILE_EDIT);
+                }
+                actionCell.addButton("submit_delete_dataset_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_DELETE);
+            }
+        }
+
         //Thirdly add the the upload data files to external repos (this is optional)
 	// Commented out because there is a bug somewhere in this code -- Clicking the checkbox for TreeBASE upload causes the Tomcat server to crash!
 	/*
@@ -228,10 +234,13 @@ public class OverviewStep extends AbstractStep {
             finDiv.setHead(T_STEPS_HEAD_4);
 
             // alert user if their submission is not finished:
-            if(submissionNotFinished)
-                finDiv.addPara("alert", "alert").addContent(T_ERROR_ALL_FILES);
-            else
-                finDiv.addPara("alert", "alert").addContent(T_ERROR_ONE_FILE);
+            if (submissionNotFinished) {
+                if (datasets.length == 0) {
+                    finDiv.addPara("alert", "alert").addContent(T_ERROR_ONE_FILE);
+                } else {
+                    finDiv.addPara("alert", "alert").addContent(T_ERROR_ALL_FILES);
+                }
+            }
 
             finDiv.addPara().addContent(T_FINALIZE_HELP);
 
@@ -248,7 +257,6 @@ public class OverviewStep extends AbstractStep {
                 finishButton.setDisabled(true);
             }
         } else {
-            //
             finDiv.addPara().addButton("submit_cancel").setValue(message("xmlui.general.return"));
         }
     }
@@ -269,87 +277,4 @@ public class OverviewStep extends AbstractStep {
         return randomKey;
     }
 
-    private boolean renderDatasetItem(boolean submissionNotFinished, Table table, org.dspace.content.Item dataset, InProgressSubmission wsDataset) throws WingException, SQLException {
-        // first row: buttons, title
-        Row row = table.addRow("dataset-row-top", null, "dataset-row-top");
-        Cell actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
-        Cell labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
-        Cell dataCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
-        Button editButton = actionCell.addButton("submit_edit_dataset_" + wsDataset.getID());
-        //To determine which name our button is getting check if we are through submission with this
-        if (dataset.getMetadata("internal", "workflow", "submitted", org.dspace.content.Item.ANY).length == 0 && (wsDataset instanceof WorkspaceItem)) {
-            editButton.setValue(T_BUTTON_DATAFILE_CONTINUE);
-            submissionNotFinished = true;
-        } else {
-            editButton.setValue(T_BUTTON_DATAFILE_EDIT);
-        }
-        actionCell.addButton("submit_delete_dataset_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_DELETE);
-
-        DryadDataFile dryadDataFile = new DryadDataFile(dataset);
-        String datasetTitle = XSLUtils.getShortFileName(wsDataset.getItem().getName(), 50);
-
-        labelCell.addContent("Title");
-        dataCell.addContent(datasetTitle);
-
-        // filename
-        row = table.addRow("dataset-row", null, "dataset-row");
-        actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
-        labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
-        dataCell = row.addCell();
-
-        String fileInfo;
-        try {
-            Bitstream mainFile = dryadDataFile.getFirstBitstream();
-            fileInfo = mainFile.getName() + " (" + FileUtils.byteCountToDisplaySize(mainFile.getSize()) + ")";
-        } catch (Exception e) {
-            fileInfo = dryadDataFile.getItem().getName();
-        }
-        labelCell.addContent("Filename");
-        dataCell.addXref(HandleManager.resolveToURL(context, dataset.getHandle()), fileInfo);
-
-        // readme
-        Bitstream readme = dryadDataFile.getREADME();
-        if (readme != null) {
-            row = table.addRow("dataset-row", null, "dataset-row");
-            actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
-            labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
-            dataCell = row.addCell();
-
-            String readmeFileInfo = readme.getName() + " (" + FileUtils.byteCountToDisplaySize(readme.getSize()) + ")";
-            labelCell.addContent("README");
-            dataCell.addContent(readmeFileInfo);
-        }
-
-        // description
-        DCValue[] descriptions = dataset.getMetadata("dc", "description", null, org.dspace.content.Item.ANY);
-        if (descriptions.length > 0) {
-            row = table.addRow("dataset-row", null, "dataset-row");
-            actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
-            labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
-            dataCell = row.addCell("dataset-description",null, 0, 0, "dataset-description");
-
-            labelCell.addContent("Description");
-            dataCell.addHighlight("dataset-description").addContent(descriptions[0].value);
-        }
-
-        // date added
-        DCValue[] provenances = dataset.getMetadata("dc", "description", "provenance", org.dspace.content.Item.ANY);
-        for (DCValue provenance : provenances) {
-            Matcher uploadMatcher = Pattern.compile("File was uploaded at (.+)").matcher(provenance.value);
-            if (uploadMatcher.matches()) {
-                String uploadDate = uploadMatcher.group(1);
-                row = table.addRow("dataset-row", null, "dataset-row");
-                actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
-                labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
-                dataCell = row.addCell();
-
-                labelCell.addContent("Date added");
-                dataCell.addHighlight("dataset-date").addContent(uploadDate);
-                break;
-            }
-        }
-
-
-        return submissionNotFinished;
-    }
 }

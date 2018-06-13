@@ -146,10 +146,9 @@ public class DryadDataFile extends DryadObject {
 
     /**
      * Remove the ispartof metadata from this file.
-     * @param context
      * @throws SQLException
      */
-    void clearDataPackage(Context context) throws SQLException {
+    void clearDataPackage() throws SQLException {
         dataPackage.clearDataFilesCache();
         clearIsPartOf();
         try {
@@ -253,6 +252,15 @@ public class DryadDataFile extends DryadObject {
             log.error("couldn't get bundles for item " + item.getID());
         }
         return null;
+    }
+
+    public String getTitle() {
+        Item item = getItem();
+        DCValue[] titles = item.getMetadata("dc.title");
+        if (titles != null || titles.length > 0) {
+            return titles[0].value;
+        }
+        return "Untitled";
     }
 
     public Long getTotalStorageSize() throws SQLException {
