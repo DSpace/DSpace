@@ -82,10 +82,16 @@
 
 	<dependencies>
 
-		<dependency>
-			<groupId>org.dspace.modules</groupId>
-			<artifactId>additions</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>additions</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>validation-api</artifactId>
+            		<groupId>javax.validation</groupId>
+            	</exclusion>
+            </exclusions>
+        </dependency>
 
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -105,6 +111,21 @@
 			<type>jar</type>
 			<classifier>classes</classifier>
 		</dependency>
+
+        <dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-api</artifactId>
+		</dependency>
+        <dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-jspui-api</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>asm</artifactId>
+					<groupId>asm</groupId>
+				</exclusion>
+			</exclusions>
+        </dependency>		
 	</dependencies>
 
 </project>

@@ -14,21 +14,21 @@
 
 	<display-name>DSpace ResourceSync Server</display-name>
 
+	<!-- new ConfigurationService initialization for dspace.dir -->
+	<context-param>
+		<param-name>dspace.dir</param-name>
+		<param-value>${dspace.dir}</param-value>
+		<description>
+			The location of the main DSpace directory
+		</description>
+	</context-param>
+	
 	<context-param>
 		<param-name>dspace-config</param-name>
 		<param-value>${dspace.dir}/config/dspace.cfg</param-value>
 		<description>
 			The location of the main DSpace configuration file
 		</description>
-	</context-param>
-
-	<!-- new ConfigurationService initialization for dspace.dir -->
-	<context-param>
-		<description>
-			The location of the main DSpace directory
-		</description>
-		<param-name>dspace.dir</param-name>
-		<param-value>${dspace.dir}</param-value>
 	</context-param>
 
 	<!-- Listener to initialise DSpace configuration and clean up the application -->
