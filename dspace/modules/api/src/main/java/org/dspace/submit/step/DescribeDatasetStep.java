@@ -40,7 +40,11 @@ public class DescribeDatasetStep extends DescribeStep {
         if(buttonPressed.equals("submit_cancel")){
             EventLogger.log(context, "submission-describe-dataset", "status=cancelled");
             if (subInfo != null) {
-                ((WorkspaceItem) subInfo.getSubmissionItem()).deleteAll();
+                // is the item here a new item w/o content, i.e. no file sizes? if so, delete.
+                DCValue[] sizes = subInfo.getSubmissionItem().getItem().getMetadata("dc.format.extent");
+                if (sizes == null || sizes.length == 0) {
+                    ((WorkspaceItem) subInfo.getSubmissionItem()).deleteAll();
+                }
                 Item publication = DryadWorkflowUtils.getDataPackage(context, subInfo.getSubmissionItem().getItem());
                 WorkflowItem wfi = null;
                 if (publication != null) {
