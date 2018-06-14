@@ -1780,9 +1780,9 @@
    <updateRequestProcessorChain name="clones-except-private">
      <processor class="solr.CloneFieldUpdateProcessorFactory">
        <lst name="source">
-         <str name="fieldRegex">*</str>
+         <str name="fieldRegex">.*</str>
          <lst name="exclude">
-           <str name="fieldName">*_private</str>
+           <str name="fieldName">.*_private</str>
          </lst>
        </lst>
        <str name="dest">search_text</str>
