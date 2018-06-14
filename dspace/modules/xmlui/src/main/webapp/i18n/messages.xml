@@ -3300,8 +3300,8 @@
     <message key="xmlui.Submission.MyTasks.doi_registration_status">DOI Registration Status:</message>
     <message key="xmlui.Submission.MyTasks.doi">DOI:</message>
 
-    <message key="xmlui.Submission.MyTasks.doi_not_registered">Not Registered with EZID</message>
-    <message key="xmlui.Submission.MyTasks.doi_registered">Successfully Registered with EZID</message>
+    <message key="xmlui.Submission.MyTasks.doi_not_registered">Not Registered with DataCite</message>
+    <message key="xmlui.Submission.MyTasks.doi_registered">Successfully Registered with DataCite</message>
 
     <message key="xmlui.Submission.MyTasks.with_identifier"> with identifier: </message>
 
