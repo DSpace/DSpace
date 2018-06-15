@@ -45,6 +45,7 @@ public class OverviewStep extends AbstractStep {
     private static final Message T_BUTTON_DATAFILE_ADD = message("xmlui.Submission.submit.OverviewStep.button.add-datafile");
     private static final Message T_BUTTON_DATAFILE_EDIT = message("xmlui.Submission.submit.OverviewStep.button.datafile.edit");
     private static final Message T_BUTTON_DATAFILE_DELETE = message("xmlui.Submission.submit.OverviewStep.button.datafile.delete");
+    private static final Message T_BUTTON_DATAFILE_EDIT_METADATA = message("xmlui.Submission.Submissions.OverviewStep.edit-metadata-dataset");
     private static final Message T_BUTTON_DATAFILE_CONTINUE = message("xmlui.Submission.submit.OverviewStep.button.datafile.continue");
     private static final Message T_DUP_SUBMISSION = message("xmlui.submit.publication.describe.duplicatesubmission");
 
@@ -135,6 +136,11 @@ public class OverviewStep extends AbstractStep {
                     editButton.setValue(T_BUTTON_DATAFILE_EDIT);
                 }
                 actionCell.addButton("submit_delete_dataset_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_DELETE);
+
+                // add metadata edit button if it's in workflow
+                if (wsDataset instanceof WorkflowItem) {
+                    actionCell.addButton("submit_edit_metadata_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_EDIT_METADATA);
+                }
             }
         }
 
