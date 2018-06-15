@@ -113,15 +113,11 @@ public class AutoReturnReviewItem {
     }
 
     private static void purgeOldItem(Context context, WorkflowItem wfi) {
-	// get a List of ClaimedTasks, using the WorkflowItem
-        List<ClaimedTask> claimedTasks = null;
         try {
             if (wfi != null) {
-                claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
                 //Check for a valid task
-                // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
                 Item item = wfi.getItem();
-                if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
+                if (!DryadWorkflowUtils.isItemInReview(context, wfi)) {
                     log.debug("Item " + item.getID() + " not found or not in review");
                 } else {
                     // make sure that this item is updated according to the ApproveReject mechanism:

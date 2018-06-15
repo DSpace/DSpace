@@ -79,6 +79,15 @@ public class DryadWorkflowUtils {
         return null;
     }
 
+    public static boolean isItemInReview(Context context, WorkflowItem wfi) throws SQLException {
+        boolean isInReview = false;
+        List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
+        if (claimedTasks != null && claimedTasks.size() > 0 && claimedTasks.get(0).getActionID().equals("reviewAction")) {
+            isInReview = true;
+        }
+        return isInReview;
+    }
+
     public static Item[] getDataFiles(Context context, Item dataPackage) throws SQLException {
         DCValue[] dataFileUrls = dataPackage.getMetadata(MetadataSchema.DC_SCHEMA, "relation", "haspart", Item.ANY);
         List<Item> result = new ArrayList<Item>();

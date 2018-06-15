@@ -241,13 +241,9 @@ public class PublicationUpdater extends HttpServlet {
             for (WorkflowItem wfi : items) {
                 if (DryadWorkflowUtils.isDataPackage(wfi)) {
                     // is this package in review?
-                    List<ClaimedTask> claimedTasks = null;
                     boolean isInReview = false;
                     try {
-                        claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
-                        if (claimedTasks != null && claimedTasks.size() > 0 && claimedTasks.get(0).getActionID().equals("reviewAction")) {
-                            isInReview = true;
-                        }
+                        isInReview = DryadWorkflowUtils.isItemInReview(context, wfi);
                     } catch (SQLException e) {
                         LOGGER.debug("couldn't find claimed task for item " + wfi.getItem().getID());
                     }

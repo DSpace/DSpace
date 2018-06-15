@@ -40,18 +40,27 @@ public class DescribeDatasetStep extends DescribeStep {
         if(buttonPressed.equals("submit_cancel")){
             EventLogger.log(context, "submission-describe-dataset", "status=cancelled");
             if (subInfo != null) {
+                // is the item here a new item w/o content, i.e. no file sizes? if so, delete.
+                DCValue[] sizes = subInfo.getSubmissionItem().getItem().getMetadata("dc.format.extent");
+                if (sizes == null || sizes.length == 0) {
+                    ((WorkspaceItem) subInfo.getSubmissionItem()).deleteAll();
+                }
                 Item publication = DryadWorkflowUtils.getDataPackage(context, subInfo.getSubmissionItem().getItem());
                 WorkflowItem wfi = null;
                 if (publication != null) {
                     wfi = WorkflowItem.findByItemId(context, publication.getID());
                 }
                 if (wfi != null) {
-                    // we're dealing with adding files to a package in review, so redirect to the review workflow
-                    ((WorkspaceItem) subInfo.getSubmissionItem()).deleteAll();
-                    response.sendRedirect(request.getContextPath() + "/handle/" + publication.getOwningCollection().getHandle() + "/workflow?workflowID=" + wfi.getID() + "&stepID=reviewStep&actionID=reviewAction");
+                    // this item is either in review or it's in curation.
+                    if (DryadWorkflowUtils.isItemInReview(context, wfi)) {
+                        // redirect to the review workflow
+                        response.sendRedirect(request.getContextPath() + "/handle/" + publication.getOwningCollection().getHandle() + "/workflow?workflowID=" + wfi.getID() + "&stepID=reviewStep&actionID=reviewAction");
+                    } else {
+                        // redirect to curation workflow
+                        response.sendRedirect(request.getContextPath() + "/handle/" + publication.getOwningCollection().getHandle() + "/workflow?workflowID=" + wfi.getID() + "&stepID=dryadAcceptEditReject&actionID=dryadAcceptEditRejectAction");
+                    }
                 } else {
                     WorkspaceItem wi = WorkspaceItem.findByItem(context, publication);
-                    ((WorkspaceItem) subInfo.getSubmissionItem()).deleteAll();
                     response.sendRedirect(request.getContextPath() + "/submit-overview?workspaceID=" + wi.getID());
                 }
             }
