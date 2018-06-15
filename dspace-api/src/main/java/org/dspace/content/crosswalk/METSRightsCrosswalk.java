@@ -606,7 +606,7 @@ public class METSRightsCrosswalk
             // if the list of policies provided by METSRights is an empty list, then
             // the final object will have no policies attached.
             authorizeService.removeAllPolicies(context, dso);
-            authorizeService.addPolicies(context, policies, dso);
+            resourcePolicyService.update(context, policies);
         } // end else
     }
 
