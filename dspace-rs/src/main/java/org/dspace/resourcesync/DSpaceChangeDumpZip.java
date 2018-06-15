@@ -177,7 +177,7 @@ public class DSpaceChangeDumpZip  extends DSpaceResourceList
         {
             throw new RuntimeException("must provide either bitstream or metadata format");
         }
-        String dumppath = separator + FileNames.dumpResourcesDir + separator + itempath + separator + filepath;
+        String dumppath = FileNames.dumpResourcesDir + separator + itempath + separator + filepath;
         return dumppath;
     }
 

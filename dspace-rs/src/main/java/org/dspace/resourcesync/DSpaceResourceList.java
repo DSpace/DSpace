@@ -80,7 +80,7 @@ public class DSpaceResourceList extends DSpaceResourceDocument
         try {
         	
         	BrowserScope bs = new BrowserScope(context);
-        	
+        	bs.setBrowseIndex(BrowseIndex.getItemBrowseIndex());        	
         	BrowseIndex bi = bs.getBrowseIndex();
         	
             boolean isMultilanguage = new DSpace()
@@ -97,8 +97,6 @@ public class DSpaceResourceList extends DSpaceResourceDocument
 			
 	        BrowseEngine be = new BrowseEngine(context, isMultilanguage? 
                     bs.getUserLocale():null);
-	        
-	        bs.setBrowseIndex(BrowseIndex.getItemBrowseIndex());
 	        
 	        bs.setResultsPerPage(100);
 	        if (dSpaceObject != null) {
