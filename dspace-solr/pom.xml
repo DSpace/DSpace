@@ -168,10 +168,6 @@
                     <artifactId>jetty-xml</artifactId>
                     <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.apache.zookeeper</groupId>
-                    <artifactId>zookeeper</artifactId>
-                </exclusion>
             </exclusions>              
         </dependency>
         <dependency>
@@ -230,13 +226,6 @@
             </exclusions>
         </dependency>
 
-        <!--This version is pinned on this one, since solr introduces both 3.4.5 & 3.4.6-->
-        <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>3.4.6</version>
-        </dependency>
-
         <!-- Replace J.U.L. logging with log4j -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -263,5 +252,15 @@
             <artifactId>commons-logging</artifactId>
          </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.4.11</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>
