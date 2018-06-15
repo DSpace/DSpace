@@ -107,6 +107,7 @@ public class METSDisseminationCrosswalk
             throw new CrosswalkInternalException("Cannot find a disseminate plugin for package=" + METS_PACKAGER_PLUGIN);
         }
 
+        Context context = null;
         try
         {
             // Set the manifestOnly=true param so we just get METS document (and not content files, etc)
@@ -121,7 +122,7 @@ public class METSDisseminationCrosswalk
             tempFile.deleteOnExit();
 
             // Disseminate METS to temp file
-            Context context = new Context();
+            context = new Context();
             dip.disseminate(context, dso, pparams, tempFile);
             context.complete();
 
@@ -140,6 +141,11 @@ public class METSDisseminationCrosswalk
         catch (PackageException pe)
         {
             throw new CrosswalkInternalException("Failed making METS manifest in packager (see wrapped error message for more details) ",pe);
+        }
+        finally {
+            if(context!=null && context.isValid()) {
+                context.abort();
+            }
         }
     }
 
