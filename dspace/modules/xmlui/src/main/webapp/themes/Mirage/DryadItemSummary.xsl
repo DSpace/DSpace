@@ -86,7 +86,7 @@
                     </xsl:call-template>
                 </div>
             </xsl:when>
-            <xsl:when test=".//dim:field[@mdschema='workflow'][@element='step'][@qualifier='reviewerKey']">
+            <xsl:when test=".//dim:field[@mdschema='workflow'][@element='step']">
                 <!-- publication header -->
                 <div class="publication-header">
                     <xsl:call-template name="publication-header">
