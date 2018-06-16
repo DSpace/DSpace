@@ -27,6 +27,8 @@
 
     <xsl:variable name="versionNotice"
                   select="/dri:document/dri:body//dri:div[@id='org.datadryad.dspace.xmlui.aspect.browse.ItemViewer.div.notice'][@rend='notice']"/>
+    <xsl:variable name="reviewTransformer"
+                  select="/dri:document/dri:body//dri:div[@id='aspect.submission.DryadReviewTransformer.div.notice'][@rend='notice']"/>
     <xsl:variable name="latestDataVersion"
                   select="/dri:document/dri:body/dri:div[@id='aspect.versioning.VersionHistoryForm.div.view-verion-history']/dri:table/dri:row[2]/dri:cell[1]"/>
     <xsl:variable name="embeddedViewReferenceSet" 
@@ -95,6 +97,7 @@
                         <xsl:with-param name="my_doi" select="$my_doi"/>
                     </xsl:call-template>
                 </div>
+                    <xsl:apply-templates select="$embeddedViewReferenceSet"/>
             </xsl:when>
             <xsl:otherwise>
                 <!-- publication header -->
