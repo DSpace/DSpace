@@ -16,8 +16,8 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <spring.version>3.2.5.RELEASE</spring.version>
-        <xoai.version>3.2.10</xoai.version>
+        <spring.version>4.3.15.RELEASE</spring.version>
+        <xoai.version>4.2.0</xoai.version>
         <jtwig.version>2.0.1</jtwig.version>
     </properties>
 
