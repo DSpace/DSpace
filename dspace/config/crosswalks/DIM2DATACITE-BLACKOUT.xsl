@@ -5,6 +5,7 @@
                 xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns:dryad="http://purl.org/dryad/terms/"
+		xmlns:ex="http://exslt.org/dates-and-times" extension-element-prefixes="ex"
                 version="1.0">
 
 	<xsl:strip-space elements="*"/>
@@ -69,7 +70,7 @@
 
 			<!-- ************ Publication Year ************** -->
 			<publicationYear>
-				<xsl:text>0000</xsl:text>
+			  <xsl:value-of select="ex:year()"/>
 			</publicationYear>
 
 			<!-- ************ Subjects ************** -->
