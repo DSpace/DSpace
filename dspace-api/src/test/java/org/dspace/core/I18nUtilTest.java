@@ -8,8 +8,11 @@
 
 package org.dspace.core;
 
-import java.sql.SQLException;
 import java.util.Locale;
+import mockit.Expectations;
+import org.dspace.AbstractDSpaceTest;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -22,7 +25,7 @@ import static org.junit.Assert.*;
  *
  * @author mwood
  */
-public class I18nUtilTest
+public class I18nUtilTest extends AbstractDSpaceTest
 {
 
     public I18nUtilTest()
@@ -43,8 +46,6 @@ public class I18nUtilTest
     @Before
     public void setUp()
     {
-        // Initialize MockConfigurationManager and tell it to NOT load any properties
-        new MockConfigurationManager(false);
     }
 
     @After
@@ -142,8 +143,17 @@ public class I18nUtilTest
     public void testGetMessage_String()
     {
         System.out.println("getMessage");
+        final ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        
+        // Override "default.locale" and ensure it is set to US English
+        new Expectations(configService.getClass()) {{
+            configService.getProperty("default.locale"); result = "en_US.UTF-8";
+        }};
+
+        // Assert our overridden default.locale is set in I18nUtil
+        assertEquals("Default locale", new Locale("en", "US", "UTF-8"), I18nUtil.getDefaultLocale());
+        
         String key, expResult, result;
-        MockConfigurationManager.setProperty("default.locale", "en_US.UTF-8");
 
         // Test for a stock key
         key = "jsp.general.home";

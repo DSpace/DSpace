@@ -9,24 +9,30 @@ importClass(Packages.java.lang.Class);
 importClass(Packages.java.lang.ClassLoader);
 
 importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
+importClass(Packages.org.dspace.app.xmlui.aspect.submission.FlowUtils);
+importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
 importClass(Packages.org.apache.cocoon.environment.http.HttpEnvironment);
+importClass(Packages.org.dspace.app.xmlui.aspect.submission.StepAndPage);
 importClass(Packages.org.apache.cocoon.servlet.multipart.Part);
 
-importClass(Packages.org.dspace.handle.HandleManager);
+importClass(Packages.org.dspace.handle.service.HandleService);
+importClass(Packages.org.dspace.handle.factory.HandleServiceFactory);
+importClass(Packages.org.dspace.workflow.WorkflowService);
 importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.workflow.WorkflowItem);
-importClass(Packages.org.dspace.workflow.WorkflowManager);
 importClass(Packages.org.dspace.content.WorkspaceItem);
+importClass(Packages.org.dspace.content.service.WorkspaceItemService);
+importClass(Packages.org.dspace.content.factory.ContentServiceFactory);
 importClass(Packages.org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem);
-importClass(Packages.org.dspace.authorize.AuthorizeManager);
+importClass(Packages.org.dspace.authorize.service.AuthorizeService);
+importClass(Packages.org.dspace.authorize.factory.AuthorizeServiceFactory);
 importClass(Packages.org.dspace.core.ConfigurationManager);
-importClass(Packages.org.dspace.license.CreativeCommons);
-importClass(Packages.org.dspace.xmlworkflow.WorkflowFactory);
+importClass(Packages.org.dspace.license.service.CreativeCommonsService);
+importClass(Packages.org.dspace.workflow.factory.WorkflowServiceFactory);
+importClass(Packages.org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory);
+
 
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
-importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
-importClass(Packages.org.dspace.app.xmlui.aspect.submission.FlowUtils);
-importClass(Packages.org.dspace.app.xmlui.aspect.submission.StepAndPage);
 
 importClass(Packages.org.dspace.app.util.SubmissionConfig);
 importClass(Packages.org.dspace.app.util.SubmissionConfigReader);
@@ -44,7 +50,7 @@ var ERROR_FIELDS = null;
  */
 function getObjectModel() 
 {
-  return FlowscriptUtils.getObjectModel(cocoon);
+    return FlowscriptUtils.getObjectModel(cocoon);
 }
 
 /**
@@ -85,12 +91,40 @@ function getHttpResponse()
 	return getObjectModel().get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 }
 
+function getHandleService(handle) {
+    var dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(getDSContext(), handle);
+    return dso;
+}
+
+function getAuthorizeService() {
+    return AuthorizeServiceFactory.getInstance().getAuthorizeService();
+}
+
+function getWorkspaceItemService() {
+    return ContentServiceFactory.getInstance().getWorkspaceItemService();
+}
+
+function getItemService() {
+    return ContentServiceFactory.getInstance().getItemService();
+}
+
+function getWorkflowItemService()
+{
+    return XmlWorkflowServiceFactory.getInstance().getWorkflowItemService();
+}
+
+function getWorkflowFactory()
+{
+    return XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+}
+
+
 /**
  * Return the SubmissionInfo for the current submission
  */
 function getSubmissionInfo(workspaceID)
 {
-	return FlowUtils.obtainSubmissionInfo(getObjectModel(), workspaceID);
+    return FlowUtils.obtainSubmissionInfo(getObjectModel(), workspaceID);
 }
 
 /**
@@ -135,8 +169,6 @@ function sendPage(uri,bizData)
     cocoon.sendPage(uri,bizData);
 }
 
-
-
 /**
  * Submission starting point.
  *
@@ -160,40 +192,38 @@ function doSubmission()
        do {
            if (handle != null)
            {
-               var dso = HandleManager.resolveToObject(getDSContext(), handle);
-               
+               var dso = getHandleService(handle);
                // Check that the dso is a collection
                if (dso != null && dso.getType() == Constants.COLLECTION)
                {
                    // Check that the user is able to submit
-                   if (AuthorizeManager.authorizeActionBoolean(getDSContext(), dso, Constants.ADD))
+                   if (getAuthorizeService().authorizeActionBoolean(getDSContext(), dso, Constants.ADD))
                    {
                        // Construct a new workspace for this submission.
-                       var workspace = WorkspaceItem.create(getDSContext(), dso, true);
+                       var workspace = getWorkspaceItemService().create(getDSContext(), dso, true);
                        workspaceID = workspace.getID();
                        
                        collectionSelected = true;
-                        
-                       break; // We don't need to ask them for a collection again.   
+
+                       break; // We don't need to ask them for a collection again.
                    }
                }
            }
-           
+
            sendPageAndWait("submit/selectCollectionStep", { "handle" : handle } );
-       
+
            handle = cocoon.request.get("handle");
-                     
+
        } while (collectionSelected == false)
-      
-       // Hand off to the master thingy.... 
+
+       // Hand off to the master thingy....
        //(specify "S" for submission item, for FlowUtils.findSubmission())
        submissionControl(handle,"S"+workspaceID, step);
-       
    }
    else
    {
        // Resume a previous submission
-       var workspace = WorkspaceItem.find(getDSContext(), workspaceID);
+       var workspace = getWorkspaceItemService().find(getDSContext(), workspaceID);
        
        // First check that the id is valid.
        var submitterID = workspace.getSubmitter().getID()
@@ -246,13 +276,13 @@ function doSubmission()
  */
 function submissionControl(collectionHandle, workspaceID, initStepAndPage) 
 {
-	//load initial submission information
+    //load initial submission information
 	var submissionInfo = getSubmissionInfo(workspaceID);
 
 	//Initialize a Cocoon Local Page to save current state information
 	//(This lets us handle when users click the browser "back button"
 	// by caching the state of that previous page, etc.)
-	var state = cocoon.createPageLocal(); 
+	var state = cocoon.createPageLocal();
     state.progressIterator = 0;  //initialize our progress indicator
 
     //this is array of all the steps/pages in current submission process
@@ -718,8 +748,8 @@ function doWorkflowEditMetadata() {
     //    submissionControl(handle, "X"+workflowItemId, null);
     if (workflowItemId.startsWith("X")) {
         workflowItemId = workflowItemId.replace("X", "");
-        var coll = XmlWorkflowItem.find(getDSContext(), workflowItemId).getCollection();
-        var workflow = WorkflowFactory.getWorkflow(coll);
+        var coll = getWorkflowItemService().find(getDSContext(), workflowItemId).getCollection();
+        var workflow = getWorkflowFactory().getWorkflow(coll);
         var step = workflow.getStep(cocoon.request.get("stepID"));
         var action = step.getActionConfig(cocoon.request.get("actionID"));
         submissionControl(handle, "X"+workflowItemId, null);

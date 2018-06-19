@@ -25,6 +25,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.license.CCLicenseField;
 import org.dspace.license.CCLookup;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -36,7 +38,8 @@ import com.google.gson.JsonObject;
 public class CreativeCommonsJSONRequest extends JSONRequest {
 
 	private static Logger log = Logger.getLogger(CreativeCommonsJSONRequest.class);
-
+	protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+	
 	@Override
 	public void doJSONRequest(Context context, HttpServletRequest req, HttpServletResponse resp)
 			throws AuthorizeException, IOException {
@@ -48,7 +51,7 @@ public class CreativeCommonsJSONRequest extends JSONRequest {
 		if (StringUtils.isNotBlank(selectedLicense)) {
 			CCLookup cclookup = new CCLookup();
 			
-	        String ccLocale = ConfigurationManager.getProperty("cc.license.locale");
+	        String ccLocale = configurationService.getProperty("cc.license.locale");
 	        /** Default locale to 'en' */
 	        ccLocale = (StringUtils.isNotBlank(ccLocale)) ? ccLocale : "en";
 	        

@@ -60,6 +60,10 @@ public class DSpaceRequestFactory {
      * If the request includes a "multipart/form-data", then wrap it with
      * methods that allow easier connection to those objects since the servlet
      * API doesn't provide those methods directly.
+     * @param request user's request.
+     * @return wrapped request.
+     * @throws java.io.IOException passed through.
+     * @throws org.apache.cocoon.servlet.multipart.MultipartException passed through.
      */
     public HttpServletRequest getServletRequest(HttpServletRequest request) throws IOException, MultipartException {
         HttpServletRequest req = request;

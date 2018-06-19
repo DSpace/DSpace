@@ -55,9 +55,21 @@ public class JSPManager
             log.debug(LogManager.getHeader((Context) request
                     .getAttribute("dspace.context"), "view_jsp", jsp));
         }
-
-        // For the moment, a simple forward
-        request.getRequestDispatcher(jsp).forward(request, response);
+        try {
+            // For the moment, a simple forward
+            // First test if the response is already committed (could happen by broken downloads),
+            // if that is the case, forward won't work.
+            if (!response.isCommitted())
+            {
+                request.getRequestDispatcher(jsp).forward(request, response);
+            }
+            else
+            {
+                log.warn("Couldn't show jsp, response is already commited.");
+            }
+        } catch (Exception e) {
+             throw new ServletException(e);
+        }
     }
 
     /**

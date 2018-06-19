@@ -12,7 +12,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>5.7-drum-0.1</version>
+        <version>6.2-drum-0</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -22,23 +22,47 @@
     </properties>
 
     <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
         <plugins>
+            <!-- Unpack the "additions" module into our target directory,
+                 so that any custom classes in that module can be included
+                 into this WAR's WEB-INF/classes (see maven-war-plugin below). -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeGroupIds>org.dspace.modules</includeGroupIds>
+                            <includeArtifactIds>additions</includeArtifactIds>
+                            <!--NOTE: by default this will also unpack transitive dependencies. To disable, uncomment this next line:
+                            <excludeTransitive>true</excludeTransitive>
+                            -->
+                            <outputDirectory>${project.build.directory}/additions</outputDirectory>
+                            <excludes>META-INF/**</excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <archiveClasses>false</archiveClasses>
+                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                    <!-- Copy any 'additions' (see m-dependency-p above) into WEB-INF/classes.
+                         This ensures they are loaded prior to dependencies in WEB-INF/lib
+                         (per Servlet 3.0 spec, section 10.5), and allows them to override
+                         default classes in this WAR -->
                     <webResources>
                         <resource>
-                            <filtering>true</filtering>
-                            <directory>${basedir}/src/main/webapp</directory>
-                            <includes>
-                                    <include>WEB-INF/web.xml</include>
-                            </includes>
+                            <directory>${project.build.directory}/additions</directory>
+                            <targetPath>WEB-INF/classes</targetPath>
                         </resource>
                     </webResources>
                 </configuration>
@@ -73,6 +97,12 @@
         <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.lyncode</groupId>
+                    <artifactId>builder-commons</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -84,6 +114,16 @@
             <artifactId>dspace-oai</artifactId>
             <type>jar</type>
             <classifier>classes</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.lyncode</groupId>
+                    <artifactId>builder-commons</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -96,8 +136,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
+            <groupId>com.lyncode</groupId>
+            <artifactId>builder-commons</artifactId>
+            <version>1.0.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -110,4 +157,3 @@
         </developer>
     </developers>
 </project>
-

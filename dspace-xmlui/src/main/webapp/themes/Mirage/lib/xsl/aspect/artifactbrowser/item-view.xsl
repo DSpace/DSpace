@@ -40,10 +40,10 @@
 
     <xsl:template name="itemSummaryView-DIM">
         <!-- optional: Altmeric.com badge and PlumX widget -->
-        <xsl:if test='confman:getProperty("altmetrics", "altmetric.enabled") and ($identifier_doi or $identifier_handle)'>
+        <xsl:if test='confman:getProperty("altmetric.enabled") and ($identifier_doi or $identifier_handle)'>
             <xsl:call-template name='impact-altmetric'/>
         </xsl:if>
-        <xsl:if test='confman:getProperty("altmetrics", "plumx.enabled") and $identifier_doi'>
+        <xsl:if test='confman:getProperty("plumx.enabled") and $identifier_doi'>
             <xsl:call-template name='impact-plumx'/>
         </xsl:if>
 
@@ -405,12 +405,19 @@
                     <xsl:choose>
                         <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
                         mets:file[@GROUPID=current()/@GROUPID]">
-                            <img alt="Thumbnail">
-                                <xsl:attribute name="src">
-                                    <xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
-                                    mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-                                </xsl:attribute>
-                            </img>
+                            <xsl:variable name="src" 
+                              select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                            <!-- Checking if Thumbnail is restricted and if so, show a restricted image --> 
+                            <xsl:choose>
+                              <xsl:when test="contains($src,'isAllowed=n')"/>
+                              <xsl:otherwise>
+                                <img class="img-thumbnail" alt="Thumbnail">
+                                    <xsl:attribute name="src">
+                                        <xsl:value-of select="$src"/>
+                                    </xsl:attribute>
+                                </img>
+                              </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
                             <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="height: {$thumbnail.maxheight}px;"/>
@@ -569,31 +576,31 @@
             </script>
             <div id='altmetric'
                  class='altmetric-embed'>
-                <xsl:variable name='badge_type' select='confman:getProperty("altmetrics", "altmetric.badgeType")'/>
+                <xsl:variable name='badge_type' select='confman:getProperty("altmetric.badgeType")'/>
                 <xsl:if test='boolean($badge_type)'>
                     <xsl:attribute name='data-badge-type'><xsl:value-of select='$badge_type'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='badge_popover' select='confman:getProperty("altmetrics", "altmetric.popover")'/>
+                <xsl:variable name='badge_popover' select='confman:getProperty("altmetric.popover")'/>
                 <xsl:if test='$badge_popover'>
                     <xsl:attribute name='data-badge-popover'><xsl:value-of select='$badge_popover'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='badge_details' select='confman:getProperty("altmetrics", "altmetric.details")'/>
+                <xsl:variable name='badge_details' select='confman:getProperty("altmetric.details")'/>
                 <xsl:if test='$badge_details'>
                     <xsl:attribute name='data-badge-details'><xsl:value-of select='$badge_details'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='no_score' select='confman:getProperty("altmetrics", "altmetric.noScore")'/>
+                <xsl:variable name='no_score' select='confman:getProperty("altmetric.noScore")'/>
                 <xsl:if test='$no_score'>
                     <xsl:attribute name='data-no-score'><xsl:value-of select='$no_score'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:if test='confman:getProperty("altmetrics", "altmetric.hideNoMentions")'>
+                <xsl:if test='confman:getProperty("altmetric.hideNoMentions")'>
                     <xsl:attribute name='data-hide-no-mentions'>true</xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='link_target' select='confman:getProperty("altmetrics", "altmetric.linkTarget")'/>
+                <xsl:variable name='link_target' select='confman:getProperty("altmetric.linkTarget")'/>
                 <xsl:if test='$link_target'>
                     <xsl:attribute name='data-link-target'><xsl:value-of select='$link_target'/></xsl:attribute>
                 </xsl:if>
@@ -614,7 +621,7 @@
     <xsl:template name="impact-plumx">
         <div id="impact-plumx" style="clear:right">
             <!-- PlumX <http://plu.mx> -->
-            <xsl:variable name="plumx_type" select="confman:getProperty('altmetrics', 'plumx.widget-type')"/>
+            <xsl:variable name="plumx_type" select="confman:getProperty('plumx.widget-type')"/>
             <xsl:variable name="plumx-script-url">
                 <xsl:choose>
                     <xsl:when test="boolean($plumx_type)">
@@ -643,30 +650,30 @@
                 <xsl:attribute name="class"><xsl:value-of select="$plumx-class"/></xsl:attribute>
                 <xsl:attribute name="href">https://plu.mx/pitt/a/?doi=<xsl:value-of select="$identifier_doi"/></xsl:attribute>
 
-                <xsl:variable name="plumx_data-popup" select="confman:getProperty('altmetrics', 'plumx.data-popup')"/>
+                <xsl:variable name="plumx_data-popup" select="confman:getProperty('plumx.data-popup')"/>
                 <xsl:if test="$plumx_data-popup">
                     <xsl:attribute name="data-popup"><xsl:value-of select="$plumx_data-popup"/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:if test="confman:getProperty('altmetrics', 'plumx.data-hide-when-empty')">
+                <xsl:if test="confman:getProperty('plumx.data-hide-when-empty')">
                     <xsl:attribute name="data-hide-when-empty">true</xsl:attribute>
                 </xsl:if>
 
-                <xsl:if test="confman:getProperty('altmetrics', 'plumx.data-hide-print')">
+                <xsl:if test="confman:getProperty('plumx.data-hide-print')">
                     <xsl:attribute name="data-hide-print">true</xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name="plumx_data-orientation" select="confman:getProperty('altmetrics', 'plumx.data-orientation')"/>
+                <xsl:variable name="plumx_data-orientation" select="confman:getProperty('plumx.data-orientation')"/>
                 <xsl:if test="$plumx_data-orientation">
                     <xsl:attribute name="data-orientation"><xsl:value-of select="$plumx_data-orientation"/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name="plumx_data-width" select="confman:getProperty('altmetrics', 'plumx.data-width')"/>
+                <xsl:variable name="plumx_data-width" select="confman:getProperty('plumx.data-width')"/>
                 <xsl:if test="$plumx_data-width">
                     <xsl:attribute name="data-width"><xsl:value-of select="$plumx_data-width"/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:if test="confman:getProperty('altmetrics', 'plumx.data-border')">
+                <xsl:if test="confman:getProperty('plumx.data-border')">
                     <xsl:attribute name="data-border">true</xsl:attribute>
                 </xsl:if>
                 &#xFEFF;

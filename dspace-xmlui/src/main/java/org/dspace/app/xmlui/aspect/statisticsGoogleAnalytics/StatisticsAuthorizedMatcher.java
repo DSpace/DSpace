@@ -13,9 +13,10 @@ import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -31,6 +32,7 @@ import java.util.Map;
  */
 public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements Matcher{
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     public Map match(String pattern, Map objectModel, Parameters parameters) throws PatternException {
         String[] statisticsDisplayTypes = parameters.getParameter("type", "").split(",");
@@ -57,7 +59,7 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             //We have always got rights to view stats on the home page (admin rights will be checked later)
-            boolean authorized = dso == null || AuthorizeManager.authorizeActionBoolean(context, dso, action, false);
+            boolean authorized = dso == null || authorizeService.authorizeActionBoolean(context, dso, action, false);
             //Check if (one of our) display type is admin only
             //If one of the given ones isn't admin only, no need to check !
             boolean  adminCheckNeeded = true;
@@ -67,7 +69,7 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
                     continue;
                 }
                 //If one isn't admin enabled no need to check for admin
-                if(!ConfigurationManager.getBooleanProperty("google-analytics", "authorization.admin." + statisticsDisplayType, true)){
+                if(!DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("google-analytics.authorization.admin." + statisticsDisplayType, true)){
                     adminCheckNeeded = false;
                 }
             }
@@ -83,11 +85,11 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
 
                 if(authorized){
                     //Check for admin
-                    authorized = AuthorizeManager.isAdmin(context);
+                    authorized = authorizeService.isAdmin(context);
                     if(!authorized)
                     {
                         //Check if we have authorization for the owning colls, comms, ...
-                        authorized = AuthorizeManager.isAdmin(context, dso);
+                        authorized = authorizeService.isAdmin(context, dso);
                     }
                 }
             }

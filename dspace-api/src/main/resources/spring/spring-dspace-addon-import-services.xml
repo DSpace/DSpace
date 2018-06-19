@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
+          lazy-init="false" autowire="byType" destroy-method="destroy">
+
+    </bean>
+
+    <!--If multiple importServices have been configured here but only one is to be used during the lookup step (StartSubmissionLookupStep),
+        this can be accomplished by specifying the property "publication-lookup.url" to the baseAddress of the required importService
+        So for example
+        publication-lookup.url=http://eutils.ncbi.nlm.nih.gov/entrez/eutils/
+        Will result in using the PubmedImportService for the lookup step
+        Omitting this property will default to searching over all configured ImportService implementations
+    -->
+
+    <bean id="PubmedImportService" class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
+        <property name="baseAddress" value="http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+
+    </bean>
+    <bean id="PubmedMetadataFieldMapping"
+          class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
+    </bean>
+
+    <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
+    <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
+</beans>

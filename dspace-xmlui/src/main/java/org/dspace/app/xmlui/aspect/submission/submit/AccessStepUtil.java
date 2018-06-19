@@ -10,15 +10,19 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
-import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.submit.step.AccessStep;
 import org.dspace.submit.step.UploadWithEmbargoStep;
 
@@ -34,7 +38,7 @@ import java.sql.SQLException;
  *
  */
 public class AccessStepUtil extends AbstractDSpaceTransformer {
-     Context context=null;
+    private Context context=null;
 
     protected static final Message T_name =message("xmlui.Submission.submit.AccessStep.name");
 	protected static final Message T_name_help = message("xmlui.Submission.submit.AccessStep.name_help");
@@ -63,9 +67,15 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
 
     private static final Message T_label_date_help =
             message("xmlui.administrative.authorization.AccessStep.label_date_help");
+    private static final Message T_label_date_displayonly_help =
+            message("xmlui.administrative.authorization.AccessStep.label_date_displayonly_help");
 
     public static final int RADIO_OPEN_ACCESS_ITEM_VISIBLE=0;
     public static final int RADIO_OPEN_ACCESS_ITEM_EMBARGOED=1;
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
 
     //public static final int CB_EMBARGOED=10;
     private String globalReason = null;
@@ -73,7 +83,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
     private boolean isAdvancedFormEnabled=false;
 
     public AccessStepUtil(Context c){
-        isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        isAdvancedFormEnabled=DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         context=c;
     }
 
@@ -112,17 +122,17 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
             Select groupSelect = form.addItem().addSelect("group_id");
             groupSelect.setMultiple(false);
 
-            Group[] loadedGroups = null;
+            java.util.List<Group> loadedGroups = null;
 
             // retrieve groups
-            String name = ConfigurationManager.getProperty("webui.submission.restrictstep.groups");
+            String name = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("webui.submission.restrictstep.groups");
             if(name!=null){
-                Group uiGroup = Group.findByName(context, name);
+                Group uiGroup = groupService.findByName(context, name);
                 if(uiGroup!=null)
                     loadedGroups= uiGroup.getMemberGroups();
             }
-            if(loadedGroups==null || loadedGroups.length ==0){
-                loadedGroups = Group.findAll(context, Group.NAME);
+            if(loadedGroups==null || loadedGroups.size() ==0){
+                loadedGroups = groupService.findAll(context, null);
             }
 
             // if no group selected for default set anonymous
@@ -132,8 +142,8 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
 		        groupID = "0";
 	        }
             for (Group group : loadedGroups){
-	            boolean selectGroup = Integer.parseInt(groupID) == group.getID();
-	            groupSelect.addOption(selectGroup, group.getID(), group.getName());
+	            boolean selectGroup = group.getID().toString().equals(groupID);
+	            groupSelect.addOption(selectGroup, group.getID().toString(), group.getName());
             }
 
             if (errorFlag == AccessStep.STATUS_DUPLICATED_POLICY || errorFlag == AccessStep.EDIT_POLICY_STATUS_DUPLICATED_POLICY
@@ -181,31 +191,25 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
         }
     }
 
-    public void addEmbargoDateSimpleForm(DSpaceObject dso, List form, int errorFlag) throws SQLException, WingException {
+    public void addEmbargoDateDisplayOnly(final DSpaceObject dso, final List list) throws SQLException, WingException {
+        final Text text = list.addItem().addText("embargo");
+        text.setLabel(T_item_embargoed);
+        text.setHelp(T_label_date_displayonly_help);
+        populateEmbargoDetail(dso, text);
+        text.setDisabled(true);
+    }
 
-        String date=null;
-
-        if(dso!=null){
-            java.util.List<ResourcePolicy> policies = AuthorizeManager.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
-            if(policies.size() > 0){
-                ResourcePolicy rp = policies.get(0);
-                if(rp.getStartDate() != null)
-                {
-                    date = DateFormatUtils.format(rp.getStartDate(), "yyyy-MM-dd");
-                }
-                globalReason = rp.getRpDescription();
+    private void populateEmbargoDetail(final DSpaceObject dso, final Text text) throws SQLException, WingException {
+        for (final ResourcePolicy readPolicy : authorizeService.getPoliciesActionFilter(context, dso, Constants.READ)) {
+            if (readPolicy.getGroup() != null && Group.ANONYMOUS.equals(readPolicy.getGroup().getName()) && readPolicy.getStartDate() != null) {
+                final String dateString = DateFormatUtils.format(readPolicy.getStartDate(), "yyyy-MM-dd");
+                text.setValue(dateString);
+                globalReason = readPolicy.getRpDescription();
             }
         }
-//        CheckBox privateCheckbox = form.addItem().addCheckBox("emabrgo_option");
-//        privateCheckbox.setLabel(T_item_embargoed);
-//        if(date!=null){
-//            privateCheckbox.addOption(true, CB_EMBARGOED, "");
-//        }
-//        else{
-//            privateCheckbox.addOption(false, CB_EMBARGOED, "");
-//        }
+    }
 
-        // Date
+    public void addEmbargoDateSimpleForm(DSpaceObject dso, List form, int errorFlag) throws SQLException, WingException {
         Text startDate = form.addItem().addText("embargo_until_date");
         startDate.setLabel(T_item_embargoed);
         if (errorFlag == org.dspace.submit.step.AccessStep.STATUS_ERROR_FORMAT_DATE){
@@ -215,8 +219,8 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
             startDate.addError(T_error_missing_date);
         }
 
-        if(date!=null){
-            startDate.setValue(date);
+        if (dso != null) {
+            populateEmbargoDetail(dso, startDate);
         }
         startDate.setHelp(T_label_date_help);
     }
@@ -229,7 +233,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
 	    div.setHead(T_head_policies_table);
 	    div.addPara(T_policies_help.parameterize(owningCollection));
 
-	    java.util.List<ResourcePolicy> resourcePolicies = AuthorizeManager.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
+	    java.util.List<ResourcePolicy> resourcePolicies = authorizeService.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
 
 	    if (resourcePolicies.isEmpty())
 	    {
@@ -255,13 +259,13 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
 	        String name = "";
 	        if(rp.getRpName()!=null) name=rp.getRpName();
 
-	        String action = rp.getActionText();
+	        String action = resourcePolicyService.getActionText(rp);
 
 	        // if it is the default policy for the Submitter don't show it.
 	        if(dso instanceof org.dspace.content.Item){
 	            org.dspace.content.Item item = (org.dspace.content.Item)dso;
-	            if(rp.getEPersonID()!=-1 && rp.getEPersonID()!=0){
-	                if(item.getSubmitter().getID()==rp.getEPersonID())
+	            if(rp.getEPerson()!=null){
+	                if(item.getSubmitter().equals(rp.getEPerson()))
 	                    continue;
 	            }
 	        }
@@ -304,7 +308,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
 		}
 		parent.addLabel(T_head_policies_table);
 
-		java.util.List<ResourcePolicy> resourcePolicies = AuthorizeManager.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
+		java.util.List<ResourcePolicy> resourcePolicies = authorizeService.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
 		if (resourcePolicies.isEmpty()) {
 			parent.addItem(T_no_policies);
 			return;
@@ -317,13 +321,13 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
 			String name = "";
 			if(rp.getRpName()!=null) name=rp.getRpName();
 
-			String action = rp.getActionText();
+			String action = resourcePolicyService.getActionText(rp);
 
 			// if it is the default policy for the Submitter don't show it.
 			if(dso instanceof org.dspace.content.Item){
 				org.dspace.content.Item item = (org.dspace.content.Item)dso;
-				if(rp.getEPersonID()!=-1 && rp.getEPersonID()!=0){
-					if(item.getSubmitter().getID()==rp.getEPersonID())
+				if(rp.getEPerson() != null){
+					if(item.getSubmitter().equals(rp.getEPerson()))
 						continue;
 				}
 			}

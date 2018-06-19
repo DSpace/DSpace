@@ -248,12 +248,31 @@
                 <a class="image-link" href="{$href}">
                     <xsl:choose>
                         <xsl:when test="mets:fileGrp[@USE='THUMBNAIL']">
-                            <img alt="Thumbnail">
-                                <xsl:attribute name="src">
-                                    <xsl:value-of
-                                            select="mets:fileGrp[@USE='THUMBNAIL']/mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-                                </xsl:attribute>
-                            </img>
+                            <!-- Checking if Thumbnail is restricted and if so, show a restricted image --> 
+                            <xsl:variable name="src">
+                              <xsl:value-of select="mets:fileGrp[@USE='THUMBNAIL']/mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                            </xsl:variable>
+                            <xsl:choose>
+                              <xsl:when test="contains($src,'isAllowed=n')">
+                                <div style="width: 100%; text-align: center">
+                                    <img>
+                                      <xsl:attribute name="src">
+                                        <xsl:value-of select="$context-path"/>
+                                        <xsl:text>/static/icons/lock24.png</xsl:text>
+                                      </xsl:attribute>
+                                      <xsl:attribute name="alt">xmlui.dri2xhtml.METS-1.0.blocked</xsl:attribute>
+                                      <xsl:attribute name="attr" namespace="http://apache.org/cocoon/i18n/2.1">alt</xsl:attribute>
+                                    </img>
+                                </div>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                <img alt="Thumbnail">
+                                    <xsl:attribute name="src">
+                                        <xsl:value-of select="$src"/>
+                                    </xsl:attribute>
+                                </img>
+                              </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
                             <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="height: {$thumbnail.maxheight}px;"/>

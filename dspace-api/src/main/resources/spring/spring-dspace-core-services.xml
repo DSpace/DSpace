@@ -17,7 +17,7 @@
     <!-- Identifier Service Application Interface.  Will be autowired with
          any Identifier Providers present in Spring context.
     -->
-    <bean id="org.dspace.identifier.IdentifierService"
+    <bean id="org.dspace.identifier.service.IdentifierService"
           class="org.dspace.identifier.IdentifierServiceImpl"
           autowire="byType"
           scope="singleton"/>
@@ -31,11 +31,17 @@
     <bean id="org.dspace.identifier.VersionedHandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"
           scope="singleton">
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
-        <property name="versionDAO">
-            <bean class="org.dspace.versioning.VersionDAO"/>
-        </property>
-        <property name="versionHistoryDAO">
-            <bean class="org.dspace.versioning.VersionHistoryDAO"/>
-        </property>
     </bean>
+
+    <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true"/>
+    <bean name="org.dspace.core.DatabaseSchemaValidator" class="org.dspace.core.HibernateDatabaseSchemaValidator" lazy-init="true"/>
+
+    <!-- Register all our Flyway callback classes (which run before/after database migrations) -->
+    <bean class="org.dspace.storage.rdbms.DatabaseRegistryUpdater"/>
+    <bean class="org.dspace.storage.rdbms.GroupServiceInitializer"/>
+    <bean class="org.dspace.storage.rdbms.PostgreSQLCryptoChecker"/>
+    <bean class="org.dspace.storage.rdbms.SiteServiceInitializer"/>
+
+    <!-- Initialize our LoggerService (i.e. log4j) -->
+    <bean class="org.dspace.core.LoggerServiceImpl"/>
 </beans>

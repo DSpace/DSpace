@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.sort.SortOption;
@@ -52,7 +53,7 @@ public class BrowseEngine
      * for the Browse Engine, based on the brand of the provided DBMS.
      *
      * @param context       the DSpace context
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public BrowseEngine(Context context)
         throws BrowseException
@@ -72,7 +73,7 @@ public class BrowseEngine
      *
      * @param bs    the scope of the browse
      * @return      the results of the browse
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     public BrowseInfo browse(BrowserScope bs)
         throws BrowseException
@@ -110,6 +111,7 @@ public class BrowseEngine
      *
      * @param bs    the scope of the browse
      * @return      the results of the browse
+     * @throws BrowseException if browse error
      */
     public BrowseInfo browseMini(BrowserScope bs)
         throws BrowseException
@@ -161,7 +163,7 @@ public class BrowseEngine
         dao.setOrderField(orderBy);
 
         // now run the query
-        List<BrowseItem> results = dao.doQuery();
+        List<Item> results = dao.doQuery();
 
         // construct the mostly empty BrowseInfo object to pass back
         BrowseInfo browseInfo = new BrowseInfo(results, 0, scope.getResultsPerPage(), 0);
@@ -195,7 +197,7 @@ public class BrowseEngine
      *
      * @param bs        the scope of the browse
      * @return          the results of the browse
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private BrowseInfo browseByItem(BrowserScope bs)
         throws BrowseException
@@ -294,7 +296,7 @@ public class BrowseEngine
             dao.setLimit(scope.getResultsPerPage());
 
             // Holder for the results
-            List<BrowseItem> results = null;
+            List<Item> results = null;
 
             // Does this browse have any contents?
             if (total > 0)
@@ -322,7 +324,7 @@ public class BrowseEngine
             else
             {
                 // No records, so make an empty list
-                results = new ArrayList<BrowseItem>();
+                results = new ArrayList<>();
             }
 
             // construct the BrowseInfo object to pass back
@@ -394,7 +396,7 @@ public class BrowseEngine
      *
      * @param bs        the scope of the browse
      * @return          the results of the browse
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private BrowseInfo browseByValue(BrowserScope bs)
         throws BrowseException
@@ -561,7 +563,7 @@ public class BrowseEngine
      * Return the focus value.
      *
      * @return  the focus value to use
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private String getJumpToValue()
         throws BrowseException
@@ -626,8 +628,9 @@ public class BrowseEngine
     /**
      * Convert the value into an offset into the table for this browse
      *
+     * @param value value
      * @return  the focus value to use
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private int getOffsetForValue(String value)
         throws BrowseException
@@ -661,8 +664,9 @@ public class BrowseEngine
     /**
      * Convert the value into an offset into the table for this browse
      *
+     * @param value value
      * @return  the focus value to use
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private int getOffsetForDistinctValue(String value)
         throws BrowseException
@@ -684,7 +688,7 @@ public class BrowseEngine
      *
      * @param value a focus value to normalize
      * @return  the normalized focus value
-     * @throws BrowseException
+     * @throws BrowseException if browse error
      */
     private String normalizeJumpToValue(String value)
         throws BrowseException
@@ -711,9 +715,9 @@ public class BrowseEngine
      * Get the total number of results for the browse.  This is the same as
      * calling getTotalResults(false)
      *
-     * @return
-     * @throws SQLException
-     * @throws BrowseException
+     * @return total
+     * @throws SQLException if database error
+     * @throws BrowseException if browse error
      */
     private int getTotalResults()
         throws SQLException, BrowseException
@@ -727,8 +731,8 @@ public class BrowseEngine
      *
      * @param distinct  is this a distinct browse or not
      * @return          the total number of results available in this type of browse
-     * @throws SQLException
-     * @throws BrowseException
+     * @throws SQLException if database error
+     * @throws BrowseException if browse error
      */
     private int getTotalResults(boolean distinct)
         throws SQLException, BrowseException

@@ -13,34 +13,27 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.InstallItem;
-import org.dspace.content.Item;
-import org.dspace.content.Site;
-import org.dspace.content.WorkspaceItem;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
-import org.dspace.handle.HandleManager;
-import org.dspace.license.CreativeCommons;
-import org.dspace.workflow.WorkflowManager;
-import org.dspace.xmlworkflow.XmlWorkflowManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.license.service.CreativeCommonsService;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * Container class for code that is useful to many packagers.
@@ -58,7 +51,7 @@ public class PackageUtils
     // Map of metadata elements for Communities and Collections
     // Format is alternating key/value in a straight array; use this
     // to initialize hash tables that convert to and from.
-    private static final String ccMetadataMap[] =
+    protected static final String ccMetadataMap[] =
     {
         // getMetadata()  ->  DC element.term
         "name",                    "dc.title",
@@ -72,8 +65,20 @@ public class PackageUtils
 
     // HashMaps to convert Community/Collection metadata to/from Dublin Core
     // (useful when crosswalking Communities/Collections)
-    private static final Map<String,String> ccMetadataToDC = new HashMap<String,String>();
-    private static final Map<String,String> ccDCToMetadata = new HashMap<String,String>();
+    protected static final Map<String,String> ccMetadataToDC = new HashMap<String,String>();
+    protected static final Map<String,String> ccDCToMetadata = new HashMap<String,String>();
+
+    protected static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected static final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    protected static final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected static final InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    protected static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected static final WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected static final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
+    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     static
     {
         for (int i = 0; i < ccMetadataMap.length; i += 2)
@@ -125,12 +130,13 @@ public class PackageUtils
      * Used by all SIP processors as a common sanity test.
      *
      * @param item - item to test.
+     * @throws PackageValidationException if validation error
      */
     public static void checkItemMetadata(Item item)
         throws PackageValidationException
     {
-        Metadatum t[] = item.getDC( "title", null, Item.ANY);
-        if (t == null || t.length == 0)
+        List<MetadataValue> t = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        if (t == null || t.size() == 0)
         {
             throw new PackageValidationException("Item cannot be created without the required \"title\" DC metadata.");
         }
@@ -146,6 +152,9 @@ public class PackageUtils
      * @param license - license string to add, may be null to invoke default.
      * @param item - the item.
      * @param collection - get the default license from here.
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static void addDepositLicense(Context context, String license,
                                        Item item, Collection collection)
@@ -153,34 +162,34 @@ public class PackageUtils
     {
         if (license == null)
         {
-            license = collection.getLicense();
+            license = collection.getLicenseCollection();
         }
         InputStream lis = new ByteArrayInputStream(license.getBytes());
 
         Bundle lb;
         //If LICENSE bundle is missing, create it
-        Bundle[] bundles = item.getBundles(Constants.LICENSE_BUNDLE_NAME);
-        if(bundles==null || bundles.length==0)
+        List<Bundle> bundles = itemService.getBundles(item, Constants.LICENSE_BUNDLE_NAME);
+        if(CollectionUtils.isEmpty(bundles))
         {
-            lb = item.createBundle(Constants.LICENSE_BUNDLE_NAME);
+            lb = bundleService.create(context, item, Constants.LICENSE_BUNDLE_NAME);
         }
         else
         {
-            lb = bundles[0];
+            lb = bundles.get(0);
         }
 
         //Create the License bitstream
-        Bitstream lbs = lb.createBitstream(lis);
+        Bitstream lbs = bitstreamService.create(context, lb, lis);
         lis.close();
-        BitstreamFormat bf = BitstreamFormat.findByShortDescription(context, "License");
+        BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context, "License");
         if (bf == null)
         {
-            bf = FormatIdentifier.guessFormat(context, lbs);
+            bf = bitstreamFormatService.guessFormat(context, lbs);
         }
-        lbs.setFormat(bf);
-        lbs.setName(Constants.LICENSE_BITSTREAM_NAME);
-        lbs.setSource(Constants.LICENSE_BITSTREAM_NAME);
-        lbs.update();
+        lbs.setFormat(context, bf);
+        lbs.setName(context, Constants.LICENSE_BITSTREAM_NAME);
+        lbs.setSource(context, Constants.LICENSE_BITSTREAM_NAME);
+        bitstreamService.update(context, lbs);
     }
 
     /**
@@ -189,6 +198,7 @@ public class PackageUtils
      * @param item Item whose bitstreams to search.
      * @param name Bitstream's name to match.
      * @return first bitstream found or null.
+     * @throws SQLException if database error
      */
     public static Bitstream getBitstreamByName(Item item, String name)
         throws SQLException
@@ -203,28 +213,28 @@ public class PackageUtils
      * @param bsName - name of bitstream to match.
      * @param bnName - bundle name to match, or null for all.
      * @return the format found or null if none found.
+     * @throws SQLException if database error
      */
     public static Bitstream getBitstreamByName(Item item, String bsName, String bnName)
         throws SQLException
     {
-        Bundle[] bundles;
+        List<Bundle> bundles;
         if (bnName == null)
         {
             bundles = item.getBundles();
         }
         else
         {
-            bundles = item.getBundles(bnName);
+            bundles = itemService.getBundles(item, bnName);
         }
-        for (int i = 0; i < bundles.length; i++)
+        for (Bundle bundle : bundles)
         {
-            Bitstream[] bitstreams = bundles[i].getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for (int k = 0; k < bitstreams.length; k++)
+            for (Bitstream bitstream : bitstreams)
             {
-                if (bsName.equals(bitstreams[k].getName()))
-                {
-                    return bitstreams[k];
+                if (bsName.equals(bitstream.getName())) {
+                    return bitstream;
                 }
             }
         }
@@ -235,34 +245,33 @@ public class PackageUtils
      * Find bitstream by its format, looking in a specific bundle.
      * Used to look for particularly-typed Package Manifest bitstreams.
      *
+     * @param context context
      * @param item - dspace item whose bundles to search.
      * @param bsf - BitstreamFormat object to match.
      * @param bnName - bundle name to match, or null for all.
      * @return the format found or null if none found.
+     * @throws SQLException if database error
      */
-    public static Bitstream getBitstreamByFormat(Item item,
+    public static Bitstream getBitstreamByFormat(Context context, Item item,
             BitstreamFormat bsf, String bnName)
         throws SQLException
     {
         int fid = bsf.getID();
-        Bundle[] bundles;
+        List<Bundle> bundles;
         if (bnName == null)
         {
             bundles = item.getBundles();
         }
         else
         {
-            bundles = item.getBundles(bnName);
+            bundles = itemService.getBundles(item, bnName);
         }
-        for (int i = 0; i < bundles.length; i++)
-        {
-            Bitstream[] bitstreams = bundles[i].getBitstreams();
+        for (Bundle bundle : bundles) {
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for (int k = 0; k < bitstreams.length; k++)
-            {
-                if (bitstreams[k].getFormat().getID() == fid)
-                {
-                    return bitstreams[k];
+            for (Bitstream bitstream : bitstreams) {
+                if (bitstream.getFormat(context).getID() == fid) {
+                    return bitstream;
                 }
             }
         }
@@ -281,7 +290,7 @@ public class PackageUtils
     public static boolean isMetaInfoBundle(Bundle bn)
     {
         return (bn.getName().equals(Constants.LICENSE_BUNDLE_NAME) ||
-                bn.getName().equals(CreativeCommons.CC_BUNDLE_NAME) ||
+                bn.getName().equals(CreativeCommonsService.CC_BUNDLE_NAME) ||
                 bn.getName().equals(Constants.METADATA_BUNDLE_NAME));
     }
 
@@ -327,6 +336,8 @@ public class PackageUtils
      * @param MIMEType - MIME content-type
      * @param desc - long description
      * @return BitstreamFormat object that was found or created.  Never null.
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
      public static BitstreamFormat findOrCreateBitstreamFormat(Context context,
             String shortDesc, String MIMEType, String desc)
@@ -348,25 +359,28 @@ public class PackageUtils
      * @param shortDesc - short descriptive name, used to locate existing format.
      * @param MIMEType - mime content-type
      * @param desc - long description
+     * @param supportLevel support level
      * @param internal value for the 'internal' flag of a new format if created.
      * @return BitstreamFormat object that was found or created.  Never null.
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
      public static BitstreamFormat findOrCreateBitstreamFormat(Context context,
             String shortDesc, String MIMEType, String desc, int supportLevel, boolean internal)
         throws SQLException, AuthorizeException
      {
-        BitstreamFormat bsf = BitstreamFormat.findByShortDescription(context,
+        BitstreamFormat bsf = bitstreamFormatService.findByShortDescription(context,
                                 shortDesc);
         // not found, try to create one
         if (bsf == null)
         {
-            bsf = BitstreamFormat.create(context);
-            bsf.setShortDescription(shortDesc);
+            bsf = bitstreamFormatService.create(context);
+            bsf.setShortDescription(context, shortDesc);
             bsf.setMIMEType(MIMEType);
             bsf.setDescription(desc);
             bsf.setSupportLevel(supportLevel);
             bsf.setInternal(internal);
-            bsf.update();
+            bitstreamFormatService.update(context, bsf);
         }
         return bsf;
     }
@@ -379,44 +393,42 @@ public class PackageUtils
      * @param item
      *            the item
      * @return the license bitstream or null
-     *
-     * @throws IOException
-     *             if the license bitstream can't be read
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if the license bitstream can't be read
      */
     public static Bitstream findDepositLicense(Context context, Item item)
             throws SQLException, IOException, AuthorizeException
     {
         // get license format ID
         int licenseFormatId = -1;
-        BitstreamFormat bf = BitstreamFormat.findByShortDescription(context,
+        BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context,
                 "License");
         if (bf != null)
         {
             licenseFormatId = bf.getID();
         }
 
-        Bundle[] bundles = item.getBundles(Constants.LICENSE_BUNDLE_NAME);
-        for (int i = 0; i < bundles.length; i++)
+        List<Bundle> bundles = itemService.getBundles(item, Constants.LICENSE_BUNDLE_NAME);
+        for (Bundle bundle : bundles)
         {
             // Assume license will be in its own bundle
-            Bitstream[] bitstreams = bundles[i].getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for(int j=0; j < bitstreams.length; j++)
+            for (Bitstream bitstream : bitstreams)
             {
                 // The License should have a file format of "License"
-                if (bitstreams[j].getFormat().getID() == licenseFormatId)
-                {
+                if (bitstream.getFormat(context).getID() == licenseFormatId) {
                     //found a bitstream with format "License" -- return it
-                    return bitstreams[j];
+                    return bitstream;
                 }
             }
 
             // If we couldn't find a bitstream with format = "License",
             // we will just assume the first bitstream is the deposit license
             // (usually a safe assumption as it is in the LICENSE bundle)
-            if(bitstreams.length>0)
-            {
-                return bitstreams[0];
+            if (bitstreams.size() > 0) {
+                return bitstreams.get(0);
             }
         }
 
@@ -441,9 +453,9 @@ public class PackageUtils
      * @param handle Handle of new Object (may be null)
      * @param params Properties-style list of options (interpreted by each packager).
      * @return newly created DSpace Object (or null)
-     * @throws AuthorizeException
-     * @throws SQLException
-     * @throws IOException
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
      */
     public static DSpaceObject createDSpaceObject(Context context, DSpaceObject parent, int type, String handle, PackageParameters params)
         throws AuthorizeException, SQLException, IOException
@@ -453,25 +465,25 @@ public class PackageUtils
         switch (type)
         {
             case Constants.COLLECTION:
-                dso = ((Community)parent).createCollection(handle);
+                dso = collectionService.create(context, (Community) parent, handle);
                 return dso;
 
             case Constants.COMMUNITY:
                 // top-level community?
                 if (parent == null || parent.getType() == Constants.SITE)
                 {
-                    dso = Community.create(null, context, handle);
+                    dso = communityService.create(null, context, handle);
                 }
                 else
                 {
-                    dso = ((Community) parent).createSubcommunity(handle);
+                    dso = communityService.createSubcommunity(context, ((Community) parent), handle);
                 }
                 return dso;
 
             case Constants.ITEM:
                 //Initialize a WorkspaceItem
                 //(Note: Handle is not set until item is finished)
-                WorkspaceItem wsi = WorkspaceItem.create(context, (Collection)parent, params.useCollectionTemplate());
+                WorkspaceItem wsi = workspaceItemService.create(context, (Collection)parent, params.useCollectionTemplate());
 
                 // Please note that we are returning an Item which is *NOT* yet in the Archive,
                 // and doesn't yet have a handle assigned.
@@ -479,7 +491,7 @@ public class PackageUtils
                 return wsi.getItem();
                 
             case Constants.SITE:
-                return Site.find(context, Site.SITE_ID);
+                return siteService.findSite(context);
         }
 
         return null;
@@ -497,18 +509,19 @@ public class PackageUtils
      * @param handle Handle to assign to item (may be null)
      * @param params Properties-style list of options (interpreted by each packager).
      * @return finished Item
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws WorkflowException if workflow error
      */
     public static Item finishCreateItem(Context context, WorkspaceItem wsi, String handle, PackageParameters params)
-            throws IOException, SQLException, AuthorizeException {
+            throws IOException, SQLException, AuthorizeException, WorkflowException {
         // if we are restoring/replacing existing object using the package
         if (params.restoreModeEnabled())
         {
             // Restore & install item immediately
             //(i.e. skip over any Collection workflows, as we are essentially restoring item from backup)
-            InstallItem.restoreItem(context, wsi, handle);
+            installItemService.restoreItem(context, wsi, handle);
 
             //return newly restored item
             return wsi.getItem();
@@ -516,25 +529,17 @@ public class PackageUtils
         // if we are treating package as a SIP, and we are told to respect workflows
         else if (params.workflowEnabled())
         {
+            WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
             // Start an item workflow
             // (NOTICE: The specified handle is ignored, as Workflows *always* end in a new handle being assigned)
-            if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
-                try {
-                    return XmlWorkflowManager.startWithoutNotify(context, wsi).getItem();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    return null;
-                }
-            } else {
-                return WorkflowManager.startWithoutNotify(context, wsi).getItem();
-            }
+            return workflowService.startWithoutNotify(context, wsi).getItem();
         }
 
         // default: skip workflow, but otherwise normal submission (i.e. package treated like a SIP)
         else
         {
             // Install item immediately with the specified handle
-            InstallItem.installItem(context, wsi, handle);
+            installItemService.installItem(context, wsi, handle);
 
             // return newly installed item
             return wsi.getItem();
@@ -547,28 +552,19 @@ public class PackageUtils
      * <p>
      * This method is necessary as there is no generic 'update()' on a DSpaceObject
      *
+     * @param context context
      * @param dso DSpaceObject to update
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
-    public static void updateDSpaceObject(DSpaceObject dso)
+    public static void updateDSpaceObject(Context context, DSpaceObject dso)
             throws AuthorizeException, SQLException, IOException
     {
         if (dso != null)
         {
-            switch (dso.getType())
-            {
-                case Constants.BITSTREAM:
-                    ((Bitstream)dso).update();
-                    break;
-                case Constants.ITEM:
-                    ((Item)dso).update();
-                    break;
-                case Constants.COLLECTION:
-                    ((Collection)dso).update();
-                    break;
-                case Constants.COMMUNITY:
-                    ((Community)dso).update();
-                    break;
-            }
+            DSpaceObjectService<DSpaceObject> dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
+            dsoService.update(context, dso);
         }
     }
 
@@ -638,9 +634,9 @@ public class PackageUtils
      * Creates the specified file (along with all parent directories) if it doesn't already
      * exist.  If the file already exists, nothing happens.
      * 
-     * @param file
+     * @param file file
      * @return boolean true if succeeded, false otherwise
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public static boolean createFile(File file)
             throws IOException
@@ -667,14 +663,18 @@ public class PackageUtils
     /**
      * Remove all bitstreams (files) associated with a DSpace object.
      * <P>
-     * If this object is an Item, it removes all bundles & bitstreams.  If this
+     * If this object is an Item, it removes all bundles and bitstreams.  If this
      * object is a Community or Collection, it removes all logo bitstreams.
      * <P>
      * This method is useful for replace functionality.
      *
+     * @param context context
      * @param dso The object to remove all bitstreams from
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    public static void removeAllBitstreams(DSpaceObject dso)
+    public static void removeAllBitstreams(Context context, DSpaceObject dso)
             throws SQLException, IOException, AuthorizeException
     {
         //If we are dealing with an Item
@@ -682,25 +682,26 @@ public class PackageUtils
         {
             Item item = (Item) dso;
             // Get a reference to all Bundles in Item (which contain the bitstreams)
-            Bundle[] bunds = item.getBundles();
+            Iterator<Bundle> bunds = item.getBundles().iterator();
 
             // Remove each bundle -- this will in turn remove all bitstreams associated with this Item.
-            for (int i = 0; i < bunds.length; i++)
-            {
-                item.removeBundle(bunds[i]);
+            while (bunds.hasNext()) {
+                Bundle bundle = bunds.next();
+                bunds.remove();
+                itemService.removeBundle(context, item, bundle);
             }
         }
         else if (dso.getType()==Constants.COLLECTION)
         {
             Collection collection = (Collection) dso;
             //clear out the logo for this collection
-            collection.setLogo(null);
+            collectionService.setLogo(context, collection, null);
         }
         else if (dso.getType()==Constants.COMMUNITY)
         {
             Community community = (Community) dso;
             //clear out the logo for this community
-            community.setLogo(null);
+            communityService.setLogo(context, community, null);
         }
     }
 
@@ -710,9 +711,13 @@ public class PackageUtils
      * <P>
      * This method is useful for replace functionality.
      *
+     * @param context context
      * @param dso The object to remove all metadata from
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    public static void clearAllMetadata(DSpaceObject dso)
+    public static void clearAllMetadata(Context context, DSpaceObject dso)
             throws SQLException, IOException, AuthorizeException
     {
         //If we are dealing with an Item
@@ -720,7 +725,7 @@ public class PackageUtils
         {
             Item item = (Item) dso;
             //clear all metadata entries
-            item.clearMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            itemService.clearMetadata(context, item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         }
         //Else if collection, clear its database table values
         else if (dso.getType()==Constants.COLLECTION)
@@ -733,7 +738,7 @@ public class PackageUtils
             {
                 try
                 {
-                    collection.setMetadata(dbField, null);
+                    collectionService.setMetadata(context, collection, dbField, null);
                 }
                 catch(IllegalArgumentException ie)
                 {
@@ -753,7 +758,7 @@ public class PackageUtils
             {
                 try
                 {
-                    community.setMetadata(dbField, null);
+                    communityService.setMetadata(context, community, dbField, null);
                 }
                 catch(IllegalArgumentException ie)
                 {
@@ -764,14 +769,11 @@ public class PackageUtils
         }
     }
 
-    /** Recognize and pick apart likely "magic" group names */
-    private static final Pattern groupAnalyzer
-        = Pattern.compile("^(COMMUNITY|COLLECTION)_([0-9]+)_(.+)");
 
     /** Lookaside list for translations we've already done, so we don't generate
      * multiple names for the same group
      */
-    private static final Map<String, String> orphanGroups = new HashMap<String, String>();
+    protected static final Map<String, String> orphanGroups = new HashMap<String, String>();
 
     /**
      * When DSpace creates Default Group Names they are of a very specific format,
@@ -787,7 +789,7 @@ public class PackageUtils
      * (represented by [ID] above) becomes meaningless when content is exported
      * outside of DSpace.  In order to make these Group names meaningful outside
      * of DSpace, they must be translated into a different format:
-     * <li> COMMUNITY_[HANDLE]_ADMIN (e.g. COMMUNITY_hdl:123456789/10_ADMIN), etc.
+     * {@code COMMUNITY_[HANDLE]_ADMIN} (e.g. COMMUNITY_hdl:123456789/10_ADMIN), etc.
      * <p>
      * This format replaces the internal ID with an external Handle identifier
      * (which is expected to be more meaningful even when content is exported
@@ -810,27 +812,36 @@ public class PackageUtils
      * @param context current DSpace Context
      * @param groupName Group's name
      * @return the group name, with any internal IDs translated to Handles
+     * @throws PackageException if package error
      */
     public static String translateGroupNameForExport(Context context, String groupName)
             throws PackageException
     {
-        // See if this resembles a default Group name
-        Matcher matched = groupAnalyzer.matcher(groupName);
-        if (!matched.matches())
+        Pattern defaultGroupNamePattern = Pattern.compile("^([^_]+)_([^_]+)_(.+)$");
+        // Check if this looks like a default Group name
+        Matcher matcher = defaultGroupNamePattern.matcher(groupName);
+        if(!matcher.matches())
+        {
+            //if this is not a valid default group name, just return group name as-is (no crosswalking necessary)
+            return groupName;
+        }
+
+        String objTypeText = matcher.group(1);
+        String objID = matcher.group(2);
+        String groupType = matcher.group(3);
+
+        int objType = Constants.getTypeID(objTypeText);
+        if (objID == null || objType == -1)
             return groupName;
 
-        // It does!  Pick out the components
-        String objType = matched.group(1);
-        String objID = matched.group(2);
-        String groupType = matched.group(3);
 
         try
         {
             //We'll translate this internal ID into a Handle
 
             //First, get the object via the Internal ID
-            DSpaceObject dso = DSpaceObject.find(context, Constants
-                    .getTypeID(objType), Integer.parseInt(objID));
+            DSpaceObject dso = ContentServiceFactory.getInstance().getDSpaceLegacyObjectService(objType).findByIdOrLegacyId(context, objID);
+            ;
 
             if(dso==null)
             {
@@ -863,7 +874,7 @@ public class PackageUtils
 
             //Create an updated group name, using the Handle to replace the InternalID
             // Format: <DSpace-Obj-Type>_hdl:<Handle>_<Group-Type>
-            return objType + "_" + "hdl:" + dso.getHandle() + "_" + groupType;
+            return objTypeText + "_" + "hdl:" + dso.getHandle() + "_" + groupType;
         }
         catch (SQLException sqle)
         {
@@ -896,6 +907,7 @@ public class PackageUtils
      * @param context current DSpace Context
      * @param groupName Group's name
      * @return the group name, with any Handles translated to internal IDs
+     * @throws PackageException if package error
      */
     public static String translateGroupNameForImport(Context context, String groupName)
             throws PackageException
@@ -924,7 +936,7 @@ public class PackageUtils
                 // (e.g. "hdl:123456789/10")
 
                 //First, get the object via the Handle
-                DSpaceObject dso = HandleManager.resolveToObject(context, objID.substring(4));
+                DSpaceObject dso = handleService.resolveToObject(context, objID.substring(4));
 
                 if(dso==null)
                 {

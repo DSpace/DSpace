@@ -22,11 +22,11 @@ public interface ExternalServiceManagerSystem extends ServiceManagerSystem {
     /**
      * Initialize the service manager's configuration.
      *
-     * @param parent
-     * @param configurationService
-     * @param testMode
-     * @param developmentMode
-     * @param serviceManagers
+     * @param parent parent ServiceManagerSystem
+     * @param configurationService current DSpace configuration service
+     * @param testMode whether in test mode
+     * @param developmentMode whether in development mode
+     * @param serviceManagers List of ServiceManagerSystems
      */
     void init(ServiceManagerSystem parent, DSpaceConfigurationService configurationService,
             boolean testMode, boolean developmentMode, List<ServiceManagerSystem> serviceManagers);

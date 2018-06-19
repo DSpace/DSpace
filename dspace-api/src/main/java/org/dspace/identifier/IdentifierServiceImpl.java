@@ -10,7 +10,10 @@ package org.dspace.identifier;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
+import org.dspace.handle.service.HandleService;
+import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -18,7 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
-import org.dspace.handle.HandleManager;
+import org.dspace.core.Constants;
 
 /**
  * The main service class used to reserve, register and resolve identifiers
@@ -33,6 +36,16 @@ public class IdentifierServiceImpl implements IdentifierService {
 
     /** log4j category */
     private static Logger log = Logger.getLogger(IdentifierServiceImpl.class);
+
+    @Autowired(required = true)
+    protected ContentServiceFactory contentServiceFactory;
+    @Autowired(required = true)
+    protected HandleService handleService;
+
+    protected IdentifierServiceImpl()
+    {
+
+    }
 
     @Autowired
    @Required
@@ -51,13 +64,18 @@ public class IdentifierServiceImpl implements IdentifierService {
      * @param context dspace context
      * @param dso dspace object
      */
+    @Override
     public void reserve(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException {
         for (IdentifierProvider service : providers)
         {
-            service.mint(context, dso);
+            String identifier = service.mint(context, dso);
+            if (!StringUtils.isEmpty(identifier))
+            {
+                service.reserve(context, dso, identifier);
+            }
         }
         //Update our item
-        dso.update();
+        contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
     }
 
     @Override
@@ -71,7 +89,7 @@ public class IdentifierServiceImpl implements IdentifierService {
             }
         }
         //Update our item
-        dso.update();
+        contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
     }
 
     @Override
@@ -82,9 +100,8 @@ public class IdentifierServiceImpl implements IdentifierService {
         {
             service.register(context, dso);
         }
-        dso.resetIdentifiersCache();
         //Update our item
-        dso.update();
+        contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
     }
 
     @Override
@@ -106,9 +123,8 @@ public class IdentifierServiceImpl implements IdentifierService {
             throw new IdentifierException("Cannot register identifier: Didn't "
                 + "find a provider that supports this identifier.");
         }
-        object.resetIdentifiersCache();
         //Update our item
-        object.update();
+        contentServiceFactory.getDSpaceObjectService(object).update(context, object);
     }
 
     @Override
@@ -126,8 +142,8 @@ public class IdentifierServiceImpl implements IdentifierService {
                catch (IdentifierNotFoundException ex)
                {
                    log.info(service.getClass().getName() + " doesn't find an "
-                           + "Identifier for " + dso.getTypeText() + ", " 
-                           + Integer.toString(dso.getID()) + ".");
+                           + "Identifier for " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + ", "
+                           + dso.getID().toString() + ".");
                    log.debug(ex.getMessage(), ex);
                }
                catch (IdentifierException e)
@@ -140,7 +156,7 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
     
     @Override
-    public String[] lookup(Context context, DSpaceObject dso)
+    public List<String> lookup(Context context, DSpaceObject dso)
     {
         List<String> identifiers = new ArrayList<>();
         for (IdentifierProvider service : providers)
@@ -165,8 +181,8 @@ public class IdentifierServiceImpl implements IdentifierService {
             catch (IdentifierNotFoundException ex)
             {
                 log.info(service.getClass().getName() + " doesn't find an "
-                        + "Identifier for " + dso.getTypeText() + ", " 
-                        + Integer.toString(dso.getID()) + ".");
+                        + "Identifier for " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + ", "
+                        + dso.getID().toString() + ".");
                 log.debug(ex.getMessage(), ex);
             }
             catch (IdentifierException ex)
@@ -181,7 +197,7 @@ public class IdentifierServiceImpl implements IdentifierService {
             {
                 if (!identifiers.contains(handle)
                         && !identifiers.contains("hdl:" + handle)
-                        && !identifiers.contains(HandleManager.getCanonicalForm(handle)))
+                        && !identifiers.contains(handleService.getCanonicalForm(handle)))
                 {
                     // The VerionedHandleIdentifierProvider gets loaded by default
                     // it returns handles without any scheme (neither hdl: nor http:).
@@ -203,9 +219,10 @@ public class IdentifierServiceImpl implements IdentifierService {
         }
         
         log.debug("Found identifiers: " + identifiers.toString());
-        return identifiers.toArray(new String[0]);
+        return identifiers;
     }
 
+    @Override
     public DSpaceObject resolve(Context context, String identifier) throws IdentifierNotFoundException, IdentifierNotResolvableException{
         for (IdentifierProvider service : providers)
         {
@@ -235,6 +252,7 @@ public class IdentifierServiceImpl implements IdentifierService {
         return null;
     }
 
+    @Override
     public void delete(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException {
        for (IdentifierProvider service : providers)
        {
@@ -245,7 +263,6 @@ public class IdentifierServiceImpl implements IdentifierService {
                 log.error(e.getMessage(),e);
             }
         }
-       dso.resetIdentifiersCache();
     }
 
     @Override
@@ -262,6 +279,5 @@ public class IdentifierServiceImpl implements IdentifierService {
                 log.error(e.getMessage(),e);
             }
         }
-        dso.resetIdentifiersCache();
     }
 }

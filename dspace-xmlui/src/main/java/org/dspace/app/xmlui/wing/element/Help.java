@@ -29,6 +29,7 @@ public class Help extends TextContainer implements StructuralElement
      * 
      * @param context
      *            (Required) The context this element is contained in
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Help(WingContext context) throws WingException
     {
@@ -48,8 +49,9 @@ public class Help extends TextContainer implements StructuralElement
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
-
+    @Override
     public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
             NamespaceSupport namespaces) throws SAXException
     {

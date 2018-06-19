@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,14 +23,18 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 
 /**
  * Servlet for HTML bitstream support.
@@ -54,15 +59,21 @@ import org.dspace.utils.DSpace;
 public class HTMLServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(HTMLServlet.class);
+    private static final Logger log = Logger.getLogger(HTMLServlet.class);
 
     /**
      * Default maximum number of path elements to strip when testing if a
      * bitstream called "foo.html" should be served when "xxx/yyy/zzz/foo.html"
      * is requested.
      */
-    private int maxDepthGuess;
+    private final int maxDepthGuess;
 
+    private final transient ItemService itemService;
+
+    private final transient HandleService handleService;
+
+    private final transient BitstreamService bitstreamService;
+    
     /**
      * Create an HTML Servlet
      */
@@ -79,6 +90,10 @@ public class HTMLServlet extends DSpaceServlet
         {
             maxDepthGuess = 3;
         }
+        
+        itemService = ContentServiceFactory.getInstance().getItemService();
+        handleService = HandleServiceFactory.getInstance().getHandleService();
+        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     }
     
     // Return bitstream whose name matches the target bitstream-name
@@ -87,17 +102,17 @@ public class HTMLServlet extends DSpaceServlet
     private static Bitstream getItemBitstreamByName(Item item, String bsName)
     						throws SQLException
     {
-        Bundle[] bundles = item.getBundles();
+        List<Bundle> bundles = item.getBundles();
 
-        for (int i = 0; i < bundles.length; i++)
+        for (Bundle bundle : bundles)
         {
-            Bitstream[] bitstreams = bundles[i].getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for (int k = 0; k < bitstreams.length; k++)
+            for (Bitstream bb : bitstreams)
             {
-                if (bsName.equals(bitstreams[k].getName()))
+                if (bsName.equals(bb.getName()))
                 {
-                    return bitstreams[k];
+                    return bb;
                 }
             }
         }
@@ -107,6 +122,7 @@ public class HTMLServlet extends DSpaceServlet
     // On the surface it doesn't make much sense for this servlet to
     // handle POST requests, but in practice some HTML pages which
     // are actually JSP get called on with a POST, so it's needed.
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
                 HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -114,6 +130,7 @@ public class HTMLServlet extends DSpaceServlet
         doDSGet(context, request, response);
     }
 
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -176,12 +193,11 @@ public class HTMLServlet extends DSpaceServlet
                 {
                     String dbIDString = handle
                             .substring(handle.indexOf('/') + 1);
-                    int dbID = Integer.parseInt(dbIDString);
-                    item = Item.find(context, dbID);
+                    item = itemService.findByIdOrLegacyId(context, dbIDString);
                 }
                 else
                 {
-                    item = (Item) HandleManager
+                    item = (Item) handleService
                             .resolveToObject(context, handle);
                 }
             }
@@ -210,25 +226,25 @@ public class HTMLServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context, "view_html", "handle="
                     + handle + ",bitstream_id=" + bitstream.getID()));
             
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
             		new UsageEvent(
             				UsageEvent.Action.VIEW,
-            				request, 
-            				context, 
+            				request,
+            				context,
             				bitstream));
             
             //new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
 			//		Constants.BITSTREAM, bitstream.getID());
 
             // Set the response MIME type
-            response.setContentType(bitstream.getFormat().getMIMEType());
+            response.setContentType(bitstream.getFormat(context).getMIMEType());
 
             // Response length
             response.setHeader("Content-Length", String.valueOf(bitstream
                     .getSize()));
 
             // Pipe the bits
-            InputStream is = bitstream.retrieve();
+            InputStream is = bitstreamService.retrieve(context, bitstream);
 
             Utils.bufferedCopy(is, response.getOutputStream());
             is.close();

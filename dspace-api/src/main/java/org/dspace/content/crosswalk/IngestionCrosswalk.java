@@ -63,6 +63,7 @@ public interface IngestionCrosswalk
      * @param context  DSpace context.
      * @param dso DSpace Object (Item, Bitstream, etc) to which new metadata gets attached.
      * @param metadata  List of XML Elements of metadata
+     * @param createMissingMetadataFields whether to create missing fields
      *
      * @throws CrosswalkInternalException (<code>CrosswalkException</code>) failure of the crosswalk itself.
      * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk into this kind of DSpace object.
@@ -71,7 +72,7 @@ public interface IngestionCrosswalk
      * @throws SQLException  Database failure in services this calls
      * @throws AuthorizeException current user not authorized for this operation.
      */
-    public void ingest(Context context, DSpaceObject dso, List<Element> metadata)
+    public abstract void ingest(Context context, DSpaceObject dso, List<Element> metadata, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException;
 
     /**
@@ -85,6 +86,7 @@ public interface IngestionCrosswalk
      * @param context  DSpace context.
      * @param dso DSpace Object (usually an Item) to which new metadata gets attached.
      * @param root root Element of metadata document.
+     * @param createMissingMetadataFields whether to create missing fields
      *
      * @throws CrosswalkInternalException (<code>CrosswalkException</code>) failure of the crosswalk itself.
      * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk into this kind of DSpace object.
@@ -93,6 +95,6 @@ public interface IngestionCrosswalk
      * @throws SQLException  Database failure in services this calls
      * @throws AuthorizeException current user not authorized for this operation.
      */
-    public void ingest(Context context, DSpaceObject dso, Element root)
+    public abstract void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException;
 }

@@ -15,54 +15,14 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>5.7-drum-0.1</version>
+        <version>6.2-drum-0</version>
         <relativePath>..</relativePath>
     </parent>
 
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <global.version>5.6</global.version>
     </properties>
-
-    <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
-
-        <resources>
-            <!-- Enumerate filtered files explicitly to avoid issues with other config tech. -->
-            <resource>
-                <directory>${basedir}</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>config/default.context.xml</include>
-                    <include>config/dspace.cfg</include>
-                    <include>config/log4j-handle-plugin.properties</include>
-                    <include>config/log4j.properties</include>
-                    <include>config/modules/curate.cfg</include>
-                    <include>config/modules/com.atmire.statistics.oai.cfg</include>
-                    <include>config/modules/solr-statistics.cfg</include>
-                </includes>
-            </resource>
-            <!-- Declare a mutually exclusive resource set for non-filtered files. -->
-            <resource>
-                <directory>${basedir}</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>config/default.context.xml</exclude>
-                    <exclude>config/dspace.cfg</exclude>
-                    <exclude>config/log4j-handle-plugin.properties</exclude>
-                    <exclude>config/log4j.properties</exclude>
-                    <exclude>config/modules/curate.cfg</exclude>
-                    <exclude>config/modules/com.atmire.statistics.oai.cfg</exclude>
-                    <exclude>config/modules/solr-statistics.cfg</exclude>
-                </excludes>
-            </resource>
-        </resources>
-
-    </build>
 
     <profiles>
 
@@ -80,7 +40,7 @@
                 <module>modules</module>
             </modules> 
         </profile>
-
+   
         <!--
             DSpace Assembly profile. By default this is enabled.
             This profile actually builds all submodules and then assembles
@@ -184,29 +144,60 @@
                     </executions>
                  </plugin>
               </plugins>
+               <resources>
+                   <!-- Enumerate filtered files explicitly to avoid issues with other config tech. -->
+                   <resource>
+                       <directory>${basedir}</directory>
+                       <filtering>true</filtering>
+                       <includes>
+                           <include>config/default.context.xml</include>
+                           <include>config/dspace.cfg</include>
+                           <include>config/log4j-handle-plugin.properties</include>
+                           <include>config/log4j.properties</include>
+                           <include>config/modules/curate.cfg</include>
+                           <include>config/modules/com.atmire.statistics.oai.cfg</include>
+                           <include>config/modules/solr-statistics.cfg</include>
+                       </includes>
+                   </resource>
+                   <!-- Declare a mutually exclusive resource set for non-filtered files. -->
+                   <resource>
+                       <directory>${basedir}</directory>
+                       <filtering>false</filtering>
+                       <excludes>
+                           <exclude>config/default.context.xml</exclude>
+                           <exclude>config/dspace.cfg</exclude>
+                           <exclude>config/log4j-handle-plugin.properties</exclude>
+                           <exclude>config/log4j.properties</exclude>
+                           <exclude>config/modules/curate.cfg</exclude>
+                           <exclude>config/modules/com.atmire.statistics.oai.cfg</exclude>
+                           <exclude>config/modules/solr-statistics.cfg</exclude>
+                       </excludes>
+                   </resource>
+               </resources>
            </build>
         </profile>
 
-	<!-- An added <profile>
-      Run 'mvn -P installer-dist' to create a tarball of target/dspace-installer-${version}.tar.gz.
-      Transfer the tarcall to server and un-tar it at /apps/drum.
-      The server is based on the value of -Denv= while building drum.
-      Ex. Build by 'mvn clean install -Denv=prod -Dlicense.skip=true' and the 
-      dspace-installer-${version}.tar.gz is the distribution for production.
-     
-      https://issues.umd.edu/browse/LIBITD-767
-    -->
-	<profile>
-	  <id>installer-dist</id>
+        <!-- An added <profile>
+            Run 'mvn -P installer-dist' to create a tarball of target/dspace-installer-${version}.tar.gz.
+            Transfer the tarcall to server and un-tar it at /apps/drum.
+            The server is based on the value of -Denv= while building drum.
+            Ex. Build by 'mvn clean install -Denv=prod -Dlicense.skip=true' and the 
+            dspace-installer-${version}.tar.gz is the distribution for production.
+
+            https://issues.umd.edu/browse/LIBITD-767
+        -->
+        <profile>
+          <id>installer-dist</id>
       	  <build>
             <defaultGoal>validate</defaultGoal>
             <plugins>
               <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                  <descriptors>
-                    <descriptor>src/main/assembly/dspace-installer-distribution.xml</descriptor>
-                  </descriptors>
+                    <tarLongFileMode>posix</tarLongFileMode>
+                    <descriptors>
+                        <descriptor>src/main/assembly/dspace-installer-distribution.xml</descriptor>
+                    </descriptors>
                 </configuration>
                 <executions>
                   <execution>
@@ -220,8 +211,77 @@
               </plugin>
             </plugins>
           </build>
-	</profile>
+        </profile>
+        <!-- 
+            Profile to deploy a snapshot version to UMD Nexus
 
+            https://issues.umd.edu/browse/LIBDRUM-514
+        -->
+        <profile>
+          <id>deploy-snapshot</id>
+          <build>
+            <defaultGoal>install</defaultGoal>
+            <plugins>
+              <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+                <executions>
+                  <execution>
+                    <id>deploy-snapshot</id>
+                    <phase>install</phase>
+                    <goals>
+                      <goal>deploy-file</goal>
+                    </goals>
+                    <configuration>
+                      <file>target/dspace-installer-${project.version}.tar.gz</file>
+                      <url>https://maven.lib.umd.edu/nexus/content/repositories/snapshots</url>
+                      <repositoryId>nexus</repositoryId>
+                      <groupId>edu.umd.lib.drum</groupId>
+                      <artifactId>drum-installer</artifactId>
+                      <version>${project.version}</version>
+                      <packaging>tar.gz</packaging>
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
+            </plugins>
+          </build>
+        </profile>
+        <!-- 
+            Profile to deploy a release version to UMD Nexus
+
+            https://issues.umd.edu/browse/LIBDRUM-514
+        -->
+        <profile>
+          <id>deploy-release</id>
+          <build>
+            <defaultGoal>install</defaultGoal>
+            <plugins>
+              <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+                <executions>
+                  <execution>
+                    <id>deploy-release</id>
+                    <phase>install</phase>
+                    <goals>
+                      <goal>deploy-file</goal>
+                    </goals>
+                    <configuration>
+                      <file>target/dspace-installer-${project.version}.tar.gz</file>
+                      <url>https://maven.lib.umd.edu/nexus/content/repositories/releases</url>
+                      <repositoryId>nexus</repositoryId>
+                      <groupId>edu.umd.lib.drum</groupId>
+                      <artifactId>drum-installer</artifactId>
+                      <version>${project.version}</version>
+                      <packaging>tar.gz</packaging>
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
+            </plugins>
+          </build>
+        </profile>
     </profiles>
 
     <dependencies>
@@ -232,7 +292,40 @@
             <artifactId>dspace-oai</artifactId>
             <type>jar</type>
             <classifier>classes</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.lyncode</groupId>
+                    <artifactId>builder-commons</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
     	</dependency>
+        <!-- Ensure that the additional service API classes are available during spring instantiation-->
+        <dependency>
+            <groupId>com.atmire</groupId>
+            <artifactId>atmire-statistics-exporter-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lyncode</groupId>
+            <artifactId>builder-commons</artifactId>
+            <version>1.0.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->
     	<dependency>

@@ -32,6 +32,7 @@
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Bundle" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="java.util.List" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -47,8 +48,8 @@
 	//retrieve attributes from request
     BitstreamFormat guess =
         (BitstreamFormat) request.getAttribute("guessed.format");
-    BitstreamFormat[] formats =
-        (BitstreamFormat[]) request.getAttribute("bitstream.formats");    
+    List<BitstreamFormat> formats =
+        (List<BitstreamFormat>) request.getAttribute("bitstream.formats");    
 
     Item item = subInfo.getSubmissionItem().getItem();
 %>
@@ -109,25 +110,25 @@
     	<div class="row">
     	<span class="col-md-6">
             <select class="form-control" name="format" size="8">
-                <option value="-1" <%= subInfo.getBitstream().getFormat().getShortDescription().equals("Unknown") ? "selected=\"selected\"" : "" %>>
+                <option value="-1" <%= subInfo.getBitstream().getFormat(context).getShortDescription().equals("Unknown") ? "selected=\"selected\"" : "" %>>
                     <%-- Format Not in List --%>
 					<fmt:message key="jsp.submit.get-file-format.info6"/>
                 </option>
 <%
-    for (int i = 0; i < formats.length; i++)
+    for (int i = 0; i < formats.size(); i++)
     {
 %>
                 <option
-                    <%= subInfo.getBitstream().getFormat().getID() == formats[i].getID() ? "selected=\"selected\"" : "" %>
-                    value="<%= formats[i].getID() %>">
-                   <%= formats[i].getShortDescription() %>
+                    <%= subInfo.getBitstream().getFormat(context).getID() == formats.get(i).getID() ? "selected=\"selected\"" : "" %>
+                    value="<%= formats.get(i).getID() %>">
+                   <%= formats.get(i).getShortDescription() %>
 <%-- <%
-        if (formats[i].getSupportLevel() == 1) { %>(known)<% }
-        if (formats[i].getSupportLevel() == 2) { %>(supported)<% } 
+        if (formats.get(i).getSupportLevel() == 1) { %>(known)<% }
+        if (formats.get(i).getSupportLevel() == 2) { %>(supported)<% } 
       %> --%>
 <%
-        if (formats[i].getSupportLevel() == 1) { %><fmt:message key="jsp.submit.get-file-format.known"/><% }
-        if (formats[i].getSupportLevel() == 2) { %><fmt:message key="jsp.submit.get-file-format.supported"/><% }
+        if (formats.get(i).getSupportLevel() == 1) { %><fmt:message key="jsp.submit.get-file-format.known"/><% }
+        if (formats.get(i).getSupportLevel() == 2) { %><fmt:message key="jsp.submit.get-file-format.supported"/><% }
 %>
                 </option>
 <%

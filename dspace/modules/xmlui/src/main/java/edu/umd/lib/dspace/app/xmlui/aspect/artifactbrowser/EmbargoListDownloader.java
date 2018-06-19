@@ -6,7 +6,6 @@ package edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -20,11 +19,14 @@ import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.TableRow;
 import org.xml.sax.SAXException;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import edu.umd.lib.dspace.content.EmbargoDTO;
+import edu.umd.lib.dspace.content.factory.DrumServiceFactory;
+import edu.umd.lib.dspace.content.service.EmbargoDTOService;
 
 /**
  * Provides the Embargo List data in CSV form
@@ -43,6 +45,8 @@ public class EmbargoListDownloader extends AbstractReader implements Recyclable
     protected Context context;
 
     protected CSVWriter writer = null;
+    
+    protected EmbargoDTOService embargoDTOService = DrumServiceFactory.getInstance().getEmbargoDTOService();
 
     @Override
     public void setup(SourceResolver sourceResolver, Map objectModel,
@@ -72,43 +76,39 @@ public class EmbargoListDownloader extends AbstractReader implements Recyclable
 
     }
 
-    private void addEmbargoDataToWriter(Request request) throws SQLException
+    private void addEmbargoDataToWriter(Request request) throws SQLException, IOException
     {
-        ArrayList<TableRow> rowList = (ArrayList<TableRow>) EmbargoListHelper
-                .getEmbargoList(request);
+        
+        if (context == null) {
+            context = ContextUtil.obtainContext(request);
+        }
+        java.util.List<EmbargoDTO> embargoDTOs = embargoDTOService.getEmbargoList(context);
 
         writer.writeNext(new String[] { "Handle", "Item ID", "Bitstream ID",
                 "Title", "Advisor", "Author", "Department", "Type", "End Date" });
 
-        if (rowList.size() == 0)
+        if (embargoDTOs.size() == 0)
         {
             return;
         }
 
-        for (TableRow row : rowList)
+
+        for (EmbargoDTO embargoETO : embargoDTOs)
         {
             String[] entryData = new String[9];
-            entryData[0] = row.getStringColumn("handle");
-            entryData[1] = String.valueOf(row.getIntColumn("item_id"));
-            entryData[2] = String.valueOf(row.getIntColumn("bitstream_id"));
-            entryData[3] = row.getStringColumn("title");
-            entryData[4] = row.getStringColumn("advisor");
-            entryData[5] = row.getStringColumn("author");
-            entryData[6] = row.getStringColumn("department");
-            entryData[7] = row.getStringColumn("type");
-            // A NullPointerException is thrown when there is no end date. This
-            // is being handled by this try catch block.
-            try
-            {
-                entryData[8] = row.getDateColumn("end_date").toString();
-            }
-            catch (NullPointerException npe)
-            {
-                // When a NullPointerException occurs, replaced with "null"
-                entryData[8] = "null";
-            }
+
+            entryData[0] = embargoETO.getHandle();
+            entryData[1] = embargoETO.getItemIdString();
+            entryData[2] = embargoETO.getBitstreamIdString();
+            entryData[3] = embargoETO.getTitle();
+            entryData[4] = embargoETO.getAdvisor();
+            entryData[5] = embargoETO.getAuthor();
+            entryData[6] = embargoETO.getDepartment();
+            entryData[7] = embargoETO.getType();
+            entryData[8] = embargoETO.getEndDateString();
             writer.writeNext(entryData);
         }
+        writer.flush();
     }
 
     @Override

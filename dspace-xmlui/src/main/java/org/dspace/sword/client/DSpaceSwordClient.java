@@ -13,8 +13,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.sword.client.exceptions.HttpException;
 import org.dspace.sword.client.exceptions.InvalidHandleException;
 import org.dspace.sword.client.exceptions.PackageFormatException;
@@ -32,6 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.UUID;
+import org.dspace.core.factory.CoreServiceFactory;
 
 /**
  * User: Robin Taylor
@@ -53,6 +54,7 @@ public class DSpaceSwordClient
     private PackageParameters pkgParams;
 
     private static Logger log = Logger.getLogger(DSpaceSwordClient.class);
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
 
     public DSpaceSwordClient()
@@ -160,12 +162,21 @@ public class DSpaceSwordClient
 
     /**
      * Create the package and write it to disk.
+     * @param context session context.
+     * @param handle object to be packaged.
+     * @param file write the package here.
+     * @throws org.dspace.sword.client.exceptions.InvalidHandleException
+     *              if handle cannot be resolved.
+     * @throws org.dspace.sword.client.exceptions.PackagerException
+     *              on error.
+     * @throws org.dspace.sword.client.exceptions.PackageFormatException
+     *              on unknown package type.
      */
     public void createPackage(Context context, String handle, File file) throws InvalidHandleException, PackagerException, PackageFormatException
     {
         // Note - in the future we may need to allow for more than zipped up packages.
 
-        PackageDisseminator dip = (PackageDisseminator) PluginManager
+        PackageDisseminator dip = (PackageDisseminator) CoreServiceFactory.getInstance().getPluginService()
                 .getNamedPlugin(PackageDisseminator.class, packageFormat);
 
         if (dip == null)
@@ -177,7 +188,7 @@ public class DSpaceSwordClient
         DSpaceObject dso = null;
         try
         {
-            dso = HandleManager.resolveToObject(context, handle);
+            dso = handleService.resolveToObject(context, handle);
         }
         catch (SQLException e)
         {
@@ -207,8 +218,9 @@ public class DSpaceSwordClient
      * Reads the file, probably a zipped package, and sends it to the Sword server.
      *
      * @return A unique ID returned by a successful deposit
-     * @throws org.purl.sword.client.SWORDClientException
-     *
+     * @throws org.purl.sword.client.SWORDClientException passed through.
+     * @throws org.dspace.sword.client.exceptions.HttpException
+     *              on error.
      */
     public String sendMessage() throws SWORDClientException, HttpException
     {

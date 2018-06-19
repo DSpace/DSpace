@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -20,6 +21,8 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 
 /**
  * Confirmation step for the deletion of an entire collection
@@ -43,7 +46,8 @@ public class DeleteCollectionConfirm extends AbstractDSpaceTransformer
 	private static final Message T_submit_confirm = message("xmlui.general.delete");
 	private static final Message T_submit_cancel = message("xmlui.general.cancel");
 	
-	
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
@@ -53,13 +57,13 @@ public class DeleteCollectionConfirm extends AbstractDSpaceTransformer
 	
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
 	{
-		int collectionID = parameters.getParameterAsInteger("collectionID", -1);
-		Collection thisCollection = Collection.find(context, collectionID);
+		UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
+		Collection thisCollection = collectionService.find(context, collectionID);
 		
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-confirm-delete",contextPath+"/admin/collection",Division.METHOD_POST,"primary administrative collection");
 	    main.setHead(T_main_head.parameterize(collectionID));
-	    main.addPara(T_main_para.parameterize(thisCollection.getMetadata("name")));	    
+	    main.addPara(T_main_para.parameterize(collectionService.getMetadata(thisCollection, "name")));
 	    List deleteConfirmHelp = main.addList("consequences",List.TYPE_BULLETED);
 	    deleteConfirmHelp.addItem(T_confirm_item1);
 	    deleteConfirmHelp.addItem(T_confirm_item2);

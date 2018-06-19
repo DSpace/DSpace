@@ -8,9 +8,13 @@
 package org.dspace.rest;
 
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Community;
 import org.dspace.rest.common.DSpaceObject;
@@ -18,7 +22,6 @@ import org.dspace.rest.common.Item;
 import org.dspace.rest.exceptions.ContextException;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -33,39 +36,43 @@ import java.sql.SQLException;
  */
 @Path("/handle")
 public class HandleResource extends Resource {
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     private static Logger log = Logger.getLogger(HandleResource.class);
 
     @GET
     @Path("/{prefix}/{suffix}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.DSpaceObject getObject(@PathParam("prefix") String prefix,
-            @PathParam("suffix") String suffix, @QueryParam("expand") String expand,
-            @Context HttpHeaders headers) throws WebApplicationException{
+    public org.dspace.rest.common.DSpaceObject getObject(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix, @QueryParam("expand") String expand, @javax.ws.rs.core.Context HttpHeaders headers) {
+        DSpaceObject dSpaceObject = new DSpaceObject();
         org.dspace.core.Context context = null;
-        DSpaceObject result = null;
 
         try {
-            context = createContext(getUser(headers));
+            context = createContext();
 
-            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+            org.dspace.content.DSpaceObject dso = handleService.resolveToObject(context, prefix + "/" + suffix);
+
             if(dso == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            log.info("DSO Lookup by handle: [" + prefix + "] / [" + suffix + "] got result of: " + dso.getTypeText() + "_" + dso.getID());
+            DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
+            log.info("DSO Lookup by handle: [" + prefix + "] / [" + suffix + "] got result of: " + dSpaceObjectService.getTypeText(dso) + "_" + dso.getID());
 
-            if(AuthorizeManager.authorizeActionBoolean(context, dso, org.dspace.core.Constants.READ)) {
+            if(authorizeService.authorizeActionBoolean(context, dso, org.dspace.core.Constants.READ)) {
                 switch(dso.getType()) {
                     case Constants.COMMUNITY:
-                        result = new Community((org.dspace.content.Community) dso, expand, context);
+                        dSpaceObject = new Community((org.dspace.content.Community) dso, servletContext, expand, context);
                         break;
                     case Constants.COLLECTION:
-                        result =  new Collection((org.dspace.content.Collection) dso, expand, context, null, null);
+                        dSpaceObject = new Collection((org.dspace.content.Collection) dso, servletContext, expand, context, null, null);
                         break;
                     case Constants.ITEM:
-                        result =  new Item((org.dspace.content.Item) dso, expand, context);
+                        dSpaceObject = new Item((org.dspace.content.Item) dso, servletContext, expand, context);
                         break;
                     default:
-                        result = new DSpaceObject(dso);
+                        dSpaceObject = new DSpaceObject(dso, servletContext);
+                        break;
                 }
             } else {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
@@ -74,13 +81,18 @@ public class HandleResource extends Resource {
             context.complete();
 
         } catch (SQLException e) {
-            processException("Could not read handle(" + prefix  + "/" + suffix + "), SQLException. Message: " + e.getMessage(), context);
-        } catch (ContextException e) {
-            processException("Could not read handle(" + prefix  + "/" + suffix + "), ContextException. Message: " + e.getMessage(), context);
-        } finally{
-           processFinally(context);
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (ContextException e)
+        {
+            processException("Could not read handle(prefix=" + prefix + "), (suffix=" + suffix + ") ContextException. Message:" + e.getMessage(),
+                    context);
+        } finally
+        {
+            processFinally(context);
         }
 
-        return result;
+        return dSpaceObject;
+
     }
 }

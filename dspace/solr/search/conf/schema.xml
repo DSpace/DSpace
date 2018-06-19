@@ -520,7 +520,7 @@
    <field name="fulltext" type="text" indexed="true" stored="true" multiValued="true"/>
 
     <!-- Internal DSpace Object ID -->
-   <field name="search.resourceid" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
+   <field name="search.resourceid" type="string" indexed="true" stored="true" required="true" omitNorms="true" />
 
     <!-- Internal DSpaceObject Type ID -->
    <field name="search.resourcetype" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
@@ -537,6 +537,8 @@
       
    <field name="read" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
    
+   <field name="has_content_in_original_bundle" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
+   
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->
    <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.comm" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
@@ -548,6 +550,7 @@
 
     <!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
    <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
+   <field name="lastModified" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
 
    <!-- Custom Mapping to assure ds.creator is placed into dc.contributor.author by defualt -->
    <!--<copyField source="dc.creator" dest="dc.contributor.author"/>-->

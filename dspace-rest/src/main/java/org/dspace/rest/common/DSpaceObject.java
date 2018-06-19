@@ -8,13 +8,17 @@
 package org.dspace.rest.common;
 
 import org.atteo.evo.inflector.English;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.rest.Resource;
 
+import javax.servlet.ServletContext;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,7 +29,8 @@ import java.util.List;
  */
 @XmlRootElement(name = "dspaceobject")
 public class DSpaceObject {
-    private Integer id;
+
+    private String uuid;
 
     private String name;
     private String handle;
@@ -41,19 +46,13 @@ public class DSpaceObject {
 
     }
 
-    public DSpaceObject(org.dspace.content.DSpaceObject dso) {
-        setId(dso.getID());
+    public DSpaceObject(org.dspace.content.DSpaceObject dso, ServletContext servletContext) {
+        setUUID(dso.getID().toString());
         setName(dso.getName());
         setHandle(dso.getHandle());
-        setType(dso.getTypeText().toLowerCase());
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+        DSpaceObjectService dspaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
+        setType(dspaceObjectService.getTypeText(dso).toLowerCase());
+        link = createLink(servletContext);
     }
 
     public String getName(){
@@ -73,7 +72,7 @@ public class DSpaceObject {
     }
 
     public String getLink() {
-        return Resource.getServletContextPath() + "/" + English.plural(getType()) + "/" + getId();
+        return link;
     }
 
     public String getType() {
@@ -95,5 +94,17 @@ public class DSpaceObject {
 
     public void addExpand(String expandableAttribute) {
         this.expand.add(expandableAttribute);
+    }
+
+    public String getUUID() {
+        return uuid;
+    }
+
+    public void setUUID(String uuid) {
+        this.uuid = uuid;
+    }
+
+    private String createLink(ServletContext context){
+        return context.getContextPath() + "/" + English.plural(getType()) + "/" + getUUID();
     }
 }

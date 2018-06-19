@@ -9,6 +9,9 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +22,8 @@ import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -52,6 +57,8 @@ public class SelectCollectionStep extends AbstractProcessingStep
     // invalid collection or error finding collection
     public static final int STATUS_INVALID_COLLECTION = 2;
 
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)
@@ -75,52 +82,59 @@ public class SelectCollectionStep extends AbstractProcessingStep
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
+    @Override
     public int doProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        // First we find the collection which was selected
-        int id[] = Util.getIntParameters(request, "mapcollections");
+        // Begin UMD Customization
+        // Modify the default logic to support mapping an item to multiple collections
+
+        // Get all selected collections
+        List<UUID> collection_ids = Util.getUUIDParameters(request, "mapcollections");
 
         // if the user didn't select a collection,
         // send him/her back to "select a collection" page
-        if (id == null)
+        if (collection_ids == null)
         {
             return STATUS_NO_COLLECTION;
         }
 
-        // try to load the collections
-        Collection col[] = new Collection[id.length];
+        List<Collection> collections = new ArrayList<Collection>();
 
-        for (int i=0; i < id.length; i++) {
-            col[i] = Collection.find(context, id[i]);
+        // for each selected collection id
+        for (UUID id : collection_ids) {
+            // try to load the collection
+            Collection col = collectionService.find(context, id);
 
             // Show an error if the collection is invalid
-            if (col[i] == null)
-                {
-                    return STATUS_INVALID_COLLECTION;
-                }
+            if (col == null)
+            {
+                return STATUS_INVALID_COLLECTION;
+            }
+
+            collections.add(col);
         }
+
+        Collection first_collection = collections.remove(0);
 
         // create our new Workspace Item
-        // the first collection is the main collection
-        WorkspaceItem wi = WorkspaceItem.create(context, col[0], true);
-
-        // the subsequent collections are mapped
-        for (int i=1; i < col.length; i++) {
-            wi.addMapCollection(col[i]);
-        }
-
+        WorkspaceItem wi = workspaceItemService.create(context, first_collection, true);
+        
+        // Map additoinal collections to the item.
+        wi.addMappedCollections(collections);
+        
         // update Submission Information with this Workspace Item
         subInfo.setSubmissionItem(wi);
 
         // commit changes to database
-        context.commit();
+        context.dispatchEvents();
 
         // need to reload current submission process config,
         // since it is based on the Collection selected
         subInfo.reloadSubmissionConfig(request);
+        // End UMD Customization
 
         // no errors occurred
         return STATUS_COMPLETE;
@@ -148,6 +162,7 @@ public class SelectCollectionStep extends AbstractProcessingStep
      * 
      * @return the number of pages in this step
      */
+    @Override
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {

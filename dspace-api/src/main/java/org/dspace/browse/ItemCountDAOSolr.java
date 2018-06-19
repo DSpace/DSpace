@@ -23,7 +23,7 @@ import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Discovery (Solr) driver implementing ItemCountDAO interface to look up item
@@ -52,42 +52,17 @@ public class ItemCountDAOSolr implements ItemCountDAO
     /** Hold the collection item count obtained from SOLR after the first query **/
     private Map<String, Integer> collectionsCount = null;
     
-    /** DSpace helper services access object */
-    DSpace dspace = new DSpace();
-    
+
     /** Solr search service */
-    SearchService searcher = dspace.getServiceManager().getServiceByName(SearchService.class.getName(), SearchService.class);
+    SearchService searcher = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(SearchService.class.getName(), SearchService.class);
     
-    /**
-     * Throw an ItemCountException as caching is not supported by ItemCountDAOSolr.
-     * 
-     * @param collection
-     * @param count
-     * @throws ItemCountException
-     */
-    public void collectionCount(Collection collection, int count) throws ItemCountException
-    {
-        log.error("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
-    }
-
-    /**
-     * Throw an ItemCountException as caching is not supported by ItemCountDAOSolr.
-     * 
-     * @param community
-     * @param count
-     * @throws ItemCountException
-     */
-    public void communityCount(Community community, int count) throws ItemCountException
-    {
-        log.error("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
-    }
-
     /**
      * Set the dspace context to use
      * 
-     * @param context
-     * @throws ItemCountException
+     * @param context DSpace Context
+     * @throws ItemCountException if count error
      */
+    @Override
     public void setContext(Context context) throws ItemCountException
     {
         this.context = context;
@@ -96,14 +71,15 @@ public class ItemCountDAOSolr implements ItemCountDAO
     /**
      * Get the count of the items in the given container.
      * 
-     * @param dso
-     * @throws ItemCountException
+     * @param dso Dspace Context
+     * @return count
+     * @throws ItemCountException if count error
      */
+    @Override
     public int getCount(DSpaceObject dso) throws ItemCountException
     {
     	loadCount();
-    	DiscoverQuery query = new DiscoverQuery();
-    	Integer val = null;
+    	Integer val;
     	if (dso instanceof Collection)
         {
             val = collectionsCount.get(String.valueOf(((Collection) dso).getID()));
@@ -126,22 +102,12 @@ public class ItemCountDAOSolr implements ItemCountDAO
             return 0;
     	}
     }
-
-    /**
-     * remove the cache for the given container (does nothing in the Solr backend)
-     * 
-     * @param dso
-     * @throws ItemCountException
-     */
-    public void remove(DSpaceObject dso) throws ItemCountException
-    {
-    }
     
     /**
      * make sure that the counts are actually fetched from Solr (if haven't been
      * cached in a Map yet)
      * 
-     * @throws ItemCountException
+     * @throws ItemCountException if count error
      */
     private void loadCount() throws ItemCountException
     {

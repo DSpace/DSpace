@@ -12,15 +12,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 	
 <%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
+<%@ page import="java.util.List" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-	Collection [] notLinkedCollections = (Collection[] )request.getAttribute("notLinkedCollections");
-	Collection [] linkedCollections = (Collection[] )request.getAttribute("linkedCollections");
+	List<Collection> notLinkedCollections = (List<Collection> )request.getAttribute("notLinkedCollections");
+	List<Collection> linkedCollections = (List<Collection>)request.getAttribute("linkedCollections");
 	
 	Item item = (Item)request.getAttribute("item");
 %>
@@ -30,7 +30,7 @@
    	<form class="form-horizontal" action="<%=request.getContextPath()%>/tools/edit-item" method="post">
 			<div class="form-group">   		
 				  <label><fmt:message key="jsp.tools.move-item.item.name.msg"/></label>
-			      <%=item.getMetadata("dc", "title", null, Item.ANY)[0].value%></font>
+			      <%=item.getName()%></font>
 			</div>
 		  <div class="form-group">
 		  	<div class="input-group">
@@ -39,10 +39,10 @@
 			</span>
 				<select class="form-control" name="collection_from_id">
 <%
-        for (int i = 0; i < linkedCollections.length; i++)
+        for (int i = 0; i < linkedCollections.size(); i++)
         {
 %>
-            <option value="<%= linkedCollections[i].getID() %>"><%= linkedCollections[i].getMetadata("name") %></option>
+            <option value="<%= linkedCollections.get(i).getID() %>"><%= linkedCollections.get(i).getName() %></option>
 <%
         }
 %>
@@ -57,10 +57,10 @@
 			<select class="form-control" name="collection_to_id">
 <%
 		//Later on find a away to display in a tree format with the linked one disabled?
-        for (int i = 0; i < notLinkedCollections.length; i++)
+        for (int i = 0; i < notLinkedCollections.size(); i++)
         {
 %>
-            <option value="<%= notLinkedCollections[i].getID() %>"><%= notLinkedCollections[i].getMetadata("name") %></option>
+            <option value="<%= notLinkedCollections.get(i).getID() %>"><%= notLinkedCollections.get(i).getName() %></option>
 <%
         }
 %>

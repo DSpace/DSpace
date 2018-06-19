@@ -11,9 +11,8 @@
 
 <!--
 
-The ArtifactBrowser Aspect is responsible for browsing communities /
-collections / items / and bitstreams, viewing an individual item,
-and searching the repository.
+The ViewArtifacts Aspect is responsible for viewing communities /
+collections / items / and bitstreams
 -->
 
 <!-- Added request-item support
@@ -45,7 +44,10 @@ and searching the repository.
 			<map:transformer name="ItemRequestStatusChanged" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestStatusChanged" />
 
             <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer"/>
+            
+            <!-- Begin UMD Customization -->
             <map:transformer name="EmbargoListDisplay" src="edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser.EmbargoListDisplay"/>
+            <!-- End UMD Customization -->
 
         </map:transformers>
 
@@ -55,8 +57,11 @@ and searching the repository.
 			<map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher" />
                         <map:matcher name="ContainerHomePageSelector" src="org.dspace.app.xmlui.aspect.viewArtifacts.ContainerHomePageMatcher"/>
 			<map:matcher name="ConfigurationMatcher" src="org.dspace.app.xmlui.aspect.general.ConfigurationMatcher" />
-
+      
+      <!-- Begin UMD Customization -->
 			<map:matcher name="StatisticsAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.statistics.StatisticsAuthorizedMatcher"/>
+      <!-- End UMD Customization -->
+      
 		</map:matchers>
 
 
@@ -74,10 +79,11 @@ and searching the repository.
 			<map:selector name="IfModifiedSinceSelector" src="org.dspace.app.xmlui.aspect.general.IfModifiedSinceSelector" />
 		</map:selectors>
 
+
 	</map:components>
 	<map:pipelines>
 		<map:pipeline>
-						
+
 
                         <map:generate/>
 
@@ -120,11 +126,13 @@ and searching the repository.
 				<map:serialize type="xml" />
 			</map:match>
 
-			<!-- DRUM Customization - Embargo List-->
+      <!-- Begin UMD Customization -->
+      <!-- DRUM Customization - Embargo List-->
 			<map:match pattern="embargo-list">
 				<map:transform type="EmbargoListDisplay" />
 				<map:serialize type="xml" />
-            </map:match>
+      </map:match>
+      <!-- End UMD Customization -->
 
 			<!-- restricted resource -->
 			<map:match pattern="restricted-resource">

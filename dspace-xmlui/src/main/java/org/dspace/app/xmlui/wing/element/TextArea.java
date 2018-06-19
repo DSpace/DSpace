@@ -36,6 +36,7 @@ public class TextArea extends Field
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected TextArea(WingContext context, String name, String rend)
             throws WingException
@@ -76,6 +77,7 @@ public class TextArea extends Field
      * Enable the add operation for this field. When this is enabled the
      * front end will add a button to add more items to the field.
      *
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void enableAddOperation() throws WingException
     {
@@ -87,6 +89,7 @@ public class TextArea extends Field
      * the front end will provide a way for the user to select fields (probably
      * checkboxes) along with a submit button to delete the selected fields.
      *
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void enableDeleteOperation()throws WingException
     {
@@ -100,6 +103,9 @@ public class TextArea extends Field
 
     /**
      * Set the raw value of the field removing any previous raw values.
+     *
+     * @return the new value.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Value setValue() throws WingException
     {
@@ -114,6 +120,7 @@ public class TextArea extends Field
      *
      * @param characters
      *            (May be null) Field value as a string
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setValue(String characters) throws WingException
     {
@@ -127,6 +134,7 @@ public class TextArea extends Field
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setValue(Message message) throws WingException
     {
@@ -135,19 +143,24 @@ public class TextArea extends Field
     }
     
     /**
-     * Set the authority value of the field removing any previous authority values.
-     * Initialized to an empty value.
+     * Set an empty authority value on the field, removing any previous authority values.
+     *
+     * @return the new value.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Value setAuthorityValue() throws WingException
     {
         return setAuthorityValue("", "UNSET");
     }
+
     /**
      * Set the authority value of the field removing any previous authority values.
      *
      * @param characters
      *            (May be null) Field value as a string
      * @param confidence symbolic confidence value
+     * @return the new value.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Value setAuthorityValue(String characters, String confidence) throws WingException
     {
@@ -159,8 +172,10 @@ public class TextArea extends Field
     }
 
     /**
-     * Add a field instance
-     * @return instance
+     * Add a field instance.
+     *
+     * @return instance.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Instance addInstance() throws WingException
     {

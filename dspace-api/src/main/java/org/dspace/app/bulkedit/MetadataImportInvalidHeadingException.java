@@ -41,6 +41,7 @@ public class MetadataImportInvalidHeadingException extends Exception
      *
      * @param message the error message
      * @param theType the type of the error
+     * @param theColumn column number
      */
     public MetadataImportInvalidHeadingException(String message, int theType, int theColumn)
     {
@@ -85,6 +86,7 @@ public class MetadataImportInvalidHeadingException extends Exception
      *
      * @return The exception message
      */
+    @Override
     public String getMessage()
     {
         if (type == SCHEMA)

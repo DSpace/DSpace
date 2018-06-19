@@ -16,6 +16,8 @@ import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -26,7 +28,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -70,6 +72,8 @@ public class ItemRequestContactRequester extends AbstractDSpaceTransformer imple
     private static final Message T_subject =
             message("xmlui.ArtifactBrowser.ItemRequestContactRequester.subject");
 
+    protected RequestItemService requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -107,12 +111,11 @@ public class ItemRequestContactRequester extends AbstractDSpaceTransformer imple
         Context context = ContextUtil.obtainContext(objectModel);
 
         String token = (String) request.getAttribute("token");
-        RequestItem requestItem = RequestItem.findByToken(context, token);
+        RequestItem requestItem = requestItemService.findByToken(context, token);
 
-        Item item = Item.find(context, requestItem.getItemID());
+        Item item = requestItem.getItem();
 
-        RequestItemAuthor requestItemAuthor = new DSpace()
-                .getServiceManager()
+        RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServiceByName(RequestItemAuthorExtractor.class.getName(),
                         RequestItemAuthorExtractor.class)
                 .getRequestItemAuthor(context, item);

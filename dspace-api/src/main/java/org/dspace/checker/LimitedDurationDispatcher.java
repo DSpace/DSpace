@@ -7,6 +7,9 @@
  */
 package org.dspace.checker;
 
+import org.dspace.content.Bitstream;
+
+import java.sql.SQLException;
 import java.util.Date;
 
 /**
@@ -64,10 +67,11 @@ public class LimitedDurationDispatcher implements BitstreamDispatcher
     }
 
     /**
+     * @throws SQLException if database error
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
-    public int next()
-    {
-        return (System.currentTimeMillis() > end) ? SENTINEL : delegate.next();
+    @Override
+    public Bitstream next() throws SQLException {
+        return (System.currentTimeMillis() > end) ? null : delegate.next();
     }
 }

@@ -25,7 +25,11 @@ public class DCInputSet
 	/** the inputs ordered by page and row position */
 	private DCInput[][] inputPages = null;
 	
-	/** constructor */
+        /** constructor
+         * @param formName form name
+         * @param pages pages
+         * @param listMap map
+         */
 	public DCInputSet(String formName, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
 	{
 		this.formName = formName;
@@ -116,6 +120,7 @@ public class DCInputSet
      * Does the current input set define the named field?
      * Scan through every field in every page of the input set
      *
+     * @param fieldName
      * @return true if the current set has the named field
      */
     public boolean isFieldPresent(String fieldName)
@@ -136,7 +141,39 @@ public class DCInputSet
     	return false;
     }
 	
-    private static boolean doField(DCInput dcf, boolean addTitleAlternative, 
+    /**
+     * Does the current input set define the named field?
+     * and is valid for the specified document type
+     * Scan through every field in every page of the input set
+     *
+     * @param fieldName field name
+     * @param documentType doc type
+     * @return true if the current set has the named field
+     */
+     public boolean isFieldPresent(String fieldName, String documentType)
+     {
+     	if(documentType == null){
+     		documentType = "";
+     	}
+     	for (int i = 0; i < inputPages.length; i++)
+ 	    {
+     		DCInput[] pageInputs = inputPages[i];
+     		for (int row = 0; row < pageInputs.length; row++)
+     		{
+     			String fullName = pageInputs[row].getElement() + "." + 
+ 				              	  pageInputs[row].getQualifier();
+     			if (fullName.equals(fieldName) )
+     			{
+     				if(pageInputs[row].isAllowedFor(documentType)){
+     					return true;
+     				}
+     			}
+     		}
+ 	    }
+     	return false;
+     }
+    
+    protected boolean doField(DCInput dcf, boolean addTitleAlternative,
 		    					   boolean addPublishedBefore)
     {
     	String rowName = dcf.getElement() + "." + dcf.getQualifier();

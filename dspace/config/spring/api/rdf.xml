@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2002-2016, DuraSpace.  All rights reserved
+    Licensed under the DuraSpace License.
+
+    A copy of the DuraSpace License has been included in this
+    distribution and is available at: http://www.dspace.org/license
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="rdfFactory" class="org.dspace.rdf.factory.RDFFactoryImpl">
+        <!-- This defines which URIGenerator will be used. The URIGenerator
+             itself must be instantiated below.
+        -->
+        <property name="generator" ref="org.dspace.rdf.storage.LocalURIGenerator"/>
+        <property name="storage" ref="org.dspace.rdf.storage.RDFStorage"/>
+        <property name="converter" ref="org.dspace.rdf.conversion.RDFConverter"/>
+    </bean>
+    
+    <!-- configure all plugins the converter should use. If you don't want to
+         use a plugin, remove it here. -->
+    <bean id="org.dspace.rdf.conversion.SimpleDSORelationsConverterPlugin" class="org.dspace.rdf.conversion.SimpleDSORelationsConverterPlugin"/>
+    <bean id="org.dspace.rdf.conversion.MetadataConverterPlugin" class="org.dspace.rdf.conversion.MetadataConverterPlugin"/>
+    <bean id="org.dspace.rdf.conversion.StaticDSOConverterPlugin" class="org.dspace.rdf.conversion.StaticDSOConverterPlugin"/>
+    
+    <!-- You do not need to change anything below this line, if you are not
+         developing DSpace. -->
+    
+    <!-- Currently there is only one implementation of RDFConverter. This uses
+         automatically all instantiated plugins. -->
+    <bean id="org.dspace.rdf.conversion.RDFConverter" class="org.dspace.rdf.conversion.RDFConverterImpl" scope="singleton"/>
+
+
+    <!-- We have multiple instances of URIGenerator using different Persistent
+         Identifier. Some of them use others as fallback (e.g. generate a DOI,
+         if there is no DOI fallback to handle, if there is no handle fallback
+         to local URIs. -->
+    <bean id="org.dspace.rdf.storage.LocalURIGenerator" class="org.dspace.rdf.storage.LocalURIGenerator"/>
+    <bean id="org.dspace.rdf.storage.HandleURIGenerator" class="org.dspace.rdf.storage.HandleURIGenerator"/>
+    <bean id="org.dspace.rdf.storage.DOIURIGenerator" class="org.dspace.rdf.storage.DOIURIGenerator">
+        <property name="fallback" ref="org.dspace.rdf.storage.LocalURIGenerator"/>
+    </bean>
+    <bean id="org.dspace.rdf.storage.DOIHandleURIGenerator" class="org.dspace.rdf.storage.DOIHandleURIGenerator">
+        <property name="fallback" ref="org.dspace.rdf.storage.HandleURIGenerator"/>
+    </bean>
+    
+    <!-- Currently there is only one implementation of RDFStorage -->
+    <bean id="org.dspace.rdf.storage.RDFStorage" class="org.dspace.rdf.storage.RDFStorageImpl" scope="singleton"/>
+</beans>

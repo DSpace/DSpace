@@ -54,7 +54,7 @@ public class StatisticsWorkflowTransformer extends AbstractStatisticsDataTransfo
 
         if(dso != null)
         {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath);
         }
         pageMeta.addTrailLink(contextPath + (dso != null && dso.getHandle() != null ? "/handle/" + dso.getHandle() : "") + "/workflow-statistics", T_trail);
 

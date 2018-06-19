@@ -7,7 +7,7 @@
  */
 package org.dspace.sort;
 
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 
 /**
  * Class implementing static helpers for anywhere that interacts with the sort columns
@@ -43,7 +43,7 @@ public class OrderFormat
     public static final String AUTHORITY = "authority";
 	
 	// Array of all available order delegates - avoids excessive calls to plugin manager
-	private static final String[] delegates = PluginManager.getAllPluginNames(OrderFormatDelegate.class);
+	private static final String[] delegates = CoreServiceFactory.getInstance().getPluginService().getAllPluginNames(OrderFormatDelegate.class);
 
     private static final OrderFormatDelegate authorDelegate = new OrderFormatAuthor();
     private static final OrderFormatDelegate titleDelegate  = new OrderFormatTitle();
@@ -116,7 +116,7 @@ public class OrderFormat
 	   		{
 	   			if (delegates[idx].equals(name))
 	   			{
-	   				return (OrderFormatDelegate)PluginManager.getNamedPlugin(OrderFormatDelegate.class, name);
+	   				return (OrderFormatDelegate)CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(OrderFormatDelegate.class, name);
 	   			}
 	   		}
    		}

@@ -28,9 +28,13 @@
 <%@ page import="org.dspace.app.webui.servlet.admin.CollectionWizardServlet" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.MetadataField" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.dspace.content.service.MetadataSchemaService" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
 
 <%  Collection collection = (Collection) request.getAttribute("collection");
-    MetadataField[] dcTypes = (MetadataField[]) request.getAttribute("dctypes"); %>
+    MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    List<MetadataField> dcTypes = (List<MetadataField>) request.getAttribute("dctypes"); %>
 
 <dspace:layout locbar="off"
                navbar="off"
@@ -77,10 +81,10 @@
 			    	<%-- <option value="-1">Select field...</option> --%>
 			    	<option value="-1"><fmt:message key="jsp.dspace-admin.wizard-default-item.select"/></option>
 <%
-		for (int dc = 0; dc < dcTypes.length; dc++)
+		for (int dc = 0; dc < dcTypes.size(); dc++)
 		{ %>
-					<option value="<%= dcTypes[dc].getFieldID() %>"><%= dcTypes[dc].getQualifier() == null ?
-					    MetadataSchema.find(UIUtil.obtainContext(request), dcTypes[dc].getSchemaID()).getName() + "." + dcTypes[dc].getElement() : MetadataSchema.find(UIUtil.obtainContext(request), dcTypes[dc].getSchemaID()).getName() + "." + dcTypes[dc].getElement() + "." + dcTypes[dc].getQualifier() %></option>
+					<option value="<%= dcTypes.get(dc).getID() %>"><%= dcTypes.get(dc).getQualifier() == null ?
+					    dcTypes.get(dc).getMetadataSchema().getName() + "." + dcTypes.get(dc).getElement() : dcTypes.get(dc).getMetadataSchema().getName() + "." + dcTypes.get(dc).getElement() + "." + dcTypes.get(dc).getQualifier() %></option>
 <%      } %>
 				</select></td>
 				<td headers="t2" class="<%= row %>RowEvenCol">

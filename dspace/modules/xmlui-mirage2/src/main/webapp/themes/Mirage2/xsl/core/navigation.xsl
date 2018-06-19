@@ -135,7 +135,8 @@
                 </div>
 
             </xsl:if>
-            
+
+            <!-- Begin UMD Customization -->
             <!-- Added Static Page Links to Options Box -->
             <div>
                 <h6 class="ds-option-set-head">Pages</h6>
@@ -144,6 +145,7 @@
                     <a class="list-group-item" href="{$context-path}/page/statistics">About Download Statistics</a>
                 </div>
             </div>
+            <!-- End UMD Customization -->
         </div>
     </xsl:template>
 

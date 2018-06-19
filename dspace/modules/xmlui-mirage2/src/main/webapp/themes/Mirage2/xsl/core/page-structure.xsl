@@ -77,6 +77,17 @@
 
                 <!-- Then proceed to the body -->
                 <body>
+                    <!-- Begin UMD Customization -->
+                    <!-- Environment Banner -->
+                    <xsl:variable name="environment" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='environment'][@qualifier='name']"/>
+                    <xsl:variable name="environmentBannerText" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='environment'][@qualifier='bannerText']"/>
+                    <xsl:if test="$environment != ''">
+                    <p class="environment-banner {$environment}">
+                        <xsl:value-of select="$environmentBannerText"/>
+                    </p>
+                    </xsl:if>
+                    <!-- End UMD Customization -->
+
                     <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
                    chromium.org/developers/how-tos/chrome-frame-getting-started -->
                     <!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
@@ -177,6 +188,14 @@
                 </xsl:attribute>
             </meta>
 
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='ROBOTS'][not(@qualifier)]">
+                <meta name="ROBOTS">
+                    <xsl:attribute name="content">
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='ROBOTS']"/>
+                    </xsl:attribute>
+                </meta>
+            </xsl:if>
+
             <!-- Add stylesheets -->
 
             <!--TODO figure out a way to include these in the concat & minify-->
@@ -229,12 +248,12 @@
             <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
             <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
             <script>
-                //Clear default text of emty text areas on focus
+                //Clear default text of empty text areas on focus
                 function tFocus(element)
                 {
                 if (element.value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){element.value='';}
                 }
-                //Clear default text of emty text areas on submit
+                //Clear default text of empty text areas on submit
                 function tSubmit(form)
                 {
                 var defaultedElements = document.getElementsByTagName("textarea");
@@ -320,7 +339,8 @@
         placeholders for header images -->
     <xsl:template name="buildHeader">
 
-
+        <!-- Begin UMD Customization -->
+        <!-- Changed add bootstrap CSS classes to change page layout -->
         <header>
             <div class="navbar navbar-default navbar-static-top" role="navigation">
                 <div class="container">
@@ -477,6 +497,7 @@
             </div>
 
         </header>
+        <!-- End UMD Customization -->
 
     </xsl:template>
 
@@ -699,10 +720,13 @@
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
                         <div>
+                            <!-- Begin UMD Customization -->
+                            <!-- DRUM Footer Content -->
                             DRUM is brought to you by the <a href="http://www.lib.umd.edu/">University of Maryland Libraries</a><br />
                             University of Maryland, College Park, MD 20742-7011 (301)314-1328.<br /> 
                             Please send us your <a href="{$context-path}/feedback"> comments</a>.<br />
                             <a href="https://umd.edu/web-accessibility" target="_blank">Web Accessibility</a>
+                            <!-- End UMD Customization -->
                         </div>
                     </div>
                 </div>
@@ -734,12 +758,13 @@
     <xsl:template match="dri:body">
         <div>
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
-                <div class="alert">
+                <div class="alert alert-warning">
                     <button type="button" class="close" data-dismiss="alert">&#215;</button>
                     <xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']/node()"/>
                 </div>
             </xsl:if>
 
+            <!-- Begin UMD Customization -->
             <!-- Check for the custom pages -->
             <xsl:choose>
                 <xsl:when test="starts-with($request-uri, 'page/')">
@@ -771,6 +796,7 @@
                     <xsl:apply-templates />
                 </xsl:otherwise>
             </xsl:choose>
+            <!-- End UMD Customization -->
 
         </div>
     </xsl:template>
@@ -791,6 +817,13 @@
 
     <xsl:template name="addJavascript">
 
+        <script type="text/javascript"><xsl:text>
+                         if(typeof window.publication === 'undefined'){
+                            window.publication={};
+                          };
+                        window.publication.contextPath= '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/><xsl:text>';</xsl:text>
+            <xsl:text>window.publication.themePath= '</xsl:text><xsl:value-of select="$theme-path"/><xsl:text>';</xsl:text>
+        </script>
         <!--TODO concat & minify!-->
 
         <script>
@@ -811,7 +844,7 @@
             <script src="{$theme-path}{@src}">&#160;</script>
         </xsl:for-each>
 
-        <!-- Add javascipt specified in DRI -->
+        <!-- Add javascript specified in DRI -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
             <script>
                 <xsl:attribute name="src">
@@ -850,29 +883,31 @@
         <xsl:if test="dri:body/dri:div[@n='lookup']">
             <xsl:call-template name="choiceLookupPopUpSetup"/>
         </xsl:if>
-        
-        <!-- UMD Header -->
-        <script src="//s3.amazonaws.com/umdheader.umd.edu/app/js/main.min.js"></script>
-        <script>
-            umdHeader.init(); 
-        </script>
 
+        <!-- Begin UMD Customization -->
+        <!-- UMD Header -->
+        <script src="https://umd-header.umd.edu/build/bundle.js?search=0&amp;search_domain=&amp;events=0&amp;news=0&amp;schools=0&amp;admissions=0&amp;support=1&amp;support_url=https%253A%252F%252Fgiving.umd.edu%252Fgiving%252FshowSchool.php%253Fname%253Dlibraries&amp;wrapper=1160&amp;sticky=0"></script>
+        <!-- End UMD Customization -->
+
+        <xsl:call-template name="addJavascript-google-analytics" />
+    </xsl:template>
+
+    <xsl:template name="addJavascript-google-analytics">
         <!-- Add a google analytics script if the key is present -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
             <script><xsl:text>
-                  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-                  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-                  ga('create', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverName']"/><xsl:text>');
-                  ga('send', 'pageview');
-           </xsl:text></script>
+                ga('create', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverName']"/><xsl:text>');
+                ga('send', 'pageview');
+            </xsl:text></script>
         </xsl:if>
     </xsl:template>
 
-    <!--The Language Selection-->
- <!--The Language Selection
+    <!--The Language Selection
         Uses a page metadata curRequestURI which was introduced by in /xmlui-mirage2/src/main/webapp/themes/Mirage2/sitemap.xmap-->
     <xsl:template name="languageSelection">
         <xsl:variable name="curRequestURI">
@@ -917,7 +952,7 @@
     </xsl:template>
 
     <!-- Builds the Query String part of the language URL. If there already is an existing query string
-    like: ?filtertype=subject&filter_relational_operator=equals&filter=keyword1 it appends the locale parameter with the ampersand (&) symbol -->
+like: ?filtertype=subject&filter_relational_operator=equals&filter=keyword1 it appends the locale parameter with the ampersand (&) symbol -->
     <xsl:template name="getLanguageURL">
         <xsl:variable name="queryString" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='queryString']"/>
         <xsl:choose>

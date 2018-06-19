@@ -8,12 +8,15 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Try to look to an item metadata for the corresponding author name and email.
@@ -24,8 +27,11 @@ import org.dspace.core.I18nUtil;
  */
 public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
 
-	private String emailMetadata;
-	private String fullNameMatadata;
+    protected String emailMetadata;
+    protected String fullNameMetadata;
+
+    @Autowired(required = true)
+    protected ItemService itemService;
 
 	public RequestItemMetadataStrategy() {
 	}
@@ -35,17 +41,17 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
 			throws SQLException {
 		if (emailMetadata != null)
 		{
-			Metadatum[] vals = item.getMetadataByMetadataString(emailMetadata);
-			if (vals.length > 0)
+			List<MetadataValue> vals = itemService.getMetadataByMetadataString(item, emailMetadata);
+			if (vals.size() > 0)
 			{
-				String email = vals[0].value;
+				String email = vals.iterator().next().getValue();
 				String fullname = null;
-				if (fullNameMatadata != null)
+				if (fullNameMetadata != null)
 				{
-					Metadatum[] nameVals = item.getMetadataByMetadataString(fullNameMatadata);
-					if (nameVals.length > 0)
+                    List<MetadataValue> nameVals = itemService.getMetadataByMetadataString(item, fullNameMetadata);
+					if (nameVals.size() > 0)
 					{
-						fullname = nameVals[0].value;
+						fullname = nameVals.iterator().next().getValue();
 					}
 				}
 				
@@ -68,8 +74,8 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
 		this.emailMetadata = emailMetadata;
 	}
 
-	public void setFullNameMatadata(String fullNameMatadata) {
-		this.fullNameMatadata = fullNameMatadata;
+	public void setFullNameMetadata(String fullNameMetadata) {
+		this.fullNameMetadata = fullNameMetadata;
 	}
 
 }

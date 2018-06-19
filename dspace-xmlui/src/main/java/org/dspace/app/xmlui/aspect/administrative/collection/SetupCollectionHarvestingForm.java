@@ -8,8 +8,10 @@
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -19,9 +21,13 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.OAIHarvester;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedCollectionService;
 
 
 /**
@@ -72,8 +78,9 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 
 	private static final Message T_submit_test = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.submit_test"); 
 
-	
-		
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	protected HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -86,11 +93,11 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 	
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
 	{
-		int collectionID = parameters.getParameterAsInteger("collectionID", -1);
-		Collection thisCollection = Collection.find(context, collectionID);
+		UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
+		Collection thisCollection = collectionService.find(context, collectionID);
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		
-		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+		HarvestedCollection hc = harvestedCollectionService.find(context, thisCollection);
 		String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
 		
 		String errorString = parameters.getParameter("errors",null);
@@ -143,7 +150,7 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 		
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-harvesting-setup",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
-	    main.setHead(T_main_head.parameterize(thisCollection.getMetadata("name")));   
+	    main.setHead(T_main_head.parameterize(thisCollection.getName()));
 	    
 	    List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
 	    options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);
@@ -178,12 +185,12 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 	    }
 	    
 	    settings.addLabel(T_label_setid);
-        Composite oaiSetComp = settings.addItem().addComposite("oai-set-comp");
-        Radio oaiSetSettingRadio = oaiSetComp.addRadio("oai-set-setting");
+        //Composite oaiSetComp = settings.addItem().addComposite("oai-set-comp");
+        Radio oaiSetSettingRadio = settings.addItem().addRadio("oai-set-setting");
         oaiSetSettingRadio.addOption("all".equals(oaiSetIdValue) || oaiSetIdValue == null, "all", "All sets");
         oaiSetSettingRadio.addOption(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null, "specific", "Specific sets");
 
-        Text oaiSetId = oaiSetComp.addText("oai_setid");
+        Text oaiSetId = settings.addItem().addText("oai_setid");
 	    oaiSetId.setSize(40);
         if(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null)
         {
@@ -208,13 +215,13 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 	
 	
 	    // Add an entry for each instance of ingestion crosswalks configured for harvesting 
-        String metaString = "harvester.oai.metadataformats.";
-        Enumeration pe = ConfigurationManager.propertyNames("oai");
+        String metaString = "oai.harvester.metadataformats.";
+        Enumeration pe = Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("oai"));
         while (pe.hasMoreElements())
         {
             String key = (String)pe.nextElement();
             if (key.startsWith(metaString)) {
-            	String metadataString = ConfigurationManager.getProperty("oai", key);
+            	String metadataString = (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key));
             	String metadataKey = key.substring(metaString.length());
             	String displayName;
 

@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>5.7-drum-0.1</version>
+      <version>6.2-drum-0</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -42,36 +42,19 @@
             </dependency>
          </dependencies>
       </profile>
-
-      <!--
-         Using xpdf filters requires the inclusion
-         Of Sun dependencies these are not redistributable
-         and you will need to install them locally in your
-         maven repository prior to building your dspace instance
-      -->
-      <profile>
-         <id>xpdf-mediafilter-support</id>
-         <activation>
-            <activeByDefault>false</activeByDefault>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>com.sun.media</groupId>
-               <artifactId>jai_imageio</artifactId>
-            </dependency>
-            <dependency>
-               <groupId>javax.media</groupId>
-               <artifactId>jai_core</artifactId>
-            </dependency>
-         </dependencies>
-      </profile>
-
    </profiles>
 
    <!--
    Runtime and Compile Time dependencies for DSpace.
    -->
    <dependencies>
+      <dependency>
+         <groupId>com.atmire</groupId>
+         <artifactId>atmire-statistics-exporter-api</artifactId>
+         <version>1.0.0</version>
+         <type>jar</type>
+      </dependency>
+
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api</artifactId>
@@ -97,15 +80,15 @@
          </exclusions>
       </dependency>
       <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-jspui</artifactId>
-         <type>jar</type>
-         <classifier>classes</classifier>
-      </dependency>
-      <dependency>
          <groupId>edu.umd.lib</groupId>
          <artifactId>lib-util</artifactId>
          <version>1.0</version>
+         <exclusions>
+            <exclusion>
+               <groupId>org.apache.poi</groupId>
+               <artifactId>poi-ooxml-schemas</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
       <dependency>
          <groupId>cas</groupId>
@@ -116,12 +99,6 @@
          <groupId>org.marc4j</groupId>
          <artifactId>marc4j</artifactId>
          <version>2.0</version>
-      </dependency>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>jsp-api</artifactId>
-         <version>2.0</version>
-         <scope>provided</scope>
       </dependency>
 
    </dependencies>

@@ -20,6 +20,8 @@ import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -32,15 +34,12 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.utils.DSpace;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -80,7 +79,10 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
 
     private static final Message T_subject = 
             message("xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.subject");
-    
+
+    protected RequestItemService requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -117,25 +119,24 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
 		Context context = ContextUtil.obtainContext(objectModel);
 
         String token = (String) request.getAttribute("token");
-        RequestItem requestItem = RequestItem.findByToken(context, token);
+        RequestItem requestItem = requestItemService.findByToken(context, token);
 
 		String title;
-		Item item = Item.find(context, requestItem.getItemID());
-		Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-		if (titleDC != null || titleDC.length > 0)
-			title = titleDC[0].value;
+		Item item = requestItem.getItem();
+		String titleDC = item.getName();
+		if (titleDC != null && titleDC.length() > 0)
+			title = titleDC;
 		else
 			title = "untitled";
 		
-		RequestItemAuthor author = new DSpace()
-				.getServiceManager()
+		RequestItemAuthor author = DSpaceServicesFactory.getInstance().getServiceManager()
 				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
 						RequestItemAuthorExtractor.class)
 				.getRequestItemAuthor(context, item);
 
 		Object[] args = new String[]{
 					requestItem.getReqName(), // User
-					HandleManager.getCanonicalForm(item.getHandle()), // URL
+                    handleService.getCanonicalForm(item.getHandle()), // URL
 					title, // request item title
 					author.getFullName(),
 					author.getEmail()

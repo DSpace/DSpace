@@ -7,138 +7,134 @@
  */
 package org.dspace.app.requestitem;
 
-import org.apache.log4j.Logger;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.core.ReloadableEntity;
 
-import java.sql.SQLException;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Object representing an Item Request
  */
-public class RequestItem {
-    private static Logger log = Logger.getLogger(RequestItem.class);
+@Entity
+@Table(name="requestitem")
+public class RequestItem implements ReloadableEntity<Integer> {
 
-    private int bitstreamId, itemID;
+
+    @Id
+    @Column(name="requestitem_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="requestitem_seq")
+    @SequenceGenerator(name="requestitem_seq", sequenceName="requestitem_seq", allocationSize = 1)
+    private int requestitem_id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bitstream_id")
+    private Bitstream bitstream;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    @Column(name = "request_email", length = 64)
     private String reqEmail;
+
+    @Column(name = "request_name", length = 64)
     private String reqName;
+
+//    @Column(name = "request_message")
+//    @Lob
+    @Column(name="request_message", columnDefinition = "text")
     private String reqMessage;
+
+    @Column(name = "token", unique = true, length = 48)
     private String token;
+
+    @Column(name = "allfiles")
     private boolean allfiles;
-    private Date decision_date;
-    private boolean accept_request;
 
-    public RequestItem(int itemID, int bitstreamId, String reqEmail, String reqName, String reqMessage, boolean allfiles){
-        this.itemID = itemID;
-        this.bitstreamId = bitstreamId;
-        this.reqEmail = reqEmail;
-        this.reqName = reqName;
-        this.reqMessage = reqMessage;
-        this.allfiles = allfiles;
-    }
+    @Column(name = "decision_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date decision_date = null;
 
-    private RequestItem(TableRow record) {
-        this.itemID = record.getIntColumn("item_id");
-        this.bitstreamId = record.getIntColumn("bitstream_id");
-        this.token = record.getStringColumn("token");
-        this.reqEmail = record.getStringColumn("request_email");
-        this.reqName = record.getStringColumn("request_name");
-        this.reqMessage = record.getStringColumn("request_message");
-        this.allfiles = record.getBooleanColumn("allfiles");
-        this.decision_date = record.getDateColumn("decision_date");
-        this.accept_request = record.getBooleanColumn("accept_request");
-    }
+    @Column(name = "expires")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date expires = null;
 
-    public static RequestItem findByToken(Context context, String token) {
-        try {
-            TableRow requestItem = DatabaseManager.findByUnique(context, "requestitem", "token", token);
-            return new RequestItem(requestItem);
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-            return null;
-        }
-    }
+    @Column(name = "request_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date request_date = null;
+
+    @Column(name = "accept_request")
+    private Boolean accept_request = null;
 
     /**
-     * Save updates to the record. Only accept_request, and decision_date are set-able.
-     * @param context
+     * Protected constructor, create object using:
+     * {@link org.dspace.app.requestitem.service.RequestItemService#createRequest(Context, Bitstream, Item, boolean, String, String, String)}
      */
-    public void update(Context context) {
-        try {
-            TableRow record = DatabaseManager.findByUnique(context, "requestitem", "token", token);
-
-            record.setColumn("accept_request", accept_request);
-            record.setColumn("decision_date", decision_date);
-
-            DatabaseManager.update(context, record);
-
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-        }
-
-    }
-
-    /**
-     * Generate a unique id of the request and put it into the DB
-     * @param context
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public String getNewToken(Context context) throws SQLException
+    protected RequestItem()
     {
-        TableRow record = DatabaseManager.create(context, "requestitem");
-        record.setColumn("token", Utils.generateHexKey());
-        record.setColumn("bitstream_id", bitstreamId);
-        record.setColumn("item_id", itemID);
-        record.setColumn("allfiles", allfiles);
-        record.setColumn("request_email", reqEmail);
-        record.setColumn("request_name", reqName);
-        record.setColumn("request_message", reqMessage);
-        record.setColumnNull("accept_request");
-        record.setColumn("request_date", new Date());
-        record.setColumnNull("decision_date");
-        record.setColumnNull("expires");
+    }
 
-        DatabaseManager.update(context, record);
+    public Integer getID() {
+        return requestitem_id;
+    }
 
-        if (log.isDebugEnabled())
-        {
-            log.debug("Created requestitem_token " + record.getIntColumn("requestitem_id")
-                    + " with token " + record.getStringColumn("token") +  "\"");
-        }
-        return record.getStringColumn("token");
-
+    void setAllfiles(boolean allfiles) {
+        this.allfiles = allfiles;
     }
 
     public boolean isAllfiles() {
         return allfiles;
     }
 
+    void setReqMessage(String reqMessage) {
+        this.reqMessage = reqMessage;
+    }
+
     public String getReqMessage() {
         return reqMessage;
+    }
+
+    void setReqName(String reqName) {
+        this.reqName = reqName;
     }
 
     public String getReqName() {
         return reqName;
     }
 
+    void setReqEmail(String reqEmail) {
+        this.reqEmail = reqEmail;
+    }
+
     public String getReqEmail() {
         return reqEmail;
+    }
+
+    void setToken(String token) {
+        this.token = token;
     }
 
     public String getToken() {
         return token;
     }
 
-    public int getItemID() {
-        return itemID;
+    void setItem(Item item) {
+        this.item = item;
     }
 
-    public int getBitstreamId() {
-        return bitstreamId;
+    public Item getItem() {
+        return item;
+    }
+
+    void setBitstream(Bitstream bitstream) {
+        this.bitstream = bitstream;
+    }
+
+    public Bitstream getBitstream() {
+        return bitstream;
     }
 
     public Date getDecision_date() {
@@ -155,5 +151,21 @@ public class RequestItem {
 
     public void setAccept_request(boolean accept_request) {
         this.accept_request = accept_request;
+    }
+
+    public Date getExpires() {
+        return expires;
+    }
+
+    void setExpires(Date expires) {
+        this.expires = expires;
+    }
+
+    public Date getRequest_date() {
+        return request_date;
+    }
+
+    void setRequest_date(Date request_date) {
+        this.request_date = request_date;
     }
 }

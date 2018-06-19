@@ -7,40 +7,29 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.CheckBox;
-import org.dspace.app.xmlui.wing.element.Composite;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.Params;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.app.xmlui.wing.element.TextArea;
-import org.dspace.app.xmlui.wing.element.Value;
-import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
+import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.content.*;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.authority.MetadataAuthorityManager;
-import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.UUID;
 
 /**
  * Display a list of all metadata available for this item and allow the user to
@@ -82,10 +71,16 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         private static final Message T_column4 = message("xmlui.administrative.item.EditItemMetadataForm.column4");
         private static final Message T_unlock = message("xmlui.authority.confidence.unlock.help");
 
+        protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+        protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+        protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+        protected ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+        protected MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+
         public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
-            Item item = Item.find(context, parameters.getParameterAsInteger("itemID", -1));
+            Item item = itemService.find(context, UUID.fromString(parameters.getParameter("itemID", null)));
             Collection owner = item.getOwningCollection();
-            int collectionID = (owner == null) ? -1 : owner.getID();
+            UUID collectionID = (owner == null) ? null : owner.getID();
 
             pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
             pageMeta.addMetadata("title").addContent(T_title);
@@ -112,10 +107,10 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         public void addBody(Body body) throws SQLException, WingException
         {
                 // Get our parameters and state
-                int itemID = parameters.getParameterAsInteger("itemID",-1);
-                Item item = Item.find(context, itemID);
-                Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-                Arrays.sort(values, new DCValueComparator());
+                UUID itemID = UUID.fromString(parameters.getParameter("itemID", null));
+                Item item = itemService.find(context, itemID);
+                java.util.List<MetadataValue> values = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+                Collections.sort(values, new DCValueComparator());
                 String baseURL = contextPath+"/admin/item?administrative-continue="+knot.getId();
 
                 Request request = ObjectModelHelper.getRequest(objectModel);
@@ -123,12 +118,12 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
 
         // Metadata editing is the only type of editing available for a template item.
         boolean editingTemplateItem = false;
-        int templateCollectionID = parameters.getParameterAsInteger("templateCollectionID",-1);
-        Collection templateCollection = templateCollectionID == -1 ? null : Collection.find(context, templateCollectionID);
+        String templateCollectionID = parameters.getParameter("templateCollectionID", null);
+        Collection templateCollection = StringUtils.isBlank(templateCollectionID) ? null : collectionService.find(context, UUID.fromString(templateCollectionID));
         if (templateCollection != null)
         {
             Item templateItem = templateCollection.getTemplateItem();
-            if (templateItem != null && templateItem.getID() == itemID)
+            if (templateItem != null && templateItem.getID().equals(itemID))
             {
                 editingTemplateItem = true;
             }
@@ -136,7 +131,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
 
         // DIVISION: main
         Division main = body.addInteractiveDivision("edit-item-status", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
-        if (editingTemplateItem)
+        if (templateCollection != null && editingTemplateItem)
         {
             main.setHead(T_template_head.parameterize(templateCollection.getName()));
         }
@@ -146,8 +141,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         }
 
         Collection owner = item.getOwningCollection();
-        int collectionID = (owner == null) ? -1 : owner.getID();
-                
+
         // LIST: options
         if (!editingTemplateItem)
         {
@@ -165,11 +159,11 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
 
                 Select addName = addForm.addItem().addSelect("field");
                 addName.setLabel(T_name_label);
-                MetadataField[] fields = MetadataField.findAll(context);
+                java.util.List<MetadataField> fields = metadataFieldService.findAll(context);
                 for (MetadataField field : fields)
                 {
-                        int fieldID = field.getFieldID();
-                        MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
+                        int fieldID = field.getID();
+                        MetadataSchema schema = field.getMetadataSchema();
                         String name = schema.getName() +"."+field.getElement();
                         if (field.getQualifier() != null)
                         {
@@ -220,14 +214,9 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 header.addCell().addContent(T_column3);
                 header.addCell().addContent(T_column4);
 
-                ChoiceAuthorityManager cmgr = ChoiceAuthorityManager.getManager();
-                for(Metadatum value : values)
+                for(MetadataValue value : values)
                 {
-                        String name = value.schema + "_" + value.element;
-                        if (value.qualifier != null)
-                        {
-                            name += "_" + value.qualifier;
-                        }
+                        String name = value.getMetadataField().toString('_');
 
                         Row row = table.addRow(name,Row.ROLE_DATA,"metadata-value");
 
@@ -241,18 +230,18 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
 
                         // value entry cell:
                         Cell mdCell = row.addCell();
-                        String fieldKey = MetadataAuthorityManager.makeFieldKey(value.schema, value.element, value.qualifier);
+                        String fieldKey = metadataAuthorityService.makeFieldKey(value.getMetadataField().getMetadataSchema().getName(), value.getMetadataField().getElement(), value.getMetadataField().getQualifier());
 
                         // put up just a selector when preferred choice presentation is select:
-                        if (cmgr.isChoicesConfigured(fieldKey) &&
-                            Params.PRESENTATION_SELECT.equals(cmgr.getPresentation(fieldKey)))
+                        if (choiceAuthorityService.isChoicesConfigured(fieldKey) &&
+                            Params.PRESENTATION_SELECT.equals(choiceAuthorityService.getPresentation(fieldKey)))
                         {
                             Select mdSelect = mdCell.addSelect("value_"+index);
                             mdSelect.setSize(1);
-                            Choices cs = cmgr.getMatches(fieldKey, value.value, collectionID, 0, 0, null);
+                            Choices cs = choiceAuthorityService.getMatches(fieldKey, value.getValue(), owner, 0, 0, null);
                             if (cs.defaultSelected < 0)
                             {
-                                mdSelect.addOption(true, value.value, value.value);
+                                mdSelect.addOption(true, value.getValue(), value.getValue());
                             }
                             for (int i = 0; i < cs.values.length; ++i)
                             {
@@ -263,31 +252,31 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                         {
                             TextArea mdValue = mdCell.addTextArea("value_"+index);
                         mdValue.setSize(4,35);
-                        mdValue.setValue(value.value);
-                            boolean isAuth = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
+                        mdValue.setValue(value.getValue());
+                            boolean isAuth = metadataAuthorityService.isAuthorityControlled(fieldKey);
                             if (isAuth)
                             {
                                 mdValue.setAuthorityControlled();
-                                mdValue.setAuthorityRequired(MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey));
-                                Value authValue =  mdValue.setAuthorityValue((value.authority == null)?"":value.authority, Choices.getConfidenceText(value.confidence));
+                                mdValue.setAuthorityRequired(metadataAuthorityService.isAuthorityRequired(fieldKey));
+                                Value authValue =  mdValue.setAuthorityValue((value.getAuthority() == null)?"":value.getAuthority(), Choices.getConfidenceText(value.getConfidence()));
                                 // add the "unlock" button to auth field
                                 Button unlock = authValue.addButton("authority_unlock_"+index,"ds-authority-lock");
                                 unlock.setHelp(T_unlock);
                             }
-                            if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey))
+                            if (choiceAuthorityService.isChoicesConfigured(fieldKey))
                             {
                                 mdValue.setChoices(fieldKey);
-                                if(Params.PRESENTATION_AUTHORLOOKUP.equals(cmgr.getPresentation(fieldKey))){
+                                if(Params.PRESENTATION_AUTHORLOOKUP.equals(choiceAuthorityService.getPresentation(fieldKey))){
                                     mdValue.setChoicesPresentation(Params.PRESENTATION_AUTHORLOOKUP);
                                 }else{
                                     mdValue.setChoicesPresentation(Params.PRESENTATION_LOOKUP);
                                 }
-                                mdValue.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
+                                mdValue.setChoicesClosed(choiceAuthorityService.isClosed(fieldKey));
                             }
                         }
                         Text mdLang = row.addCell().addText("language_"+index);
                         mdLang.setSize(6);
-                        mdLang.setValue(value.language);
+                        mdLang.setValue(value.getLanguage());
 
                         // Tick the index counter;
                         index++;
@@ -311,13 +300,15 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
          * Compare two metadata element's name so that they may be sorted.
          */
         static class DCValueComparator implements Comparator, Serializable {
-                public int compare(Object arg0, Object arg1) {
-                        final Metadatum o1 = (Metadatum)arg0;
-                        final Metadatum o2 = (Metadatum)arg1;
-                        final String s1 = o1.schema + o1.element + (o1.qualifier==null?"":("." + o1.qualifier));
-                        final  String s2 = o2.schema + o2.element + (o2.qualifier==null?"":("." + o2.qualifier));
-                        return s1.compareTo(s2);
-                }
+            public int compare(Object arg0, Object arg1) {
+          			final MetadataValue o1 = (MetadataValue)arg0;
+          			final MetadataValue o2 = (MetadataValue)arg1;
+          			MetadataField o1Field = o1.getMetadataField();
+          			MetadataField o2Field = o2.getMetadataField();
+          			final String s1 = o1Field.getMetadataSchema().getName() + o1Field.getElement() + (o1Field.getQualifier()==null?"":("." + o1Field.getQualifier()));
+          			final  String s2 = o2Field.getMetadataSchema().getName() + o2Field.getElement() + (o2Field.getQualifier()==null?"":("." + o2Field.getQualifier()));
+          			return s1.compareTo(s2);
+          		}
         }
 
 }

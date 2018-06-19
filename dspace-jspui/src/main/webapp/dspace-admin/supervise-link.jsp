@@ -22,19 +22,20 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group" %>
-<%@ page import="org.dspace.eperson.Supervisor" %>
+<%@ page import="org.dspace.eperson.SupervisorServiceImpl" %>
 <%@ page import="org.dspace.core.Utils" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
+<%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%
     // get objects from request
-    Group[] groups = (Group[]) request.getAttribute("groups");
-    WorkspaceItem[] workspaceItems = (WorkspaceItem[]) request.getAttribute("wsItems");
+    List<Group> groups = (List<Group>) request.getAttribute("groups");
+    List<WorkspaceItem> workspaceItems = (List<WorkspaceItem>) request.getAttribute("wsItems");
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
@@ -59,10 +60,10 @@
             <label class="input-group-addon"><fmt:message key="jsp.dspace-admin.supervise-link.group"/></label> 
             <select class="form-control" name="TargetGroup">
 <%
-    for (int i = 0; i < groups.length; i++)
+    for (int i = 0; i < groups.size(); i++)
     {
 %>
-                <option value="<%= groups[i].getID() %>"><%= groups[i].getName() %></option>
+                <option value="<%= groups.get(i).getID() %>"><%= groups.get(i).getName() %></option>
 <%
     }
 %>
@@ -73,9 +74,9 @@
 
             <label class="input-group-addon"><fmt:message key="jsp.dspace-admin.supervise-link.policy"/></label>
             <select class="form-control" name="PolicyType">
-                <option value="<%= Supervisor.POLICY_NONE %>" selected="selected"><fmt:message key="jsp.dspace-admin.supervise-link.policynone"/></option>
-                <option value="<%= Supervisor.POLICY_EDITOR %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyeditor"/></option>
-                <option value="<%= Supervisor.POLICY_OBSERVER %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyobserver"/></option>
+                <option value="<%= SupervisorServiceImpl.POLICY_NONE %>" selected="selected"><fmt:message key="jsp.dspace-admin.supervise-link.policynone"/></option>
+                <option value="<%= SupervisorServiceImpl.POLICY_EDITOR %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyeditor"/></option>
+                <option value="<%= SupervisorServiceImpl.POLICY_OBSERVER %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyobserver"/></option>
             </select>
 </div>
 <%-- Select the workspace item to be supervised --%>
@@ -94,26 +95,26 @@
 <%
     String row = "even";
 
-    for (int i = 0; i < workspaceItems.length; i++)
+    for (int i = 0; i < workspaceItems.size(); i++)
     {
         // get title (or "untitled" if none) and submitter of workspace item
-        Metadatum[] titleArray = workspaceItems[i].getItem().getDC("title", null, Item.ANY);
+        String title = workspaceItems.get(i).getItem().getName();
 //        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
-        EPerson submitter = workspaceItems[i].getItem().getSubmitter();
+        EPerson submitter = workspaceItems.get(i).getItem().getSubmitter();
 %>
                 <tr>
                     <td class="<%= row %>RowOddCol">
-                        <%= workspaceItems[i].getID() %>
+                        <%= workspaceItems.get(i).getID() %>
                     </td>
                     <td class="<%= row %>RowEvenCol">
                         <a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a>
                     </td>
                     <td class="<%= row %>RowOddCol">
 <%
-					if (titleArray.length > 0)
+					if (StringUtils.isNotBlank(title))
 					{
 %>
-						<%= titleArray[0].value %>
+						<%= title %>
 <%
 					}
 					else
@@ -125,10 +126,10 @@
 %>
                     </td>
                     <td class="<%= row %>RowEvenCol">
-                        <%= workspaceItems[i].getCollection().getMetadata("name") %>
+                        <%= workspaceItems.get(i).getCollection().getName() %>
                     </td>
                     <td class="<%= row %>RowOddCol" align="center">
-                        <input type="radio" name="TargetWSItem" value="<%= workspaceItems[i].getID() %>"/>
+                        <input type="radio" name="TargetWSItem" value="<%= workspaceItems.get(i).getID() %>"/>
                     </td>
                 </tr>
 <%

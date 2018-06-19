@@ -7,6 +7,12 @@
  */
 package org.dspace.checker;
 
+import org.dspace.checker.factory.CheckerServiceFactory;
+import org.dspace.checker.service.MostRecentChecksumService;
+import org.dspace.content.Bitstream;
+import org.dspace.core.Context;
+
+import java.sql.SQLException;
 import java.util.Date;
 
 /**
@@ -24,30 +30,34 @@ public class SimpleDispatcher implements BitstreamDispatcher
     /**
      * Should this dispatcher keep on dispatching around the collection?
      */
-    private boolean loopContinuously = false;
+    protected boolean loopContinuously = false;
 
     /**
      * Date this dispatcher started dispatching.
      */
-    private Date processStartTime = null;
+    protected Date processStartTime = null;
 
     /**
      * Access for bitstream information
      */
-    private BitstreamInfoDAO bitstreamInfoDAO;
+    protected MostRecentChecksumService checksumService;
+
+    protected Context context;
 
     /**
      * Creates a new SimpleDispatcher.
      * 
+     * @param context Context
      * @param startTime
      *            timestamp for beginning of checker process
      * @param looping
      *            indicates whether checker should loop infinitely through
      *            most_recent_checksum table
      */
-    public SimpleDispatcher(BitstreamInfoDAO bitstreamInfoDAO, Date startTime, boolean looping)
+    public SimpleDispatcher(Context context, Date startTime, boolean looping)
     {
-        this.bitstreamInfoDAO = bitstreamInfoDAO;
+        checksumService = CheckerServiceFactory.getInstance().getMostRecentChecksumService();
+        this.context = context;
         this.processStartTime = (startTime == null ? null : new Date(startTime.getTime()));
         this.loopContinuously = looping;
     }
@@ -62,20 +72,32 @@ public class SimpleDispatcher implements BitstreamDispatcher
     /**
      * Selects the next candidate bitstream.
      * 
+     * @throws SQLException if database error
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
-    public synchronized int next()
-    {
+    @Override
+    public synchronized Bitstream next() throws SQLException {
         // should process loop infinitely through the
         // bitstreams in most_recent_checksum table?
         if (!loopContinuously && (processStartTime != null))
         {
-            return bitstreamInfoDAO.getOldestBitstream(new java.sql.Timestamp(
-                    processStartTime.getTime()));
+            MostRecentChecksum oldestRecord = checksumService.findOldestRecord(context, processStartTime);
+            if(oldestRecord != null)
+            {
+                return oldestRecord.getBitstream();
+            }else{
+                return null;
+            }
         }
         else
         {
-            return bitstreamInfoDAO.getOldestBitstream();
+            MostRecentChecksum oldestRecord = checksumService.findOldestRecord(context);
+            if(oldestRecord != null)
+            {
+                return oldestRecord.getBitstream();
+            }else{
+                return null;
+            }
         }
 
     }

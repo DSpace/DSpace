@@ -42,15 +42,34 @@
 <%@ page import="org.dspace.eperson.Group"            %>
 
 <%
-    Group      [] groups     = (Group      []) request.getAttribute("groups"     );
-    Collection [] collections= (Collection []) request.getAttribute("collections");
+    List<Group>      groups     = (List<Group>)      request.getAttribute("groups"     );
+    List<Collection> collections= (List<Collection>) request.getAttribute("collections");
     request.setAttribute("LanguageSwitch", "hide");
+    
+    // Is the logged in user an admin or community admin or collection admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
+    
+    Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
+    boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
+    
+    Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
+    boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
+    
+    String naviAdmin = "admin";
+    String link = "/dspace-admin";
+    
+    if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+    {
+        naviAdmin = "community-or-collection-admin";
+        link = "/tools";
+    }
 %>
 
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.authorize-advanced.advanced"
-               navbar="admin"
+               navbar="<%= naviAdmin %>"
                locbar="link"
-               parentlink="/dspace-admin"
+               parentlink="<%= link %>"
                parenttitlekey="jsp.administer">
 
 <h1><fmt:message key="jsp.dspace-admin.authorize-advanced.advanced"/>
@@ -70,8 +89,8 @@
             <span class="col-md-2"><label for="tcollection"><fmt:message key="jsp.dspace-admin.authorize-advanced.col"/></label></span>
             <span class="col-md-10">
                 <select class="form-control" size="10" name="collection_id" id="tcollection">
-                    <%  for(int i = 0; i < collections.length; i++ ) { %>
-                            <option value="<%= collections[i].getID() %>"> <%= collections[i].getMetadata("name")%>
+                    <%  for(int i = 0; i < collections.size(); i++ ) { %>
+                            <option value="<%= collections.get(i).getID() %>"> <%= collections.get(i).getName()%>
                             </option>
                         <%  } %>
                 </select>
@@ -94,8 +113,8 @@
 			</span>
             <span class="col-md-10">
             	<select class="form-control" size="10" name="group_id" id="tgroup_id">
-                    <%  for(int i = 0; i < groups.length; i++ ) { %>
-                            <option value="<%= groups[i].getID() %>"> <%= groups[i].getName()%>
+                    <%  for(int i = 0; i < groups.size(); i++ ) { %>
+                            <option value="<%= groups.get(i).getID() %>"> <%= groups.get(i).getName()%>
                             </option>
                         <%  } %>
                 </select>

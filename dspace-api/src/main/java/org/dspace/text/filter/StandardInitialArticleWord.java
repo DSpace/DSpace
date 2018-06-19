@@ -18,6 +18,7 @@ public class StandardInitialArticleWord extends InitialArticleWord
 {
     private static final String[] articleWords = { "the", "an", "a" };
 
+    @Override
     protected String[] getArticleWords(String lang)
     {
         if (lang != null && lang.startsWith("en"))

@@ -10,8 +10,8 @@ package org.dspace.xmlworkflow.state.actions.processingaction;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.xmlworkflow.WorkflowException;
-import org.dspace.xmlworkflow.WorkflowRequirementsManager;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -43,8 +43,8 @@ public class ScoreReviewAction extends ProcessingAction{
         if(request.getParameter("submit_score") != null){
             int score = Util.getIntParameter(request, "score");
             //Add our score to the metadata
-            wfi.getItem().addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "score", null, null, String.valueOf(score));
-            wfi.getItem().update();
+            itemService.addMetadata(c, wfi.getItem(), WorkflowRequirementsService.WORKFLOW_SCHEMA, "score", null, null, String.valueOf(score));
+            itemService.update(c, wfi.getItem());
 
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
         }else{

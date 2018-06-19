@@ -46,11 +46,21 @@ public class AuthorizeException extends Exception
         myobject = null;
     }
 
+    public AuthorizeException(Throwable throwable)
+    {
+        super(throwable);
+
+        myaction = -1;
+        myobject = null;
+    }
+
     /**
      * Create an authorize exception with a message
      * 
      * @param message
      *            the message
+     * @param o object
+     * @param a actionID
      */
     public AuthorizeException(String message, DSpaceObject o, int a)
     {

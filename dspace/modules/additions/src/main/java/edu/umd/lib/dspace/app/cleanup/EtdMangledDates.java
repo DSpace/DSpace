@@ -6,52 +6,26 @@
 package edu.umd.lib.dspace.app.cleanup;
 
 import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.Map;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.Vector;
-import java.util.HashSet;
-import java.util.TreeMap;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 import java.text.SimpleDateFormat;
 
 // IO
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.File;
-import java.io.FilenameFilter;
-import java.io.FileOutputStream;
 import java.io.FileInputStream;
-import java.io.Writer;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
 import java.io.StringWriter;
 
 // XML
-import org.dom4j.Attribute;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
-import org.dom4j.ElementHandler;
-import org.dom4j.ElementPath;
 import org.dom4j.InvalidXPathException;
-import org.dom4j.Namespace;
-import org.dom4j.Node;
-import org.dom4j.QName;
-import org.dom4j.Text;
 import org.dom4j.XPath;
 
 import org.dom4j.io.SAXReader;
@@ -63,50 +37,28 @@ import org.dom4j.io.XMLWriter;
 import org.xml.sax.InputSource;
 
 // XSL
-import javax.xml.transform.dom.DOMSource;  
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 
-import javax.xml.transform.stream.StreamSource; 
-import javax.xml.transform.stream.StreamResult; 
-
-// XPath
-import org.jaxen.Function;
-import org.jaxen.FunctionCallException;
-import org.jaxen.FunctionContext;
-import org.jaxen.Navigator;
-import org.jaxen.SimpleFunctionContext;
-import org.jaxen.XPathFunctionContext;
+import javax.xml.transform.stream.StreamSource;
 
 // Log4J
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
 // DSpace
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Email;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
-
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-
-import org.dspace.handle.HandleManager;
-
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 // Lims
 import edu.umd.lims.util.ErrorHandling;
@@ -141,6 +93,11 @@ public class EtdMangledDates
 
   static SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 
+  private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+  protected final static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();;
+
+  protected final static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
   /***************************************************************** main */
   /**
@@ -151,7 +108,7 @@ public class EtdMangledDates
   {
 
     Context context = new Context();
-    context.setIgnoreAuthorization(true);
+    context.ignoreAuthorization();
 
     try {
 
@@ -161,7 +118,7 @@ public class EtdMangledDates
       String strInDir      = props.getProperty("indir", null);
 
       // dspace dir
-      String strDspace     = ConfigurationManager.getProperty("dspace.dir");
+      String strDspace     = configurationService.getProperty("dspace.dir");
 
       // logging (log4j.defaultInitOverride needs to be set or
       // config/log4j.properties will be read and used additionally)
@@ -177,58 +134,57 @@ public class EtdMangledDates
       // Process each infile entry
       String strLine = null;
       while ((strLine = infile.readLine()) != null) {
-	StringTokenizer st = new StringTokenizer(strLine, "\t");
-	String strItem = st.nextToken();
-	String strHandle= st.nextToken();
+        StringTokenizer st = new StringTokenizer(strLine, "\t");
+        String strItem = st.nextToken();
+        String strHandle= st.nextToken();
 
-	log.info("\nItem: " + strItem + ", "
-		 + "Handle: " + strHandle);
+        log.info("\nItem: " + strItem + ", "
+          + "Handle: " + strHandle);
 
-	strHandle = strHandle.substring(22);
+        strHandle = strHandle.substring(22);
 
-	// get the metadata
-	String strMeta = 
-	  strInDir + "/" + strItem + "/"
-	  + "umi-umd-" + strItem + ".xml"
-	  ;
-	FileInputStream isMeta = new FileInputStream(strMeta);
+        // get the metadata
+        String strMeta = 
+          strInDir + "/" + strItem + "/"
+          + "umi-umd-" + strItem + ".xml"
+          ;
+        FileInputStream isMeta = new FileInputStream(strMeta);
 
-	Document meta = reader.read(new InputSource(isMeta));
+        Document meta = reader.read(new InputSource(isMeta));
 
-	// get the issue date
-	DocumentSource source = new DocumentSource(meta);
-	DocumentResult result = new DocumentResult();
+        // get the issue date
+        DocumentSource source = new DocumentSource(meta);
+        DocumentResult result = new DocumentResult();
 
-	tDC.transform(source, result);
+        tDC.transform(source, result);
 
-	Document dc = result.getDocument();
+        Document dc = result.getDocument();
 
-	String strNewDate = getXPath("/dublin_core/dcvalue[@element='date' and @qualifier='issued']").selectSingleNode(dc).getText();
-	  
-	log.info("  issue date from meta: " + strNewDate);
+        String strNewDate = getXPath("/dublin_core/dcvalue[@element='date' and @qualifier='issued']").selectSingleNode(dc).getText();
+          
+        log.info("  issue date from meta: " + strNewDate);
 
-	// get the item
-	Item item = (Item)HandleManager.resolveToObject(context, strHandle);
+        // get the item
+        Item item = (Item)handleService.resolveToObject(context, strHandle);
 
-	Metadatum dcval[] = item.getDC("title", null, Item.ANY);
-	log.info("  title: " + dcval[0].value);
+        String title = itemService.getMetadataFirstValue(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        log.info("  title: " + title);
 
-	lRead++;
+        lRead++;
 
-	// get the existing issue date
-	dcval = item.getDC("date", "issued", Item.ANY);
-	String strOldDate = dcval[0].value;
-	log.info("  issue date in db: " + strOldDate);
+        // get the existing issue date
+        
+        String strOldDate = itemService.getMetadataFirstValue(item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+        log.info("  issue date in db: " + strOldDate);
 
-	if (! strNewDate.equals(strOldDate)) {
-	  // update needed
-	  item.clearDC("date", "issued", Item.ANY);
-	  item.addDC("date", "issued", null, new String[] {strNewDate});
+        if (! strNewDate.equals(strOldDate)) {
+          // update needed
+          itemService.clearMetadata(context,item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY);
+          itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "date", "issued", Item.ANY, Arrays.asList(strNewDate));
+          itemService.update(context, item);
 
-	  item.update();
-
-	  lWritten++;
-	}
+          lWritten++;
+        }
       }
 
       context.commit();
@@ -241,7 +197,7 @@ public class EtdMangledDates
 
     finally {
       if (context != null) {
-	try { context.complete(); } catch (Exception e) {}
+	      try { context.complete(); } catch (Exception e) {}
       }
 
       log.info("=====================================\n" +
@@ -288,14 +244,14 @@ public class EtdMangledDates
     sb.append("Item loaded: " + strHandle + "\n");
 
     // Title
-    Metadatum dc[] = item.getDC("title", null, Item.ANY);
-    sb.append("  Title: " + dc[0].value + "\n");
+    String title = itemService.getMetadataFirstValue(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+	  sb.append("  Title: " + title + "\n");
 
     // Collections
-    sb.append("  Collection: " + etdcollection.getMetadata("name") + "\n");
+    sb.append("  Collection: " + etdcollection.getName() + "\n");
     for (Iterator ic = sCollections.iterator(); ic.hasNext(); ) {
       Collection coll = (Collection)ic.next();
-      sb.append("  Collection: " + coll.getMetadata("name") + "\n");
+      sb.append("  Collection: " + coll.getName() + "\n");
     }
 
     log.info(sb.toString());

@@ -24,13 +24,13 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.core.PluginManager;
+import org.dspace.core.Context;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
-
 
 /**
  * This is the abstract adapter containing all the common elements between
@@ -38,24 +38,26 @@ import org.xml.sax.helpers.NamespaceSupport;
  * translate a given type of DSpace object into a METS document for rendering
  * into the DRI document.
  * 
- * This class provides the chassis for those unique parts of the document to be
+ * <p>This class provides the chassis for those unique parts of the document to be
  * built upon. There are seven rendering methods that may be overridden for each
- * section of the METS document.
- * 
- * Header
- * Descriptive Section
- * Administrative Section
- * File Section
- * Structure Map
- * Structural Link
- * Behavioral Section
- * 
+ * section of the METS document:
+ *
+ * <ul>
+ * <li>Header</li>
+ * <li>Descriptive Section</li>
+ * <li>Administrative Section</li>
+ * <li>File Section</li>
+ * <li>Structure Map</li>
+ * <li>Structural Link</li>
+ * <li>Behavioral Section</li>
+ * </ul>
+ *
  * @author Scott Phillips
  */
 
 public abstract class AbstractAdapter
 {
-    /** Namespace declaration for METS & XLINK */
+    /** Namespace declaration for METS and XLINK */
     public static final String METS_URI = "http://www.loc.gov/METS/";
     public static final Namespace METS = new Namespace(METS_URI);
     public static final String XLINK_URI = "http://www.w3.org/TR/xlink/";
@@ -97,11 +99,11 @@ public abstract class AbstractAdapter
     }
 
     /** The variables that dictate what part of the METS document to render */
-    List<String> sections = new ArrayList<String>();
-    List<String> dmdTypes = new ArrayList<String>();
-    Map<String,List> amdTypes = new HashMap<String,List>();
-    List<String> fileGrpTypes = new ArrayList<String>();
-    List<String> structTypes = new ArrayList<String>();
+    List<String> sections = new ArrayList<>();
+    List<String> dmdTypes = new ArrayList<>();
+    Map<String,List> amdTypes = new HashMap<>();
+    List<String> fileGrpTypes = new ArrayList<>();
+    List<String> structTypes = new ArrayList<>();
     
     /**
      * A comma-separated list of METS sections to render. If no value 
@@ -145,8 +147,8 @@ public abstract class AbstractAdapter
      * Store information about what will be rendered in the METS administrative
      * metadata section.  HashMap format: keys = amdSec, value = List of mdTypes
      *
-     * @param amdSec Section of <amdSec> where this administrative metadata
-     *                will be rendered
+     * @param amdSec Section of {@code <amdSec>} where this administrative metadata
+     *                will be rendered.
      * @param mdTypes Comma-separated list of METS metadata types.
      */
     public final void setAmdTypes(String amdSec, String mdTypes)
@@ -156,7 +158,7 @@ public abstract class AbstractAdapter
             return;
         }
 
-        List<String> mdTypeList = new ArrayList<String>();
+        List<String> mdTypeList = new ArrayList<>();
     	for (String mdType : mdTypes.split(","))
     	{
     		mdTypeList.add(mdType);
@@ -265,7 +267,8 @@ public abstract class AbstractAdapter
     
     
     /**
-     * @return the URL for this item in the interface
+     * @return the URL for this item in the interface.
+     * @throws org.dspace.app.xmlui.wing.WingException on error.
      */
     protected abstract String getMETSOBJID() throws WingException;
 
@@ -276,24 +279,36 @@ public abstract class AbstractAdapter
 
     /**
      * @return the METS ID of the mets document.
+     * @throws org.dspace.app.xmlui.wing.WingException on error.
      */
     protected abstract String getMETSID() throws WingException;
 
     /**
      * @return The Profile this METS document conforms to.
+     * @throws org.dspace.app.xmlui.wing.WingException on error.
      */
     protected abstract String getMETSProfile() throws WingException;
 
     /**
      * @return The label of this METS document.
+     * @throws org.dspace.app.xmlui.wing.WingException on error.
      */
     protected abstract String getMETSLabel() throws WingException;
 
     
 	/**
 	 * Render the complete METS document.
+     * @param context session context.
+     * @param contentHandler XML content handler.
+     * @param lexicalHandler XML lexical handler.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.content.crosswalk.CrosswalkException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
 	 */
-    public final void renderMETS(ContentHandler contentHandler, LexicalHandler lexicalHandler) throws WingException, SAXException, CrosswalkException, IOException, SQLException 
+    public final void renderMETS(Context context, ContentHandler contentHandler, LexicalHandler lexicalHandler)
+            throws WingException, SAXException, CrosswalkException, IOException, SQLException
     {
     		this.contentHandler = contentHandler;
     		this.lexicalHandler = lexicalHandler;
@@ -332,7 +347,7 @@ public abstract class AbstractAdapter
     		startElement(METS,"METS",attributes);
 
     		// If the user requested no specific sections then render them all.
-    		boolean all = (sections.size() == 0);
+    		boolean all = (sections.isEmpty());
     		
     		if (all || sections.contains("metsHdr"))
             {
@@ -348,7 +363,7 @@ public abstract class AbstractAdapter
             }
     		if (all || sections.contains("fileSec"))
             {
-                renderFileSection();
+                renderFileSection(context);
             }
     		if (all || sections.contains("structMap"))
             {
@@ -377,13 +392,13 @@ public abstract class AbstractAdapter
 
     }
 	
-    /**
+    /*
      * Each of the METS sections
      */
 	protected void renderHeader() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderDescriptiveSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderAdministrativeSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
-	protected void renderFileSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
+	protected void renderFileSection(Context context) throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderStructureMap() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderStructuralLink() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderBehavioralSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
@@ -394,6 +409,8 @@ public abstract class AbstractAdapter
     /**
      * Generate a METS file element for a given bitstream.
      *
+     * @param context
+     *            Session context.
      * @param item
      *            If the bitstream is associated with an item provide the item
      *            otherwise leave null.
@@ -404,15 +421,20 @@ public abstract class AbstractAdapter
      * @param groupID
      *            The group id for this file, if it is derived from another file
      *            then they should share the same groupID.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws java.sql.SQLException passed through.
      */
-	protected final void renderFile(Item item, Bitstream bitstream, String fileID, String groupID) throws SAXException
-	{
-       renderFile(item, bitstream, fileID, groupID, null);
+	protected final void renderFile(Context context, Item item, Bitstream bitstream, String fileID, String groupID)
+            throws SAXException, SQLException
+    {
+       renderFile(context, item, bitstream, fileID, groupID, null);
     }
 
 	/**
      * Generate a METS file element for a given bitstream.
-     * 
+     *
+     * @param context
+     *            session context.
      * @param item
      *            If the bitstream is associated with an item, provide the item,
      *            otherwise leave null.
@@ -426,14 +448,18 @@ public abstract class AbstractAdapter
      * @param admID
      *            The IDs of the administrative metadata sections which pertain
      *            to this file
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws java.sql.SQLException passed through.
      */
-	protected final void renderFile(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException
-	{
+	protected final void renderFile(Context context, Item item,
+            Bitstream bitstream, String fileID, String groupID, String admID)
+            throws SAXException, SQLException
+    {
 		AttributeMap attributes;
 		
 		// //////////////////////////////
     	// Determine the file attributes
-        BitstreamFormat format = bitstream.getFormat();
+        BitstreamFormat format = bitstream.getFormat(context);
         String mimeType = null;
         if (format != null)
         {
@@ -555,13 +581,17 @@ public abstract class AbstractAdapter
     /**
      * Return a dissemination crosswalk for the given name.
      * 
-     * @param crosswalkName
-     * @return The crosswalk or throw an exception if not found.
+     * @param crosswalkName name of crosswalk plugin to be looked up.
+     * @return The crosswalk.
+     * @throws org.dspace.app.xmlui.wing.WingException if crosswalk not found.
      */
     public final DisseminationCrosswalk getDisseminationCrosswalk(String crosswalkName) throws WingException 
     {
     	// FIXME add some caching here
-    	DisseminationCrosswalk crosswalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, crosswalkName);
+    	DisseminationCrosswalk crosswalk
+                = (DisseminationCrosswalk) CoreServiceFactory.getInstance()
+                        .getPluginService()
+                        .getNamedPlugin(DisseminationCrosswalk.class, crosswalkName);
 
 	    if (crosswalk == null)
         {
@@ -620,6 +650,7 @@ public abstract class AbstractAdapter
      *            (Required) The local name of this element.
      * @param attributes
      *            (May be null) Attributes for this element
+     * @throws org.xml.sax.SAXException passed through.
      */
     protected final void startElement(Namespace namespace, String name,
             AttributeMap... attributes) throws SAXException
@@ -634,6 +665,7 @@ public abstract class AbstractAdapter
      * 
      * @param characters
      *            (May be null) Characters to send.
+     * @throws org.xml.sax.SAXException passed through.
      */
     protected final void sendCharacters(String characters) throws SAXException
     {
@@ -651,6 +683,7 @@ public abstract class AbstractAdapter
      *            (Required) The namespace of this element.
      * @param name
      *            (Required) The local name of this element.
+     * @throws org.xml.sax.SAXException passed through.
      */
     protected final void endElement(Namespace namespace, String name)
             throws SAXException

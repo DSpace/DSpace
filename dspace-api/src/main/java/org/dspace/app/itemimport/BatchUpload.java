@@ -7,9 +7,7 @@
  */
 package org.dspace.app.itemimport;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -19,7 +17,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * @author kstamatis
@@ -37,7 +34,8 @@ public class BatchUpload {
 	private String errorMsgHTML = "";
 	
 	/**
-	 * 
+         * Initialize with directory
+	 * @param dirPath directory path
 	 */
 	public BatchUpload(String dirPath) {
 		
@@ -45,13 +43,20 @@ public class BatchUpload {
 		
 	}
 
+        /**
+         * Initialize with directory
+         * @param dir directory path
+         */
 	public BatchUpload(File dir) {
 		
 		this.initializeWithFile(dir);
 		
 	}
 
-
+        /**
+         * Initialize with directory
+         * @param dir directory path
+         */
 	private void initializeWithFile(File dir){
 		
 		this.dir = dir;
@@ -89,6 +94,12 @@ public class BatchUpload {
 		}
 	}
 	
+        /**
+         * Count lines in file
+         * @param filename file name
+         * @return lines in file
+         * @throws IOException if IO error
+         */
 	private int countLines(String filename) throws IOException {
 	    LineNumberReader reader  = new LineNumberReader(new FileReader(filename));
 	    int cnt = 0;
@@ -106,6 +117,11 @@ public class BatchUpload {
 	    return cnt;
 	}
 	
+        /**
+         * Read a file
+         * @param filename file name
+         * @throws IOException if IO error
+         */
 	private void readFile(String filename) throws IOException {
 	    LineNumberReader reader  = new LineNumberReader(new FileReader(filename));
 	    String lineRead = "";
@@ -125,40 +141,76 @@ public class BatchUpload {
 	    reader.close();
 	}
 
+        /**
+         * Get date
+         * @return Date
+         */
 	public Date getDate() {
 		return date;
 	}
 
+        /**
+         * Get path to directory
+         * @return directory
+         */
 	public File getDir() {
 		return dir;
 	}
 
+        /**
+         * Whether successulf
+         * @return true or false
+         */
 	public boolean isSuccessful() {
 		return successful;
 	}
 
+        /**
+         * Get items imported
+         * @return number of items
+         */
 	public int getItemsImported() {
 		return itemsImported;
 	}
 
+        /**
+         * Get total items
+         * @return total
+         */
 	public int getTotalItems() {
 		return totalItems;
 	}
 	
+        /**
+         * Get formatted date (DD/MM/YY)
+         * @return date as string
+         */
 	public String getDateFormatted(){
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy - HH:mm");
 		
 		return df.format(date);
 	}
 
+        /**
+         * Get handles of imported files
+         * @return list of handles
+         */
 	public List<String> getHandlesImported() {
 		return handlesImported;
 	}
 
+        /**
+         * Get error message
+         * @return error message
+         */
 	public String getErrorMsg() {
 		return errorMsg;
 	}
 
+        /**
+         * Get error message as HTML
+         * @return error message string as HTML
+         */
 	public String getErrorMsgHTML() {
 		return errorMsgHTML;
 	}

@@ -16,7 +16,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 /**
  * Schema for DSpace Metadata RDF Mappings.
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
- * @see http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0
+ * @see <a href="http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0">http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0</a>
  */
 public class DMRM {
     /** <p>The RDF model that holds the vocabulary terms</p> */
@@ -68,7 +68,7 @@ public class DMRM {
     /** <p>The object of a DSpace metadata RDF mapping result.</p> */
     public static final Property object = m_model.createProperty( NS + "object" );
     
-    /** <p>The name of the metadata to convert (g.e. dc.title).</p> */
+    /** <p>The name of the metadata to convert (e.g. dc.title).</p> */
     public static final Property metadataName = m_model.createProperty( NS + "metadataName" );
     
     /** <p>A regex that the metadata value has to fulfill if the mapping should become active.</p> */

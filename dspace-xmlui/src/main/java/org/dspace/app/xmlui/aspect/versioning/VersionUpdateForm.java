@@ -12,8 +12,8 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.Item;
-import org.dspace.utils.DSpace;
-import org.dspace.versioning.VersioningService;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersioningService;
 
 import java.sql.SQLException;
 
@@ -39,6 +39,7 @@ public class VersionUpdateForm extends AbstractDSpaceTransformer {
 	private static final Message T_submit_update_version= message("xmlui.aspect.versioning.VersionUpdateForm.submit_update_version");
     private static final Message T_summary = message("xmlui.aspect.versioning.VersionUpdateForm.summary");
 
+    protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException {
 		pageMeta.addMetadata("title").addContent(T_title);
@@ -73,8 +74,8 @@ public class VersionUpdateForm extends AbstractDSpaceTransformer {
 	}
 
 
-    private org.dspace.versioning.Version getVersion(int versionID){
-        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+    private org.dspace.versioning.Version getVersion(int versionID) throws SQLException
+    {
         return versioningService.getVersion(context, versionID);
     }
 }

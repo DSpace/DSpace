@@ -8,6 +8,8 @@
 package org.dspace.app.itemupdate;
 
 import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 
@@ -18,7 +20,7 @@ import org.dspace.content.Bundle;
  */
 public class OriginalWithDerivativesBitstreamFilter extends BitstreamFilter 
 {
-	private String[] bundlesToEmpty = { "ORIGINAL", "TEXT", "THUMBNAIL" };	
+    protected String[] bundlesToEmpty = { "ORIGINAL", "TEXT", "THUMBNAIL" };
 	
 	public OriginalWithDerivativesBitstreamFilter()
 	{
@@ -28,19 +30,20 @@ public class OriginalWithDerivativesBitstreamFilter extends BitstreamFilter
 	/**
 	 * 	Tests bitstream for membership in specified bundles (ORIGINAL, TEXT, THUMBNAIL)
 	 * 
-	 * @param bitstream
-	 * @throws BitstreamFilterException
+	 * @param bitstream Bitstream
+	 * @throws BitstreamFilterException if error
 	 * @return true if bitstream is in specified bundles
 	 */
-	public boolean accept(Bitstream bitstream) 
+	@Override
+    public boolean accept(Bitstream bitstream)
 	throws BitstreamFilterException
 	{		
 		try
 		{
-			Bundle[] bundles = bitstream.getBundles();
+			List<Bundle> bundles = bitstream.getBundles();
 			for (Bundle b : bundles)
 			{
-				for (String bn : bundlesToEmpty)
+                for (String bn : bundlesToEmpty)
 				{
 					if (b.getName().equals(bn))
 					{

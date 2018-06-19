@@ -9,9 +9,6 @@ package org.dspace.app.xmlui.cocoon;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.SocketException;
-import java.net.URL;
-import java.net.URLConnection;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -26,8 +23,9 @@ import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.harvest.OAIHarvester;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestSchedulingService;
 
 /**
  * This is a wrapper servlet around the cocoon servlet that performs two functions, 1) it 
@@ -41,126 +39,14 @@ public class DSpaceCocoonServletFilter implements Filter
     private static final Logger LOG = Logger.getLogger(DSpaceCocoonServletFilter.class);
 	
 	private static final long serialVersionUID = 1L;
-	
-	
-    /**
-     * The DSpace config paramater, this is where the path to the DSpace
-     * configuration file can be obtained
-     */
-    public static final String DSPACE_CONFIG_PARAMETER = "dspace-config";
-	
-    /**
-     * This method holds code to be removed in the next version 
-     * of the DSpace XMLUI, it is now managed by a Shared Context 
-     * Listener in the dspace-api project. 
-     * 
-     * It is deprecated, rather than removed to maintain backward 
-     * compatibility for local DSpace 1.5.x customized overlays.
-     * 
-     * TODO: Remove in trunk
-     *
-     * @deprecated Use Servlet Context Listener provided 
-     * in dspace-api (remove in > 1.5.x)
-     * @throws ServletException
-     */
-    private void initDSpace(FilterConfig arg0) throws ServletException
-    {
-        // On Windows, URL caches can cause problems, particularly with undeployment
-        // So, here we attempt to disable them if we detect that we are running on Windows
-        try
-        {
-            String osName = System.getProperty("os.name");
-            if (osName != null)
-            {
-                osName = osName.toLowerCase();
-            }
 
-            if (osName != null && osName.contains("windows"))
-            {
-                URL url = new URL("http://localhost/");
-                URLConnection urlConn = url.openConnection();
-                urlConn.setDefaultUseCaches(false);
-            }
-        }
-        // Any errors thrown in disabling the caches aren't significant to
-        // the normal execution of the application, so we ignore them
-        catch (RuntimeException e)
-        {
-            LOG.error(e.getMessage(), e);
-        }
-        catch (Exception e)
-        {
-            LOG.error(e.getMessage(), e);
-        }
-        
-        /**
-         * Previous stages moved to shared ServletListener available in dspace-api
-         */
-        String dspaceConfig = null;
-        
-        /**
-         * Stage 1
-         * 
-         * Locate the dspace config
-         */
-        
-        // first check the local per-webapp parameter, then check the global parameter.
-        dspaceConfig = arg0.getInitParameter(DSPACE_CONFIG_PARAMETER);
-        if (dspaceConfig == null)
-        {
-            dspaceConfig = arg0.getServletContext().getInitParameter(DSPACE_CONFIG_PARAMETER);
-        }
-        
-        // Finally, if no config parameter found throw an error
-        if (dspaceConfig == null || "".equals(dspaceConfig))
-        {
-            throw new ServletException(
-                    "\n\nDSpace has failed to initialize. This has occurred because it was unable to determine \n" +
-                    "where the dspace.cfg file is located. The path to the configuration file should be stored \n" +
-                    "in a context variable, '"+DSPACE_CONFIG_PARAMETER+"', in either the local servlet or global contexts. \n" +
-                    "No context variable was found in either location.\n\n");
-        }
-            
-        /**
-         * Stage 2
-         * 
-         * Load the dspace config. Also may load log4j configuration.
-         * (Please rely on ConfigurationManager or Log4j to configure logging)
-         * 
-         */
-        try 
-        {
-            if(!ConfigurationManager.isConfigured())
-            {
-                // Load in DSpace config
-                ConfigurationManager.loadConfig(dspaceConfig);
-            }
-            
-            
-        }
-        catch (RuntimeException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new ServletException(
-                    "\n\nDSpace has failed to initialize, during stage 2. Error while attempting to read the \n" +
-                    "DSpace configuration file (Path: '"+dspaceConfig+"'). \n" +
-                    "This has likely occurred because either the file does not exist, or its permissions \n" +
-                    "are set incorrectly, or the path to the configuration file is incorrect. The path to \n" +
-                    "the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
-                    "either the local servlet or global context.\n\n",e);
-        }
-    }
-    
+    protected HarvestSchedulingService harvestSchedulingService = HarvestServiceFactory.getInstance().getHarvestSchedulingService();
+
     /**
      * Before this servlet will become functional replace 
      */
     public void init(FilterConfig arg0) throws ServletException {
 
-        this.initDSpace(arg0);
-        
     	// Paths to the various config files
     	String webappConfigPath    = null;
     	String installedConfigPath = null;
@@ -179,7 +65,7 @@ public class DSpaceCocoonServletFilter implements Filter
     		webappConfigPath = arg0.getServletContext().getRealPath("/") 
     				+ File.separator + "WEB-INF" + File.separator + "xmlui.xconf";
     		
-    		installedConfigPath = ConfigurationManager.getProperty("dspace.dir")
+    		installedConfigPath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
 	                + File.separator + "config" + File.separator + "xmlui.xconf";
     		
 	        XMLUIConfiguration.loadConfig(webappConfigPath,installedConfigPath);
@@ -199,10 +85,10 @@ public class DSpaceCocoonServletFilter implements Filter
     				"DSpace configuration directory. \n\n",e);
     	}
    
-		if (ConfigurationManager.getBooleanProperty("oai", "harvester.autoStart"))
+		if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("oai.harvester.autoStart"))
     	{
     		try {
-    			OAIHarvester.startNewScheduler();
+                harvestSchedulingService.startNewScheduler();
     		}
             catch (RuntimeException e)
             {
@@ -258,12 +144,12 @@ public class DSpaceCocoonServletFilter implements Filter
                     realResponse.sendRedirect(locationWithTrailingSlash);
                 }    
 	        // if force ssl is on and the user has authenticated and the request is not secure redirect to https
-                else if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl"))
+                else if ((DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.force.ssl"))
                         && (AuthenticationUtil.isLoggedIn(realRequest))
                         && (!realRequest.isSecure()))
                 {
                     StringBuffer location = new StringBuffer("https://");
-                    location.append(ConfigurationManager.getProperty("dspace.hostname"))
+                    location.append(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname"))
                         .append(realRequest.getRequestURI())
                             .append(realRequest.getQueryString() == null ? ""
                                     : ("?" + realRequest.getQueryString()));

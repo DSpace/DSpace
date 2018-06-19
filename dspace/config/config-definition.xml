@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!-- 
+     DSpace Configuration Definition
+     This file defines the ordering of configuration files loaded by DSpace.
+     Optionally, you may choose to add additional configuration files/locations.
+
+     For more information and examples of valid configuration definition files, see:
+     http://commons.apache.org/proper/commons-configuration/userguide_v1.10/howto_configurationbuilder.html 
+-->
+<configuration>
+    <header>
+        <!-- Necessary for CombinedConfiguration to detect & reload individual config files.
+             This allows DSpace module configs to reload when they change.
+             See JavaDocs for org.apache.commons.configuration.CombinedConfiguration setForceReloadCheck() method -->
+        <result forceReloadCheck="true"/>
+    </header>
+    <!-- Configurations in this section override one another. 
+         Earlier values take precedence, and override any values in later config files -->
+    <override>
+        <!-- By default, we load all System Properties and Environment variables,
+             in case any override default settings (e.g. "-Ddspace.dir" will override "dspace.dir").
+             Optionally, you could choose to disable this setting, but still load
+             individual settings from System or Env using variable interpolation,
+             e.g. ${sys:dspace.dir} or ${env:DSPACE_HOME}
+             For more info see:
+             http://commons.apache.org/proper/commons-configuration/userguide_v1.10/howto_basicfeatures.html#Variable_Interpolation -->
+        <!-- Load Java System properties -->
+        <system/>
+        <!-- Load Environment variables -->
+        <env/>
+
+        <!-- Allow user to override any configs in a local.cfg -->
+        <!-- Any properties in this config will override defaults in dspace.cfg (or any included *.cfg file) -->
+        <properties fileName="local.cfg" throwExceptionOnMissing="false" config-name="local" config-optional="true" encoding="UTF-8">
+            <!-- Reload this file if it has changed, and at least 5 seconds (5,000 ms) have passed -->
+            <reloadingStrategy refreshDelay="5000"
+                config-class="org.apache.commons.configuration.reloading.FileChangedReloadingStrategy"/>
+        </properties>
+
+        <!-- Load our dspace.cfg (which in turn loads all module configs via "include=" statements) -->
+        <properties fileName="dspace.cfg" throwExceptionOnMissing="true" encoding="UTF-8">
+            <!-- Reload this file if it has changed, and at least 5 seconds (5,000 ms) have passed -->
+            <reloadingStrategy refreshDelay="5000"
+                config-class="org.apache.commons.configuration.reloading.FileChangedReloadingStrategy"/>
+        </properties>
+    </override>
+    
+</configuration>

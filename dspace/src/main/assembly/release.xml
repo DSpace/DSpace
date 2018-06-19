@@ -34,8 +34,7 @@
             <include>dspace/**</include>
             <include>LICENSE*</include>
             <include>NOTICE</include>
-            <include>README</include>
-            <include>build.properties</include>
+            <include>README.md</include>
             <include>pom.xml</include>
          </includes>
          <!-- Exclude any target directories or dot files -->

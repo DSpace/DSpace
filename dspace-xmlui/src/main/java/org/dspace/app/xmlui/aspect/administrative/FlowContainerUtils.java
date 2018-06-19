@@ -7,44 +7,58 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
+import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.servlet.multipart.Part;
+import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.wing.Message;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.browse.BrowseException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.curate.Curator;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.harvest.HarvestScheduler;
+import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.OAIHarvester;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.WorkflowUtils;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.servlet.multipart.Part;
-import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.browse.BrowseException;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.harvest.HarvestedCollection;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.harvest.OAIHarvester;
-import org.dspace.harvest.OAIHarvester.HarvestScheduler;
-import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.curate.Curator;
-import org.dspace.eperson.Group;
-import org.dspace.xmlworkflow.Role;
-import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.WorkflowUtils;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.xml.sax.SAXException;
 
 /**
  * Utility methods to processes actions on Communities and Collections.
@@ -61,7 +75,18 @@ public class FlowContainerUtils
 	public static final String ROLE_WF_STEP3 	 = "WF_STEP3";
 	public static final String ROLE_SUBMIT   	 = "SUBMIT";
 	public static final String ROLE_DEFAULT_READ = "DEFAULT_READ";
-	
+
+	protected static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+	protected static final ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+	protected static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+	protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+
+	protected static final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+	protected static final HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+	protected static final WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
+
 	
 	// Collection related functions
 
@@ -73,12 +98,15 @@ public class FlowContainerUtils
 	 * @param deleteLogo Determines if the logo should be deleted along with the metadata editing action.
 	 * @param request the Cocoon request object
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
-	public static FlowResult processEditCollection(Context context, int collectionID, boolean deleteLogo, Request request) throws SQLException, IOException, AuthorizeException
+	public static FlowResult processEditCollection(Context context, UUID collectionID, boolean deleteLogo, Request request) throws SQLException, IOException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 		
-		Collection collection = Collection.find(context, collectionID);
+		Collection collection = collectionService.find(context, collectionID);
 		
 		// Get the metadata
 		String name = request.getParameter("name");
@@ -122,20 +150,20 @@ public class FlowContainerUtils
         }
 		
 		// Save the metadata
-		collection.setMetadata("name", name);
-		collection.setMetadata("short_description", shortDescription);
-		collection.setMetadata("introductory_text", introductoryText);
-		collection.setMetadata("copyright_text", copyrightText);
-		collection.setMetadata("side_bar_text", sideBarText);
-		collection.setMetadata("license", license);
-		collection.setMetadata("provenance_description", provenanceDescription);
+		collectionService.setMetadata(context, collection, "name", name);
+		collectionService.setMetadata(context, collection, "short_description", shortDescription);
+		collectionService.setMetadata(context, collection, "introductory_text", introductoryText);
+		collectionService.setMetadata(context, collection, "copyright_text", copyrightText);
+		collectionService.setMetadata(context, collection, "side_bar_text", sideBarText);
+		collectionService.setMetadata(context, collection, "license", license);
+		collectionService.setMetadata(context, collection, "provenance_description", provenanceDescription);
 		
         
 		// Change or delete the logo
         if (deleteLogo)
         {
         	// Remove the logo
-        	collection.setLogo(null);
+			collectionService.setLogo(context, collection, null);
         }
         else
         {
@@ -151,14 +179,13 @@ public class FlowContainerUtils
     		{
     			InputStream is = filePart.getInputStream();
     			
-    			collection.setLogo(is);
+				collectionService.setLogo(context, collection, is);
     		}
         }
         
         // Save everything
-        collection.update();
-        context.commit();
-        
+        collectionService.update(context, collection);
+
         
         // No notice...
         result.setContinue(true);
@@ -173,11 +200,15 @@ public class FlowContainerUtils
 	 * @param collectionID The collection id.
 	 * @param request the Cocoon request object
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
-	public static FlowResult processSetupCollectionHarvesting(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException
+	public static FlowResult processSetupCollectionHarvesting(Context context, UUID collectionID, Request request) throws SQLException, IOException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
-		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+		Collection collection = collectionService.find(context, collectionID);
+		HarvestedCollection hc = harvestedCollectionService.find(context, collection);
 
 		String contentSource = request.getParameter("source");
 
@@ -186,7 +217,7 @@ public class FlowContainerUtils
 		{
 			if (hc != null)
             {
-                hc.delete();
+				harvestedCollectionService.delete(context, hc);
             }
 			
 			result.setContinue(true);
@@ -197,7 +228,7 @@ public class FlowContainerUtils
 			
 			// create a new harvest instance if all the settings check out
 			if (hc == null) {
-				hc = HarvestedCollection.create(context, collectionID);
+				hc = harvestedCollectionService.create(context, collection);
 			}
 			
 			// if the supplied options all check out, set the harvesting parameters on the collection
@@ -227,12 +258,9 @@ public class FlowContainerUtils
 				return result;
 			}
 			
-			hc.update();
+			harvestedCollectionService.update(context, hc);
 		}
 		        
-        // Save everything
-        context.commit();
-        
         // No notice...
         //result.setMessage(new Message("default","Harvesting options successfully modified."));
         result.setOutcome(true);
@@ -249,21 +277,26 @@ public class FlowContainerUtils
 	 * @param collectionID The collection id.
 	 * @param request the Cocoon request object
 	 * @return A process result's object.
-	 * @throws TransformerException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
-	 * @throws CrosswalkException 
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+	 * @throws TransformerException passed through.
+	 * @throws SAXException passed through.
+	 * @throws ParserConfigurationException passed through.
+	 * @throws CrosswalkException passed through.
 	 */
-	public static FlowResult processRunCollectionHarvest(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException
+	public static FlowResult processRunCollectionHarvest(Context context, UUID collectionID, Request request)
+            throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException
 	{
 		FlowResult result = new FlowResult();
 		OAIHarvester harvester;
 		List<String> testErrors = new ArrayList<String>();
-		Collection collection = Collection.find(context, collectionID);
-		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+		Collection collection = collectionService.find(context, collectionID);
+		HarvestedCollection hc = harvestedCollectionService.find(context, collection);
 
 		//TODO: is there a cleaner way to do this?
-		try {
+		try
+		{
 			if (!HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_STOPPED)) {
 				synchronized(HarvestScheduler.lock) {
 					HarvestScheduler.setInterrupt(HarvestScheduler.HARVESTER_INTERRUPT_INSERT_THREAD, collectionID);
@@ -271,8 +304,9 @@ public class FlowContainerUtils
 				}
 			}
 			else {
+				// Harvester should return some errors in my opinion..
 				harvester = new OAIHarvester(context, collection, hc);
-				harvester.runHarvest();
+				harvester.runHarvest(); // this throws an exception when fetching bitstreams.
 			}
 		}
 		catch (Exception e) {
@@ -286,8 +320,7 @@ public class FlowContainerUtils
 		
 		return result;
 	}
-	
-	
+
 	/**
 	 * Purge the collection of all items, then run a fresh harvest cycle.
 	 * 
@@ -295,39 +328,51 @@ public class FlowContainerUtils
 	 * @param collectionID The collection id.
 	 * @param request the Cocoon request object
 	 * @return A process result's object.
-	 * @throws TransformerException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
-	 * @throws CrosswalkException 
-	 * @throws BrowseException 
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+	 * @throws TransformerException passed through.
+	 * @throws SAXException passed through.
+	 * @throws ParserConfigurationException passed through.
+	 * @throws CrosswalkException passed through.
+	 * @throws BrowseException passed through.
 	 */
-	public static FlowResult processReimportCollection(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException, BrowseException 
+	public static FlowResult processReimportCollection(Context context, UUID collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException, BrowseException
 	{
-		Collection collection = Collection.find(context, collectionID);
-		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+		Context.Mode originalMode = context.getCurrentMode();
+		context.setMode(Context.Mode.BATCH_EDIT);
+
+		Collection collection = collectionService.find(context, collectionID);
+		HarvestedCollection hc = harvestedCollectionService.find(context, collection);
 		
-		ItemIterator it = collection.getAllItems();
+		Iterator<Item> it = itemService.findByCollection(context, collection);
 		//IndexBrowse ib = new IndexBrowse(context);
 		while (it.hasNext()) {
 			Item item = it.next();
 			//System.out.println("Deleting: " + item.getHandle());
 			//ib.itemRemoved(item);
-			collection.removeItem(item);
+			collectionService.removeItem(context, collection, item);
+			context.uncacheEntity(item);
 		}
-		hc.setHarvestResult(null,"");
-		hc.update();
-		collection.update();
-		context.commit();
-		
+
+		hc.setLastHarvested(null);
+		hc.setHarvestMessage("");
+		harvestedCollectionService.update(context, hc);
+		collectionService.update(context, collection);
+        // update the context?
+		//context.dispatchEvent() // not sure if this is required yet.ts();
+
+		context.setMode(originalMode);
+
 		return processRunCollectionHarvest(context, collectionID, request);
 	}
-	
-	
+
 	/**
 	 * Test the supplied OAI settings. 
 	 * 
-	 * @param context
-	 * @param request
+	 * @param context session context.
+	 * @param request user's request.
+     * @return result of testing.
 	 */
 	public static FlowResult testOAISettings(Context context, Request request)  
 	{
@@ -364,8 +409,7 @@ public class FlowContainerUtils
         {
             harvestTypeInt = Integer.parseInt(harvestType);
         }
-			
-		
+
 		if (result.getErrors() == null) {
 			List<String> testErrors = OAIHarvester.verifyOAIharvester(oaiProvider, oaiSetId, metadataKey, (harvestTypeInt>1));
 			result.setErrors(testErrors);
@@ -393,29 +437,27 @@ public class FlowContainerUtils
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
 	 * @return The id of the template item.
-	 * @throws IOException 
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+	 * @throws IOException passed through.
 	 */
-	public static int getTemplateItemID(Context context, int collectionID) throws SQLException, AuthorizeException, IOException
+	public static UUID getTemplateItemID(Context context, UUID collectionID) throws SQLException, AuthorizeException, IOException
 	{
-		Collection collection = Collection.find(context, collectionID);
+		Collection collection = collectionService.find(context, collectionID);
 		Item template = collection.getTemplateItem();
 		
 		if (template == null)
 		{
-			collection.createTemplateItem();
+			collectionService.createTemplateItem(context, collection);
 			template = collection.getTemplateItem();
 			
-			collection.update();
-			template.update();
-			context.commit();
+			collectionService.update(context, collection);
+			itemService.update(context, template);
 		}
 		
 		return template.getID();
 	}
 
-	
-	
-	
 	/**
 	 * Look up the id of a group authorized for one of the given roles. If no group is currently 
 	 * authorized to perform this role then a new group will be created and assigned the role.
@@ -424,91 +466,49 @@ public class FlowContainerUtils
 	 * @param collectionID The collection id.
 	 * @param roleName ADMIN, WF_STEP1,	WF_STEP2, WF_STEP3,	SUBMIT, DEFAULT_READ.
 	 * @return The id of the group associated with that particular role, or -1 if the role was not found.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws javax.xml.transform.TransformerException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.xmlworkflow.WorkflowConfigurationException passed through.
+     * @throws javax.xml.parsers.ParserConfigurationException passed through.
+     * @throws org.dspace.workflow.WorkflowException passed through.
 	 */
-	public static int getCollectionRole(Context context, int collectionID, String roleName) throws SQLException, AuthorizeException, IOException, TransformerException, SAXException, WorkflowConfigurationException, ParserConfigurationException {
-		Collection collection = Collection.find(context, collectionID);
-		
+	public static UUID getCollectionRole(Context context, UUID collectionID, String roleName)
+            throws SQLException, AuthorizeException, IOException,
+            TransformerException, SAXException, WorkflowConfigurationException,
+            ParserConfigurationException, WorkflowException {
+		Collection collection = collectionService.find(context, collectionID);
+
 		// Determine the group based upon wich role we are looking for.
 		Group roleGroup = null;
 		if (ROLE_ADMIN.equals(roleName))
 		{
 			roleGroup = collection.getAdministrators();
 			if (roleGroup == null){
-				roleGroup = collection.createAdministrators();
+				roleGroup = collectionService.createAdministrators(context, collection);
             }
 		} 
 		else if (ROLE_SUBMIT.equals(roleName))
 		{
 			roleGroup = collection.getSubmitters();
 			if (roleGroup == null)
-				roleGroup = collection.createSubmitters();
+				roleGroup = collectionService.createSubmitters(context, collection);
 		}else{
-            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){//Resolve our id to a role
-                roleGroup = getXMLWorkflowRole(context, collectionID, roleName, collection, roleGroup);
-             }else{
-                roleGroup = getOriginalWorkflowRole(roleName, collection, roleGroup);
-            }
-
+			roleGroup = workflowService.getWorkflowRoleGroup(context, collection, roleName, roleGroup);
 		}
 
 		// In case we needed to create a group, save our changes
-		collection.update();
-		context.commit();
+		collectionService.update(context, collection);
 
 		// If the role name was valid then role should be non null,
 		if (roleGroup != null)
 			return roleGroup.getID();
 
-		return -1;
-    }
-			
-    private static Group getOriginalWorkflowRole(String roleName, Collection collection, Group roleGroup) throws SQLException, AuthorizeException {
-        if (ROLE_WF_STEP1.equals(roleName))
-        {
-            roleGroup = collection.getWorkflowGroup(1);
-            if (roleGroup == null)
-                roleGroup = collection.createWorkflowGroup(1);
-
-		}
-		else if (ROLE_WF_STEP2.equals(roleName))
-		{
-            roleGroup = collection.getWorkflowGroup(2);
-            if (roleGroup == null)
-                roleGroup = collection.createWorkflowGroup(2);
-        }
-		else if (ROLE_WF_STEP3.equals(roleName))
-		{
-            roleGroup = collection.getWorkflowGroup(3);
-            if (roleGroup == null)
-                roleGroup = collection.createWorkflowGroup(3);
-
-		}
-        return roleGroup;
-    }
-		
-    private static Group getXMLWorkflowRole(Context context, int collectionID, String roleName, Collection collection, Group roleGroup) throws IOException, WorkflowConfigurationException, SQLException, AuthorizeException {
-        Role role = WorkflowUtils.getCollectionAndRepositoryRoles(collection).get(roleName);
-        if(role.getScope() == Role.Scope.COLLECTION || role.getScope() == Role.Scope.REPOSITORY){
-            roleGroup = WorkflowUtils.getRoleGroup(context, collectionID, role);
-            if(roleGroup == null){
-                AuthorizeManager.authorizeAction(context, collection, Constants.WRITE);
-                roleGroup = Group.create(context);
-                if(role.getScope() == Role.Scope.COLLECTION){
-                    roleGroup.setName("COLLECTION_" + collection.getID() + "_WORKFLOW_ROLE_" + roleName);
-                }else{
-                    roleGroup.setName(role.getName());
-                }
-                roleGroup.update();
-                AuthorizeManager.addPolicy(context, collection, Constants.ADD, roleGroup);
-                if(role.getScope() == Role.Scope.COLLECTION){
-                    WorkflowUtils.createCollectionWorkflowRole(context, collectionID, roleName, roleGroup);
-                }
-           }
-        }
-        return roleGroup;
+		return null;
     }
 
-	
 	/**
 	 * Delete one of collection's roles
 	 * 
@@ -517,39 +517,45 @@ public class FlowContainerUtils
 	 * @param roleName ADMIN, WF_STEP1,	WF_STEP2, WF_STEP3,	SUBMIT, DEFAULT_READ.
 	 * @param groupID The id of the group associated with this role.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.xmlworkflow.WorkflowConfigurationException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
-	public static FlowResult processDeleteCollectionRole(Context context, int collectionID, String roleName, int groupID) throws SQLException, UIException, IOException, AuthorizeException, WorkflowConfigurationException
+	public static FlowResult processDeleteCollectionRole(Context context, UUID collectionID, String roleName, UUID groupID)
+            throws SQLException, UIException, IOException, AuthorizeException, WorkflowConfigurationException
     {
 		FlowResult result = new FlowResult();
 		
-		Collection collection = Collection.find(context,collectionID);
-		Group role = Group.find(context, groupID);
+		Collection collection = collectionService.find(context,collectionID);
+		Group role = groupService.find(context, groupID);
 		
 		// First, Unregister the role
 		if (ROLE_ADMIN.equals(roleName))
 		{
-			collection.removeAdministrators();
+			collectionService.removeAdministrators(context, collection);
 		} 
 		else if (ROLE_SUBMIT.equals(roleName))
 		{
-			collection.removeSubmitters();
+			collectionService.removeSubmitters(context, collection);
 		}
         else{
-            if(ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+            if(WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService)
             {
                 WorkflowUtils.deleteRoleGroup(context, collection, roleName);
             }else{
                 if (ROLE_WF_STEP1.equals(roleName))
                 {
-                    collection.setWorkflowGroup(1, null);
+                    collection.setWorkflowGroup(context, 1, null);
                 }
                 else if (ROLE_WF_STEP2.equals(roleName))
                 {
-                    collection.setWorkflowGroup(2, null);
+                    collection.setWorkflowGroup(context, 2, null);
                 }
                 else if (ROLE_WF_STEP3.equals(roleName))
                 {
-                    collection.setWorkflowGroup(3, null);
+                    collection.setWorkflowGroup(context, 3, null);
                 }
             }
 		}
@@ -558,70 +564,72 @@ public class FlowContainerUtils
 		// group has on the collection and remove them otherwise the delete will fail because 
 		// there are dependencies.
 		@SuppressWarnings("unchecked") // the cast is correct
-		List<ResourcePolicy> policies = AuthorizeManager.getPolicies(context,collection);
+		List<ResourcePolicy> policies = authorizeService.getPolicies(context, collection);
 		for (ResourcePolicy policy : policies)
 		{
-			if (policy.getGroupID() == groupID)
+			if (policy.getGroup() != null && policy.getGroup().getID().equals(groupID))
             {
-                policy.delete();
+				resourcePolicyService.delete(context, policy);
             }
 		}
 		
 		// Finally, Delete the role's actual group.
-		collection.update();
-		role.delete();
-		context.commit();
-	
+		collectionService.update(context, collection);
+		groupService.delete(context, role);
+
 		result.setContinue(true);
 		result.setOutcome(true);
 		result.setMessage(new Message("default","The role was successfully deleted."));
 		return result;
 	}
-	
-	
+
 	/**
 	 * Look up the id of a group authorized for one of the given roles. If no group is currently 
 	 * authorized to perform this role then a new group will be created and assigned the role.
 	 * 
 	 * @param context The current DSpace context.
-	 * @param collectionID The collection id.
+	 * @param collection The collection.
 	 * @return The id of the group associated with that particular role or -1
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
-	public static int getCollectionDefaultRead(Context context, int collectionID) throws SQLException, AuthorizeException
+	public static Group getCollectionDefaultRead(Context context, Collection collection) throws SQLException, AuthorizeException
 	{
-		Collection collection = Collection.find(context,collectionID);
+
+		List<Group> itemGroups = authorizeService.getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
+		List<Group> bitstreamGroups = authorizeService.getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
 		
-		Group[] itemGroups = AuthorizeManager.getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
-		Group[] bitstreamGroups = AuthorizeManager.getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
-		
-       int itemGroupID = -1;
-        
+       Group itemGroup = null;
+
 		// If there are more than one groups assigned either of these privileges then this role based method will not work.
         // The user will need to go to the authorization section to manually straighten this out.		
-		if (itemGroups.length != 1 || bitstreamGroups.length != 1)
+		if (itemGroups.size() != 1 || bitstreamGroups.size() != 1)
 		{
-		    // do nothing the itemGroupID is already set to -1
+            itemGroup = null;
 		}
 		else
 		{
-	        Group itemGroup = itemGroups[0];
-	        Group bitstreamGroup = bitstreamGroups[0];
+	        itemGroup = itemGroups.get(0);
+	        Group bitstreamGroup = bitstreamGroups.get(0);
 	        
             // If the same group is not assigned both of these privileges then this role based method will not work. The user 
             // will need to go to the authorization section to manually straighten this out.
-	        if (itemGroup.getID() != bitstreamGroup.getID())
+	        if (!itemGroup.getID().equals(bitstreamGroup.getID()))
 	        {
-	            // do nothing the itemGroupID is already set to -1
-	        }
-	        else
-	        {
-	            itemGroupID = itemGroup.getID();
+                itemGroup = null;
 	        }
 		}
 
-		return itemGroupID;
+		return itemGroup;
 	}
-	
+
+	/**
+	 * @see #getCollectionDefaultRead(Context, Collection)
+     */
+	public static UUID getCollectionDefaultRead(final Context context, final UUID collectionID) throws SQLException, AuthorizeException {
+		return getCollectionDefaultRead(context, collectionService.find(context,collectionID)).getID();
+	}
+
 	/**
 	 * Change default privileges from the anonymous group to a new group that will be created and
 	 * appropriate privileges assigned. The id of this new group will be returned.
@@ -629,32 +637,34 @@ public class FlowContainerUtils
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
 	 * @return The group ID of the new group.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
 	 */
-	public static int createCollectionDefaultReadGroup(Context context, int collectionID) throws SQLException, AuthorizeException, UIException
+	public static UUID createCollectionDefaultReadGroup(Context context, UUID collectionID) throws SQLException, AuthorizeException, UIException
 	{
-		int roleID = getCollectionDefaultRead(context, collectionID);
+		Collection collection = collectionService.find(context,collectionID);
+		Group defaultRead = getCollectionDefaultRead(context, collection);
 		
-		if (roleID != 0)
+		if (defaultRead != null && !defaultRead.getName().equals(Group.ANONYMOUS))
         {
             throw new UIException("Unable to create a new default read group because either the group already exists or multiple groups are assigned the default privileges.");
         }
 		
-		Collection collection = Collection.find(context,collectionID);
-		Group role = Group.create(context);
-		role.setName("COLLECTION_"+collection.getID() +"_DEFAULT_READ");
+		Group role = groupService.create(context);
+        groupService.setName(role, "COLLECTION_"+collection.getID().toString() +"_DEFAULT_READ");
 		
 		// Remove existing privileges from the anonymous group.
-		AuthorizeManager.removePoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
-		AuthorizeManager.removePoliciesActionFilter(context, collection, Constants.DEFAULT_BITSTREAM_READ);
+		authorizeService.removePoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
+		authorizeService.removePoliciesActionFilter(context, collection, Constants.DEFAULT_BITSTREAM_READ);
 		
 		// Grant our new role the default privileges.
-		AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ,      role);
-		AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ, role);
+		authorizeService.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ, role);
+		authorizeService.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ, role);
 		
 		// Commit the changes
-		role.update();
-		context.commit();
-		
+		groupService.update(context, role);
+
 		return role.getID();
 	}
 	
@@ -667,31 +677,31 @@ public class FlowContainerUtils
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static FlowResult changeCollectionDefaultReadToAnonymous(Context context, int collectionID) throws SQLException, AuthorizeException, UIException
-	{
+	public static FlowResult changeCollectionDefaultReadToAnonymous(Context context, UUID collectionID)
+            throws SQLException, AuthorizeException, UIException, IOException {
 		FlowResult result = new FlowResult();
 		
-		int roleID = getCollectionDefaultRead(context, collectionID);
+		Collection collection = collectionService.find(context,collectionID);
+		Group defaultRead = getCollectionDefaultRead(context, collection);
 		
-		if (roleID < 1)
+		if (defaultRead == null || defaultRead.getName().equals(Group.ANONYMOUS))
 		{
 			throw new UIException("Unable to delete the default read role because the role is either already assigned to the anonymous group or multiple groups are assigned the default privileges.");
 		}
 		
-		Collection collection = Collection.find(context,collectionID);
-		Group role = Group.find(context, roleID);
-		Group anonymous = Group.find(context,0);
+		Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
 		
 		// Delete the old role, this will remove the default privileges.
-		role.delete();
+		groupService.delete(context, defaultRead);
 		
 		// Set anonymous as the default read group.
-		AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ,      anonymous);
-		AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ, anonymous);
-		
-		// Commit the changes
-		context.commit();
+		authorizeService.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ, anonymous);
+		authorizeService.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ, anonymous);
 		
 		result.setContinue(true);
 		result.setOutcome(true);
@@ -705,22 +715,17 @@ public class FlowContainerUtils
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static FlowResult processDeleteCollection(Context context, int collectionID) throws SQLException, AuthorizeException, IOException
+	public static FlowResult processDeleteCollection(Context context, UUID collectionID) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		
-		Collection collection = Collection.find(context, collectionID);
+		Collection collection = collectionService.find(context, collectionID);
+		collectionService.delete(context, collection);
 		
-		Community[] parents = collection.getCommunities();
-		
-		for (Community parent: parents)
-		{
-			parent.removeCollection(collection);
-			parent.update();
-		}
-		
-		context.commit();
 		
 		result.setContinue(true);
 		result.setOutcome(true);
@@ -735,14 +740,19 @@ public class FlowContainerUtils
 	 * 
 	 * @param context The current DSpace context.
 	 * @param communityID The id of the parent community.
+     * @param request user's request.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static FlowResult processCreateCollection(Context context, int communityID, Request request) throws SQLException, AuthorizeException, IOException
+	public static FlowResult processCreateCollection(Context context, UUID communityID, Request request)
+            throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		
-		Community parent = Community.find(context, communityID);
-		Collection newCollection = parent.createCollection();
+		Community parent = communityService.find(context, communityID);
+		Collection newCollection = collectionService.create(context, parent);
 		
 		// Get the metadata
 		String name = request.getParameter("name");
@@ -786,15 +796,14 @@ public class FlowContainerUtils
         }
 		
 		// Save the metadata
-		newCollection.setMetadata("name", name);
-		newCollection.setMetadata("short_description", shortDescription);
-		newCollection.setMetadata("introductory_text", introductoryText);
-		newCollection.setMetadata("copyright_text", copyrightText);
-		newCollection.setMetadata("side_bar_text", sideBarText);
-		newCollection.setMetadata("license", license);
-		newCollection.setMetadata("provenance_description", provenanceDescription);
-		
-        
+		collectionService.setMetadata(context, newCollection, "name", name);
+		collectionService.setMetadata(context, newCollection, "short_description", shortDescription);
+		collectionService.setMetadata(context, newCollection, "introductory_text", introductoryText);
+		collectionService.setMetadata(context, newCollection, "copyright_text", copyrightText);
+		collectionService.setMetadata(context, newCollection, "side_bar_text", sideBarText);
+		collectionService.setMetadata(context, newCollection, "license", license);
+		collectionService.setMetadata(context, newCollection, "provenance_description", provenanceDescription);
+
         // Set the logo
     	Object object = request.get("logo");
     	Part filePart = null;
@@ -807,12 +816,11 @@ public class FlowContainerUtils
 		{
 			InputStream is = filePart.getInputStream();
 			
-			newCollection.setLogo(is);
+			collectionService.setLogo(context, newCollection, is);
 		}
         
         // Save everything
-		newCollection.update();
-        context.commit();
+		collectionService.update(context, newCollection);
         // success
         result.setContinue(true);
         result.setOutcome(true);
@@ -821,34 +829,34 @@ public class FlowContainerUtils
 		
 		return result;
 	}
-	
-		
-	
-	
-	
+
 	// Community related functions
 
 	/**
-	 * Create a new community 
+	 * Create a new community.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param communityID The id of the parent community (-1 for a top-level community).
+     * @param request user's request.
 	 * @return A process result's object.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
 	 */
-	public static FlowResult processCreateCommunity(Context context, int communityID, Request request) throws AuthorizeException, IOException, SQLException
+	public static FlowResult processCreateCommunity(Context context, UUID communityID, Request request)
+            throws AuthorizeException, IOException, SQLException
 	{
 		FlowResult result = new FlowResult();
 
-		Community parent = Community.find(context, communityID);
 		Community newCommunity;
-		
-		if (parent != null)
+
+		if (communityID != null)
         {
-            newCommunity = parent.createSubcommunity();
+            newCommunity = communityService.createSubcommunity(context, communityService.find(context, communityID));
         }
 		else
         {
-            newCommunity = Community.create(null, context);
+            newCommunity = communityService.create(null, context);
         }
 		
 		String name = request.getParameter("name");
@@ -881,11 +889,11 @@ public class FlowContainerUtils
             sideBarText = null;
         }
 		
-		newCommunity.setMetadata("name", name);
-		newCommunity.setMetadata("short_description", shortDescription);
-		newCommunity.setMetadata("introductory_text", introductoryText);
-		newCommunity.setMetadata("copyright_text", copyrightText);
-		newCommunity.setMetadata("side_bar_text", sideBarText);
+		communityService.setMetadata(context, newCommunity, "name", name);
+		communityService.setMetadata(context, newCommunity, "short_description", shortDescription);
+		communityService.setMetadata(context, newCommunity, "introductory_text", introductoryText);
+		communityService.setMetadata(context, newCommunity, "copyright_text", copyrightText);
+		communityService.setMetadata(context, newCommunity, "side_bar_text", sideBarText);
         
     	// Upload the logo
 		Object object = request.get("logo");
@@ -899,12 +907,11 @@ public class FlowContainerUtils
 		{
 			InputStream is = filePart.getInputStream();
 			
-			newCommunity.setLogo(is);
+			communityService.setLogo(context, newCommunity, is);
 		}
         
 		// Save everything
-		newCommunity.update();
-        context.commit();
+		communityService.update(context, newCommunity);
         // success
         result.setContinue(true);
         result.setOutcome(true);
@@ -923,12 +930,16 @@ public class FlowContainerUtils
 	 * @param deleteLogo Determines if the logo should be deleted along with the metadata editing action.
 	 * @param request the Cocoon request object
 	 * @return A process result's object.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
 	 */
-	public static FlowResult processEditCommunity(Context context, int communityID, boolean deleteLogo, Request request) throws AuthorizeException, IOException, SQLException
+	public static FlowResult processEditCommunity(Context context, UUID communityID, boolean deleteLogo, Request request)
+            throws AuthorizeException, IOException, SQLException
 	{
 		FlowResult result = new FlowResult();
 
-		Community community = Community.find(context, communityID);
+		Community community = communityService.find(context, communityID);
 		
 		String name = request.getParameter("name");
 		String shortDescription = request.getParameter("short_description");
@@ -961,16 +972,16 @@ public class FlowContainerUtils
         }
 		
 		// Save the data
-		community.setMetadata("name", name);
-		community.setMetadata("short_description", shortDescription);
-        community.setMetadata("introductory_text", introductoryText);
-        community.setMetadata("copyright_text", copyrightText);
-        community.setMetadata("side_bar_text", sideBarText);
+		communityService.setMetadata(context, community, "name", name);
+		communityService.setMetadata(context, community, "short_description", shortDescription);
+        communityService.setMetadata(context, community, "introductory_text", introductoryText);
+        communityService.setMetadata(context, community, "copyright_text", copyrightText);
+        communityService.setMetadata(context, community, "side_bar_text", sideBarText);
         
         if (deleteLogo)
         {
         	// Remove the logo
-        	community.setLogo(null);
+        	communityService.setLogo(context, community, null);
         }
         else
         {
@@ -986,37 +997,36 @@ public class FlowContainerUtils
     		{
     			InputStream is = filePart.getInputStream();
     			
-    			community.setLogo(is);
+				communityService.setLogo(context, community, is);
     		}
         }
         
         // Save everything
-        community.update();
-        context.commit();
-        
+        communityService.update(context, community);
+
         // No notice...
         result.setContinue(true);
 		return result;
 	}
-	
-	
-	
+
 	/**
-	 * Delete community itself
+	 * Delete community itself.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param communityID The community id.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static FlowResult processDeleteCommunity(Context context, int communityID) throws SQLException, AuthorizeException, IOException
+	public static FlowResult processDeleteCommunity(Context context, UUID communityID) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		
-		Community community = Community.find(context, communityID);
+		Community community = communityService.find(context, communityID);
 		
-		community.delete();
-		context.commit();
-		
+		communityService.delete(context, community);
+
 		result.setContinue(true);
 		result.setOutcome(true);
 		result.setMessage(new Message("default","The community was successfully deleted."));
@@ -1032,10 +1042,13 @@ public class FlowContainerUtils
      * @param communityID The collection id.
      * @param roleName ADMIN.
      * @return The id of the group associated with that particular role, or -1 if the role was not found.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
      */
-    public static int getCommunityRole(Context context, int communityID, String roleName) throws SQLException, AuthorizeException, IOException
+    public static UUID getCommunityRole(Context context, UUID communityID, String roleName) throws SQLException, AuthorizeException, IOException
     {
-        Community community = Community.find(context, communityID);
+        Community community = communityService.find(context, communityID);
 	
         // Determine the group based upon which role we are looking for.
         Group role = null;
@@ -1044,21 +1057,20 @@ public class FlowContainerUtils
             role = community.getAdministrators();
             if (role == null)
             {
-                role = community.createAdministrators();
+                role = communityService.createAdministrators(context, community);
             }
         } 
 	
         // In case we needed to create a group, save our changes
-        community.update();
-        context.commit();
-        
+		communityService.update(context, community);
+
         // If the role name was valid then role should be non null,
         if (role != null)
         {
             return role.getID();
         }
         
-        return -1;
+        return null;
     }
 
 	/**
@@ -1069,38 +1081,42 @@ public class FlowContainerUtils
      * @param roleName ADMIN.
      * @param groupID The id of the group associated with this role.
      * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.app.xmlui.utils.UIException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
-    public static FlowResult processDeleteCommunityRole(Context context, int communityID, String roleName, int groupID) throws SQLException, UIException, IOException, AuthorizeException
+    public static FlowResult processDeleteCommunityRole(Context context, UUID communityID, String roleName, UUID groupID)
+            throws SQLException, UIException, IOException, AuthorizeException
     {
         FlowResult result = new FlowResult();
         
-        Community community = Community.find(context, communityID);
-        Group role = Group.find(context, groupID);
+        Community community = communityService.find(context, communityID);
+        Group role = groupService.find(context, groupID);
         
         // First, unregister the role
         if (ROLE_ADMIN.equals(roleName))
         {
-            community.removeAdministrators();
+			communityService.removeAdministrators(context, community);
         }
         
         // Second, remove all authorizations for this role by searching for all policies that this 
         // group has on the collection and remove them otherwise the delete will fail because 
         // there are dependencies.
         @SuppressWarnings("unchecked") // the cast is correct
-        List<ResourcePolicy> policies = AuthorizeManager.getPolicies(context, community);
+        List<ResourcePolicy> policies = authorizeService.getPolicies(context, community);
         for (ResourcePolicy policy : policies)
         {
-            if (policy.getGroupID() == groupID)
+            if (policy.getGroup() != null && policy.getGroup().getID().equals(groupID))
             {
-                policy.delete();
+                resourcePolicyService.delete(context, policy);
             }
         }
         
         // Finally, delete the role's actual group.
-        community.update();
-        role.delete();
-        context.commit();
-    
+        communityService.update(context, community);
+		groupService.delete(context, role);
+
         result.setContinue(true);
         result.setOutcome(true);
         result.setMessage(new Message("default","The role was successfully deleted."));
@@ -1110,47 +1126,49 @@ public class FlowContainerUtils
     /**
      * Delete a collection's template item (which is not a member of the collection).
      * 
-     * @param context
-     * @param collectionID
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     * @param context session context.
+     * @param collectionID the collection.
+     * @return continuation result.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     * @throws IOException passed through.
      */
-    public static FlowResult processDeleteTemplateItem(Context context, int collectionID) throws SQLException, AuthorizeException, IOException
+    public static FlowResult processDeleteTemplateItem(Context context, UUID collectionID) throws SQLException, AuthorizeException, IOException
     {
         FlowResult result = new FlowResult();
         
-        Collection collection = Collection.find(context, collectionID);
+        Collection collection = collectionService.find(context, collectionID);
         
-        collection.removeTemplateItem();
-        context.commit();
-        
+        collectionService.removeTemplateItem(context, collection);
+
         result.setContinue(true);
         result.setOutcome(true);
         return result;
     }
-	
-    
-        /**
+
+    /**
      * processCurateCollection
      *
      * Utility method to process curation tasks
      * submitted via the DSpace GUI
      *
-     * @param context
-     * @param dsoID
-     * @param request
-     *
+     * @param context session context.
+     * @param dsoID the object to be curated.
+     * @param request user's request.
+     * @return flow result.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
      */
-        public static FlowResult processCurateCollection(Context context, int dsoID, Request request)
-                                                                throws AuthorizeException, IOException, SQLException, Exception
+    public static FlowResult processCurateCollection(Context context, UUID dsoID, Request request)
+        throws AuthorizeException, IOException, SQLException, Exception
 	{
                 String task = request.getParameter("curate_task");
                 Curator curator = FlowCurationUtils.getCurator(task);
                
                 try
                 {
-                    Collection collection = Collection.find(context, dsoID);
+                    Collection collection = collectionService.find(context, dsoID);
                     if (collection != null)
                     {
                         //Call curate(context,ID) to ensure a Task Performer (Eperson) is set in Curator
@@ -1167,18 +1185,25 @@ public class FlowContainerUtils
                 
 	}
 
-        /**
-         * queues curation tasks
-         */
-        public static FlowResult processQueueCollection(Context context, int dsoID, Request request)
-                                                                throws AuthorizeException, IOException, SQLException, Exception
+    /**
+     * Queues curation tasks.
+     * @param context session context.
+     * @param dsoID the object to be curated.
+     * @param request user's request.
+     * @return flow result.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
+     */
+    public static FlowResult processQueueCollection(Context context, UUID dsoID, Request request)
+            throws AuthorizeException, IOException, SQLException, Exception
 	{
                 String task = request.getParameter("curate_task");
                 Curator curator = FlowCurationUtils.getCurator(task);
                 String objId = String.valueOf(dsoID);
-                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                String taskQueueName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.queuename");
                 boolean status = false;
-                Collection collection = Collection.find(context, dsoID);
+                Collection collection = collectionService.find(context, dsoID);
                 if (collection != null)
                 {
                     objId = collection.getHandle();
@@ -1196,50 +1221,58 @@ public class FlowContainerUtils
 	}
 
     /** 
-     * processCurateCommunity
+     * Utility method to process curation tasks submitted via the DSpace GUI.
      *
-     * Utility method to process curation tasks
-     * submitted via the DSpace GUI
-     *
-     * @param context
-     * @param dsoID
-     * @param request
-     *
+     * @param context session context.
+     * @param dsoID object to be curated.
+     * @param request user's request
+     * @return flow result.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
      */
-        public static FlowResult processCurateCommunity(Context context, int dsoID, Request request)
-                                                                throws AuthorizeException, IOException, SQLException, Exception
+    public static FlowResult processCurateCommunity(Context context, UUID dsoID, Request request)
+            throws AuthorizeException, IOException, SQLException, Exception
 	{
-                String task = request.getParameter("curate_task");
+        String task = request.getParameter("curate_task");
 		Curator curator = FlowCurationUtils.getCurator(task);
-                try
-                {
-                    Community community = Community.find(context, dsoID);
-                    if (community != null)
-                    {
-                        //Call curate(context,ID) to ensure a Task Performer (Eperson) is set in Curator
-                        curator.curate(context, community.getHandle());
-                    }
-                    return FlowCurationUtils.getRunFlowResult(task, curator, true);
-                }
-                catch (Exception e) 
-                {
-                    curator.setResult(task, e.getMessage());
-                    return FlowCurationUtils.getRunFlowResult(task, curator, false);
+        try
+        {
+            Community community = communityService.find(context, dsoID);
+            if (community != null)
+            {
+                //Call curate(context,ID) to ensure a Task Performer (Eperson) is set in Curator
+                curator.curate(context, community.getHandle());
+            }
+            return FlowCurationUtils.getRunFlowResult(task, curator, true);
+        }
+        catch (Exception e) 
+        {
+            curator.setResult(task, e.getMessage());
+            return FlowCurationUtils.getRunFlowResult(task, curator, false);
 		}
 	}
 
-        /**
-         * queues curation tasks
-         */
-        public static FlowResult processQueueCommunity(Context context, int dsoID, Request request)
-                                                                throws AuthorizeException, IOException, SQLException, Exception
+    /**
+     * queues curation tasks.
+     *
+     * @param context session context.
+     * @param dsoID object to be curated.
+     * @param request user's request.
+     * @return flow result.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
+     */
+    public static FlowResult processQueueCommunity(Context context, UUID dsoID, Request request)
+            throws AuthorizeException, IOException, SQLException, Exception
 	{
                 String task = request.getParameter("curate_task");
                 Curator curator = FlowCurationUtils.getCurator(task);
                 String objId = String.valueOf(dsoID);
-                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                String taskQueueName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.ui.queuename");
                 boolean status = false;
-                Community community = Community.find(context, dsoID);
+                Community community = communityService.find(context, dsoID);
                 if (community != null)
                 {
                     objId = community.getHandle();
@@ -1255,8 +1288,7 @@ public class FlowContainerUtils
                 }
                 return FlowCurationUtils.getQueueFlowResult(task, status, objId, taskQueueName);
 	}
-	
-    
+
 	/**
 	 * Check whether this metadata value is a proper XML fragment. If the value is not 
 	 * then an error message will be returned that might (sometimes not) tell the user how
@@ -1395,6 +1427,5 @@ public class FlowContainerUtils
     	
     	return false;
     }
-	
 
 }

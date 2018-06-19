@@ -15,16 +15,10 @@
          id="WebApp_ID" version="2.5">
 
     <display-name>RDF Data Provider</display-name>
+
     <context-param>
         <description>
-            The location of the main DSpace configuration file
-        </description>
-        <param-name>dspace-config</param-name>
-        <param-value>${dspace.dir}/config/dspace.cfg</param-value>
-    </context-param>
-    <context-param>
-        <description>
-            The location of the main DSpace configuration file
+            The location of the DSpace home directory
         </description>
         <param-name>dspace.dir</param-name>
         <param-value>${dspace.dir}</param-value>

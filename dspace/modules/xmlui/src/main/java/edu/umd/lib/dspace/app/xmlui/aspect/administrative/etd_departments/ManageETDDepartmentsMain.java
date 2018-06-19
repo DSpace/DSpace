@@ -5,7 +5,9 @@
 package edu.umd.lib.dspace.app.xmlui.aspect.administrative.etd_departments;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -19,6 +21,8 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.EtdUnit;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.EtdUnitService;
 
 /**
  * Manage etd_departments page is the entry point for etd_department management.
@@ -71,6 +75,8 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
 
     /** The number of results to show on one page. */
     private static final int PAGE_SIZE = 15;
+    
+    private static EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -89,9 +95,9 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
                 + knot.getId();
         String query = decodeFromURL(parameters.getParameter("query", ""));
         int page = parameters.getParameterAsInteger("page", 0);
-        int highlightID = parameters.getParameterAsInteger("highlightID", -1);
-        int resultCount = EtdUnit.searchResultCount(context, query);
-        EtdUnit[] etd_departments = EtdUnit.search(context, query, page
+        String highlightID = parameters.getParameter("highlightID", null);
+        int resultCount = etdunitService.searchResultCount(context, query);
+        java.util.List<EtdUnit> etd_departments = etdunitService.search(context, query, page
                 * PAGE_SIZE, PAGE_SIZE);
 
         // DIVISION: etd_departments-main
@@ -132,7 +138,7 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
         {
             // If there are enough results then paginate the results
             int firstIndex = page * PAGE_SIZE + 1;
-            int lastIndex = page * PAGE_SIZE + etd_departments.length;
+            int lastIndex = page * PAGE_SIZE + etd_departments.size();
 
             String nextURL = null, prevURL = null;
             if (page < (resultCount / PAGE_SIZE))
@@ -149,7 +155,7 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
         }
 
         Table table = search.addTable("etd_departments-search-table",
-                etd_departments.length + 1, 3);
+                etd_departments.size() + 1, 3);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_search_column1);
         header.addCell().addContent(T_search_column2);
@@ -158,7 +164,8 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
         for (EtdUnit etd_department : etd_departments)
         {
             Row row;
-            if (etd_department.getID() == highlightID)
+
+            if (StringUtils.isNotBlank(highlightID) && etd_department.getID().equals(UUID.fromString(highlightID)))
             {
                 row = table.addRow(null, null, "highlight");
             }
@@ -167,14 +174,12 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
                 row = table.addRow();
             }
 
-            if (etd_department.getID() > 0)
+            if (etd_department.getID() != null)
             {
                 CheckBox select = row.addCell().addCheckBox(
                         "select_etd_department");
-                select.setLabel(Integer.valueOf(etd_department.getID())
-                        .toString());
-                select.addOption(Integer.valueOf(etd_department.getID())
-                        .toString());
+                select.setLabel(etd_department.getName());
+                select.addOption(etd_department.getID().toString());
             }
             else
             {
@@ -183,14 +188,14 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
                 row.addCell();
             }
 
-            row.addCell().addContent(etd_department.getID());
+            row.addCell().addContent(etd_department.getID().toString());
             row.addCell().addXref(
                     baseURL + "&submit_edit&etd_departmentID="
                             + etd_department.getID(), etd_department.getName());
 
         }
 
-        if (etd_departments.length <= 0)
+        if (etd_departments.isEmpty())
         {
             Cell cell = table.addRow().addCell(1, 5);
             cell.addHighlight("italic").addContent(T_no_results);

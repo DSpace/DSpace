@@ -23,7 +23,10 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.jdom.Document;
@@ -35,7 +38,7 @@ import org.xml.sax.SAXException;
 
 /**
  * This is an adapter which translates DSpace containers 
- * (communities & collections) into METS documents. This adapter follows
+ * (communities and collections) into METS documents. This adapter follows
  * the DSpace METS profile, however that profile does not define how a
  * community or collection should be described, but we make the obvious 
  * decisions to deviate when necessary from the profile.
@@ -56,17 +59,22 @@ public class ContainerAdapter extends AbstractAdapter
     private static final Logger log = Logger.getLogger(ContainerAdapter.class);
 
     /** The community or collection this adapter represents. */
-    private DSpaceObject dso;
+    private final DSpaceObject dso;
 
     /** A space-separated list of descriptive metadata sections */
     private StringBuffer dmdSecIDS;
     
     /** Current DSpace context **/
-    private Context dspaceContext;
+    private final Context dspaceContext;
 
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+   	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    
+    
     /**
      * Construct a new CommunityCollectionMETSAdapter.
      * 
+     * @param context session context.
      * @param dso
      *            A DSpace Community or Collection to adapt.
      * @param contextPath
@@ -79,7 +87,9 @@ public class ContainerAdapter extends AbstractAdapter
         this.dspaceContext = context;
     }
 
-    /** Return the container, community or collection, object */
+    /** Return the container, community or collection, object
+     * @return the contained object.
+     */
     public DSpaceObject getContainer()
     {
     	return this.dso;
@@ -96,8 +106,9 @@ public class ContainerAdapter extends AbstractAdapter
      */
     
     /**
-     * Return the URL of this community/collection in the interface
+     * @return the URL of this community/collection in the interface.
      */
+    @Override
     protected String getMETSOBJID()
     {
     	if (dso.getHandle() != null)
@@ -110,14 +121,17 @@ public class ContainerAdapter extends AbstractAdapter
     /**
      * @return Return the URL for editing this item
      */
+    @Override
     protected String getMETSOBJEDIT()
     {
         return null;
     }
     
     /**
-     * Use the handle as the id for this METS document
+     * Use the handle as the id for this METS document.
+     * @return the id.
      */
+    @Override
     protected String getMETSID()
     {
     	if (dso.getHandle() == null)
@@ -140,16 +154,20 @@ public class ContainerAdapter extends AbstractAdapter
     /**
      * Return the profile to use for communities and collections.
      * 
+     * @return the constant profile name.
+     * @throws org.dspace.app.xmlui.wing.WingException never.
      */
+    @Override
     protected String getMETSProfile() throws WingException
     {
     	return "DSPACE METS SIP Profile 1.0";
     }
 
     /**
-     * Return a friendly label for the METS document to say we are a community
+     * @return a friendly label for the METS document to say we are a community
      * or collection.
      */
+    @Override
     protected String getMETSLabel()
     {
         if (dso instanceof Community)
@@ -163,7 +181,8 @@ public class ContainerAdapter extends AbstractAdapter
     }
 
     /**
-     * Return a unique id for the given bitstream
+     * @param bitstream the bitstream to be identified.
+     * @return a unique id for the given bitstream.
      */
     protected String getFileID(Bitstream bitstream)
     {
@@ -171,7 +190,8 @@ public class ContainerAdapter extends AbstractAdapter
     }
 
     /**
-     * Return a group id for the given bitstream
+     * @param bitstream the bitstream to be queried.
+     * @return a group id for the given bitstream.
      */
     protected String getGroupFileID(Bitstream bitstream)
     {
@@ -197,15 +217,24 @@ public class ContainerAdapter extends AbstractAdapter
      * Render the METS descriptive section. This will create a new metadata
      * section for each crosswalk configured.
      * 
-     * Example:
+     * <p>Example:
+     *
+     * <pre>{@code
      * <dmdSec>
      *  <mdWrap MDTYPE="MODS">
      *    <xmlData>
      *      ... content from the crosswalk ...
      *    </xmlDate>
      *  </mdWrap>
-     * </dmdSec
+     * </dmdSec>
+     * } </pre>
+     * @throws org.dspace.app.xmlui.wing.WingException on XML errors.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws org.dspace.content.crosswalk.CrosswalkException passed through.
+     * @throws java.io.IOException if items could not be counted.
+     * @throws java.sql.SQLException passed through.
      */
+    @Override
     protected void renderDescriptiveSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException 
     {
         AttributeMap attributes;
@@ -216,7 +245,7 @@ public class ContainerAdapter extends AbstractAdapter
         // Add DIM descriptive metadata if it was requested or if no metadata types 
         // were specified. Furthermore, since this is the default type we also use a 
         // faster rendering method that the crosswalk API.
-        if(dmdTypes.size() == 0 || dmdTypes.contains("DIM"))
+        if(dmdTypes.isEmpty() || dmdTypes.contains("DIM"))
         {
             // Metadata element's ID
             String dmdID = getGenericID("dmd_");
@@ -255,14 +284,14 @@ public class ContainerAdapter extends AbstractAdapter
             {
                 Collection collection = (Collection) dso;
                 
-                String description = collection.getMetadata("introductory_text");
-                String description_abstract = collection.getMetadata("short_description");
-                String description_table = collection.getMetadata("side_bar_text");
+                String description = collectionService.getMetadata(collection, "introductory_text");
+                String description_abstract = collectionService.getMetadata(collection, "short_description");
+                String description_table = collectionService.getMetadata(collection, "side_bar_text");
                 String identifier_uri = "http://hdl.handle.net/" + collection.getHandle();
-                String provenance = collection.getMetadata("provenance_description");
-                String rights = collection.getMetadata("copyright_text");
-                String rights_license = collection.getMetadata("license");
-                String title = collection.getMetadata("name");
+                String provenance = collectionService.getMetadata(collection, "provenance_description");
+                String rights = collectionService.getMetadata(collection, "copyright_text");
+                String rights_license = collectionService.getMetadata(collection, "license");
+                String title = collectionService.getMetadata(collection, "name");
                 
                 createField("dc","description",null,null,description);
                 createField("dc","description","abstract",null,description_abstract);
@@ -273,7 +302,7 @@ public class ContainerAdapter extends AbstractAdapter
                 createField("dc","rights","license",null,rights_license);
                 createField("dc","title",null,null,title);
                 
-                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
                  
                 if (showCount)
                 {
@@ -292,12 +321,12 @@ public class ContainerAdapter extends AbstractAdapter
             {
                 Community community = (Community) dso;
                 
-                String description = community.getMetadata("introductory_text");
-                String description_abstract = community.getMetadata("short_description");
-                String description_table = community.getMetadata("side_bar_text");
+                String description = communityService.getMetadata(community, "introductory_text");
+                String description_abstract = communityService.getMetadata(community, "short_description");
+                String description_table = communityService.getMetadata(community, "side_bar_text");
                 String identifier_uri = "http://hdl.handle.net/" + community.getHandle();
-                String rights = community.getMetadata("copyright_text");
-                String title = community.getMetadata("name");
+                String rights = communityService.getMetadata(community, "copyright_text");
+                String title = communityService.getMetadata(community, "name");
                 
                 createField("dc","description",null,null,description);
                 createField("dc","description","abstract",null,description_abstract);
@@ -306,7 +335,7 @@ public class ContainerAdapter extends AbstractAdapter
                 createField("dc","rights",null,null,rights);
                 createField("dc","title",null,null,title);
                 
-                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
         		
                 if (showCount)
                 {
@@ -382,7 +411,7 @@ public class ContainerAdapter extends AbstractAdapter
             // ///////////////////////////////
             // Send the actual XML content
             try {
-	    		Element dissemination = crosswalk.disseminateElement(dso);
+	    		Element dissemination = crosswalk.disseminateElement(dspaceContext, dso);
 	
 	    		SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler, namespaces);
 	    		// Allow the basics for XML
@@ -428,8 +457,10 @@ public class ContainerAdapter extends AbstractAdapter
      * Render the METS file section. If a logo is present for this
      * container then that single bitstream is listed in the 
      * file section.
-     * 
-     * Example:
+     *
+     * <p>Example:
+     *
+     * <pre>{@code
      * <fileSec>
      *   <fileGrp USE="LOGO">
      *     <file ... >
@@ -437,8 +468,13 @@ public class ContainerAdapter extends AbstractAdapter
      *     </file>
      *   </fileGrp>
      * </fileSec>
+     * }</pre>
+     * @param context session context.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws java.sql.SQLException passed through.
      */
-    protected void renderFileSection() throws SAXException
+    @Override
+    protected void renderFileSection(Context context) throws SAXException, SQLException
     {
     	AttributeMap attributes;
     	
@@ -461,7 +497,7 @@ public class ContainerAdapter extends AbstractAdapter
             // Add the actual file element
             String fileID = getFileID(logo);
             String groupID = getGroupFileID(logo);
-            renderFile(null, logo, fileID, groupID);
+            renderFile(context, null, logo, fileID, groupID);
             
             // ////////////////////////////////
             // End th file group and file section
@@ -475,13 +511,19 @@ public class ContainerAdapter extends AbstractAdapter
      * to the container's logo, if available, otherwise it is an empty 
      * division that just states it is a DSpace community or Collection.
      * 
-     * Example:
+     * <p>Example:
+     *
+     * <pre>{@code
      * <structMap TYPE="LOGICAL" LABEL="DSpace">
      *   <div TYPE="DSpace Collection" DMDID="space-separated list of ids">
      *     <fptr FILEID="logo id"/>
      *   </div>
      * </structMap>
+     * }</pre>
+     * @throws java.sql.SQLException passed through.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     protected void renderStructureMap() throws SQLException, SAXException
     {
     	AttributeMap attributes;
@@ -735,7 +777,7 @@ public class ContainerAdapter extends AbstractAdapter
 					
 					xmlDocument = document.getRootElement();
 	        	} 
-	        	catch (Exception e) 
+	        	catch (JDOMException | IOException e)
 				{
                     log.trace("Caught exception", e);
 				}

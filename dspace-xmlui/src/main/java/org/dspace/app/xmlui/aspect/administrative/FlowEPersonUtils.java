@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,9 +24,12 @@ import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.eperson.AccountManager;
+import org.dspace.eperson.AccountServiceImpl;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonDeletionException;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.AccountService;
+import org.dspace.eperson.service.EPersonService;
 
 /**
  * Utility methods to processes actions on EPeople. These methods are used
@@ -50,7 +54,10 @@ public class FlowEPersonUtils {
 	
 	private static final Message t_delete_eperson_failed_notice =
 		new Message("default","xmlui.administrative.FlowEPersonUtils.delete_eperson_failed_notice");
-	
+
+	protected static final AccountService accountService = EPersonServiceFactory.getInstance().getAccountService();
+	protected static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
 	/**
 	 * Add a new eperson. This method will check that the email address, 
 	 * first name, and last name are non empty. Also a check is performed 
@@ -61,6 +68,8 @@ public class FlowEPersonUtils {
 	 * @param request The HTTP request parameters
 	 * @param objectModel Cocoon's object model
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
 	public static FlowResult processAddEPerson(Context context, Request request, Map objectModel) throws SQLException, AuthorizeException 
 	{
@@ -91,7 +100,7 @@ public class FlowEPersonUtils {
 	    
 	    
 		// Check if the email address is already being used.	        		
-    	EPerson potentialDupicate = EPerson.findByEmail(context,email);
+    	EPerson potentialDupicate = ePersonService.findByEmail(context,email);
     	if (potentialDupicate != null)
     	{
     		// special error that the front end knows about.
@@ -103,15 +112,14 @@ public class FlowEPersonUtils {
 	    {
     		EPerson newPerson = AuthenticationUtil.createNewEperson(objectModel,email);
     		
-    		newPerson.setFirstName(first);
-            newPerson.setLastName(last);
-            newPerson.setMetadata("phone", phone);
+    		newPerson.setFirstName(context, first);
+            newPerson.setLastName(context, last);
+            ePersonService.setMetadata(context, newPerson, "phone", phone);
             newPerson.setCanLogIn(login);
             newPerson.setRequireCertificate(certificate);
             newPerson.setSelfRegistered(false);
             
-            newPerson.update();
-            context.commit();
+			ePersonService.update(context, newPerson);
             // success
             result.setContinue(true);
             result.setOutcome(true);
@@ -133,9 +141,11 @@ public class FlowEPersonUtils {
 	 * @param ObjectModel Cocoon's object model
 	 * @param epersonID The unique id of the eperson being edited.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
 	public static FlowResult processEditEPerson(Context context,
-            Request request, Map ObjectModel, int epersonID)
+            Request request, Map ObjectModel, UUID epersonID)
             throws SQLException, AuthorizeException 
 	{
 
@@ -170,13 +180,13 @@ public class FlowEPersonUtils {
 		if (result.getErrors() == null)
 	    {
     		// Grab the person in question 
-    		EPerson personModified = EPerson.find(context, epersonID);
+    		EPerson personModified = ePersonService.find(context, epersonID);
         	
     		// Make sure the email address we are changing to is unique
         	String originalEmail = personModified.getEmail();
             if (originalEmail == null || !originalEmail.equals(email))
         	{	
-        		EPerson potentialDupicate = EPerson.findByEmail(context,email);
+        		EPerson potentialDupicate = ePersonService.findByEmail(context,email);
         		
         		if (potentialDupicate == null) 
         		{
@@ -191,23 +201,22 @@ public class FlowEPersonUtils {
         	}
         	String originalFirstName = personModified.getFirstName();
             if (originalFirstName == null || !originalFirstName.equals(first)) {
-        		personModified.setFirstName(first);
+        		personModified.setFirstName(context, first);
         	}
         	String originalLastName = personModified.getLastName();
             if (originalLastName == null || !originalLastName.equals(last)) {
-        		personModified.setLastName(last);
+        		personModified.setLastName(context, last);
         	}
-        	String originalPhone = personModified.getMetadata("phone");
+        	String originalPhone = ePersonService.getMetadata(personModified, "phone");
             if (originalPhone == null || !originalPhone.equals(phone)) {
-        		personModified.setMetadata("phone", phone);
+				ePersonService.setMetadata(context, personModified, "phone", phone);
         	}
         	personModified.setCanLogIn(login);
         	personModified.setRequireCertificate(certificate);
         	
         	
-        	personModified.update();
-        	context.commit();
-        	
+			ePersonService.update(context, personModified);
+
         	result.setContinue(true);
         	result.setOutcome(true);
         	// FIXME: rename this message
@@ -225,13 +234,18 @@ public class FlowEPersonUtils {
 	 * @param context The current DSpace context
 	 * @param epersonID The unique id of the eperson being edited.
 	 * @return A process result's object.
+     * @throws java.io.IOException passed through.
+     * @throws javax.mail.MessagingException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
-	public static FlowResult processResetPassword(Context context, int epersonID) throws IOException, MessagingException, SQLException, AuthorizeException 
+	public static FlowResult processResetPassword(Context context, UUID epersonID)
+            throws IOException, MessagingException, SQLException, AuthorizeException
 	{	
-		EPerson eperson = EPerson.find(context, epersonID);
+		EPerson eperson = ePersonService.find(context, epersonID);
 		
 		// Note, this may throw an error is the email is bad.
-		AccountManager.sendForgotPasswordInfo(context,eperson.getEmail());
+		accountService.sendForgotPasswordInfo(context, eperson.getEmail());
 	
 		FlowResult result = new FlowResult();
 		result.setContinue(true);
@@ -250,8 +264,9 @@ public class FlowEPersonUtils {
 	 * @param objectModel Object model to obtain the HTTP request from.
 	 * @param epersonID The epersonID of the person to login as.
 	 * @return The flow result.
+     * @throws java.sql.SQLException passed through.
 	 */
-	public static FlowResult processLoginAs(Context context, Map objectModel, int epersonID) throws SQLException
+	public static FlowResult processLoginAs(Context context, Map objectModel, UUID epersonID) throws SQLException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(true);
@@ -259,7 +274,7 @@ public class FlowEPersonUtils {
 		
 		final HttpServletRequest request = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
         
-		EPerson eperson = EPerson.find(context,epersonID);
+		EPerson eperson = ePersonService.find(context,epersonID);
 
 		try {
 			AuthenticationUtil.loginAs(context, request, eperson);
@@ -281,25 +296,20 @@ public class FlowEPersonUtils {
 	 * @param context The current DSpace context
 	 * @param epeopleIDs The unique id of the eperson being edited.
 	 * @return A process result's object.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws org.dspace.eperson.EPersonDeletionException passed through.
+     * @throws java.io.IOException passed through.
 	 */
-	public static FlowResult processDeleteEPeople(Context context, String[] epeopleIDs) throws NumberFormatException, SQLException, AuthorizeException, EPersonDeletionException
-	{
+	public static FlowResult processDeleteEPeople(Context context, String[] epeopleIDs)
+            throws NumberFormatException, SQLException, AuthorizeException, EPersonDeletionException, IOException {
 		FlowResult result = new FlowResult();
 		
 		List<String> unableList = new ArrayList<String>();
     	for (String id : epeopleIDs) 
     	{
-    		EPerson personDeleted = EPerson.find(context, Integer.valueOf(id));
-    		try {
-				personDeleted.delete();
-    		} 
-    		catch (EPersonDeletionException epde)
-    		{
-    			String firstName = personDeleted.getFirstName();
-    			String lastName = personDeleted.getLastName();
-    			String email = personDeleted.getEmail();
-    			unableList.add(firstName + " " + lastName + " ("+email+")");
-    		}
+    		EPerson personDeleted = ePersonService.find(context, UUID.fromString(id));
+			ePersonService.delete(context, personDeleted);
 	    }
     	
     	if (unableList.size() > 0)
@@ -327,8 +337,7 @@ public class FlowEPersonUtils {
     		result.setOutcome(true);
     		result.setMessage(t_delete_eperson_success_notice);
     	}
- 
-    	
+
     	return result;
 	}
 }

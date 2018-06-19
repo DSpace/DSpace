@@ -19,11 +19,15 @@
   -    admin_button - Boolean, show admin 'edit' button
   --%>
 
+<%@page import="org.dspace.content.service.CollectionService"%>
+<%@page import="org.dspace.content.factory.ContentServiceFactory"%>
+<%@page import="org.dspace.content.service.CommunityService"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
@@ -31,17 +35,18 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
 <%@ page import="org.dspace.content.*" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.services.ConfigurationService" %>
+<%@ page import="org.dspace.services.factory.DSpaceServicesFactory" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
     // Retrieve attributes
     Community community = (Community) request.getAttribute( "community" );
-    Collection[] collections =
-        (Collection[]) request.getAttribute("collections");
-    Community[] subcommunities =
-        (Community[]) request.getAttribute("subcommunities");
+    List<Collection> collections =
+        (List<Collection>) request.getAttribute("collections");
+    List<Community> subcommunities =
+        (List<Community>) request.getAttribute("subcommunities");
     
     RecentSubmissions rs = (RecentSubmissions) request.getAttribute("recently.submitted");
     
@@ -54,19 +59,25 @@
 
 	// get the browse indices
     BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
-
+	CommunityService comServ = ContentServiceFactory.getInstance().getCommunityService();
+	CollectionService colServ = ContentServiceFactory.getInstance().getCollectionService();
     // Put the metadata values into guaranteed non-null variables
-    String name = community.getMetadata("name");
-    String intro = community.getMetadata("introductory_text");
-    String copyright = community.getMetadata("copyright_text");
-    String sidebar = community.getMetadata("side_bar_text");
+    String name = comServ.getMetadata(community, "name");
+    String intro = comServ.getMetadata(community, "introductory_text");
+    String copyright = comServ.getMetadata(community, "copyright_text");
+    String sidebar = comServ.getMetadata(community, "side_bar_text");
     Bitstream logo = community.getLogo();
     
-    boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
+    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    
+    boolean feedEnabled = configurationService.getBooleanProperty("webui.feed.enable");
     String feedData = "NONE";
     if (feedEnabled)
     {
-        feedData = "comm:" + ConfigurationManager.getProperty("webui.feed.formats");
+        // FeedData is expected to be a comma separated list
+        String[] formats = configurationService.getArrayProperty("webui.feed.formats");
+        String allFormats = StringUtils.join(formats, ",");
+        feedData = "comm:" + allFormats;
     }
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
@@ -79,7 +90,7 @@
 	<div class="col-md-8">
         <h2><%= name %>
         <%
-            if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+            if(configurationService.getBooleanProperty("webui.strengths.show"))
             {
 %>
                 : [<%= ic.getCount(community) %>]
@@ -104,7 +115,7 @@
 <p class="copyrightText"><%= copyright %></p>
 	<div class="row">
 <%
-	if (rs != null)
+	if (rs != null  && rs.count() > 0)
 	{ %>
 	<div class="col-md-8">
         <div class="panel panel-primary">        
@@ -143,28 +154,25 @@
 			</h3>
 		
 	<%
-		Item[] items = rs.getRecentSubmissions();
+		List<Item> items = rs.getRecentSubmissions();
 		boolean first = true;
-		if(items!=null && items.length>0) 
+		if(items!=null && items.size()>0) 
 		{ 
 	%>	
 		<!-- Wrapper for slides -->
 		  <div class="carousel-inner">
-	<%	for (int i = 0; i < items.length; i++)
+	<%	for (int i = 0; i < items.size(); i++)
 		{
-			Metadatum[] dcv = items[i].getMetadata("dc", "title", null, Item.ANY);
+			String title = items.get(i).getName();
 			String displayTitle = "Untitled";
-			if (dcv != null)
+			if (StringUtils.isNotBlank(title))
 			{
-				if (dcv.length > 0)
-				{
-					displayTitle = Utils.addEntities(dcv[0].value);
-				}
+				displayTitle = Utils.addEntities(title);
 			}
 			%>
 		    <div style="padding-bottom: 50px; min-height: 200px;" class="item <%= first?"active":""%>">
 		      <div style="padding-left: 80px; padding-right: 80px; display: inline-block;"><%= StringUtils.abbreviate(displayTitle, 400) %> 
-		      	<a href="<%= request.getContextPath() %>/handle/<%=items[i].getHandle() %>" class="btn btn-success">See</a>
+		      	<a href="<%= request.getContextPath() %>/handle/<%=items.get(i).getHandle() %>" class="btn btn-success">See</a>
 		      </div>
 		    </div>
 <%
@@ -196,9 +204,6 @@
 <%
 	}
 %>
-	<div class="col-md-4">
-    	<%= sidebar %>
-	</div>
 </div>	
 
 <%-- Browse --%>
@@ -224,22 +229,13 @@
 </div>
 
 <div class="row">
-
-    <%
-    	int discovery_panel_cols = 12;
-    	int discovery_facet_cols = 4;
-    %>
-	<%@ include file="discovery/static-sidebar-facet.jsp" %>
-</div>
-
-<div class="row">
 	<%@ include file="discovery/static-tagcloud-facet.jsp" %>
 </div>
 	
 <div class="row">
 <%
-	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.community-home.logos", true);
-	if (subcommunities.length != 0)
+	boolean showLogos = configurationService.getBooleanProperty("jspui.community-home.logos", true);
+	if (subcommunities.size() != 0)
     {
 %>
 	<div class="col-md-6">
@@ -248,12 +244,12 @@
    
         <div class="list-group">
 <%
-        for (int j = 0; j < subcommunities.length; j++)
+        for (int j = 0; j < subcommunities.size(); j++)
         {
 %>
 			<div class="list-group-item row">  
 <%  
-		Bitstream logoCom = subcommunities[j].getLogo();
+		Bitstream logoCom = subcommunities.get(j).getLogo();
 		if (showLogos && logoCom != null) { %>
 			<div class="col-md-3">
 		        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logoCom.getID() %>" /> 
@@ -263,26 +259,26 @@
 			<div class="col-md-12">
 <% }  %>		
 
-	      <h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= subcommunities[j].getHandle() %>">
-	                <%= subcommunities[j].getMetadata("name") %></a>
+	      <h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= subcommunities.get(j).getHandle() %>">
+	                <%= subcommunities.get(j).getName() %></a>
 <%
-                if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+                if (configurationService.getBooleanProperty("webui.strengths.show"))
                 {
 %>
-                    [<%= ic.getCount(subcommunities[j]) %>]
+                    [<%= ic.getCount(subcommunities.get(j)) %>]
 <%
                 }
 %>
 	    		<% if (remove_button) { %>
 	                <form class="btn-group" method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
 			          <input type="hidden" name="parent_community_id" value="<%= community.getID() %>" />
-			          <input type="hidden" name="community_id" value="<%= subcommunities[j].getID() %>" />
+			          <input type="hidden" name="community_id" value="<%= subcommunities.get(j).getID() %>" />
 			          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_DELETE_COMMUNITY%>" />
 	                  <button type="submit" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button>
 	                </form>
 	    		<% } %>
 			    </h4>
-                <p class="collectionDescription"><%= subcommunities[j].getMetadata("short_description") %></p>
+                <p class="collectionDescription"><%= comServ.getMetadata(subcommunities.get(j), "short_description") %></p>
             </div>
          </div> 
 <%
@@ -295,7 +291,7 @@
 %>
 
 <%
-    if (collections.length != 0)
+    if (collections.size() != 0)
     {
 %>
 	<div class="col-md-6">
@@ -304,12 +300,12 @@
 		<h3><fmt:message key="jsp.community-home.heading2"/></h3>
 		<div class="list-group">
 <%
-        for (int i = 0; i < collections.length; i++)
+        for (int i = 0; i < collections.size(); i++)
         {
 %>
 			<div class="list-group-item row">  
 <%  
-		Bitstream logoCol = collections[i].getLogo();
+		Bitstream logoCol = collections.get(i).getLogo();
 		if (showLogos && logoCol != null) { %>
 			<div class="col-md-3">
 		        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logoCol.getID() %>" /> 
@@ -319,13 +315,13 @@
 			<div class="col-md-12">
 <% }  %>		
 
-	      <h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= collections[i].getHandle() %>">
-	      <%= collections[i].getMetadata("name") %></a>
+	      <h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= collections.get(i).getHandle() %>">
+	      <%= collections.get(i).getName() %></a>
 <%
-            if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+            if(configurationService.getBooleanProperty("webui.strengths.show"))
             {
 %>
-                [<%= ic.getCount(collections[i]) %>]
+                [<%= ic.getCount(collections.get(i)) %>]
 <%
             }
 %>
@@ -333,13 +329,13 @@
 	      <form class="btn-group" method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
 	          <input type="hidden" name="parent_community_id" value="<%= community.getID() %>" />
 	          <input type="hidden" name="community_id" value="<%= community.getID() %>" />
-	          <input type="hidden" name="collection_id" value="<%= collections[i].getID() %>" />
+	          <input type="hidden" name="collection_id" value="<%= collections.get(i).getID() %>" />
 	          <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_DELETE_COLLECTION%>" />
 	          <button type="submit" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button>
 	      </form>
 	    <% } %>
 		</h4>
-      <p class="collectionDescription"><%= collections[i].getMetadata("short_description") %></p>
+      <p class="collectionDescription"><%= colServ.getMetadata(collections.get(i), "short_description") %></p>
     </div>
   </div>  
 <%
@@ -351,9 +347,9 @@
     }
 %>
 </div>
+    <dspace:sidebar>
     <% if(editor_button || add_button)  // edit button(s)
     { %>
-    <dspace:sidebar>
 		 <div class="panel panel-warning">
              <div class="panel-heading">
              	<fmt:message key="jsp.admintools"/>
@@ -402,6 +398,12 @@
 			<% } %>
 			</div>
 		</div>
+		<% } %>
+		<%= sidebar %>
+		<%
+			int discovery_panel_cols = 12;
+			int discovery_facet_cols = 12;
+		%>
+		<%@ include file="discovery/static-sidebar-facet.jsp" %>
   </dspace:sidebar>
-    <% } %>
 </dspace:layout>

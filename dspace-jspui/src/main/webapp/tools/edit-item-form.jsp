@@ -26,37 +26,31 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
     prefix="c" %>
 
-<%@ page import="java.util.Date" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Map" %>
-
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="javax.servlet.jsp.PageContext" %>
 
-<%@ page import="org.dspace.content.MetadataField" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.AuthorizeAdminServlet" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
-<%@ page import="org.dspace.content.Bitstream" %>
-<%@ page import="org.dspace.content.BitstreamFormat" %>
-<%@ page import="org.dspace.content.Bundle" %>
-<%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="org.dspace.content.Metadatum" %>
-<%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.core.Utils" %>
-<%@ page import="org.dspace.content.authority.MetadataAuthorityManager" %>
-<%@ page import="org.dspace.content.authority.ChoiceAuthorityManager" %>
+<%@ page import="org.dspace.content.authority.service.MetadataAuthorityService" %>
+<%@ page import="org.dspace.content.authority.service.ChoiceAuthorityService" %>
 <%@ page import="org.dspace.content.authority.Choices" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.*" %>
+<%@ page import="org.dspace.content.authority.service.MetadataAuthorityService" %>
+<%@ page import="org.dspace.content.*" %>
+<%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.authority.factory.ContentAuthorityServiceFactory" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%
     Item item = (Item) request.getAttribute("item");
     String handle = (String) request.getAttribute("handle");
-    Collection[] collections = (Collection[]) request.getAttribute("collections");
-    MetadataField[] dcTypes = (MetadataField[])  request.getAttribute("dc.types");
+    List<Collection> collections = (List<Collection>) request.getAttribute("collections");
+    List<MetadataField> dcTypes = (List<MetadataField>)  request.getAttribute("dc.types");
     HashMap metadataFields = (HashMap) request.getAttribute("metadataFields");
     request.setAttribute("LanguageSwitch", "hide");
 
@@ -66,6 +60,25 @@
     // Is the logged in user an admin of the item
     Boolean itemAdmin = (Boolean)request.getAttribute("admin_button");
     boolean isItemAdmin = (itemAdmin == null ? false : itemAdmin.booleanValue());
+
+    // Is the logged in user an admin or community admin or collection admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
+    
+    Boolean communityAdmin = (Boolean)request.getAttribute("is.communityAdmin");
+    boolean isCommunityAdmin = (communityAdmin == null ? false : communityAdmin.booleanValue());
+    
+    Boolean collectionAdmin = (Boolean)request.getAttribute("is.collectionAdmin");
+    boolean isCollectionAdmin = (collectionAdmin == null ? false : collectionAdmin.booleanValue());
+    
+    String naviAdmin = "admin";
+    String link = "/dspace-admin";
+    
+    if(!isAdmin && (isCommunityAdmin || isCollectionAdmin))
+    {
+        naviAdmin = "community-or-collection-admin";
+        link = "/tools";
+    }
     
     Boolean policy = (Boolean)request.getAttribute("policy_button");
     boolean bPolicy = (policy == null ? false : policy.booleanValue());
@@ -98,15 +111,15 @@
     boolean breOrderBitstreams = (reOrderBitstreams != null && reOrderBitstreams);
 
     // owning Collection ID for choice authority calls
-    int collectionID = -1;
-    if (collections.length > 0)
-        collectionID = collections[0].getID();
+    Collection collection = null;
+    if (collections.size() > 0)
+        collection = collections.get(0);
 %>
 <%!
-     StringBuffer doAuthority(MetadataAuthorityManager mam, ChoiceAuthorityManager cam,
+     StringBuffer doAuthority(MetadataAuthorityService mam, ChoiceAuthorityService cam,
             PageContext pageContext,
             String contextPath, String fieldName, String idx,
-            Metadatum dcv, int collectionID)
+            MetadataValue dcv, Collection collection)
     {
         StringBuffer sb = new StringBuffer();
         if (cam.isChoicesConfigured(fieldName))
@@ -124,10 +137,10 @@
                 sb.append("<select class=\"form-control\" id=\"").append(fieldNameIdx)
                    .append("\" name=\"").append(fieldNameIdx)
                    .append("\" size=\"1\">");
-                Choices cs = cam.getMatches(fieldName, dcv.value, collectionID, 0, 0, null);
+                Choices cs = cam.getMatches(fieldName, dcv.getValue(), collection, 0, 0, null);
                 if (cs.defaultSelected < 0)
-                    sb.append("<option value=\"").append(dcv.value).append("\" selected>")
-                      .append(dcv.value).append("</option>\n");
+                    sb.append("<option value=\"").append(dcv.getValue()).append("\" selected>")
+                      .append(dcv.getValue()).append("</option>\n");
 
                 for (int i = 0; i < cs.values.length; ++i)
                 {
@@ -144,11 +157,11 @@
                 String confidenceIndicator = "indicator_"+confidenceName;
                 sb.append("<textarea class=\"form-control\" id=\"").append(fieldNameIdx).append("\" name=\"").append(fieldNameIdx)
                    .append("\" rows=\"3\" cols=\"50\">")
-                   .append(dcv.value).append("</textarea>\n<br/>\n");
+                   .append(dcv.getValue()).append("</textarea>\n<br/>\n");
 
                 if (authority)
                 {
-                    String confidenceSymbol = Choices.getConfidenceText(dcv.confidence).toLowerCase();
+                    String confidenceSymbol = Choices.getConfidenceText(dcv.getConfidence()).toLowerCase();
                     sb.append("<span class=\"col-md-1\">")
                       .append("<img id=\""+confidenceIndicator+"\"  title=\"")
                       .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
@@ -157,7 +170,7 @@
                       .append("</span>");
                 	sb.append("<span class=\"col-md-5\">")
                       .append("<input class=\"form-control\" type=\"text\" readonly value=\"")
-                      .append(dcv.authority != null ? dcv.authority : "")
+                      .append(dcv.getAuthority() != null ? dcv.getAuthority() : "")
                       .append("\" id=\"").append(authorityName)
                       .append("\" onChange=\"javascript: return DSpaceAuthorityOnChange(this, '")
                       .append(confidenceName).append("','").append(confidenceIndicator)
@@ -181,7 +194,7 @@
                  .append(fieldName).append("','edit_metadata','")
                  .append(fieldNameIdx).append("','").append(authorityName).append("','")
                  .append(confidenceIndicator).append("',")
-                 .append(String.valueOf(collectionID)).append(",")
+                 .append(String.valueOf(collection.getID())).append(",")
                  .append("false").append(",false);\"")
                  .append(" title=\"")
                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.lookup"))
@@ -201,10 +214,10 @@
 </c:set>
 
 <dspace:layout style="submission" titlekey="jsp.tools.edit-item-form.title"
-               navbar="admin"
+               navbar="<%= naviAdmin %>"
                locbar="link"
                parenttitlekey="jsp.administer"
-               parentlink="/dspace-admin"
+               parentlink="<%= link %>"
                nocache="true">
 
 
@@ -250,7 +263,7 @@
 						<td><fmt:message key="jsp.tools.edit-item-form.collections" />
 						</td>
 						<td>
-							<%  for (int i = 0; i < collections.length; i++) { %> <%= collections[i].getMetadata("name") %>
+							<%  for (int i = 0; i < collections.size(); i++) { %> <%= collections.get(i).getName() %>
 							<br /> <%  } %>
 						</td>
 					</tr>
@@ -420,9 +433,9 @@
                 <th id="t5" class="oddRowEvenCol">&nbsp;</th>
             </tr>
 <%
-    MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
-    ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
-    Metadatum[] dcv = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+    MetadataAuthorityService mam = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+    ChoiceAuthorityService cam = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+    List<MetadataValue> dcv = ContentServiceFactory.getInstance().getItemService().getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
     String row = "even";
     
     // Keep a count of the number of values of each element+qualifier
@@ -430,11 +443,11 @@
     // values are Integers - number of values that element/qualifier so far
     Map<String, Integer> dcCounter = new HashMap<String, Integer>();
     
-    for (int i = 0; i < dcv.length; i++)
+    for (int i = 0; i < dcv.size(); i++)
     {
         // Find out how many values with this element/qualifier we've found
 
-        String key = ChoiceAuthorityManager.makeFieldKey(dcv[i].schema, dcv[i].element, dcv[i].qualifier);
+        String key = dcv.get(i).getMetadataField().toString();
 
         Integer count = dcCounter.get(key);
         if (count == null)
@@ -457,9 +470,9 @@
         }
  %>
             <tr>
-                <td headers="t0" class="<%= row %>RowOddCol"><%=dcv[i].schema %></td>
-                <td headers="t1" class="<%= row %>RowEvenCol"><%= dcv[i].element %>&nbsp;&nbsp;</td>
-                <td headers="t2" class="<%= row %>RowOddCol"><%= (dcv[i].qualifier == null ? "" : dcv[i].qualifier) %></td>
+                <td headers="t0" class="<%= row %>RowOddCol"><%=dcv.get(i).getMetadataField().getMetadataSchema().getName() %></td>
+                <td headers="t1" class="<%= row %>RowEvenCol"><%= dcv.get(i).getMetadataField().getElement() %>&nbsp;&nbsp;</td>
+                <td headers="t2" class="<%= row %>RowOddCol"><%= (dcv.get(i).getMetadataField().getQualifier() == null ? "" : dcv.get(i).getMetadataField().getQualifier()) %></td>
                 <td headers="t3" class="<%= row %>RowEvenCol">
                     <%
                         if (cam.isChoicesConfigured(key))
@@ -467,14 +480,14 @@
                     %>
                     <%=
                         doAuthority(mam, cam, pageContext, request.getContextPath(), key, sequenceNumber,
-                                dcv[i], collectionID).toString()
+                                dcv.get(i), collection).toString()
                     %>
                     <% } else { %>
-                        <textarea class="form-control" id="value_<%= key %>_<%= sequenceNumber %>" name="value_<%= key %>_<%= sequenceNumber %>" rows="3" cols="50"><%= dcv[i].value %></textarea>
+                        <textarea class="form-control" id="value_<%= key %>_<%= sequenceNumber %>" name="value_<%= key %>_<%= sequenceNumber %>" rows="3" cols="50"><%= dcv.get(i).getValue() %></textarea>
                     <% } %>
                 </td>
                 <td headers="t4" class="<%= row %>RowOddCol">
-                    <input class="form-control" type="text" name="language_<%= key %>_<%= sequenceNumber %>" value="<%= (dcv[i].language == null ? "" : dcv[i].language.trim()) %>" size="5"/>
+                    <input class="form-control" type="text" name="language_<%= key %>_<%= sequenceNumber %>" value="<%= (dcv.get(i).getLanguage() == null ? "" : dcv.get(i).getLanguage().trim()) %>" size="5"/>
                 </td>
                 <td headers="t5" class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="Remove" /> --%>
@@ -490,9 +503,9 @@
         
                 <td headers="t1" colspan="3" class="<%= row %>RowEvenCol">
                     <select  class="form-control" name="addfield_dctype">
-<%  for (int i = 0; i < dcTypes.length; i++)
+<%  for (int i = 0; i < dcTypes.size(); i++)
     {
-        Integer fieldID = new Integer(dcTypes[i].getFieldID());
+        Integer fieldID = new Integer(dcTypes.get(i).getID());
         String displayName = (String)metadataFields.get(fieldID);
 %>
                         <option value="<%= fieldID.intValue() %>"><%= displayName %></option>
@@ -545,35 +558,36 @@
                 <th id="t18" class="oddRowEvenCol">&nbsp;</th>
             </tr>
 <%
-    Bundle[] bundles = item.getBundles();
+    List<Bundle> bundles = item.getBundles();
     row = "even";
 
-    for (int i = 0; i < bundles.length; i++)
+    for (int i = 0; i < bundles.size(); i++)
     {
-        Bitstream[] bitstreams = bundles[i].getBitstreams();
-        for (int j = 0; j < bitstreams.length; j++)
+        List<Bitstream> bitstreams = bundles.get(i).getBitstreams();
+        for (int j = 0; j < bitstreams.size(); j++)
         {
-            ArrayList<Integer> bitstreamIdOrder = new ArrayList<Integer>();
+            ArrayList<UUID> bitstreamIdOrder = new ArrayList<UUID>();
             for (Bitstream bitstream : bitstreams) {
                 bitstreamIdOrder.add(bitstream.getID());
             }
 
             // Parameter names will include the bundle and bitstream ID
             // e.g. "bitstream_14_18_desc" is the description of bitstream 18 in bundle 14
-            String key = bundles[i].getID() + "_" + bitstreams[j].getID();
-            BitstreamFormat bf = bitstreams[j].getFormat();
+            Bitstream bitstream = bitstreams.get(j);
+            String key = bundles.get(i).getID() + "_" + (bitstream).getID();
+            BitstreamFormat bf = (bitstream).getFormat(UIUtil.obtainContext(request));
 %>
-            <tr id="<%="row_" + bundles[i].getName() + "_" + bitstreams[j].getID()%>">
+            <tr id="<%="row_" + bundles.get(i).getName() + "_" + bitstream.getID()%>">
             	<td headers="t10" class="<%= row %>RowEvenCol" align="center">
-                	<%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
-					<a class="btn btn-info" target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;
+                	<%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
+					<a class="btn btn-info" target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstream.getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;
 				</td>
-                <% if (bundles[i].getName().equals("ORIGINAL"))
+                <% if (bundles.get(i).getName().equals("ORIGINAL"))
                    { %>
                      <td headers="t11" class="<%= row %>RowEvenCol" align="center">
                        <span class="form-control">
-                       <input type="radio" name="<%= bundles[i].getID() %>_primary_bitstream_id" value="<%= bitstreams[j].getID() %>"
-                           <% if (bundles[i].getPrimaryBitstreamID() == bitstreams[j].getID()) { %>
+                       <input type="radio" name="<%= bundles.get(i).getID() %>_primary_bitstream_id" value="<%= bitstream.getID() %>"
+                           <% if (bitstream.equals(bundles.get(i).getPrimaryBitstream())) { %>
                                   checked="<%="checked" %>"
                            <% } %> /></span>
                    </td>
@@ -581,57 +595,57 @@
                      <td headers="t11"> </td>
                 <% } %>
                 <td headers="t12" class="<%= row %>RowOddCol">
-                    <input class="form-control" type="text" name="bitstream_name_<%= key %>" value="<%= (bitstreams[j].getName() == null ? "" : Utils.addEntities(bitstreams[j].getName())) %>"/>
+                    <input class="form-control" type="text" name="bitstream_name_<%= key %>" value="<%= ((bitstream).getName() == null ? "" : Utils.addEntities(bitstream.getName())) %>"/>
                 </td>
                 <td headers="t13" class="<%= row %>RowEvenCol">
-                    <input class="form-control" type="text" name="bitstream_source_<%= key %>" value="<%= (bitstreams[j].getSource() == null ? "" : bitstreams[j].getSource()) %>"/>
+                    <input class="form-control" type="text" name="bitstream_source_<%= key %>" value="<%= ((bitstream).getSource() == null ? "" : bitstream.getSource()) %>"/>
                 </td>
                 <td headers="t14" class="<%= row %>RowOddCol">
-                    <input class="form-control" type="text" name="bitstream_description_<%= key %>" value="<%= (bitstreams[j].getDescription() == null ? "" : Utils.addEntities(bitstreams[j].getDescription())) %>"/>
+                    <input class="form-control" type="text" name="bitstream_description_<%= key %>" value="<%= ((bitstream).getDescription() == null ? "" : Utils.addEntities(bitstream.getDescription())) %>"/>
                 </td>
                 <td headers="t15" class="<%= row %>RowEvenCol">
                     <input class="form-control" type="text" name="bitstream_format_id_<%= key %>" value="<%= bf.getID() %>" size="4"/> (<%= Utils.addEntities(bf.getShortDescription()) %>)
                 </td>
                 <td headers="t16" class="<%= row %>RowOddCol">
-                    <input class="form-control" type="text" name="bitstream_user_format_description_<%= key %>" value="<%= (bitstreams[j].getUserFormatDescription() == null ? "" : Utils.addEntities(bitstreams[j].getUserFormatDescription())) %>"/>
+                    <input class="form-control" type="text" name="bitstream_user_format_description_<%= key %>" value="<%= ((bitstream).getUserFormatDescription() == null ? "" : Utils.addEntities(bitstream.getUserFormatDescription())) %>"/>
                 </td>
 <%
-                   if (bundles[i].getName().equals("ORIGINAL") && breOrderBitstreams)
+                   if (bundles.get(i).getName().equals("ORIGINAL") && breOrderBitstreams)
                    {
                        //This strings are only used in case the user has javascript disabled
                        String upButtonValue = null;
                        String downButtonValue = null;
                        if(0 != j){
-                           ArrayList<Integer> temp = (ArrayList<Integer>) bitstreamIdOrder.clone();
+                           ArrayList<UUID> temp = (ArrayList<UUID>) bitstreamIdOrder.clone();
                            //We don't have the first button, so create a value where the current bitstreamId moves one up
-                           Integer tempInt = temp.get(j);
+                           UUID tempInt = temp.get(j);
                            temp.set(j, temp.get(j - 1));
                            temp.set(j - 1, tempInt);
-                           upButtonValue = StringUtils.join(temp.toArray(new Integer[temp.size()]), ",");
+                           upButtonValue = StringUtils.join(temp.toArray(new UUID[temp.size()]), ",");
                        }
-                       if(j < (bitstreams.length -1)){
+                       if(j < (bitstreams.size() -1)){
                            //We don't have the first button, so create a value where the current bitstreamId moves one up
-                           ArrayList<Integer> temp = (ArrayList<Integer>) bitstreamIdOrder.clone();
-                           Integer tempInt = temp.get(j);
+                           ArrayList<UUID> temp = (ArrayList<UUID>) bitstreamIdOrder.clone();
+                           UUID tempInt = temp.get(j);
                            temp.set(j, temp.get(j + 1));
                            temp.set(j + 1, tempInt);
-                           downButtonValue = StringUtils.join(temp.toArray(new Integer[temp.size()]), ",");
+                           downButtonValue = StringUtils.join(temp.toArray(new UUID[temp.size()]), ",");
                        }
 
 
 
 %>
                 <td headers="t17" class="<%= row %>RowEvenCol">
-                    <input type="hidden" value="<%=j+1%>" name="order_<%=bitstreams[j].getID()%>">
-                    <input type="hidden" value="<%=upButtonValue%>" name="<%=bundles[i].getID()%>_<%=bitstreams[j].getID()%>_up_value">
-                    <input type="hidden" value="<%=downButtonValue%>" name="<%=bundles[i].getID()%>_<%=bitstreams[j].getID()%>_down_value">
+                    <input type="hidden" value="<%=j+1%>" name="order_<%=bitstream.getID()%>">
+                    <input type="hidden" value="<%=upButtonValue%>" name="<%=bundles.get(i).getID()%>_<%=bitstream.getID()%>_up_value">
+                    <input type="hidden" value="<%=downButtonValue%>" name="<%=bundles.get(i).getID()%>_<%=bitstream.getID()%>_down_value">
                     <div>
                         <button class="btn btn-default" name="submit_order_<%=key%>_up" value="<fmt:message key="jsp.tools.edit-item-form.move-up"/> " <%=j==0 ? "disabled=\"disabled\"" : ""%>>
                         	<span class="glyphicon glyphicon-arrow-up"></span>
                         </button>
                     </div>
                     <div>
-                        <button class="btn btn-default" name="submit_order_<%=key%>_down" value="<fmt:message key="jsp.tools.edit-item-form.move-down"/> " <%=j==(bitstreams.length-1) ? "disabled=\"disabled\"" : ""%>>
+                        <button class="btn btn-default" name="submit_order_<%=key%>_down" value="<fmt:message key="jsp.tools.edit-item-form.move-down"/> " <%=j==(bitstreams.size()-1) ? "disabled=\"disabled\"" : ""%>>
                         	<span class="glyphicon glyphicon-arrow-down"></span>
                         </button>
                     </div>
@@ -680,8 +694,8 @@
                         if (ConfigurationManager.getBooleanProperty("webui.submit.enable-cc") && bccLicense)
                         {
                                 String s;
-                                Bundle[] ccBundle = item.getBundles("CC-LICENSE");
-                                s = ccBundle.length > 0 ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.replacecc.button") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.addcc.button");
+                                List<Bundle> ccBundle = ContentServiceFactory.getInstance().getItemService().getBundles(item, "CC-LICENSE");
+                                s = ccBundle.size() > 0 ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.replacecc.button") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.addcc.button");
                 %>
                     <input class="btn btn-success col-md-3" type="submit" name="submit_addcc" value="<%= s %>" />
                     <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>"/>

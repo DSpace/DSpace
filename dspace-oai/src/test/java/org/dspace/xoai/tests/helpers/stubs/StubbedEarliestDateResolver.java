@@ -9,7 +9,7 @@ package org.dspace.xoai.tests.helpers.stubs;
 
 import org.dspace.core.Context;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
-import org.dspace.xoai.services.api.database.EarliestDateResolver;
+import org.dspace.xoai.services.api.EarliestDateResolver;
 
 import java.sql.SQLException;
 import java.util.Date;

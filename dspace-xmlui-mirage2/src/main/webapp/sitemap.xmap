@@ -54,6 +54,11 @@
             <transformer name="strip-namespaces" src="org.apache.cocoon.transformation.StripNameSpacesTransformer"/>
         </map:transformers>
 
+        <map:actions>
+            <map:action name="ContextAbortAction" src="org.dspace.app.xmlui.cocoon.ContextAbortAction" />
+        </map:actions>
+
+
         <map:serializers>
             <map:serializer name="html-no-doctype" logger="sitemap.serializer.xhtml"
                             src="org.apache.cocoon.serialization.HTMLSerializer"
@@ -230,6 +235,7 @@
                 </map:when>
                 <!-- All other errors (HTTP 500 Internal Server Error) -->
                 <map:otherwise>
+                    <map:act type="ContextAbortAction"/>
                     <map:serialize type="html-no-doctype" status-code="500"/>
                 </map:otherwise>
             </map:select>

@@ -9,11 +9,12 @@ package org.dspace.content.crosswalk;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -66,6 +67,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
             + File.separator + "xhtml-head-item.properties";
 
     private static final String XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
+    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Maps DSpace metadata field to name to use in XHTML head element, e.g.
@@ -135,6 +137,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
         }
     }
 
+    @Override
     public boolean canDisseminate(DSpaceObject dso)
     {
         return (dso.getType() == Constants.ITEM);
@@ -143,13 +146,19 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
     /**
      * This generates a &lt;head&gt; element around the metadata; in general
      * this will probably not be used
+     * @param context context
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    public Element disseminateElement(DSpaceObject dso)
+    @Override
+    public Element disseminateElement(Context context, DSpaceObject dso)
             throws CrosswalkException, IOException, SQLException,
             AuthorizeException
     {
         Element head = new Element("head", XHTML_NAMESPACE);
-        head.addContent(disseminateList(dso));
+        head.addContent(disseminateList(context, dso));
 
         return head;
     }
@@ -157,8 +166,14 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
     /**
      * Return &lt;meta&gt; elements that can be put in the &lt;head&gt; element
      * of an XHTML document.
+     * @param context context
+     * @throws CrosswalkException crosswalk error
+     * @throws IOException if IO error 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    public List<Element> disseminateList(DSpaceObject dso) throws CrosswalkException,
+    @Override
+    public List<Element> disseminateList(Context context, DSpaceObject dso) throws CrosswalkException,
             IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)
@@ -174,7 +189,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
         Item item = (Item) dso;
         String handle = item.getHandle();
         List<Element> metas = new ArrayList<Element>();
-        Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        List<MetadataValue> values = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
         // Add in schema URLs e.g. <link rel="schema.DC" href="...." />
         Iterator<String> schemaIterator = schemaURLs.keySet().iterator();
@@ -188,28 +203,30 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
             metas.add(e);
         }
 
-        for (int i = 0; i < values.length; i++)
+        for (int i = 0; i < values.size(); i++)
         {
-            Metadatum v = values[i];
+            MetadataValue v = values.get(i);
+            MetadataField metadataField = v.getMetadataField();
+            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
 
             // Work out the key for the Maps that will tell us which metadata
             // name + scheme to use
-            String key = v.schema + "." + v.element
-                    + (v.qualifier != null ? "." + v.qualifier : "");
+            String key = metadataSchema.getName() + "." + metadataField.getElement()
+                    + (metadataField.getQualifier() != null ? "." + metadataField.getQualifier() : "");
             String originalKey = key; // For later error msg
 
             // Find appropriate metadata field name to put in element
             String name = names.get(key);
 
             // If we don't have a field, try removing qualifier
-            if (name == null && v.qualifier != null)
+            if (name == null && metadataField.getQualifier() != null)
             {
-                key = v.schema + "." + v.element;
+                key = metadataSchema.getName() + "." + metadataField.getElement();
                 name = names.get(key);
             }
 		    
             // Do not include description.provenance
-            boolean provenance = "description".equals(v.element) && "provenance".equals(v.qualifier);
+            boolean provenance = "description".equals(metadataField.getElement()) && "provenance".equals(metadataField.getQualifier());
 
             if (name == null)
             {
@@ -226,19 +243,19 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
             {
                 Element e = new Element("meta", XHTML_NAMESPACE);
                 e.setAttribute("name", name);
-                if (v.value == null)
+                if (v.getValue() == null)
                 {
                     e.setAttribute("content", "");
                 }
                 else
                 {
                     // Check that we can output the content
-                    String reason = Verifier.checkCharacterData(v.value);
+                    String reason = Verifier.checkCharacterData(v.getValue());
                     if (reason == null)
                     {
                         // TODO: Check valid encoding?  We assume UTF-8
                         // TODO: Check escaping "<>&
-                        e.setAttribute("content", v.value);
+                        e.setAttribute("content", v.getValue());
                     }
                     else
                     {
@@ -246,16 +263,16 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                         log.warn("Invalid attribute characters in Metadata: " + reason);
 
                         // Strip any characters that we can, and if the result is valid, output it
-                        String simpleText = v.value.replaceAll("\\p{Cntrl}", "");
+                        String simpleText = v.getValue().replaceAll("\\p{Cntrl}", "");
                         if (Verifier.checkCharacterData(simpleText) == null)
                         {
                             e.setAttribute("content", simpleText);
                         }
                     }
                 }
-                if (v.language != null && !v.language.equals(""))
+                if (v.getLanguage() != null && !v.getLanguage().equals(""))
                 {
-                    e.setAttribute("lang", v.language, Namespace.XML_NAMESPACE);
+                    e.setAttribute("lang", v.getLanguage(), Namespace.XML_NAMESPACE);
                 }
                 String schemeAttr = schemes.get(key);
                 if (schemeAttr != null)
@@ -269,16 +286,19 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
         return metas;
     }
 
+    @Override
     public Namespace[] getNamespaces()
     {
         return new Namespace[] {Namespace.getNamespace(XHTML_NAMESPACE)};
     }
 
+    @Override
     public String getSchemaLocation()
     {
         return "";
     }
 
+    @Override
     public boolean preferList()
     {
         return true;

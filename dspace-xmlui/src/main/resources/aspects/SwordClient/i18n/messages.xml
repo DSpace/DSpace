@@ -65,7 +65,7 @@
     <message key="xmlui.swordclient.SelectPackagingAction.packageFormat_error">Unsupported package format selected</message>
 
     <message key="xmlui.swordclient.DepositAction.success">Item successfully copied</message>
-    <message key="xmlui.swordclient.DepositAction.package_error">Package format error</message>
+    <message key="xmlui.swordclient.DepositAction.package_format_error">Package format error</message>
     <message key="xmlui.swordclient.DepositAction.invalid_handle">Invalid handle</message>
     <message key="xmlui.swordclient.DepositAction.package_error">An error occurred creating the packaging object</message>
     <message key="xmlui.swordclient.DepositAction.error">Error encountered during deposit: {0}</message>

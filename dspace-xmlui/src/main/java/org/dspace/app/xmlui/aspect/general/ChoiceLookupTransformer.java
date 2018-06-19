@@ -10,9 +10,10 @@ package org.dspace.app.xmlui.aspect.general;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.DCPersonName;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -36,29 +37,44 @@ import org.xml.sax.SAXException;
  * back to the indicated form fields in the window that launched it.
  * Some necessary logic is in JavaScript, see choice-control.js.
  *
- * Expected Parameters:
- *  field - name of metadata field in "_" notation, eg: dc_contributor_author
- *  value - maybe-partial value of field
- *  formID - the @id of <form> tag in calling window containing the inputs we are to set.
- *  valueInput - @name of input field in DOM for value.
- *  authorityInput - @name of input field in DOM for authority value
- *  isRepeating - true if metadata value can be repeated
- *  isName - true if this is a name value (i.e. last/first boxes)
- *  start - starting index, default 0
- *  limit - maximum values to return, default 0 (none)
+ * <p>Expected Parameters:
+ * <dl>
+ *  <dt>field <dd>name of metadata field in "_" notation, eg: dc_contributor_author
+ *  <dt>value <dd>maybe-partial value of field
+ *  <dt>formID <dd>the @id of {@code <form>} tag in calling window containing the inputs we are to set.
+ *  <dt>valueInput <dd>@name of input field in DOM for value.
+ *  <dt>authorityInput <dd>@name of input field in DOM for authority value
+ *  <dt>isRepeating <dd>true if metadata value can be repeated
+ *  <dt>isName <dd>true if this is a name value (i.e. last/first boxes)
+ *  <dt>start <dd>starting index, default 0
+ *  <dt>limit <dd>maximum values to return, default 0 (none)
+ * </dl>
  *
- * Configuration Properties:
- *  xmlui.lookup.select.size = 12  (default, entries to show in SELECT widget.)
+ * <p>Configuration Properties:
+ * <ul>
+ *  <li>xmlui.lookup.select.size = 12  (default, entries to show in SELECT widget.)
+ * </ul>
  *
- * For each FIELD, e.g. dc.contributor.author, these message properties
+ * <p>For each FIELD, e.g. dc.contributor.author, these message properties
  * will OVERRIDE the corresponding i18n message catalog entries:
- *  xmlui.lookup.field.FIELD.title = title of lookup page
+ * <dl>
+ *  <dt>xmlui.lookup.field.FIELD.title
+ *  <dd>title of lookup page
  *   (e.g. xmlui.lookup.field.dc_contributor_author.title = Author..)
- *  xmlui.lookup.field.FIELD.nonauthority = template for "non-authority" label in options
- *  xmlui.lookup.field.FIELD.help = help message for single input
+ *
+ *  <dt>xmlui.lookup.field.FIELD.nonauthority
+ *  <dd>template for "non-authority" label in options
+ *
+ *  <dt>xmlui.lookup.field.FIELD.help
+ *  <dd>help message for single input
  *    (NOTE this is still required even for name inputs)
- *  xmlui.lookup.field.FIELD.help.last = help message for last name of Name-oriented input
- *  xmlui.lookup.field.FIELD.help.first = help message for first name of Name-oriented input
+ *
+ *  <dt>xmlui.lookup.field.FIELD.help.last
+ *  <dd>help message for last name of Name-oriented input
+ *
+ *  <dt>xmlui.lookup.field.FIELD.help.first
+ *  <dd>help message for first name of Name-oriented input
+ * </dl>
  *
  * @author  Larry Stone
  */
@@ -76,6 +92,9 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
     private static final Message T_results = message(MESSAGE_PREFIX+"results");
     private static final Message T_fail =    message(MESSAGE_PREFIX+"fail");
 
+    protected ChoiceAuthorityService choicheAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+
+    @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
@@ -138,7 +157,7 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
         // the <select> tag, and param values
         Item selectItem = fl.addItem("select", "choices-lookup");
         Select s = selectItem.addSelect("chooser", "choices-lookup");
-        s.setSize(ConfigurationManager.getIntProperty("xmlui.lookup.select.size", 12));
+        s.setSize(DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("xmlui.lookup.select.size", 12));
 
         // parameters for javascript
         Hidden h = selectItem.addHidden("paramField");
@@ -163,7 +182,7 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
         h.setValue(confIndicatorID);
         h = selectItem.addHidden("paramFail");
         h.setValue(T_fail);
-        boolean isClosed = ChoiceAuthorityManager.getManager().isClosed(field);
+        boolean isClosed = choicheAuthorityService.isClosed(field);
         h = selectItem.addHidden("paramIsClosed");
         h.setValue(String.valueOf(isClosed));
         h = selectItem.addHidden("paramCollection");
@@ -247,6 +266,7 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
         cancel.setValue(T_cancel);
     }
 
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException
@@ -278,7 +298,7 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
     // get field-specific label value
     private String getFieldLabel(String field, String name)
     {
-        return ConfigurationManager.getProperty(CONFIG_PREFIX+field+"."+name);
+        return DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(CONFIG_PREFIX+field+"."+name);
     }
 
     // get field-specific label value

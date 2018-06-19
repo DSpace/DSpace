@@ -7,23 +7,18 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.registries;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.CheckBox;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataSchemaService;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * This is the main entry point for managing the metadata registry. This transformer 
@@ -84,6 +79,8 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
             message(
             "xmlui.administrative.registries.MetadataRegistryMain.submit_add");
 
+    protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+
     public void addPageMeta(PageMeta pageMeta)
             throws WingException
     {
@@ -108,7 +105,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
                 errors.add(error);
             }
         }
-        MetadataSchema[] schemas = MetadataSchema.findAll(context);
+        java.util.List<MetadataSchema> schemas = metadataSchemaService.findAll(context);
 
 
 
@@ -119,7 +116,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
         main.setHead(T_head1);
         main.addPara(T_para1);
 
-        Table table = main.addTable("metadata-registry-main-table", schemas.length
+        Table table = main.addTable("metadata-registry-main-table", schemas.size()
                 + 1, 5);
 
         Row header = table.addRow(Row.ROLE_HEADER);
@@ -130,7 +127,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
 
         for (MetadataSchema schema : schemas)
         {
-            int schemaID = schema.getSchemaID();
+            int schemaID = schema.getID();
             String namespace = schema.getNamespace();
             String name = schema.getName();
             String url = contextPath
@@ -155,7 +152,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
             row.addCell().addXref(url, namespace);
             row.addCell().addXref(url, name);
         }
-        if (schemas.length > 1)
+        if (schemas.size() > 1)
         {
             // Only give the delete option if there are more schema's than the required dublin core.
             main.addPara().addButton("submit_delete").setValue(T_submit_delete);

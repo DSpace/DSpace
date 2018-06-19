@@ -27,12 +27,15 @@ import org.apache.cocoon.reading.AbstractReader;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
-import org.dspace.search.DSQuery;
-import org.dspace.search.QueryArgs;
-import org.dspace.search.QueryResults;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.SearchUtils;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.xml.sax.SAXException;
 
 /**
@@ -65,6 +68,9 @@ public class OpenURLReader extends AbstractReader implements Recyclable {
 	/** Logger */
 	private static Logger log = Logger.getLogger(OpenURLReader.class);
 
+	protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
+    @Override
 	public void generate() throws IOException, SAXException,
 			ProcessingException {
 	}
@@ -137,64 +143,92 @@ public class OpenURLReader extends AbstractReader implements Recyclable {
 	}
 
 	private String getFirstHandle(String query) throws IOException {
-		List<String> handles = getHandles(query);
-		for (String handle : handles) {
-			return handle;
-		}
-		return null;
-	}
+                
+            // Construct a Discovery query
+            DiscoverQuery queryArgs = new DiscoverQuery();
+            queryArgs.setQuery(query);
+            // we want Items only
+            queryArgs.setDSpaceObjectFilter(Constants.ITEM);
+                
+            try
+            {
+                DiscoverResult queryResults = SearchUtils.getSearchService().search(context, queryArgs);
+                List<DSpaceObject> objResults = queryResults.getDspaceObjects();
 
-	private List<String> getHandles(String query) throws IOException {
-		QueryArgs args = new QueryArgs();
-		args.setQuery(query);
-		QueryResults results = DSQuery.doQuery(context, args);
-		return results.getHitHandles();
+                if(objResults!=null && !objResults.isEmpty())
+                    return objResults.get(0).getHandle();
+                else
+                    return null;
+            }
+            catch(SearchServiceException e)
+            {
+                throw new IOException(e);
+            }
 	}
 
 	/**
-	 * Validate supported formats
-	 * 
+	 * Validate supported formats.
+	 *
+     * <p>
 	 * We can deal with various formats if they exist such as journals and
-	 * books, but we currently do not have specific needs represent
-	 * different formats, thus it may be more appropriate to use dublin core
+	 * books, but we currently do not have specific needs to represent
+	 * different formats, thus it may be more appropriate to use Dublin Core
 	 * here directly.
-	 * 
-	 * rft_val_fmt=info:ofi/fmt:kev:mtx:dc
-	 * 
+	 *
+     * <p>
+	 * {@code rft_val_fmt=info:ofi/fmt:kev:mtx:dc}
+	 *
+     * <p>
 	 * See Dublin Core OpenURL Profile Citation Guidelines:
-	 * http://dublincore.org/documents/dc-citation-guidelines/
-	 * http://alcme.oclc
-	 * .org/openurl/servlet/OAIHandler/extension?verb=GetMetadata
-	 * &metadataPrefix=mtx&identifier=info:ofi/fmt:kev:mtx:dc
-	 * 
+     * <ul>
+	 * <li><a href="http://dublincore.org/documents/dc-citation-guidelines/">Dublin Core Citation Guidelines</a>
+	 * <li><a href="http://alcme.oclc.org/openurl/servlet/OAIHandler/extension?verb=GetMetadata&metadataPrefix=mtx&identifier=info:ofi/fmt:kev:mtx:dc">
+     * OpenURL KEV format for DC</a>
+     * </ul>
+	 *
+     * <p>
 	 * What happens when we use Context Objects of different versions? Do
-	 * they exist? ctx_ver=Z39.88-2004
-	 * 
+	 * they exist? {@code ctx_ver=Z39.88-2004}
+	 *
+     * <p>
 	 * COinS will be implemented as:
+	 *
+     * <pre>{@code
+	 * <span class="Z3988" title="ctx_ver=Z39.88-2004&rft_val_fmt=info:ofi/fmt:kev:mtx:journal&rft.issn=1045-4438">
+	 *  <A HREF="http://library.example.edu/?url_ver=Z39.88-2004&ctx_ver=Z39.88-2004&rft_val_fmt=info:ofi/fmt:kev:mtx:journal&rft.issn=1045-4438">
+	 *   Find at Example Library
+     *  </A>
+     * </span>
+     * }</pre>
 	 * 
-	 * <span class="Z3988" title="ctx_ver=Z39.88-2004&rft_val_fmt=info:ofi/fmt:kev:mtx:journal&rft.issn=1045-4438"
-	 * > <A HREF="http://library.example.edu/?url_ver=Z39.88-2004&ctx_ver=Z39.88-2004&rft_val_fmt=info:ofi/fmt:kev:mtx:journal&rft.issn=1045-4438"
-	 * >Find at Example Library</A> </span>
-	 * 
-	 * If an ctx_id is present use it to resolve the item directly.
-	 * Otherwise, use the search mechanism. Our ctx_id are going to be local
-	 * handle identifiers like the following
-	 * 
-	 * ctx_id=10255/dryad.111
-	 * 
-	 * Global identifiers will be any other valid dc.identifier present
+	 * If a {@code ctx_id} is present, use it to resolve the item directly.
+	 * Otherwise, use the search mechanism. Our {@code ctx_id}s are going to be
+     * local handle identifiers like the following:
+	 *
+     * <p>
+	 * {@code ctx_id=10255/dryad.111}
+	 *
+     * <p>
+	 * Global identifiers will be any other valid {@code dc.identifier} present
 	 * within that field. Thus:
-	 * 
+	 *
+     * <pre>{@code
 	 * dc.identifier.uri http://dx.doi.org/10.1080/106351598260806
 	 * dc.identifier.uri http://hdl.handle.net/10255/dryad.111
-	 * 
+     * }</pre>
+	 *
 	 * will lead to
-	 * 
+	 *
+     * <pre>{@code
 	 * rft.identifier=http%3A%2F%2Fdx.doi.org%2F10.1080%2F106351598260806
 	 * rft.identifier=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.111
-	 * 
-	 * And Thus be resolvable as well
-	 * @throws SQLException 
+     * }</pre>
+	 *
+	 * and thus be resolvable as well
+     *
+     * @throws java.io.IOException passed through.
+     * @throws org.apache.cocoon.ProcessingException on unknown formats.
+	 * @throws SQLException passed through.
 	 */
 	public void handleZ39882004() throws IOException, ProcessingException, SQLException {
 		
@@ -222,7 +256,7 @@ public class OpenURLReader extends AbstractReader implements Recyclable {
 		if(rft_ids != null)
 		{
 			for (String rft_id : rft_ids) {
-				DSpaceObject obj = HandleManager.resolveToObject(context, rft_id);
+				DSpaceObject obj = handleService.resolveToObject(context, rft_id);
 				if (obj != null) {
 					httpResponse.sendRedirect(httpResponse
 							.encodeRedirectURL(request.getContextPath()

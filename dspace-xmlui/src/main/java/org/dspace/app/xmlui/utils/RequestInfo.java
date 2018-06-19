@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * can be replicated during a later request, once authentication has
  * successfully occurred. 
  * 
- * This class is the same as found in the JSPUI, however a few extra methods were added to
- * remember the original path information (info,translated, uri, url, etc..) that coocoon
- * needs inorder to be able to resume a request.
+ * This class is the same as found in the JSPUI; however, a few extra methods were added to
+ * remember the original path information (info, translated, uri, url, etc..) that Cocoon
+ * needs in order to be able to resume a request.
  * 
  * @author Robert Tansley
  * @author Scott Phillips
@@ -80,6 +80,7 @@ public class RequestInfo
 
     /**
      * Return the servlet path that this request is for.
+     * @return the path.
      */
     public String getServletPath()
     {
@@ -87,7 +88,8 @@ public class RequestInfo
     }
 
     /**
-     * Return the servlet path that this request is for.
+     * Return the actual path that this request is for.
+     * @return the path.
      */
     public String getActualPath()
     {
@@ -120,42 +122,52 @@ public class RequestInfo
     		super(request);
     	}
     	
+        @Override
     	public String getAuthType() {
     		return authType;
     	}
 
+        @Override
     	public String getContextPath() {
     		return contextPath;
     	}
 
+        @Override
     	public String getMethod() {
     		return method;
     	}
 
+        @Override
     	public String getPathInfo() {
     		return pathInfo;
     	}
 
+        @Override
     	public String getPathTranslated() {
     		return pathTranslated;
     	}
 
+        @Override
     	public String getQueryString() {
     		return queryString;
     	}
 
+        @Override
     	public String getRequestURI() {
     		return requestURI;
     	}
 
+        @Override
     	public StringBuffer getRequestURL() {
     		return requestURL;
     	}
 
+        @Override
     	public String getServletPath() {
     		return servletPath;
     	}
 
+        @Override
     	public String getParameter(String arg0) {	
     		String[] values = parameters.get(arg0);
     		
@@ -169,23 +181,28 @@ public class RequestInfo
             }
     	}
 
+        @Override
     	public Map getParameterMap() {
     		return parameters;
     	}
 
+        @Override
     	public Enumeration getParameterNames() {
     		Iterator parameterIterator = parameters.keySet().iterator();
     		return new EnumIterator(parameterIterator);
     	}
 
+        @Override
     	public String[] getParameterValues(String arg0) {
     		return parameters.get(arg0);
     	}
     	
+        @Override
     	public String getScheme() {
     		return scheme;
     	}
 
+        @Override
     	public boolean isSecure() {
     		return secure;
     	}
@@ -230,7 +247,7 @@ public class RequestInfo
 //    	public void setCharacterEncoding(String arg0) throws UnsupportedEncodingException 
     	
     	/**
-         * This class converts an interator into an enumerator. This is done
+         * This class converts an iterator into an enumerator. This is done
          * because we have the parameters as a Map (JDK 1.2 style), but for some
          * weird reason the HttpServletRequest interface returns an Enumeration
          * from getParameterNames() (JDK1.0 style.) JDK apparently offers no way
@@ -245,11 +262,13 @@ public class RequestInfo
                 iterator = i;
             }
 
+            @Override
             public boolean hasMoreElements()
             {
                 return iterator.hasNext();
             }
 
+            @Override
             public Object nextElement()
             {
                 return iterator.next();

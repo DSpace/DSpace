@@ -8,13 +8,10 @@
 package org.dspace.xmlworkflow.storedcomponents;
 
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.core.ReloadableEntity;
+import org.dspace.eperson.EPerson;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.*;
 
 /**
  * Claimed task representing the database representation of an action claimed by an eperson
@@ -24,173 +21,91 @@ import java.util.List;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class ClaimedTask {
-     /** Our context */
-    private Context myContext;
+@Entity
+@Table(name="cwf_claimtask")
+public class ClaimedTask implements ReloadableEntity<Integer> {
 
-    /** The row in the table representing this object */
-    private TableRow myRow;
+
+    @Id
+    @Column(name="claimtask_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="cwf_claimtask_seq")
+    @SequenceGenerator(name="cwf_claimtask_seq", sequenceName="cwf_claimtask_seq", allocationSize = 1)
+    private Integer id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workflowitem_id")
+    private XmlWorkflowItem workflowItem;
+
+//    @Column(name = "workflow_id")
+//    @Lob
+    @Column(name="workflow_id", columnDefinition = "text")
+    private String workflowId;
+
+//    @Column(name = "step_id")
+//    @Lob
+    @Column(name="step_id", columnDefinition = "text")
+    private String stepId;
+
+//    @Column(name = "action_id")
+//    @Lob
+    @Column(name="action_id", columnDefinition = "text")
+    private String actionId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private EPerson owner;
 
     /**
-     * Construct an Claimed Task
+     * Protected constructor, create object using:
+     * {@link org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService#create(Context)}
      *
-     * @param context
-     *            the context this object exists in
-     * @param row
-     *            the corresponding row in the table
      */
-    ClaimedTask(Context context, TableRow row)
+    protected ClaimedTask()
     {
-        myContext = context;
-        myRow = row;
-    }
-
-    public static ClaimedTask find(Context context, int id)
-            throws SQLException {
-        TableRow row = DatabaseManager.find(context, "cwf_claimtask", id);
-
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
-            return new ClaimedTask(context, row);
-        }
-    }
-
-    public static List<ClaimedTask> findByWorkflowId(Context context, int workflowID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_claimtask",
-                "SELECT * FROM cwf_claimtask WHERE workflowitem_id= "+workflowID);
-        List<ClaimedTask> list = new ArrayList<ClaimedTask>();
-        while(tri.hasNext()) {
-            TableRow row = tri.next();
-            list.add(new ClaimedTask(context, row));
-        }
-        return list;
-    }
-
-    public static ClaimedTask findByWorkflowIdAndEPerson(Context context, int workflowID, int epersonID) throws SQLException {
-        TableRow row = DatabaseManager.querySingleTable(context,"cwf_claimtask",
-                "SELECT * FROM cwf_claimtask WHERE workflowitem_id= ? AND owner_id= ?", workflowID, epersonID);
-        if(row == null)
-            return null;
-        else
-            return new ClaimedTask(context, row);
-    }
-
-    public static List<ClaimedTask> findByEperson(Context context, int epersonID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_claimtask",
-                "SELECT * FROM cwf_claimtask WHERE owner_id= "+epersonID);
-        List<ClaimedTask> list = new ArrayList<ClaimedTask>();
-        while(tri.hasNext()) {
-            TableRow row = tri.next();
-            list.add(new ClaimedTask(context, row));
-        }
-        return list;
-    }
-
-    public static List<ClaimedTask> find(Context c, int wfiID, String stepID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_claimtask",
-                "SELECT * FROM cwf_claimtask WHERE workflowitem_id="+wfiID+" AND step_id= ?", stepID);
-        List<ClaimedTask> list = new ArrayList<ClaimedTask>();
-
-        while(tri.hasNext()) {
-            TableRow row = tri.next();
-            list.add(new ClaimedTask(c, row));
-        }
-        return list;
 
     }
 
-    public static ClaimedTask find(Context c, int epersonID, int wfiID, String stepID, String actionID) throws SQLException {
-        TableRow row = DatabaseManager.querySingleTable(c,"cwf_claimtask",
-                "SELECT * FROM cwf_claimtask WHERE workflowitem_id="+wfiID+" AND owner_id= "+epersonID+" AND action_id= ? AND step_id= ?",actionID, stepID);
-
-        return new ClaimedTask(c, row);
-    }
-    public static List<ClaimedTask> find(Context c, int wfiID, String stepID, String actionID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_claimtask",
-                "SELECT * FROM cwf_claimtask WHERE workflowitem_id="+wfiID+" AND step_id= ? AND action_id=?", stepID, actionID);
-        List<ClaimedTask> list = new ArrayList<ClaimedTask>();
-        while(tri.hasNext()) {
-            TableRow row = tri.next();
-            list.add(new ClaimedTask(c, row));
-        }
-        return list;
+    public Integer getID() {
+        return id;
     }
 
-    public static List<ClaimedTask> find(Context c, XmlWorkflowItem workflowItem) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_claimtask",
-                "SELECT * FROM cwf_claimtask WHERE workflowitem_id="+workflowItem.getID());
-        List<ClaimedTask> list = new ArrayList<ClaimedTask>();
-        while(tri.hasNext()) {
-            TableRow row = tri.next();
-            list.add(new ClaimedTask(c, row));
-        }
-        return list;
+    public void setOwner(EPerson owner){
+        this.owner = owner;
     }
 
-    public static List<ClaimedTask> findAllInStep(Context c, String stepID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_claimtask", "SELECT * FROM cwf_claimtask WHERE step_id= ?", stepID);
-
-        List<ClaimedTask> list = new ArrayList<ClaimedTask>();
-        while(tri.hasNext()) {
-            TableRow row = tri.next();
-            list.add(new ClaimedTask(c, row));
-        }
-        return list;
+    public EPerson getOwner(){
+        return owner;
     }
 
-    public static ClaimedTask create(Context context) throws SQLException {
-
-        TableRow row = DatabaseManager.create(context, "cwf_claimtask");
-
-        return new ClaimedTask(context, row);
+    public void setWorkflowItem(XmlWorkflowItem workflowItem){
+        this.workflowItem = workflowItem;
     }
 
-
-    public void delete() throws SQLException
-    {
-        DatabaseManager.delete(myContext, myRow);
+    public XmlWorkflowItem getWorkflowItem(){
+        return workflowItem;
     }
 
-
-    public void update() throws SQLException
-    {
-        DatabaseManager.update(myContext, myRow);
-    }
-
-    public void setOwnerID(int ownerID){
-        myRow.setColumn("owner_id", ownerID);
-    }
-    public int getOwnerID(){
-        return myRow.getIntColumn("owner_id");
-    }
-    public void setWorkflowItemID(int workflowItemID){
-        myRow.setColumn("workflowitem_id", workflowItemID);
-    }
-    public int getWorkflowItemID(){
-        return myRow.getIntColumn("workflowitem_id");
-    }
     public void setActionID(String actionID){
-        myRow.setColumn("action_id", actionID);
+        this.actionId = actionID;
     }
+
     public String getActionID(){
-        return myRow.getStringColumn("action_id");
+        return actionId;
     }
+
     public void setStepID(String stepID){
-        myRow.setColumn("step_id", stepID);
+        this.stepId = stepID;
     }
+
     public String getStepID(){
-        return myRow.getStringColumn("step_id");
+        return stepId;
     }
 
     public void setWorkflowID(String workflowID){
-        myRow.setColumn("workflow_id", workflowID);
+        this.workflowId = workflowID;
     }
 
     public String getWorkflowID(){
-        return myRow.getStringColumn("workflow_id");
+        return workflowId;
     }
 }

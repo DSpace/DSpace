@@ -7,7 +7,8 @@
  */
 package org.dspace.app.webui.components;
 
-import org.apache.commons.lang.ArrayUtils;
+import java.util.List;
+
 import org.dspace.content.Item;
 
 
@@ -21,7 +22,7 @@ import org.dspace.content.Item;
 public class RecentSubmissions
 {
 	/** The set of items being represented */
-	private Item[] items;
+	private List<Item> items;
 	
 	/**
 	 * Construct a new RecentSubmissions object to represent the passed
@@ -29,9 +30,9 @@ public class RecentSubmissions
 	 * 
 	 * @param items
 	 */
-	public RecentSubmissions(Item[] items)
+	public RecentSubmissions(List<Item> items)
 	{
-		this.items = (Item[]) ArrayUtils.clone(items);
+		this.items = items;
 	}
 
 	/**
@@ -41,7 +42,7 @@ public class RecentSubmissions
 	 */
 	public int count()
 	{
-		return items.length;
+		return items.size();
 	}
 	
 	/**
@@ -49,9 +50,9 @@ public class RecentSubmissions
 	 * 
 	 * @return	an array of items
 	 */
-	public Item[] getRecentSubmissions()
+	public List<Item> getRecentSubmissions()
 	{
-		return (Item[])ArrayUtils.clone(items);
+		return items;
 	}
 	
 	/**
@@ -64,9 +65,9 @@ public class RecentSubmissions
 	 */
 	public Item getRecentSubmission(int i)
 	{
-		if (i < items.length)
+		if (i < items.size())
 		{
-			return items[i];
+			return items.get(i);
 		}
 		else
 		{

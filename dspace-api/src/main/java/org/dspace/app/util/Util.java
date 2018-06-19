@@ -17,13 +17,15 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang.StringUtils;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 
@@ -87,6 +89,7 @@ public class Util {
          * @param encoding
          *            character encoding, e.g. UTF-8
          * @return the encoded string
+         * @throws java.io.UnsupportedEncodingException if encoding error
          */
         public static String encodeBitstreamName(String stringIn, String encoding) throws java.io.UnsupportedEncodingException {
             // FIXME: This should be moved elsewhere, as it is used outside the UI
@@ -162,6 +165,7 @@ public class Util {
          * @param stringIn
          *                input string to encode
          * @return the encoded string
+         * @throws java.io.UnsupportedEncodingException if encoding error
          */
         public static String encodeBitstreamName(String stringIn) throws java.io.UnsupportedEncodingException {
                 return encodeBitstreamName(stringIn, Constants.DEFAULT_ENCODING);
@@ -233,6 +237,81 @@ public class Util {
             return -1;
         }
     }
+
+    /**
+     * Obtain a parameter from the given request as a UUID. <code>null</code> is
+     * returned if the parameter is garbled or does not exist.
+     *
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     *
+     * @return the integer value of the parameter, or -1
+     */
+    public static UUID getUUIDParameter(HttpServletRequest request, String param)
+    {
+        String val = request.getParameter(param);
+        if (StringUtils.isEmpty(val))
+        {
+            return null;
+        }
+
+        try
+        {
+            return UUID.fromString(val.trim());
+        }
+        catch (Exception e)
+        {
+            // at least log this error to make debugging easier
+            // do not silently return null only.
+            log.warn("Unable to recoginze UUID from String \"" 
+                    + val + "\". Will return null.", e);
+            // Problem with parameter
+            return null;
+        }
+    }
+    
+    /**
+     * Obtain a List of UUID parameters from the given request as an UUID. null
+     * is returned if parameter doesn't exist. <code>null</code> is returned in
+     * position of the list if that particular value is garbled.
+     *
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     *
+     * @return list of UUID or null
+     */
+    public static List<UUID> getUUIDParameters(HttpServletRequest request,
+            String param)
+    {
+        String[] request_values = request.getParameterValues(param);
+
+        if (request_values == null)
+        {
+            return null;
+        }
+
+        List<UUID> return_values = new ArrayList<UUID>(request_values.length);
+
+        for (String s : request_values)
+        {
+            try
+            {
+                return_values.add(UUID.fromString(s.trim()));
+            }
+            catch (Exception e)
+            {
+                // Problem with parameter, stuff null in the list
+            	return_values.add(null);
+            }
+        }
+
+        return return_values;
+    }
+
 
     /**
      * Obtain an array of int parameters from the given request as an int. null
@@ -378,11 +457,14 @@ public class Util {
      *            A String with the element name of the metadata field
      * @param qualifier
      *            A String with the qualifier name of the metadata field
+     * @param locale locale
      * @return A list of the respective "displayed-values"
+     * @throws SQLException if database error
+     * @throws DCInputsReaderException if reader error
      */
 
     public static List<String> getControlledVocabulariesDisplayValueLocalized(
-            Item item, Metadatum[] values, String schema, String element,
+            Item item, List<MetadataValue> values, String schema, String element,
             String qualifier, Locale locale) throws SQLException,
             DCInputsReaderException
     {
@@ -452,16 +534,14 @@ public class Util {
         if (myInputsFound)
         {
 
-            for (int j = 0; j < values.length; j++)
-            {
+            for (MetadataValue value : values) {
 
                 String pairsName = myInputs.getPairsType();
-                String stored_value = values[j].value;
+                String stored_value = value.getValue();
                 String displayVal = myInputs.getDisplayString(pairsName,
                         stored_value);
 
-                if (displayVal != null && !"".equals(displayVal))
-                {
+                if (displayVal != null && !"".equals(displayVal)) {
 
                     toReturn.add(displayVal);
                 }

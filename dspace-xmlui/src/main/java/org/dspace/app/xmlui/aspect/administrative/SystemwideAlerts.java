@@ -51,7 +51,9 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 	
 	/**
      * Generate the unique caching key.
+     * @return the key.
      */
+    @Override
     public Serializable getKey()
     {
     	if (active)
@@ -67,7 +69,9 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 
     /**
      * Generate the cache validity object.
+     * @return the validity.
      */
+    @Override
     public SourceValidity getValidity()
     {
     	if (active)
@@ -82,7 +86,9 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 	
     /**
      * If an alert is activated then add a count down message.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
+    @Override
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         
@@ -105,6 +111,7 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 
 	/**
 	 * Check whether an alert is active.
+     * @return true if active.
 	 */
 	public static boolean isAlertActive()
 	{
@@ -146,6 +153,7 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 
 	/**
 	 * Get the time, in millieseconds, when the countdown timer is scheduled to end.
+     * @return countdown end time.
 	 */
 	public static long getCountDownToo()
 	{
@@ -155,15 +163,15 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 	/**
 	 * Set the time, in millieseconds, to which the countdown timer should end.
 	 * 
-	 * Note, that once the countdown has expried, the alert is
+	 * Note, that once the countdown has expired, the alert is
 	 * still active. However the countdown will disappear.
+     * @param countDownTo countdown end time.
 	 */
 	public static void setCountDownToo(long countDownTo)
 	{
 		SystemwideAlerts.countDownToo = countDownTo;
 	}
-	
-	
+
 	// Can users login or continue to use the system?
 	public static int getRestrictSessions()
 	{

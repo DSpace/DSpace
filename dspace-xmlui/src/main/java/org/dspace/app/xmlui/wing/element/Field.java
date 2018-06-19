@@ -7,57 +7,6 @@
  */
 package org.dspace.app.xmlui.wing.element;
 
-/**
- * A class representing an an abstract input control (which is just a fancy name
- * for a field :) )
- *
- * The field element is a container for all information necessary to create a
- * form field. The required "type" attribute determines the type of the field,
- * while the children tags carry the information on how to build it. Fields can
- * only occur in divisions of type "interactive".
- *
- * There are several types of possible fields and each of these field types
- * determine the appropriate parameters on the parameter object. This is the
- * only place in the schema where this design pattern is used. It limits the
- * proliferation of elements, such as a special element for textarea, select
- * lists, text fields etc... as HTML does. It also forces us to treat all fields
- * the same.
- *
- * text: A single-line text input control.
- *
- * textarea: A multi-line text input control.
- *
- * password: A single-line text input control where the input text is rendered
- * in such a way as to hide the characters from the user.
- *
- * hidden: An input control that is not rendered on the screen and hidden from
- * the user.
- *
- * button: A button input control that when activated by the user will submit
- * the form, including all the fields, back to the server for processing.
- *
- * checkbox: A boolean input control which may be toggled by the user. A
- * checkbox may have several fields which share the same name and each of those
- * fields may be toggled independently. This is distinct from a radio button
- * where only one field may be toggled.
- *
- * file: An input control that allows the user to select files to be submitted
- * with the form. Note that a form which uses a file field must use the
- * multipart method.
- *
- * radio: A boolean input control which may be toggled by the user. Multiple
- * radio button fields may share the same name. When this occurs only one field
- * may be selected to be true. This is distinct from a checkbox where multiple
- * fields may be toggled.
- *
- * select: A menu input control which allows the user to select from a list of
- * available options.
- *
- * composite: A combination of multile fields into one input control.
- *
- * @author Scott Phillips
- */
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +20,58 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 
+/**
+ * A class representing an an abstract input control (which is just a fancy name
+ * for a field :) )
+ *
+ * <p>The field element is a container for all information necessary to create a
+ * form field. The required "type" attribute determines the type of the field,
+ * while the children tags carry the information on how to build it. Fields can
+ * only occur in divisions of type "interactive".
+ *
+ * <p>There are several types of possible fields and each of these field types
+ * determine the appropriate parameters on the parameter object. This is the
+ * only place in the schema where this design pattern is used. It limits the
+ * proliferation of elements, such as a special element for textarea, select
+ * lists, text fields etc... as HTML does. It also forces us to treat all fields
+ * the same.
+ *
+ * <ul>
+ * <li>text: A single-line text input control.</li>
+ *
+ * <li>textarea: A multi-line text input control.</li>
+ *
+ * <li>password: A single-line text input control where the input text is rendered
+ * in such a way as to hide the characters from the user.</li>
+ *
+ * <li>hidden: An input control that is not rendered on the screen and hidden from
+ * the user.</li>
+ *
+ * <li>button: A button input control that when activated by the user will submit
+ * the form, including all the fields, back to the server for processing.</li>
+ *
+ * <li>checkbox: A boolean input control which may be toggled by the user. A
+ * checkbox may have several fields which share the same name and each of those
+ * fields may be toggled independently. This is distinct from a radio button
+ * where only one field may be toggled.</li>
+ *
+ * <li>file: An input control that allows the user to select files to be submitted
+ * with the form. Note that a form which uses a file field must use the
+ * multipart method.</li>
+ *
+ * <li>radio: A boolean input control which may be toggled by the user. Multiple
+ * radio button fields may share the same name. When this occurs only one field
+ * may be selected to be true. This is distinct from a checkbox where multiple
+ * fields may be toggled.</li>
+ *
+ * <li>select: A menu input control which allows the user to select from a list of
+ * available options.</li>
+ *
+ * <li>composite: A combination of multiple fields into one input control.</li>
+ * </ul>
+ *
+ * @author Scott Phillips
+ */
 public abstract class Field extends AbstractWingElement implements
         StructuralElement
 {
@@ -145,19 +146,19 @@ public abstract class Field extends AbstractWingElement implements
     protected Help help;
     
     /** Error instructions for this field */
-    protected List<Error> errors = new ArrayList<Error>();
+    protected List<Error> errors = new ArrayList<>();
     
     /** All sub fields contained within a composite field */
-    protected List<Field> fields = new ArrayList<Field>();
+    protected List<Field> fields = new ArrayList<>();
     
     /** The value of this field */
-    protected List<Option> options = new ArrayList<Option>();
+    protected List<Option> options = new ArrayList<>();
     
     /** The value of this field */
-    protected List<Value> values = new ArrayList<Value>();
+    protected List<Value> values = new ArrayList<>();
     
     /** The set of stored values */
-    protected List<Instance> instances = new ArrayList<Instance>();
+    protected List<Instance> instances = new ArrayList<>();
 
     /**
      * Construct a new field.
@@ -177,6 +178,7 @@ public abstract class Field extends AbstractWingElement implements
      * @param rend
      *            (May be null) a rendering hint used to override the default
      *            display of the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     protected Field(WingContext context, String name, String type,
             String rend) throws WingException
@@ -305,6 +307,7 @@ public abstract class Field extends AbstractWingElement implements
      * select vs. suggest.  Value must match one of the PRESENTATIONS.
      *
      * @param value pre-determined metadata field key
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setChoicesPresentation(String value)
         throws WingException
@@ -335,6 +338,8 @@ public abstract class Field extends AbstractWingElement implements
      * The help element provides help instructions to assist the user in using
      * this field.
      *
+     * @return a new Help.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Help setHelp() throws WingException
     {
@@ -349,6 +354,7 @@ public abstract class Field extends AbstractWingElement implements
      * @param characters
      *            (May be null) Direct content or a dictionary tag to be
      *            inserted into the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setHelp(String characters) throws WingException
     {
@@ -363,6 +369,7 @@ public abstract class Field extends AbstractWingElement implements
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setHelp(Message message) throws WingException
     {
@@ -379,6 +386,8 @@ public abstract class Field extends AbstractWingElement implements
      * context. The message contained within the error message will provide
      * assistance to the user in correcting the problem.
      *
+     * @return the new Error.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Error addError() throws WingException
     {
@@ -395,6 +404,7 @@ public abstract class Field extends AbstractWingElement implements
      * @param characters
      *            (May be null) Direct content or a dictionary tag to be
      *            inserted into the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addError(String characters) throws WingException
     {
@@ -411,6 +421,7 @@ public abstract class Field extends AbstractWingElement implements
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addError(Message message) throws WingException
     {
@@ -427,6 +438,8 @@ public abstract class Field extends AbstractWingElement implements
      * The help element provides help instructions to assist the user in using
      * this field.
      *
+     * @return the new Label.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Label setLabel() throws WingException
     {
@@ -441,6 +454,7 @@ public abstract class Field extends AbstractWingElement implements
      * @param characters
      *            (May be null) Direct content or a dictionary tag to be
      *            inserted into the element.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setLabel(String characters) throws WingException
     {
@@ -455,6 +469,7 @@ public abstract class Field extends AbstractWingElement implements
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void setLabel(Message message) throws WingException
     {
@@ -471,7 +486,7 @@ public abstract class Field extends AbstractWingElement implements
      */
     protected void removeValueOfType(String removeType)
     {
-        List<Value> found = new ArrayList<Value>();
+        List<Value> found = new ArrayList<>();
         for (Value value : values)
         {
             if (value.getType().equals(removeType))
@@ -500,7 +515,9 @@ public abstract class Field extends AbstractWingElement implements
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
+     * @throws org.xml.sax.SAXException passed through.
      */
+    @Override
     public void toSAX(ContentHandler contentHandler,
             LexicalHandler lexicalHandler, NamespaceSupport namespaces)
             throws SAXException
@@ -571,6 +588,7 @@ public abstract class Field extends AbstractWingElement implements
     /**
      * Dispose
      */
+    @Override
     public void dispose()
     {
         if (params != null)

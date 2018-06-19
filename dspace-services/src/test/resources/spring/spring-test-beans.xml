@@ -29,4 +29,12 @@
         <property name="timeToIdle" value="30" />
     </bean>
 
+    <!-- Test bean for property substitution from configuration service
+         (used by DSpaceConfigurationFactoryBeanTest)
+         The value of "testDynamicBean.property" should be auto-substituted from
+         config/local.properties -->
+    <bean id="dynamicPropertyBean" class="org.dspace.servicemanager.config.TestDynamicPropertyBean">
+        <property name="property" value="${testDynamicBean.property}"/>
+    </bean>
+
 </beans>

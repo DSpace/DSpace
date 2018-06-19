@@ -14,10 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.DCDate;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.core.Context;
 
 /**
@@ -33,12 +30,12 @@ import org.dspace.core.Context;
  */
 public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 
-	private BitstreamFilter filter;
+	protected BitstreamFilter filter;
 	
 	/**
 	 *   Set filter
 	 *   
-	 * @param filter
+	 * @param filter BitstreamFilter
 	 */
 	public void setBitstreamFilter(BitstreamFilter filter)
 	{
@@ -57,17 +54,18 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 	/**
 	 * 	 Delete bitstream
 	 * 
-	 *  @param context
-	 *  @param itarch
-	 *  @param isTest
-	 *  @param suppressUndo
-	 *  @throws IllegalArgumentException
-	 *  @throws ParseException
-	 *  @throws IOException
-	 *  @throws AuthorizeException
-	 *  @throws SQLException
+	 * @param context DSpace Context
+	 * @param itarch item archive
+	 * @param isTest test flag
+	 * @param suppressUndo undo flag
+	 * @throws IOException if IO error
+         * @throws SQLException if database error
+         * @throws AuthorizeException if authorization error
+         * @throws ParseException if parse error
+         * @throws BitstreamFilterException if filter error
 	 */
-	public void execute(Context context, ItemArchive itarch, boolean isTest,
+	@Override
+    public void execute(Context context, ItemArchive itarch, boolean isTest,
             boolean suppressUndo) throws AuthorizeException,
             BitstreamFilterException, IOException, ParseException, SQLException 
 	{
@@ -75,16 +73,16 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 		List<String> deleted = new ArrayList<String>();
 		
 		Item item = itarch.getItem();
-		Bundle[] bundles = item.getBundles();
+		List<Bundle> bundles = item.getBundles();
 		
 		for (Bundle b : bundles)    
 		{
-			Bitstream[] bitstreams = b.getBitstreams();
+			List<Bitstream> bitstreams = b.getBitstreams();
 			String bundleName = b.getName();
-			
+
 			for (Bitstream bs : bitstreams)
-			{		
-			    if (filter.accept(bs))
+			{
+                if (filter.accept(bs))
 				{
 	    			if (isTest)
 	    			{
@@ -98,7 +96,7 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 	    				{
 	    					deleted.add(bs.getName());
 	    				}
-	    				b.removeBitstream(bs); 
+	    				bundleService.removeBitstream(context, b, bs);
 		    			ItemUpdate.pr("Deleted " + bundleName + " bitstream " + bs.getName() 
 		    					+ " with id = " + bs.getID());		    			
 	    			}
@@ -122,7 +120,7 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
     		
     		if (!isTest)
     		{
-    			MetadataUtilities.appendMetadata(item, dtom, false, sb.toString());
+    			MetadataUtilities.appendMetadata(context, item, dtom, false, sb.toString());
     		}
         }
 	}

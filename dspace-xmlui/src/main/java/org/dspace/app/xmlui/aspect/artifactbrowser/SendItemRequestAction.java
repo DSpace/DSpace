@@ -8,9 +8,9 @@
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
@@ -20,25 +20,24 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.utils.DSpace;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
  /**
  * This action will send a mail to request a item to administrator when all mandatory data is present.
@@ -51,8 +50,13 @@ import org.dspace.utils.DSpace;
  */
 public class SendItemRequestAction extends AbstractAction
 {
-    private static Logger log = Logger.getLogger(SendItemRequestAction.class);
+    private static final Logger log = Logger.getLogger(SendItemRequestAction.class);
 
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected RequestItemService requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
@@ -78,7 +82,7 @@ public class SendItemRequestAction extends AbstractAction
         {
             // Either the user did not fill out the form or this is the
             // first time they are visiting the page.
-            Map<String,String> map = new HashMap<String,String>();
+            Map<String,String> map = new HashMap<>();
             map.put("bitstreamId",bitstreamId);
 
             if (StringUtils.isEmpty(requesterEmail))
@@ -101,40 +105,36 @@ public class SendItemRequestAction extends AbstractAction
         }
         
         Item item = (Item) dso;
-        String title = "";
-        Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-        if (titleDC == null || titleDC.length == 0) {
-            titleDC = item.getDC("title", Item.ANY, Item.ANY); // dc.title with qualifier term
-        }
-        if (titleDC != null && titleDC.length > 0) {
-            title = titleDC[0].value;
-        }
+        String title = item.getName();
         
-        RequestItemAuthor requestItemAuthor = new DSpace()
-                .getServiceManager()
+        title = StringUtils.isNotBlank(title) ? title : I18nUtil
+                            .getMessage("jsp.general.untitled", context);
+        Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamId));
+
+        RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServiceByName(
                         RequestItemAuthorExtractor.class.getName(),
                         RequestItemAuthorExtractor.class
                 )
                 .getRequestItemAuthor(context, item);
 
-        RequestItem requestItem = new RequestItem(item.getID(), Integer.parseInt(bitstreamId), requesterEmail, requesterName, message, Boolean.valueOf(allFiles));
+        String token = requestItemService.createRequest(context, bitstream, item, Boolean.valueOf(allFiles), requesterEmail, requesterName, message);
 
         // All data is there, send the email
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.author"));
         email.addRecipient(requestItemAuthor.getEmail());
 
         email.addArgument(requesterName);    
-        email.addArgument(requesterEmail);   
-        email.addArgument(allFiles.equals("true")?I18nUtil.getMessage("itemRequest.all"):Bitstream.find(context,Integer.parseInt(bitstreamId)).getName());      
-        email.addArgument(HandleManager.getCanonicalForm(item.getHandle()));      
+        email.addArgument(requesterEmail);
+        email.addArgument(allFiles.equals("true") ? I18nUtil.getMessage("itemRequest.all") : bitstream.getName());
+        email.addArgument(handleService.getCanonicalForm(item.getHandle()));
         email.addArgument(title);    // request item title
         email.addArgument(message);   // message
-        email.addArgument(getLinkTokenEmail(context,requestItem));
+        email.addArgument(getLinkTokenEmail(context,token));
         email.addArgument(requestItemAuthor.getFullName());    //   corresponding author name
         email.addArgument(requestItemAuthor.getEmail());    //   corresponding author email
-        email.addArgument(ConfigurationManager.getProperty("dspace.name"));
-        email.addArgument(ConfigurationManager.getProperty("mail.helpdesk"));
+        email.addArgument(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.name"));
+        email.addArgument(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("mail.helpdesk"));
 
         email.setReplyTo(requesterEmail);
          
@@ -145,19 +145,21 @@ public class SendItemRequestAction extends AbstractAction
 
     /**
      * Get the link to the author in RequestLink email.
-     * @param context
-     * @param requestItem
-     * @return
-     * @throws SQLException
+     * @param context DSpace session context.
+     * @param token token.
+     * @return the link.
+     * @throws SQLException passed through.
      */
-    protected String getLinkTokenEmail(Context context, RequestItem requestItem)
+    protected String getLinkTokenEmail(Context context, String token)
             throws SQLException
     {
-        String base = ConfigurationManager.getProperty("dspace.url");
+        String base = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
 
-        String specialLink = (new StringBuffer()).append(base).append(
-                base.endsWith("/") ? "" : "/").append(
-                "itemRequestResponse/").append(requestItem.getNewToken(context))
+        String specialLink = new StringBuffer()
+                .append(base)
+                .append(base.endsWith("/") ? "" : "/")
+                .append("itemRequestResponse/")
+                .append(token)
                 .toString()+"/";
 
         return specialLink;

@@ -21,10 +21,13 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.UserMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.LogManager;
-import org.dspace.xmlworkflow.WorkflowFactory;
+import org.dspace.xmlworkflow.XmlWorkflowFactoryImpl;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -48,6 +51,9 @@ public class WorkflowTransformer extends AbstractDSpaceTransformer {
 
     private static Logger log = Logger.getLogger(WorkflowTransformer.class);
 
+    protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+    protected XmlWorkflowFactory workflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
@@ -57,8 +63,8 @@ public class WorkflowTransformer extends AbstractDSpaceTransformer {
             String stepID = parameters.getParameter("stepID");
             String actionID = parameters.getParameter("actionID");
             int workflowID = parameters.getParameterAsInteger("workflowID");
-            XmlWorkflowItem wfi = XmlWorkflowItem.find(context, workflowID);
-            Workflow wf = WorkflowFactory.getWorkflow(wfi.getCollection());
+            XmlWorkflowItem wfi = xmlWorkflowItemService.find(context, workflowID);
+            Workflow wf = workflowFactory.getWorkflow(wfi.getCollection());
 
             Step step = wf.getStep(stepID);
             xmluiActionUI = (AbstractXMLUIAction) WorkflowXMLUIFactory.getActionInterface(actionID);

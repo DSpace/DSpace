@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.aspect.submission.submit.AccessStepUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -22,17 +23,22 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
  * 
- * Show a form allowing the user to edit a bitstream's metadata, the description & format.
- * 
+ * Show a form allowing the user to edit a bitstream's metadata, the description
+ * and format.
+ *
  * @author Scott Phillips
  */
 public class EditBitstreamForm extends AbstractDSpaceTransformer
@@ -64,6 +70,11 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 
     private boolean isAdvancedFormEnabled=true;
 
+	protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+
+    @Override
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
 		pageMeta.addMetadata("title").addContent(T_title);
@@ -74,28 +85,29 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
         pageMeta.addMetadata("javascript", "static").addContent("static/js/editItemUtil.js");
 	}
 
+    @Override
 	public void addBody(Body body) throws SAXException, WingException,
 	UIException, SQLException, IOException, AuthorizeException
 	{
 
-        isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+        isAdvancedFormEnabled= DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
 		// Get our parameters
-		int bitstreamID = parameters.getParameterAsInteger("bitstreamID",-1);
+		UUID bitstreamID = UUID.fromString(parameters.getParameter("bitstreamID", null));
 
 		// Get the bitstream and all the various formats
                 // Administrator is allowed to see internal formats too.
-		Bitstream bitstream = Bitstream.find(context, bitstreamID);
-		BitstreamFormat currentFormat = bitstream.getFormat();
-                BitstreamFormat[] bitstreamFormats = AuthorizeManager.isAdmin(context) ?
-                    BitstreamFormat.findAll(context) :
-                    BitstreamFormat.findNonInternal(context);
+		Bitstream bitstream = bitstreamService.find(context, bitstreamID);
+		BitstreamFormat currentFormat = bitstream.getFormat(context);
+                java.util.List<BitstreamFormat> bitstreamFormats = authorizeService.isAdmin(context) ?
+					bitstreamFormatService.findAll(context) :
+					bitstreamFormatService.findNonInternal(context);
 		
 		boolean primaryBitstream = false;
-		Bundle[] bundles = bitstream.getBundles();
-		if (bundles != null && bundles.length > 0)
+		java.util.List<Bundle> bundles = bitstream.getBundles();
+		if (bundles != null && bundles.size() > 0)
 		{
-			if (bitstreamID == bundles[0].getPrimaryBitstreamID())
+			if (bitstream.equals(bundles.get(0).getPrimaryBitstream()))
 			{
 				primaryBitstream = true;
 			}
@@ -115,7 +127,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		// LIST: edit form
 		List edit = div.addList("edit-bitstream-list", List.TYPE_FORM);
         edit.addLabel(T_file_label);
-        edit.addItem().addXref(fileUrl, fileName);
+        edit.addItem(null,"break-all").addXref(fileUrl, fileName);
 
         Text bitstreamName = edit.addItem().addText("bitstreamName");
         bitstreamName.setLabel(T_filename_label);
@@ -137,8 +149,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
         if(!isAdvancedFormEnabled){
             AccessStepUtil asu = new AccessStepUtil(context);
             // if the item is embargoed default value will be displayed.
-            asu.addEmbargoDateSimpleForm(bitstream, edit, -1);
-            asu.addReason(null, edit, -1);
+            asu.addEmbargoDateDisplayOnly(bitstream, edit);
         }
 
 		edit.addItem(T_para1);
@@ -148,7 +159,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		format.setLabel(T_format_label);
 
                 // load the options menu, skipping the "Unknown" format since "Not on list" takes its place
-                int unknownFormatID = BitstreamFormat.findUnknown(context).getID();
+                int unknownFormatID = bitstreamFormatService.findUnknown(context).getID();
 		format.addOption(-1,T_format_default);
 		for (BitstreamFormat bitstreamFormat : bitstreamFormats)
 		{

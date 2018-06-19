@@ -9,15 +9,15 @@ package org.dspace.app.xmlui.cocoon;
 
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Item;
-import org.dspace.content.Bundle;
-import org.dspace.handle.HandleManager;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
@@ -26,7 +26,9 @@ import org.apache.cocoon.acting.AbstractAction;
 import org.apache.avalon.framework.parameters.Parameters;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,6 +36,10 @@ import javax.servlet.http.HttpServletRequest;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class UsageLoggerAction extends AbstractAction {
+
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     public Map act(Redirector redirector, SourceResolver sourceResolver, Map objectModel, String string, Parameters parameters) throws Exception {
         try{
@@ -63,7 +69,7 @@ public class UsageLoggerAction extends AbstractAction {
 
         try {
         	
-			new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
 					new UsageEvent(
 							UsageEvent.Action.VIEW,
 							(HttpServletRequest)request,
@@ -79,8 +85,8 @@ public class UsageLoggerAction extends AbstractAction {
 
     private Bitstream findBitstream(Context context, Parameters par) throws SQLException {
         // Get our parameters that identify the bitstream
-        int itemID = par.getParameterAsInteger("itemID", -1);
-        int bitstreamID = par.getParameterAsInteger("bitstreamID", -1);
+        String itemID = par.getParameter("itemID", null);
+        String bitstreamID = par.getParameter("bitstreamID", null);
         String handle = par.getParameter("handle", null);
 
         int sequence = par.getParameterAsInteger("sequence", -1);
@@ -92,15 +98,15 @@ public class UsageLoggerAction extends AbstractAction {
         Item item;
         DSpaceObject dso;
 
-        if (bitstreamID > -1)
+        if (bitstreamID != null)
         {
             // Direct reference to the individual bitstream ID.
-            bitstream = Bitstream.find(context, bitstreamID);
+            bitstream = bitstreamService.find(context, UUID.fromString(bitstreamID));
         }
-        else if (itemID > -1)
+        else if (itemID != null)
         {
             // Referenced by internal itemID
-            item = Item.find(context, itemID);
+            item = itemService.find(context, UUID.fromString(itemID));
 
             if (sequence > -1)
             {
@@ -114,7 +120,7 @@ public class UsageLoggerAction extends AbstractAction {
         else if (handle != null)
         {
             // Reference by an item's handle.
-            dso = HandleManager.resolveToObject(context,handle);
+            dso = handleService.resolveToObject(context, handle);
 
             if (dso instanceof Item)
             {
@@ -147,10 +153,10 @@ public class UsageLoggerAction extends AbstractAction {
             return null;
         }
 
-    	Bundle[] bundles = item.getBundles();
+    	List<Bundle> bundles = item.getBundles();
         for (Bundle bundle : bundles)
         {
-            Bitstream[] bitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
             for (Bitstream bitstream : bitstreams)
             {
@@ -182,9 +188,9 @@ public class UsageLoggerAction extends AbstractAction {
 
     	// Determine our the maximum number of directories that will be removed for a path.
     	int maxDepthPathSearch = 3;
-    	if (ConfigurationManager.getProperty("xmlui.html.max-depth-guess") != null)
+    	if (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.html.max-depth-guess") != null)
         {
-            maxDepthPathSearch = ConfigurationManager.getIntProperty("xmlui.html.max-depth-guess");
+            maxDepthPathSearch = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("xmlui.html.max-depth-guess");
         }
 
     	// Search for the named bitstream on this item. Each time through the loop
@@ -195,10 +201,10 @@ public class UsageLoggerAction extends AbstractAction {
     	{
     	   	// Search through all the bitstreams and see
 	    	// if the name can be found
-	    	Bundle[] bundles = item.getBundles();
+	    	List<Bundle> bundles = item.getBundles();
 	        for (Bundle bundle : bundles)
 	        {
-	            Bitstream[] bitstreams = bundle.getBitstreams();
+	            List<Bitstream> bitstreams = bundle.getBitstreams();
 
 	            for (Bitstream bitstream : bitstreams)
 	            {

@@ -5,123 +5,67 @@
 
 package edu.umd.lib.dspace.app.isr;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
-import java.util.HashSet;
-import java.util.TreeMap;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import java.util.regex.Pattern;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamSource;
 
-import java.text.SimpleDateFormat;
-
-// SQL
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
-// IO
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.Writer;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
-import java.io.StringWriter;
-
-// XML
-import org.dom4j.Attribute;
+// Log4J
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.ElementHandler;
 import org.dom4j.ElementPath;
 import org.dom4j.InvalidXPathException;
-import org.dom4j.Namespace;
 import org.dom4j.Node;
-import org.dom4j.QName;
-import org.dom4j.Text;
 import org.dom4j.XPath;
-
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.DocumentSource;
 import org.dom4j.io.DocumentResult;
+import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-
-import org.xml.sax.InputSource;
-
-import org.xml.sax.helpers.AttributesImpl;
-
-// XSL
-import javax.xml.transform.dom.DOMSource;  
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-
-import javax.xml.transform.stream.StreamSource; 
-import javax.xml.transform.stream.StreamResult; 
-
-// XPath
-import org.jaxen.Function;
-import org.jaxen.FunctionCallException;
-import org.jaxen.FunctionContext;
-import org.jaxen.Navigator;
-import org.jaxen.SimpleFunctionContext;
-import org.jaxen.XPathFunctionContext;
-
-// Log4J
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-// DSpace
-import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Email;
-
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
-
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
+// DSpace
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-
-import org.dspace.handle.HandleManager;
-
-
-// Marc4J
-import org.marc4j.MarcXmlReader;
-import org.marc4j.MarcStreamWriter;
-
-import org.marc4j.marc.Record;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.UUIDUtils;
+import org.xml.sax.helpers.AttributesImpl;
 
 // Lims
 import edu.umd.lims.util.ErrorHandling;
@@ -174,6 +118,27 @@ public class Loader  implements ElementHandler {
   static String strPdfDir = null;
   static boolean bLoad = false;
 
+  private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+  
+  private final static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();;
+
+  private final static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+  
+  private final static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+  
+  private final static BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+  
+  private final static BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+
+  private final static BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+
+  private final static WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+
+  private final static InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+
+  private final static EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
+
 
   /***************************************************************** main */
   /**
@@ -195,9 +160,9 @@ public class Loader  implements ElementHandler {
       bLoad = strLoad.equals("true");
 
       // dspace dir
-      String strDspace     = ConfigurationManager.getProperty("dspace.dir");
-      String strEPerson    = ConfigurationManager.getProperty("isrloader.eperson");
-      String strCollection = ConfigurationManager.getProperty("isrloader.collection");
+      String strDspace     = configurationService.getProperty("dspace.dir");
+      String strEPerson    = configurationService.getProperty("isrloader.eperson");
+      String strCollection = configurationService.getProperty("isrloader.collection");
 
       // logging (log4j.defaultInitOverride needs to be set or
       // config/log4j.properties will be read and used additionally)
@@ -211,19 +176,19 @@ public class Loader  implements ElementHandler {
       Context context = new Context();
 
       if (strCollection == null) {
-	throw new Exception("isrloader.collection not set");
+	      throw new Exception("isrloader.collection not set");
       }
-      isrcollection = Collection.find(context, Integer.parseInt(strCollection));
+      isrcollection = collectionService.find(context, UUIDUtils.fromString(strCollection));
       if (isrcollection == null) {
-	throw new Exception("Unable to find isrloader.collection: " + strCollection);
+	      throw new Exception("Unable to find isrloader.collection: " + strCollection);
       }
 
       if (strEPerson == null) {
-	throw new Exception("isrloader.eperson not set");
+      	throw new Exception("isrloader.eperson not set");
       }
-      isreperson = EPerson.findByEmail(context, strEPerson);
+      isreperson = epersonService.findByEmail(context, strEPerson);
       if (isreperson == null) {
-	throw new Exception("Unable to find isrloader.eperson: " + strEPerson);
+	      throw new Exception("Unable to find isrloader.eperson: " + strEPerson);
       }
 
       context.complete();
@@ -232,25 +197,25 @@ public class Loader  implements ElementHandler {
       InputStream is = new FileInputStream(strInFile);
 
       if (bOutFile) {
-	// Setup the output xml
-	FileOutputStream fos = new FileOutputStream(strOutFile);
-	OutputFormat format = OutputFormat.createPrettyPrint();
-	out = new XMLWriter(fos, format);
+        // Setup the output xml
+        FileOutputStream fos = new FileOutputStream(strOutFile);
+        OutputFormat format = OutputFormat.createPrettyPrint();
+        out = new XMLWriter(fos, format);
 
-	out.startDocument();
-	out.startElement("","","collection",new AttributesImpl());
-      }
+        out.startDocument();
+        out.startElement("","","collection",new AttributesImpl());
+            }
 
-      // Read through the input records
-      Loader handler = new Loader();
-      reader.addHandler("/collection/record", handler);
-      reader.read(is);
+            // Read through the input records
+            Loader handler = new Loader();
+            reader.addHandler("/collection/record", handler);
+            reader.read(is);
 
-      if (bOutFile) {
-	// Close the xml output
-	out.endElement("","","collection");
-	out.endDocument();
-	out.close();
+            if (bOutFile) {
+        // Close the xml output
+        out.endElement("","","collection");
+        out.endDocument();
+        out.close();
       }
     }
 
@@ -313,11 +278,11 @@ public class Loader  implements ElementHandler {
       Document dc = result.getDocument();
 
       if (bOutFile) {
-	out.write(dc.getRootElement());
+	      out.write(dc.getRootElement());
       }
 
       if (bLoad) {
-	loadItem(doc, dc);
+	      loadItem(doc, dc);
       }
 
     }
@@ -340,10 +305,10 @@ public class Loader  implements ElementHandler {
       // Setup the context
       context = new Context();
       context.setCurrentUser(isreperson);
-      context.setIgnoreAuthorization(true);
+      context.ignoreAuthorization();
 
       // Create a new Item, started in a workspace
-      WorkspaceItem wi = WorkspaceItem.create(context, isrcollection, false);
+      WorkspaceItem wi = workspaceItemService.create(context, isrcollection, false);
       Item item = wi.getItem();
 
       // Add dublin core
@@ -353,11 +318,11 @@ public class Loader  implements ElementHandler {
       addBitstreams(context, item, meta);
 
       // Finish installation into the database
-      InstallItem.installItem(context, wi);
+      installItemService.installItem(context, wi);
 
       // Get the handle
-      String strHandle = HandleManager.findHandle(context, item);
-      strHandle = HandleManager.getCanonicalForm(strHandle);
+      String strHandle = handleService.findHandle(context, item);
+      strHandle = handleService.getCanonicalForm(strHandle);
 
       context.commit();
 
@@ -371,13 +336,13 @@ public class Loader  implements ElementHandler {
       log.error("Error loading item: " +
 		ErrorHandling.getStackTrace(e));
       if (context != null) {
-	context.abort();
+	      context.abort();
       }
     }
 
     finally {
       if (context != null) {
-	try { context.complete(); } catch (Exception e) {}
+	      try { context.complete(); } catch (Exception e) {}
       }
     }
   }
@@ -415,16 +380,16 @@ public class Loader  implements ElementHandler {
       // lastname, firstname
       Matcher m = pName.matcher(strAuthor[i]);
       if (m.matches()) {
-	strAuthor[i] = m.group(2) + ", " + m.group(1);
+	      strAuthor[i] = m.group(2) + ", " + m.group(1);
       }
 
       if (i == 0) {
-	e.setText(strAuthor[i]);
-      } else {
-	Element e2 = e.createCopy();
-	e2.setText(strAuthor[i]);
-	n++;
-	l.add(n, e2);
+        e.setText(strAuthor[i]);
+            } else {
+        Element e2 = e.createCopy();
+        e2.setText(strAuthor[i]);
+        n++;
+        l.add(n, e2);
       }
     }
     
@@ -464,13 +429,13 @@ public class Loader  implements ElementHandler {
   public static void addBitstreams(Context context, Item item, Document meta) throws Exception {
 
     // Get the ORIGINAL bundle which contains public bitstreams
-    Bundle[] bundles = item.getBundles("ORIGINAL");
+    List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
     Bundle bundle = null;
 
-    if (bundles.length < 1) {
-      bundle = item.createBundle("ORIGINAL");
+    if (bundles.isEmpty()) {
+      bundle = bundleService.create(context, item, "ORIGINAL");
     } else {
-      bundle = bundles[0];
+      bundle = bundles.get(0);
     }
 
     // Build the file name
@@ -487,14 +452,14 @@ public class Loader  implements ElementHandler {
 
     // Create the bitstream
     InputStream is = new GZIPInputStream(new FileInputStream(f));
-    Bitstream bs = bundle.createBitstream(is);
-    bs.setName(strName);
+    Bitstream bs = bitstreamService.create(context, bundle, is);
+    bs.setName(context, strName);
     
     // Set the format
-    BitstreamFormat bf = FormatIdentifier.guessFormat(context, bs);
-    bs.setFormat(bf);
+    BitstreamFormat bf = bitstreamFormatService.guessFormat(context, bs);
+    bs.setFormat(context, bf);
     
-    bs.update();
+    bitstreamService.update(context, bs);
   }
 
 
@@ -520,10 +485,10 @@ public class Loader  implements ElementHandler {
       n = getXPath("@language").selectSingleNode(ndc);
       String language = ((n == null || n.getText().equals("none"))? null : n.getText());
       if (language == null) {
-	language = ConfigurationManager.getProperty("default.language");
+	      language = configurationService.getProperty("default.language");
       }
 
-      item.addDC(element, qualifier, language, value);
+      itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, element, qualifier, language, value);
       log.debug(element + ":" + qualifier + ":" + language + ":" + value);
     }
   }

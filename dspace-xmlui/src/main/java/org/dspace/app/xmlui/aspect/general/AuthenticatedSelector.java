@@ -14,17 +14,18 @@ import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.selection.Selector;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 /**
  * This simple selector operates on the authenticated DSpace user and selects
  * between two levels of access.
- * 
+ *
+ * <pre>
+ * {@code
  * <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.AuthenticatedSelector"/>
- * 
- * 
  * 
  * <map:select type="AuthenticatedSelector"> 
  *   <map:when test="administrator">
@@ -37,11 +38,13 @@ import org.dspace.eperson.EPerson;
  *     ...
  *   </map:otherwise> 
  * </map:select>
+ * }
+ * </pre>
  * 
  * There are only two defined test expressions: "administrator" and "eperson".
- * Remember an administrator is also an eperson so if you need to check for
+ * Remember that an administrator is also an eperson, so if you need to check for
  * administrators distinct from epersons that select must come first.
- * 
+ *
  * @author Scott Phillips
  */
 
@@ -49,16 +52,24 @@ public class AuthenticatedSelector extends AbstractLogEnabled implements
         Selector
 {
 
-    private static Logger log = Logger.getLogger(AuthenticatedSelector.class);
+    private static final Logger log = Logger.getLogger(AuthenticatedSelector.class);
 
-    /** Test expressiots */
+    /** Test expressions */
     public static final String EPERSON = "eperson";
 
     public static final String ADMINISTRATOR = "administrator";
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     /**
      * Determine if the authenticated eperson matches the given expression.
+     *
+     * @param expression "eperson" or "administrator".
+     * @param objectModel Cocoon object model.
+     * @param parameters unused.
+     * @return whether the eperson is authenticated or an administrator.
      */
+    @Override
     public boolean select(String expression, Map objectModel,
             Parameters parameters)
     {
@@ -82,7 +93,7 @@ public class AuthenticatedSelector extends AbstractLogEnabled implements
             else if (ADMINISTRATOR.equals(expression))
             {
                 // Is this eperson an administrator?
-                return AuthorizeManager.isAdmin(context);
+                return authorizeService.isAdmin(context);
             }
 
             // Otherwise return false;
