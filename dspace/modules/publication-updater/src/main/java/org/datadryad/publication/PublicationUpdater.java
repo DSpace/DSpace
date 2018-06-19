@@ -1,6 +1,5 @@
 package org.datadryad.publication;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.*;
@@ -26,7 +25,6 @@ import java.io.*;
 import java.lang.RuntimeException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -100,7 +98,7 @@ public class PublicationUpdater extends HttpServlet {
                             }
                         } else if (itemID != null) {
                             Item item = Item.find(context, itemID);
-                            StringBuilder result = matchItemToCrossref(context, item);
+                            StringBuilder result = matchItemToCrossref(context, item, null);
                             LOGGER.info(result);
                         } else {
                             checkPublications(context, startLetter);
@@ -271,7 +269,7 @@ public class PublicationUpdater extends HttpServlet {
                     }
 
 
-                    message.append(matchItemToCrossref(context, item));
+                    message.append(matchItemToCrossref(context, item, databaseManuscript));
                     if (!"".equals(message.toString())) {
                         updatedItems.add(buildItemSummary(item) + "\n\t" + message);
                         // was there a manuscript record saved for this? If so, update it.
@@ -301,7 +299,7 @@ public class PublicationUpdater extends HttpServlet {
         // For all found items, look for matches in CrossRef publications.
         for (Item item : items) {
             LOGGER.debug(">>> processing archived item with internal ID " + item.getID());
-            StringBuilder message = matchItemToCrossref(context, item);
+            StringBuilder message = matchItemToCrossref(context, item, null);
             if (!"".equals(message.toString())) {
                 updatedItems.add(buildItemSummary(item) + "\n\t" + message);
             }
@@ -312,7 +310,7 @@ public class PublicationUpdater extends HttpServlet {
         }
     }
 
-    private StringBuilder matchItemToCrossref(Context context, Item item) {
+    private StringBuilder matchItemToCrossref(Context context, Item item, Manuscript databaseManuscript) {
         StringBuilder message = new StringBuilder();
         Manuscript queryManuscript = new Manuscript(item);
 
@@ -351,6 +349,18 @@ public class PublicationUpdater extends HttpServlet {
             }
         } catch (RESTModelException e) {
             LOGGER.debug("crossref match wasn't valid: " + e.getMessage());
+        }
+        // was there a manuscript record saved for this? If so, update it.
+        if (databaseManuscript != null && !"".equals(message.toString())) {
+            databaseManuscript.setStatus(matchedManuscript.getLiteralStatus());
+            databaseManuscript.setPublicationDate(matchedManuscript.getPublicationDate());
+            databaseManuscript.setPublicationDOI(matchedManuscript.getPublicationDOI());
+            try {
+                LOGGER.debug("writing publication data for item " + item.getID() + ", " + databaseManuscript.getPublicationDOI() + " back to " + databaseManuscript.getManuscriptId());
+                JournalUtils.writeManuscriptToDB(databaseManuscript);
+            } catch (Exception e) {
+                LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
+            }
         }
         return message;
     }
