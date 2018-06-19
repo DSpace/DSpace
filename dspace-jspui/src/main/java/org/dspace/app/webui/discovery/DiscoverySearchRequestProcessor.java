@@ -418,12 +418,23 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             }
             catch (SQLException e)
             {
-                throw new SearchProcessorException(e.getMessage(), e);            }
 
-            if ("submit_export_metadata".equals(UIUtil.getSubmitButton(request,
-                    "submit")))
-            {
-                exportMetadata(context, response, resultsItems);
+            }
+
+            if ("submit_export_metadata".equals(UIUtil.getSubmitButton(request,"submit"))) {
+                try {
+                    if (AuthorizeManager.isAdmin(context)) {
+                        exportMetadata(context, response, resultsItems);
+                    }
+                    else {
+                        JSPManager.showJSP(request, response, "/error/authorize.jsp");
+                    }
+                }
+                catch (SQLException e)
+                {
+                    throw new SearchProcessorException(e.getMessage(), e);
+                }
+
             }
         }
         catch (SearchServiceException e)
