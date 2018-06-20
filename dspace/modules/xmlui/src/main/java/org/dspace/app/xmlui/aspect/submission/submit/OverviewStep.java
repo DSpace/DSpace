@@ -1,18 +1,13 @@
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import org.apache.commons.io.FileUtils;
-import org.datadryad.api.DryadDataFile;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
+import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
-import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
@@ -50,6 +45,7 @@ public class OverviewStep extends AbstractStep {
     private static final Message T_BUTTON_DATAFILE_ADD = message("xmlui.Submission.submit.OverviewStep.button.add-datafile");
     private static final Message T_BUTTON_DATAFILE_EDIT = message("xmlui.Submission.submit.OverviewStep.button.datafile.edit");
     private static final Message T_BUTTON_DATAFILE_DELETE = message("xmlui.Submission.submit.OverviewStep.button.datafile.delete");
+    private static final Message T_BUTTON_DATAFILE_EDIT_METADATA = message("xmlui.Submission.Submissions.OverviewStep.edit-metadata-dataset");
     private static final Message T_BUTTON_DATAFILE_CONTINUE = message("xmlui.Submission.submit.OverviewStep.button.datafile.continue");
     private static final Message T_DUP_SUBMISSION = message("xmlui.submit.publication.describe.duplicatesubmission");
 
@@ -78,70 +74,76 @@ public class OverviewStep extends AbstractStep {
 
         Division mainDiv = body.addInteractiveDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
 
-
-
         Division actionsDiv = mainDiv.addDivision("submit-completed-overview");
 
         //First of all add all the publication info
-        {
-            Division pubDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
+        Division pubDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
 
-            pubDiv.setHead(T_STEPS_HEAD_1);
-            //TODO: expand this !
+        pubDiv.setHead(T_STEPS_HEAD_1);
+        //TODO: expand this !
 
-            // display a formatted reference to the data package
-            ReferenceSet refSet = pubDiv.addReferenceSet("submission", ReferenceSet.TYPE_SUMMARY_LIST);
-            refSet.addReference(publication);
+        // display a formatted reference to the data package
+        ReferenceSet refSet = pubDiv.addReferenceSet("submission", ReferenceSet.TYPE_SUMMARY_VIEW);
+        refSet.addReference(publication);
 
-            //add an edit button for the publication (if we aren't archived)
-            if(!publication.isArchived()){
-                Para actionsPara = pubDiv.addPara();
-                actionsPara.addButton("submit_edit_publication").setValue(T_BUTTON_PUBLICATION_EDIT);
-                if(submission instanceof WorkflowItem){
-                    //For a curator add an edit metadata button
-                    actionsPara.addButton("submit_edit_metadata_" + submission.getID()).setValue(message("xmlui.Submission.Submissions.OverviewStep.edit-metadata-pub"));
-                }
+        //add an edit button for the publication (if we aren't archived)
+        if(!publication.isArchived()){
+            Para actionsPara = pubDiv.addPara();
+            actionsPara.addButton("submit_edit_publication").setValue(T_BUTTON_PUBLICATION_EDIT);
+            if(submission instanceof WorkflowItem){
+                //For a curator add an edit metadata button
+                actionsPara.addButton("submit_edit_metadata_" + submission.getID()).setValue(message("xmlui.Submission.Submissions.OverviewStep.edit-metadata-pub"));
             }
         }
 
 
         //A boolean set to true if we have dataset that is not fully submitted, BUT has been linked to the publication
         boolean submissionNotFinished = false;
-        boolean noDatasets = false;
         org.dspace.content.Item[] datasets = DryadWorkflowUtils.getDataFiles(context, publication);
         //Second add info & edit/delete buttons for all our data files
-        {
-            Division dataDiv = actionsDiv.addDivision("dataoverviewdivision", "even subdiv");
+        Division dataDiv = actionsDiv.addDivision("dataoverviewdivision", "even subdiv");
 
-            //First of all add the current one !
-            dataDiv.setHead(T_STEPS_HEAD_2);
+        dataDiv.setHead(T_STEPS_HEAD_2);
 
-            List dataSetList = dataDiv.addList("datasets");
+        Table dataSetList = dataDiv.addTable("datasets", 1, 3, "datasets");
+        Cell addCell = dataSetList.addRow().addCell("add_file", null, 1, 3, "add_file");
+        addCell.addButton("submit_adddataset").setValue(T_BUTTON_DATAFILE_ADD);
 
-            if(datasets.length == 0)
-                noDatasets = true;
+        if(datasets.length == 0)
+            submissionNotFinished = true;
 
-            if(publication.isArchived()){
-                //Add the current dataset, since our publication is archived this will probally be the only one !
-                submissionNotFinished = renderDatasetItem(submissionNotFinished, dataSetList, submission.getItem(), (WorkspaceItem) submission);
-            }
+        if(publication.isArchived()){
+            //Add the current dataset, since our publication is archived this will probally be the only one !
+            Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, submission.getItem(), (WorkspaceItem) submission);
+        }
 
-            for (org.dspace.content.Item dataset : datasets) {
-                //Our current item has already been added
-                InProgressSubmission wsDataset;
-                if(submissionInfo.getSubmissionItem() instanceof WorkspaceItem)
-                    wsDataset = WorkspaceItem.findByItemId(context, dataset.getID());
-                else
-                    wsDataset = WorkflowItem.findByItemId(context, dataset.getID());
-                //Only add stuff IF we have a workspaceitem
-                if(wsDataset != null){
-                    submissionNotFinished = renderDatasetItem(submissionNotFinished, dataSetList, dataset, wsDataset);
+        for (org.dspace.content.Item dataset : datasets) {
+            //Our current item has already been added
+            InProgressSubmission wsDataset;
+            if(submissionInfo.getSubmissionItem() instanceof WorkspaceItem)
+                wsDataset = WorkspaceItem.findByItemId(context, dataset.getID());
+            else
+                wsDataset = WorkflowItem.findByItemId(context, dataset.getID());
+            //Only add stuff IF we have a workspaceitem
+            if(wsDataset != null){
+                Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, dataset, wsDataset);
+                Button editButton = actionCell.addButton("submit_edit_dataset_" + wsDataset.getID());
+                //To determine which name our button is getting check if we are through submission with this
+                if (dataset.getMetadata("internal", "workflow", "submitted", org.dspace.content.Item.ANY).length == 0 && (wsDataset instanceof WorkspaceItem)) {
+                    editButton.setValue(T_BUTTON_DATAFILE_CONTINUE);
+                    submissionNotFinished = true;
+                } else {
+                    editButton.setValue(T_BUTTON_DATAFILE_EDIT);
+                }
+                actionCell.addButton("submit_delete_dataset_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_DELETE);
+
+                // add metadata edit button if it's in workflow
+                if (wsDataset instanceof WorkflowItem) {
+                    actionCell.addButton("submit_edit_metadata_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_EDIT_METADATA);
                 }
             }
-
-            Item addDataFileItem = dataSetList.addItem();
-            addDataFileItem.addButton("submit_adddataset").setValue(T_BUTTON_DATAFILE_ADD);
         }
+
         //Thirdly add the the upload data files to external repos (this is optional)
 	// Commented out because there is a bug somewhere in this code -- Clicking the checkbox for TreeBASE upload causes the Tomcat server to crash!
 	/*
@@ -226,33 +228,36 @@ public class OverviewStep extends AbstractStep {
 //        }
 
         //Lastly add the finalize submission button
-        {
-            Division finDiv = actionsDiv.addDivision("finalizedivision", (submission instanceof WorkspaceItem ? "even" : "odd") + " subdiv");
+        Division finDiv = actionsDiv.addDivision("finalizedivision", (submission instanceof WorkspaceItem ? "even" : "odd") + " subdiv");
 
-            if(submission instanceof WorkspaceItem){
-                finDiv.setHead(T_STEPS_HEAD_4);
-                finDiv.addPara().addContent(T_FINALIZE_HELP);
+        if(submission instanceof WorkspaceItem){
+            finDiv.setHead(T_STEPS_HEAD_4);
 
-                // add Delete and Continue to Checkout buttons
-                Para bottomButtonPara = finDiv.addPara();
-                if (!publication.isArchived() && submission instanceof WorkspaceItem) {
-                    WorkspaceItem pubWsItem = WorkspaceItem.findByItemId(context, publication.getID());
-                    bottomButtonPara.addButton("submit_delete_datapack_" + pubWsItem.getID()).setValue(T_BUTTON_PUBLICATION_DELETE);
+            // alert user if their submission is not finished:
+            if (submissionNotFinished) {
+                if (datasets.length == 0) {
+                    finDiv.addPara("alert", "alert").addContent(T_ERROR_ONE_FILE);
+                } else {
+                    finDiv.addPara("alert", "alert").addContent(T_ERROR_ALL_FILES);
                 }
-
-                Button finishButton = bottomButtonPara.addButton(AbstractProcessingStep.NEXT_BUTTON);
-                finishButton.setValue(T_FINALIZE_BUTTON);
-                if(submissionNotFinished || noDatasets){
-                    finishButton.setDisabled(true);
-                    if(submissionNotFinished)
-                        finishButton.addError(T_ERROR_ALL_FILES);
-                    else
-                        finishButton.addError(T_ERROR_ONE_FILE);
-                }
-            } else {
-                //
-                finDiv.addPara().addButton("submit_cancel").setValue(message("xmlui.general.return"));
             }
+
+            finDiv.addPara().addContent(T_FINALIZE_HELP);
+
+            // add Delete and Continue to Checkout buttons
+            Para bottomButtonPara = finDiv.addPara();
+            if (!publication.isArchived() && submission instanceof WorkspaceItem) {
+                WorkspaceItem pubWsItem = WorkspaceItem.findByItemId(context, publication.getID());
+                bottomButtonPara.addButton("submit_delete_datapack_" + pubWsItem.getID()).setValue(T_BUTTON_PUBLICATION_DELETE);
+            }
+
+            Button finishButton = bottomButtonPara.addButton(AbstractProcessingStep.NEXT_BUTTON);
+            finishButton.setValue(T_FINALIZE_BUTTON);
+            if(submissionNotFinished){
+                finishButton.setDisabled(true);
+            }
+        } else {
+            finDiv.addPara().addButton("submit_cancel").setValue(message("xmlui.general.return"));
         }
     }
 
@@ -272,55 +277,4 @@ public class OverviewStep extends AbstractStep {
         return randomKey;
     }
 
-    private boolean renderDatasetItem(boolean submissionNotFinished, List dataSetList, org.dspace.content.Item dataset, InProgressSubmission wsDataset) throws WingException, SQLException {
-        DryadDataFile dryadDataFile = new DryadDataFile(dataset);
-        Item dataItem = dataSetList.addItem(String.valueOf(wsDataset.getID()), "dataset_overview");
-
-        if (AuthorizeManager.isCuratorOrAdmin(context)) {
-            String datasetTitle = XSLUtils.getShortFileName(wsDataset.getItem().getName(), 50);
-            if(datasetTitle == null)
-                datasetTitle = "Untitled";
-
-            dataItem.addXref(HandleManager.resolveToURL(context, dataset.getHandle()), datasetTitle);
-        } else {
-            try {
-                Bitstream mainFile = dryadDataFile.getFirstBitstream();
-                String fileInfo = mainFile.getName() + " (" + FileUtils.byteCountToDisplaySize(mainFile.getSize()) + ")";
-                dataItem.addHighlight("filename").addContent(fileInfo);
-            } catch (Exception e) {
-                dataItem.addHighlight("filename").addContent(dryadDataFile.getItem().getName());
-            }
-        }
-
-
-        Button editButton = dataItem.addButton("submit_edit_dataset_" + wsDataset.getID());
-        //To determine which name our button is getting check if we are through submission with this
-        if(dataset.getMetadata("internal", "workflow", "submitted", org.dspace.content.Item.ANY).length == 0 && (wsDataset instanceof WorkspaceItem)){
-            editButton.setValue(T_BUTTON_DATAFILE_CONTINUE);
-            submissionNotFinished = true;
-        }
-        else
-            editButton.setValue(T_BUTTON_DATAFILE_EDIT);
-
-        if(wsDataset instanceof WorkflowItem){
-            dataItem.addButton("submit_edit_metadata_" + wsDataset.getID()).setValue(message("xmlui.Submission.Submissions.OverviewStep.edit-metadata-dataset"));
-        }
-
-        dataItem.addButton("submit_delete_dataset_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_DELETE);
-
-        // curators don't care to see the READMEs or descriptions, just submitters
-        if (!AuthorizeManager.isCuratorOrAdmin(context)) {
-            Bitstream readme = dryadDataFile.getREADME();
-            if (readme != null) {
-                String readmeFileInfo = readme.getName() + " (" + FileUtils.byteCountToDisplaySize(readme.getSize()) + ")";
-                dataItem.addHighlight("dataset-description").addContent(readmeFileInfo);
-            }
-            // add dc_description text if available
-            DCValue[] descriptions = dataset.getMetadata("dc", "description", org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
-            if (descriptions.length > 0)
-                dataItem.addHighlight("dataset-description").addContent(descriptions[0].value);
-        }
-        
-        return submissionNotFinished;
-    }
 }

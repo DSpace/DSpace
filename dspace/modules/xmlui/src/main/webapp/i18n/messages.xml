@@ -3043,9 +3043,9 @@
 	<message key="xmlui.Submission.submit.OverviewStep.button.finalize">Continue to checkout</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.edit">Edit</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.delete">Delete</message>
-	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.continue">Continue submission</message>
+	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.continue">Verify</message>
 	<message key="xmlui.Submission.submit.OverviewStep.error.finalize.all-files">You cannot finish the
-		submission until all the data files are through the submission workflow.</message>
+		submission until all the data files are through the submission workflow. Please verify each file in the package.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.error.finalize.one-file">You cannot finish the
 		submission until at least one data file is attached to the publication.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.finalize.help">When you are satisfied with your submission, click the button below to proceed to checkout.<br /> 
@@ -3098,7 +3098,7 @@
 	<message key="xmlui.Submission.Submissions.curator.delete.column.date">Deletion date</message>
 	<message key="xmlui.Submission.Submissions.curator.edit.item">Edit item metadata</message>
 	<message key="xmlui.Submission.Submissions.OverviewStep.edit-metadata-pub">Edit publication metadata</message>
-	<message key="xmlui.Submission.Submissions.OverviewStep.edit-metadata-dataset">Edit data file metadata</message>
+	<message key="xmlui.Submission.Submissions.OverviewStep.edit-metadata-dataset">Edit file metadata</message>
 
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_prism.publicationName_filter">Publication Name</message>
 	<message key="xmlui.Discovery.AbstractSearch.type_prism.publicationName_filter">Refine by: Publication Name</message>

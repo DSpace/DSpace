@@ -43,14 +43,22 @@ package org.dspace.app.xmlui.aspect.submission;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataFile;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.app.util.*;
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.app.xmlui.wing.Message;
+import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.Button;
+import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.Row;
+import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
@@ -77,6 +85,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.dspace.usagelogging.EventLogger;
 
 /**
@@ -1374,4 +1385,81 @@ public class FlowUtils {
         System.out.println(" (run with -h flag for details)");
         System.exit(1);
     }
+
+    // returns the table cell that actions should be rendered in
+    public static Cell renderDatasetItem(Context context, Table table, org.dspace.content.Item dataset, InProgressSubmission wsDataset) throws WingException, SQLException {
+        // first row: buttons, title
+        Row row = table.addRow("dataset-row-top", null, "dataset-row-top");
+        Cell finalActionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
+        Cell labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+        Cell dataCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+
+        DryadDataFile dryadDataFile = new DryadDataFile(dataset);
+        String datasetTitle = XSLUtils.getShortFileName(dryadDataFile.getTitle(), 50);
+
+        labelCell.addContent("Title");
+        dataCell.addContent(datasetTitle);
+
+        // filename
+        row = table.addRow("dataset-row", null, "dataset-row");
+        Cell actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
+        labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+        dataCell = row.addCell();
+
+        String fileInfo;
+        try {
+            Bitstream mainFile = dryadDataFile.getFirstBitstream();
+            fileInfo = mainFile.getName() + " (" + FileUtils.byteCountToDisplaySize(mainFile.getSize()) + ")";
+        } catch (Exception e) {
+            fileInfo = dryadDataFile.getItem().getName();
+        }
+        labelCell.addContent("Filename");
+        dataCell.addXref(HandleManager.resolveToURL(context, dataset.getHandle()), fileInfo);
+
+        // readme
+        Bitstream readme = dryadDataFile.getREADME();
+        if (readme != null) {
+            row = table.addRow("dataset-row", null, "dataset-row");
+            actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
+            labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+            dataCell = row.addCell();
+
+            String readmeFileInfo = readme.getName() + " (" + FileUtils.byteCountToDisplaySize(readme.getSize()) + ")";
+            labelCell.addContent("README");
+            dataCell.addContent(readmeFileInfo);
+        }
+
+        // description
+        DCValue[] descriptions = dataset.getMetadata("dc", "description", null, org.dspace.content.Item.ANY);
+        if (descriptions.length > 0) {
+            row = table.addRow("dataset-row", null, "dataset-row");
+            actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
+            labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+            dataCell = row.addCell("dataset-description",null, 0, 0, "dataset-description");
+
+            labelCell.addContent("Description");
+            dataCell.addHighlight("dataset-description").addContent(descriptions[0].value);
+        }
+
+        // date added
+        DCValue[] provenances = dataset.getMetadata("dc", "description", "provenance", org.dspace.content.Item.ANY);
+        for (DCValue provenance : provenances) {
+            Matcher uploadMatcher = Pattern.compile("File was uploaded at (.+)").matcher(provenance.value);
+            if (uploadMatcher.matches()) {
+                String uploadDate = uploadMatcher.group(1);
+                row = table.addRow("dataset-row", null, "dataset-row");
+                actionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");
+                labelCell = row.addCell("dataset-label",null, 0, 0, "dataset-label");
+                dataCell = row.addCell();
+
+                labelCell.addContent("Date added");
+                dataCell.addHighlight("dataset-date").addContent(uploadDate);
+                break;
+            }
+        }
+
+
+        return finalActionCell;
+    }
+
 }

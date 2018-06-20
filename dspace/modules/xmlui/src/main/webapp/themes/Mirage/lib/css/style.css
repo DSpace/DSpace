@@ -2638,6 +2638,31 @@ td.ds-author-input-col input {
     width: 45%;
 }
 
+tr.dataset-row {
+    padding: 0px;
+}
+
+tr.dataset-row-top{
+    border-top: 1px solid #AAA;
+}
+
+table.datasets {
+    width: 100%;
+}
+
+td.dataset-label {
+    font-weight: bold;
+    vertical-align: top;
+}
+
+td.dataset-description {
+    width: 380px;
+}
+
+p.alert {
+    font-weight: bold;
+}
+
 /* membershipOverview.xhtml */
 ul.membership-overview {
     margin-bottom: 10px;

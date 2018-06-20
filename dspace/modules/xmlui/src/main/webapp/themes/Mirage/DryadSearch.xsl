@@ -139,14 +139,17 @@
                         </xsl:when>
                     </xsl:choose>
                 </span>
-                <xsl:if test="dim:field[@element='date' and @qualifier='issued']">
-                    <span class="pub-date">
-                        <xsl:text> (</xsl:text>
-                        <xsl:value-of
-                                select="substring(dim:field[@element='date' and @qualifier='issued']/node(),1,4)"/>
-                        <xsl:text>) </xsl:text>
-                    </span>
-                </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="dim:field[@element='date' and @qualifier='issued']">
+                        <span class="pub-date">
+                            <xsl:text> (</xsl:text>
+                            <xsl:value-of
+                                    select="substring(dim:field[@element='date' and @qualifier='issued']/node(),1,4)"/>
+                            <xsl:text>) </xsl:text>
+                        </span>
+                    </xsl:when>
+                    <xsl:otherwise><xsl:text>. </xsl:text></xsl:otherwise>
+                </xsl:choose>
                 <span class="artifact-title">
                     <xsl:choose>
                         <xsl:when test="dim:field[@element='title']">
