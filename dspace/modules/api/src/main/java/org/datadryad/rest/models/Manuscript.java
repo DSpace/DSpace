@@ -413,6 +413,9 @@ public class Manuscript {
     }
 
     public String getStatus() {
+        if (isPublished()) {
+            return STATUS_PUBLISHED;
+        }
         if (isAccepted()) {
             return STATUS_ACCEPTED;
         }
@@ -421,9 +424,6 @@ public class Manuscript {
         }
         if (isSubmitted()) {
             return STATUS_SUBMITTED;
-        }
-        if (isPublished()) {
-            return STATUS_PUBLISHED;
         }
 
         // default is STATUS_ACCEPTED
