@@ -42,7 +42,7 @@ public class DescribeDatasetStep extends DescribeStep {
             if (subInfo != null) {
                 // if there is neither an external identifier nor any file sizes present, delete the submission item.
                 DCValue[] sizes = subInfo.getSubmissionItem().getItem().getMetadata("dc.format.extent");
-                DCValue[] externalIdentifiers = subInfo.getSubmissionItem().getItem().getMetadata("dc.externalIdentifier");
+                DCValue[] externalIdentifiers = subInfo.getSubmissionItem().getItem().getMetadata("dryad.externalIdentifier");
                 if (sizes.length == 0 && externalIdentifiers.length == 0) {
                     ((WorkspaceItem) subInfo.getSubmissionItem()).deleteAll();
                 }
