@@ -12,9 +12,7 @@
          xsi:noNamespaceSchemaLocation="ehcache.xsd"
          updateCheck='false'>
 
-    <!-- WARNING: If you are running multiple DSpace instances on the same server, make sure to start
-         each DSpace instance with another value for java.io.tmpdir !!! -->
-    <diskStore path="java.io.tmpdir/DSpaceHibernateCache"/>
+    <diskStore path="java.io.tmpdir"/>
 
     <!--
     Mandatory Default Cache configuration. These settings will be applied to caches
