@@ -813,8 +813,9 @@
     -->
      <searchComponent name="crismetrics-extract" 
       class="org.dspace.solr.handler.component.CrisMetricsExtractComponent"/>
-  <requestHandler name="/select" class="solr.SearchHandler">
-    <!-- default values for query parameters can be specified, these
+
+	 <requestHandler name="/select" class="solr.SearchHandler">
+     <!-- default values for query parameters can be specified, these
          will be overridden by parameters in the request
       -->
      <lst name="defaults">
@@ -1030,6 +1031,9 @@
          <str name="update.chain">dedupe</str>
        </lst>
        -->
+       <lst name="defaults">
+         <str name="update.chain">clones_except_private</str>
+       </lst>      
   </requestHandler>
 
   <!-- for back compat with clients using /update/json and /update/csv -->  
@@ -1776,17 +1780,20 @@
        http://wiki.apache.org/solr/UpdateRequestProcessor
 
     -->
-    
-   <updateRequestProcessorChain name="clones-except-private">
+
+  <!-- Exclude *_private field from default search_text -->    
+   <updateRequestProcessorChain name="clones_except_private">
      <processor class="solr.CloneFieldUpdateProcessorFactory">
        <lst name="source">
          <str name="fieldRegex">.*</str>
          <lst name="exclude">
-           <str name="fieldName">.*_private</str>
+           <str name="fieldRegex">.*_private</str>
          </lst>
        </lst>
        <str name="dest">search_text</str>
      </processor>
+       <processor class="solr.LogUpdateProcessorFactory" />
+       <processor class="solr.RunUpdateProcessorFactory" />     
    </updateRequestProcessorChain>
       
   <!-- Deduplication
