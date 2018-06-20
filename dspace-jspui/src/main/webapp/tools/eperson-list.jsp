@@ -228,18 +228,22 @@ function clearEPeople()
 %>
   <tr>
 			<form method="post" action="<%= request.getContextPath() %>/dspace-admin/edit-epeople">
-				<td headers="t1"><%= e.getID() %></td>
-				<td headers="t2"><%= (e.getEmail() == null ? "" : Utils.addEntities(e.getEmail())) %></td>
-				<td headers="t3">
+				<td headers="t1">
+					<input class="btn btn-success" type="button" value="<%
+			if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
+			else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= email %>', '<%= fullname %>');<%= closeWindow %>"/></td>
+				<td headers="t2"><%= e.getID() %></td>
+				<td headers="t3"><%= (e.getEmail() == null ? "" : Utils.addEntities(e.getEmail())) %></td>
+				<td headers="t4">
 					<%= (e.getLastName() == null ? "" : Utils.addEntities(e.getLastName())) %>
 				</td>
-				<td headers="t4">
+				<td headers="t5">
 					<%= (e.getFirstName() == null ? "" : Utils.addEntities(e.getFirstName())) %>
 				</td>
-				<td headers="t5">
+				<td headers="t6">
 					<%= (e.getLanguage() == null ? "" : Utils.addEntities(e.getLanguage())) %>
 				</td>
-				<td headers="t6">
+				<td headers="t7">
 					<input type="hidden" name="eperson_id" value="<%= e.getID() %>"/>
 					<input type="submit" name="submit_edit" class="btn btn-primary" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
 					<input type="submit" name="submit_delete" class="btn btn-danger" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>" />
