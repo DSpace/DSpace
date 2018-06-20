@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.*;
-import org.datadryad.rest.models.Package;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
@@ -35,9 +34,12 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import static java.time.temporal.TemporalAdjusters.*;
+
 /**
  * User: lantian @ atmire . com
  * Date: 9/12/14
@@ -718,10 +720,24 @@ public class JournalUtils {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             try {
                 JsonNode dateParts = dateNode.path("date-parts").get(0);
-                Date date = dateFormat.parse(dateParts.get(0).intValue() + "-" + dateParts.get(1).intValue() + "-" + dateParts.get(2).intValue());
+                int year = dateParts.get(0).asInt();
+                int month = 12;
+                int day = 1;
+                if (dateParts.has(1)) {
+                    month = dateParts.get(1).asInt();
+                }
+                if (dateParts.has(2)) {
+                    day = dateParts.get(2).asInt();
+                } else {
+                    // adjust to the end of the month, if necessary:
+                    LocalDate date = LocalDate.of(year, month, day);
+                    date = date.with(lastDayOfMonth());
+                    day = date.getDayOfMonth();
+                }
+                Date date = dateFormat.parse(year + "-" + month + "-" + day);
                 manuscript.setPublicationDate(date);
-            } catch (ParseException e) {
-                log.error("couldn't parse date: " + dateNode.path("date-time").textValue());
+            } catch (Exception e) {
+                log.error("exception calculating date: " + e.getClass().getName() + ", " + e.getMessage());
             }
         }
         JsonNode titleNode = jsonNode.path("title");
