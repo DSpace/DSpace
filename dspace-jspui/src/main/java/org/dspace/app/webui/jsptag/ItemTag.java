@@ -611,20 +611,10 @@ public class ItemTag extends TagSupport {
                                     ean = item.getMetadata(eanSchema);
                                     
                                     String[] sale = Utils.tokenize(saleSchema);
-                                    Metadatum[] metadatumArray = null;
-                                    if (sale.length == 3)
-                                    {
-                                        metadatumArray = item.getMetadata(
-                                                sale[0], sale[1], sale[2],
-                                                Item.ANY);
-                                    }
-                                    else if (sale.length == 2)
-                                    {
-                                        metadatumArray = item.getMetadata(
+                                    Metadatum[] metadatumArray = item.getMetadata(
                                                 sale[0], sale[1], null,
                                                 Item.ANY);
-                                    }
-
+                                    
                                     if (metadatumArray.length >= 0
                                             && metadatumArray != null)
                                     {
@@ -694,25 +684,71 @@ public class ItemTag extends TagSupport {
 										out.print("</ul> </div>");
 									}
 								} else if (canBuy) {
-									if (viewOptions.size() > 2) {
-										out.print("<li role=\"separator\" class=\"divider\"></li> ");
-									}
-									// see btn buy
-									String metadataPermalink = ConfigurationManager.getProperty("ecommerce",
-											"ecommerce.permalink");
-									String permalink = "";
-									if (StringUtils.isNotBlank(ean)) {
-										permalink = item.getMetadata(metadataPermalink);
-									}
-									out.print("<a class=\"btn btn-danger\" ");
-									out.print("href=\"" + permalink + "\" target=_blank");
-									out.print(LocaleSupport.getLocalizedMessage(pageContext,
-											"org.dspace.app.webui.jsptag.ItemTag.sale"));
-									out.print("</a>");
+									EPerson user = context.getCurrentUser();
+                                    if (user == null) {
+                                    	out.print("<a class=\"btn btn-primary\" ");
+                                    	out.print("href=\"" + request.getContextPath()+"/login-in-page?url="+request.getContextPath()+"/handle/" + handle+"\"");
+    									out.print(LocaleSupport.getLocalizedMessage(pageContext,
+    											"org.dspace.app.webui.jsptag.ItemTag.login"));
+    									out.print("</a>");
+	                                    }else {
+										if (viewOptions.size() > 2) {
+											out.print("<li role=\"separator\" class=\"divider\"></li> ");
+										}
+										// see btn buy
+										String metadataPermalink = ConfigurationManager.getProperty("ecommerce",
+												"ecommerce.permalink");
+										String permalink = "";
+										if (StringUtils.isNotBlank(ean)) {
+											permalink = item.getMetadata(metadataPermalink);
+										}
+										out.print("<a class=\"btn btn-danger\" ");
+										out.print("href=\"" + permalink + "\" target=_blank");
+										out.print(LocaleSupport.getLocalizedMessage(pageContext,
+												"org.dspace.app.webui.jsptag.ItemTag.sale"));
+										out.print("</a>");
+	                                    }
 								} else if(isSale) {
 									// see label you can't buy this item
-									out.print(LocaleSupport.getLocalizedMessage(pageContext,
-											"org.dspace.app.webui.jsptag.ItemTag.notsale"));
+                                    EPerson user = context.getCurrentUser();
+                                    if (user == null) {
+                                    	out.print("<a class=\"btn btn-primary\" ");
+    									out.print("href=\"" + request.getContextPath()+"/login-in-page?url="+request.getContextPath()+"/handle/" + handle+"\"");
+    									out.print(LocaleSupport.getLocalizedMessage(pageContext,
+    											"org.dspace.app.webui.jsptag.ItemTag.login"));
+    									out.print("</a>");
+                                    }else {
+                                    	Metadatum[] metadatumArray = item.getMetadata(
+                                                "ec", "sale", null,
+                                                Item.ANY);
+                                    	int j=0;
+                                    	String str = "";
+                                    	String str2 = "";
+                                    	for (Metadatum m : metadatumArray) {
+                                    		j++;
+                            				Group g = Group.findByName(context, m.value);
+                                    		String link = g.getMetadata("ec.product.permalink");
+        									Object[] params = new Object[2];
+        									params[0]=g.getName();
+        									params[1]=link;
+        									str += LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.ItemTag.reservedsale.group",params);
+        									String space = null;
+        									if (j == metadatumArray.length-1)
+        									{
+        										space = LocaleSupport.getLocalizedMessage(pageContext,
+            											"org.dspace.app.webui.jsptag.ItemTag.reservedsale.group.last-separator");
+        										str += space; 
+        									}else if (j < metadatumArray.length-1){
+        										space = LocaleSupport.getLocalizedMessage(pageContext,
+            											"org.dspace.app.webui.jsptag.ItemTag.reservedsale.group.separator");
+                								str += space; 
+        									}
+                                    	}
+                                    	Object[] params2 = new Object[1];
+    									params2[0]=str;
+    									str2 = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.ItemTag.reservedsale",params2);
+    									out.println(str2);
+                                    }
 								}else if ( showRequestCopy) {
 									out.print("&nbsp;<a class=\"btn btn-success\" href=\"" + request.getContextPath()
 											+ "/request-item?handle=" + handle + "&bitstream-id="

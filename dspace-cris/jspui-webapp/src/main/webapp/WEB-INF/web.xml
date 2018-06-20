@@ -622,6 +622,11 @@
     	<servlet-class>org.dspace.app.webui.servlet.DoiQueuedServlet</servlet-class>
   	</servlet>
   	
+  	<servlet>
+    	<servlet-name>inpageloginservlet</servlet-name>
+    	<servlet-class>org.dspace.app.webui.servlet.InPageLoginServlet</servlet-class>
+  	</servlet>
+  	
 	<!-- Servlet Mappings -->
 
   	<servlet-mapping>
@@ -1127,6 +1132,12 @@
 		<servlet-name>networkrelationsservice</servlet-name>
 		<url-pattern>/networkdatarelations/*</url-pattern>
 	</servlet-mapping>
+	
+	<servlet-mapping>
+    <servlet-name>inpageloginservlet</servlet-name>
+    <url-pattern>/login-in-page</url-pattern>
+  </servlet-mapping>
+  
 	<!-- Pubmed retrieval -->
 	<servlet>
 		<servlet-name>PMCGetCitedByCount</servlet-name>
