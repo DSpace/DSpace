@@ -195,7 +195,7 @@ public class JWTTokenHandler implements InitializingBean {
 
     private boolean isValidToken(HttpServletRequest request, SignedJWT signedJWT, JWTClaimsSet jwtClaimsSet,
                                  EPerson ePerson) throws JOSEException {
-        if (StringUtils.isBlank(ePerson.getSessionSalt())) {
+        if (ePerson == null || StringUtils.isBlank(ePerson.getSessionSalt())) {
             return false;
         } else {
             JWSVerifier verifier = new MACVerifier(buildSigningKey(request, ePerson));
