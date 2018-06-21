@@ -158,6 +158,10 @@
     		<artifactId>opencloud</artifactId>
     		<version>0.3</version>
 		</dependency>
+		<dependency>
+			<groupId>it.4science.dspace</groupId>
+			<artifactId>addon-commons-api</artifactId>
+		</dependency>		
     </dependencies>
 
 </project>
