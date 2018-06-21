@@ -105,7 +105,7 @@ public class AuthenticationRestController implements InitializingBean {
     @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity logout() {
         //This is handled by org.dspace.app.rest.security.CustomLogoutHandler
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     protected ResponseEntity getLoginResponse(HttpServletRequest request, String failedMessage) {
