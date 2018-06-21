@@ -455,9 +455,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
-        makeUserAdmin();
-
-        String token = getAuthToken(eperson.getEmail(), password);
+        String token = getAuthToken(admin.getEmail(), password);
 
         // Delete
         getClient(token).perform(delete("/api/core/bitstreams/" + bitstream.getID()))
@@ -574,9 +572,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection").build();
 
-        makeUserAdmin();
-
-        String token = getAuthToken(eperson.getEmail(), password);
+        String token = getAuthToken(admin.getEmail(), password);
 
         // 422 error when trying to DELETE parentCommunity logo
         getClient(token).perform(delete("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
