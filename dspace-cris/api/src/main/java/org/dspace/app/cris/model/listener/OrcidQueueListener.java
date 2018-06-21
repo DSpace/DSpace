@@ -71,10 +71,7 @@ public class OrcidQueueListener
 		        ACrisNestedObject crisNestedObject = (ACrisNestedObject)object;
 		        
 		        if(crisNestedObject instanceof RPNestedObject) {
-		            crisNestedObject.getTypo().getShortName();
-		            ResearcherPage rp = (ResearcherPage)crisNestedObject.getParent();
-		            
-		            orcidPreferencesUtils.prepareOrcidQueue(rp.getCrisID(), rp);
+		            orcidPreferencesUtils.prepareOrcidQueueByNested(crisNestedObject);
 		        }		        
 		    }
 			if (object instanceof ACrisObject) {
@@ -329,31 +326,7 @@ public class OrcidQueueListener
         ACrisNestedObject crisNestedObject = (ACrisNestedObject) object;
 
         if(crisNestedObject instanceof RPNestedObject) {
-            String shortname = crisNestedObject.getTypo().getShortName();
-            ResearcherPage rp = (ResearcherPage)crisNestedObject.getParent();
-            List<RPPropertiesDefinition> metadataDefinitions = orcidPreferencesUtils
-                    .getApplicationService()
-                    .likePropertiesDefinitionsByShortName(
-                            RPPropertiesDefinition.class,
-                            PREFIX_ORCID_PROFILE_PREF);
-            for (RPPropertiesDefinition rppd : metadataDefinitions)
-            {
-                String metadataShortnameINTERNAL = rppd.getShortName()
-                        .replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
-                List<RPProperty> propsRps = rp.getAnagrafica4view()
-                        .get(rppd.getShortName());
-                for (RPProperty prop : propsRps)
-                {
-                    BooleanValue booleanValue = (BooleanValue) (prop
-                            .getValue());
-                    if (booleanValue.getObject())
-                    {
-                        if(metadataShortnameINTERNAL.contains(shortname)) {
-                            
-                        }
-                    }
-                }
-            }
+            orcidPreferencesUtils.prepareOrcidQueueByNested(crisNestedObject);
         }
 
     }

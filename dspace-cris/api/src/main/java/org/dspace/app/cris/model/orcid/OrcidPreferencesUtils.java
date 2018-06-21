@@ -30,6 +30,7 @@ import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.RelationPreference;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.VisibilityConstants;
+import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.service.ApplicationService;
@@ -1014,4 +1015,37 @@ public class OrcidPreferencesUtils
         }
     }
 
+    public boolean prepareOrcidQueueByNested(ACrisNestedObject crisNestedObject)
+    {
+        if (crisNestedObject.getParent() instanceof ResearcherPage)
+        {
+            String shortname = crisNestedObject.getTypo().getShortName();
+            ResearcherPage rp = (ResearcherPage) crisNestedObject.getParent();
+            List<RPPropertiesDefinition> metadataDefinitions = getApplicationService()
+                    .likePropertiesDefinitionsByShortName(
+                            RPPropertiesDefinition.class,
+                            PREFIX_ORCID_PROFILE_PREF);
+            for (RPPropertiesDefinition rppd : metadataDefinitions)
+            {
+                String metadataShortnameINTERNAL = rppd.getShortName()
+                        .replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
+                List<RPProperty> propsRps = rp.getAnagrafica4view()
+                        .get(rppd.getShortName());
+                for (RPProperty prop : propsRps)
+                {
+                    BooleanValue booleanValue = (BooleanValue) (prop
+                            .getValue());
+                    if (booleanValue.getObject())
+                    {
+                        if (metadataShortnameINTERNAL.endsWith(shortname))
+                        {
+                            prepareOrcidQueue(rp.getCrisID(), rp);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
