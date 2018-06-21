@@ -86,7 +86,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .addLogoutHandler(customLogoutHandler)
             //Configure the logout entry point
             .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout"))
-            //When logout is successful, return OK (200) status
+            //When logout is successful, return OK (204) status
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
             //Everyone can call this endpoint
             .permitAll()
