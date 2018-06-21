@@ -14,28 +14,31 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.discovery.NativeNestedListenerSolrIndexer;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.RelationPreference;
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.model.jdyna.ProjectProperty;
+import org.dspace.app.cris.model.jdyna.RPNestedObject;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.value.RPPointer;
 import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.hibernate.event.spi.PostLoadEvent;
 import org.hibernate.event.spi.PostLoadEventListener;
 
+import it.cilea.osd.common.listener.NativePostDeleteEventListener;
 import it.cilea.osd.common.listener.NativePostUpdateEventListener;
 import it.cilea.osd.common.model.Identifiable;
 import it.cilea.osd.jdyna.value.BooleanValue;
 
 public class OrcidQueueListener
-        implements NativePostUpdateEventListener, PostLoadEventListener
+        implements NativePostUpdateEventListener, NativePostDeleteEventListener, PostLoadEventListener 
 {
 
     private static final String PREFIX_ORCID_PROFILE_PREF = OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF;
@@ -56,7 +59,7 @@ public class OrcidQueueListener
     @Override
 	public <T extends Identifiable> void onPostUpdate(T entity) {		
 		Object object = entity;
-		if (!(object instanceof ACrisObject) && !(object instanceof RelationPreference)) {
+		if (!(object instanceof ACrisObject) && !(object instanceof RelationPreference) && !(object instanceof ACrisNestedObject)) {
 			// nothing to do
 			return;
 		}
@@ -64,6 +67,16 @@ public class OrcidQueueListener
 		log.debug("Call onPostUpdate " + OrcidQueueListener.class);
 		
 		try {
+		    if (object instanceof ACrisNestedObject) {
+		        ACrisNestedObject crisNestedObject = (ACrisNestedObject)object;
+		        
+		        if(crisNestedObject instanceof RPNestedObject) {
+		            crisNestedObject.getTypo().getShortName();
+		            ResearcherPage rp = (ResearcherPage)crisNestedObject.getParent();
+		            
+		            orcidPreferencesUtils.prepareOrcidQueue(rp.getCrisID(), rp);
+		        }		        
+		    }
 			if (object instanceof ACrisObject) {
 				ACrisObject crisObj = (ACrisObject) object;
 				if (crisObj.getType() == CrisConstants.RP_TYPE_ID
@@ -298,6 +311,51 @@ public class OrcidQueueListener
             }
             log.debug("End onPostLoad " + OrcidQueueListener.class);
         }
+    }
+
+    @Override
+    public <T> void onPostDelete(T entity)
+    {
+        
+        Object object = entity;
+        if (!(object instanceof ACrisNestedObject))
+        {
+            // nothing to do
+            return;
+        }
+
+        log.debug("Call onPostDelete " + OrcidQueueListener.class);
+        
+        ACrisNestedObject crisNestedObject = (ACrisNestedObject) object;
+
+        if(crisNestedObject instanceof RPNestedObject) {
+            String shortname = crisNestedObject.getTypo().getShortName();
+            ResearcherPage rp = (ResearcherPage)crisNestedObject.getParent();
+            List<RPPropertiesDefinition> metadataDefinitions = orcidPreferencesUtils
+                    .getApplicationService()
+                    .likePropertiesDefinitionsByShortName(
+                            RPPropertiesDefinition.class,
+                            PREFIX_ORCID_PROFILE_PREF);
+            for (RPPropertiesDefinition rppd : metadataDefinitions)
+            {
+                String metadataShortnameINTERNAL = rppd.getShortName()
+                        .replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
+                List<RPProperty> propsRps = rp.getAnagrafica4view()
+                        .get(rppd.getShortName());
+                for (RPProperty prop : propsRps)
+                {
+                    BooleanValue booleanValue = (BooleanValue) (prop
+                            .getValue());
+                    if (booleanValue.getObject())
+                    {
+                        if(metadataShortnameINTERNAL.contains(shortname)) {
+                            
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
 }
