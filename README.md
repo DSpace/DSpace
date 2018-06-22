@@ -1,6 +1,9 @@
 
 # DSpace
 
+## NOTE: The rest-tutorial branch has been created to support the [DSpace 7 REST documentation](https://dspace-labs.github.io/DSpace7RestTutorial/walkthrough/intro)
+- This branch provides stable, referencable line numbers in code
+
 [![Build Status](https://travis-ci.org/DSpace/DSpace.png?branch=master)](https://travis-ci.org/DSpace/DSpace)
 
 [DSpace Documentation](https://wiki.duraspace.org/display/DSDOC/) | 
