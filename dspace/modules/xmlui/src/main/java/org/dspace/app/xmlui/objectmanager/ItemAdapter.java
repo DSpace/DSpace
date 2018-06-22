@@ -1097,7 +1097,11 @@ public class ItemAdapter extends AbstractAdapter
         Long views = null;
         try
         {
-            views = solrLoggerService.queryTotal("id: " + bitstream.getID(),
+            String searchId = bitstream.getID().toString();
+            if (bitstream.getLegacyId() != null) {
+                searchId = "(" + searchId + " OR " + bitstream.getLegacyId() + ")";
+            }
+            views = solrLoggerService.queryTotal("id: " + searchId,
                     "type: " + Constants.BITSTREAM + " AND -isBot:true")
                     .getCount();
         }
