@@ -18,6 +18,7 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.ContextAwareDisseminationCrosswalk;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -691,7 +692,10 @@ public class ItemAdapter extends AbstractAdapter
 
         // Suppress license?
         Boolean showLicense = ConfigurationManager.getBooleanProperty("webui.licence_bundle.show");
-        
+
+        // Check if ORIGINAL bundle included (either explicitly or via include all fileGrp types)
+        boolean includeContentBundle = this.fileGrpTypes.isEmpty() ? true : this.fileGrpTypes.contains("ORIGINAL");
+
         // Loop over all requested bundles
         for (Bundle bundle : bundles)
         {
@@ -716,20 +720,41 @@ public class ItemAdapter extends AbstractAdapter
                 continue;
             }
 
+            // /////////////////////////////////////
+            // Determine which bitstreams to include in bundle
+            Bitstream[] bitstreams = new Bitstream[0];
+
+            // If this is the THUMBNAIL bundle, and we are NOT including content bundle,
+            // Then assume this is an item summary page, and we can just include the main thumbnail.
+            if ("THUMBNAIL".equals(bundle.getName()) && !includeContentBundle)
+            {
+                Thumbnail thumbnail = ItemService.getThumbnail(context, item.getID(), false);
+                if(thumbnail != null) {
+                    bitstreams = new Bitstream[] { thumbnail.getThumb() };
+                }
+            }
+            else
+            {   // Default to including all bitstreams
+                bitstreams = bundle.getBitstreams();
+            }
+
+
             // ///////////////////
             // Start bundle's file group
             attributes = new AttributeMap();
             attributes.put("USE", use);
             startElement(METS,"fileGrp",attributes);
-            
-            for (Bitstream bitstream : bundle.getBitstreams())
+
+            for (Bitstream bitstream : bitstreams)
             {
                 // //////////////////////////////
                 // Determine the file's IDs
                 String fileID = getFileID(bitstream);
                 
                 Bitstream originalBitstream = null;
-                if (isDerivedBundle)
+                // If we are looping through a derived bundle and content bundle is included,
+                // ensure each derived bitstream and original bitstream share the same groupID
+                if (isDerivedBundle && includeContentBundle)
                 {
                     originalBitstream = findOriginalBitstream(item, bitstream);
                 }
