@@ -126,14 +126,7 @@ public class RestRepositoryUtils {
 
         for (MethodParameter parameter : methodParameters.getParameters()) {
             final Parameter parameterAnnotation = parameter.getParameterAnnotation(Parameter.class);
-            String paramName = null;
-
-            if (parameterAnnotation != null) {
-                paramName = parameterAnnotation.value();
-            }
-            if (paramName == null) {
-                paramName = parameter.getParameterName();
-            }
+            String paramName = getParamName(parameter, parameterAnnotation);
             List<Object> value = parameters.get(paramName);
             if (value == null) {
                 if (parameterAnnotation != null && parameterAnnotation.required()) {
@@ -196,13 +189,7 @@ public class RestRepositoryUtils {
                 result[i] = sortToUse;
             } else {
                 final Parameter parameterAnnotation = param.getParameterAnnotation(Parameter.class);
-                String parameterName = null;
-                if (parameterAnnotation != null) {
-                    parameterName = parameterAnnotation.value();
-                }
-                if (parameterName == null) {
-                    parameterName = param.getParameterName();
-                }
+                String parameterName = getParamName(param, parameterAnnotation);
 
                 if (StringUtils.isBlank(parameterName)) {
                     throw new IllegalArgumentException(
@@ -216,6 +203,18 @@ public class RestRepositoryUtils {
         }
 
         return result;
+    }
+
+    private String getParamName(MethodParameter parameter, final Parameter parameterAnnotation) {
+        String paramName = null;
+
+        if (parameterAnnotation != null) {
+            paramName = parameterAnnotation.value();
+        }
+        if (paramName == null) {
+            paramName = parameter.getParameterName();
+        }
+        return paramName;
     }
 
     /**
