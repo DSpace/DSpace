@@ -310,10 +310,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * XMLUnit for Java (xmlunit:xmlunit:1.1 - http://xmlunit.sourceforge.net/)
         * XMLUnit for Java (xmlunit:xmlunit:1.3 - http://xmlunit.sourceforge.net/)
 
-    BSD-2-Clause:
-
-        * PostgreSQL JDBC Driver - JDBC 4.2 (org.postgresql:postgresql:42.2.1 - https://github.com/pgjdbc/pgjdbc)
-
     BSD-Style License:
 
         * JAXB2 Basics - Runtime (org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.9.5 - https://github.com/highsource/jaxb2-basics/jaxb2-basics-runtime)
@@ -413,6 +409,10 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * h2 (com.h2database:h2:1.4.187 - no url defined)
         * Javassist (org.javassist:javassist:3.18.1-GA - http://www.javassist.org/)
         * Rhino (rhino:js:1.6R7 - http://www.mozilla.org/rhino/)
+
+    The PostgreSQL License:
+
+        * PostgreSQL JDBC Driver - JDBC 4.2 (org.postgresql:postgresql:42.2.1 - https://github.com/pgjdbc/pgjdbc)
 
     Public Domain:
 
