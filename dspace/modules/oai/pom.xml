@@ -12,7 +12,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>4.9-SNAPSHOT</version>
+        <version>4.9</version>
         <relativePath>..</relativePath>
     </parent>
 
