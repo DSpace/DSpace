@@ -84,4 +84,10 @@
         <qualifier>toworkflow</qualifier>
     </dc-type>
 
+    <dc-type>
+        <schema>workflow</schema>
+        <element>review</element>
+        <qualifier>fileStatus</qualifier>
+    </dc-type>
+
 </dspace-dc-types>
