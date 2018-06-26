@@ -2,26 +2,23 @@ package org.dspace.app.xmlui.aspect.submission.workflow.actions.processingaction
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.aspect.submission.workflow.AbstractXMLUIAction;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.identifier.DOIIdentifierProvider;
-import org.dspace.identifier.IdentifierNotFoundException;
-import org.dspace.identifier.IdentifierNotResolvableException;
-import org.dspace.utils.DSpace;
+import org.dspace.content.authority.Choices;
+import org.dspace.workflow.DryadWorkflowUtils;
+import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -38,88 +35,82 @@ public class DryadReviewActionXMLUI extends AbstractXMLUIAction {
     protected static final Message T_info1= message("xmlui.Submission.workflow.DryadReviewActionXMLUI.info1");
 
     protected static final Message T_cancel_submit = message("xmlui.general.cancel");
+    private static final Message T_save_changes = message("xmlui.general.save");
     private static final Message T_head_has_part = message("xmlui.ArtifactBrowser.ItemViewer.head_hasPart");
+    private static final Message T_STEPS_HEAD_1 = message("xmlui.Submission.submit.OverviewStep.steps.1");
+    private static final Message T_STEPS_HEAD_2 = message("xmlui.Submission.submit.OverviewStep.steps.2");
 
 
     @Override
      public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
-        Item item = workflowItem.getItem();
+        org.dspace.content.Item publication = workflowItem.getItem();
         Collection collection = workflowItem.getCollection();
         Request request = ObjectModelHelper.getRequest(objectModel);
 
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/workflow_new";
 
-        //Retrieve our pagenumber
-        // Generate a from asking the user two questions: multiple
-        // titles & published before.
-    	Division div = body.addInteractiveDivision("perform-task", actionURL, Division.METHOD_POST, "primary workflow");
+    	Division mainDiv = body.addInteractiveDivision("review-submission-overview", actionURL, Division.METHOD_POST, "review submission");
+        mainDiv.setHead("Review submission");
+
+        Division actionsDiv = mainDiv.addDivision("review-actions");
         //TODO: add to msgs.props
-        div.setHead("Review submission");
 
-        //addWorkflowItemInformation(div, item, request);
 
-         // Add datafile list
-        String showfull = request.getParameter("submit_full_item_info");
+        //First of all add all the publication info
+        Division pubDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
+        pubDiv.setHead(T_STEPS_HEAD_1);
 
-        // if the user selected showsimple, remove showfull.
-        if (showfull != null && request.getParameter("submit_simple_item_info") != null)
-            showfull = null;
+        ReferenceSet referenceSet = pubDiv.addReferenceSet("collection-viewer", ReferenceSet.TYPE_SUMMARY_VIEW);
+        org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(publication);
 
-        ReferenceSet referenceSet;
-        if (showfull == null){
-            referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_SUMMARY_VIEW);
-        } else {
-            referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_DETAIL_VIEW);
-        }
-        org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(item);
-        if (item.getMetadata("dc.relation.haspart").length > 0) {
-            ReferenceSet hasParts;
-            hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
-            hasParts.setHead(T_head_has_part);
+        //Second add info & edit/delete buttons for all our data files
+        Division dataDiv = actionsDiv.addDivision("dataoverviewdivision", "even subdiv");
+        dataDiv.setHead(T_STEPS_HEAD_2);
 
-            for (Item obj : retrieveDataFiles(item)) {
-                hasParts.addReference(obj);
+        Table dataSetList = dataDiv.addTable("datasets", 1, 3, "datasets");
+        Cell addCell = dataSetList.addRow().addCell("add_file", null, 1, 3, "add_file");
+        addCell.addButton("submit_adddataset").setValue(T_BUTTON_DATAFILE_ADD);
+
+        HashMap<Integer, Integer> fileStatuses = new HashMap<Integer, Integer>();
+        DCValue[] fileStatusDCVs = publication.getMetadata("workflow.review.fileStatus");
+        if (fileStatusDCVs != null && fileStatusDCVs.length > 0) {
+            for (DCValue dcValue : fileStatusDCVs) {
+                fileStatuses.put(Integer.valueOf(dcValue.value), dcValue.confidence);
             }
         }
 
-
-        Table table = div.addTable("workflow-actions", 1, 1);
-        table.setHead(T_info1);
-
-
-
-        // Approve task
-        Row row = table.addRow();
-        row.addCellContent(T_ADD_DATAFILE_help);
-        row.addCell().addButton("submit_adddataset").setValue(T_BUTTON_DATAFILE_ADD);
-
-        // Everyone can just cancel
-        row = table.addRow();
-        row.addCell(0, 2).addButton("submit_leave").setValue(T_cancel_submit);
-
-
-        div.addHidden("submission-continue").setValue(knot.getId());
-    }
-
-    private List<Item> retrieveDataFiles(Item item) throws SQLException {
-        java.util.List<Item> dataFiles = new ArrayList<Item>();
-        DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-
-        if (item.getMetadata("dc.relation.haspart").length > 0) {
-
-            for (DCValue value : item.getMetadata("dc.relation.haspart")) {
-
-                DSpaceObject obj = null;
-                try {
-                    obj = dis.resolve(context, value.value);
-                } catch (IdentifierNotFoundException e) {
-                    // just keep going
-                } catch (IdentifierNotResolvableException e) {
-                    // just keep going
-                }
-                if (obj != null) dataFiles.add((Item) obj);
+        org.dspace.content.Item[] datasets = DryadWorkflowUtils.getDataFiles(context, publication);
+        for (org.dspace.content.Item dataset : datasets) {
+            int fileStatus = Choices.CF_ACCEPTED;
+            if (fileStatuses.containsKey(dataset.getID())) {
+                fileStatus = fileStatuses.get(dataset.getID());
+            } else {
+                publication.addMetadata("workflow.review.fileStatus", Item.ANY, String.valueOf(dataset.getID()), "USER", fileStatus);
+                publication.updateMetadata();
+            }
+            //Our current item has already been added
+            InProgressSubmission wfi;
+            wfi = WorkflowItem.findByItemId(context, dataset.getID());
+            if(wfi != null){
+                 Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, dataset, wfi);
+                 Radio fileButtons = actionCell.addRadio("filestatus_" + dataset.getID(), "filestatus");
+                 fileButtons.addOption(Choices.CF_ACCEPTED, "Keep");
+                 fileButtons.addOption(Choices.CF_REJECTED, "Delete");
+                 switch (fileStatus) {
+                     case Choices.CF_REJECTED:
+                         fileButtons.setOptionSelected(Choices.CF_REJECTED);
+                         break;
+                     case Choices.CF_ACCEPTED:
+                         fileButtons.setOptionSelected(Choices.CF_ACCEPTED);
+                         break;
+                     default:
+                         break;
+                 }
             }
         }
-        return dataFiles;
+
+        actionsDiv.addPara().addButton("submit_leave").setValue(T_cancel_submit);
+
+        mainDiv.addHidden("submission-continue").setValue(knot.getId());
     }
 }
