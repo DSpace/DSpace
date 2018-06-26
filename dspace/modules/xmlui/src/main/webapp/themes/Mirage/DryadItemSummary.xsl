@@ -77,7 +77,7 @@
         </xsl:variable>
 
         <xsl:choose>
-            <xsl:when test=".//dim:field[@mdschema='internal'][@element='workflow'][@qualifier='submitted']">
+            <xsl:when test="contains($meta[@element='request'][@qualifier='URI'], 'submit-overview')">
                 <!-- publication header -->
                 <div class="publication-header">
                     <xsl:call-template name="publication-header">
@@ -86,7 +86,7 @@
                     </xsl:call-template>
                 </div>
             </xsl:when>
-            <xsl:when test=".//dim:field[@mdschema='workflow'][@element='step']">
+            <xsl:when test="contains($meta[@element='request'][@qualifier='URI'], 'workflow')">
                 <!-- publication header -->
                 <div class="publication-header">
                     <xsl:call-template name="publication-header">
