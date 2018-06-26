@@ -841,6 +841,10 @@ li.ds-form-item label.ds-composite-component.last{
     margin-left: 0;
 }
 
+.ds-radio-field.filestatus input {
+    margin-right: 5px;
+}
+
 .ds-checkbox-field label,
 .ds-radio-field label {
     margin-right: 3px;
@@ -2072,6 +2076,13 @@ fieldset.ds-checkbox-field legend,fieldset.ds-radio-field legend {
 fieldset.ds-checkbox-field label,fieldset.ds-radio-field label {
     display: block;
 }
+
+/* for review layout, buttons should be side by side. */
+fieldset.ds-radio-field.filestatus label {
+    display: inline;
+    margin-right:5px;
+}
+
 /* Sub sections within a form */
 fieldset.ds-form-list {
     border: none;
