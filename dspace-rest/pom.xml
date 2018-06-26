@@ -3,7 +3,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-rest</artifactId>
     <packaging>war</packaging>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.3</version>
     <name>DSpace REST :: API and Implementation</name>
     <description>DSpace RESTful Web Services API</description>
     <url>http://demo.dspace.org</url>
@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>6.3-SNAPSHOT</version>
+        <version>6.3</version>
         <relativePath>..</relativePath>
     </parent>
 
