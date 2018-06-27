@@ -944,9 +944,10 @@ function doWorkflow()
                 sendPage("handle/"+handle+"/workflow_new/workflowexception",{"error":"Unknown error"});
             }
         }
-        else
-        if (cocoon.request.get("submit_edit"))
-        {
+        else if (cocoon.request.get("save_changes")) {
+
+        }
+        else if (cocoon.request.get("submit_edit")) {
         	//User is editing this submission:
             //	Send user through the Submission Control
             cocoon.redirectTo(cocoon.request.getContextPath() + "/submit-overview?workflowID=" + workflowItemId, true);
@@ -987,6 +988,13 @@ function doWorkflow()
             //cancel perform the reauthorizationpaymentaction
             var contextPath = cocoon.request.getContextPath();
             cocoon.redirectTo(contextPath+"/my-tasks",true);
+            getDSContext().complete();
+            cocoon.exit();
+        }
+        else if (cocoon.request.get("save_review_changes")) {
+            FlowUtils.processReviewSaveChanges(getDSContext(), cocoon.request, workflowItem.getID());
+            var contextPath = cocoon.request.getContextPath();
+            cocoon.redirectTo(contextPath+"/submissions",true);
             getDSContext().complete();
             cocoon.exit();
         }

@@ -55,7 +55,6 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
@@ -1462,4 +1461,27 @@ public class FlowUtils {
         return finalActionCell;
     }
 
+    public static void processReviewSaveChanges(Context context, HttpServletRequest request, int workflowID) {
+    	try {
+			Item publication = WorkflowItem.find(context, workflowID).getItem();
+			Enumeration<String> parameters = request.getParameterNames();
+			HashMap<String, Integer> filestatuses = new HashMap<String, Integer>();
+			while (parameters.hasMoreElements()) {
+				String paramName = parameters.nextElement();
+				Matcher matcher = Pattern.compile("filestatus_(\\d+)").matcher(paramName);
+				if (matcher.matches()) {
+					filestatuses.put(matcher.group(1), Integer.valueOf(request.getParameter(paramName)));
+				}
+			}
+			DCValue[] fileStatusMDVs = publication.getMetadata("workflow.review.fileStatus");
+			publication.clearMetadata("workflow.review.fileStatus");
+			for (DCValue fileStatusMDV : fileStatusMDVs) {
+				fileStatusMDV.confidence = filestatuses.get(fileStatusMDV.value);
+				publication.addMetadata(fileStatusMDV);
+			}
+			publication.update();
+		} catch (Exception e) {
+			log.error("Exception " + e.getMessage());
+		}
+	}
 }

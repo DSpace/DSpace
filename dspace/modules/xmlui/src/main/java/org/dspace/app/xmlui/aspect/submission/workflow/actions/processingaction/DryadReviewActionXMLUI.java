@@ -109,7 +109,9 @@ public class DryadReviewActionXMLUI extends AbstractXMLUIAction {
             }
         }
 
-        actionsDiv.addPara().addButton("submit_leave").setValue(T_cancel_submit);
+        Para buttonsPara = actionsDiv.addPara();
+        buttonsPara.addButton("submit_leave").setValue(T_cancel_submit);
+        buttonsPara.addButton("save_review_changes").setValue(T_save_changes);
 
         mainDiv.addHidden("submission-continue").setValue(knot.getId());
     }
