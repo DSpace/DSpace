@@ -318,7 +318,8 @@
 				<property name="listenerOnPostDelete">
 					<list>
 						<ref local="crisIndexerListener" />
-						<ref local="nestedIndexerListener" />		
+						<ref local="nestedIndexerListener" />
+						<ref local="ORCIDListener" />		
 					</list>
 				</property>
 				<property name="listenerOnPreInsert">
@@ -1645,7 +1646,7 @@
 				</entry>				
 				<entry key="post-delete">
 					<list>
-						<ref local="rpResourcePolicyListener" />						
+						<ref local="rpResourcePolicyListener" />
 					</list>
 				</entry>				
 			</map>

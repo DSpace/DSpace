@@ -74,7 +74,7 @@ public class OrcidQueueListener
 		            orcidPreferencesUtils.prepareOrcidQueueByNested(crisNestedObject);
 		        }		        
 		    }
-			if (object instanceof ACrisObject) {
+		    else if (object instanceof ACrisObject) {
 				ACrisObject crisObj = (ACrisObject) object;
 				if (crisObj.getType() == CrisConstants.RP_TYPE_ID
 						|| crisObj.getType() == CrisConstants.PROJECT_TYPE_ID) {
