@@ -39,7 +39,7 @@
 		<org.hibernate.jpa.version>1.0.1.Final</org.hibernate.jpa.version>
 		
 		<org.jdyna.version>5.9-SNAPSHOT</org.jdyna.version>		
-		<it.cilea.ccommons.version>2.3</it.cilea.ccommons.version>
+		<it.cilea.ccommons.version>2.4-SNAPSHOT</it.cilea.ccommons.version>
 		
 		<ckan.addon.modules>[5.1-SNAPSHOT,6.0-SNAPSHOT)</ckan.addon.modules>
 		<iiif.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</iiif.addon.modules>
