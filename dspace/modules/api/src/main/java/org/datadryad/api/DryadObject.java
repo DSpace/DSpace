@@ -41,6 +41,10 @@ public abstract class DryadObject {
     static final String RELATION_SCHEMA = "dc";
     static final String RELATION_ELEMENT = "relation";
 
+    // Object title
+    static final String TITLE_SCHEMA = "dc";
+    static final String TITLE_ELEMENT = "title";
+
     // File ispartof package
     static final String RELATION_ISPARTOF_QUALIFIER = "ispartof";
 
@@ -172,6 +176,18 @@ public abstract class DryadObject {
         } catch (AuthorizeException ex) {
             log.error("Authorize exception reserving identifier", ex);
         }
+    }
+
+    public String getTitle() throws SQLException {
+        String result = getSingleMetadataValue(TITLE_SCHEMA, TITLE_ELEMENT, null);
+        if (result == null) {
+            result = "Untitled";
+        }
+        return result;
+    }
+
+    public void setTitle(String newTitle) throws SQLException {
+        addSingleMetadataValue(Boolean.TRUE, TITLE_SCHEMA, TITLE_ELEMENT, null, newTitle);
     }
 
     protected final void addToCollectionAndArchive(Collection collection) throws SQLException {

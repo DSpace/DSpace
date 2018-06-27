@@ -254,15 +254,6 @@ public class DryadDataFile extends DryadObject {
         return null;
     }
 
-    public String getTitle() {
-        Item item = getItem();
-        DCValue[] titles = item.getMetadata("dc.title");
-        if (titles != null || titles.length > 0) {
-            return titles[0].value;
-        }
-        return "Untitled";
-    }
-
     public Long getTotalStorageSize() throws SQLException {
         // bundles and bitstreams
         Long size = 0L;
