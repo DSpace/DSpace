@@ -8,7 +8,7 @@
 package org.dspace.app.cris.model.orcid;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.persistence.Transient;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -44,27 +45,22 @@ import org.dspace.authority.orcid.jaxb.common.ExternalId;
 import org.dspace.authority.orcid.jaxb.common.Visibility;
 import org.dspace.authority.orcid.jaxb.email.EmailCtype;
 import org.dspace.authority.orcid.jaxb.email.Emails;
-import org.dspace.authority.orcid.jaxb.keyword.Keyword;
 import org.dspace.authority.orcid.jaxb.keyword.KeywordCtype;
 import org.dspace.authority.orcid.jaxb.keyword.Keywords;
 import org.dspace.authority.orcid.jaxb.othername.OtherNameCtype;
 import org.dspace.authority.orcid.jaxb.othername.OtherNames;
 import org.dspace.authority.orcid.jaxb.person.Person;
-import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifier;
 import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifiers;
 import org.dspace.authority.orcid.jaxb.personaldetails.BiographyCtype;
 import org.dspace.authority.orcid.jaxb.personaldetails.NameCtype.CreditName;
-import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrl;
 import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrlCtype;
 import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrls;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.utils.DSpace;
 
-import it.cilea.osd.common.core.SingleTimeStampInfo;
 import it.cilea.osd.jdyna.value.BooleanValue;
 
 public class OrcidPreferencesUtils
@@ -125,19 +121,22 @@ public class OrcidPreferencesUtils
 
     public boolean isProfileSelectedToShare(ResearcherPage researcher)
     {
+        //if the profile have already acquired authorization scope
         if (isTokenReleasedForSync(researcher,
                 OrcidService.SYSTEM_ORCID_TOKEN_PROFILE_CREATE_SCOPE))
         {
 
+            //prepare the old value
             Map<String, List<String>> oldMapOrcidProfilePreference = researcher
                     .getOldMapOrcidProfilePreference();
 
-            // if metadata set to go on Orcid Registry have modifications return
-            // true
+            //retrieve all metadata that match Orcid Registry metadata 
             List<RPPropertiesDefinition> metadataDefinitions = getApplicationService()
                     .likePropertiesDefinitionsByShortName(
                             RPPropertiesDefinition.class,
                             PREFIX_ORCID_PROFILE_PREF);
+            
+            // if metadata is enable to go on Orcid Registry 
             for (RPPropertiesDefinition rppd : metadataDefinitions)
             {
                 String metadataShortnameINTERNAL = rppd.getShortName()
@@ -146,20 +145,24 @@ public class OrcidPreferencesUtils
                 List<RPProperty> propsRps = researcher.getAnagrafica4view()
                         .get(rppd.getShortName());
 
+                boolean preference = false;
                 for (RPProperty prop : propsRps)
                 {
                     BooleanValue booleanValue = (BooleanValue) (prop
                             .getValue());
                     if (booleanValue.getObject())
                     {
+                        // if there is a new metadata enabled on the user preferences
                         if (!researcher.getOldOrcidProfilePreference()
                                 .contains(metadataShortnameINTERNAL))
                         {
                             return true;
                         }
+                        preference = true;
                     }
                 }
 
+                // get old values
                 List<String> rpPropValues = new ArrayList<String>();
                 if (oldMapOrcidProfilePreference
                         .containsKey(metadataShortnameINTERNAL))
@@ -168,21 +171,26 @@ public class OrcidPreferencesUtils
                             .get(metadataShortnameINTERNAL);
                 }
 
+                // get current values
                 List<RPProperty> propsFoundedRps = researcher
                         .getAnagrafica4view().get(metadataShortnameINTERNAL);
-                boolean founded = false;
-                for (String rpPropValue : rpPropValues)
+                List<String> listProps = new ArrayList<String>();
+                for (RPProperty props : propsFoundedRps)
                 {
-                    for (RPProperty propFoundedRp : propsFoundedRps)
-                    {
-                        if (rpPropValue.equals(propFoundedRp.toString()))
-                        {
-                            founded = true;
-                        }
-                    }
+                    // manage only first value
+                    listProps.add(props.toString());
                 }
-                if (!founded && propsFoundedRps != null
-                        && !propsFoundedRps.isEmpty())
+                
+                // diff current vs old
+                boolean founded = false;
+                
+                Collections.sort(listProps);
+                Collections.sort(rpPropValues);
+                founded = CollectionUtils.isEqualCollection(listProps, rpPropValues);
+               
+                //if there are changes return true
+                if (preference && !founded && (propsFoundedRps != null
+                        && !propsFoundedRps.isEmpty()))
                 {
                     return true;
                 }
