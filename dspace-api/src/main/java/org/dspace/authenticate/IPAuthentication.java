@@ -276,4 +276,9 @@ public class IPAuthentication implements AuthenticationMethod {
                                HttpServletResponse response) {
         return null;
     }
+
+    @Override
+    public String getName() {
+        return "ip";
+    }
 }
