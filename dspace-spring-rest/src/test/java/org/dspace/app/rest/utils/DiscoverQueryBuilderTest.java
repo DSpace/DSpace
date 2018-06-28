@@ -92,7 +92,7 @@ public class DiscoverQueryBuilderTest {
             .then(invocation -> invocation.getArguments()[0] + "_sort");
 
         when(searchService.getFacetYearRange(eq(context), any(BrowsableDSpaceObject.class),
-                any(DiscoverySearchFilterFacet.class), any()))
+                any(DiscoverySearchFilterFacet.class), any(), any(DiscoverQuery.class)))
             .then(invocation
                       -> new FacetYearRange((DiscoverySearchFilterFacet) invocation.getArguments()[2]));
 

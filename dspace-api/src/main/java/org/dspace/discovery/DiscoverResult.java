@@ -152,11 +152,11 @@ public class DiscoverResult {
     }
 
     public DSpaceObjectHighlightResult getHighlightedResults(BrowsableDSpaceObject dso) {
-        return highlightedResults.get(dso.getHandle());
+        return highlightedResults.get(dso.getUniqueIndexID());
     }
 
     public void addHighlightedResult(BrowsableDSpaceObject dso, DSpaceObjectHighlightResult highlightedResult) {
-        this.highlightedResults.put(dso.getHandle(), highlightedResult);
+        this.highlightedResults.put(dso.getUniqueIndexID(), highlightedResult);
     }
 
     public static final class FacetResult {

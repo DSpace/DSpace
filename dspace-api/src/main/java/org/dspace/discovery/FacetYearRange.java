@@ -47,7 +47,7 @@ public class FacetYearRange {
     }
 
     public void calculateRange(Context context, List<String> filterQueries, BrowsableDSpaceObject scope,
-                               SearchService searchService) throws SearchServiceException {
+                               SearchService searchService, DiscoverQuery parentQuery) throws SearchServiceException {
         dateFacet = facet.getIndexFieldName() + ".year";
         //Get a range query so we can create facet queries ranging from our first to our last date
         //Attempt to determine our oldest & newest year by checking for previously selected filters
@@ -55,7 +55,7 @@ public class FacetYearRange {
 
         //Check if we have found a range, if not then retrieve our first & last year using Solr
         if (oldestYear == -1 && newestYear == -1) {
-            calculateNewRangeBasedOnSearchIndex(context, filterQueries, scope, searchService);
+            calculateNewRangeBasedOnSearchIndex(context, filterQueries, scope, searchService, parentQuery);
         }
     }
 
@@ -94,8 +94,10 @@ public class FacetYearRange {
     }
 
     private void calculateNewRangeBasedOnSearchIndex(Context context, List<String> filterQueries,
-            BrowsableDSpaceObject scope, SearchService searchService) throws SearchServiceException {
+                                                     BrowsableDSpaceObject scope, SearchService searchService,
+                                                     DiscoverQuery parentQuery) throws SearchServiceException {
         DiscoverQuery yearRangeQuery = new DiscoverQuery();
+        yearRangeQuery.setDiscoveryConfigurationName(parentQuery.getDiscoveryConfigurationName());
         yearRangeQuery.setMaxResults(1);
         //Set our query to anything that has this value
         yearRangeQuery.addFieldPresentQueries(dateFacet);

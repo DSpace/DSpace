@@ -64,13 +64,7 @@ public class ContextUtil {
         Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
         if (context == null) {
-            try {
-                context = ContextUtil.initializeContext();
-            } catch (SQLException e) {
-                log.error("Unable to initialize context", e);
-                return null;
-            }
-
+            context = ContextUtil.initializeContext();
             // Store the context in the request
             request.setAttribute(DSPACE_CONTEXT, context);
         }
@@ -84,7 +78,7 @@ public class ContextUtil {
      * @return a DSpace Context Object
      * @throws SQLException
      */
-    private static Context initializeContext() throws SQLException {
+    private static Context initializeContext() {
         // Create a new Context
         Context context = new Context();
 

@@ -73,7 +73,6 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-
 @Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME)
 public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer> {
 
@@ -158,7 +157,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     }
 
     @Override
-    protected WorkspaceItemRest createAndReturn(Context context) {
+    protected WorkspaceItemRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
         return converter.convert(source);
     }

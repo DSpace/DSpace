@@ -125,8 +125,8 @@ public class DiscoverResultConverter {
         }
     }
 
-    private RestAddressableModel convertDSpaceObject(final Object dspaceObject) {
-        for (BrowsableDSpaceObjectConverter<Object, RestAddressableModel> converter : converters) {
+    private RestAddressableModel convertDSpaceObject(final BrowsableDSpaceObject dspaceObject) {
+        for (BrowsableDSpaceObjectConverter<BrowsableDSpaceObject, RestAddressableModel> converter : converters) {
             if (converter.supportsModel(dspaceObject)) {
                 return converter.convert(dspaceObject);
             }

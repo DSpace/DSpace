@@ -130,7 +130,7 @@ public interface SearchService {
     String escapeQueryChars(String query);
 
     FacetYearRange getFacetYearRange(Context context, BrowsableDSpaceObject scope, DiscoverySearchFilterFacet facet,
-                                     List<String> filterQueries) throws SearchServiceException;
+            List<String> filterQueries, DiscoverQuery parentQuery) throws SearchServiceException;
 
     /**
      * This method returns us either the highest or lowest value for the field that we give to it

@@ -537,11 +537,6 @@
       
    <field name="read" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
 
-    <!-- index for build a facet on the resource type -->
-   <field name="resourcetype_filter" type="keywordFilter" indexed="true" stored="true" required="true" omitNorms="true" />
-   <field name="resourcetype_keyword" type="keywordFilter" indexed="true" stored="true" required="true" omitNorms="true" />
-   <field name="resourcetype_ac" type="keywordFilter" indexed="true" stored="true" required="true" omitNorms="true" />
-      
    <field name="has_content_in_original_bundle" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
    
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->

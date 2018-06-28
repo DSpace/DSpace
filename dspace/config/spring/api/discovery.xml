@@ -310,17 +310,17 @@
 		<!--Which sidebar facets are to be displayed -->
 		<property name="sidebarFacets">
 			<list>
+				<ref bean="searchFilterObjectNamedType" />				
 				<ref bean="searchFilterType" />
 				<ref bean="searchFilterIssued" />
-				<ref bean="searchFilterSubmitted" />
 			</list>
 		</property>
 		<!--The search filters which can be used on the discovery search page -->
 		<property name="searchFilters">
 			<list>
+				<ref bean="searchFilterObjectNamedType" />			
 				<ref bean="searchFilterType" />
 				<ref bean="searchFilterIssued" />
-				<ref bean="searchFilterSubmitted" />
 			</list>
 		</property>
         <!--The sort filters for the discovery search-->
@@ -415,18 +415,18 @@
 		<!--Which sidebar facets are to be displayed -->
 		<property name="sidebarFacets">
 			<list>
+				<ref bean="searchFilterObjectNamedType" />			
 				<ref bean="searchFilterType" />
 				<ref bean="searchFilterIssued" />
-				<ref bean="searchFilterSubmitted" />
 				<ref bean="searchFilterSubmitter" />
 			</list>
 		</property>
 		<!--The search filters which can be used on the discovery search page -->
 		<property name="searchFilters">
 			<list>
+				<ref bean="searchFilterObjectNamedType" />			
 				<ref bean="searchFilterType" />
 				<ref bean="searchFilterIssued" />
-				<ref bean="searchFilterSubmitted" />
 				<ref bean="searchFilterSubmitter" />
 			</list>
 		</property>
@@ -702,18 +702,26 @@
 		</property>
 	</bean>	
 
-	<bean id="searchFilterSubmitted" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-		<property name="indexFieldName" value="dateSubmitted" />
+	<bean id="searchFilterObjectType"
+		class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+		<property name="indexFieldName" value="resourcetype" />
 		<property name="metadataFields">
 			<list>
-				<value>dc.date.submitted</value>
+				<value>placeholder.placeholder.placeholder</value>
 			</list>
 		</property>
-		<property name="type" value="date" />
-		<property name="sortOrderSidebar" value="VALUE"/>
-        <property name="sortOrderFilterPage" value="VALUE"/>
 	</bean>
-	
+
+	<bean id="searchFilterObjectNamedType"
+		class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+		<property name="indexFieldName" value="namedresourcetype" />
+		<property name="metadataFields">
+			<list>
+				<value>placeholder.placeholder.placeholder</value>
+			</list>
+		</property>
+	</bean>
+
 	<!-- Used only to READ "submitter" facets (managed programmatically at SolrServiceImpl) -->
 	<bean id="searchFilterSubmitter"
 		class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">

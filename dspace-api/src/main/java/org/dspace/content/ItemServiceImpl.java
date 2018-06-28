@@ -1292,10 +1292,4 @@ prevent the generation of resource policy entry values with null dspace_object a
         return itemDAO.countItems(context, ep, true, false);
     }
 
-    @Override
-    public boolean isSupportsTypeConstant(int type) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
 }

@@ -7,8 +7,6 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
-import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -127,11 +125,6 @@ public class ClaimedTask implements ReloadableEntity<Integer>, BrowsableDSpaceOb
     }
 
     @Override
-    public String getHandle() {
-        return null;
-    }
-
-    @Override
     public String getTypeText() {
         return "claimedtask";
     }
@@ -139,11 +132,6 @@ public class ClaimedTask implements ReloadableEntity<Integer>, BrowsableDSpaceOb
     @Override
     public int getType() {
         return Constants.WORKFLOW_CLAIMED;
-    }
-
-    @Override
-    public Map<String, Object> getExtraInfo() {
-        return extraInfo;
     }
 
     @Override
@@ -157,27 +145,7 @@ public class ClaimedTask implements ReloadableEntity<Integer>, BrowsableDSpaceOb
     }
 
     @Override
-    public String getName() {
-        return workflowItem.getItem().getName();
-    }
-
-    @Override
-    public String findHandle(Context context) throws SQLException {
-        return null;
-    }
-
-    @Override
-    public boolean haveHierarchy() {
-        return false;
-    }
-
-    @Override
-    public BrowsableDSpaceObject getParentObject() {
-        return getWorkflowItem();
-    }
-
-    @Override
-    public Date getLastModified() {
-        return workflowItem.getItem().getLastModified();
+    public String getHandle() {
+        return getType() + "-" + getID();
     }
 }

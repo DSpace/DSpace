@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -165,7 +166,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         }
     }
 
-    protected T createAndReturn(Context context) throws AuthorizeException, RepositoryMethodNotImplementedException {
+    protected T createAndReturn(Context context)
+            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 

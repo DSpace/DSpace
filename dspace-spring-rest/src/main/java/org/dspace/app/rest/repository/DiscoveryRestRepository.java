@@ -130,14 +130,14 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     }
 
     public FacetResultsRest getFacetObjects(String facetName, String prefix, String query, String dsoType,
-                                            String dsoScope, List<SearchFilter> searchFilters, Pageable page)
+            String dsoScope, String configurationName, List<SearchFilter> searchFilters, Pageable page)
             throws InvalidRequestException {
 
         Context context = obtainContext();
 
         BrowsableDSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration configuration = searchConfigurationService
-                .getDiscoveryConfigurationByNameOrDso(facetName, scopeObject);
+                .getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
 
         DiscoverResult searchResult = null;
         DiscoverQuery discoverQuery = null;

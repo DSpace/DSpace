@@ -171,12 +171,12 @@ public class DiscoveryRestController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets/{name}")
     public ResourceSupport getFacetValues(@PathVariable("name") String facetName,
-                                          @RequestParam(name = "prefix", required = false) String prefix,
-                                          @RequestParam(name = "query", required = false) String query,
-                                          @RequestParam(name = "dsoType", required = false) String dsoType,
-                                          @RequestParam(name = "scope", required = false) String dsoScope,
-                                          List<SearchFilter> searchFilters,
-                                          Pageable page) throws Exception {
+            @RequestParam(name = "prefix", required = false) String prefix,
+            @RequestParam(name = "query", required = false) String query,
+            @RequestParam(name = "dsoType", required = false) String dsoType,
+            @RequestParam(name = "scope", required = false) String dsoScope,
+            @RequestParam(name = "configuration", required = false) String configurationName,
+            List<SearchFilter> searchFilters, Pageable page) throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Facetting on facet " + facetName + " with scope: " + StringUtils.trimToEmpty(dsoScope)
                           + ", dsoType: " + StringUtils.trimToEmpty(dsoType)
@@ -187,7 +187,7 @@ public class DiscoveryRestController implements InitializingBean {
         }
 
         FacetResultsRest facetResultsRest = discoveryRestRepository
-            .getFacetObjects(facetName, prefix, query, dsoType, dsoScope, searchFilters, page);
+            .getFacetObjects(facetName, prefix, query, dsoType, dsoScope, configurationName, searchFilters, page);
 
         FacetResultsResource facetResultsResource = new FacetResultsResource(facetResultsRest);
 

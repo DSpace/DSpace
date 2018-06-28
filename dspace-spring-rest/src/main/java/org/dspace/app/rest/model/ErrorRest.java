@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -31,7 +31,7 @@ public class ErrorRest {
 
     public List<String> getPaths() {
         if (this.paths == null) {
-            this.paths = new ArrayList<String>();
+            this.paths = new LinkedList<String>();
         }
         return paths;
     }

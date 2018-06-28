@@ -9,10 +9,8 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,7 +34,6 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-import org.dspace.handle.factory.HandleServiceFactory;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -366,12 +363,6 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     }
 
     @Override
-    public Map<String, Object> getExtraInfo() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean isArchived() {
         return true;
     }
@@ -381,34 +372,4 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         return true;
     }
 
-    @Override
-    public String findHandle(Context context) throws SQLException {
-        return HandleServiceFactory.getInstance().getHandleService().findHandle(context, this);
-    }
-
-    @Override
-    public boolean haveHierarchy() {
-        return true;
-    }
-
-    @Override
-    public BrowsableDSpaceObject getParentObject() {
-        Context context = new Context();
-        try {
-            return (BrowsableDSpaceObject) (getCollectionService().getParentObject(context, this));
-        } catch (SQLException e) {
-            // nothing
-        } finally {
-            if (context != null && context.isValid()) {
-                context.abort();
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public Date getLastModified() {
-        //FIXME tmp return NOW
-        return new Date();
-    }
 }

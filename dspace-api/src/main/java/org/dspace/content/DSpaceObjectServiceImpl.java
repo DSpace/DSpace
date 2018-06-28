@@ -604,11 +604,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     @Override
-    public boolean isSupportsTypeConstant(int type) {
-        return getSupportsTypeConstant() == type;
-    }
-
-    @Override
     public void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier,
                                          String lang, String value, String authority, int confidence, int index)
         throws SQLException {

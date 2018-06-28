@@ -8,29 +8,25 @@
 package org.dspace.browse;
 
 import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.dspace.core.Context;
+import org.dspace.core.Constants;
 
 public interface BrowsableDSpaceObject<PK extends Serializable> {
+    Map<String, Object> extraInfo = new HashMap<String, Object>();
 
-    public Map<String, Object> getExtraInfo();
+    default public Map<String, Object> getExtraInfo() {
+        return extraInfo;
+    }
 
-    public boolean isArchived();
+    default public boolean isArchived() {
+        return false;
+    }
 
-    public boolean isDiscoverable();
-
-    public String getName();
-
-    public String findHandle(Context context) throws SQLException;
-
-    public boolean haveHierarchy();
-
-    public BrowsableDSpaceObject<PK> getParentObject();
-
-    public Date getLastModified();
+    default public boolean isDiscoverable() {
+        return false;
+    }
 
     public int getType();
 
@@ -40,7 +36,9 @@ public interface BrowsableDSpaceObject<PK extends Serializable> {
         return getType() + "-" + getID().toString();
     }
 
-    public String getHandle();
+    default public String getTypeText() {
+        return Constants.typeText[getType()];
+    };
 
-    public String getTypeText();
+    public String getHandle();
 }

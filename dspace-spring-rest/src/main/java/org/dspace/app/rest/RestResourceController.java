@@ -408,6 +408,8 @@ public class RestResourceController implements InitializingBean {
      * @param model
      * @return
      * @throws HttpRequestMethodNotSupportedException
+     * @throws AuthorizeException
+     * @throws SQLException
      */
     public <ID extends Serializable> ResponseEntity<ResourceSupport> postInternal(HttpServletRequest request,
                                                                                   String apiCategory,
@@ -429,6 +431,47 @@ public class RestResourceController implements InitializingBean {
         linkService.addLinks(result);
         //TODO manage HTTPHeader
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+    }
+
+    /**
+     * Called in POST, with a json payload, execute an action on a resource
+     *
+     * Note that the regular expression in the request mapping accept a number as identifier;
+     *
+     * @param request
+     * @param apiCategory
+     * @param model
+     * @param id
+     * @return
+     * @throws HttpRequestMethodNotSupportedException
+     */
+    @RequestMapping(method = RequestMethod.POST, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT, headers =
+        "content-type=application/x-www-form-urlencoded")
+    public ResponseEntity<ResourceSupport> action(HttpServletRequest request, @PathVariable String apiCategory,
+                                                  @PathVariable String model, @PathVariable Integer id)
+        throws HttpRequestMethodNotSupportedException {
+        checkModelPluralForm(apiCategory, model);
+        DSpaceRestRepository<RestAddressableModel, Integer> repository =
+            utils.getResourceRepository(apiCategory, model);
+
+        RestAddressableModel modelObject = null;
+        try {
+            modelObject = repository.action(request, id);
+        } catch (UnprocessableEntityException e) {
+            log.error(e.getMessage(), e);
+            return ControllerUtils.toEmptyResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        if (modelObject != null) {
+            DSpaceResource result = repository.wrapResource(modelObject);
+            linkService.addLinks(result);
+            return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        } else {
+            return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
+        }
     }
 
     /**
@@ -467,7 +510,7 @@ public class RestResourceController implements InitializingBean {
      * @param request
      * @param apiCategory
      * @param model
-     * @param id
+     * @param uuid
      * @param extraField
      * @param uploadfile
      * @return
@@ -478,13 +521,13 @@ public class RestResourceController implements InitializingBean {
     public <ID extends Serializable> ResponseEntity<ResourceSupport> upload(HttpServletRequest request,
                                                                             @PathVariable String apiCategory,
                                                                             @PathVariable String model,
-                                                                            @PathVariable UUID id,
+                                                                            @PathVariable UUID uuid,
                                                                             @RequestParam(required = false, value =
                                                                                 "extraField") String extraField,
                                                                             @RequestParam("file") MultipartFile
                                                                                 uploadfile)
         throws HttpRequestMethodNotSupportedException {
-        return uploadInternal(request, apiCategory, model, id, extraField, uploadfile);
+        return uploadInternal(request, apiCategory, model, uuid, extraField, uploadfile);
     }
 
     /**
@@ -549,7 +592,7 @@ public class RestResourceController implements InitializingBean {
      * @param request
      * @param apiCategory
      * @param model
-     * @param id
+     * @param uuid
      * @param jsonNode
      * @return
      * @throws HttpRequestMethodNotSupportedException

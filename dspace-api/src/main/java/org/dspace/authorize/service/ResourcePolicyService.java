@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -75,5 +76,8 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     public void removeDsoAndTypeNotEqualsToPolicies(Context c, DSpaceObject o, String type)
         throws SQLException, AuthorizeException;
+
+    public List<ResourcePolicy> findExceptRpType(Context c, BrowsableDSpaceObject o, int actionID, String rpType)
+            throws SQLException;
 
 }
