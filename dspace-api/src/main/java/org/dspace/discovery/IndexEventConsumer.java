@@ -161,28 +161,28 @@ public class IndexEventConsumer implements Consumer {
                  * decisions on indexing and/or removal
                  */
                 // iu = ctx.reloadEntity(o);
-                String hdl = iu.getHandle();
-                if (hdl != null && !uniqueIdsToDelete.contains(hdl)) {
+                String uniqueIndexID = iu.getUniqueIndexID();
+                if (uniqueIndexID != null && !uniqueIdsToDelete.contains(uniqueIndexID)) {
                     try {
                         indexer.indexContent(ctx, iu, true, true);
                         log.debug("Indexed "
                                       + Constants.typeText[iu.getType()]
                                       + ", id=" + String.valueOf(iu.getID())
-                                      + ", handle=" + hdl);
+                                      + ", unique_id=" + uniqueIndexID);
                     } catch (Exception e) {
                         log.error("Failed while indexing object: ", e);
                     }
                 }
             }
 
-            for (String hdl : uniqueIdsToDelete) {
+            for (String uid : uniqueIdsToDelete) {
                 try {
-                    indexer.unIndexContent(ctx, hdl, true);
+                    indexer.unIndexContent(ctx, uid, true);
                     if (log.isDebugEnabled()) {
-                        log.debug("UN-Indexed Item, handle=" + hdl);
+                        log.debug("UN-Indexed Item, handle=" + uid);
                     }
                 } catch (Exception e) {
-                    log.error("Failed while UN-indexing object: " + hdl, e);
+                    log.error("Failed while UN-indexing object: " + uid, e);
                 }
 
             }

@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -20,7 +21,7 @@ import org.dspace.eperson.EPerson;
  * @author Robert Tansley
  * @version $Revision$
  */
-public interface InProgressSubmission<ID extends Serializable> {
+public interface InProgressSubmission<ID extends Serializable> extends BrowsableDSpaceObject<ID> {
     /**
      * Get the internal ID of this submission
      *

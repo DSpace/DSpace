@@ -70,7 +70,7 @@ public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
     public void createOwnedTask(Context context, XmlWorkflowItem wi, Step step, WorkflowActionConfig action, EPerson e)
         throws SQLException, AuthorizeException;
 
-    public void grantUserAllItemPolicies(Context context, Item item, EPerson epa)
+    public void grantUserAllItemPolicies(Context context, Item item, EPerson epa, String actionType)
         throws AuthorizeException, SQLException;
 
     public void removeUserItemPolicies(Context context, Item item, EPerson e) throws SQLException, AuthorizeException;

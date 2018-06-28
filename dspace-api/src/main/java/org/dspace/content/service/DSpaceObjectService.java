@@ -28,19 +28,7 @@ import org.dspace.core.Context;
  * @param <T> class type
  * @author kevinvandevelde at atmire.com
  */
-public interface DSpaceObjectService<T extends DSpaceObject> extends RootEntityService<T> {
-
-
-    /**
-     * Generic find for when the precise type of a DSO is not known, just the
-     * a pair of type number and database ID.
-     *
-     * @param context - the context
-     * @param id      - id within table of type'd objects
-     * @return the object found, or null if it does not exist.
-     * @throws SQLException only upon failure accessing the database.
-     */
-    public T find(Context context, UUID id) throws SQLException;
+public interface DSpaceObjectService<T extends DSpaceObject> extends BrowsableObjectService<T, UUID> {
 
     /**
      * Get a proper name for the object. This may return <code>null</code>.
@@ -366,13 +354,6 @@ public interface DSpaceObjectService<T extends DSpaceObject> extends RootEntityS
 
     public void delete(Context context, T dso) throws SQLException, AuthorizeException, IOException;
 
-
-    /**
-     * Returns the Constants which this service supports
-     *
-     * @return a org.dspace.core.Constants that represents a DSpaceObjct type
-     */
-    public int getSupportsTypeConstant();
 
     void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
                                   String value, String authority, int confidence, int index) throws SQLException;

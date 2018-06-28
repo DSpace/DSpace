@@ -9,6 +9,7 @@ package org.dspace.app.rest.converter;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.ClaimedTaskRest;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,8 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class ClaimedTaskConverter extends DSpaceConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest>
-    implements BrowsableDSpaceObjectConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest> {
+public class ClaimedTaskConverter
+    extends BrowsableDSpaceObjectConverter<ClaimedTask, org.dspace.app.rest.model.ClaimedTaskRest> {
 
     private static final Logger log = Logger.getLogger(ClaimedTaskConverter.class);
 
@@ -47,7 +48,7 @@ public class ClaimedTaskConverter extends DSpaceConverter<ClaimedTask, org.dspac
     }
 
     @Override
-    public boolean supportsModel(Object object) {
+    public boolean supportsModel(BrowsableDSpaceObject object) {
         return object instanceof ClaimedTask;
     }
 

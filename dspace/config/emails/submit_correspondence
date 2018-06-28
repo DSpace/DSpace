@@ -1,0 +1,19 @@
+# Notify correspondence added
+#
+# {0}  Title of submission
+# {1}  Subject of the message
+# {2}  Text of the message
+#
+Subject: DSpace: New correspondence added
+
+A new message has been added to an item under your control
+
+Item title:        {0}
+
+Message:   {1}
+Text: {2}
+
+
+Many thanks!
+
+DSpace

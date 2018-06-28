@@ -41,9 +41,8 @@ public class BitstreamConverter
         List<Bundle> bundles = null;
         try {
             bundles = obj.getBundles();
-        } catch (SQLException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         if (bundles != null && bundles.size() > 0) {
             b.setBundleName(bundles.get(0).getName());
@@ -56,8 +55,7 @@ public class BitstreamConverter
         try {
             format = bfConverter.fromModel(obj.getFormat(null));
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         b.setFormat(format);
         b.setSizeBytes(obj.getSize());

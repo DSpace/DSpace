@@ -25,7 +25,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
     @JsonIgnore
     private String scope;
     @JsonIgnore
-    private String configurationName;
+    private String configuration;
 
     private List<Filter> filters = new LinkedList<>();
     private List<SortOption> sortOptions = new LinkedList<>();
@@ -50,12 +50,12 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         this.scope = scope;
     }
 
-    public String getConfigurationName() {
-        return configurationName;
+    public String getConfiguration() {
+        return configuration;
     }
 
-    public void setConfigurationName(String configurationName) {
-        this.configurationName = configurationName;
+    public void setConfiguration(String configurationName) {
+        this.configuration = configurationName;
     }
 
     public void addFilter(Filter filter) {
@@ -81,8 +81,8 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
                                .append(this.getType(), ((SearchConfigurationRest) object).getType())
                                .append(this.getController(), ((SearchConfigurationRest) object).getController())
                                .append(this.getScope(), ((SearchConfigurationRest) object).getScope())
-                               .append(this.getConfigurationName(),
-                                       ((SearchConfigurationRest) object).getConfigurationName())
+                               .append(this.getConfiguration(),
+                                       ((SearchConfigurationRest) object).getConfiguration())
                                .append(this.getFilters(), ((SearchConfigurationRest) object).getFilters())
                                .append(this.getSortOptions(), ((SearchConfigurationRest) object).getSortOptions())
                                .isEquals());
@@ -95,7 +95,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
             .append(this.getType())
             .append(this.getController())
             .append(this.getScope())
-            .append(this.getConfigurationName())
+            .append(this.getConfiguration())
             .append(this.getFilters())
             .append(this.getSortOptions())
             .toHashCode();

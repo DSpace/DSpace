@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.GroupConverter;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.hateoas.GroupResource;
@@ -63,6 +64,21 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
         }
         Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total).map(converter);
         return page;
+    }
+
+    @SearchRestMethod(name = "isMemberOf")
+    public GroupRest isMemberOf(String groupName) {
+        Group group = null;
+        try {
+            Context context = obtainContext();
+            group = gs.isMember(context, groupName) ? gs.findByName(context, groupName) : null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (group == null) {
+            return null;
+        }
+        return converter.fromModel(group);
     }
 
     @Override

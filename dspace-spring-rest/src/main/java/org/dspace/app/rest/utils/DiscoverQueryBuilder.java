@@ -148,8 +148,8 @@ public class DiscoverQueryBuilder implements InitializingBean {
                                         DiscoverySearchFilterFacet facet, final int pageSize) {
         if (facet.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             try {
-                FacetYearRange facetYearRange = searchService
-                    .getFacetYearRange(context, scope, facet, queryArgs.getFilterQueries());
+                FacetYearRange facetYearRange =
+                    searchService.getFacetYearRange(context, scope, facet, queryArgs.getFilterQueries(), queryArgs);
 
                 queryArgs.addYearRangeFacet(facet, facetYearRange);
 
@@ -192,6 +192,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private DiscoverQuery buildBaseQueryForConfiguration(DiscoveryConfiguration discoveryConfiguration) {
         DiscoverQuery queryArgs = new DiscoverQuery();
+        queryArgs.setDiscoveryConfigurationName(discoveryConfiguration.getId());
         queryArgs.addFilterQueries(discoveryConfiguration.getDefaultFilterQueries()
                                                          .toArray(
                                                              new String[discoveryConfiguration.getDefaultFilterQueries()

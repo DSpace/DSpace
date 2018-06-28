@@ -25,12 +25,10 @@ public class DiscoverFacetConfigurationConverter {
                                           DiscoveryConfiguration discoveryConfiguration) {
         FacetConfigurationRest facetConfigurationRest = new FacetConfigurationRest();
 
-        facetConfigurationRest.setConfigurationName(configuration);
+        facetConfigurationRest.setConfiguration(configuration);
         facetConfigurationRest.setScope(scope);
 
-        if (configuration != null) {
-            addSidebarFacets(facetConfigurationRest, discoveryConfiguration.getSidebarFacets());
-        }
+        addSidebarFacets(facetConfigurationRest, discoveryConfiguration.getSidebarFacets());
 
         return facetConfigurationRest;
     }

@@ -9,6 +9,7 @@ package org.dspace.app.rest.converter;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.PoolTaskRest;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,8 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class PoolTaskConverter extends DSpaceConverter<PoolTask, org.dspace.app.rest.model.PoolTaskRest>
-    implements BrowsableDSpaceObjectConverter<PoolTask, org.dspace.app.rest.model.PoolTaskRest> {
+public class PoolTaskConverter
+    extends BrowsableDSpaceObjectConverter<PoolTask, org.dspace.app.rest.model.PoolTaskRest> {
 
     private static final Logger log = Logger.getLogger(PoolTaskConverter.class);
 
@@ -47,7 +48,8 @@ public class PoolTaskConverter extends DSpaceConverter<PoolTask, org.dspace.app.
     }
 
     @Override
-    public boolean supportsModel(Object object) {
+    public boolean supportsModel(BrowsableDSpaceObject object) {
         return object instanceof PoolTask;
     }
+
 }

@@ -130,5 +130,6 @@ public interface SearchService {
     String escapeQueryChars(String query);
 
     FacetYearRange getFacetYearRange(Context context, BrowsableDSpaceObject scope, DiscoverySearchFilterFacet facet,
-                                     List<String> filterQueries) throws SearchServiceException;
+            List<String> filterQueries, DiscoverQuery parentQuery)
+                    throws SearchServiceException;
 }

@@ -32,7 +32,7 @@ public class FacetConfigurationResourceHalLinkFactory extends DiscoveryRestHalLi
 
         if (data != null) {
             list.add(buildLink(Link.REL_SELF, getMethodOn()
-                .getFacetsConfiguration(data.getScope(), data.getConfigurationName())));
+                .getFacetsConfiguration(data.getScope(), data.getConfiguration())));
         }
     }
 

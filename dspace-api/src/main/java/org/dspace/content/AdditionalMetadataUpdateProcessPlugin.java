@@ -7,15 +7,10 @@
  */
 package org.dspace.content;
 
-import java.util.UUID;
+import org.dspace.core.Context;
 
-public interface RootObject {
+public interface AdditionalMetadataUpdateProcessPlugin {
 
-    int getType();
+    public void process(Context context, Item item, String provider);
 
-    String getName();
-
-    UUID getID();
-
-    String getHandle();
 }

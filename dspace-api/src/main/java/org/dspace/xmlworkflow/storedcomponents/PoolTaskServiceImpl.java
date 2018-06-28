@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -45,6 +46,11 @@ public class PoolTaskServiceImpl implements PoolTaskService {
 
     protected PoolTaskServiceImpl() {
 
+    }
+
+    @Override
+    public int getSupportsTypeConstant() {
+        return Constants.WORKFLOW_POOL;
     }
 
     @Override
@@ -133,6 +139,14 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     @Override
     public PoolTask find(Context context, int id) throws SQLException {
         return poolTaskDAO.findByID(context, PoolTask.class, id);
+    }
+
+    @Override
+    public PoolTask find(Context context, Integer id) throws SQLException {
+        if (id == null) {
+            return null;
+        }
+        return find(context, id.intValue());
     }
 
     @Override

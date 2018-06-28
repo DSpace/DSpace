@@ -19,6 +19,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -765,6 +766,12 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         policy.setRpName(name);
         policy.setRpDescription(reason);
         return policy;
+    }
+
+    @Override
+    public List<ResourcePolicy> getPoliciesActionFilterExceptRpType(Context c, BrowsableDSpaceObject o, int actionID,
+            String rpType) throws SQLException {
+        return resourcePolicyService.findExceptRpType(c, o, actionID, rpType);
     }
 
 }

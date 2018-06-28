@@ -43,6 +43,12 @@
 	<!-- Messages.properties -->
 	<!-- -->
 	<step-definitions>
+		<step id="extraction">
+       		<heading></heading> 
+	   		<processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+			<type>utils</type>
+			<scope visibility="hidden" visibilityOutside="hidden">submission</scope>       
+     	</step>
 	    <!-- The "collection" step is a "special step" which is *REQUIRED* -->
 	    <!-- In DSpace, all submitted items must be immediately assigned --> 
 	    <!-- to a collection. This step ensures that a collection is always selected. -->
@@ -132,6 +138,7 @@
 
 			<!--Uncommment to display the SAMPLE step as your first step -->
 			<!--<step id="sample"/> -->
+			<step id="extraction" />
 
 			<step id="collection" />
 			

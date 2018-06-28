@@ -13,16 +13,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.EPersonServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,6 +44,8 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     @Autowired
     ItemConverter converter;
 
+    @Autowired
+    EPersonServiceImpl epersonService;
 
     public ItemRestRepository() {
         System.out.println("Repository initialized by Spring");
@@ -71,6 +77,22 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
                 Item i = it.next();
                 items.add(i);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(converter);
+        return page;
+    }
+
+    @SearchRestMethod(name = "findBySubmitter")
+    public Page<ItemRest> findBySubmitter(@Param(value = "uuid") UUID submitterID, Pageable pageable) {
+        List<Item> items = null;
+        int total = 0;
+        try {
+            Context context = obtainContext();
+            EPerson ep = epersonService.find(context, submitterID);
+            items = is.findBySubmitter(context, ep, pageable.getPageSize(), pageable.getOffset());
+            total = is.countBySubmitter(context, ep);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

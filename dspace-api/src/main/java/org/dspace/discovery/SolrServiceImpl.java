@@ -117,6 +117,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 /**
  * SolrIndexer contains the methods that index Items and their metadata,
  * collections, communities, etc. It is meant to either be invoked from the
@@ -597,12 +598,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                          */
                         unIndexContent(context, uniqueID);
                     } else {
-                        log.debug("Keeping: " + o.getHandle());
+                        log.debug("Keeping: " + o.getUniqueIndexID());
                     }
                 }
             }
         } catch (Exception e) {
-            log.error("Error cleaning cris discovery index: " + e.getMessage(), e);
+            log.error("Error cleaning discovery index: " + e.getMessage(), e);
         } finally {
             context.abort();
         }
@@ -785,6 +786,19 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return locations;
     }
 
+    protected List<String> getCommunityLocations(Community target) throws SQLException {
+        List<String> locations = new Vector<String>();
+        // build list of community ids
+        List<Community> communities = target.getParentCommunities();
+
+        // now put those into strings
+        for (Community community : communities) {
+            locations.add("m" + community.getID());
+        }
+
+        return locations;
+    }
+
     @Override
     public String createLocationQueryForAdministrableItems(Context context)
         throws SQLException {
@@ -900,9 +914,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     protected void buildDocument(Context context, Community community)
         throws SQLException, IOException {
+
+        List<String> locations = getCommunityLocations(community);
+
         // Create Document
         SolrInputDocument doc = buildDocument(Constants.COMMUNITY, community.getID(),
-                                              community.getHandle(), null);
+                                              community.getHandle(), locations);
 
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(community);
         DiscoveryHitHighlightingConfiguration highlightingConfiguration = discoveryConfiguration
@@ -1062,6 +1079,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         List<DiscoveryConfiguration> discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(item);
         addDiscoveryFields(doc, context, item, discoveryConfigurations);
+
+        //mandatory facet to show status on mydspace
+        final String typeText = StringUtils.deleteWhitespace(item.getTypeText().toLowerCase());
+        String acvalue = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(
+                "discovery.facet.namedtype." + typeText,
+                typeText + SolrServiceImpl.AUTHORITY_SEPARATOR + typeText);
+        if (StringUtils.isNotBlank(acvalue)) {
+            String fvalue = acvalue;
+            addNamedResourceTypeIndex(doc, acvalue, fvalue);
+        }
 
         // write the index and close the inputstreamreaders
         try {
@@ -2131,31 +2158,23 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         Object id = doc.getFirstValue(RESOURCE_ID_FIELD);
         String handle = (String) doc.getFirstValue(HANDLE_FIELD);
         BrowsableDSpaceObject o = null;
+        Serializable uid = null;
         if (type != null && id != null) {
             switch (type) {
                 case Constants.WORKSPACEITEM:
-                    Integer wsiId = Integer.parseInt((String) id);
-                    o = (BrowsableDSpaceObject) workspaceItemService.find(context, wsiId);
-                    break;
                 case Constants.WORKFLOWITEM:
-                    Integer wfiId = Integer.parseInt((String) id);
-                    o = (BrowsableDSpaceObject) workflowItemService.find(context, wfiId);
-                    break;
                 case Constants.WORKFLOW_POOL:
-                    Integer wfpId = Integer.parseInt((String) id);
-                    o = poolTaskService.find(context, wfpId);
-                    break;
                 case Constants.WORKFLOW_CLAIMED:
-                    Integer wfcId = Integer.parseInt((String) id);
-                    o = claimedTaskService.find(context, wfcId);
+                    uid = Integer.parseInt((String) id);
                     break;
                 default:
-                    UUID uid = UUID.fromString((String) id);
-                    o = (BrowsableDSpaceObject) contentServiceFactory.getDSpaceObjectService(type).find(context, uid);
+                    uid = UUID.fromString((String) id);
                     break;
             }
-        } else if (handle != null) {
-            o = (BrowsableDSpaceObject) handleService.resolveToObject(context, handle);
+        }
+
+        if (uid != null) {
+            o = (BrowsableDSpaceObject) contentServiceFactory.getBrowsableDSpaceObjectService(type).find(context, uid);
         }
 
         if (o != null) {
@@ -2204,7 +2223,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 SolrDocument doc = (SolrDocument) iter.next();
 
                 BrowsableDSpaceObject o = (BrowsableDSpaceObject)contentServiceFactory
-                    .getRootObjectService((Integer) doc.getFirstValue(RESOURCE_TYPE_FIELD))
+                    .getBrowsableDSpaceObjectService((Integer) doc.getFirstValue(RESOURCE_TYPE_FIELD))
                     .find(context, UUID.fromString((String) doc.getFirstValue(RESOURCE_ID_FIELD)));
 
                 if (o != null) {
@@ -2497,9 +2516,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     @Override
     public FacetYearRange getFacetYearRange(Context context, BrowsableDSpaceObject scope,
-            DiscoverySearchFilterFacet facet, List<String> filterQueries) throws SearchServiceException {
+                                            DiscoverySearchFilterFacet facet, List<String> filterQueries,
+                                            DiscoverQuery parentQuery) throws SearchServiceException {
         FacetYearRange result = new FacetYearRange(facet);
-        result.calculateRange(context, filterQueries, scope, this);
+        result.calculateRange(context, filterQueries, scope, this, parentQuery);
         return result;
     }
 

@@ -82,8 +82,8 @@ public class DiscoverResultConverter {
         }
     }
 
-    private RestAddressableModel convertDSpaceObject(final Object dspaceObject) {
-        for (BrowsableDSpaceObjectConverter<Object, RestAddressableModel> converter : converters) {
+    private RestAddressableModel convertDSpaceObject(final BrowsableDSpaceObject dspaceObject) {
+        for (BrowsableDSpaceObjectConverter<BrowsableDSpaceObject, RestAddressableModel> converter : converters) {
             if (converter.supportsModel(dspaceObject)) {
                 return converter.convert(dspaceObject);
             }
@@ -105,8 +105,6 @@ public class DiscoverResultConverter {
             Sort.Order order = page.getSort().iterator().next();
             resultsRest.setSort(order.getProperty(), order.getDirection().name());
         }
-        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter =
-            new SearchFilterToAppliedFilterConverter();
         for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
 
             resultsRest

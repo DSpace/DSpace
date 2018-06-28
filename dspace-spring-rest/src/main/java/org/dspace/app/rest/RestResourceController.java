@@ -408,6 +408,8 @@ public class RestResourceController implements InitializingBean {
      * @param model
      * @return
      * @throws HttpRequestMethodNotSupportedException
+     * @throws AuthorizeException
+     * @throws SQLException
      */
     public <ID extends Serializable> ResponseEntity<ResourceSupport> postInternal(HttpServletRequest request,
                                                                                   String apiCategory,
@@ -429,6 +431,47 @@ public class RestResourceController implements InitializingBean {
         linkService.addLinks(result);
         //TODO manage HTTPHeader
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+    }
+
+    /**
+     * Called in POST, with a json payload, execute an action on a resource
+     *
+     * Note that the regular expression in the request mapping accept a number as identifier;
+     *
+     * @param request
+     * @param apiCategory
+     * @param model
+     * @param id
+     * @return
+     * @throws HttpRequestMethodNotSupportedException
+     */
+    @RequestMapping(method = RequestMethod.POST, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT, headers =
+        "content-type=application/x-www-form-urlencoded")
+    public ResponseEntity<ResourceSupport> action(HttpServletRequest request, @PathVariable String apiCategory,
+                                                  @PathVariable String model, @PathVariable Integer id)
+        throws HttpRequestMethodNotSupportedException {
+        checkModelPluralForm(apiCategory, model);
+        DSpaceRestRepository<RestAddressableModel, Integer> repository =
+            utils.getResourceRepository(apiCategory, model);
+
+        RestAddressableModel modelObject = null;
+        try {
+            modelObject = repository.action(request, id);
+        } catch (UnprocessableEntityException e) {
+            log.error(e.getMessage(), e);
+            return ControllerUtils.toEmptyResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        if (modelObject != null) {
+            DSpaceResource result = repository.wrapResource(modelObject);
+            linkService.addLinks(result);
+            return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);
+        } else {
+            return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
+        }
     }
 
     /**
@@ -467,7 +510,7 @@ public class RestResourceController implements InitializingBean {
      * @param request
      * @param apiCategory
      * @param model
-     * @param id
+     * @param uuid
      * @param extraField
      * @param uploadfile
      * @return
@@ -478,13 +521,13 @@ public class RestResourceController implements InitializingBean {
     public <ID extends Serializable> ResponseEntity<ResourceSupport> upload(HttpServletRequest request,
                                                                             @PathVariable String apiCategory,
                                                                             @PathVariable String model,
-                                                                            @PathVariable UUID id,
+                                                                            @PathVariable UUID uuid,
                                                                             @RequestParam(required = false, value =
                                                                                 "extraField") String extraField,
                                                                             @RequestParam("file") MultipartFile
                                                                                 uploadfile)
         throws HttpRequestMethodNotSupportedException {
-        return uploadInternal(request, apiCategory, model, id, extraField, uploadfile);
+        return uploadInternal(request, apiCategory, model, uuid, extraField, uploadfile);
     }
 
     /**
@@ -549,17 +592,17 @@ public class RestResourceController implements InitializingBean {
      * @param request
      * @param apiCategory
      * @param model
-     * @param id
+     * @param uuid
      * @param jsonNode
      * @return
      * @throws HttpRequestMethodNotSupportedException
      */
     @RequestMapping(method = RequestMethod.PATCH, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
-                                                 @PathVariable String model, @PathVariable UUID id,
+                                                 @PathVariable String model, @PathVariable UUID uuid,
                                                  @RequestBody(required = true) JsonNode jsonNode)
         throws HttpRequestMethodNotSupportedException {
-        return patchInternal(request, apiCategory, model, id, jsonNode);
+        return patchInternal(request, apiCategory, model, uuid, jsonNode);
     }
 
     /**
@@ -663,14 +706,14 @@ public class RestResourceController implements InitializingBean {
      */
     private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request,
                                                                       HttpServletResponse response, String apiCategory,
-                                                                      String model, ID uuid, String rel, Pageable page,
-                                                                      PagedResourcesAssembler assembler,
+                                                                      String model, ID uuid, String subpath,
+                                                                      Pageable page, PagedResourcesAssembler assembler,
                                                                       String projection) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
 
-        LinkRest linkRest = utils.getLinkRest(rel, domainClass);
+        LinkRest linkRest = utils.getLinkRest(subpath, domainClass);
         PagedResources<? extends HALResource> result;
 
         if (linkRest != null) {
@@ -680,23 +723,23 @@ public class RestResourceController implements InitializingBean {
             if (linkMethod == null) {
                 // TODO custom exception
                 throw new RuntimeException(
-                    "Method for relation " + rel + " not found: " + linkRest.name() + ":" + linkRest.method());
+                        "Method for relation " + subpath + " not found: " + linkRest.name() + ":" + linkRest.method());
             } else {
                 try {
                     if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
                         Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                            .invoke(linkRepository, request, uuid, page, projection);
-                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
-                                                                               .slash(rel).withSelfRel();
+                                .invoke(linkRepository, request, uuid, page, projection);
+                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
+                                .withSelfRel();
                         Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
                         halResources.forEach(linkService::addLinks);
 
                         return assembler.toResource(halResources, link);
                     } else {
                         RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
-                                                                         projection);
-                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(rel)
-                                                                               .withSelfRel();
+                                projection);
+                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
+                                .withSelfRel();
                         HALResource tmpresult = linkRepository.wrapResource(object);
                         tmpresult.add(link);
                         return tmpresult;
@@ -707,12 +750,12 @@ public class RestResourceController implements InitializingBean {
             }
         }
         RestAddressableModel modelObject = repository.findOne(uuid);
-        
+
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
         }
-                
-        DSpaceResource resource = repository.wrapResource(modelObject, rel);
+
+        DSpaceResource resource = repository.wrapResource(modelObject, subpath);
         linkService.addLinks(resource);
 
         String rel = null;
@@ -847,7 +890,6 @@ public class RestResourceController implements InitializingBean {
     public <T extends RestAddressableModel> ResourceSupport executeSearchMethods(@PathVariable String apiCategory,
                                                                                  @PathVariable String model,
                                                                                  @PathVariable String searchMethodName,
-                                                                                 HttpServletResponse response,
                                                                                  Pageable pageable, Sort sort,
                                                                                  PagedResourcesAssembler assembler,
                                                                                  @RequestParam MultiValueMap<String,
