@@ -306,16 +306,16 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
                     if (stepInstance instanceof AbstractRestProcessingStep) {
                         // load the JSPStep interface for this step
-                        AbstractRestProcessingStep stepProcessing = (AbstractRestProcessingStep) stepClass
-                            .newInstance();
+                        AbstractRestProcessingStep stepProcessing =
+                            (AbstractRestProcessingStep) stepClass.newInstance();
+                        stepProcessing.doPreProcessing(context, source);
                         stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, op);
+                        stepProcessing.doPostProcessing(context, source);
                     } else {
-                        throw new PatchBadRequestException("The submission step class specified by '"
-                                                               + stepConfig.getProcessingClassName()
-                                                               + "' does not extend the class org.dspace.submit" +
-                                                               ".AbstractProcessingStep!"
-                                                               + " Therefore it cannot be used by the Configurable " +
-                                                               "Submission as the <processing-class>!");
+                        throw new PatchBadRequestException(
+                            "The submission step class specified by '" + stepConfig.getProcessingClassName() +
+                            "' does not extend the class org.dspace.submit.AbstractProcessingStep!" +
+                            " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
                     }
 
                 } catch (Exception e) {

@@ -106,16 +106,16 @@ public class DiscoverQueryBuilderTest {
         discoveryConfiguration.setDefaultFilterQueries(Arrays.asList("archived:true"));
 
 
-        DiscoveryHitHighlightingConfiguration discoveryHitHighlightingConfiguration = new
-            DiscoveryHitHighlightingConfiguration();
+        DiscoveryHitHighlightingConfiguration discoveryHitHighlightingConfiguration =
+            new DiscoveryHitHighlightingConfiguration();
         List<DiscoveryHitHighlightFieldConfiguration> discoveryHitHighlightFieldConfigurations = new LinkedList<>();
 
-        DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration = new
-            DiscoveryHitHighlightFieldConfiguration();
+        DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration =
+            new DiscoveryHitHighlightFieldConfiguration();
         discoveryHitHighlightFieldConfiguration.setField("dc.title");
 
-        DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration1 = new
-            DiscoveryHitHighlightFieldConfiguration();
+        DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration1 =
+            new DiscoveryHitHighlightFieldConfiguration();
         discoveryHitHighlightFieldConfiguration1.setField("fulltext");
 
         discoveryHitHighlightFieldConfigurations.add(discoveryHitHighlightFieldConfiguration1);
