@@ -166,7 +166,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         }
     }
 
-    protected T createAndReturn(Context context) throws AuthorizeException, RepositoryMethodNotImplementedException {
+    protected T createAndReturn(Context context)
+            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 

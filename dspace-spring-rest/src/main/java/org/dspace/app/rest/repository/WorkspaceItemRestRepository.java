@@ -158,7 +158,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     }
 
     @Override
-    protected WorkspaceItemRest createAndReturn(Context context) {
+    protected WorkspaceItemRest createAndReturn(Context context)
+            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
         WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
         return converter.convert(source);
     }
