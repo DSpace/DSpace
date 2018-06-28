@@ -25,7 +25,7 @@ import org.dspace.app.rest.model.SearchSupportRest;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.utils.DiscoverQueryBuilder;
 import org.dspace.app.rest.utils.ScopeResolver;
-import org.dspace.content.DSpaceObject;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -81,7 +81,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     public SearchConfigurationRest getSearchConfiguration(final String dsoScope, final String configuration) {
         Context context = obtainContext();
 
-        DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+        BrowsableDSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
 
@@ -94,7 +94,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         throws InvalidRequestException {
         Context context = obtainContext();
 
-        DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+        BrowsableDSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
 
@@ -118,7 +118,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     public FacetConfigurationRest getFacetsConfiguration(final String dsoScope, final String configuration) {
         Context context = obtainContext();
 
-        DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+        BrowsableDSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
 
@@ -135,7 +135,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
         Context context = obtainContext();
 
-        DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+        BrowsableDSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
 
@@ -162,7 +162,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
         Context context = obtainContext();
         Pageable page = new PageRequest(1, 1);
-        DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+        BrowsableDSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
 

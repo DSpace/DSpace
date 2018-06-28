@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.content.DSpaceObject;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -48,7 +48,7 @@ public class DiscoveryConfigurationService {
         this.toIgnoreMetadataFields = toIgnoreMetadataFields;
     }
 
-    public DiscoveryConfiguration getDiscoveryConfiguration(DSpaceObject dso) {
+    public DiscoveryConfiguration getDiscoveryConfiguration(BrowsableDSpaceObject dso) {
         String name;
         if (dso == null) {
             name = "site";
@@ -73,7 +73,7 @@ public class DiscoveryConfigurationService {
     }
 
     public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName,
-                                                                       final DSpaceObject dso) {
+                                                                       final BrowsableDSpaceObject dso) {
         if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
             return getMap().get(configurationName);
         } else {

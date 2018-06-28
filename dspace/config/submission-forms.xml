@@ -43,20 +43,10 @@
 				<dc-element>contributor</dc-element>
 				<dc-qualifier>author</dc-qualifier>
 				<repeatable>false</repeatable>
-				<label>Authors</label>
+				<label>Author</label>
 				<input-type>onebox</input-type>
 				<hint>Enter the name of the author.</hint>
 				<required>Required field!</required>
-			</field>
-			<field>
-				<dc-schema>local</dc-schema>
-				<dc-element>contributor</dc-element>
-				<dc-qualifier>orcid</dc-qualifier>
-				<repeatable>false</repeatable>
-				<label>ORCID</label>
-				<input-type>onebox</input-type>
-				<hint>Enter the ORCID of the author.</hint>
-				<required></required>
 			</field>
 		</row>
 		<row>

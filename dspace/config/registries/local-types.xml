@@ -32,4 +32,11 @@
   </dc-type>
 -->
 
+  <dc-type>
+    <schema>local</schema>
+    <element>contributor</element>
+    <qualifier>affiliation</qualifier>
+    <scope_note>Name of the affiliation for contributor</scope_note>
+  </dc-type>
+  
 </dspace-dc-types>
