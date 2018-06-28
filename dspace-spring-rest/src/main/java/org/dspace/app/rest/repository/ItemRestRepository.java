@@ -88,4 +88,22 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         return new ItemResource(item, utils, rels);
     }
 
+    @Override
+    protected void delete(Context context, UUID id) throws AuthorizeException {
+        Bitstream bit = null;
+        try {
+            bit = bs.find(context, id);
+            if (bit.getCommunity() != null | bit.getCollection() != null) {
+                throw new UnprocessableEntityException("The bitstream cannot be deleted it is a logo");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        try {
+            bs.delete(context, bit);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
 }
