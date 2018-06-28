@@ -242,4 +242,9 @@ public class PasswordAuthentication
                                HttpServletResponse response) {
         return null;
     }
+
+    @Override
+    public String getName() {
+        return "password";
+    }
 }
