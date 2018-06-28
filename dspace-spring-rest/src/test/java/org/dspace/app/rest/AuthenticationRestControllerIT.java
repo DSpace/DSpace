@@ -24,8 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Base64;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -49,7 +47,9 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     public static final String[] PASS_ONLY = {"org.dspace.authenticate.PasswordAuthentication"};
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.ShibAuthentication"};
-    public static final String[] SHIB_AND_IP = {"org.dspace.authenticate.IPAuthentication", "org.dspace.authenticate.ShibAuthentication"};
+    public static final String[] SHIB_AND_IP =
+            {"org.dspace.authenticate.IPAuthentication",
+            "org.dspace.authenticate.ShibAuthentication"};
 
     @Before
     public void setup() throws Exception {
@@ -357,7 +357,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/authn/login").header("Referer", "http://my.uni.edu"))
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate",
                         "shibboleth realm=\"DSpace REST API\", " +
@@ -390,7 +390,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         configurationService.setProperty("authentication-ip.Administrator", "123.123.123.123");
 
 
-        getClient().perform(get("/api/authn/login")
+        getClient().perform(post("/api/authn/login")
                             .header("Referer", "http://my.uni.edu")
                             .with(ip("123.123.123.123")))
                 .andExpect(status().isUnauthorized())
@@ -399,7 +399,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                                 "location=\"/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu\""));
 
         //Simulate that a shibboleth authentication has happened
-        String token = getClient().perform(get("/api/authn/login")
+        String token = getClient().perform(post("/api/authn/login")
                     .with(ip("123.123.123.123"))
                     .header("SHIB-MAIL", eperson.getEmail()))
                 .andExpect(status().isOk())
@@ -417,10 +417,11 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())))
                 .andExpect(jsonPath("$._embedded.eperson.groups", containsInAnyOrder(
-                        GroupMatcher.matchGroupWithName("Administrator"), GroupMatcher.matchGroupWithName("Anonymous"))));
+                        GroupMatcher.matchGroupWithName("Administrator"),
+                        GroupMatcher.matchGroupWithName("Anonymous"))));
 
         //Simulate that a new shibboleth authentication has happened from another IP
-        token = getClient().perform(get("/api/authn/login")
+        token = getClient().perform(post("/api/authn/login")
                 .with(ip("234.234.234.234"))
                 .header("SHIB-MAIL", eperson.getEmail()))
                 .andExpect(status().isOk())
