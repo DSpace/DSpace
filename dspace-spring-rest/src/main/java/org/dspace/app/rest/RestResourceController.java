@@ -890,6 +890,7 @@ public class RestResourceController implements InitializingBean {
     public <T extends RestAddressableModel> ResourceSupport executeSearchMethods(@PathVariable String apiCategory,
                                                                                  @PathVariable String model,
                                                                                  @PathVariable String searchMethodName,
+                                                                                 HttpServletResponse response,
                                                                                  Pageable pageable, Sort sort,
                                                                                  PagedResourcesAssembler assembler,
                                                                                  @RequestParam MultiValueMap<String,
