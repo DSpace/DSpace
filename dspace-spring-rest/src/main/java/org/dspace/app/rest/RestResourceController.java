@@ -33,11 +33,11 @@ import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.PatchBadRequestException;
-import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
@@ -586,7 +586,7 @@ public class RestResourceController implements InitializingBean {
             JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
             Patch patch = patchConverter.convert(jsonNode);
             modelObject = repository.patch(request, apiCategory, model, id, patch);
-        } catch (RepositoryMethodNotImplementedException | PatchUnprocessableEntityException |
+        } catch (RepositoryMethodNotImplementedException | UnprocessableEntityException |
             PatchBadRequestException e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -707,8 +707,29 @@ public class RestResourceController implements InitializingBean {
             }
         }
         RestAddressableModel modelObject = repository.findOne(uuid);
+        
+        if (modelObject == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
+        }
+                
         DSpaceResource resource = repository.wrapResource(modelObject, rel);
         linkService.addLinks(resource);
+
+        String rel = null;
+
+        for (Link l : resource.getLinks()) {
+            if (l.isTemplated()) {
+                if (l.getHref().substring(0, l.getHref().indexOf("?")).contentEquals(request.getRequestURL())) {
+                    rel = l.getRel();
+                }
+            } else if (l.getHref().contentEquals(request.getRequestURL())) {
+                rel = l.getRel();
+            }
+        }
+
+        if (rel == null) {
+            throw new ResourceNotFoundException(rel + " undefined for " + model);
+        }
 
         if (resource.getLink(rel) == null) {
             // TODO create a custom exception
@@ -826,6 +847,7 @@ public class RestResourceController implements InitializingBean {
     public <T extends RestAddressableModel> ResourceSupport executeSearchMethods(@PathVariable String apiCategory,
                                                                                  @PathVariable String model,
                                                                                  @PathVariable String searchMethodName,
+                                                                                 HttpServletResponse response,
                                                                                  Pageable pageable, Sort sort,
                                                                                  PagedResourcesAssembler assembler,
                                                                                  @RequestParam MultiValueMap<String,
@@ -853,10 +875,23 @@ public class RestResourceController implements InitializingBean {
         returnPage = searchMethod.getReturnType().isAssignableFrom(Page.class);
         ResourceSupport result = null;
         if (returnPage) {
-            Page<DSpaceResource<T>> resources = ((Page<T>) searchResult).map(repository::wrapResource);
+            Page<DSpaceResource<T>> resources;
+            if (searchResult == null) {
+                resources = new PageImpl(new ArrayList(), pageable, 0);
+            } else {
+                resources = ((Page<T>) searchResult).map(repository::wrapResource);
+            }
             resources.forEach(linkService::addLinks);
             result = assembler.toResource(resources, link);
         } else {
+            if (searchResult == null) {
+                try {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                } catch (IOException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+                return null;
+            }
             DSpaceResource<T> dsResource = repository.wrapResource((T) searchResult);
             linkService.addLinks(dsResource);
             result = dsResource;
@@ -887,9 +922,9 @@ public class RestResourceController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public ResponseEntity<ResourceSupport> delete(HttpServletRequest request, @PathVariable String apiCategory,
-                                                  @PathVariable String model, @PathVariable UUID id)
+                                                  @PathVariable String model, @PathVariable UUID uuid)
         throws HttpRequestMethodNotSupportedException {
-        return deleteInternal(apiCategory, model, id);
+        return deleteInternal(apiCategory, model, uuid);
     }
 
     /**

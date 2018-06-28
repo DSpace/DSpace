@@ -143,7 +143,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     }
 
     @SearchRestMethod(name = "findBySubmitter")
-    public Page<WorkspaceItemRest> findBySubmitter(@Param(value = "uuid") UUID submitterID, Pageable pageable) {
+    public Page<WorkspaceItemRest> findBySubmitter(@Parameter(value = "uuid", required = true) UUID submitterID,
+            Pageable pageable) {
         List<WorkspaceItem> witems = null;
         int total = 0;
         try {
@@ -159,15 +160,15 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     }
 
     @Override
-    protected WorkspaceItemRest createAndReturn(Context context) throws SQLException, AuthorizeException {
+    protected WorkspaceItemRest createAndReturn(Context context) {
         WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
         return converter.convert(source);
     }
 
     @Override
     protected WorkspaceItemRest save(Context context, WorkspaceItemRest wsi) {
-        SubmissionConfig submissionConfig =
-            submissionConfigReader.getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
+        SubmissionConfig submissionConfig = submissionConfigReader
+            .getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
         WorkspaceItem source = converter.toModel(wsi);
         for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
 
