@@ -36,7 +36,21 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         ItemBuilder builder = new ItemBuilder(context);
         return builder.create(context, col);
     }
-
+     
+    public static Item createTemplateItem(final Context context, final Collection collection) {
+        ItemBuilder builder = new ItemBuilder(context);
+        return builder.create_template_item(collection);
+    }
+    
+    private Item create_template_item(final Collection collection) {
+        try {
+            item = itemService.createTemplateItem(context, collection);
+            return item;
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+    
     private ItemBuilder create(final Context context, final Collection col) {
         this.context = context;
 
@@ -70,7 +84,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         item.setDiscoverable(false);
         return this;
     }
-
+    
     public ItemBuilder withEmbargoPeriod(String embargoPeriod) {
         return setEmbargo(embargoPeriod, item);
     }
@@ -99,7 +113,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             return handleException(e);
         }
     }
-
+      
     protected void cleanup() throws Exception {
         delete(item);
     }
