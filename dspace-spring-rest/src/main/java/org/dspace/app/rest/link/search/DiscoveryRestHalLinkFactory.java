@@ -34,7 +34,8 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
     }
 
     protected UriComponentsBuilder buildFacetBaseLink(final FacetResultsRest data) throws Exception {
-        UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
+        try {
+            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
                                                          .getFacetValues(data.getFacetEntry().getName(),
                                                                          data.getPrefix(), data.getQuery(),
                                                                          data.getDsoType(), data.getScope(),
