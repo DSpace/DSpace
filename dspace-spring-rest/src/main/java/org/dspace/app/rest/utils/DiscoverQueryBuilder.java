@@ -101,7 +101,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     public DiscoverQuery buildFacetQuery(Context context, DSpaceObject scope,
                                          DiscoveryConfiguration discoveryConfiguration,
-                                         String query, List<SearchFilter> searchFilters,
+                                         String prefix, String query, List<SearchFilter> searchFilters,
                                          String dsoType, Pageable page, String facetName)
         throws InvalidRequestException {
 
@@ -109,7 +109,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
                                                            dsoType);
 
         //When all search criteria are set, configure facet results
-        addFacetingForFacets(context, scope, queryArgs, discoveryConfiguration, facetName, page);
+        addFacetingForFacets(context, scope, prefix, queryArgs, discoveryConfiguration, facetName, page);
 
         //We don' want any search results, we only want facet values
         queryArgs.setMaxResults(0);
@@ -126,8 +126,8 @@ public class DiscoverQueryBuilder implements InitializingBean {
         }
     }
 
-    private DiscoverQuery addFacetingForFacets(Context context, DSpaceObject scope, DiscoverQuery queryArgs,
-                                               DiscoveryConfiguration discoveryConfiguration,
+    private DiscoverQuery addFacetingForFacets(Context context, DSpaceObject scope, String prefix,
+                                               DiscoverQuery queryArgs, DiscoveryConfiguration discoveryConfiguration,
                                                String facetName, Pageable page) throws InvalidSearchFacetException {
 
         DiscoverySearchFilterFacet facet = discoveryConfiguration.getSidebarFacet(facetName);
@@ -135,7 +135,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
             queryArgs.setFacetMinCount(1);
             int pageSize = Math.min(pageSizeLimit, page.getPageSize());
 
-            fillFacetIntoQueryArgs(context, scope, queryArgs, facet, pageSize);
+            fillFacetIntoQueryArgs(context, scope, prefix, queryArgs, facet, pageSize);
 
         } else {
             throw new InvalidSearchFacetException(facetName + " is not a valid search facet");
@@ -144,7 +144,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
         return queryArgs;
     }
 
-    private void fillFacetIntoQueryArgs(Context context, DSpaceObject scope, DiscoverQuery queryArgs,
+    private void fillFacetIntoQueryArgs(Context context, DSpaceObject scope, String prefix, DiscoverQuery queryArgs,
                                         DiscoverySearchFilterFacet facet, final int pageSize) {
         if (facet.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             try {
@@ -165,7 +165,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
             int facetLimit = pageSize + 1;
             //This should take care of the sorting for us
             queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit,
-                                                           facet.getSortOrderSidebar()));
+                    facet.getSortOrderSidebar(), StringUtils.trimToNull(prefix)));
         }
     }
 
@@ -321,7 +321,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
             /** enable faceting of search results */
             for (DiscoverySearchFilterFacet facet : facets) {
-                fillFacetIntoQueryArgs(context, scope, queryArgs, facet, facet.getFacetLimit());
+                fillFacetIntoQueryArgs(context, scope, null, queryArgs, facet, facet.getFacetLimit());
             }
         }
 

@@ -129,7 +129,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         return discoverSearchSupportConverter.convert();
     }
 
-    public FacetResultsRest getFacetObjects(String facetName, String query, String dsoType, String dsoScope,
+    public FacetResultsRest getFacetObjects(String facetName, String prefix, String query, String dsoType, String dsoScope,
                                             List<SearchFilter> searchFilters, Pageable page)
         throws InvalidRequestException {
 
@@ -143,7 +143,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         DiscoverQuery discoverQuery = null;
         try {
             discoverQuery = queryBuilder
-                .buildFacetQuery(context, scopeObject, configuration, query, searchFilters, dsoType, page, facetName);
+                .buildFacetQuery(context, scopeObject, configuration, prefix, query, searchFilters, dsoType, page, facetName);
             searchResult = searchService.search(context, scopeObject, discoverQuery);
 
         } catch (SearchServiceException e) {
@@ -152,7 +152,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         }
 
         FacetResultsRest facetResultsRest = discoverFacetResultsConverter
-            .convert(context, facetName, query, dsoType, dsoScope, searchFilters, searchResult, configuration, page);
+            .convert(context, facetName, prefix, query, dsoType, dsoScope, searchFilters, searchResult, configuration, page);
         return facetResultsRest;
     }
 
