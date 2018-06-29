@@ -1,11 +1,13 @@
 package org.dspace.workflow;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataFile;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -165,7 +167,8 @@ public class WorkflowManager {
                     WorkflowRequirementsManager.clearStepMetadata(wfi);
                     //Remove all the tasks
                     WorkflowManager.deleteAllTasks(c, wfi);
-
+                    // update any review file name changes
+                    updateFileNames(c, wfi);
 
                     Step nextStep = workflow.getNextStep(c, wfi, currentStep, currentOutcome.getResult());
                     if(nextStep!=null){
@@ -654,5 +657,21 @@ public class WorkflowManager {
         EPerson e = wi.getSubmitter();
 
         return getEPersonName(e);
+    }
+
+    public static void updateFileNames(Context context, WorkflowItem wfi) throws AuthorizeException, SQLException {
+        Item publication = wfi.getItem();
+        DCValue[] fileStatusMDVs = publication.getMetadata("workflow.review.fileStatus");
+        publication.clearMetadata("workflow.review.fileStatus");
+        publication.update();
+        for (DCValue fileStatusMDV : fileStatusMDVs) {
+            if (fileStatusMDV.confidence == Choices.CF_REJECTED) {
+                Item datafile = Item.find(context, Integer.valueOf(fileStatusMDV.value));
+                if (datafile != null) {
+                    DryadDataFile dryadDataFile = new DryadDataFile(datafile);
+                    dryadDataFile.setTitle("SUPERSEDED - " + dryadDataFile.getTitle());
+                }
+            }
+        }
     }
 }

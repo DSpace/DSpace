@@ -57,6 +57,10 @@ public class AlterWorkflowStepAction extends AbstractAction {
             //Remove all the tasks
             WorkflowManager.deleteAllTasks(context, wfItem);
 
+            if (newStep.getId().equals("dryadAcceptEditReject")) {
+                WorkflowManager.updateFileNames(context, wfItem);
+            }
+
 
             WorkflowActionConfig nextActionConfig = newStep.getUserSelectionMethod();
             nextActionConfig.getProcessingAction().activate(context, wfItem);
