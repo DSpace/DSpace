@@ -305,7 +305,7 @@ public class Loader  implements ElementHandler {
       // Setup the context
       context = new Context();
       context.setCurrentUser(isreperson);
-      context.ignoreAuthorization();
+      context.turnOffAuthorisationSystem();
 
       // Create a new Item, started in a workspace
       WorkspaceItem wi = workspaceItemService.create(context, isrcollection, false);

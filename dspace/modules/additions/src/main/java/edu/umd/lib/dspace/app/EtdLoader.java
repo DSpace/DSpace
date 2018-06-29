@@ -926,7 +926,7 @@ public class EtdLoader
             // Setup the context
             context = new Context();
             context.setCurrentUser(etdeperson);
-            context.ignoreAuthorization();
+            context.turnOffAuthorisationSystem();
 
             // Read the ETD metadata
             ZipEntry ze = (ZipEntry) files.get(1);

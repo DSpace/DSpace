@@ -64,7 +64,7 @@ public class DeleteItems {
   {
 
     Context context = new Context();
-    context.ignoreAuthorization();
+    context.turnOffAuthorisationSystem();
 
     try {
 
