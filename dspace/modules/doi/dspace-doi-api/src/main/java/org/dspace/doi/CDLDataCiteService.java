@@ -164,8 +164,8 @@ public class CDLDataCiteService {
 
         this.getClient(false).executeMethod(httpMethod);
 	log.info("HTTP status: " + httpMethod.getStatusLine());
-	log.debug("HTTP response text: " + httpMethod.getResponseBodyAsString(1000));
-        return httpMethod.getResponseBodyAsString(1000);
+	log.debug("HTTP response text: " + httpMethod.getResponseBodyAsString());
+        return httpMethod.getResponseBodyAsString();
     }
 
 
