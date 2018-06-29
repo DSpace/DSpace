@@ -160,6 +160,76 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void discoverFacetsAuthorTestWithPrefix() throws Exception {
+        //Turn off the authorization system, otherwise we can't make the objects
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects and authors
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2016-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2016-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .build();
+
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
+        getClient().perform(get("/api/discover/facets/author?prefix=smith")
+                .param("size", "10"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type needs to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //The name of the facet needs to be author, because that's what we called
+                .andExpect(jsonPath("$.name", is("author")))
+                //The facetType has to be 'text' because that's how the author facet is configured by default
+                .andExpect(jsonPath("$.facetType", is("text")))
+                //Because we've constructed such a structure so that we have more than 2 (size) authors, there
+                // needs to be a next link
+                .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/author?prefix=smith&page")))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?prefix=smith")))
+                //Because there are more authors than is represented (because of the size param), hasMore has to
+                // be true
+                //The page object needs to be present and just like specified in the matcher
+                .andExpect(jsonPath("$.page",
+                        is(PageMatcher.pageEntry(0, 10))))
+                //These authors need to be in the response because it's sorted on how many times the author comes
+                // up in different items
+                //These authors are order according to count. Only two show up because of the prefix.
+                .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                        FacetValueMatcher.entryAuthor("Smith, Maria"),
+                        FacetValueMatcher.entryAuthor("Smith, Donald")
+                )))
+        ;
+    }
+
+    @Test
     public void discoverFacetsAuthorTestForHasMoreFalse() throws Exception {
         //Turn of the authorization system so that we can create the structure specified below
         context.turnOffAuthorisationSystem();

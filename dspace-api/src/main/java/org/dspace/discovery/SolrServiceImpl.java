@@ -1995,13 +1995,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             filterQuery.append(field);
 
 
-            if(operator.endsWith("equals")){
+            if (operator.endsWith("equals")) {
                 filterQuery.append("_keyword");
-            } else if (operator.endsWith("authority")){
+            } else if (operator.endsWith("authority")) {
                 filterQuery.append("_authority");
             }
 
-            if(operator.startsWith("not")){
+            if (operator.startsWith("not")) {
                 filterQuery.insert(0, "-");
             }
 
