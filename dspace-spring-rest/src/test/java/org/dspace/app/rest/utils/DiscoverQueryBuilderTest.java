@@ -287,7 +287,8 @@ public class DiscoverQueryBuilderTest {
 
     @Test
     public void testBuildFacetQuery() throws Exception {
-        DiscoverQuery discoverQuery = queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration, query,
+        DiscoverQuery discoverQuery = queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration,
+                                                            "prefix", query,
                                                                    Arrays.asList(searchFilter), "item", page,
                                                                    "subject");
 
@@ -302,13 +303,13 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getFacetFields(), hasSize(1));
         assertThat(discoverQuery.getFacetFields(), contains(
             new ReflectionEquals(new DiscoverFacetField("subject", DiscoveryConfigurationParameters.TYPE_TEXT, 11,
-                                                        DiscoveryConfigurationParameters.SORT.COUNT))
+                                                        DiscoveryConfigurationParameters.SORT.COUNT, "prefix"))
         ));
     }
 
     @Test(expected = InvalidSearchFacetException.class)
     public void testInvalidSearchFacet() throws Exception {
-        queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration, query,
+        queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration, null, query,
                                      Arrays.asList(searchFilter), "item", page, "test");
     }
 
