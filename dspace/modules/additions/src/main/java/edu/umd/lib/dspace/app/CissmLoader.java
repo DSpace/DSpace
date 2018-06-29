@@ -254,7 +254,7 @@ public class CissmLoader implements ElementHandler {
       // Setup the context
       context = new Context();
       context.setCurrentUser(cissmeperson);
-      context.ignoreAuthorization();
+      context.turnOffAuthorisationSystem();
 
       // Create a new Item, started in a workspace
       WorkspaceItem wi = workspaceItemService.create(context, cissmcollection, false);
