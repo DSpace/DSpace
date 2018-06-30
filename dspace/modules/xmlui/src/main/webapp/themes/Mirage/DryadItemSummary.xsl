@@ -88,7 +88,7 @@
                     </xsl:call-template>
                 </div>
             </xsl:when>
-            <xsl:when test="contains($meta[@element='request'][@qualifier='URI'], 'workflow')">
+            <xsl:when test="contains($meta[@element='request'][@qualifier='queryString'], 'reviewStep')">
                 <!-- publication header -->
                 <div class="publication-header">
                     <xsl:call-template name="publication-header">
