@@ -2,18 +2,18 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.converter.query;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.query.RestSearchOperator;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class SearchQueryConverter {
 
