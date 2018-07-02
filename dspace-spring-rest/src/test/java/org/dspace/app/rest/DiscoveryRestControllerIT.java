@@ -209,9 +209,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.name", is("author")))
                 //The facetType has to be 'text' because that's how the author facet is configured by default
                 .andExpect(jsonPath("$.facetType", is("text")))
-                //Because we've constructed such a structure so that we have more than 2 (size) authors, there
-                // needs to be a next link
-                .andExpect(jsonPath("$._links.next.href", containsString("api/discover/facets/author?prefix=smith&page")))
+                //We only request value starting with "smith", so we expect to only receive one page
+                .andExpect(jsonPath("$._links.next").doesNotExist())
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("api/discover/facets/author?prefix=smith")))
                 //Because there are more authors than is represented (because of the size param), hasMore has to
