@@ -276,8 +276,11 @@ public class XOAI {
             while (iterator.hasNext()) {
                 try {
                     Item item = iterator.next();
-                    
-                    server.add(this.index(item));
+                    if (item.getHandle() == null) {
+                        log.warn("Skipped item without handle: " + item.getID());
+                    } else {
+                        server.add(this.index(item));
+                    }
                     context.uncacheEntity(item);
 
                 } catch (SQLException | MetadataBindException | ParseException | XMLStreamException
