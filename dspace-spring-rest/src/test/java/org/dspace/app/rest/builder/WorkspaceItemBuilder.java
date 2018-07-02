@@ -15,16 +15,13 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
 /**
- * Builder to construct Item objects
+ * Builder to construct WorkspaceItem objects
  *
- * @author Tom Desair (tom dot desair at atmire dot com)
- * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
- */
+ **/
 public class WorkspaceItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     private WorkspaceItem workspaceItem;
     private Item item;
-    private Group readerGroup = null;
 
     protected WorkspaceItemBuilder(Context context) {
         super(context);
