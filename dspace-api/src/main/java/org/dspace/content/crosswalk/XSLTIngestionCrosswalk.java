@@ -24,6 +24,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.PackageUtils;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -71,18 +72,18 @@ public class XSLTIngestionCrosswalk
     }
 
     // apply metadata values returned in DIM to the target item.
-    private static void applyDim(Context context, List<Element> dimList, Item item, boolean createMissingMetadataFields)
+    private static void applyDim(Context context, List<Element> dimList, DSpaceObject dso, boolean createMissingMetadataFields)
             throws CrosswalkException, SQLException, AuthorizeException {
         for (Element elt : dimList)
         {
             if ("field".equals(elt.getName()) && DIM_NS.equals(elt.getNamespace()))
             {
-                applyDimField(context, elt, item, createMissingMetadataFields);
+                applyDimField(context, elt, dso, createMissingMetadataFields);
             }
             else if ("dim".equals(elt.getName()) && DIM_NS.equals(elt.getNamespace()))
             {
                 // if it's a <dim> container, apply its guts
-                applyDim(context, elt.getChildren(), item, createMissingMetadataFields);
+                applyDim(context, elt.getChildren(), dso, createMissingMetadataFields);
             }
             else
             {
@@ -93,7 +94,7 @@ public class XSLTIngestionCrosswalk
     }
 
     // adds the metadata element from one <field>
-    private static void applyDimField(Context context, Element field, Item item, boolean createMissingMetadataFields) throws CrosswalkException, SQLException, AuthorizeException {
+    private static void applyDimField(Context context, Element field, DSpaceObject dso, boolean createMissingMetadataFields) throws CrosswalkException, SQLException, AuthorizeException {
         String schema = field.getAttributeValue("mdschema");
         String element = field.getAttributeValue("element");
         String qualifier = field.getAttributeValue("qualifier");
@@ -110,16 +111,17 @@ public class XSLTIngestionCrosswalk
             qualifier = null;
         }
 
+        DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         if ((authority != null && authority.length() > 0) ||
             (sconf != null && sconf.length() > 0))
         {
             int confidence = (sconf != null && sconf.length() > 0) ?
                     Choices.getConfidenceValue(sconf) : Choices.CF_UNSET;
-            itemService.addMetadata(context, item, metadataField, lang, field.getText(), authority, confidence);
+            dsoService.addMetadata(context, dso, metadataField, lang, field.getText(), authority, confidence);
         }
         else
         {
-            itemService.addMetadata(context, item, metadataField, lang, field.getText());
+            dsoService.addMetadata(context, dso, metadataField, lang, field.getText());
         }
     }
 
@@ -237,56 +239,12 @@ public class XSLTIngestionCrosswalk
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
-        int type = dso.getType();
-        if (type == Constants.ITEM)
-        {
-            Item item = (Item)dso;
-            applyDim(context, fields, item, createMissingMetadataFields);
+        switch (dso.getType()) {
+            case Constants.COMMUNITY:
+            case Constants.COLLECTION:
+            case Constants.ITEM:
+                applyDim(context, fields, dso, createMissingMetadataFields);
         }
-        else if (type == Constants.COLLECTION ||
-                 type == Constants.COMMUNITY)
-        {
-            for (Element field : fields)
-            {
-                String schema = field.getAttributeValue("mdschema");
-                if ("dim".equals(field.getName()) && DIM_NS.equals(field.getNamespace()))
-                {
-                    ingestDIM(context, dso, field.getChildren(), createMissingMetadataFields);
-                }
-                else if ("field".equals(field.getName()) &&
-                        DIM_NS.equals(field.getNamespace()) &&
-                    schema != null && "dc".equals(schema))
-                {
-                    String md = getMetadataForDIM(field);
-                    if (md == null)
-                    {
-                        log.warn("Cannot map to Coll/Comm metadata field, DIM element=" +
-                                field.getAttributeValue("element") + ", qualifier=" + field.getAttributeValue("qualifier"));
-                    }
-                    else
-                    {
-                        if (type == Constants.COLLECTION)
-                        {
-                            collectionService.setMetadata(context, (Collection) dso, md, field.getText());
-                        }
-                        else
-                        {
-                            communityService.setMetadata(context, (Community) dso, md, field.getText());
-                        }
-                    }
-                }
-
-                else
-                {
-                    log.warn("ignoring unrecognized DIM element: " + field.toString());
-                }
-            }
-        }
-        else
-        {
-            throw new CrosswalkObjectNotSupported("XsltSubmissionionCrosswalk can only crosswalk to an Item.");
-        }
-
     }
 
 

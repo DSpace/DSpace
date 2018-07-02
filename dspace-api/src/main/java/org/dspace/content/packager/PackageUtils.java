@@ -720,52 +720,12 @@ public class PackageUtils
     public static void clearAllMetadata(Context context, DSpaceObject dso)
             throws SQLException, IOException, AuthorizeException
     {
-        //If we are dealing with an Item
-        if(dso.getType()==Constants.ITEM)
-        {
-            Item item = (Item) dso;
-            //clear all metadata entries
-            itemService.clearMetadata(context, item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        }
-        //Else if collection, clear its database table values
-        else if (dso.getType()==Constants.COLLECTION)
-        {
-            Collection collection = (Collection) dso;
-
-            // Use the MetadataToDC map (defined privately in this class)
-            // to clear out all the Collection database fields.
-            for(String dbField : ccMetadataToDC.keySet())
-            {
-                try
-                {
-                    collectionService.setMetadata(context, collection, dbField, null);
-                }
-                catch(IllegalArgumentException ie)
-                {
-                    // ignore the error -- just means the field doesn't exist in DB
-                    // Communities & Collections don't include the exact same metadata fields
-                }
-            }
-        }
-        //Else if community, clear its database table values
-        else if (dso.getType()==Constants.COMMUNITY)
-        {
-            Community community = (Community) dso;
-
-            // Use the MetadataToDC map (defined privately in this class)
-            // to clear out all the Community database fields.
-            for(String dbField : ccMetadataToDC.keySet())
-            {
-                try
-                {
-                    communityService.setMetadata(context, community, dbField, null);
-                }
-                catch(IllegalArgumentException ie)
-                {
-                    // ignore the error -- just means the field doesn't exist in DB
-                    // Communities & Collections don't include the exact same metadata fields
-                }
-            }
+        switch (dso.getType()) {
+            case Constants.ITEM:
+            case Constants.COLLECTION:
+            case Constants.COMMUNITY:
+                DSpaceObjectService dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
+                dsoService.clearMetadata(context, dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         }
     }
 
