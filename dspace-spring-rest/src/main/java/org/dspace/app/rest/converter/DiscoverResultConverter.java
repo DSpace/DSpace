@@ -13,6 +13,7 @@ import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
@@ -164,9 +165,12 @@ public class DiscoverResultConverter {
             Sort.Order order = page.getSort().iterator().next();
             resultsRest.setSort(order.getProperty(), order.getDirection().name());
         }
+        SearchQueryConverter searchQueryConverter = new SearchQueryConverter();
+        List<SearchFilter> transformedFilters = searchQueryConverter.convert(searchFilters);
+
         SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter =
             new SearchFilterToAppliedFilterConverter();
-        for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
+        for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(transformedFilters)) {
 
             resultsRest
                 .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
