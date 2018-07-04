@@ -15,6 +15,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.exception.InvalidDSpaceObjectTypeException;
 import org.dspace.app.rest.exception.InvalidRequestException;
 import org.dspace.app.rest.exception.InvalidSearchFacetException;
@@ -285,8 +286,10 @@ public class DiscoverQueryBuilder implements InitializingBean {
                                     List<SearchFilter> searchFilters) throws InvalidSearchFilterException {
         ArrayList<String> filterQueries = new ArrayList<>(CollectionUtils.size(searchFilters));
 
+        SearchQueryConverter searchQueryConverter = new SearchQueryConverter();
+        List<SearchFilter> transformedFilters = searchQueryConverter.convert(searchFilters);
         try {
-            for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
+            for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(transformedFilters)) {
                 DiscoverySearchFilter filter = discoveryConfiguration.getSearchFilter(searchFilter.getName());
                 if (filter == null) {
                     throw new InvalidSearchFilterException(searchFilter.getName() + " is not a valid search filter");

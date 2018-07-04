@@ -7,14 +7,14 @@
  */
 package org.dspace.app.rest.converter.query;
 
-import org.dspace.app.rest.parameter.SearchFilter;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import org.dspace.app.rest.parameter.SearchFilter;
+import org.junit.Before;
+import org.junit.Test;
 
 public class SearchQueryConverterTest {
 
@@ -22,12 +22,12 @@ public class SearchQueryConverterTest {
 
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         searchQueryConverter = new SearchQueryConverter();
     }
 
     @Test
-    public void convertAuthorContainsSearchFilterTest(){
+    public void convertAuthorContainsSearchFilterTest() {
         SearchFilter searchFilter = new SearchFilter("author", "query", "test*");
         List<SearchFilter> list = new LinkedList<>();
         list.add(searchFilter);
@@ -42,7 +42,7 @@ public class SearchQueryConverterTest {
     }
 
     @Test
-    public void convertAuthorNotContainsSearchFilterTest(){
+    public void convertAuthorNotContainsSearchFilterTest() {
         SearchFilter searchFilter = new SearchFilter("author", "query", "-test*");
         List<SearchFilter> list = new LinkedList<>();
         list.add(searchFilter);
@@ -57,7 +57,7 @@ public class SearchQueryConverterTest {
     }
 
     @Test
-    public void convertAuthorEqualsSearchFilterTest(){
+    public void convertAuthorEqualsSearchFilterTest() {
         SearchFilter searchFilter = new SearchFilter("author", "query", "test");
         List<SearchFilter> list = new LinkedList<>();
         list.add(searchFilter);
@@ -72,7 +72,7 @@ public class SearchQueryConverterTest {
     }
 
     @Test
-    public void convertAuthorNotEqualsSearchFilterTest(){
+    public void convertAuthorNotEqualsSearchFilterTest() {
         SearchFilter searchFilter = new SearchFilter("author", "query", "-test");
         List<SearchFilter> list = new LinkedList<>();
         list.add(searchFilter);
@@ -87,7 +87,7 @@ public class SearchQueryConverterTest {
     }
 
     @Test
-    public void convertAuthorAuthoritySearchFilterTest(){
+    public void convertAuthorAuthoritySearchFilterTest() {
         SearchFilter searchFilter = new SearchFilter("author", "query", "id:test");
         List<SearchFilter> list = new LinkedList<>();
         list.add(searchFilter);
@@ -102,7 +102,7 @@ public class SearchQueryConverterTest {
     }
 
     @Test
-    public void convertAuthorNotAuthoritySearchFilterTest(){
+    public void convertAuthorNotAuthoritySearchFilterTest() {
         SearchFilter searchFilter = new SearchFilter("author", "query", "-id:test");
         List<SearchFilter> list = new LinkedList<>();
         list.add(searchFilter);

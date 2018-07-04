@@ -35,8 +35,8 @@ public enum RestSearchOperator {
     }
 
     public static RestSearchOperator forQuery(String query) {
-        for(RestSearchOperator op : RestSearchOperator.values()) {
-            if(op.getRegex().matcher(query).matches()) {
+        for (RestSearchOperator op : RestSearchOperator.values()) {
+            if (op.getRegex().matcher(query).matches()) {
                 return op;
             }
         }

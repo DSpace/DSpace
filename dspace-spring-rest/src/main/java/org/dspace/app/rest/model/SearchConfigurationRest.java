@@ -116,6 +116,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         public static final String OPERATOR_NOTAUTHORITY = "notauthority";
         public static final String OPERATOR_CONTAINS = "contains";
         public static final String OPERATOR_NOTCONTAINS = "notcontains";
+        public static final String OPERATOR_QUERY = "query";
 
         public boolean isHasFacets() {
             return hasFacets;
@@ -171,6 +172,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
             operators.add(new Operator(OPERATOR_NOTAUTHORITY));
             operators.add(new Operator(OPERATOR_CONTAINS));
             operators.add(new Operator(OPERATOR_NOTCONTAINS));
+            operators.add(new Operator(OPERATOR_QUERY));
         }
 
         @Override
