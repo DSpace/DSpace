@@ -1386,7 +1386,7 @@ public class FlowUtils {
     }
 
     // returns the table cell that actions should be rendered in
-    public static Cell renderDatasetItem(Context context, Table table, org.dspace.content.Item dataset, InProgressSubmission wsDataset) throws WingException, SQLException {
+    public static Cell renderDatasetItem(Context context, Table table, Item dataset) throws WingException, SQLException {
         // first row: buttons, title
         Row row = table.addRow("dataset-row-top", null, "dataset-row-top");
         Cell finalActionCell = row.addCell("dataset-action",null, 0, 0, "dataset-action");

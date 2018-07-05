@@ -92,7 +92,7 @@ public class DryadReviewActionXMLUI extends AbstractXMLUIAction {
             InProgressSubmission wfi;
             wfi = WorkflowItem.findByItemId(context, dataset.getID());
             if(wfi != null){
-                 Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, dataset, wfi);
+                 Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, dataset);
                  Radio fileButtons = actionCell.addRadio("filestatus_" + dataset.getID(), "filestatus");
                  fileButtons.addOption(Choices.CF_ACCEPTED, "Keep");
                  fileButtons.addOption(Choices.CF_REJECTED, "Delete");
