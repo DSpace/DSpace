@@ -144,55 +144,54 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     enum OP {
         equals {
-            public Predicate buildPredicate(List<String> query_val, CriteriaBuilder criteriaBuilder, int i,
+            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
                                             Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.equal(subqueryRoot.get(MetadataValue_.value), query_val.get(i));
+                return criteriaBuilder.equal(subqueryRoot.get(MetadataValue_.value), val);
             }
         },
         not_equals {
-            public Predicate buildPredicate(List<String> query_val, CriteriaBuilder criteriaBuilder, int i,
+            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
                                             Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.notEqual(subqueryRoot.get(MetadataValue_.value), query_val.get(i));
+                return criteriaBuilder.notEqual(subqueryRoot.get(MetadataValue_.value), val);
             }
         },
         like {
-            public Predicate buildPredicate(List<String> query_val, CriteriaBuilder criteriaBuilder, int i,
+            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
                                             Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.like(subqueryRoot.get(MetadataValue_.value), query_val.get(i));
+                return criteriaBuilder.like(subqueryRoot.get(MetadataValue_.value), val);
             }
         },
         not_like {
-            public Predicate buildPredicate(List<String> query_val, CriteriaBuilder criteriaBuilder, int i,
+            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
                                             Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.notLike(subqueryRoot.get(MetadataValue_.value), query_val.get(i));
+                return criteriaBuilder.notLike(subqueryRoot.get(MetadataValue_.value), val);
             }
         },
         contains {
-            public Predicate buildPredicate(List<String> query_val, CriteriaBuilder criteriaBuilder, int i,
+            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
                                             Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.like(subqueryRoot.get(MetadataValue_.value), "%" + query_val.get(i) + "%");
+                return criteriaBuilder.like(subqueryRoot.get(MetadataValue_.value), "%" + val + "%");
             }
         },
         doesnt_contain {
-            public Predicate buildPredicate(List<String> query_val, CriteriaBuilder criteriaBuilder, int i,
+            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
                                             Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.notLike(subqueryRoot.get(MetadataValue_.value), "%" + query_val.get(i) + "%");
+                return criteriaBuilder.notLike(subqueryRoot.get(MetadataValue_.value), "%" + val + "%");
             }
         },
         exists {
-            public Predicate buildPredicate(List<String> query_val, CriteriaBuilder criteriaBuilder, int i,
+            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
                                             Root<MetadataValue> subqueryRoot) {
-                return OP.equals.buildPredicate(query_val, criteriaBuilder, i, subqueryRoot);
+                return OP.equals.buildPredicate(val, criteriaBuilder, subqueryRoot);
             }
         },
         doesnt_exist {
-            public Predicate buildPredicate(List<String> query_val, CriteriaBuilder criteriaBuilder, int i,
+            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
                                             Root<MetadataValue> subqueryRoot) {
-                return OP.not_equals.buildPredicate(query_val, criteriaBuilder, i, subqueryRoot);
+                return OP.not_equals.buildPredicate(val, criteriaBuilder, subqueryRoot);
             }
         };
-
-        public abstract Predicate buildPredicate(List<String> query_val, CriteriaBuilder criteriaBuilder, int i,
+        public abstract Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
                                                  Root<MetadataValue> subqueryRoot);
     }
 
@@ -201,7 +200,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit) throws SQLException {
 
-        //TODO Check Tim Donohue's comment on this method.
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
         Root<Item> itemRoot = criteriaQuery.from(Item.class);
@@ -236,8 +234,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                     criteriaBuilder.isTrue(subqueryRoot.get(MetadataValue_.metadataField).in(listFieldList.get(i))));
             }
 
-            //TODO query_val weg naar val en i weg
-            predicateListSubQuery.add(op.buildPredicate(query_val, criteriaBuilder, i, subqueryRoot));
+            predicateListSubQuery.add(op.buildPredicate(query_val.get(i), criteriaBuilder, subqueryRoot));
 
             subquery.where(predicateListSubQuery.toArray(new Predicate[] {}));
             predicateList.add(criteriaBuilder.isTrue(itemRoot.get(Item_.id).in(subquery)));
