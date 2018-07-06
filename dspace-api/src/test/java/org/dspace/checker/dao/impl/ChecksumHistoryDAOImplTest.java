@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import javax.persistence.Query;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.checker.ChecksumResultCode;
@@ -23,7 +24,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.CoreHelpers;
 import org.dspace.core.HibernateDBConnection;
-import javax.persistence.Query;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
