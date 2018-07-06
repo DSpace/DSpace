@@ -1298,12 +1298,12 @@ it, please enter the types and the actual numbers or codes.</hint>
        <stored-value>Anonymous</stored-value>
      </pair>
      <pair>
-       <displayed-value>Initiate</displayed-value>
-       <stored-value>initiate</stored-value>
+       <displayed-value>First Membership</displayed-value>
+       <stored-value>First Membership</stored-value>
      </pair>
      <pair>
-       <displayed-value>Master</displayed-value>
-       <stored-value>master</stored-value>
+       <displayed-value>Second Membership</displayed-value>
+       <stored-value>Second Membership</stored-value>
      </pair>
      
    	</value-pairs>
