@@ -22,6 +22,9 @@
         <property name="awsAccessKey" value=""/>
         <property name="awsSecretKey" value=""/>
 
+        <!-- Alternative endpoint URL for use with alternative S3 implementations. -->
+        <property name="awsEndpoint" value=""/>
+
         <!-- S3 bucket name to store assets in. example: longsight-dspace-auk -->
         <property name="bucketName" value=""/>
 

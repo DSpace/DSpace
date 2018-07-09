@@ -12,12 +12,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -36,6 +39,8 @@ import org.springframework.beans.factory.annotation.Required;
 /**
  * Asset store using Amazon's Simple Storage Service (S3).
  * S3 is a commercial, web-service accessible, remote storage facility.
+ * The S3 API is implemented by contributors (like Ceph). You can use
+ * alternative implementations by offering an endpoint URL.
  * NB: you must have obtained an account with Amazon to use this store
  *
  * @author Richard Rodgers, Peter Dietz
@@ -54,6 +59,7 @@ public class S3BitStoreService implements BitStoreService {
 
     private String awsAccessKey;
     private String awsSecretKey;
+    private String awsEndpoint;
     private String awsRegionName;
 
     /**
@@ -87,8 +93,20 @@ public class S3BitStoreService implements BitStoreService {
         }
 
         // init client
-        AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
-        s3Service = new AmazonS3Client(awsCredentials);
+        System.setProperty("aws.accessKeyId", getAwsAccessKey());
+        System.setProperty("aws.secretKey", getAwsSecretKey());
+        if (StringUtils.isEmpty(awsEndpoint)) {
+            s3Service = AmazonS3ClientBuilder.standard()
+                    .build();
+        } else {
+            ClientConfiguration clientConfiguration = new ClientConfiguration();
+            clientConfiguration.setSignerOverride("S3SignerType");
+            s3Service = AmazonS3ClientBuilder.standard()
+                    .withClientConfiguration(clientConfiguration)
+                    .withPathStyleAccessEnabled(true)
+                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsEndpoint, null))
+                    .build();
+        }
 
         // bucket name
         if (StringUtils.isEmpty(bucketName)) {
@@ -276,6 +294,15 @@ public class S3BitStoreService implements BitStoreService {
     @Required
     public void setAwsSecretKey(String awsSecretKey) {
         this.awsSecretKey = awsSecretKey;
+    }
+
+    public String getAwsEndpoint() {
+        return awsEndpoint;
+    }
+
+    @Required
+    public void setAwsEndpoint(String awsEndpoint) {
+        this.awsEndpoint = awsEndpoint;
     }
 
     public String getAwsRegionName() {
