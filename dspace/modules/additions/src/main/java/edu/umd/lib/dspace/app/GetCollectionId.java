@@ -22,7 +22,7 @@ public class GetCollectionId
     {
       // Setup the context
       Context context = new Context();
-      context.ignoreAuthorization();
+      context.turnOffAuthorisationSystem();
 
       try {
 	// Get the list of all collections

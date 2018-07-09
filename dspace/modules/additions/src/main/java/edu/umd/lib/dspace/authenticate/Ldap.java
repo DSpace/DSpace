@@ -284,10 +284,10 @@ public class Ldap {
    * get all instances of an attribute.
    */
 
-  public List getAttributeAll(String strName)
+  public List<String> getAttributeAll(String strName)
   throws NamingException
   {
-    Vector vRet = new Vector();
+    List<String> attributes = new ArrayList<>();
 
     if (entry != null) {
       Attributes as = entry.getAttributes();
@@ -297,12 +297,12 @@ public class Ldap {
         NamingEnumeration e = a.getAll();
 
         while (e.hasMore()) {
-          vRet.add((String)e.next());
+            attributes.add((String)e.next());
         }
       }
     }
 
-    return vRet;
+    return attributes;
   }
 
 
@@ -376,7 +376,7 @@ public class Ldap {
    * organization units
    */
 
-  public List getUnits()
+  public List<String> getUnits()
   throws NamingException
   {
     return getAttributeAll("ou");

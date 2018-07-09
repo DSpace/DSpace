@@ -768,10 +768,10 @@ public class EtdLoader
      * Get additional mapped collections.
      */
 
-    public static Set getCollections(Context context, Document meta)
+    public static Set<Collection> getCollections(Context context, Document meta)
             throws Exception
     {
-        Set sCollections = new HashSet();
+        Set<Collection> collections = new HashSet<>();
 
         log.debug("Looking for mapped collections");
 
@@ -796,15 +796,10 @@ public class EtdLoader
             }
             else
             {
-                for (Iterator j = Arrays.asList(etdunit.getCollections())
-                        .iterator(); j.hasNext();)
-                {
-                    sCollections.add(j.next());
-                }
+                collections.addAll(etdunit.getCollections());
             }
         }
-
-        return sCollections;
+        return collections;
     }
 
     /*********************************************************** getEmbargo */
@@ -926,7 +921,7 @@ public class EtdLoader
             // Setup the context
             context = new Context();
             context.setCurrentUser(etdeperson);
-            context.ignoreAuthorization();
+            context.turnOffAuthorisationSystem();
 
             // Read the ETD metadata
             ZipEntry ze = (ZipEntry) files.get(1);
