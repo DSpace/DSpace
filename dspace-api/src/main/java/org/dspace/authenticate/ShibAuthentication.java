@@ -272,7 +272,7 @@ public class ShibAuthentication implements AuthenticationMethod {
      *
      * The values extracted (a user may have multiple roles) will be used to look
      * up which groups to place the user into. The groups are defined as
-     * {@code authentication.shib.role.<role-name>} which is a comma separated list of
+     * {@code authentication-shibboleth.role.<role-name>} which is a comma separated list of
      * DSpace groups.
      *
      * @param context A valid DSpace context.
@@ -312,10 +312,10 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             if (ignoreScope && ignoreValue) {
                 throw new IllegalStateException(
-                    "Both config parameters for ignoring an roll attributes scope and value are turned on, this is " +
-                        "not a permissable configuration. (Note: ignore-scope defaults to true) The configuration " +
-                        "parameters are: 'authentication.shib.role-header.ignore-scope' and 'authentication.shib" +
-                        ".role-header.ignore-value'");
+                    "Both config parameters for ignoring role attributes scope and value are turned on, this is " +
+                        "not a permissible configuration. (Note: ignore-scope defaults to true) The configuration " +
+                        "parameters are: 'authentication-shibboleth.role-header.ignore-scope' and " +
+                        "'authentication-shibboleth.role-header.ignore-value'");
             }
 
             // Get the Shib supplied affiliation or use the default affiliation
@@ -326,8 +326,7 @@ public class ShibAuthentication implements AuthenticationMethod {
                 }
                 log.debug(
                     "Failed to find Shibboleth role header, '" + roleHeader + "', falling back to the default roles: " +
-                        "'" + StringUtils
-                        .join(defaultRoles, ",") + "'");
+                        "'" + StringUtils.join(defaultRoles, ",") + "'");
             } else {
                 log.debug("Found Shibboleth role header: '" + roleHeader + "' = '" + affiliations + "'");
             }
@@ -352,18 +351,45 @@ public class ShibAuthentication implements AuthenticationMethod {
                     }
 
                     // Get the group names
-                    String[] groupNames = configurationService
-                        .getArrayProperty("authentication-shibboleth.role." + affiliation);
-                    if (groupNames == null || groupNames.length == 0) {
-                        groupNames = configurationService
-                            .getArrayProperty("authentication-shibboleth.role." + affiliation.toLowerCase());
+                    List<String> groupNames = new ArrayList<String>();
+
+                    {   // get group names according to the affiliation as prepared above according to
+                        // ignoreScope and ignoreValue
+                        String[] groupNamesTmp = getGroupNames(affiliation);
+                        if (groupNamesTmp != null) {
+                            groupNames.addAll(Arrays.asList(groupNamesTmp));
+                        }
                     }
 
-                    if (groupNames == null) {
+                    // look for special group assignments based on value-only, then scope-only, if configuration
+                    // does not ignore scope, nor value, and there is @ present in the affiliation string
+                    if (!ignoreScope && !ignoreValue) {
+                        int index = affiliation.indexOf('@');
+                        if (index != -1) {
+                            // Note that special group assignments are configured including @ sign,
+                            // i.e. role.value@ or role.@scope, so we preserve @ here.
+                            String affiliationValueSpecial = affiliation.substring(0, index + 1);
+                            String affiliationScopeSpecial = affiliation.substring(index, affiliation.length());
+
+                            String[] groupNamesTmp;
+
+                            groupNamesTmp = getGroupNames(affiliationValueSpecial);
+                            if (groupNamesTmp != null) {
+                                groupNames.addAll(Arrays.asList(groupNamesTmp));
+                            }
+
+                            groupNamesTmp = getGroupNames(affiliationScopeSpecial);
+                            if (groupNamesTmp != null) {
+                                groupNames.addAll(Arrays.asList(groupNamesTmp));
+                            }
+                        }
+                    }
+
+                    if (groupNames.size() == 0) {
                         log.debug(
                             "Unable to find role mapping for the value, '" + affiliation + "', there should be a " +
-                                "mapping in config/modules/authentication-shibboleth.cfg:  role." + affiliation + " =" +
-                                " <some group name>");
+                                "mapping in config/modules/authentication-shibboleth.cfg: " +
+                                "authentication-shibboleth.role." + affiliation + " = <some group name>");
                         continue;
                     } else {
                         log.debug(
@@ -371,19 +397,18 @@ public class ShibAuthentication implements AuthenticationMethod {
                     }
 
                     // Add each group to the list.
-                    for (int i = 0; i < groupNames.length; i++) {
+                    for (String groupName : groupNames) {
                         try {
-                            Group group = groupService.findByName(context, groupNames[i].trim());
+                            Group group = groupService.findByName(context, groupName.trim());
                             if (group != null) {
                                 groups.add(group);
                             } else {
-                                log.debug("Unable to find group: '" + groupNames[i].trim() + "'");
+                                log.debug("Unable to find group: '" + groupName.trim() + "'");
                             }
                         } catch (SQLException sqle) {
                             log.error(
                                 "Exception thrown while trying to lookup affiliation role for group name: '" +
-                                    groupNames[i]
-                                        .trim() + "'", sqle);
+                                    groupName.trim() + "'", sqle);
                         }
                     } // for each groupNames
                 } // foreach affiliations
@@ -403,11 +428,31 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             return new ArrayList<>(groups);
         } catch (Throwable t) {
-            log.error("Unable to validate any sepcial groups this user may belong too because of an exception.", t);
+            log.error("Unable to validate any special groups this user may belong to because of an exception.", t);
             return ListUtils.EMPTY_LIST;
         }
     }
 
+
+    /**
+     * Retrieves the special group assignment from the configuration based on the scoped affiliation.
+     *
+     * First, there is a case sensitive search, but in case no group names found in the config file,
+     * this falls back to lowercase searching.
+     *
+     * @param affiliation affiliation value to look up the special groups by.
+     *
+     * @return array of special group names
+     */
+    private String[] getGroupNames(String affiliation) {
+        String[] groupNames = configurationService.getArrayProperty("authentication-shibboleth.role." + affiliation);
+        if (groupNames == null || groupNames.length == 0) {
+            groupNames = configurationService.getArrayProperty("authentication-shibboleth.role." +
+                affiliation.toLowerCase());
+        }
+
+        return groupNames;
+    }
 
     /**
      * Indicate whether or not a particular self-registering user can set
@@ -971,14 +1016,14 @@ public class ShibAuthentication implements AuthenticationMethod {
 
         // Bail out if not set, returning an empty map.
         if (mappingString == null || mappingString.length == 0) {
-            log.debug("No additional eperson metadata mapping found: authentication.shib.eperson.metadata");
+            log.debug("No additional eperson metadata mapping found: authentication-shibboleth.eperson.metadata");
 
             metadataHeaderMap = map;
             return;
         }
 
-        log.debug("Loading additional eperson metadata from: 'authentication.shib.eperson.metadata' = '" + StringUtils
-            .join(mappingString, ",") + "'");
+        log.debug("Loading additional eperson metadata from: 'authentication-shibboleth.eperson.metadata' = '" +
+            StringUtils.join(mappingString, ",") + "'");
 
 
         for (String metadataString : mappingString) {
