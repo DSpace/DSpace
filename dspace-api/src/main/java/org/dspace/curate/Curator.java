@@ -7,22 +7,28 @@
  */
 package org.dspace.curate;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
-
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
-
-import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+
+import javax.mail.MessagingException;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Curator orchestrates and manages the application of a one or more curation
@@ -55,7 +61,9 @@ public class Curator
     private static final Logger log = Logger.getLogger(Curator.class);
     
     protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<>();
-    
+
+    protected boolean sendEmailAlert;
+    protected Map<String, String> report = new HashMap<>();
     protected Map<String, TaskRunner> trMap = new HashMap<>();
     protected List<String> perfList = new ArrayList<>();
     protected TaskQueue taskQ = null;
@@ -66,6 +74,7 @@ public class Curator
     protected CommunityService communityService;
     protected ItemService itemService;
     protected HandleService handleService;
+    protected ConfigurationService configurationService;
 
     /**
      * No-arg constructor
@@ -75,6 +84,8 @@ public class Curator
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
+        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        sendEmailAlert = configurationService.getBooleanProperty("curate.email.report", true);
     }
 
     /**
@@ -188,6 +199,25 @@ public class Curator
      */
     public void curate(Context c, String id) throws IOException
     {
+        curate(c, id, null);
+    }
+
+    /**
+     * Performs all configured tasks upon object identified by id. If
+     * the object can be resolved as a handle, the DSO will be the
+     * target object.
+     *
+     * <p>
+     * Note:  this method has the side-effect of setting this instance's Context
+     * reference.  The setting is retained on return.
+     *
+     * @param c a DSpace context
+     * @param id an object identifier
+     * @param epersonEmail additional alert recipient
+     * @throws IOException if IO error
+     */
+    public void curate(Context c, String id, String epersonEmail) throws IOException
+    {
         if (id == null)
         {
            throw new IOException("Cannot perform curation task(s) on a null object identifier!");            
@@ -217,6 +247,7 @@ public class Curator
             		ctx.complete();
             	}
             }
+            sendEmailAlert(c, dso, epersonEmail);
         }
         catch (SQLException sqlE)
         {
@@ -234,7 +265,7 @@ public class Curator
      * <P>
      * Note: Site-wide tasks will default to running as
      * an Anonymous User unless you call the Site-wide task
-     * via the {@link curate(Context,String)} or
+     * via the {@link #curate(Context, String)} or
      * {@link #curate(Context, DSpaceObject)} method with an
      * authenticated Context object.
      *
@@ -331,8 +362,15 @@ public class Curator
      * 
      * @param message the message to output to the reporting stream.
      */
-    public void report(String message)
+    public void report(String message, String taskId)
     {
+        String taskReport = report.get(taskId);
+        if (taskReport == null) {
+            taskReport = "";
+        }
+        taskReport += message;
+        report.put(taskId, taskReport);
+
         // Stub for now
         if ("-".equals(reporter))
         {
@@ -541,6 +579,148 @@ public class Curator
                 curCtx.dispatchEvents();
             }
     	}
+    }
+
+    /**
+     * Sends out an email alert with the information reported to the Curator. Reports are sent to the email
+     * configured by {@code curate.email.recipient}, the Context object's current EPerson, and the EPerson
+     * passed to this function.
+     *
+     * @param c a DSpace Context
+     * @param dso the processed DSpace object
+     * @param epersonEmail additional alert recipient
+     * @throws IOException
+     */
+    private void sendEmailAlert(Context c, DSpaceObject dso, String epersonEmail) throws IOException
+    {
+        if (!sendEmailAlert)
+        {
+            return;
+        }
+
+        List<String> recipients = new ArrayList<>();
+        HashMap<String, String> map = new HashMap<>();
+
+        for (String name : configurationService.getArrayProperty("curate.ui.tasknames"))
+        {
+            String[] taskName = name.split("=");
+            map.put(taskName[0].trim(), taskName[1].trim());
+        }
+
+        String alertRecipient = configurationService.getProperty("curate.email.recipient");
+        if (alertRecipient != null && EmailValidator.getInstance().isValid(alertRecipient))
+        {
+            log.debug("Curation Email: adding " + alertRecipient);
+            recipients.add(alertRecipient);
+        }
+
+        if (c != null && c.getCurrentUser() != null &&
+            EmailValidator.getInstance().isValid(c.getCurrentUser().getEmail()))
+        {
+            log.debug("Curation Email: adding " + c.getCurrentUser().getEmail());
+            recipients.add(c.getCurrentUser().getEmail());
+        }
+
+        if (epersonEmail != null && EmailValidator.getInstance().isValid(epersonEmail))
+        {
+            log.debug("Curation Email: adding " + epersonEmail);
+            recipients.add(epersonEmail);
+        }
+
+        /*
+         Curation Task Executed: {0}
+         Target Resource: {1}
+         Outcome: {2}
+         Report: {3}
+        */
+        log.debug("Curation Email: adding report");
+        Set<String> keys = this.trMap.keySet();
+        for (String key : keys)
+        {
+            String taskReport = report.get(key);
+            if (StringUtils.isNotBlank(taskReport) || configurationService.getBooleanProperty("curate.email.report.if-blank", false))
+            {
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "curation_report"));
+
+                for(String recipient : recipients)
+                {
+                    email.addRecipient(recipient);
+                }
+
+                /* Curation Task Executed: {0} */
+                if (map.get(key) != null)
+                {
+                    email.addArgument(map.get(key));
+                }
+                else
+                {
+                    email.addArgument(key);
+                }
+
+                /* Target Resource: {1} */
+                email.addArgument(dso != null ? dso.getHandle() : "Entire Repository");
+
+                /* Outcome: {2} */
+                int status = getStatus(key);
+                switch (status)
+                {
+                    case CURATE_NOTASK:
+                        email.addArgument("Curator Tools unable to find requested task");
+                        break;
+                    case CURATE_UNSET:
+                        email.addArgument("No assigned status code - typically because task not yet performed");
+                        break;
+                    case CURATE_ERROR:
+                        email.addArgument("Task encountered a error in processing");
+                        break;
+                    case CURATE_SUCCESS:
+                    case CURATE_SKIP:
+                        email.addArgument("Task completed successfully");
+                        break;
+                    case CURATE_FAIL:
+                        email.addArgument("Task failed");
+                        break;
+                    default:
+                        email.addArgument("Unknown status Code: " + status);
+                        break;
+                }
+
+                /* Report: {3} */
+                if (StringUtils.isNotBlank(taskReport))
+                {
+                    email.addArgument(taskReport);
+                }
+                else
+                {
+                    email.addArgument("Nothing to report");
+                }
+
+                try
+                {
+                    email.send();
+                }
+                catch (MessagingException e)
+                {
+                    throw new IOException(e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Turns off email alerts (regardless of configuration)
+     */
+    public void disableEmailAlert()
+    {
+        sendEmailAlert = false;
+    }
+
+    /**
+     * Turns on email alerts (regardless of configuration)
+     */
+    public void enableEmailAlert()
+    {
+        sendEmailAlert = true;
     }
 
     protected class TaskRunner
