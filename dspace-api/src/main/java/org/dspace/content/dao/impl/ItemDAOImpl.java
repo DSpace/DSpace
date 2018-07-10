@@ -241,7 +241,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         }
         criteriaQuery.where(predicateList.toArray(new Predicate[] {}));
 
-        return list(context, criteriaQuery, false, Item.class, offset, limit).iterator();
+        return list(context, criteriaQuery, false, Item.class, limit, offset).iterator();
     }
 
     @Override
