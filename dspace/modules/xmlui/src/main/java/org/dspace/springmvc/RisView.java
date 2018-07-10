@@ -120,7 +120,7 @@ public class RisView implements View {
 			builder.append("JF  - ").append(journalName).append(EOL);
 		}
 
-		builder.append("PB  - ").append("Dryad Data Repository").append(EOL);
+		builder.append("PB  - ").append("Dryad Digital Repository").append(EOL);
 
 		if (doi != null) {
 			builder.append("UR  - ");
