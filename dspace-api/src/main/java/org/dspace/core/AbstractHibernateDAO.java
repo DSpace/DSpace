@@ -21,8 +21,6 @@ import javax.persistence.criteria.Root;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Session;
 
-//import org.hibernate.query.Query;
-
 /**
  * Hibernate implementation for generic DAO interface.  Also includes additional
  * Hibernate calls that are commonly used.

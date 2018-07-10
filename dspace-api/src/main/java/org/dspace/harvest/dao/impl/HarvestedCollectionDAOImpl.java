@@ -158,7 +158,7 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
         return count(context, criteriaQuery, criteriaBuilder, harvestedCollectionRoot);
     }
 
-    protected CriteriaQuery getByStatusAndMinimalTypeCriteria(Context context, int status, int type, int limit)
+    protected CriteriaQuery getByStatusAndMinimalTypeCriteria(Context context, int status, int type)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
