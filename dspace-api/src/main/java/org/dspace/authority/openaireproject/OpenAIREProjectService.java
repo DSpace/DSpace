@@ -66,6 +66,9 @@ public class OpenAIREProjectService {
 			URIBuilder builder = new URIBuilder(OPENAIRE_SEARCH_PROJECT_ENDPOINT);
 			builder.setParameter(field, text);
 			builder.setParameter("format", "json");
+			builder.setParameter("size", String.valueOf(max));
+			builder.setParameter("page", String.valueOf((int) (start / max)) +1);
+			int offset = start % max;
 			URI uri = builder.build();
 			GetMethod method = null;
 			method = new GetMethod(uri.toASCIIString());
@@ -81,11 +84,10 @@ public class OpenAIREProjectService {
 			JSONObject obj = new JSONObject(responseBody);
 			Integer total = (Integer) obj.getJSONObject("response").getJSONObject("header").getJSONObject("total").get("$");
 			JSONObject results = obj.getJSONObject("response").getJSONObject("results");
-			JSONArray resultArray = results.getJSONArray("result");
+			JSONArray resultArray = results != null?results.getJSONArray("result"):new JSONArray();
 			 
 			max =  total.intValue() < max? total.intValue(): max;
-			for (int x = 0; x < max; x++) {
-				System.out.println(x);
+			for (int x = offset; x < resultArray.length(); x++) {
 				String funder = null;
 				String funding = null;
 				String code = null;
