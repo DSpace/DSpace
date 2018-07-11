@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -206,7 +207,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		    listObjects(request, response, objManager, false);
 		}
 		else if (reqPath.startsWith("/object/")) {
-		    getObject(reqPath, request.getQueryString(), response, objManager, le);
+		    getObject(request, reqPath, request.getQueryString(), response, objManager, le);
 		    String objid = reqPath.substring("/object/".length());
 		    log.info("logging request for object id= " + objid + " queryString=" + request.getQueryString());
 		    le.setEvent(DataOneLogger.EVENT_READ);
@@ -493,7 +494,9 @@ public class DataOneMN extends HttpServlet implements Constants {
     /**
        Retrieve a particular object from this Member Node.
     **/
-    private void getObject(String reqPath, String reqQueryString, HttpServletResponse response, ObjectManager objManager, LogEntry logent) throws ServletException, IOException {
+    private void getObject(HttpServletRequest request, String reqPath, String reqQueryString,
+                           HttpServletResponse response, ObjectManager objManager, LogEntry logent)
+        throws ServletException, IOException {
 	log.info("getObject()");
 	String idTimestamp = "";
 	String format = "";
@@ -525,14 +528,11 @@ public class DataOneMN extends HttpServlet implements Constants {
 		// locate the bitstream
 		Item item = objManager.getDSpaceItem(id);
 		Bitstream bitstream = objManager.getFirstBitstream(item);
-		
-		// send it to output stream
-		String mimeType = bitstream.getFormat().getMIMEType();
-		response.setContentType(mimeType);
-		log.debug("Setting data file MIME type to: " + mimeType);		
-		fileName = bitstream.getName();
-		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName);
-		objManager.writeBitstream(bitstream.retrieve(), response.getOutputStream());	
+
+                String redirectURL = "/bitstream/handle/" + item.getHandle() + "/" +
+                    URLEncoder.encode(bitstream.getName(), "UTF-8") + "?sequence=" + bitstream.getSequenceID();
+                log.debug("redirectURL = " + redirectURL);
+                response.sendRedirect(redirectURL);
 	    } else if(id.contains("format=d1rem")) {
 		logent.setIdentifier(id + idTimestamp);
 		// return a (dataONE format) resource map
