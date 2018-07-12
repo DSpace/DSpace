@@ -16,6 +16,7 @@ import org.apache.commons.lang3.CharEncoding;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -29,7 +30,7 @@ import org.dspace.core.Context;
 public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     private Collection collection;
-
+    
     protected CollectionBuilder(Context context) {
         super(context);
 
@@ -76,6 +77,20 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
             return handleException(e);
         }
         return collection;
+    }
+
+    public static Item createTemplateItem(final Context context, final Collection collection) {
+        CollectionBuilder builder = new CollectionBuilder(context);
+        return builder.create_template_item(collection);
+    }
+
+    private Item create_template_item(final Collection collection) {
+        try {
+            Item item = itemService.createTemplateItem(context, collection);
+            return item;
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     protected void cleanup() throws Exception {
