@@ -8,19 +8,20 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * RequestItem strategy to allow DSpace support team's helpdesk to receive requestItem request
+ * RequestItem strategy to allow DSpace support team's helpdesk to receive requestItem request.
  * With this enabled, then the Item author/submitter doesn't receive the request, but the helpdesk instead does.
  *
  * Failover to the RequestItemSubmitterStrategy, which means the submitter would get the request if there is no
@@ -30,23 +31,26 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Peter Dietz
  */
 public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
-
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(RequestItemHelpdeskStrategy.class);
-
     @Autowired(required = true)
     protected EPersonService ePersonService;
+
+    @Autowired(required = true)
+    private ConfigurationService configuration;
 
     public RequestItemHelpdeskStrategy() {
     }
 
     @Override
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item) throws SQLException {
-        boolean helpdeskOverridesSubmitter = ConfigurationManager
+    public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
+            throws SQLException {
+        boolean helpdeskOverridesSubmitter = configuration
             .getBooleanProperty("request.item.helpdesk.override", false);
-        String helpDeskEmail = ConfigurationManager.getProperty("mail.helpdesk");
+        String helpDeskEmail = configuration.getProperty("mail.helpdesk");
 
         if (helpdeskOverridesSubmitter && StringUtils.isNotBlank(helpDeskEmail)) {
-            return getHelpDeskPerson(context, helpDeskEmail);
+            List<RequestItemAuthor> authors = new ArrayList<>(1);
+            authors.add(getHelpDeskPerson(context, helpDeskEmail));
+            return authors;
         } else {
             //Fallback to default logic (author of Item) if helpdesk isn't fully enabled or setup
             return super.getRequestItemAuthor(context, item);

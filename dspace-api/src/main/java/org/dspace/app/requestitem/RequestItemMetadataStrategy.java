@@ -8,6 +8,7 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Try to look to an item metadata for the corresponding author name and email.
- * Failover to the RequestItemSubmitterStrategy
+ * Failover to the RequestItemSubmitterStrategy.
  *
  * @author Andrea Bollini
  */
@@ -36,29 +37,32 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
     }
 
     @Override
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
+    public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
         throws SQLException {
         if (emailMetadata != null) {
             List<MetadataValue> vals = itemService.getMetadataByMetadataString(item, emailMetadata);
             if (vals.size() > 0) {
-                String email = vals.iterator().next().getValue();
-                String fullname = null;
-                if (fullNameMetadata != null) {
-                    List<MetadataValue> nameVals = itemService.getMetadataByMetadataString(item, fullNameMetadata);
-                    if (nameVals.size() > 0) {
-                        fullname = nameVals.iterator().next().getValue();
+                List<RequestItemAuthor> authors = new ArrayList<>(vals.size());
+                for (MetadataValue datum : vals) {
+                    String email = datum.getValue();
+                    String fullname = null;
+                    if (fullNameMetadata != null) {
+                        List<MetadataValue> nameVals = itemService.getMetadataByMetadataString(item, fullNameMetadata);
+                        if (!nameVals.isEmpty()) {
+                            fullname = nameVals.get(0).getValue();
+                        }
                     }
-                }
 
-                if (StringUtils.isBlank(fullname)) {
-                    fullname = I18nUtil
-                        .getMessage(
-                            "org.dspace.app.requestitem.RequestItemMetadataStrategy.unnamed",
-                            context);
+                    if (StringUtils.isBlank(fullname)) {
+                        fullname = I18nUtil.getMessage(
+                                "org.dspace.app.requestitem.RequestItemMetadataStrategy.unnamed",
+                                context);
+                    }
+                    RequestItemAuthor author = new RequestItemAuthor(
+                            fullname, email);
+                    authors.add(author);
                 }
-                RequestItemAuthor author = new RequestItemAuthor(
-                    fullname, email);
-                return author;
+                return authors;
             }
         }
         return super.getRequestItemAuthor(context, item);

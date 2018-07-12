@@ -8,6 +8,7 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -19,6 +20,6 @@ import org.dspace.core.Context;
  * @author Andrea Bollini
  */
 public interface RequestItemAuthorExtractor {
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
+    public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
         throws SQLException;
 }
