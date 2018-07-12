@@ -30,7 +30,7 @@ import org.dspace.core.Context;
 public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     private Collection collection;
-    
+
     protected CollectionBuilder(Context context) {
         super(context);
 
