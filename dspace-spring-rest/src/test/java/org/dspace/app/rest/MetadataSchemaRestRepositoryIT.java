@@ -18,10 +18,9 @@ import org.dspace.app.rest.matcher.MetadataschemaMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.MetadataSchema;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 
-public class MetadataschemaRestRepositoryIT extends AbstractControllerIntegrationTest {
+public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAll() throws Exception {
@@ -41,9 +40,7 @@ public class MetadataschemaRestRepositoryIT extends AbstractControllerIntegratio
     }
 
 
-    //TODO This test fails, reactivate when endpoint is fixed
     @Test
-    @Ignore
     public void findOne() throws Exception {
 
         context.turnOffAuthorisationSystem();

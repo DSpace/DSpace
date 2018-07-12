@@ -10,11 +10,15 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataFieldConverter;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.hateoas.MetadataFieldResource;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +35,9 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
     @Autowired
     MetadataFieldService metaFieldService;
+
+    @Autowired
+    MetadataSchemaService metadataSchemaService;
 
     @Autowired
     MetadataFieldConverter converter;
@@ -61,6 +68,24 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             throw new RuntimeException(e.getMessage(), e);
         }
         Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable).map(converter);
+        return page;
+    }
+
+    @SearchRestMethod(name = "bySchema")
+    public Page<MetadataFieldRest> findBySchema(@Parameter(value = "schema", required = true) String schemaName,
+                                                          Pageable pageable) {
+        Context context = obtainContext();
+        List<MetadataField> metadataFields = null;
+        try {
+            MetadataSchema schema = metadataSchemaService.find(context, schemaName);
+            if (schema == null) {
+                return null;
+            }
+            metadataFields = metaFieldService.findAllInSchema(context, schema);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<MetadataFieldRest> page = utils.getPage(metadataFields, pageable).map(converter);
         return page;
     }
 
