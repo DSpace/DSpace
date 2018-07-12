@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
@@ -24,6 +25,11 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
     private static final Logger log = Logger.getLogger(MetadataFieldBuilder.class);
 
     private MetadataField metadataField;
+
+    @Override
+    protected int getPriority() {
+        return Integer.MAX_VALUE - 1;
+    }
 
     protected MetadataFieldBuilder(Context context) {
         super(context);
@@ -82,13 +88,27 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
         return metadataFieldBuilder.create(context, element, qualifier, scopeNote);
     }
 
+    public static MetadataFieldBuilder createMetadataField(Context context, MetadataSchema schema, String element,
+            String qualifier, String scopeNote) throws SQLException, AuthorizeException {
+        MetadataFieldBuilder metadataFieldBuilder = new MetadataFieldBuilder(context);
+        return metadataFieldBuilder.create(context, schema, element, qualifier, scopeNote);
+    }
+
     private MetadataFieldBuilder create(Context context, String element, String qualifier, String scopeNote)
         throws SQLException, AuthorizeException {
+
+        create(context, metadataSchemaService.find(context, "dc"), element, qualifier, scopeNote);
+        return this;
+    }
+
+    private MetadataFieldBuilder create(Context context, MetadataSchema schema, String element, String qualifier,
+            String scopeNote) throws SQLException, AuthorizeException {
+
         this.context = context;
 
         try {
             metadataField = metadataFieldService
-                .create(context, metadataSchemaService.find(context, "dc"), element, qualifier, scopeNote);
+                .create(context, schema, element, qualifier, scopeNote);
         } catch (NonUniqueMetadataException e) {
             e.printStackTrace();
         }
