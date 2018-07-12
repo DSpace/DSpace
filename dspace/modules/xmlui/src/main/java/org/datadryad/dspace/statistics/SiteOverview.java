@@ -67,7 +67,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
             }
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            throw new UIException("Failed to create stats overview object");
+            throw new UIException("Failed to create stats overview object", ex);
         }
 
         Division overviewStats = body.addDivision("front-page-stats");
