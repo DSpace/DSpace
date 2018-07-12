@@ -385,7 +385,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         //Trying to delete a templateItem should fail with 422
         getClient(token).perform(delete("/api/core/items/" + templateItem.getID()))
                     .andExpect(status().is(422));
-    
+
         //Check templateItem is available after failed deletion
         getClient().perform(get("/api/core/items/" + templateItem.getID()))
                    .andExpect(status().isOk());
@@ -411,7 +411,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         //Trying to delete a workspaceItem should fail with 422
         getClient(token).perform(delete("/api/core/items/" + workspaceItem.getItem().getID()))
                     .andExpect(status().is(422));
-        
+
         //Check templateItem is available after failed deletion
         getClient().perform(get("/api/core/items/" + workspaceItem.getID()))
                    .andExpect(status().isOk());

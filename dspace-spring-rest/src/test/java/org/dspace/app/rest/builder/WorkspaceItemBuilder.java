@@ -9,24 +9,20 @@ package org.dspace.app.rest.builder;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
-import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.service.DSpaceCRUDService;
 
 /**
  * Builder to construct WorkspaceItem objects
  *
  **/
 public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, WorkspaceItemService> {
-    
+
     /* Log4j logger*/
     private static final Logger log = Logger.getLogger(AbstractDSpaceObjectBuilder.class);
 
     private WorkspaceItem workspaceItem;
-    private WorkspaceItemService workspaceItemService;
 
     protected WorkspaceItemBuilder(Context context) {
         super(context);
