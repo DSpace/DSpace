@@ -40,6 +40,14 @@
                 </div>
                 </div>
             </xsl:when>
+            <xsl:when test="current()[@rend='isSuperseded']">
+                <div class="ds-static-div primary">
+                    <h2 class="ds-list-head">Superseded files</h2>
+                    <div class="file-list" style="text-decoration: line-through">
+                        <xsl:apply-templates select="*[not(name()='head')]" mode="embeddedView"/>
+                    </div>
+                </div>
+            </xsl:when>
             <xsl:when test="current()[@rend='duplicateItems']">
                 <div class="ds-static-div primary">
                 <h2>Duplicate items detected:</h2>

@@ -114,7 +114,7 @@ public class OverviewStep extends AbstractStep {
 
         if(publication.isArchived()){
             //Add the current dataset, since our publication is archived this will probally be the only one !
-            Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, submission.getItem(), (WorkspaceItem) submission);
+            Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, submission.getItem());
         }
 
         for (org.dspace.content.Item dataset : datasets) {
@@ -126,7 +126,7 @@ public class OverviewStep extends AbstractStep {
                 wsDataset = WorkflowItem.findByItemId(context, dataset.getID());
             //Only add stuff IF we have a workspaceitem
             if(wsDataset != null){
-                Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, dataset, wsDataset);
+                Cell actionCell = FlowUtils.renderDatasetItem(context, dataSetList, dataset);
                 Button editButton = actionCell.addButton("submit_edit_dataset_" + wsDataset.getID());
                 //To determine which name our button is getting check if we are through submission with this
                 if (dataset.getMetadata("internal", "workflow", "submitted", org.dspace.content.Item.ANY).length == 0 && (wsDataset instanceof WorkspaceItem)) {

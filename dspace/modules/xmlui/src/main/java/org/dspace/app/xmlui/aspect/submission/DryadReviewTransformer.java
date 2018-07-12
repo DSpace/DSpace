@@ -19,6 +19,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.authority.Choices;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
@@ -32,6 +33,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.dspace.workflow.ClaimedTask;
@@ -62,7 +64,8 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     private boolean authorized;
     private boolean currentlyInReview;
     private String requestDoi;
-    List<Item> dataFiles = new ArrayList<Item>();
+    // map of items and whether or not they're superseded
+    Map<Item, Boolean> dataFiles = new HashMap<Item, Boolean>();
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
@@ -213,14 +216,26 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             // adding the dataFile
             org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(wfItem.getItem());
             if (wfItem.getItem().getMetadata("dc.relation.haspart").length > 0) {
-                ReferenceSet hasParts;
-                hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
-                hasParts.setHead(T_head_has_part);
-
+                ArrayList<Item> hasPartsList = new ArrayList<Item>();
+                ArrayList<Item> supersededList = new ArrayList<Item>();
                 if (dataFiles.size() == 0) retrieveDataFiles(wfItem.getItem());
-
-                for (Item obj : dataFiles) {
+                for (Item obj : dataFiles.keySet()) {
+                    if (dataFiles.get(obj)) {
+                        supersededList.add(obj);
+                    } else {
+                        hasPartsList.add(obj);
+                    }
+                }
+                ReferenceSet hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
+                hasParts.setHead(T_head_has_part);
+                for (Item obj : hasPartsList) {
                     hasParts.addReference(obj);
+                }
+                if (supersededList.size() > 0) {
+                    ReferenceSet supersededFiles = itemRef.addReferenceSet("embeddedView", null, "isSuperseded");
+                    for (Item obj : supersededList) {
+                        supersededFiles.addReference(obj);
+                    }
                 }
             }
 
@@ -293,9 +308,13 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
 
     private void retrieveDataFiles(Item item) throws SQLException {
         DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-
+        DCValue[] fileStatusMDVs = item.getMetadata("workflow.review.fileStatus");
+        HashMap<Integer, Boolean> fileIsSupersededMap = new HashMap<Integer, Boolean>();
+        for (DCValue fileStatusMDV : fileStatusMDVs) {
+            fileIsSupersededMap.put(Integer.valueOf(fileStatusMDV.value), (fileStatusMDV.confidence == Choices.CF_REJECTED));
+        }
         if (item.getMetadata("dc.relation.haspart").length > 0) {
-            dataFiles = new ArrayList<Item>();
+            dataFiles = new HashMap<Item, Boolean>();
             for (DCValue value : item.getMetadata("dc.relation.haspart")) {
 
                 DSpaceObject obj = null;
@@ -306,7 +325,11 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
                 } catch (IdentifierNotResolvableException e) {
                     // just keep going
                 }
-                if (obj != null) dataFiles.add((Item) obj);
+                if (obj != null) {
+                    Boolean isSuperseded = fileIsSupersededMap.get(obj.getID());
+                    if (isSuperseded == null) isSuperseded = false;
+                    dataFiles.put((Item) obj, isSuperseded);
+                }
             }
         }
     }
@@ -348,7 +371,7 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     {
         this.wfItem = null;
 	this.authorized = false;
-	this.dataFiles=new ArrayList<Item>();
+	this.dataFiles=new HashMap<Item, Boolean>();
         super.recycle();
     }
 
