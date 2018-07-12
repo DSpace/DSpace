@@ -37,21 +37,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return builder.create(context, col);
     }
 
-    public static Item createTemplateItem(final Context context, final Collection collection) {
-        ItemBuilder builder = new ItemBuilder(context);
-        return builder.create_template_item(collection);
-    }
-
-    private Item create_template_item(final Collection collection) {
-        try {
-            item = itemService.createTemplateItem(context, collection);
-            return item;
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
-    private ItemBuilder create(final Context context, final Collection col) {
+     private ItemBuilder create(final Context context, final Collection col) {
         this.context = context;
 
         try {
