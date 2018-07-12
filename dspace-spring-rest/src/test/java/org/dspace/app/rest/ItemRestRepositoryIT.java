@@ -30,6 +30,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -377,17 +378,17 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
         //2. One template item.
-        Item templateItem = ItemBuilder.createTemplateItem(context, col1);
+        Item templateItem = CollectionBuilder.createTemplateItem(context, col1);
 
         String token = getAuthToken(admin.getEmail(), password);
-
-        //Check templateItem creation
-        getClient().perform(get("/api/core/items/" + templateItem.getID()))
-                   .andExpect(status().isOk());
 
         //Trying to delete a templateItem should fail with 422
         getClient(token).perform(delete("/api/core/items/" + templateItem.getID()))
                     .andExpect(status().is(422));
+    
+        //Check templateItem is available after failed deletion
+        getClient().perform(get("/api/core/items/" + templateItem.getID()))
+                   .andExpect(status().isOk());
     }
 
     public void deleteOneWorkspaceTest() throws Exception {
@@ -402,17 +403,17 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
         //2. One workspace item.
-        Item workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                             .build();
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        //Check workspaceItem creation
+        //Trying to delete a workspaceItem should fail with 422
+        getClient(token).perform(delete("/api/core/items/" + workspaceItem.getItem().getID()))
+                    .andExpect(status().is(422));
+        
+        //Check templateItem is available after failed deletion
         getClient().perform(get("/api/core/items/" + workspaceItem.getID()))
                    .andExpect(status().isOk());
-
-        //Trying to delete a workspaceItem should fail with 422
-        getClient(token).perform(delete("/api/core/items/" + workspaceItem.getID()))
-                    .andExpect(status().is(422));
     }
 }
