@@ -14,11 +14,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.converter.ItemConverter;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -42,7 +42,6 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
     @Autowired
     ItemConverter converter;
-
 
     public ItemRestRepository() {
         System.out.println("Repository initialized by Spring");
@@ -97,17 +96,18 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         try {
             item = is.find(context, id);
             if (is.isInProgressSubmission(context, item)) {
-                throw new UnprocessableEntityException("The item cannot be deleted. It's part of a in-progress submission.");
+                throw new UnprocessableEntityException("The item cannot be deleted. "
+                        + "It's part of a in-progress submission.");
             }
             if (item.getTemplateItemOf() != null) {
-                throw new UnprocessableEntityException("The item cannot be deleted. It's a template for a collection");
+                throw new UnprocessableEntityException("The item cannot be deleted. "
+                        + "It's a template for a collection");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
-        }                   
+        }
         try {
             is.delete(context, item);
-            is.removeAllBundles(context, item);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
