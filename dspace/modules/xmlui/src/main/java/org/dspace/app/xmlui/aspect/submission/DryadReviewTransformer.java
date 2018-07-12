@@ -233,7 +233,7 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
                 }
                 if (supersededList.size() > 0) {
                     ReferenceSet supersededFiles = itemRef.addReferenceSet("embeddedView", null, "isSuperseded");
-                    for (Item obj : hasPartsList) {
+                    for (Item obj : supersededList) {
                         supersededFiles.addReference(obj);
                     }
                 }
