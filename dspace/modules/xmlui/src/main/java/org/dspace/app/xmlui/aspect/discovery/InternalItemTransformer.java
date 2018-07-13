@@ -4,6 +4,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
+import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.wing.Message;
@@ -178,14 +179,17 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
          * reference any isPartOf items to create listing...
          */
         if (item.getMetadata("dc.relation.haspart").length > 0){
-            ReferenceSet hasParts;
-            hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
+            Map<String, java.util.List<Item>> fileStatuses = FlowUtils.retrieveInternalFileStatuses(context, item);
+            ReferenceSet hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
             hasParts.setHead(T_head_has_part);
-
-            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
-
-            for(Item obj : dataFiles){
+            for (Item obj : fileStatuses.get("hasParts")) {
                 hasParts.addReference(obj);
+            }
+            if (fileStatuses.get("superseded").size() > 0) {
+                ReferenceSet supersededFiles = itemRef.addReferenceSet("embeddedView", null, "isSuperseded");
+                for (Item obj : fileStatuses.get("superseded")) {
+                    supersededFiles.addReference(obj);
+                }
             }
         }
 

@@ -99,6 +99,17 @@
                 </div>
                     <xsl:apply-templates select="$embeddedViewReferenceSet"/>
             </xsl:when>
+            <xsl:when test="contains($meta[@element='request'][@qualifier='URI'], 'internal-item')">
+                <!-- publication header -->
+                <div class="publication-header">
+                    <xsl:call-template name="publication-header">
+                        <xsl:with-param name="title" select=".//dim:field[@element='title']/node()"/>
+                        <xsl:with-param name="authorstring" select="$meta[@element='authors'][@qualifier='item']"/>
+                        <xsl:with-param name="my_doi" select="$my_doi"/>
+                    </xsl:call-template>
+                </div>
+                <xsl:apply-templates select="$embeddedViewReferenceSet"/>
+            </xsl:when>
             <xsl:otherwise>
                 <!-- publication header -->
                 <div class="publication-header">
