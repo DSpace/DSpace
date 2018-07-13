@@ -16,13 +16,13 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 
 	protected static final Resource person = ResourceFactory.createResource(NS_FOAF + "Person");
-	protected static final Property familyName = ResourceFactory.createProperty(NS_FOAF + "familyName");
+	protected static final Property surname = ResourceFactory.createProperty(NS_FOAF + "surname");
 	protected static final Property type = ResourceFactory.createProperty(NS_RDF + "type");
 	protected static final Property givenName = ResourceFactory.createProperty(NS_FOAF + "givenName");
 	protected static final Property mbox = ResourceFactory.createProperty(NS_FOAF + "mbox");
 	protected static final Property organization = ResourceFactory.createProperty(NS_FOAF + "Organization");
 	protected static final Property linksToOrganisationUnit = ResourceFactory.createProperty(NS_CERIF, "linksToOrganisationUnit");
-	protected static final Property title = ResourceFactory.createProperty(NS_DC + "title");	
+	protected static final Property orgName = ResourceFactory.createProperty(NS_FOAF + "name");	
 	protected static final Property siocId = ResourceFactory.createProperty(NS_SIOC + "id");
 	protected static final Property startDate = ResourceFactory.createProperty(NS_CERIF + "startDate");
 	protected static final Property endDate = ResourceFactory.createProperty(NS_CERIF + "endDate");
@@ -35,7 +35,7 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 	protected Choice extractChoice(Resource subject) {
 		
 		String key = subject.getURI();
-		String label = subject.getProperty(familyName).getString() + ", " + subject.getProperty(givenName).getString() ;
+		String label = subject.getProperty(surname).getString() + ", " + subject.getProperty(givenName).getString() ;
 		String value = label;
 		StmtIterator links = subject.listProperties(linksToOrganisationUnit);
 		if (links.hasNext()){
@@ -56,14 +56,14 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 		pqs.setNsPrefix("rdf", NS_RDF);
 		pqs.setNsPrefix("sioc", NS_SIOC);
 
-		pqs.setCommandText("CONSTRUCT { ?person a foaf:Person. ?person foaf:givenName ?name . ?person foaf:mbox ?mail . ?person foaf:familyName ?surname. ?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio. ?link cerif:endDate ?fin . ?link foaf:Organization ?org . ?org dc:title ?affiliation. ?org sioc:id ?id. }\n");
+		pqs.setCommandText("CONSTRUCT { ?person a foaf:Person. ?person foaf:givenName ?name . ?person foaf:mbox ?mail . ?person foaf:surname ?surname. ?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio. ?link cerif:endDate ?fin . ?link foaf:Organization ?org . ?org foaf:name ?affiliation. ?org sioc:id ?id. }\n");
 		pqs.append("WHERE {\n");
-		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:familyName ?surname .\n");
+		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:surname ?surname .\n");
 		pqs.append("	OPTIONAL {\n");
 		pqs.append("	?person foaf:mbox ?mail . \n");
 		pqs.append("	} . \n");
 		pqs.append("	OPTIONAL {\n");
-		pqs.append("	?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio; cerif:endDate ?fin; foaf:Organization ?org . ?org dc:title ?affiliation; sioc:id ?id\n");
+		pqs.append("	?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio; cerif:endDate ?fin; foaf:Organization ?org . ?org foaf:name ?affiliation; sioc:id ?id\n");
 		pqs.append("	}\n");
 		pqs.append("FILTER(REGEX(?person, ?key, \"i\"))\n");
 		pqs.append("}\n");
@@ -84,14 +84,14 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 		pqs.setNsPrefix("rdf", NS_RDF);
 		pqs.setNsPrefix("sioc", NS_SIOC);
 
-		pqs.setCommandText("CONSTRUCT { ?person a foaf:Person. ?person foaf:givenName ?name . ?person foaf:mbox ?mail . ?person foaf:familyName ?surname. ?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio. ?link cerif:endDate ?fin . ?link foaf:Organization ?org . ?org dc:title ?affiliation. ?org sioc:id ?id. }\n");
+		pqs.setCommandText("CONSTRUCT { ?person a foaf:Person. ?person foaf:givenName ?name . ?person foaf:mbox ?mail . ?person foaf:surname ?surname. ?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio. ?link cerif:endDate ?fin . ?link foaf:Organization ?org . ?org foaf:name ?affiliation. ?org sioc:id ?id. }\n");
 		pqs.append("WHERE {\n");
-		pqs.append("?person a foaf:Person ; foaf:givenName ?name; foaf:familyName ?surname. \n");
+		pqs.append("?person a foaf:Person ; foaf:givenName ?name; foaf:surname ?surname. \n");
 		pqs.append("	OPTIONAL {\n");
 		pqs.append("	?person foaf:mbox ?mail . \n");
 		pqs.append("	} . \n");
 		pqs.append("	OPTIONAL {\n");
-		pqs.append("	?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio; cerif:endDate ?fin; foaf:Organization ?org . ?org dc:title ?affiliation; sioc:id ?id\n");
+		pqs.append("	?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio; cerif:endDate ?fin; foaf:Organization ?org . ?org foaf:name ?affiliation; sioc:id ?id\n");
 		pqs.append("	}\n");
 		if (!"".equals(text)) {
 			String[] tokens = text.split(",");
@@ -123,7 +123,7 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 				string.append(id);
 			}
 			else{
-				string.append(org.getProperty(title).getString());
+				string.append(org.getProperty(orgName).getString());
 			}
 			String start = affiliation.getProperty(startDate).getString();
 			String end = affiliation.getProperty(endDate).getString();
@@ -167,7 +167,7 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 			if(currentPerson.getProperty(mbox) != null) {
 				String[] respuesta = new String[2];				
 				respuesta[0] = currentPerson.getProperty(mbox).getString();
-				respuesta[1] = currentPerson.getProperty(givenName).getString() + ", " + currentPerson.getProperty(familyName).getString();
+				respuesta[1] = currentPerson.getProperty(givenName).getString() + ", " + currentPerson.getProperty(surname).getString();
 				result.add(respuesta);
 			}
 		}

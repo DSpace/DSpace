@@ -15,11 +15,11 @@ public class InstitutionAuthority extends SimpleSPARQLAuthorityProvider {
 		pqs.setNsPrefix("dc", NS_DC);
 		pqs.setNsPrefix("sioc", NS_SIOC);
 
-		pqs.setCommandText("SELECT ?concept ?label ?initials\n");
+		pqs.setCommandText("SELECT ?institution ?label ?initials\n");
 		pqs.append("WHERE {\n");
-		pqs.append("?concept a foaf:Organization ; dc:title ?label .\n");
-		pqs.append("OPTIONAL { ?concept sioc:id ?initials} \n");
-		pqs.append("FILTER(REGEX(?concept, ?key, \"i\"))\n");
+		pqs.append("?institution a foaf:Organization ; foaf:name ?label .\n");
+		pqs.append("OPTIONAL { ?institution sioc:id ?initials} \n");
+		pqs.append("FILTER(REGEX(?institution, ?key, \"i\"))\n");
 		pqs.append("}\n");
 
 		pqs.setLiteral("key", key);
@@ -35,10 +35,10 @@ public class InstitutionAuthority extends SimpleSPARQLAuthorityProvider {
 		pqs.setNsPrefix("dc", NS_DC);
 		pqs.setNsPrefix("sioc", NS_SIOC);
 
-		pqs.setCommandText("SELECT ?concept ?label ?initials\n");
+		pqs.setCommandText("SELECT ?institution ?label ?initials\n");
 		pqs.append("WHERE {\n");
-		pqs.append("?concept a foaf:Organization ; dc:title ?label .\n");
-		pqs.append("OPTIONAL { ?concept sioc:id ?initials} \n");
+		pqs.append("?institution a foaf:Organization ; foaf:name ?label .\n");
+		pqs.append("OPTIONAL { ?institution sioc:id ?initials} \n");
 		if (!"".equals(text)) {
 			pqs.append("FILTER(REGEX(?label, ?text, \"i\") || REGEX(?initials, ?text, \"i\"))\n");
 			pqs.setLiteral("text", text);
@@ -51,7 +51,7 @@ public class InstitutionAuthority extends SimpleSPARQLAuthorityProvider {
 
 	@Override
 	protected Choice extractChoice(QuerySolution solution) {
-		String key = solution.getResource("concept").getURI();
+		String key = solution.getResource("institution").getURI();
 		String label = solution.getLiteral("label").getString();
 		
 		if (solution.contains("initials") && !"".equals(solution.getLiteral("initials").getString())) {
