@@ -56,6 +56,7 @@ import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
@@ -66,6 +67,9 @@ import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
+import org.dspace.identifier.DOIIdentifierProvider;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.paymentsystem.PaymentSystemService;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.submit.AbstractProcessingStep;
@@ -1461,7 +1465,48 @@ public class FlowUtils {
         return finalActionCell;
     }
 
-    public static void processReviewSaveChanges(Context context, HttpServletRequest request, int workflowID) {
+	public static Map<String, List<Item>> retrieveInternalFileStatuses(Context context, Item item) {
+    	Map<Item, Boolean> dataFiles = new HashMap<Item, Boolean>();
+		DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+		DCValue[] fileStatusMDVs = item.getMetadata("workflow.review.fileStatus");
+		HashMap<Integer, Boolean> fileIsSupersededMap = new HashMap<Integer, Boolean>();
+		for (DCValue fileStatusMDV : fileStatusMDVs) {
+			fileIsSupersededMap.put(Integer.valueOf(fileStatusMDV.value), (fileStatusMDV.confidence == Choices.CF_REJECTED));
+		}
+		if (item.getMetadata("dc.relation.haspart").length > 0) {
+			for (DCValue value : item.getMetadata("dc.relation.haspart")) {
+
+				DSpaceObject obj = null;
+				try {
+					obj = dis.resolve(context, value.value);
+				} catch (IdentifierNotFoundException e) {
+					// just keep going
+				} catch (IdentifierNotResolvableException e) {
+					// just keep going
+				}
+				if (obj != null) {
+					Boolean isSuperseded = fileIsSupersededMap.get(obj.getID());
+					if (isSuperseded == null) isSuperseded = false;
+					dataFiles.put((Item) obj, isSuperseded);
+				}
+			}
+		}
+		ArrayList<Item> hasPartsList = new ArrayList<Item>();
+		ArrayList<Item> supersededList = new ArrayList<Item>();
+		for (Item obj : dataFiles.keySet()) {
+			if (dataFiles.get(obj)) {
+				supersededList.add(obj);
+			} else {
+				hasPartsList.add(obj);
+			}
+		}
+		HashMap<String, List<Item>> resultMap = new HashMap<String, List<Item>>();
+		resultMap.put("hasParts", hasPartsList);
+		resultMap.put("superseded", supersededList);
+		return resultMap;
+	}
+
+	public static void processReviewSaveChanges(Context context, HttpServletRequest request, int workflowID) {
     	try {
 			Item publication = WorkflowItem.find(context, workflowID).getItem();
 			Enumeration<String> parameters = request.getParameterNames();

@@ -19,7 +19,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.authority.Choices;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
@@ -64,8 +63,6 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     private boolean authorized;
     private boolean currentlyInReview;
     private String requestDoi;
-    // map of items and whether or not they're superseded
-    Map<Item, Boolean> dataFiles = new HashMap<Item, Boolean>();
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
@@ -216,24 +213,15 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             // adding the dataFile
             org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(wfItem.getItem());
             if (wfItem.getItem().getMetadata("dc.relation.haspart").length > 0) {
-                ArrayList<Item> hasPartsList = new ArrayList<Item>();
-                ArrayList<Item> supersededList = new ArrayList<Item>();
-                if (dataFiles.size() == 0) retrieveDataFiles(wfItem.getItem());
-                for (Item obj : dataFiles.keySet()) {
-                    if (dataFiles.get(obj)) {
-                        supersededList.add(obj);
-                    } else {
-                        hasPartsList.add(obj);
-                    }
-                }
+                Map<String, List<Item>> fileStatuses = FlowUtils.retrieveInternalFileStatuses(context, wfItem.getItem());
                 ReferenceSet hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
                 hasParts.setHead(T_head_has_part);
-                for (Item obj : hasPartsList) {
+                for (Item obj : fileStatuses.get("hasParts")) {
                     hasParts.addReference(obj);
                 }
-                if (supersededList.size() > 0) {
+                if (fileStatuses.get("superseded").size() > 0) {
                     ReferenceSet supersededFiles = itemRef.addReferenceSet("embeddedView", null, "isSuperseded");
-                    for (Item obj : supersededList) {
+                    for (Item obj : fileStatuses.get("superseded")) {
                         supersededFiles.addReference(obj);
                     }
                 }
@@ -305,36 +293,6 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         return null;
     }
 
-
-    private void retrieveDataFiles(Item item) throws SQLException {
-        DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-        DCValue[] fileStatusMDVs = item.getMetadata("workflow.review.fileStatus");
-        HashMap<Integer, Boolean> fileIsSupersededMap = new HashMap<Integer, Boolean>();
-        for (DCValue fileStatusMDV : fileStatusMDVs) {
-            fileIsSupersededMap.put(Integer.valueOf(fileStatusMDV.value), (fileStatusMDV.confidence == Choices.CF_REJECTED));
-        }
-        if (item.getMetadata("dc.relation.haspart").length > 0) {
-            dataFiles = new HashMap<Item, Boolean>();
-            for (DCValue value : item.getMetadata("dc.relation.haspart")) {
-
-                DSpaceObject obj = null;
-                try {
-                    obj = dis.resolve(context, value.value);
-                } catch (IdentifierNotFoundException e) {
-                    // just keep going
-                } catch (IdentifierNotResolvableException e) {
-                    // just keep going
-                }
-                if (obj != null) {
-                    Boolean isSuperseded = fileIsSupersededMap.get(obj.getID());
-                    if (isSuperseded == null) isSuperseded = false;
-                    dataFiles.put((Item) obj, isSuperseded);
-                }
-            }
-        }
-    }
-
-
     private void addWarningMessage(Item item, Division division) throws WingException, SQLException, AuthorizeException, IOException {
 
         log.warn("InternalItemTransformer - addWarningMessage");
@@ -371,7 +329,6 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     {
         this.wfItem = null;
 	this.authorized = false;
-	this.dataFiles=new HashMap<Item, Boolean>();
         super.recycle();
     }
 
