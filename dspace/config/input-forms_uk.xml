@@ -353,6 +353,10 @@
        <stored-value>Theses</stored-value>
      </pair>
      <pair>
+       <displayed-value>Бакалаврська робота</displayed-value>
+       <stored-value>Bachelous paper</stored-value>
+     </pair>
+     <pair>
        <displayed-value>Інше</displayed-value>
        <stored-value>Other</stored-value>
      </pair>

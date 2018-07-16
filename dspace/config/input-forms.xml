@@ -354,6 +354,10 @@
        <stored-value>Working Paper</stored-value>
      </pair>
      <pair>
+       <displayed-value>Bachelous Paper</displayed-value>
+       <stored-value>Bachelous paper</stored-value>
+     </pair>
+     <pair>
        <displayed-value>Other</displayed-value>
        <stored-value>Other</stored-value>
      </pair>

@@ -341,6 +341,10 @@
         <stored-value>Theses</stored-value>
       </pair>
       <pair>
+        <displayed-value>Бакалаврская работа</displayed-value>
+        <stored-value>Bachelous paper</stored-value>
+      </pair>
+      <pair>
         <displayed-value>Списки</displayed-value>
         <stored-value>Lists</stored-value>
       </pair>
