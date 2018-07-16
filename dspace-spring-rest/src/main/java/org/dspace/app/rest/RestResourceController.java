@@ -765,13 +765,11 @@ public class RestResourceController implements InitializingBean {
         } else {
             if (resource.getEmbeddedResources().get(rel) == null) {
                 // in some cases, we wish to return an empty list with status 200 rather than null/204
-                /*
                 for (int i = 0; i < STATUS_OK_ENDPOINT.length; i++) {
                     if (request.getRequestURI().endsWith(STATUS_OK_ENDPOINT[i])) {
                         return new ResourceSupport();
                     }
                 }
-                */
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
 
