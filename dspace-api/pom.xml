@@ -399,10 +399,6 @@
            <artifactId>fontbox</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.apache.pdfbox</groupId>
-           <artifactId>jempbox</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15</artifactId>
         </dependency>
