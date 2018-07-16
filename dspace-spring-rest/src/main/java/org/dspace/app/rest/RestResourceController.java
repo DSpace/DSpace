@@ -88,6 +88,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class RestResourceController implements InitializingBean {
 
     /**
+     * Array of String holds a list of endpoints that return an empty list with status 200 instead of null with 204
+     */
+    private static final String[] STATUS_OK_ENDPOINT = {"/config/submissiondefinitions/traditional/collections"};
+
+    /**
      * Regular expression in the request mapping to accept UUID as identifier
      */
     private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
@@ -759,12 +764,19 @@ public class RestResourceController implements InitializingBean {
 
         } else {
             if (resource.getEmbeddedResources().get(rel) == null) {
+                // in some cases, we wish to return an empty list with status 200 rather than null/204
+                /*
+                for (int i = 0; i < STATUS_OK_ENDPOINT.length; i++) {
+                    if (request.getRequestURI().endsWith(STATUS_OK_ENDPOINT[i])) {
+                        return new ResourceSupport();
+                    }
+                }
+                */
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
 
             return (ResourceSupport) resource.getEmbeddedResources().get(rel);
         }
-
     }
 
     /**
