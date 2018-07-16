@@ -31,6 +31,8 @@
 
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="ua.edu.sumdu.essuir.cache.AuthorCache" %>
+<%@ page import="ua.edu.sumdu.essuir.entity.AuthorLocalization" %>
 <%@ page import="ua.edu.sumdu.essuir.entity.FacultyEntity" %>
 <%@ page import="ua.edu.sumdu.essuir.utils.EssuirUtils" %>
 <%@ page import="java.util.List" %>
@@ -46,6 +48,8 @@
     String language = "";
     int chairid = -1;
     String position = "";
+    String orcid = "";
+
 
     if (epersonForm != null) {
         // Get non-null values
@@ -65,6 +69,11 @@
 
         position = epersonForm.getPosition();
         if (position == null) position = "";
+
+        orcid = AuthorCache.getAuthor(String.format("%s, %s", lastName, firstName))
+                .map(EssuirUtils::findAuthor)
+                .map(AuthorLocalization::getOrcid)
+                .orElse("");
     }
     int faculty = (chairid == -1) ? -1 : EssuirUtils.getFacultyIdByChaidId(chairid);
 %>
@@ -161,5 +170,16 @@
     <div class="col-md-3">
         <input class="form-control" name="position" id="tposition" size="24"
                value="<%=position == null ? "" : Utils.addEntities(position) %>"/>
+    </div>
+</div>
+
+
+<div class="form-group">
+
+    <label class="col-md-offset-3 col-md-2 control-label" for="orcid">ORCID</label>
+
+    <div class="col-md-3">
+        <input class="form-control" name="orcid" id="orcid" size="24"
+               value="<%= orcid == null ? "" : Utils.addEntities(orcid) %>"/>
     </div>
 </div>

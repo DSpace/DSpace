@@ -21,6 +21,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.*;
 import org.dspace.handle.HandleManager;
+import ua.edu.sumdu.essuir.cache.AuthorCache;
 import ua.edu.sumdu.essuir.statistics.EssuirStatistics;
 
 import javax.servlet.http.HttpServletRequest;
@@ -583,6 +584,7 @@ public class ItemTag extends TagSupport
                         }
                         else if (browseIndex != null)
                         {
+
 	                        String argument, value;
 	                        if ( values[j].authority != null &&
 	                                            values[j].confidence >= MetadataAuthorityManager.getManager()
@@ -596,10 +598,21 @@ public class ItemTag extends TagSupport
 	                            argument = "value";
 	                            value = values[j].value;
 	                        }
+
+	                        String orcid = "";
+                            if (browseIndex.equals("author")) {
+                                orcid = AuthorCache.getOrcid(value);
+                                if (orcid != null) {
+                                    orcid = String.format("&nbsp;<a href = \"http://orcid.org/%s\"><img src = \"/image/orcid.gif\" width=\"16px\"></a>", orcid);
+                                } else {
+                                    orcid = "";
+                                }
+                            }
+
 	                    	out.print("<a class=\"" + ("authority".equals(argument)?"authority ":"") + browseIndex + "\""
 	                                                + "href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;" + argument + "="
 	                    				+ URLEncoder.encode(value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
-	                    				+ "</a>");
+	                    				+ "</a>" + orcid);
 	                    }
                         else
                         {

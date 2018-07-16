@@ -14,12 +14,17 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import ua.edu.sumdu.essuir.cache.Author;
+import ua.edu.sumdu.essuir.cache.AuthorCache;
+import ua.edu.sumdu.essuir.entity.AuthorLocalization;
+import ua.edu.sumdu.essuir.utils.EssuirUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Optional;
 
 /**
  * Servlet for handling editing user profiles
@@ -127,6 +132,13 @@ public class EditProfileServlet extends DSpaceServlet
         String language = request.getParameter("language");
         int chairid = Integer.parseInt(request.getParameter("chair_id") == null ? "-1" : request.getParameter("chair_id"));
         String position = request.getParameter("position");
+        String orcid = request.getParameter("orcid")
+                .replaceAll("https://", "")
+                .replaceAll("http://", "")
+                .replaceAll("orcid.org/", "");
+
+
+
 
         // Update the eperson
         eperson.setFirstName(firstName);
@@ -148,6 +160,12 @@ public class EditProfileServlet extends DSpaceServlet
         }
         else
         {
+            Optional<Author> author = AuthorCache.getAuthor(String.format("%s, %s", lastName, firstName));
+            if(author.isPresent()) {
+                AuthorLocalization authorLocalization = EssuirUtils.findAuthor(author.get());
+                authorLocalization.setOrcid(orcid);
+                EssuirUtils.saveAuthor(authorLocalization);
+            }
             return true;
         }
     }

@@ -17,6 +17,8 @@ public class AuthorLocalization implements Serializable {
     private String surname_uk;
     @Column
     private String initials_uk;
+    @Column
+    private String orcid;
 
     public String getSurname_en() {
         return authorsLocalizationPK.getSurname_en();
@@ -64,5 +66,13 @@ public class AuthorLocalization implements Serializable {
 
     public void setInitials_uk(String initials_uk) {
         this.initials_uk = initials_uk;
+    }
+
+    public String getOrcid() {
+        return orcid;
+    }
+
+    public void setOrcid(String orcid) {
+        this.orcid = orcid;
     }
 }

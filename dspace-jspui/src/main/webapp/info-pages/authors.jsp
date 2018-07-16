@@ -54,6 +54,7 @@
             <th><fmt:message key = "jsp.dspace-admin.authors.initials_ru" /></th>
             <th><fmt:message key = "jsp.dspace-admin.authors.surname_ua" /></th>
             <th><fmt:message key = "jsp.dspace-admin.authors.initials_ua" /></th>
+            <th>ORCID</th>
             <th><fmt:message key = "jsp.tools.itemmap-browse.th.action" /></th>
         </tr>
 
@@ -71,6 +72,7 @@
                     <td><%=author.getInitials_uk() %></td>
                     <td><%=author.getSurname_ru() %></td>
                     <td><%=author.getInitials_ru() %></td>
+                    <td><%= author.getOrcid()%></td>
                     <td>
                         <a href="authors_edit.jsp<%=link%>">
                             <span class="glyphicon glyphicon-pencil" aria-hidden="true" style = "color:black; font-size:14pt;"></span>

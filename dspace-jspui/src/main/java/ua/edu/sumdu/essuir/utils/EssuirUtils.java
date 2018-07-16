@@ -4,6 +4,7 @@ package ua.edu.sumdu.essuir.utils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ua.edu.sumdu.essuir.cache.Author;
 import ua.edu.sumdu.essuir.entity.*;
 import ua.edu.sumdu.essuir.repository.AuthorsRepository;
 import ua.edu.sumdu.essuir.repository.ChairRepository;
@@ -167,5 +168,15 @@ public class EssuirUtils {
 
     public static AuthorLocalization findAuthor(String surname, String initials) {
         return authorsRepository.findOne(new AuthorsLocalizationPK().setSurname_en(surname).setInitials_en(initials));
+    }
+
+    public static AuthorLocalization saveAuthor(AuthorLocalization author) {
+        return authorsRepository.save(author);
+    }
+
+    public static AuthorLocalization findAuthor(Author author) {
+        String surname = author.getName("en").split(", ")[0];
+        String initials = author.getName("en").split(", ")[1];
+        return findAuthor(surname, initials);
     }
 }
