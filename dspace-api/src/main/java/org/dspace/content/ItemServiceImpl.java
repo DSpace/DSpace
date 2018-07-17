@@ -1236,7 +1236,13 @@ prevent the generation of resource policy entry values with null dspace_object a
         // return count of items that are not in archive and withdrawn
         return itemDAO.countItems(context, false, true);
     }
-
+    
+    @Override
+    public int countArchivedNotWithdrawnItems(Context context) throws SQLException{
+	// return count of items that are in archive and not withdrawn
+        return itemDAO.countItems(context, true, false);
+    }
+    
     @Override
     public boolean canCreateNewVersion(Context context, Item item) throws SQLException {
         if (authorizeService.isAdmin(context, item)) {

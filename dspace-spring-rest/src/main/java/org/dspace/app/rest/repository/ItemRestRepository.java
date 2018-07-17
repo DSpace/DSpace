@@ -65,7 +65,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         List<Item> items = new ArrayList<Item>();
         int total = 0;
         try {
-            total = is.countTotal(context);
+            total = is.countArchivedNotWithdrawnItems(context);
             it = is.findAll(context, pageable.getPageSize(), pageable.getOffset());
             while (it.hasNext()) {
                 Item i = it.next();

@@ -629,4 +629,13 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
+
+    /**
+     * counts all archived and not withdrawn items
+     *
+     * @param context DSpace context object
+     * @return total items
+     * @throws SQLException if database error
+     */
+    int countArchivedNotWithdrawnItems(Context context) throws SQLException;
 }
