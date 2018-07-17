@@ -1,37 +1,33 @@
+
 RewriteEngine on
 
-#RewriteRule ^/+themes/.*:.*$ /error [R=permanent,L]
-
-#External redirect para accessos a la colección de la radiouniversidad. No quitar
-RewriteRule ^radio(.*)$ /handle/10915/25224$1 [R=permanent,L]
+###################################################
+## Redirecciones de rutas pre 2012 (ticket 4665) ##
+###################################################
 
 #External redirect para accessos phpoai de sedici2003
-RewriteRule ^phpoai/oai2.php(.*)$ /oai/request$1 [R=permanent,L]
-
-#Internal rewrite
+RewriteRule ^phpoai/oai2.php(.*)$ /oai/request$1 [L,R=301]
+ 
 #De: /ARG-UNLP-EBook-0000000001/1789.pdf
-#A: /search/downloadp.php?id_document=ARG-UNLP-EBook-0000000001&id_parte=1789
-RewriteRule ^([^/]+)/([0-9]+)\.[a-z]{3}$ /search/downloadp.php?id_document=$1&id_parte=$2 [L,NC]
+RewriteRule ^([a-zA-Z0-9\-]+)/([0-9]+)\.[a-z]{3}$ /discover?query="$1" [L,R=301]
+ 
+#De: /?id=ARG-UNLP-EBook-0000000001 
+RewriteCond %{QUERY_STRING} id=([a-zA-Z0-9\-]+)(.*)    
+RewriteRule ^$ /discover?query="%1" [L,R=301]
 
-#Internal rewrite
-#De: /?id=ARG-UNLP-EBook-0000000001
 #De: /index.php?id=ARG-UNLP-ART-0000008109
-#A: /search/request.php?id_document=ARG-UNLP-EBook-0000000001
-RewriteCond %{QUERY_STRING} id=([^&]*)
-RewriteRule ^([^/]*)$ search/request.php?id_document=%1 [L,NC]
+RewriteCond %{QUERY_STRING} id=([a-zA-Z0-9\-]+)(.*)
+RewriteRule ^index.php$ /discover?query="%1" [L,R=301]
 
-#Internal rewrite
-#De: /static/redirector.php?adress=oai/oai
-#A: /static/oai/oai.php
-RewriteCond %{QUERY_STRING} ^.*adress=([^&]*).*$
-RewriteRule ^static/redirector.php(.*)$ static/%1.php [L]
+#De: /search/request.php?id_document=ARG-UNLP-ART-0000008109
+RewriteCond %{QUERY_STRING} id_document=([a-zA-Z0-9\-]+)(.*)
+RewriteRule ^search/request.php$ /discover?query="%1" [L,R=301]
 
-#Internal rewrite al aspecto de redirección de DSpace
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_URI} !redirect.php$
-RewriteCond %{REQUEST_URI} \.php$ [OR]
-RewriteCond %{REQUEST_URI} ^/autoarchivo/.*
-RewriteRule ^(.*)$ /redirect.php?old_url=\/$1\&%{QUERY_STRING}  [L]
+RewriteRule ^rss.php$ /feed/rss_2.0/site [L,R=301]
+
+RewriteRule ^recorrido/recorrido.php /community-list [L,R=301]
+
+RewriteRule ^search/(.*).php /discover [L,R=301]
 
 ###################################################
 ###################################################
