@@ -72,7 +72,6 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
 
         query.setParameter("handle", handle);
 
-        query.setCacheable(true);
         return uniqueResult(query);
     }
 
