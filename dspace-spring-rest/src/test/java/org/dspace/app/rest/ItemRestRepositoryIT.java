@@ -319,7 +319,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void widthdrawPatchTest() throws Exception {
+    public void withdrawPatchTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -345,7 +345,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         // is used in the provenance note.
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList();
+        List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -359,12 +359,114 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
                         .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
 
+        // check item status after the patch
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+
         // item already withdrawn, no-op, 200 response
         getClient(token).perform(patch("/api/core/items/" + item.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+    }
 
+    @Test
+    public void withdrawPatchUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+
+        //2. One public item
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // withdraw item
+        getClient().perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isUnauthorized());
+
+        // use the admin to be sure to get the item status
+        String tokenAdmin = getAuthToken(eperson.getEmail(), password);
+
+        // check item status after the failed patch
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+    }
+
+    @Test
+    public void withdrawPatchForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+
+        //2. One public item
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        // try to use an unauthorized user
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // withdraw item
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
+
+        // use the admin to be sure to get the item status
+        String tokenAdmin = getAuthToken(eperson.getEmail(), password);
+
+        // check item status after the failed patch
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
     }
 
     @Test
@@ -382,6 +484,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1").build();
 
+        // we need to set a current user as the withdrawn operation use it to add provenance information
+        context.setCurrentUser(admin);
+
         //2. One public item
         Item item = ItemBuilder.createItem(context, col1)
                                .withTitle("Public item 1")
@@ -390,9 +495,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
+        //2. One withdrawn item
+        Item item2 = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .withdrawn()
+                               .build();
+
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList();
+        List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", null);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -401,6 +515,25 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isBadRequest());
+
+        // check item status after the failed patch (it must be unchanged)
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isBadRequest());
+
+        // check item status after the failed patch (it must be unchanged)
+        getClient(token).perform(get("/api/core/items/" + item2.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item2.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
     }
 
     @Test
@@ -418,31 +551,23 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                                            .withName("Collection 1").build();
 
+        // we need to set a current user as the withdrawn operation use it to add provenance information
+        context.setCurrentUser(admin);
+
         //2. One public item
         Item item = ItemBuilder.createItem(context, col1)
                                .withTitle("Public item 1")
                                .withIssueDate("2017-10-17")
                                .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                .withSubject("ExtraEntry")
+                               .withdrawn()
                                .build();
 
         // A token must be provided for reinstate operation. The person
         // is used in the provenance note.
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList();
-        // first, withdraw item
-        ReplaceOperation initalizeOperation = new ReplaceOperation("/withdrawn", true);
-        ops.add(initalizeOperation);
-        String patchInitialState = getPatchContent(ops);
-
-        getClient(token).perform(patch("/api/core/items/" + item.getID())
-            .content(patchInitialState)
-            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isOk());
-
-        // now reinstate item
-        ops.clear();
+        List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -454,6 +579,119 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                    .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
                    .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        // check item status after the patch
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+
+        // reinstate an already installed item is a no-op
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                       .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                       .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+    }
+
+    @Test
+    public void reinstatePatchUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+
+        // we need to set a current user as the withdrawn operation use it to add provenance information
+        context.setCurrentUser(admin);
+
+        //2. One public item
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .withdrawn()
+                               .build();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", false);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // make an anonymous request
+        getClient().perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                   .andExpect(status().isUnauthorized());
+
+        // check item status after the failed patch
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+    }
+
+    @Test
+    public void reinstatePatchForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1").build();
+
+        // we need to set a current user as the withdrawn operation use it to add provenance information
+        context.setCurrentUser(admin);
+
+        //2. One public item
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .withdrawn()
+                               .build();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", false);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // make a request with an unauthorized user
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                   .andExpect(status().isForbidden());
+
+        // check item status after the failed patch
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.withdrawn", Matchers.is(true)))
+                        .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
     }
 
     @Test
@@ -478,19 +716,122 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .makePrivate()
                                .build();
-        List<Operation> ops = new ArrayList();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
         // make discoverable
-        getClient().perform(patch("/api/core/items/" + item.getID())
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                         .andExpect(jsonPath("$.discoverable", Matchers.is(true)));
 
+        // check item status after the patch
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(true)));
+
+        // make discoverable an already discoverable item is a no-op
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(true)));
+    }
+
+    @Test
+    public void makeDiscoverablePatchUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One private item
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .makePrivate()
+                               .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // make discoverable with anonymous user
+        getClient().perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isUnauthorized());
+
+        // check item status after the patch
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
+    }
+
+    @Test
+    public void makeDiscoverablePatchForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One private item
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .makePrivate()
+                               .build();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // make discoverable with anonymous user
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
+
+        // check item status after the patch
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
     }
 
     @Test
@@ -515,18 +856,112 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        List<Operation> ops = new ArrayList();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
         // make private
-        getClient().perform(patch("/api/core/items/" + item.getID())
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                    .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
+
+        // check item status after the patch
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
+
+    }
+
+    @Test
+    public void makePrivatePatchUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public item
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", false);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // make private with an anonymous user
+        getClient().perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                   .andExpect(status().isUnauthorized());
+
+        // check item status after the failed patch
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(true)));
+
+    }
+
+    public void makePrivatePatchForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public item
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", false);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // make private
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                   .andExpect(status().isForbidden());
+
+        // check item status after the failed patch
+        getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(true)));
 
     }
 
@@ -553,9 +988,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        String token = getAuthToken(eperson.getEmail(), password);
+        //3. One private item
+        Item item2 = ItemBuilder.createItem(context, col1)
+                               .withTitle("Not discoverable item 2")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .makePrivate()
+                               .build();
 
-        List<Operation> ops = new ArrayList();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", null);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -564,6 +1008,29 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isBadRequest());
+
+        // check item status after the failed patch (it must be unchanged)
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(true)));
+
+        List<Operation> ops2 = new ArrayList();
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/discoverable", null);
+        ops.add(replaceOperation);
+        String patchBody2 = getPatchContent(ops);
+
+        getClient(token).perform(patch("/api/core/items/" + item2.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        // check item status after the failed patch (it must be unchanged)
+        getClient(token).perform(get("/api/core/items/" + item2.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item2.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
+
     }
 
 }
