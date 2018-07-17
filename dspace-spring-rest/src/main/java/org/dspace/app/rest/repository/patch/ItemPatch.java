@@ -120,10 +120,11 @@ public class ItemPatch extends AbstractResourcePatch<ItemRest> {
      * @param restModel
      * @param context
      * @param isDiscoverable
-     * @throws PatchBadRequestException
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     private void discoverable(ItemRest restModel, Context context, Boolean isDiscoverable)
-        throws PatchBadRequestException {
+        throws SQLException, AuthorizeException {
 
         if (isDiscoverable == null) {
             throw new PatchBadRequestException("Boolean value not provided for discoverable operation.");
@@ -131,8 +132,10 @@ public class ItemPatch extends AbstractResourcePatch<ItemRest> {
         try {
             Item item = is.find(context, UUID.fromString(restModel.getUuid()));
             item.setDiscoverable(isDiscoverable);
-        } catch (SQLException e) {
-            e.printStackTrace();
+            is.update(context, item);
+        } catch (SQLException | AuthorizeException e) {
+            log.error(e.getMessage(), e);
+            throw e;
         }
 
     }
