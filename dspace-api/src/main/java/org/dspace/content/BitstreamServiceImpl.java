@@ -128,14 +128,31 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     
     @Override
     public Bitstream create(Context context, InputStream is) throws IOException, SQLException {
+        return create(context, is, null);
+    }
+
+    @Override
+    public Bitstream create(Context context, InputStream is, UUID uuid) throws IOException, SQLException {
+        Bitstream bitstream;
+        if (uuid != null) {
+            bitstream = find(context, uuid);
+            if (bitstream != null) {
+                bitstream.setDeleted(false);
+            } else {
+                bitstream = bitstreamDAO.create(context, new Bitstream(uuid));
+            }
+        } else {
+            bitstream = bitstreamDAO.create(context, new Bitstream());
+        }
+
         // Store the bits
-        UUID bitstreamID = bitstreamStorageService.store(context, bitstreamDAO.create(context, new Bitstream()), is);
+        UUID bitstreamID = bitstreamStorageService.store(context, bitstream, is);
 
         log.info(LogManager.getHeader(context, "create_bitstream",
                 "bitstream_id=" + bitstreamID));
 
         // Set the format to "unknown"
-        Bitstream bitstream = find(context, bitstreamID);
+        bitstream = find(context, bitstreamID);
         setFormat(context, bitstream, null);
 
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null, getIdentifiers(context, bitstream)));
@@ -145,10 +162,15 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public Bitstream create(Context context, Bundle bundle, InputStream is) throws IOException, SQLException, AuthorizeException {
+        return create(context, bundle, is, null);
+    }
+
+    @Override
+    public Bitstream create(Context context, Bundle bundle, InputStream is, UUID uuid) throws IOException, SQLException, AuthorizeException {
         // Check authorisation
         authorizeService.authorizeAction(context, bundle, Constants.ADD);
 
-        Bitstream b = create(context, is);
+        Bitstream b = create(context, is, uuid);
         bundleService.addBitstream(context, bundle, b);
         return b;
     }

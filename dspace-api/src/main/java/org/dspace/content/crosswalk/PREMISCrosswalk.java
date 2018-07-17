@@ -230,11 +230,21 @@ public class PREMISCrosswalk
         premis.addContent(object);
 
         // objectIdentifier is required
+        // Store the internal and external addresses
         Element oid = new Element("objectIdentifier", PREMIS_NS);
         Element oit = new Element("objectIdentifierType", PREMIS_NS);
-        oit.setText("URL");
+        oit.setText("INTERNAL");
         oid.addContent(oit);
         Element oiv = new Element("objectIdentifierValue", PREMIS_NS);
+        oiv.setText(bitstream.getStoreNumber() + ":" + bitstream.getInternalId());
+        oid.addContent(oiv);
+        object.addContent(oid);
+
+        oid = new Element("objectIdentifier", PREMIS_NS);
+        oit = new Element("objectIdentifierType", PREMIS_NS);
+        oit.setText("URL");
+        oid.addContent(oit);
+        oiv = new Element("objectIdentifierValue", PREMIS_NS);
 
         // objectIdentifier value: by preference, if available:
         //  a. DSpace "persistent" URL to bitstream, if components available.
@@ -264,7 +274,7 @@ public class PREMISCrosswalk
         {
             oiv.setText(baseUrl
                     + "/bitstream/"
-                    + URLEncoder.encode(handle, "UTF-8")
+                    + handle
                     + "/"
                     + sid
                     + "/"

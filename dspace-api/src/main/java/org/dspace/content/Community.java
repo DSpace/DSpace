@@ -86,6 +86,10 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     {
 
     }
+    protected Community(UUID uuid)
+    {
+        this.predefinedUUID = uuid;
+    }
 
     void addSubCommunity(Community subCommunity)
     {

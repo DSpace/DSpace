@@ -157,12 +157,16 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         return item;
     }
 
-    @Override
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
+        return create(context, workspaceItem, null);
+    }
+
+    @Override
+    public Item create(Context context, WorkspaceItem workspaceItem, UUID uuid) throws SQLException, AuthorizeException {
         if (workspaceItem.getItem() != null) {
             throw new IllegalArgumentException("Attempting to create an item for a workspace item that already contains an item");
         }
-        Item item = createItem(context);
+        Item item = createItem(context, uuid);
         workspaceItem.setItem(item);
 
 
@@ -181,7 +185,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         AuthorizeUtil.authorizeManageTemplateItem(context, collection);
 
         if (collection.getTemplateItem() == null) {
-            Item template = createItem(context);
+            Item template = createItem(context, null);
             collection.setTemplateItem(template);
             template.setTemplateItemOf(collection);
 
@@ -374,8 +378,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         return bitstreamList;
     }
 
-    protected Item createItem(Context context) throws SQLException, AuthorizeException {
-        Item item = itemDAO.create(context, new Item());
+    protected Item createItem(Context context, UUID uuid) throws SQLException, AuthorizeException {
+        Item item;
+        if (uuid != null) {
+            item = itemDAO.create(context, new Item(uuid));
+        } else {
+            item = itemDAO.create(context, new Item());
+        }
         // set discoverable to true (default)
         item.setDiscoverable(true);
 

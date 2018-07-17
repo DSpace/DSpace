@@ -46,6 +46,20 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException;
 
     /**
+     * Create a new item, with a provided ID. This method is not public,
+     * since items need to be created as workspace items. Authorisation is the
+     * responsibility of the caller.
+     *
+     * @param context DSpace context object
+     * @param workspaceItem in progress workspace item
+     * @param uuid the pre-determined UUID to assign to the new item
+     * @return the newly created item
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Item create(Context context, WorkspaceItem workspaceItem, UUID uuid) throws SQLException, AuthorizeException;
+
+    /**
      * Create an empty template item for this collection. If one already exists,
      * no action is taken. Caution: Make sure you call <code>update</code> on
      * the collection after doing this, or the item will have been created but

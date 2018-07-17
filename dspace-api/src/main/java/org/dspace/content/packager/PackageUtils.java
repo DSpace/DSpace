@@ -457,7 +457,7 @@ public class PackageUtils
      * @throws SQLException if database error
      * @throws IOException if IO error
      */
-    public static DSpaceObject createDSpaceObject(Context context, DSpaceObject parent, int type, String handle, PackageParameters params)
+    public static DSpaceObject createDSpaceObject(Context context, DSpaceObject parent, int type, String handle, UUID uuid, PackageParameters params)
         throws AuthorizeException, SQLException, IOException
     {
         DSpaceObject dso = null;
@@ -465,25 +465,25 @@ public class PackageUtils
         switch (type)
         {
             case Constants.COLLECTION:
-                dso = collectionService.create(context, (Community) parent, handle);
+                dso = collectionService.create(context, (Community) parent, handle, uuid);
                 return dso;
 
             case Constants.COMMUNITY:
                 // top-level community?
                 if (parent == null || parent.getType() == Constants.SITE)
                 {
-                    dso = communityService.create(null, context, handle);
+                    dso = communityService.create(null, context, handle, uuid);
                 }
                 else
                 {
-                    dso = communityService.createSubcommunity(context, ((Community) parent), handle);
+                    dso = communityService.createSubcommunity(context, ((Community) parent), handle, uuid);
                 }
                 return dso;
 
             case Constants.ITEM:
                 //Initialize a WorkspaceItem
                 //(Note: Handle is not set until item is finished)
-                WorkspaceItem wsi = workspaceItemService.create(context, (Collection)parent, params.useCollectionTemplate());
+                WorkspaceItem wsi = workspaceItemService.create(context, (Collection)parent, uuid, params.useCollectionTemplate());
 
                 // Please note that we are returning an Item which is *NOT* yet in the Archive,
                 // and doesn't yet have a handle assigned.

@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service interface class for the Bitstream object.
@@ -58,6 +59,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * @throws SQLException if database error
      */
     public Bitstream create(Context context, InputStream is) throws IOException, SQLException;
+    public Bitstream create(Context context, InputStream is, UUID uuid) throws IOException, SQLException;
 
     /**
      * Create a new bitstream, with a new ID. The checksum and file size are
@@ -78,7 +80,8 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * @throws AuthorizeException if authorization error
      */
     public Bitstream create(Context context, Bundle bundle, InputStream is) throws IOException, SQLException, AuthorizeException;
- 
+    public Bitstream create(Context context, Bundle bundle, InputStream is, UUID uuid) throws IOException, SQLException, AuthorizeException;
+
     /**
      * Register a new bitstream, with a new ID.  The checksum and file size
      * are calculated. The newly created bitstream has the "unknown"

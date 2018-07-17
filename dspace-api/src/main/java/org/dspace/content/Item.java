@@ -97,6 +97,11 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
 
     }
 
+    protected Item(UUID uuid)
+    {
+        this.predefinedUUID = uuid;
+    }
+
     /**
      * Find out if the item is part of the main archive
      *

@@ -8,8 +8,6 @@
 package org.dspace.content;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.handle.Handle;
@@ -29,8 +27,8 @@ import javax.persistence.*;
 public abstract class DSpaceObject implements Serializable, ReloadableEntity<java.util.UUID>
 {
     @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+    @GeneratedValue(generator = "check-existing-uuid")
+    @GenericGenerator(name = "check-existing-uuid", strategy = "org.dspace.storage.rdbms.hibernate.CheckExistingUUIDGenerator")
     @Column(name = "uuid", unique = true, nullable = false, insertable = true, updatable = false)
     protected java.util.UUID id;
 
@@ -63,6 +61,12 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     /** Flag set when data is modified, for events */
     @Transient
     private boolean modified = false;
+
+    @Transient
+    protected UUID predefinedUUID;
+    public UUID getPredefinedUUID() {
+        return predefinedUUID;
+    }
 
     protected DSpaceObject()
     {

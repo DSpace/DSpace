@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Service interface class for the WorkspaceItem object.
@@ -60,6 +61,9 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * @throws AuthorizeException if authorization error
      */
     public WorkspaceItem create(Context context, Collection collection,  boolean template)
+            throws AuthorizeException, SQLException;
+
+    public WorkspaceItem create(Context context, Collection collection, UUID uuid, boolean template)
             throws AuthorizeException, SQLException;
 
     public WorkspaceItem create(Context c, WorkflowItem wfi) throws SQLException, AuthorizeException;

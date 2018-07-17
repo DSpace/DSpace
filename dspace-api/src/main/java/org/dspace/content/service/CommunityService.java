@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.UUID;
 
 /**
  * Service interface class for the Community object.
@@ -57,6 +58,20 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      * @throws AuthorizeException if authorization error
      */
     public Community create(Community parent, Context context, String handle)
+            throws SQLException, AuthorizeException;
+
+    /**
+     * Create a new top-level community, with a new ID.
+     *
+     * @param parent parent community
+     * @param context DSpace context object
+     * @param handle the pre-determined Handle to assign to the new community
+     * @poram uuid the pre-determined UUID to assign to the new community
+     * @return the newly created community
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Community create(Community parent, Context context, String handle, UUID uuid)
             throws SQLException, AuthorizeException;
 
 
@@ -243,6 +258,20 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      * @throws AuthorizeException if authorization error
      */
     public Community createSubcommunity(Context context, Community parentCommunity, String handle)
+            throws SQLException, AuthorizeException;
+
+    /**
+     * Create a new sub-community within this community.
+     *
+     * @param context context
+     * @param handle the pre-determined Handle to assign to the new community
+     * @param parentCommunity parent community
+     * @param uuid the pre-determined UUID to assign to the new community
+     * @return the new community
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Community createSubcommunity(Context context, Community parentCommunity, String handle, UUID uuid)
             throws SQLException, AuthorizeException;
 
     /**

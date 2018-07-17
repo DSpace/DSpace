@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.UUID;
 
 /**
  * Service interface class for the Collection object.
@@ -60,6 +61,21 @@ public interface CollectionService extends DSpaceObjectService<Collection>, DSpa
      * @throws AuthorizeException if authorization error
      */
     public Collection create(Context context, Community community, String handle) throws SQLException,
+            AuthorizeException;
+
+    /**
+     * Create a new collection with the supplied handle and ID.
+     * Once created the collection is added to the given community
+     *
+     * @param context DSpace context object
+     * @param community DSpace Community (parent)
+     * @param handle the pre-determined Handle to assign to the new collection
+     * @param uuid the pre-determined UUID to assign to the new collection
+     * @return the newly created collection
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Collection create(Context context, Community community, String handle, UUID uuid) throws SQLException,
             AuthorizeException;
 
     /**

@@ -7,19 +7,20 @@
  */
 package org.dspace.content.packager;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
@@ -429,6 +430,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             handle = getObjectHandle(manifest);
         }
 
+        UUID uuid = getObjectID(manifest);
+
         // -- Step 2 --
         // Create our DSpace Object based on info parsed from manifest, and
         // packager params
@@ -436,7 +439,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         try
         {
             dso = PackageUtils.createDSpaceObject(context, parent,
-                    type, handle, params);
+                    type, handle, uuid, params);
         }
         catch (SQLException sqle)
         {
@@ -791,10 +794,20 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
             // retrieve path/name of file in manifest
             String path = METSManifest.getFileName(mfile);
-
-            // extract the file input stream from package (or retrieve
-            // externally, if it is an externally referenced file)
-            InputStream fileStream = getFileInputStream(pkgFile, params, path);
+            Pair<Integer, String> internal = METSManifest.getFileInternal(mfile);
+            Pattern uuidPattern = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+            Matcher match = uuidPattern.matcher(path);
+            UUID uuid = null;
+            if (match.find()) {
+                uuid = UUID.fromString(match.group());
+            }
+            int bitstore = -1;
+            String internalId = null;
+            if (internal != null) {
+                bitstore = internal.getLeft();
+                internalId = internal.getRight();
+            }
+            Bitstream bitstream = bitstreamService.find(context, uuid);
 
             // retrieve bundle name from manifest
             String bundleName = METSManifest.getBundleName(mfile);
@@ -811,8 +824,48 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 bundle = bundleService.create(context, item, bundleName);
             }
 
-            // Create the bitstream in the bundle & initialize its name
-            Bitstream bitstream = bitstreamService.create(context, bundle, fileStream);
+            InputStream fileStream = null;
+            if (bitstream != null) { // If we found a bitstream row
+                // Check to see if file is available in assetstore
+                try {
+                    fileStream = bitstreamService.retrieve(context, bitstream);
+                    // Found file, restore item
+                    bitstream.setDeleted(false);
+                    bitstreamService.setFormat(context, bitstream, null);
+                    bundleService.addBitstream(context, bundle, bitstream);
+                } catch (IOException ignored) {
+                    //File missing, delete bitstream record
+                    bitstreamService.delete(context, bitstream);
+                }
+            } else if (internal != null) { // If we didn't find a bitstream row
+                // Check to see if file is availabe in assetstore
+                Bitstream dummyBitstream = bitstreamService.create(context, new ByteArrayInputStream(new byte[0]));
+                dummyBitstream.setStoreNumber(bitstore);
+                dummyBitstream.setInternalId(internalId);
+                try {
+                    fileStream = bitstreamService.retrieve(context, dummyBitstream);
+                    // Found file, restore bitstream
+                    // Create the bitstream in the bundle & initialize its name
+                    bitstream = bitstreamService.create(context, bundle, fileStream, uuid);
+                } catch (IOException ignored) { // This is expected when the file is not found
+                } catch (SQLException e) { // This probably means the record is still in the dspaceobject table
+                    log.error(e);
+                    throw e;
+                }finally {
+                    bitstreamService.delete(context, dummyBitstream);
+                    bitstreamService.expunge(context, dummyBitstream);
+                }
+            }
+
+            // Bitstream is new or assetstore file was removed
+            if (fileStream == null) {
+                // extract the file input stream from package (or retrieve
+                // externally, if it is an externally referenced file)
+                fileStream = getFileInputStream(pkgFile, params, path);
+
+                // Create the bitstream in the bundle & initialize its name
+                bitstream = bitstreamService.create(context, bundle, fileStream, uuid);
+            }
             bitstream.setName(context, path);
 
              // Set bitstream sequence id, if known
@@ -1421,6 +1474,22 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
 
         return handle;
+    }
+
+    public UUID getObjectID(METSManifest manifest)
+            throws PackageValidationException {
+        Element mets = manifest.getMets();
+        String idStr = mets.getAttributeValue("ID");
+        if (idStr == null || idStr.length() == 0) {
+            throw new PackageValidationException("Manifest is missing the required mets@ID attribute.");
+        }
+        if (idStr.contains("DB-ID-")) {
+            idStr = idStr.substring(idStr.lastIndexOf("DB-ID-")+6, idStr.length());
+        }
+        try {
+            return UUID.fromString(idStr);
+        } catch (IllegalArgumentException ignored) {}
+        return null;
     }
 
     /**

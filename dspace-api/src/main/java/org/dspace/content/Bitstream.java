@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -83,6 +84,10 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     protected Bitstream()
     {
+    }
+    protected Bitstream(UUID uuid)
+    {
+        this.predefinedUUID = uuid;
     }
 
     /**

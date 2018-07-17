@@ -115,6 +115,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     {
 
     }
+    protected Collection(UUID uuid)
+    {
+        this.predefinedUUID = uuid;
+    }
 
     @Override
     public String getName()

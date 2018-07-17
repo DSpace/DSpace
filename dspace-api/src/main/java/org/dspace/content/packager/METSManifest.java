@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -142,6 +144,10 @@ public class METSManifest
     /** METS namespace -- includes "mets" prefix for use in XPaths */
     public static final Namespace metsNS = Namespace
             .getNamespace("mets", "http://www.loc.gov/METS/");
+
+    /** PREMIS namespace -- includes "premis" prefix for use in XPaths */
+    public static final Namespace premisNS = Namespace
+            .getNamespace("premis", "http://www.loc.gov/standards/premis");
 
     /** XLink namespace -- includes "xlink" prefix prefix for use in XPaths */
     public static final Namespace xlinkNS = Namespace
@@ -540,7 +546,7 @@ public class METSManifest
         }
         else
         {
-            throw new MetadataValidationException("getFileName() called with recognized element type: " + file.toString());
+            throw new MetadataValidationException("getFileName() called with unrecognized element type: " + file.toString());
         }
         String loctype = ref.getAttributeValue("LOCTYPE");
         if (loctype != null && loctype.equals("URL"))
@@ -553,6 +559,49 @@ public class METSManifest
             return result;
         }
         throw new MetadataValidationException("Invalid METS Manifest: FLocat/mdRef does not have LOCTYPE=\"URL\" attribute.");
+    }
+
+    /**
+     * Get the internal address of this <code>file</code> element.
+     * This information is returned as a Pair object representing the bitstore number & internalID
+     * @param file file element
+     * @return Pair with bitstore number & internalID
+     * @throws MetadataValidationException when there is not enough information to find a resource identifier.
+     */
+    public static Pair<Integer, String> getFileInternal(Element file)
+            throws MetadataValidationException {
+        if (!file.getName().equals("file")) {
+            throw new MetadataValidationException("getFileInternal() called with unrecognized element type: " + file.toString());
+        }
+
+        try {
+            String amdSecID = file.getAttributeValue("ADMID");
+            for (Object section : file.getParentElement().getParentElement().getParentElement().getChildren("amdSec", metsNS)) {
+                if (section instanceof Element) {
+                    Element amdSec = (Element) section;
+                    String id = amdSec.getAttributeValue("ID");
+                    if (amdSecID.equals(id)) {
+                        List objectIdentifiers = amdSec.getChild("techMD", metsNS)
+                                .getChild("mdWrap", metsNS)
+                                .getChild("xmlData", metsNS)
+                                .getChild("premis", premisNS)
+                                .getChild("object", premisNS)
+                                .getChildren("objectIdentifier", premisNS);
+                        for (Object objectIdentifier : objectIdentifiers) {
+                            if (objectIdentifier instanceof Element) {
+                                Element identifier = (Element) objectIdentifier;
+                                String type = identifier.getChild("objectIdentifierType", premisNS).getValue();
+                                if (type.equals("INTERNAL")) {
+                                    String[] values = identifier.getChild("objectIdentifierValue", premisNS).getValue().split(":");
+                                    return new ImmutablePair<>(Integer.parseInt(values[0]), values[1]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (NullPointerException | NumberFormatException ignored) {}
+        return null;
     }
 
     /**
