@@ -8,8 +8,7 @@
 /**
  * Providers of durable unique identifiers (Handles, DOIs, etc.).
  * Generally, subclasses of {@link org.dspace.identifier.IdentifierProvider}
- * offer methods to create, delete, and resolve subclasses of
- * {@link org.dspace.identifier.Identifier}.  Classes outside this package
+ * offer methods to create, delete, and resolve identifiers. Classes outside this package
  * should rely on {@link org.dspace.identifier.service.IdentifierService} to perform
  * these operations using the most appropriate provider.
  */

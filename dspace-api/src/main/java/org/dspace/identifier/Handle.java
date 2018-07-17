@@ -12,5 +12,5 @@ package org.dspace.identifier;
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
-public class Handle implements Identifier {
+public class Handle {
 }

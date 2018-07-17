@@ -140,7 +140,7 @@ public class DOIIdentifierProvider
      * @return boolean
      */
     @Override
-    public boolean supports(Class<? extends Identifier> identifier) {
+    public boolean supports(Class<?> identifier) {
         return DOI.class.isAssignableFrom(identifier);
     }
 

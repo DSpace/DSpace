@@ -207,7 +207,7 @@ public class EZIDIdentifierProviderTest
                                                                .getServiceByName(EZIDIdentifierProvider.class.getName(),
                                                                                  EZIDIdentifierProvider.class);
 
-        Class<? extends Identifier> identifier = DOI.class;
+        Class<?> identifier = DOI.class;
         boolean result = instance.supports(identifier);
         assertTrue("DOI is supported", result);
     }

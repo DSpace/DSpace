@@ -41,7 +41,7 @@ public abstract class IdentifierProvider {
      * @param identifier requested type.
      * @return true if the given type is assignable from this provider's type.
      */
-    public abstract boolean supports(Class<? extends Identifier> identifier);
+    public abstract boolean supports(Class<?> identifier);
 
     /**
      * Can this provider provide identifiers of a given type?

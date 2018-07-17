@@ -14,12 +14,19 @@ import static org.hamcrest.Matchers.is;
 import java.util.UUID;
 
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 public class CommunityMatcher {
 
     private CommunityMatcher() { }
+
+    public static Matcher<? super Object> matchCommunityEntry(Community community) {
+        return allOf(
+            matchCommunityEntry(community.getName(), community.getID(), community.getHandle())
+        );
+    }
 
     public static Matcher<? super Object> matchCommunityEntry(String name, UUID uuid, String handle) {
         return allOf(
