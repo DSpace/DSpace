@@ -76,11 +76,14 @@ public class AuthenticationRestController implements InitializingBean {
         Context context = ContextUtil.obtainContext(request);
         EPersonRest ePersonRest = null;
         if (context.getCurrentUser() != null) {
-            ePersonRest = ePersonConverter.fromModel(context.getCurrentUser());
+            ePersonRest = ePersonConverter.fromModelWithGroups(context, context.getCurrentUser());
         }
+
         AuthenticationStatusResource authenticationStatusResource = new AuthenticationStatusResource(
             new AuthenticationStatusRest(ePersonRest), utils);
+
         halLinkService.addLinks(authenticationStatusResource);
+
         return authenticationStatusResource;
     }
 
@@ -105,7 +108,7 @@ public class AuthenticationRestController implements InitializingBean {
     @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity logout() {
         //This is handled by org.dspace.app.rest.security.CustomLogoutHandler
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     protected ResponseEntity getLoginResponse(HttpServletRequest request, String failedMessage) {
@@ -116,6 +119,8 @@ public class AuthenticationRestController implements InitializingBean {
 
 
         if (context == null || context.getCurrentUser() == null) {
+            // Note that the actual HTTP status in this case is set by
+            // org.dspace.app.rest.security.StatelessLoginFilter.unsuccessfulAuthentication()
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                                  .body(failedMessage);
         } else {
@@ -123,6 +128,4 @@ public class AuthenticationRestController implements InitializingBean {
             return ResponseEntity.ok().build();
         }
     }
-
-
 }

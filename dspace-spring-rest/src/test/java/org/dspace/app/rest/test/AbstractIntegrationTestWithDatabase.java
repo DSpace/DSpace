@@ -50,6 +50,11 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     protected EPerson eperson;
 
     /**
+     * EPerson mock object in the Administrators group to use in the tests.
+     */
+    protected EPerson admin;
+
+    /**
      * The password of our test eperson
      */
     protected String password = "mySuperS3cretP4ssW0rd";
@@ -116,11 +121,30 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 // actually save the eperson to unit testing DB
                 ePersonService.update(context, eperson);
             }
+
             // Set our global test EPerson as the current user in DSpace
             context.setCurrentUser(eperson);
 
             // If our Anonymous/Administrator groups aren't initialized, initialize them as well
             EPersonServiceFactory.getInstance().getGroupService().initDefaultGroupNames(context);
+
+            admin = ePersonService.findByEmail(context, "admin@email.com");
+            if (admin == null) {
+                // This EPerson creation should only happen once (i.e. for first test run)
+                log.info("Creating initial EPerson (email=admin@email.com) for Unit Tests");
+                admin = ePersonService.create(context);
+                admin.setFirstName(context, "first (admin)");
+                admin.setLastName(context, "last (admin)");
+                admin.setEmail("admin@email.com");
+                admin.setCanLogIn(true);
+                admin.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+                ePersonService.setPassword(admin, password);
+                // actually save the eperson to unit testing DB
+                ePersonService.update(context, admin);
+                GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+                Group adminGroup = groupService.findByName(context, Group.ADMIN);
+                groupService.addMember(context, adminGroup, admin);
+            }
 
             context.restoreAuthSystemState();
         } catch (AuthorizeException ex) {
@@ -148,12 +172,15 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 context = new Context();
             }
             eperson = context.reloadEntity(eperson);
+            admin = context.reloadEntity(admin);
 
             context.turnOffAuthorisationSystem();
             if (eperson != null) {
                 EPersonServiceFactory.getInstance().getEPersonService().delete(context, eperson);
             }
-
+            if (admin != null) {
+                EPersonServiceFactory.getInstance().getEPersonService().delete(context, admin);
+            }
             parentCommunity = null;
             cleanupContext();
         } catch (Exception e) {
@@ -204,12 +231,4 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             setUp();
         }
     }
-
-    public void makeUserAdmin() throws Exception {
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group admin = groupService.findByName(context, Group.ADMIN);
-        groupService.addMember(context, admin, eperson);
-        context.commit();
-    }
-
 }

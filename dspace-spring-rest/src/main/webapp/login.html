@@ -44,6 +44,10 @@
             margin-bottom: 15px;
             padding: 7px 9px;
         }
+
+        .alternative-login {
+            margin-bottom: 10px;
+        }
     </style>
     <script src="browser/vendor/js/jquery-1.10.2.min.js"></script>
     <script src="browser/vendor/js/bootstrap.js"></script>
@@ -56,6 +60,10 @@
         <input type="text" class="input-block-level" placeholder="Username" id="username">
         <input type="password" class="input-block-level" placeholder="Password" id="password">
         <button type="button" class="btn btn-large btn-primary" id="login">Sign in</button>
+        <div class="other-login-methods hidden">
+            <h3>Other login methods:</h3>
+
+        </div>
     </form>
 </div>
 
@@ -91,15 +99,39 @@
           type : 'POST',
           success : successHandler,
           error : function(result, status, xhr) {
-              if (xhr == 401) {
-                  var loc = result.getResponseHeader("location");
-                  if (loc != null && loc != "") {
-                      document.location = loc;
+              if (result.status === 401) {
+                  var authenticate = result.getResponseHeader("WWW-Authenticate");
+                  var element = $('div.other-login-methods');
+                  if(authenticate !== null) {
+                      var realms = authenticate.match(/(\w+ (\w+=((".*?")|[^,]*)(, )?)*)/g);
+                      if (realms.length == 1){
+                          var loc = /location="([^,]*)"/.exec(authenticate);
+                          if (loc !== null && loc.length === 2) {
+                          document.location = loc[1];
+                          }
+                      } else if (realms.length > 1){
+                          for (var i = 0; i < realms.length; i++){
+                              addLocationButton(realms[i], element);
+
+                          }
+                      }
                   }
               }
           }
         });
 
+        function addLocationButton(realm, element){
+            element.removeClass("hidden");
+            var loc = /location="([^,]*)"/.exec(realm);
+            var name = /(\w+) (\w+=((".*?")|[^,]*)(, )?)*/.exec(realm);
+            if (loc !== null && loc.length === 2) {
+                element.append('<a href="' + loc[1] + '" class="btn btn-large btn-primary alternative-login">' + capitalizeFirstLetter(name[1]) + '</a>');
+            }
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
         
         $("#login").click(function() {
             $.ajax({

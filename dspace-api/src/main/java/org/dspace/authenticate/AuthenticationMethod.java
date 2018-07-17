@@ -210,4 +210,10 @@ public interface AuthenticationMethod {
     public String loginPageURL(Context context,
                                HttpServletRequest request,
                                HttpServletResponse response);
+
+    /**
+     * Returns a short name that uniquely identifies this authentication method
+     * @return The authentication method name
+     */
+    public String getName();
 }
