@@ -341,11 +341,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        makeUserAdmin();
-
         // A token must be provided for withdraw operation. The person
         // is used in the provenance note.
-        String token = getAuthToken(eperson.getEmail(), password);
+        String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
@@ -392,9 +390,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        makeUserAdmin();
-
-        String token = getAuthToken(eperson.getEmail(), password);
+        String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", null);
@@ -430,11 +426,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
-        makeUserAdmin();
-
         // A token must be provided for reinstate operation. The person
         // is used in the provenance note.
-        String token = getAuthToken(eperson.getEmail(), password);
+        String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList();
         // first, withdraw item
