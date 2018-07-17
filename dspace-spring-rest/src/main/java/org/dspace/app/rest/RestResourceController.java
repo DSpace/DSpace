@@ -550,7 +550,8 @@ public class RestResourceController implements InitializingBean {
      */
     @RequestMapping(method = RequestMethod.PATCH, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
-                                                 @PathVariable String model, @PathVariable UUID id,
+                                                 @PathVariable String model,
+                                                 @PathVariable(name = "uuid") UUID id,
                                                  @RequestBody(required = true) JsonNode jsonNode)
         throws HttpRequestMethodNotSupportedException {
         return patchInternal(request, apiCategory, model, id, jsonNode);
@@ -581,12 +582,9 @@ public class RestResourceController implements InitializingBean {
             Patch patch = patchConverter.convert(jsonNode);
             modelObject = repository.patch(request, apiCategory, model, id, patch);
         } catch (RepositoryMethodNotImplementedException | UnprocessableEntityException |
-            PatchBadRequestException e) {
+            PatchBadRequestException | ResourceNotFoundException e) {
             log.error(e.getMessage(), e);
             throw e;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         DSpaceResource result = repository.wrapResource(modelObject);
         linkService.addLinks(result);
