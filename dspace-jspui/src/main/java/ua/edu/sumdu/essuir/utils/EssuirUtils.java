@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.edu.sumdu.essuir.cache.Author;
+import ua.edu.sumdu.essuir.cache.AuthorCache;
 import ua.edu.sumdu.essuir.entity.*;
 import ua.edu.sumdu.essuir.repository.AuthorsRepository;
 import ua.edu.sumdu.essuir.repository.ChairRepository;
@@ -177,6 +178,7 @@ public class EssuirUtils {
     public static AuthorLocalization findAuthor(Author author) {
         String surname = author.getName("en").split(", ")[0];
         String initials = author.getName("en").split(", ")[1];
+        AuthorCache.update();
         return findAuthor(surname, initials);
     }
 }

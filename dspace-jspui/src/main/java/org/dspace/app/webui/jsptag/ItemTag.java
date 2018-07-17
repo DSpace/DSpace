@@ -8,6 +8,7 @@
 package org.dspace.app.webui.jsptag;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.MetadataExposure;
@@ -602,7 +603,7 @@ public class ItemTag extends TagSupport
 	                        String orcid = "";
                             if (browseIndex.equals("author")) {
                                 orcid = AuthorCache.getOrcid(value);
-                                if (orcid != null) {
+                                if (!StringUtils.isEmpty(orcid)) {
                                     orcid = String.format("&nbsp;<a href = \"http://orcid.org/%s\"><img src = \"/image/orcid.gif\" width=\"16px\"></a>", orcid);
                                 } else {
                                     orcid = "";

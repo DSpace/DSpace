@@ -127,7 +127,8 @@ public class AuthorCache {
 		            author.setName(res.getString("surname_uk") + ", " + res.getString("initials_uk"), "uk");
 		            author.setName(res.getString("surname_en") + ", " + res.getString("initials_en"), "en");
 		            author.setName(res.getString("surname_ru") + ", " + res.getString("initials_ru"), "ru");
-		        	
+		        	author.setOrcid(res.getString("orcid"));
+
 		        	authors.put(author.getName("uk"), author);
 		        	authors.put(author.getName("en"), author);
 		        	authors.put(author.getName("ru"), author);
