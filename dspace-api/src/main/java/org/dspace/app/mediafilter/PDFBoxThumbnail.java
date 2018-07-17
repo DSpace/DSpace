@@ -9,7 +9,6 @@ package org.dspace.app.mediafilter;
 
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
-import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -25,7 +24,7 @@ import org.dspace.content.Item;
  * @author Ivan Masár helix84@centrum.sk
  * @author Jason Sherman jsherman@usao.edu
  */
-public class PDFBoxThumbnail extends MediaFilter implements SelfRegisterInputFormats {
+public class PDFBoxThumbnail extends MediaFilter {
     @Override
     public String getFilteredName(String oldFilename) {
         return oldFilename + ".jpg";
@@ -73,22 +72,5 @@ public class PDFBoxThumbnail extends MediaFilter implements SelfRegisterInputFor
 
         JPEGFilter jpegFilter = new JPEGFilter();
         return jpegFilter.getThumb(currentItem, buf, verbose);
-    }
-
-    @Override
-    public String[] getInputMIMETypes() {
-        return ImageIO.getReaderMIMETypes();
-    }
-
-    @Override
-    public String[] getInputDescriptions() {
-        return null;
-    }
-
-    @Override
-    public String[] getInputExtensions() {
-        // Temporarily disabled as JDK 1.6 only
-        // return ImageIO.getReaderFileSuffixes();
-        return null;
     }
 }
