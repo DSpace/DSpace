@@ -56,7 +56,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT ").append(Community.class.getSimpleName()).append(" FROM Community as ")
-            .append(Community.class.getSimpleName()).append(" ");
+                    .append(Community.class.getSimpleName()).append(" ");
         addMetadataLeftJoin(queryBuilder, Community.class.getSimpleName(), Arrays.asList(sortField));
         addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), Collections.EMPTY_LIST);
 

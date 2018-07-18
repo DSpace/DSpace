@@ -63,7 +63,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
         for (MetadataField metadataField : metadataFields) {
             query.append(" left join ").append(tableIdentifier).append(".metadata ").append(metadataField.toString());
             query.append(" WITH ").append(metadataField.toString()).append(".metadataField.id").append(" = :")
-                .append(metadataField.toString());
+                 .append(metadataField.toString());
         }
     }
 
@@ -87,7 +87,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
                 if (StringUtils.isNotBlank(operator)) {
                     query.append(" (");
                     query.append("lower(STR(" + metadataField.toString()).append(".value)) ").append(operator)
-                        .append(" lower(:queryParam)");
+                         .append(" lower(:queryParam)");
                     query.append(")");
                     if (i < metadataFields.size() - 1) {
                         query.append(" OR ");

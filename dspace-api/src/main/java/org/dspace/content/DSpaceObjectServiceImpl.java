@@ -680,6 +680,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                         moved.getAuthority(), moved.getConfidence());
         }
     }
+
     @Override
     public void replaceMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
                                 String value, String authority, int confidence, int index) throws SQLException {
