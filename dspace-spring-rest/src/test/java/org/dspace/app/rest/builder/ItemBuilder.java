@@ -37,7 +37,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return builder.create(context, col);
     }
 
-     private ItemBuilder create(final Context context, final Collection col) {
+    private ItemBuilder create(final Context context, final Collection col) {
         this.context = context;
 
         try {

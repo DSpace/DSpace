@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.builder;
 
-import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
@@ -18,9 +17,6 @@ import org.dspace.core.Context;
  *
  **/
 public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, WorkspaceItemService> {
-
-    /* Log4j logger*/
-    private static final Logger log = Logger.getLogger(AbstractDSpaceObjectBuilder.class);
 
     private WorkspaceItem workspaceItem;
 
@@ -45,18 +41,9 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return this;
     }
 
-    protected <B> B handleException(final Exception e) {
-        log.error(e.getMessage(), e);
-        return null;
-    }
-
     @Override
     public WorkspaceItem build() {
-        try {
             return workspaceItem;
-        } catch (Exception e) {
-            return handleException(e);
-        }
     }
 
     @Override
