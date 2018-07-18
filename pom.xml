@@ -1154,6 +1154,9 @@
                 <artifactId>commons-collections4</artifactId>
                 <version>4.1</version>
             </dependency>
+            <!-- commons-collections v3 is still required by commons-beanutils,
+                 which is required by commons-configuration. Once those are
+                 upgraded, we should remove this dependency -->
             <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
