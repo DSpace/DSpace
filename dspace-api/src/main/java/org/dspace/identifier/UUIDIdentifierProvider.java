@@ -16,12 +16,16 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.util.UUIDUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UUIDIdentifierProvider extends IdentifierProvider {
 
     private static Logger log = Logger.getLogger(UUIDIdentifierProvider.class);
+
+    @Autowired
+    private ContentServiceFactory contentServiceFactory;
 
     public boolean supports(Class<?> identifier) {
         return UUID.class.isAssignableFrom(identifier);
@@ -44,16 +48,21 @@ public class UUIDIdentifierProvider extends IdentifierProvider {
     public DSpaceObject resolve(Context context, String identifier, String... attributes)
         throws IdentifierNotFoundException, IdentifierNotResolvableException {
 
-        for (DSpaceObjectService dSpaceObjectService : ContentServiceFactory.getInstance().getDSpaceObjectServices()) {
-            try {
-                DSpaceObject dSpaceObject = dSpaceObjectService.find(context, UUID.fromString(identifier));
-                if (dSpaceObject != null) {
-                    return dSpaceObject;
+        UUID uuid = UUIDUtils.fromString(identifier);
+
+        if (uuid != null) {
+            for (DSpaceObjectService dSpaceObjectService : contentServiceFactory.getDSpaceObjectServices()) {
+                try {
+                    DSpaceObject dSpaceObject = dSpaceObjectService.find(context, uuid);
+                    if (dSpaceObject != null) {
+                        return dSpaceObject;
+                    }
+                } catch (SQLException e) {
+                    log.error(e, e);
                 }
-            } catch (SQLException e) {
-                log.error(e, e);
             }
         }
+
         return null;
     }
 
