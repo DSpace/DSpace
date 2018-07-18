@@ -9,20 +9,15 @@ package org.dspace.app.rest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.matcher.CollectionMatcher;
-import org.dspace.app.rest.matcher.CommunityMatcher;
-import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -128,29 +123,6 @@ public class IdentifierRestControllerIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
-        //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
         context.restoreAuthSystemState();
         String collectionDetails = REST_SERVER_URL + "core/collections/" + col1.getID();
 
@@ -173,31 +145,6 @@ public class IdentifierRestControllerIT extends AbstractControllerIntegrationTes
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-
-        //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
 
         context.restoreAuthSystemState();
 

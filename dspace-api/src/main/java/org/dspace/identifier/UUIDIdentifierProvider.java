@@ -59,7 +59,7 @@ public class UUIDIdentifierProvider extends IdentifierProvider {
 
     public String lookup(Context context, DSpaceObject object)
         throws IdentifierNotFoundException, IdentifierNotResolvableException {
-        return object.getID().toString();
+        return object == null || object.getID() == null ? null : object.getID().toString();
     }
 
 
