@@ -97,7 +97,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
 
         List<MetadataField> sortFields = Collections.EMPTY_LIST;
 
-        if (metadataSortField != null) {ItemRestRepositoryIT
+        if (metadataSortField != null) {
             sortFields = Collections.singletonList(metadataSortField);
         }
 
