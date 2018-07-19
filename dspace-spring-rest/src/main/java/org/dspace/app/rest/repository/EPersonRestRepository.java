@@ -126,6 +126,16 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         return page;
     }
 
+    /**
+     * Find the epersons matching the query q parameter. The search is delegated to the
+     * {@link EPersonService#search(Context, String, int, int)} method
+     *
+     * @param q
+     *            is the *required* query string
+     * @param pageable
+     *            contains the pagination information
+     * @return a Page of EPersonRest instances matching the user query
+     */
     @SearchRestMethod(name = "byName")
     public Page<EPersonRest> findByName(@Parameter(value = "q", required = true) String q,
             Pageable pageable) {
@@ -142,6 +152,16 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         return page;
     }
 
+    /**
+     * Find the eperson with the provided email address if any. The search is delegated to the
+     * {@link EPersonService#findByEmail(Context, String)} method
+     *
+     * @param email
+     *            is the *required* email address
+     * @param pageable
+     *            contains the pagination information
+     * @return a Page of EPersonRest instances matching the user query
+     */
     @SearchRestMethod(name = "byEmail")
     public EPersonRest findByEmail(@Parameter(value = "email", required = true) String email) {
         EPerson eperson = null;
