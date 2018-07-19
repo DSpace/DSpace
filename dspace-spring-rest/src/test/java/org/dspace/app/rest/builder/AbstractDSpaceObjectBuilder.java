@@ -22,6 +22,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.MutablePeriod;
 import org.joda.time.format.PeriodFormat;
+import org.joda.time.format.PeriodFormatter;
 
 /**
  * Abstract builder to construct DSpace Objects
@@ -77,6 +78,17 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return (B) this;
     }
 
+    /**
+     * Support method to grant the {@link Constants#READ} permission over an object only to the {@link Group#ANONYMOUS}
+     * after the specified embargoPeriod. Any other READ permissions will be removed
+     *
+     * @param embargoPeriod
+     *            the embargo period after which the READ permission will be active. It is parsed using the
+     *            {@link PeriodFormatter#parseMutablePeriod(String)} method of the joda library
+     * @param dso
+     *            the DSpaceObject on which grant the permission
+     * @return the builder properly configured to retain read permission on the object only for the specified group
+     */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setEmbargo(String embargoPeriod, DSpaceObject dso) {
         // add policy just for anonymous
         try {
@@ -89,6 +101,16 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         }
     }
 
+    /**
+     * Support method to grant the {@link Constants#READ} permission over an object only to a specific group. Any other
+     * READ permissions will be removed
+     *
+     * @param dso
+     *            the DSpaceObject on which grant the permission
+     * @param group
+     *            the EPersonGroup that will be granted of the permission
+     * @return the builder properly configured to retain read permission on the object only for the specified group
+     */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setOnlyReadPermission(DSpaceObject dso, Group group,
                                                                                  Date startDate) {
         // add policy just for anonymous
@@ -107,6 +129,17 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return (B) this;
     }
 
+    /**
+     * Support method to grant {@link Constants#REMOVE} permission to a specific eperson
+     *
+     * @param dso
+     *            the DSpaceObject on which grant the permission
+     * @param eperson
+     *            the eperson that will be granted of the permission
+     * @param startDate
+     *            the optional start date from which the permission will be grant, can be <code>null</code>
+     * @return the builder properly configured to build the object with the additional remove permission
+     */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setRemovePermissionForEperson(DSpaceObject dso,
                                                                                          EPerson eperson,
                                                                                          Date startDate) {
@@ -125,6 +158,17 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return (B) this;
     }
 
+    /**
+     * Support method to grant {@link Constants#ADD} permission to a specific eperson
+     *
+     * @param dso
+     *            the DSpaceObject on which grant the permission
+     * @param eperson
+     *            the eperson that will be granted of the permission
+     * @param startDate
+     *            the optional start date from which the permission will be grant, can be <code>null</code>
+     * @return the builder properly configured to build the object with the additional add permission
+     */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setAddPermissionForEperson(DSpaceObject dso,
                                                                                       EPerson eperson,
                                                                                       Date startDate) {
@@ -143,6 +187,17 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return (B) this;
     }
 
+    /**
+     * Support method to grant {@link Constants#WRITE} permission to a specific eperson
+     *
+     * @param dso
+     *            the DSpaceObject on which grant the permission
+     * @param eperson
+     *            the eperson that will be granted of the permission
+     * @param startDate
+     *            the optional start date from which the permission will be grant, can be <code>null</code>
+     * @return the builder properly configured to build the object with the additional write permission
+     */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setWritePermissionForEperson(DSpaceObject dso,
                                                                                         EPerson eperson,
                                                                                         Date startDate) {
