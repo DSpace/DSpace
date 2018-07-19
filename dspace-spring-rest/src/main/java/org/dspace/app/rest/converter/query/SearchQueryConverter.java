@@ -15,8 +15,19 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.query.RestSearchOperator;
 import org.dspace.app.rest.parameter.SearchFilter;
 
+/**
+ * This method will traverse a list of SearchFilters and transform any SearchFilters with an operator
+ * this is equal to 'Query' into a SearchFilter that has a standard DSpace operator like 'contains'
+ */
 public class SearchQueryConverter {
 
+    /**
+     * This method traverses the list of SearchFilters and transforms all of those that contain 'Query'
+     * as the operator into a standard DSpace SearchFilter
+     *
+     * @param   searchFilters The list of SearchFilters to be used
+     * @return  A list of transformed SearchFilters
+     */
     public List<SearchFilter> convert(List<SearchFilter> searchFilters) {
 
         List<SearchFilter> transformedSearchFilters = new LinkedList<>();
@@ -32,6 +43,12 @@ public class SearchQueryConverter {
 
     }
 
+    /**
+     * This method takes care of the converter of a specific SearchFilter given to it
+     *
+     * @param searchFilter  The SearchFilter to be transformed
+     * @return  The transformed SearchFilter
+     */
     public SearchFilter convertQuerySearchFilterIntoStandardSearchFilter(SearchFilter searchFilter) {
         RestSearchOperator restSearchOperator = RestSearchOperator.forQuery(searchFilter.getValue());
         SearchFilter transformedSearchFilter = new SearchFilter(searchFilter.getName(),

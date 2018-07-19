@@ -381,7 +381,7 @@
         <property name="sortOrderFilterPage" value="COUNT"/>
         <property name="isOpenByDefault" value="true"/>
         <property name="pageSize" value="10"/>
-        <property name="exposeMinMax" value="true"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
 
     </bean>
 
@@ -412,7 +412,7 @@
         <property name="sortOrderFilterPage" value="COUNT"/>
         <property name="isOpenByDefault" value="false"/>
         <property name="pageSize" value="10"/>
-        <property name="exposeMinMax" value="true"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
 
     </bean>
     

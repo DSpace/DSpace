@@ -979,7 +979,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     boolean shouldExposeMinMax = false;
                     DiscoverySearchFilter discoverySearchFilter = discoveryConfiguration.getSearchFilters().get(i);
                     if (StringUtils.equalsIgnoreCase(discoverySearchFilter.getFilterType(), "facet")) {
-                        if (((DiscoverySearchFilterFacet) discoverySearchFilter).isExposeMinMax()) {
+                        if (((DiscoverySearchFilterFacet) discoverySearchFilter).exposeMinAndMaxValue()) {
                             shouldExposeMinMax = true;
                         }
                     }
