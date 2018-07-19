@@ -99,7 +99,7 @@
                 </div>
                     <xsl:apply-templates select="$embeddedViewReferenceSet"/>
             </xsl:when>
-            <xsl:when test="contains($meta[@element='request'][@qualifier='URI'], 'internal-item')">
+            <xsl:when test="contains($meta[@element='request'][@qualifier='URI'], 'internal-item') and contains($meta[@element='request'][@qualifier='queryString'], 'reviewStep')">
                 <!-- publication header -->
                 <div class="publication-header">
                     <xsl:call-template name="publication-header">
