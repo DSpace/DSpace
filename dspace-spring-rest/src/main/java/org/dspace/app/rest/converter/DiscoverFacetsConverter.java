@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.SearchResultsRest;
@@ -28,6 +29,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DiscoverFacetsConverter {
+
+    private static final Logger log = Logger.getLogger(DiscoverFacetsConverter.class);
 
     private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
 
@@ -60,8 +63,8 @@ public class DiscoverFacetsConverter {
             SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(field.getIndexFieldName());
             int valueCount = 0;
             facetEntry.setFacetLimit(field.getFacetLimit());
-            facetEntry.setExposeMinMax(field.isExposeMinMax());
-            if (field.isExposeMinMax()) {
+            facetEntry.setExposeMinMax(field.exposeMinAndMaxValue());
+            if (field.exposeMinAndMaxValue()) {
                 handleExposeMinMaxValues(context,field,facetEntry);
             }
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
@@ -102,7 +105,7 @@ public class DiscoverFacetsConverter {
                 facetEntry.setMaxValue(maxValue);
             }
         } catch (SearchServiceException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 

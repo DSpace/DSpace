@@ -56,11 +56,22 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
         return FILTER_TYPE_FACET;
     }
 
-    public boolean isExposeMinMax() {
+    /**
+     * This method returns whether or not the DiscoverySearchFilterFacet should return a
+     * min and max value.
+     *
+     * @return  A boolean indicating whether or not this DiscoverySearchFilterFacet should expose
+     *          a min and max value
+     */
+    public boolean exposeMinAndMaxValue() {
         return exposeMinMax;
     }
 
-    public void setExposeMinMax(boolean exposeMinMax) {
+    /**
+     * This method sets the boolean for {@link org.dspace.discovery.configuration.DiscoverySearchFilterFacet#exposeMinAndMaxValue}
+     * @param exposeMinMax A boolean value that will be set to return in the above mentioned link
+     */
+    public void setExposeMinAndMaxValue(boolean exposeMinMax) {
         this.exposeMinMax = exposeMinMax;
     }
 }

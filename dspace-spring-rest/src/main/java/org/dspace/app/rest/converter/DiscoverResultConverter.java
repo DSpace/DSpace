@@ -13,6 +13,7 @@ import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
@@ -38,6 +39,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DiscoverResultConverter {
+
+    private static final Logger log = Logger.getLogger(DiscoverResultConverter.class);
 
     @Autowired
     private List<DSpaceObjectConverter> converters;
@@ -76,10 +79,10 @@ public class DiscoverResultConverter {
             int valueCount = 0;
             facetEntry.setHasMore(false);
             facetEntry.setFacetLimit(field.getFacetLimit());
-            if (field.isExposeMinMax()) {
+            if (field.exposeMinAndMaxValue()) {
                 handleExposeMinMaxValues(context,field,facetEntry);
             }
-            facetEntry.setExposeMinMax(field.isExposeMinMax());
+            facetEntry.setExposeMinMax(field.exposeMinAndMaxValue());
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
                 //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
                 //more results available.
@@ -118,7 +121,7 @@ public class DiscoverResultConverter {
                 facetEntry.setMaxValue(maxValue);
             }
         } catch (SearchServiceException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
     private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {

@@ -19,6 +19,12 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, DiscoveryRestController> {
 
+    /**
+     * This method will build the base search link for the data that's been given to it
+     *
+     * @param data  The data for which a link will be constructed
+     * @return      The link without extra filters to the endpoint for this data
+     */
     public UriComponentsBuilder buildSearchBaseLink(final DiscoveryResultsRest data) {
         try {
             UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()

@@ -97,7 +97,7 @@ public class SearchFacetEntryRest implements RestAddressableModel {
         this.facetLimit = facetLimit;
     }
 
-    public boolean isExposeMinMax() {
+    public boolean exposeMinAndMaxValue() {
         return exposeMinMax;
     }
 
