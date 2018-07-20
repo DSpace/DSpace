@@ -445,7 +445,15 @@
                 </xsl:call-template>
                 <xsl:apply-templates select="dri:item" mode="nested"/>
             </ul>
+            <xsl:if test="not(ancestor::dri:list)">
+                <xsl:apply-templates select="dri:list" mode="nested-list"/>
+            </xsl:if>
         </xsl:if>
+    </xsl:template>
+
+    <xsl:template match="dri:list[not(@type)]" priority="2" mode="nested-list">
+        <xsl:apply-templates select="dri:head"/>
+        <xsl:apply-templates select="dri:item" mode="nested"/>
     </xsl:template>
 
     <xsl:template match="dri:list[not(@type)]/dri:item" priority="2" mode="labeled">
@@ -526,6 +534,10 @@
         <li>
             <xsl:apply-templates select="."/>
         </li>
+    </xsl:template>
+
+    <xsl:template match="dri:list/dri:list" priority="1" mode="nested-list">
+        <xsl:apply-templates select="." mode="nested-list"/>
     </xsl:template>
 
 
