@@ -34,7 +34,7 @@ public class AuthorCache {
 	}
 
 	
-	public static ArrayList<String> getLocalizedAuthors(ArrayList<String> authors, String locale) {
+	public static List<String> getLocalizedAuthors(List<String> authors, String locale) {
 		TreeSet<String> res = new TreeSet<String>();
 		
 		for (String name : authors) {
@@ -44,7 +44,7 @@ public class AuthorCache {
 		return new ArrayList<String>(res);
 	}
 
-	public static String getOrcid(String authorName) {
+	public static Optional<String> getOrcid(String authorName) {
 		String res;
 
 		checkUpdate();
@@ -54,7 +54,7 @@ public class AuthorCache {
 			res = a != null ? a.getOrcid() : null;
 		}
 
-		return res;
+		return Optional.ofNullable(res);
 	}
 
     public static void makeLocalizedAuthors(List<DiscoverResult.FacetResult> authors, String locale, int facetPage) {

@@ -163,7 +163,7 @@ public class EditProfileServlet extends DSpaceServlet
             Optional<Author> author = AuthorCache.getAuthor(String.format("%s, %s", lastName, firstName));
             if(author.isPresent()) {
                 AuthorLocalization authorLocalization = EssuirUtils.findAuthor(author.get());
-                authorLocalization.setOrcid(orcid);
+                authorLocalization.setOrcid(orcid.isEmpty() ? null : orcid);
                 EssuirUtils.saveAuthor(authorLocalization);
             }
             return true;

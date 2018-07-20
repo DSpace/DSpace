@@ -392,6 +392,8 @@ public class ItemTag extends TagSupport
          */
         StringTokenizer st = new StringTokenizer(configLine, ",");
 
+        List<String> authors = new ArrayList<>();
+        boolean needToWriteAuthorsBlock = false;
         while (st.hasMoreTokens())
         {
         	String field = st.nextToken().trim();
@@ -513,7 +515,9 @@ public class ItemTag extends TagSupport
                             }
                             else
                             {
-                                out.print("<br />");
+                                if(!"author".equals(browseIndex)) {
+                                    out.print("<br />");
+                                }
                             }
                         }
                         if (field.startsWith("dc.type"))
@@ -581,7 +585,6 @@ public class ItemTag extends TagSupport
                                     out.print(value);
                                 }
                             }
-
                         }
                         else if (browseIndex != null)
                         {
@@ -600,20 +603,15 @@ public class ItemTag extends TagSupport
 	                            value = values[j].value;
 	                        }
 
-	                        String orcid = "";
                             if (browseIndex.equals("author")) {
-                                orcid = AuthorCache.getOrcid(value);
-                                if (!StringUtils.isEmpty(orcid)) {
-                                    orcid = String.format("&nbsp;<a href = \"http://orcid.org/%s\"><img src = \"/image/orcid.gif\" width=\"16px\"></a>", orcid);
-                                } else {
-                                    orcid = "";
-                                }
+                                authors.add(value);
+                                needToWriteAuthorsBlock = true;
+                            } else {
+                                out.print("<a class=\"" + ("authority".equals(argument) ? "authority " : "") + browseIndex + "\""
+                                        + "href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;" + argument + "="
+                                        + URLEncoder.encode(value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
+                                        + "</a>");
                             }
-
-	                    	out.print("<a class=\"" + ("authority".equals(argument)?"authority ":"") + browseIndex + "\""
-	                                                + "href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;" + argument + "="
-	                    				+ URLEncoder.encode(value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
-	                    				+ "</a>" + orcid);
 	                    }
                         else
                         {
@@ -621,7 +619,20 @@ public class ItemTag extends TagSupport
                         }
                     }
                 }
+                if(needToWriteAuthorsBlock) {
+                    List<String> localizedAuthors = AuthorCache.getLocalizedAuthors(authors, sessionLocale.getLanguage());
+                    for(String author : localizedAuthors) {
+                        String orcid = AuthorCache.getOrcid(author)
+                                .map(orc -> String.format("&nbsp;<a href = \"http://orcid.org/%s\"><img src = \"/image/orcid.gif\" width=\"16px\"></a>", orc))
+                                .orElse("");
 
+                        out.print("<a class=\"author\""
+                                + "href=\"" + request.getContextPath() + "/browse?type=author&amp;value="
+                                + URLEncoder.encode(author, "UTF-8") + "\">" + Utils.addEntities(author)
+                                + "</a>" + orcid + "<br/>");
+                    }
+                    needToWriteAuthorsBlock = false;
+                }
                 out.println("</td></tr>");
             }
         }

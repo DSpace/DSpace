@@ -172,7 +172,9 @@ public class EssuirUtils {
     }
 
     public static AuthorLocalization saveAuthor(AuthorLocalization author) {
-        return authorsRepository.save(author);
+        AuthorLocalization authorLocalization = authorsRepository.save(author);
+        AuthorCache.update();
+        return  authorLocalization;
     }
 
     public static AuthorLocalization findAuthor(Author author) {
