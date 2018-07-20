@@ -9,6 +9,7 @@
 package org.dspace.app.rest.repository;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -18,14 +19,13 @@ import org.dspace.app.rest.model.hateoas.RequestItemResource;
 import org.dspace.core.Context;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Controller;
 
 /**
- * Controller to expose item requests.
+ * Component to expose item requests.
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-@Controller(RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME)
+@Named(RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME)
 public class RequestItemRepository
         extends DSpaceRestRepository<RequestItemRest, String> {
     @Inject

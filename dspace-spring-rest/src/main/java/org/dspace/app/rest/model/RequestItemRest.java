@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 
 import org.dspace.app.rest.converter.BitstreamConverter;
@@ -39,14 +40,16 @@ public class RequestItemRest
     protected boolean allfiles;
 
     /**
-     * @return the bitstream
+     * @return the bitstream requested.
      */
+    @LinkRest(linkClass=BitstreamRest.class)
+    @JsonIgnore
     public Bitstream getBitstream() {
         return new BitstreamConverter().toModel(bitstream);
     }
 
     /**
-     * @param bitstream the bitstream to set
+     * @param bitstream the bitstream requested.
      */
     public void setBitstream(BitstreamRest bitstream) {
         this.bitstream = bitstream;
@@ -81,56 +84,58 @@ public class RequestItemRest
     }
 
     /**
-     * @return the item
+     * @return the item requested.
      */
+    @LinkRest(linkClass=ItemRest.class)
+    @JsonIgnore
     public Item getItem() {
         return new ItemConverter().toModel(item);
     }
 
     /**
-     * @param item the item to set
+     * @param item the item requested.
      */
     public void setItem(ItemRest item) {
         this.item = item;
     }
 
     /**
-     * @return the req_email
+     * @return the email address of the requester.
      */
     public String getReq_email() {
         return req_email;
     }
 
     /**
-     * @param req_email the req_email to set
+     * @param req_email the email address of the requester.
      */
     public void setReq_email(String req_email) {
         this.req_email = req_email;
     }
 
     /**
-     * @return the req_message
+     * @return the requester's message.
      */
     public String getReq_message() {
         return req_message;
     }
 
     /**
-     * @param req_message the req_message to set
+     * @param req_message the requester's message.
      */
     public void setReq_message(String req_message) {
         this.req_message = req_message;
     }
 
     /**
-     * @return the req_name
+     * @return the requester's name.
      */
     public String getReq_name() {
         return req_name;
     }
 
     /**
-     * @param req_name the req_name to set
+     * @param req_name the requester's name.
      */
     public void setReq_name(String req_name) {
         this.req_name = req_name;
@@ -151,42 +156,42 @@ public class RequestItemRest
     }
 
     /**
-     * @return the token
+     * @return the token which identifies this request.
      */
     public String getToken() {
         return token;
     }
 
     /**
-     * @param token the token to set
+     * @param token the token which identifies this request.
      */
     public void setToken(String token) {
         this.token = token;
     }
 
     /**
-     * @return the accept_request
+     * @return true if the request has been accepted.
      */
     public boolean isAccept_request() {
         return accept_request;
     }
 
     /**
-     * @param accept_request the accept_request to set
+     * @param accept_request true if the request has been accepted.
      */
     public void setAccept_request(boolean accept_request) {
         this.accept_request = accept_request;
     }
 
     /**
-     * @return the allfiles
+     * @return true if the request is for all files in the item.
      */
     public boolean isAllfiles() {
         return allfiles;
     }
 
     /**
-     * @param allfiles the allfiles to set
+     * @param allfiles true requesting all of the item's files.
      */
     public void setAllfiles(boolean allfiles) {
         this.allfiles = allfiles;
