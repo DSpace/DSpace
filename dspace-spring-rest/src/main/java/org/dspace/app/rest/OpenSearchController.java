@@ -80,9 +80,17 @@ public class OpenSearchController {
     public void search(HttpServletRequest request,
                          HttpServletResponse response,
                          @RequestParam(name="query", required=false) String query,
+                         @RequestParam(name="start", required=false) Integer start,
+                         @RequestParam(name="rpp", required=false) Integer count,
                          @RequestParam(name="format", required=false) String format,
                          Model model) throws IOException, ServletException {
         context = ContextUtil.obtainContext(request);
+        if (start == null) {
+            start = 0;
+        }
+        if (count == null) {
+            count = -1;
+        }
         openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
 
         // get enough request parameters to decide on action to take
@@ -108,6 +116,8 @@ public class OpenSearchController {
         // TODO: support pagination parameters
         DiscoverQuery queryArgs = new DiscoverQuery();
         queryArgs.setQuery(query);
+        queryArgs.setStart(start);
+        queryArgs.setMaxResults(count);
 
         // Perform the search
         DiscoverResult qResults = null;
@@ -156,6 +166,7 @@ public class OpenSearchController {
     @GetMapping("/service")
     public void service(HttpServletRequest request,
                          HttpServletResponse response) throws IOException {
+// TODO: the URL tags are missing in document, get them in there!
         log.debug("Show OpenSearch Service document");
         openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
         String svcDescrip = openSearchService.getDescription(null);
