@@ -10,6 +10,7 @@ package org.dspace.app.rest.model.hateoas;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
+import org.springframework.hateoas.ResourceSupport;
 
 /**
  * SubmissionDefinition Rest HAL Resource. The HAL Resource wraps the REST Resource
@@ -21,5 +22,6 @@ import org.dspace.app.rest.utils.Utils;
 public class SubmissionDefinitionResource extends DSpaceResource<SubmissionDefinitionRest> {
     public SubmissionDefinitionResource(SubmissionDefinitionRest sd, Utils utils, String... rels) {
         super(sd, utils, rels);
+        embedded.put("collections", new ResourceSupport());
     }
 }
