@@ -199,3 +199,9 @@ db.schema = public
 # Authentication by Password (encrypted in DSpace's database). See authentication-password.cfg for default configuration.
 # Enabled by default in authentication.cfg
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
+
+#### OpenSearch Settings ####
+# NB: for result data formatting, OpenSearch uses Syndication Feed Settings
+# so even if Syndication Feeds are not enabled, they must be configured
+# enable open search
+websvc.opensearch.enable = true
