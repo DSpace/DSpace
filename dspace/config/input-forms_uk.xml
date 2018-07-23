@@ -287,9 +287,12 @@
 
      <pair>
        <displayed-value>Конкурсна наукова робота</displayed-value>
-       <stored-value>Сompetitive_scientific_work</stored-value>
+       <stored-value>Competitive_scientific_work</stored-value>
      </pair>
-
+     <pair>
+       <displayed-value>Розділ книги</displayed-value>
+       <stored-value>Book chapter</stored-value>
+     </pair>
      <pair>
        <displayed-value>Конспект лекцій</displayed-value>
        <stored-value>Learning Object</stored-value>

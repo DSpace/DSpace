@@ -279,9 +279,12 @@
 
       <pair>
         <displayed-value>Конкурсная научная работа</displayed-value>
-        <stored-value>Сompetitive_scientific_work</stored-value>
+        <stored-value>Competitive_scientific_work</stored-value>
       </pair>
-
+      <pair>
+        <displayed-value>Глава книги</displayed-value>
+        <stored-value>Book chapter</stored-value>
+      </pair>
       <pair>
         <displayed-value>Конспект лекций</displayed-value>
         <stored-value>Learning Object</stored-value>
