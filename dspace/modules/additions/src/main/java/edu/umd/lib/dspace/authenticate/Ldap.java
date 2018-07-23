@@ -490,7 +490,7 @@ public class Ldap {
       eperson.setEmail(uid + "@umd.edu");
       eperson.setFirstName(context, strFirstName);
       eperson.setLastName(context, strLastName);
-      epersonService.addMetadata(context, eperson, MetadataSchema.DC_SCHEMA, "phone", null, ANY, strPhone);
+      epersonService.setMetadata(context, eperson, "phone", strPhone);
       eperson.setCanLogIn(true);
       eperson.setRequireCertificate(false);
 
