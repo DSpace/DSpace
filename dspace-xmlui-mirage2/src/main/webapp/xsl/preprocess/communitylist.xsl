@@ -30,11 +30,19 @@
         xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
         xmlns:mets="http://www.loc.gov/METS/"
         xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
-        exclude-result-prefixes="xsl dri dim mets i18n">
+        xmlns:confman="org.dspace.core.ConfigurationManager"
+        exclude-result-prefixes="xsl dri dim mets i18n confman">
 
     <xsl:output indent="yes"/>
 
     <xsl:template match="dri:referenceSet[@id='aspect.artifactbrowser.CommunityBrowser.referenceSet.community-browser']">
+        <xsl:if test="//dri:metadata[@qualifier='URI'] != '' and confman:getProperty('xmlui.community-list.expand.all') = 'true'">
+            <p>
+                <xref rend="community-browser-expand-all" target="javascript:void(0)">Expand All</xref>
+                <xsl:text> / </xsl:text>
+                <xref rend="community-browser-collapse-all" target="javascript:void(0)">Collapse All</xref>
+            </p>
+        </xsl:if>
         <div id="{@id}" rend="community-browser-wrapper">
             <xsl:apply-templates mode="community-browser"/>
         </div>

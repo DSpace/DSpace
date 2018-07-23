@@ -6,58 +6,84 @@
  * http://www.dspace.org/license/
  */
 (function($) {
+    var limitExpand = $('#aspect_artifactbrowser_CommunityBrowser_field_allowExpandAll').count == undefined;
     $(init_community_list);
+    if (!limitExpand) {
+        $(expand_collapse);
+    }
 
     function init_community_list() {
         $('.community-browser-row .toggler').click(function() {
             var parent_row, parent_toggler, parent_wrappers, other_wrappers, other_toggler_rows, all_rows, target, $this, target_id, open_icon, closed_icon;
             $this = $(this);
 
-            $('.current-community-browser-row').removeClass('current-community-browser-row')
-                                                .find('a strong').contents().unwrap();
+            if (limitExpand) {
+                $('.current-community-browser-row').removeClass('current-community-browser-row')
+                    .find('a strong').contents().unwrap();
+            }
 
             target_id = $this.data('target');
 
-            parent_wrappers = $this.parents('.sub-tree-wrapper');
-            other_wrappers = $('.sub-tree-wrapper:not(' + target_id + ')').not(parent_wrappers);
-            other_wrappers.addClass('hidden');
+            if (limitExpand) {
+                parent_wrappers = $this.parents('.sub-tree-wrapper');
+                other_wrappers = $('.sub-tree-wrapper:not(' + target_id + ')').not(parent_wrappers);
+                other_wrappers.addClass('hidden');
 
-            other_toggler_rows = $([]);
-            other_wrappers.each(function() {
-                other_toggler_rows = other_toggler_rows.add(get_toggler_from_wrapper($(this)).closest('.community-browser-row'));
-            });
-            other_toggler_rows.removeClass('open-community-browser-row').addClass('closed-community-browser-row');
+                other_toggler_rows = $([]);
+                other_wrappers.each(function () {
+                    other_toggler_rows = other_toggler_rows.add(get_toggler_from_wrapper($(this)).closest('.community-browser-row'));
+                });
+                other_toggler_rows.removeClass('open-community-browser-row').addClass('closed-community-browser-row');
+            }
 
             parent_row = $this.closest('.community-browser-row');
 
             open_icon = $this.find('.open-icon');
             closed_icon = $this.find('.closed-icon');
 
-            all_rows = $('.community-browser-row');
-            clear_relation_classes(all_rows);
+            if (limitExpand) {
+                all_rows = $('.community-browser-row');
+                clear_relation_classes(all_rows);
+            }
             target = $(target_id);
             if (target.is(':visible')) {
+                if (!limitExpand) {
+                    children_toggler = parent_row.next('.sub-tree-wrapper').find('.toggler');
+                    if (children_toggler.length > 0) {
+                        children_toggler.each(function () {
+                            if ($(this).is(':visible') && !$(this).find('i.glyphicon-minus').hasClass('hidden')) {
+                                $(this).click()
+                            }
+                        })
+                    }
+                }
                 target.addClass('hidden');
                 open_icon.addClass('hidden');
                 closed_icon.removeClass('hidden');
-                parent_row.removeClass('open-community-browser-row').addClass('closed-community-browser-row');
+                if (limitExpand) {
+                    parent_row.removeClass('open-community-browser-row').addClass('closed-community-browser-row');
+                }
                 target.find('.open-icon').addClass('hidden');
                 target.find('.closed-icon').removeClass('hidden');
-                parent_toggler = get_toggler_from_wrapper($this.closest('.sub-tree-wrapper'));
-                if (parent_toggler.length > 0) {
-                    parent_toggler.closest('.community-browser-row').addClass('current-community-browser-row').find('a').wrapInner( "<strong></strong>");
-                    set_relation_classes(all_rows, parent_toggler, $(parent_toggler.data('target')), parent_toggler.parents('.sub-tree-wrapper'));
+                if (limitExpand) {
+                    parent_toggler = get_toggler_from_wrapper($this.closest('.sub-tree-wrapper'));
+                    if (parent_toggler.length > 0) {
+                        parent_toggler.closest('.community-browser-row').addClass('current-community-browser-row').find('a').wrapInner("<strong></strong>");
+                        set_relation_classes(all_rows, parent_toggler, $(parent_toggler.data('target')), parent_toggler.parents('.sub-tree-wrapper'));
+                    }
                 }
             }
             else {
                 target.removeClass('hidden');
                 open_icon.removeClass('hidden');
                 closed_icon.addClass('hidden');
-                parent_row.removeClass('closed-community-browser-row')
+                if (limitExpand) {
+                    parent_row.removeClass('closed-community-browser-row')
                         .addClass('open-community-browser-row')
                         .addClass('current-community-browser-row')
-                        .find('a').wrapInner( "<strong></strong>");
-                set_relation_classes(all_rows, $this, target, parent_wrappers);
+                        .find('a').wrapInner("<strong></strong>");
+                    set_relation_classes(all_rows, $this, target, parent_wrappers);
+                }
             }
             set_odd_even_rows();
         }).bind('touchend', function () {
@@ -103,5 +129,31 @@
         visible_rows.filter(':odd').addClass('odd-community-browser-row');
     }
 
+    function expand_collapse() {
+        $('.community-browser-expand-all').click(function() {
+            $('.toggler').each(function() {
+                if ($(this).is(':visible') && !$(this).find('i.glyphicon-plus').hasClass('hidden')) {
+                    $this = $(this);
+
+                    target_id = $this.data('target');
+                    target = $(target_id);
+                    open_icon = $this.find('.open-icon');
+                    closed_icon = $this.find('.closed-icon');
+
+                    target.removeClass('hidden');
+                    open_icon.removeClass('hidden');
+                    closed_icon.addClass('hidden');
+                }
+            });
+        });
+
+        $('.community-browser-collapse-all').click(function() {
+            $('.community-browser-wrapper > .community-browser-row .toggler').each(function() {
+                if ($(this).is(':visible') && !$(this).find('i.glyphicon-minus').hasClass('hidden')) {
+                	$(this).click();
+                }
+            });
+        });
+    }
 
 })(jQuery);
