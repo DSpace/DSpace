@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class AuthorCache {
@@ -33,15 +34,16 @@ public class AuthorCache {
 		return newValues.toArray(new Metadatum[0]);
 	}
 
-	
+
+	public static String getLocalizedAuthor(String name, String locale) {
+		return getAuthor(name).map(author -> author.getName(locale)).orElse(name);
+	}
+
 	public static List<String> getLocalizedAuthors(List<String> authors, String locale) {
-		TreeSet<String> res = new TreeSet<String>();
-		
-		for (String name : authors) {
-			res.add(getAuthor(name).map(author -> author.getName(locale)).orElse(name));
-		}
-		
-		return new ArrayList<String>(res);
+		return authors.stream()
+				.map(name -> getLocalizedAuthor(name, locale))
+				.distinct()
+				.collect(Collectors.toList());
 	}
 
 	public static Optional<String> getOrcid(String authorName) {

@@ -149,17 +149,32 @@
     // Admin user or not
     Boolean admin_b = (Boolean) request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+    ExportService exportService = new ExportService();
+    String publications = exportService.publicationList(bi);
 %>
 
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
 
 <%@page import="java.util.Set" %>
+<%@ page import="ua.edu.sumdu.essuir.utils.ExportService" %>
+<%@ page import="org.springframework.web.util.HtmlUtils" %>
+<%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form" %>
+
 <dspace:layout titlekey="browse.page-title" navbar="<%=layoutNavbar %>">
 
     <%-- Build the header (careful use of spacing) --%>
     <h2>
-        <fmt:message key="browse.full.header"><fmt:param value="<%= scope %>"/></fmt:message>&nbsp;<fmt:message
-            key="<%= typeKey %>"/>&nbsp;<%= value %>
+
+        <form action="/export/user" method="post" enctype="application/json" accept-charset="utf-8">
+            <fmt:message key="browse.full.header"><fmt:param value="<%= scope %>"/></fmt:message>&nbsp;<fmt:message
+                key="<%= typeKey %>"/>&nbsp;<%= value %>
+
+            <input type="hidden" name = "publications" id = "publications" value="<%= HtmlUtils.htmlEscape(publications) %>">
+            <input type="hidden" name = "author" id = "author" value="<%= value %>">
+            <button type="submit" class="btn btn-default btn-sm">
+                <span class="glyphicon glyphicon-import"></span>
+            </button>
+        </form>
     </h2>
 
     <%-- Include the main navigation for all the browse pages --%>
