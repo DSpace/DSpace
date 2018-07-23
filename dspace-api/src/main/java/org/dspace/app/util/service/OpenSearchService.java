@@ -42,6 +42,13 @@ public interface OpenSearchService {
     public List<String> getFormats();
 
     /**
+     * Determine if the module is active
+     *
+     * @return boolean indicator if the OpenSearch module is enabled or not
+     */
+    public boolean isEnabled();
+
+    /**
      * Returns a mime-type associated with passed format
      *
      * @param format the results document format (rss, atom, html)

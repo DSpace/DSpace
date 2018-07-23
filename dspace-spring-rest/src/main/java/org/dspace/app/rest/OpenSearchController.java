@@ -92,70 +92,74 @@ public class OpenSearchController {
             count = -1;
         }
         openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
+        if (openSearchService.isEnabled()) {
+            // get enough request parameters to decide on action to take
+            if (format == null || "".equals(format))
+            {
+                // default to atom
+                format = "atom";
+            }
 
-        // get enough request parameters to decide on action to take
-        if (format == null || "".equals(format))
-        {
-            // default to atom
-            format = "atom";
-        }
+            log.debug("Searching for "+query+" in format "+format);
 
-        log.debug("Searching for "+query+" in format "+format);
+            // do some sanity checking
+            // TODO: make that work correctly
+            if (!openSearchService.getFormats().contains(format))
+            {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                //return "error";
+            }
 
-        // do some sanity checking
-        // TODO: make that work correctly
-        if (!openSearchService.getFormats().contains(format))
-        {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            //return "error";
-        }
+            // then the rest - we are processing the query
+            DSpaceObject container = null;
 
-        // then the rest - we are processing the query
-        DSpaceObject container = null;
+            // TODO: support pagination parameters
+            DiscoverQuery queryArgs = new DiscoverQuery();
+            queryArgs.setQuery(query);
+            queryArgs.setStart(start);
+            queryArgs.setMaxResults(count);
 
-        // TODO: support pagination parameters
-        DiscoverQuery queryArgs = new DiscoverQuery();
-        queryArgs.setQuery(query);
-        queryArgs.setStart(start);
-        queryArgs.setMaxResults(count);
-
-        // Perform the search
-        DiscoverResult qResults = null;
-        try
-        {
-            qResults = SearchUtils.getSearchService().search(context,
+            // Perform the search
+            DiscoverResult qResults = null;
+            try
+            {
+                qResults = SearchUtils.getSearchService().search(context,
                     container, queryArgs);
-        }
-        catch (SearchServiceException e)
-        {
-            log.error(
+            }
+            catch (SearchServiceException e)
+            {
+                log.error(
                     LogManager.getHeader(context, "opensearch", "query="
                             + queryArgs.getQuery()
                             + ",error=" + e.getMessage()), e);
-            throw new RuntimeException(e.getMessage(), e);
-        }
+                throw new RuntimeException(e.getMessage(), e);
+            }
 
-        // Log
-        log.info("opensearch done, query=\"" + query + "\",results="
+            // Log
+            log.info("opensearch done, query=\"" + query + "\",results="
                         + qResults.getTotalSearchResults());
 
-        // format and return results
-        Map<String, String> labelMap = getLabels(request);
-        List<DSpaceObject> dsoResults = qResults.getDspaceObjects();
-        Document resultsDoc = openSearchService.getResultsDoc(context, format, query,
+            // format and return results
+            Map<String, String> labelMap = getLabels(request);
+            List<DSpaceObject> dsoResults = qResults.getDspaceObjects();
+            Document resultsDoc = openSearchService.getResultsDoc(context, format, query,
                 (int) qResults.getTotalSearchResults(), qResults.getStart(),
                 qResults.getMaxResults(), container, dsoResults, labelMap);
-        try
-        {
-            Transformer xf = TransformerFactory.newInstance().newTransformer();
-            response.setContentType(openSearchService.getContentType(format));
-            xf.transform(new DOMSource(resultsDoc),
+            try
+            {
+                Transformer xf = TransformerFactory.newInstance().newTransformer();
+                response.setContentType(openSearchService.getContentType(format));
+                xf.transform(new DOMSource(resultsDoc),
                     new StreamResult(response.getWriter()));
+            }
+            catch (TransformerException e)
+            {
+                log.error(e);
+                throw new ServletException(e.toString());
+            }
         }
-        catch (TransformerException e)
-        {
-            log.error(e);
-            throw new ServletException(e.toString());
+        else {
+            log.debug("OpenSearch Service is disabled");
         }
     }
 
@@ -166,15 +170,19 @@ public class OpenSearchController {
     @GetMapping("/service")
     public void service(HttpServletRequest request,
                          HttpServletResponse response) throws IOException {
-// TODO: the URL tags are missing in document, get them in there!
         log.debug("Show OpenSearch Service document");
         openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
-        String svcDescrip = openSearchService.getDescription(null);
-        log.debug("opensearchdescription is "+svcDescrip);
-        response.setContentType(openSearchService
+        if (openSearchService.isEnabled()) {
+            String svcDescrip = openSearchService.getDescription(null);
+            log.debug("opensearchdescription is "+svcDescrip);
+            response.setContentType(openSearchService
                 .getContentType("opensearchdescription"));
-        response.setContentLength(svcDescrip.length());
-        response.getWriter().write(svcDescrip);
+            response.setContentLength(svcDescrip.length());
+            response.getWriter().write(svcDescrip);
+        }
+        else {
+            log.debug("OpenSearch Service is disabled");
+        }
     }
 
     /**
