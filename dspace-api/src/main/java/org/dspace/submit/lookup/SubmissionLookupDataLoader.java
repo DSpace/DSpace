@@ -37,6 +37,8 @@ public interface SubmissionLookupDataLoader extends DataLoader
     
     public final static String ADSBIBCODE = "adsbibcode";
 
+    public final static String ISBN = "isbn";
+
     public final static String REPEC = "repec";
 
     public final static String SCOPUSEID = "scopuseid";

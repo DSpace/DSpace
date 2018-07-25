@@ -134,6 +134,8 @@
 	            <entry key="csv" value-ref="csvDataLoader"/>
 	            <entry key="tsv" value-ref="tsvDataLoader"/>
 	            <!-- <entry key="pdf" value-ref="grobidDataLoader" /> -->
+		    <entry key="b3kat" value-ref="ISBNOnlineDataLoaderB3Kat" />
+		    <entry key="loc" value-ref="ISBNOnlineDataLoaderLOC" />
 			</map>
 	    </property>
 	</bean>
@@ -772,6 +774,50 @@
 
 	
 	
+	<bean id="ISBNOnlineDataLoaderLOC" class="org.dspace.submit.lookup.ISBNOnlineDataLoader">
+	    <property name="searchProvider" value="false" />
+	    <property name="fieldMap" ref="ISBNInputMap" />
+	    <property name="isbnURL" value="http://lx2.loc.gov:210/LCDB" />
+	    <property name="queryFieldName" value="bath.isbn" />
+	</bean>
+
+	<bean id="ISBNOnlineDataLoaderB3Kat" class="org.dspace.submit.lookup.ISBNOnlineDataLoader">
+	    <property name="searchProvider" value="false" />
+	    <property name="fieldMap" ref="ISBNInputMap" />
+	    <property name="isbnURL" value="http://bvbr.bib-bvb.de:5661/bvb01sru" />
+	    <property name="queryFieldName" value="marcxml.isbn" />
+	</bean>
+
+	<bean name="ISBNInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="url" value="url" />
+				<entry key="title" value="title" />
+				<entry key="providerType" value="providerType" />
+				<entry key="sourceTitle" value="journal" />
+				<entry key="issued" value="issued" />
+				<entry key="abstract" value="abstract" />
+				<entry key="language" value="language" />
+				<entry key="author" value="authors" />
+				<entry key="orcid" value="orcid" />
+				<entry key="arxiv" value="arxiv" />
+				<entry key="eid" value="eid" />
+				<entry key="doi" value="doi" />
+				<entry key="pmid" value="pubmedID" />
+				<entry key="pmc" value="pubmedcentralID" />
+				<entry key="handle" value="handle" />
+				<entry key="isbn" value="pisbn" />
+				<entry key="issn" value="jissn" />
+				<entry key="uri" value="uri" />
+				<entry key="wosuid" value="isiId" />
+				<entry key="type" value="subtype" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+
+
+
 	<!-- **************************************************************************************************** -->
 	<!-- Output Mapping 																					  -->
 	<!-- **************************************************************************************************** -->
