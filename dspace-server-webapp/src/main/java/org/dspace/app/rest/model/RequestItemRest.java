@@ -7,13 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 
-import org.dspace.app.rest.converter.BitstreamConverter;
-import org.dspace.app.rest.converter.ItemConverter;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Item;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Represent a user's request for a copy of an Item.
@@ -184,22 +180,14 @@ public class RequestItemRest
     }
 
     /**
-<<<<<<< HEAD:dspace-server-webapp/src/main/java/org/dspace/app/rest/model/RequestItemRest.java
-     * @return all files?
-=======
      * @return true if the request is for all files in the item.
->>>>>>> 7cb3f3d4b ([DS-3952] Better, fuller annotations; better documentation.):dspace-spring-rest/src/main/java/org/dspace/app/rest/model/RequestItemRest.java
      */
     public boolean isAllfiles() {
         return allfiles;
     }
 
     /**
-<<<<<<< HEAD:dspace-server-webapp/src/main/java/org/dspace/app/rest/model/RequestItemRest.java
-     * @param allfiles all files?
-=======
      * @param allfiles true requesting all of the item's files.
->>>>>>> 7cb3f3d4b ([DS-3952] Better, fuller annotations; better documentation.):dspace-spring-rest/src/main/java/org/dspace/app/rest/model/RequestItemRest.java
      */
     public void setAllfiles(boolean allfiles) {
         this.allfiles = allfiles;
