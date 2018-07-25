@@ -108,9 +108,9 @@ public class PREMISCrosswalk
                     if (ssize != null) {
                         try {
                             int size = Integer.parseInt(ssize);
-                            if (bitstream.getSize() != size) {
+                            if (bitstream.getSizeBytes() != size) {
                                 throw new MetadataValidationException(
-                                    "Bitstream size (" + String.valueOf(bitstream.getSize()) +
+                                    "Bitstream size (" + String.valueOf(bitstream.getSizeBytes()) +
                                         ") does not match size in PREMIS (" + ssize + "), rejecting it.");
                             }
                         } catch (NumberFormatException ne) {
@@ -274,7 +274,7 @@ public class PREMISCrosswalk
 
         // size
         Element size = new Element("size", PREMIS_NS);
-        size.setText(String.valueOf(bitstream.getSize()));
+        size.setText(String.valueOf(bitstream.getSizeBytes()));
         ochar.addContent(size);
 
         //  Punt and set formatName to the MIME type; the best we can
