@@ -7,8 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.converter.ItemConverter;
@@ -42,7 +43,7 @@ public class RequestItemRest
     /**
      * @return the bitstream requested.
      */
-    @LinkRest(linkClass=BitstreamRest.class)
+    @LinkRest(linkClass = BitstreamRest.class)
     @JsonIgnore
     public Bitstream getBitstream() {
         return new BitstreamConverter().toModel(bitstream);
@@ -86,7 +87,7 @@ public class RequestItemRest
     /**
      * @return the item requested.
      */
-    @LinkRest(linkClass=ItemRest.class)
+    @LinkRest(linkClass = ItemRest.class)
     @JsonIgnore
     public Item getItem() {
         return new ItemConverter().toModel(item);
