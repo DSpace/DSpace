@@ -86,7 +86,7 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream> {
         if (priority1 > priority2) {
             return 1;
         } else if (priority1 == priority2) {
-            if (b1.getSize() <= b2.getSize()) {
+            if (b1.getSizeBytes() <= b2.getSizeBytes()) {
                 return 1;
             } else {
                 return -1;
