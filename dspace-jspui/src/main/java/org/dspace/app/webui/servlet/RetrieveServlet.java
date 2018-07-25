@@ -143,9 +143,9 @@ public class RetrieveServlet extends DSpaceServlet
 
             // Response length
             response.setHeader("Content-Length", String.valueOf(bitstream
-                    .getSize()));
+                    .getSizeBytes()));
             
-    		if(threshold != -1 && bitstream.getSize() >= threshold)
+    		if(threshold != -1 && bitstream.getSizeBytes() >= threshold)
     		{
     			UIUtil.setBitstreamDisposition(bitstream.getName(), request, response);
     		}

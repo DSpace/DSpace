@@ -412,7 +412,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 //End of CitationDocument
             } else {
                 this.bitstreamInputStream = bitstreamService.retrieve(context, bitstream);
-                this.bitstreamSize = bitstream.getSize();
+                this.bitstreamSize = bitstream.getSizeBytes();
             }
 
             this.bitstreamMimeType = bitstream.getFormat(context).getMIMEType();
