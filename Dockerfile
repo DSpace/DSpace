@@ -1,4 +1,5 @@
 # This image will be published as dspace/dspace
+# See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
 
 # Step 1 - Run Maven Build
 FROM maven as build
