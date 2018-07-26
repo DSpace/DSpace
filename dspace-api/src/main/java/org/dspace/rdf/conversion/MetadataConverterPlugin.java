@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * 
+ *
  * http://www.dspace.org/license/
  */
 
@@ -46,11 +46,11 @@ public class MetadataConverterPlugin implements ConverterPlugin
     public final static String METADATA_MAPPING_PATH_KEY = "rdf.metadata.mappings";
     public final static String METADATA_SCHEMA_URL_KEY = "rdf.metadata.schema";
     public final static String METADATA_PREFIXES_KEY = "rdf.metadata.prefixes";
-    
+
     private final static Logger log = Logger.getLogger(MetadataConverterPlugin.class);
     @Autowired(required=true)
     protected ConfigurationService configurationService;
-    
+
     @Override
     public void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
@@ -63,7 +63,7 @@ public class MetadataConverterPlugin implements ConverterPlugin
         DSpaceObjectService<DSpaceObject> dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         if (uri == null)
         {
-            log.error("Cannot create URI for " + dsoService.getTypeText(dso) + " " 
+            log.error("Cannot create URI for " + dsoService.getTypeText(dso) + " "
                     + dso.getID() + " stopping conversion.");
             return null;
         }
@@ -87,8 +87,8 @@ public class MetadataConverterPlugin implements ConverterPlugin
                 }
             }
         }
-        
-        Model config = loadConfiguration();
+
+        Model config = loadConfiguration(dso);
         if (config == null)
         {
             log.error("Cannot load MetadataConverterPlugin configuration, "
@@ -111,14 +111,14 @@ public class MetadataConverterPlugin implements ConverterPlugin
         }
         */
 
-        ResIterator mappingIter = 
+        ResIterator mappingIter =
                 config.listSubjectsWithProperty(RDF.type, DMRM.DSpaceMetadataRDFMapping);
         if (!mappingIter.hasNext())
         {
             log.warn("No metadata mappings found, returning null.");
             return null;
         }
-        
+
         List<MetadataRDFMapping> mappings = new ArrayList<>();
         while (mappingIter.hasNext())
         {
@@ -126,14 +126,14 @@ public class MetadataConverterPlugin implements ConverterPlugin
                     mappingIter.nextResource(), uri);
             if (mapping != null) mappings.add(mapping);
         }
-        
+
         List<MetadataValue> metadata_values = dsoService.getMetadata(dso, MetadataSchema.DC_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
         for (MetadataValue value : metadata_values)
         {
             MetadataField metadataField = value.getMetadataField();
             MetadataSchema metadataSchema = metadataField.getMetadataSchema();
             String fieldname = metadataSchema.getName() + "." + metadataField.getElement();
-            if (metadataField.getQualifier() != null) 
+            if (metadataField.getQualifier() != null)
             {
                 fieldname = fieldname + "." + metadataField.getQualifier();
             }
@@ -190,10 +190,18 @@ public class MetadataConverterPlugin implements ConverterPlugin
 
     @Override
     public boolean supports(int type) {
-        return (type == Constants.ITEM || type == Constants.COLLECTION || type == Constants.COMMUNITY);
+        switch (type) {
+            case Constants.ITEM:
+            case Constants.COLLECTION:
+            case Constants.COMMUNITY:
+            case Constants.SITE:
+                return true;
+            default:
+                return false;
+        }
     }
-    
-    protected Model loadConfiguration()
+
+    protected Model loadConfiguration(DSpaceObject dso)
     {
         InputStream is = null;
         Model config = ModelFactory.createDefaultModel();
@@ -206,12 +214,14 @@ public class MetadataConverterPlugin implements ConverterPlugin
         }
         else
         {
-            is = FileManager.get().open(mapping);
+            String dsoTypeName = Constants.typeText[dso.getType()].toLowerCase();
+            String mappingFile = mapping+"-"+dsoTypeName+".ttl";
+            is = FileManager.get().open(mappingFile);
             if (is == null)
             {
-                log.warn("Cannot find file '" + mapping + "', ignoring...");
+                log.warn("Cannot find file '" + mappingFile + "', ignoring...");
             }
-            config.read(is, "file://" + mapping, FileUtils.guessLang(mapping));
+            config.read(is, "file://" + mappingFile, FileUtils.guessLang(mappingFile));
             try {
                 // Make sure that we have an input stream to avoid NullPointer
                 if(is != null)
@@ -230,7 +240,7 @@ public class MetadataConverterPlugin implements ConverterPlugin
             log.warn("Metadata RDF Mapping did not contain any triples!");
             return null;
         }
-        
+
         String schemaURL = configurationService.getProperty(METADATA_SCHEMA_URL_KEY);
         if (schemaURL == null)
         {
@@ -273,5 +283,5 @@ public class MetadataConverterPlugin implements ConverterPlugin
         }
         return config;
     }
-    
+
 }

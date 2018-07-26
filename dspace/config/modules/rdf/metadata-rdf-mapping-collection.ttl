@@ -1,0 +1,103 @@
+@prefix rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:       <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:        <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:        <http://www.w3.org/2001/XMLSchema#> .
+@prefix dc:         <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms:    <http://purl.org/dc/terms/> .
+@prefix bibo:       <http://purl.org/ontology/bibo/> .
+
+@prefix dm:         <http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0#> .
+
+@prefix :           <#> .
+
+
+:title
+  dm:metadataName "dc.title" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate dcterms:title ;
+    dm:object dm:DSpaceValue ;
+  ] ;
+  .
+
+:description
+  dm:metadataName "dc.description.abstract" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate dc:description ;
+    dm:object [
+      a dm:LiteralGenerator ;
+      dm:pattern "$DSpaceValue" ;
+      dm:dspaceLanguageTag "true"^^xsd:boolean ;
+    ] ;
+  ];
+  .
+
+:news
+  dm:metadataName "dc.description.tableofcontents" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate dc:description ;
+    dm:object [
+      a dm:LiteralGenerator ;
+      dm:pattern "$DSpaceValue" ;
+      dm:dspaceLanguageTag "true"^^xsd:boolean ;
+    ] ;
+  ];
+  .
+
+:rights
+  dm:metadataName "dc.rights" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate dc:rights ;
+    dm:object dm:DSpaceValue ;
+  ];
+  .
+
+:handle
+  dm:metadataName "dc.identifier.uri" ;
+  dm:condition "^http://hdl.handle.net/.*$" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate bibo:handle ;
+    dm:object [
+      a dm:LiteralGenerator ;
+      dm:modifier [
+        dm:matcher "^http://hdl.handle.net/(.*)$" ;
+        dm:replacement "hdl:$1";
+      ];
+    ];
+  ];
+  .
+
+:localHandleURI
+  dm:metadataName "dc.identifier.uri" ;
+  dm:condition "^http://localhost:8080/jspui/handle/" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate bibo:handle ;
+    dm:object [
+      a dm:LiteralGenerator ;
+      dm:modifier [
+        dm:matcher "^http://localhost:8080/jspui/handle/(.*)$" ;
+        dm:replacement "hdl:$1";
+      ];
+      dm:pattern "$DSpaceValue";
+    ];
+  ];
+  .
+
+:uri
+  dm:metadataName "dc.identifier.uri" ;
+  dm:condition "^((?!http://dx.doi.org/)(?!http://hdl.handle.net/)(?!http://localhost:8080/jspui/handle/)).*" ;
+  dm:creates [
+    dm:subject dm:DSpaceObjectIRI ;
+    dm:predicate bibo:uri ;
+    dm:object [
+      a dm:ResourceGenerator ;
+      dm:pattern "$DSpaceValue" ;
+    ] ;
+  ];
+  .
+
