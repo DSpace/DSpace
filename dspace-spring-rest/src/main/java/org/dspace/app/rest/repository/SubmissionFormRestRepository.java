@@ -41,7 +41,7 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         inputReader = new DCInputsReader();
     }
 
-    @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public SubmissionFormRest findOne(String submitName) {
         DCInputSet inputConfig;
@@ -56,7 +56,7 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         return converter.convert(inputConfig);
     }
 
-    @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionFormRest> findAll(Pageable pageable) {
         List<DCInputSet> subConfs = new ArrayList<DCInputSet>();

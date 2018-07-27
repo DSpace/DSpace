@@ -37,7 +37,7 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
     @Autowired
     private AuthorityUtils authorityUtils;
 
-    @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public AuthorityRest findOne(String name) {
         ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(name);
@@ -45,7 +45,7 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
         return result;
     }
 
-    @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<AuthorityRest> findAll(Pageable pageable) {
         Set<String> authoritiesName = cas.getChoiceAuthoritiesNames();

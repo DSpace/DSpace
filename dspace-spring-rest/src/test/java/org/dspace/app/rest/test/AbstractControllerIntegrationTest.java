@@ -63,6 +63,9 @@ import org.springframework.web.context.WebApplicationContext;
 public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";
+
+    //The Authorization header contains a value like "Bearer TOKENVALUE". This constant string represents the part that
+    //sits before the actual authentication token and can be used to easily compose or parse the Authorization header.
     protected static final String AUTHORIZATION_TYPE = "Bearer ";
 
     public static final String REST_SERVER_URL = "http://localhost/api/";

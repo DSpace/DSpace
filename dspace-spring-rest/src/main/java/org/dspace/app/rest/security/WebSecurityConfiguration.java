@@ -38,7 +38,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     public static final String ADMIN_GRANT = "ADMIN";
-    public static final String EPERSON_GRANT = "EPERSON";
+    public static final String AUTHENTICATED_GRANT = "AUTHENTICATED";
     public static final String ANONYMOUS_GRANT = "ANONYMOUS";
 
     @Autowired

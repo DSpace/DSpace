@@ -48,7 +48,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         submissionConfigReader = new SubmissionConfigReader();
     }
 
-    @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public SubmissionDefinitionRest findOne(String submitName) {
         SubmissionConfig subConfig = submissionConfigReader.getSubmissionConfigByName(submitName);
@@ -58,7 +58,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         return converter.convert(subConfig);
     }
 
-    @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionDefinitionRest> findAll(Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
@@ -68,7 +68,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         return page;
     }
 
-    @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findByCollection")
     public SubmissionDefinitionRest findByCollection(@Parameter(value = "uuid", required = true) UUID collectionUuid)
             throws SQLException {
