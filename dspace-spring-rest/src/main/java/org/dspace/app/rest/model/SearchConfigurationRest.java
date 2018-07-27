@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
 /**
  * This class' purpose is to store the information that'll be shown on the /search endpoint.
@@ -133,10 +134,19 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
             this.pageSize = pageSize;
         }
 
+        /**
+         * This is the same type as described in {@link DiscoverySearchFilter#getType()}
+         * @return  The type of this filter
+         */
         public String getType() {
             return type;
         }
 
+        /**
+         * This is the same type as described in {@link org.dspace.discovery.configuration.DiscoverySearchFilter#setType(String)}
+         *
+         * @param type  The type for this Filter to be set to
+         */
         public void setType(String type) {
             this.type = type;
         }

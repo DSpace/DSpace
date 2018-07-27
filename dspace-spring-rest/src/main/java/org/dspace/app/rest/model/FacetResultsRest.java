@@ -20,6 +20,9 @@ public class FacetResultsRest extends DiscoveryResultsRest {
     @JsonUnwrapped
     private SearchFacetEntryRest facetEntry;
 
+    /**
+     * Every facet value needs to start with the given prefix
+     */
     private String prefix;
 
     public void addToFacetResultList(SearchFacetValueRest facetResult) {
