@@ -62,7 +62,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
         submissionConfigReader = new SubmissionConfigReader();
     }
 
-    @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public SubmissionUploadRest findOne(String submitName) {
         UploadConfiguration config = uploadConfigurationService.getMap().get(submitName);
@@ -74,7 +74,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
         return null;
     }
 
-    @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionUploadRest> findAll(Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();

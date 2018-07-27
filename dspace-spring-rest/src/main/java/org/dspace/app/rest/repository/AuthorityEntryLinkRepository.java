@@ -55,7 +55,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
         return new AuthorityEntryResource(model);
     }
 
-    @PreAuthorize("hasAuthority('EPERSON')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<AuthorityEntryRest> query(HttpServletRequest request, String name,
                                           Pageable pageable, String projection) {
         Context context = obtainContext();
