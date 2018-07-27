@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
 /**
  * This class' purpose is to store the information that'll be shown on the /search endpoint.
@@ -116,25 +117,44 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         public static final String OPERATOR_CONTAINS = "contains";
         public static final String OPERATOR_NOTCONTAINS = "notcontains";
 
+        /**
+         * Specifies whether this filter has facets or not
+         * @return  A boolean indicating whether this filter has facets or not
+         */
         public boolean isHasFacets() {
             return hasFacets;
         }
+
+        /**
+         * Sets the hasFacets property of the filter class to the given boolean
+         *
+         * @param hasFacets The boolean that the hasFacets property will be set to
+         */
         public void setHasFacets(boolean hasFacets) {
             this.hasFacets = hasFacets;
         }
 
+        /**
+          * See documentantion at {@link DiscoverySearchFilter#getType()}
+          */
         public String getType() {
             return type;
         }
-
+        /**
+         * See documentantion at {@link DiscoverySearchFilter#setType(String)}
+         */
         public void setType(String type) {
             this.type = type;
         }
-
+        /**
+         * See documentantion at {@link DiscoverySearchFilter#isOpenByDefault()}
+         */
         public boolean isOpenByDefault() {
             return isOpenByDefault;
         }
-
+        /**
+         * See documentantion at {@link DiscoverySearchFilter#setIsOpenByDefault(boolean)}
+         */
         public void setOpenByDefault(boolean openByDefault) {
             isOpenByDefault = openByDefault;
         }
