@@ -104,6 +104,13 @@ public class DiscoverResultConverter {
             resultsRest.addFacetEntry(facetEntry);
         }
     }
+
+    /**
+     * This method will fill the facetEntry with the appropriate min and max values if they're not empty
+     * @param context       The relevant DSpace context
+     * @param field         The DiscoverySearchFilterFacet field to search for this value in solr
+     * @param facetEntry    The SearchFacetEntryRest facetEntry for which this needs to be filled in
+     */
     private void handleExposeMinMaxValues(Context context,DiscoverySearchFilterFacet field,
                                           SearchFacetEntryRest facetEntry) {
         try {
