@@ -351,7 +351,6 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         {
             bitstreamService.addMetadata(context, clonedBitstream, metadataValue.getMetadataField(), metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence());
         }
-        bitstreamService.update(context, clonedBitstream);
         return clonedBitstream;
 
     }
