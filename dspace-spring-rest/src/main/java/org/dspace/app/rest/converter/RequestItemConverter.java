@@ -48,17 +48,17 @@ public class RequestItemConverter
     @Override
     public RequestItemRest fromModel(RequestItem requestItem) {
         RequestItemRest requestItemRest = new RequestItemRest();
-        requestItemRest.setAccept_request(requestItem.isAccept_request());
+        requestItemRest.setAcceptRequest(requestItem.isAccept_request());
         requestItemRest.setAllfiles(requestItem.isAllfiles());
         requestItemRest.setBitstream(bitstreamConverter.fromModel(requestItem.getBitstream()));
-        requestItemRest.setDecision_date(requestItem.getDecision_date());
+        requestItemRest.setDecisionDate(requestItem.getDecision_date());
         requestItemRest.setExpires(requestItem.getExpires());
         requestItemRest.setId(requestItem.getID());
         requestItemRest.setItem(itemConverter.fromModel(requestItem.getItem()));
-        requestItemRest.setReq_email(requestItem.getReqEmail());
-        requestItemRest.setReq_message(requestItem.getReqMessage());
-        requestItemRest.setReq_name(requestItem.getReqName());
-        requestItemRest.setRequest_date(requestItem.getRequest_date());
+        requestItemRest.setReqEmail(requestItem.getReqEmail());
+        requestItemRest.setReqMessage(requestItem.getReqMessage());
+        requestItemRest.setReqName(requestItem.getReqName());
+        requestItemRest.setRequestDate(requestItem.getRequest_date());
         requestItemRest.setToken(requestItem.getToken());
         return requestItemRest;
     }
@@ -73,15 +73,15 @@ public class RequestItemConverter
                     obj.getBitstream(),
                     obj.getItem(),
                     obj.isAllfiles(),
-                    obj.getReq_email(),
-                    obj.getReq_name(),
-                    obj.getReq_message());
+                    obj.getReqEmail(),
+                    obj.getReqName(),
+                    obj.getReqMessage());
         } catch (SQLException ex) {
             LOG.error(ex.getMessage(), ex);
         }
         RequestItem requestItem = requestItemService.findByToken(context, token);
-        requestItem.setAccept_request(obj.isAccept_request());
-        requestItem.setDecision_date(obj.getDecision_date());
+        requestItem.setAccept_request(obj.isAcceptRequest());
+        requestItem.setDecision_date(obj.getDecisionDate());
         return requestItem;
     }
 
