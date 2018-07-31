@@ -45,19 +45,19 @@ public class RequestItemConverter
         RequestItemRest requestItemRest = new RequestItemRest();
         requestItemRest.setProjection(projection);
 
-        requestItemRest.setAccept_request(requestItem.isAccept_request());
+        requestItemRest.setAcceptRequest(requestItem.isAccept_request());
         requestItemRest.setAllfiles(requestItem.isAllfiles());
         requestItemRest.setBitstream(
                 bitstreamConverter.convert(requestItem.getBitstream(), projection));
-        requestItemRest.setDecision_date(requestItem.getDecision_date());
+        requestItemRest.setDecisionDate(requestItem.getDecision_date());
         requestItemRest.setExpires(requestItem.getExpires());
         requestItemRest.setId(requestItem.getID());
         requestItemRest.setItem(
                 itemConverter.convert(requestItem.getItem(), projection));
-        requestItemRest.setReq_email(requestItem.getReqEmail());
-        requestItemRest.setReq_message(requestItem.getReqMessage());
-        requestItemRest.setReq_name(requestItem.getReqName());
-        requestItemRest.setRequest_date(requestItem.getRequest_date());
+        requestItemRest.setReqEmail(requestItem.getReqEmail());
+        requestItemRest.setReqMessage(requestItem.getReqMessage());
+        requestItemRest.setReqName(requestItem.getReqName());
+        requestItemRest.setRequestDate(requestItem.getRequest_date());
         requestItemRest.setToken(requestItem.getToken());
         return requestItemRest;
     }

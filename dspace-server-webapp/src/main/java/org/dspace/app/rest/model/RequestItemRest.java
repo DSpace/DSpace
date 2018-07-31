@@ -8,8 +8,12 @@
 package org.dspace.app.rest.model;
 
 import java.util.Date;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.dspace.app.rest.converter.BitstreamConverter;
+import org.dspace.app.rest.converter.ItemConverter;
 
 /**
  * Represent a user's request for a copy of an Item.
@@ -17,22 +21,29 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
+@Named
 public class RequestItemRest
         extends BaseObjectRest {
     public static final String NAME = "copy_request";
 
     public static final String CATEGORY = RestAddressableModel.COPY_REQUEST;
 
+    @Inject
+    private BitstreamConverter bitstreamConverter;
+
+    @Inject
+    private ItemConverter itemConverter;
+
     protected BitstreamRest bitstream;
-    protected Date decision_date;
+    protected Date decisionDate;
     protected Date expires;
     protected ItemRest item;
-    protected String req_email;
-    protected String req_message;
-    protected String req_name;
-    protected Date request_date;
+    protected String reqEmail;
+    protected String reqMessage;
+    protected String reqName;
+    protected Date requestDate;
     protected String token;
-    protected boolean accept_request;
+    protected boolean acceptRequest;
     protected boolean allfiles;
 
     /**
@@ -52,17 +63,17 @@ public class RequestItemRest
     }
 
     /**
-     * @return the decision_date
+     * @return the decisionDate
      */
-    public Date getDecision_date() {
-        return decision_date;
+    public Date getDecisionDate() {
+        return decisionDate;
     }
 
     /**
-     * @param decision_date the decision_date to set
+     * @param decided the decisionDate to set
      */
-    public void setDecision_date(Date decision_date) {
-        this.decision_date = decision_date;
+    public void setDecisionDate(Date decided) {
+        this.decisionDate = decided;
     }
 
     /**
@@ -98,57 +109,57 @@ public class RequestItemRest
     /**
      * @return the email address of the requester.
      */
-    public String getReq_email() {
-        return req_email;
+    public String getReqEmail() {
+        return reqEmail;
     }
 
     /**
-     * @param req_email the email address of the requester.
+     * @param email the email address of the requester.
      */
-    public void setReq_email(String req_email) {
-        this.req_email = req_email;
+    public void setReqEmail(String email) {
+        this.reqEmail = email;
     }
 
     /**
      * @return the requester's message.
      */
-    public String getReq_message() {
-        return req_message;
+    public String getReqMessage() {
+        return reqMessage;
     }
 
     /**
-     * @param req_message the requester's message.
+     * @param message the requester's message.
      */
-    public void setReq_message(String req_message) {
-        this.req_message = req_message;
+    public void setReqMessage(String message) {
+        this.reqMessage = message;
     }
 
     /**
      * @return the requester's name.
      */
-    public String getReq_name() {
-        return req_name;
+    public String getReqName() {
+        return reqName;
     }
 
     /**
-     * @param req_name the requester's name.
+     * @param name the requester's name.
      */
-    public void setReq_name(String req_name) {
-        this.req_name = req_name;
+    public void setReqName(String name) {
+        this.reqName = name;
     }
 
     /**
-     * @return the request_date
+     * @return the requestDate
      */
-    public Date getRequest_date() {
-        return request_date;
+    public Date getRequestDate() {
+        return requestDate;
     }
 
     /**
-     * @param request_date the request_date to set
+     * @param requested the requestDate to set
      */
-    public void setRequest_date(Date request_date) {
-        this.request_date = request_date;
+    public void setRequestDate(Date requested) {
+        this.requestDate = requested;
     }
 
     /**
@@ -168,15 +179,15 @@ public class RequestItemRest
     /**
      * @return true if the request has been accepted.
      */
-    public boolean isAccept_request() {
-        return accept_request;
+    public boolean isAcceptRequest() {
+        return acceptRequest;
     }
 
     /**
-     * @param accept_request true if the request has been accepted.
+     * @param accepted true if the request has been accepted.
      */
-    public void setAccept_request(boolean accept_request) {
-        this.accept_request = accept_request;
+    public void setAcceptRequest(boolean accepted) {
+        this.acceptRequest = accepted;
     }
 
     /**
