@@ -36,7 +36,7 @@
     </bean>
 
     <bean name="azureStore" class="org.dspace.storage.bitstore.AzureBlobStorageBitStoreService" scope="singleton">
-        <!-- Azure Blob Storage Account and Key, with policies for specified bucket -->
+        <!-- Azure Blob Storage Account and Key -->
         <property name="azureAccountName" value=""/>
         <property name="azureAccountKey" value=""/>
 
