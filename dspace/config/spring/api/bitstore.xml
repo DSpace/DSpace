@@ -9,6 +9,7 @@
             <map>
                 <entry key="0" value-ref="localStore"/>
                 <!--<entry key="1" value-ref="s3Store"/>-->
+                <!--<entry key="2" value-ref="azureStore"/>-->
             </map>
         </property>
     </bean>
@@ -34,6 +35,21 @@
         <property name="subfolder" value=""/>
     </bean>
 
+    <bean name="azureStore" class="org.dspace.storage.bitstore.AzureBlobStorageBitStoreService" scope="singleton">
+        <!-- Azure Blob Storage Account and Key, with policies for specified bucket -->
+        <property name="azureAccountName" value=""/>
+        <property name="azureAccountKey" value=""/>
+
+        <!-- Azure Container reference/name to store assets in. example: longsight-dspace-auk -->
+        <!-- Optional, sdk default is us-east-1 -->
+        <property name="azureContainerReference" value=""/>
+
+        <!-- Subfolder to organize assets within the container,
+            in case this container is shared with other DSPace Instances  -->
+        <!-- Optional, default is root level of container -->
+        <property name="subfolder" value=""/>
+    </bean>
     <!-- <bean name="localStore2 ... -->
     <!-- <bean name="s3Store2 ... -->
+    <!-- <bean name="azureStore2 ... -->
 </beans>

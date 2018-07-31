@@ -75,7 +75,7 @@ public class Cleanup
             	log.debug("option l used setting flag to leave db records");
                 deleteDbRecords = false;    
             }
-           	log.debug("leave db records = " + deleteDbRecords);
+           	log.debug("leave db records = " + !deleteDbRecords);
             StorageServiceFactory.getInstance().getBitstreamStorageService().cleanup(deleteDbRecords, line.hasOption('v'));
             
             System.exit(0);
