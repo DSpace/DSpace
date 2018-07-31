@@ -40,8 +40,7 @@
         <property name="azureAccountName" value=""/>
         <property name="azureAccountKey" value=""/>
 
-        <!-- Azure Container reference/name to store assets in. example: longsight-dspace-auk -->
-        <!-- Optional, sdk default is us-east-1 -->
+        <!-- Azure Container reference/name to store assets in. example: uploadedFiles -->
         <property name="azureContainerReference" value=""/>
 
         <!-- Subfolder to organize assets within the container,
