@@ -151,6 +151,14 @@ public interface BitstreamStorageService {
     /**
      * Clone the given bitstream to a new bitstream with a new ID. 
      * Metadata of the given bitstream are also copied to the new bitstream.
+     *
+     * <p>
+     * This method does not persist the modifications to the new bitstream.
+     * This would lead to authorization failures, because the new bitstream
+     * does not belong to any Item yet. The caller have to ensure to call
+     * {@link org.dspace.content.service.BitstreamService#update} on the
+     * returned bitstream after adding it to an Item.
+     * </p>
      * 
      * @param context
      *            DSpace context object
