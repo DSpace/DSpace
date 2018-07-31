@@ -14,11 +14,13 @@ public class InstitutionAuthority extends SimpleSPARQLAuthorityProvider {
 		pqs.setNsPrefix("foaf", NS_FOAF);
 		pqs.setNsPrefix("dc", NS_DC);
 		pqs.setNsPrefix("sioc", NS_SIOC);
+		pqs.setNsPrefix("skos", NS_SKOS);
 
-		pqs.setCommandText("SELECT ?institution ?label ?initials\n");
+		pqs.setCommandText("SELECT ?institution ?label ?initials ?labelpadre ?initpadre \n");
 		pqs.append("WHERE {\n");
 		pqs.append("?institution a foaf:Organization ; foaf:name ?label .\n");
-		pqs.append("OPTIONAL { ?institution sioc:id ?initials} \n");
+		pqs.append("OPTIONAL { ?institution sioc:id ?initials} . \n");
+		pqs.append("OPTIONAL { ?institution skos:broader ?padre . ?padre foaf:name ?labelpadre  OPTIONAL { ?padre sioc:id  ?initpadre } . } \n");    
 		pqs.append("FILTER(REGEX(?institution, ?key, \"i\"))\n");
 		pqs.append("}\n");
 
@@ -34,11 +36,13 @@ public class InstitutionAuthority extends SimpleSPARQLAuthorityProvider {
 		pqs.setNsPrefix("foaf", NS_FOAF);
 		pqs.setNsPrefix("dc", NS_DC);
 		pqs.setNsPrefix("sioc", NS_SIOC);
+		pqs.setNsPrefix("skos", NS_SKOS);
 
-		pqs.setCommandText("SELECT ?institution ?label ?initials\n");
+		pqs.setCommandText("SELECT ?institution ?label ?initials ?labelpadre ?initpadre \n");
 		pqs.append("WHERE {\n");
 		pqs.append("?institution a foaf:Organization ; foaf:name ?label .\n");
-		pqs.append("OPTIONAL { ?institution sioc:id ?initials} \n");
+		pqs.append("OPTIONAL { ?institution sioc:id ?initials } . \n");
+		pqs.append("OPTIONAL { ?institution skos:broader ?padre . ?padre foaf:name ?labelpadre  OPTIONAL { ?padre sioc:id  ?initpadre } . } \n");    
 		if (!"".equals(text)) {
 			pqs.append("FILTER(REGEX(?label, ?text, \"i\") || REGEX(?initials, ?text, \"i\"))\n");
 			pqs.setLiteral("text", text);
@@ -52,13 +56,23 @@ public class InstitutionAuthority extends SimpleSPARQLAuthorityProvider {
 	@Override
 	protected Choice extractChoice(QuerySolution solution) {
 		String key = solution.getResource("institution").getURI();
-		String label = solution.getLiteral("label").getString();
+		String label = "";
+		if (solution.contains("labelpadre") && !"".equals(solution.getLiteral("labelpadre").getString())) {
+			label += solution.getLiteral("labelpadre").getString();
+			if (solution.contains("initpadre") && !"".equals(solution.getLiteral("initpadre").getString())) {
+				String initpadre = solution.getLiteral("initpadre").getString();
+				label += " (" + initpadre + ")";
+			}
+			label += " - ";
+		}
+		label += solution.getLiteral("label").getString();
 		
 		if (solution.contains("initials") && !"".equals(solution.getLiteral("initials").getString())) {
 			String initials = solution.getLiteral("initials").getString();
-			label = label + " (" + initials + ")";
+			label += " (" + initials + ")";
 		}
-		
+
+
 		return new Choice(key, label, label);
 	}
 }
