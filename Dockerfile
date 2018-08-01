@@ -18,7 +18,7 @@ COPY --from=build /app /dspace-src
 WORKDIR /dspace-src/dspace/target/${TARGET_DIR}
 
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.4
+ENV ANT_VERSION 1.10.5
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
 
