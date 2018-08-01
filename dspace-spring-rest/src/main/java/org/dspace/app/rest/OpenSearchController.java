@@ -24,6 +24,7 @@ import org.w3c.dom.Document;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,10 +60,10 @@ import org.dspace.authorize.service.AuthorizeService;
  */
 @Controller
 @RequestMapping("/opensearch")
-public class OpenSearchController {
+public class OpenSearchController implements ErrorController {
 
     private static final Logger log = Logger.getLogger(ScopeResolver.class);
-
+    private static final String errorpath = "/error";
     private List<String> searchIndices = null;
 
     private CommunityService communityService;
@@ -106,7 +107,11 @@ public class OpenSearchController {
             // TODO: make that work correctly
             if (!openSearchService.getFormats().contains(format))
             {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                String err = "Format "+format+" is not supported.";
+                response.setContentType("text/html");
+                response.setContentLength(err.length());
+                response.getWriter().write(err);
+                //response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 //return "error";
             }
 
@@ -160,6 +165,10 @@ public class OpenSearchController {
         }
         else {
             log.debug("OpenSearch Service is disabled");
+            String err = "OpenSearch Service is disabled";
+            response.setContentType("text/html");
+            response.setContentLength(err.length());
+            response.getWriter().write(err);
         }
     }
 
@@ -182,7 +191,21 @@ public class OpenSearchController {
         }
         else {
             log.debug("OpenSearch Service is disabled");
+            String err = "OpenSearch Service is disabled";
+            response.setContentType("text/html");
+            response.setContentLength(err.length());
+            response.getWriter().write(err);
         }
+    }
+
+    @RequestMapping(value = errorpath)
+    public String error() {
+        return "Error handling";
+    }
+
+    @Override
+    public String getErrorPath() {
+        return errorpath;
     }
 
     /**
