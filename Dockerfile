@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
 ADD . /app/
-COPY docker.local.cfg /app/local.cfg
+COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
 RUN mvn package
 
@@ -18,7 +18,7 @@ COPY --from=build /app /dspace-src
 WORKDIR /dspace-src/dspace/target/${TARGET_DIR}
 
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.4
+ENV ANT_VERSION 1.10.5
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
 
@@ -34,7 +34,7 @@ COPY --from=ant_build /dspace /dspace
 EXPOSE 8080 8009
 
 # Ant will be embedded in the final container to allow additional deployments
-ENV ANT_VERSION 1.10.4
+ENV ANT_VERSION 1.10.5
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
 
