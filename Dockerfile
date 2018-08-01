@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
 ADD . /app/
-COPY docker.local.cfg /app/local.cfg
+COPY src/main/docker/local.cfg /app/local.cfg
 
 RUN mvn package
 
