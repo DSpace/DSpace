@@ -5,11 +5,17 @@
 FROM maven as build
 WORKDIR /app
 
+# The Mirage2 build cannot run as root.  Setting the user to dspace.
+RUN useradd dspace \
+    && mkdir /home/dspace \
+    && chown -Rv dspace: /home/dspace
+USER dspace
+
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
-ADD . /app/
+ADD --chown=dspace . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
-RUN mvn package
+RUN mvn package -Dmirage2.on=true
 
 # Step 2 - Run Ant Deploy
 FROM tomcat:8 as ant_build
