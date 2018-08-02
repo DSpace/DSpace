@@ -10,7 +10,6 @@ package org.dspace.app.rest.security;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,11 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationMethod;
-import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -59,25 +56,9 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
         String user = req.getParameter("user");
         String password = req.getParameter("password");
 
-        try {
-            return authenticationManager.authenticate(
+        return authenticationManager.authenticate(
                 new DSpaceAuthentication(user, password, new ArrayList<>())
-            );
-        } catch (BadCredentialsException e) {
-            AuthenticationService authenticationService =
-                AuthenticateServiceFactory.getInstance().getAuthenticationService();
-            Iterator<AuthenticationMethod> authenticationMethodIterator =
-                authenticationService.authenticationMethodIterator();
-            while (authenticationMethodIterator.hasNext()) {
-                AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
-                Context context = ContextUtil.obtainContext(req);
-                String loginPageURL = authenticationMethod.loginPageURL(context, req, res);
-                if (StringUtils.isNotBlank(loginPageURL)) {
-                    res.addHeader("Location", loginPageURL);
-                }
-            }
-            throw e;
-        }
+        );
     }
 
 
@@ -89,5 +70,38 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
         restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication);
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response, AuthenticationException failed)
+            throws IOException, ServletException {
+
+        AuthenticationService authenticationService = restAuthenticationService.getAuthenticationService();
+
+        Iterator<AuthenticationMethod> authenticationMethodIterator
+                = authenticationService.authenticationMethodIterator();
+        Context context = ContextUtil.obtainContext(request);
+
+        StringBuilder wwwAuthenticate = new StringBuilder();
+        while (authenticationMethodIterator.hasNext()) {
+            AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
+
+            if (wwwAuthenticate.length() > 0) {
+                wwwAuthenticate.append(", ");
+            }
+
+            wwwAuthenticate.append(authenticationMethod.getName()).append(" realm=\"DSpace REST API\"");
+
+            String loginPageURL = authenticationMethod.loginPageURL(context, request, response);
+            if (StringUtils.isNotBlank(loginPageURL)) {
+                // We cannot reply with a 303 code because may browsers handle 3xx response codes transparently. This
+                // means that the JavaScript client code is not aware of the 303 status and fails to react accordingly.
+                wwwAuthenticate.append(", location=\"").append(loginPageURL).append("\"");
+            }
+        }
+
+        response.setHeader("WWW-Authenticate", wwwAuthenticate.toString());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, failed.getMessage());
     }
 }

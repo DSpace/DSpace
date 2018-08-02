@@ -225,11 +225,11 @@ public class InstallItemTest extends AbstractUnitTest {
         // Create provenance description
         String testMessage = "No. of bitstreams: 2\n";
         testMessage += "one: "
-            + one.getSize() + " bytes, checksum: "
+            + one.getSizeBytes() + " bytes, checksum: "
             + one.getChecksum() + " ("
             + one.getChecksumAlgorithm() + ")\n";
         testMessage += "two: "
-            + two.getSize() + " bytes, checksum: "
+            + two.getSizeBytes() + " bytes, checksum: "
             + two.getChecksum() + " ("
             + two.getChecksumAlgorithm() + ")\n";
 

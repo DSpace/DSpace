@@ -137,7 +137,7 @@ public class ItemFilterUtil {
                 for (Bitstream bit : bundle.getBitstreams()) {
                     for (String mime : mimeList) {
                         if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
-                            if (bit.getSize() < size) {
+                            if (bit.getSizeBytes() < size) {
                                 count++;
                             }
                         }
@@ -162,7 +162,7 @@ public class ItemFilterUtil {
                 for (Bitstream bit : bundle.getBitstreams()) {
                     for (String mime : mimeList) {
                         if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
-                            if (bit.getSize() > size) {
+                            if (bit.getSizeBytes() > size) {
                                 count++;
                             }
                         }

@@ -60,7 +60,7 @@ public class BitstreamConverter
             e.printStackTrace();
         }
         b.setFormat(format);
-        b.setSizeBytes(obj.getSize());
+        b.setSizeBytes(obj.getSizeBytes());
         return b;
     }
 

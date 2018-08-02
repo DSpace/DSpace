@@ -9,10 +9,10 @@ package org.dspace.core;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
@@ -115,7 +115,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      */
     protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields,
                                         List<String> columnSortFields) {
-        addMetadataSortQuery(query, metadataSortFields, columnSortFields, ListUtils.EMPTY_LIST);
+        addMetadataSortQuery(query, metadataSortFields, columnSortFields, Collections.EMPTY_LIST);
     }
 
     /**
