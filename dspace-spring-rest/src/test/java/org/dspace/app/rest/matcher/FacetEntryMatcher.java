@@ -28,6 +28,17 @@ public class FacetEntryMatcher {
         );
     }
 
+    public static Matcher<? super Object> authorFacetWithMinMax(boolean hasNext, String min, String max) {
+        return allOf(
+            hasJsonPath("$.name", is("author")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.minValue", is(min)),
+            hasJsonPath("$.maxValue", is(max)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/author")),
+            hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/author"))
+        );
+    }
+
     public static Matcher<? super Object> subjectFacet(boolean hasNext) {
         return allOf(
             hasJsonPath("$.name", is("subject")),
@@ -42,6 +53,17 @@ public class FacetEntryMatcher {
         return allOf(
             hasJsonPath("$.name", is("dateIssued")),
             hasJsonPath("$.facetType", is("date")),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/dateIssued")),
+            hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/dateIssued"))
+        );
+    }
+
+    public static Matcher<? super Object> dateIssuedFacetWithMinMax(boolean hasNext, String min, String max) {
+        return allOf(
+            hasJsonPath("$.name", is("dateIssued")),
+            hasJsonPath("$.facetType", is("date")),
+            hasJsonPath("$.minValue", is(min)),
+            hasJsonPath("$.maxValue", is(max)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/dateIssued")),
             hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/dateIssued"))
         );

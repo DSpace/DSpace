@@ -20,6 +20,7 @@ public class DiscoverySearchFilter {
     protected List<String> metadataFields;
     protected String type = DiscoveryConfigurationParameters.TYPE_TEXT;
     public static final String FILTER_TYPE_DEFAULT = "default";
+    protected boolean isOpenByDefault = false;
 
     public String getIndexFieldName() {
         return indexFieldName;
@@ -39,10 +40,23 @@ public class DiscoverySearchFilter {
         this.metadataFields = metadataFields;
     }
 
+    /**
+      * Returns the type of the DiscoverySearchFilter
+      * @return  The type of the DiscoverySearchFilter
+      */
     public String getType() {
         return type;
     }
 
+    /**
+      * Sets the type of the DiscoverySearchFilter to the one given in the parameter if it matches
+      * a set of possible types
+      * The possible types are described in: {@link org.dspace.discovery.configuration.DiscoveryConfigurationParameters}
+      * For the DiscoverySearchFilter only the TYPE_TEXT, TYPE_DATE and TYPE_HIERARCHICAL are allowed
+      *
+      * @param type  The type for this DiscoverySearchFilter
+      * @throws DiscoveryConfigurationException  If none of the types match, this error will be thrown indiciating this
+      */
     public void setType(String type) throws DiscoveryConfigurationException {
         if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_TEXT)) {
             this.type = DiscoveryConfigurationParameters.TYPE_TEXT;
@@ -59,6 +73,23 @@ public class DiscoverySearchFilter {
 
     public String getFilterType() {
         return FILTER_TYPE_DEFAULT;
+    }
+
+    /**
+     * Specifies whether the DiscoverySearchfilter should be open by default in the UI or not
+     * @return  A boolean to indicate whether the filter should be open by default in the UI or not
+     */
+    public boolean isOpenByDefault() {
+        return isOpenByDefault;
+    }
+
+    /**
+     * Sets the openByDefault property for this DiscoverySearchFilter
+     *
+     * @param isOpenByDefault The boolean value to set the openByDefault property to
+     */
+    public void setIsOpenByDefault(boolean isOpenByDefault) {
+        this.isOpenByDefault = isOpenByDefault;
     }
 
 }

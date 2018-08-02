@@ -21,7 +21,7 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
     private DiscoveryConfigurationParameters.SORT sortOrderSidebar = DiscoveryConfigurationParameters.SORT.COUNT;
     private DiscoveryConfigurationParameters.SORT sortOrderFilterPage = DiscoveryConfigurationParameters.SORT.COUNT;
     public static final String FILTER_TYPE_FACET = "facet";
-
+    private boolean exposeMinMax = false;
 
     public int getFacetLimit() {
         if (facetLimit == -1) {
@@ -54,5 +54,24 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
     @Override
     public String getFilterType() {
         return FILTER_TYPE_FACET;
+    }
+
+    /**
+     * This is a boolean value indicating whether or not this DiscoverySearchFilterFacet should expose
+     * the minimum and maximum value
+     *
+     * @return A boolean indicating whether or not the minimum and maximum value should be exposed
+     */
+    public boolean isExposeMinMax() {
+        return exposeMinMax;
+    }
+
+    /**
+     * This method will set the exposeMinMax property to the boolean that's passed along with the param
+     *
+     * @param exposeMinMax The boolean that will the exposeMinMax property will be set to
+     */
+    public void setExposeMinMax(boolean exposeMinMax) {
+        this.exposeMinMax = exposeMinMax;
     }
 }
