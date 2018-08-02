@@ -1466,10 +1466,11 @@ public class FlowUtils {
     }
 
 	public static Map<String, List<Item>> retrieveInternalFileStatuses(Context context, Item item) {
-    	Map<Item, Boolean> dataFiles = new HashMap<Item, Boolean>();
+    	Map<Integer, Boolean> dataFileSupersededStatus = new HashMap<Integer, Boolean>();
 		DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
 		DCValue[] fileStatusMDVs = item.getMetadata("workflow.review.fileStatus");
 		HashMap<Integer, Boolean> fileIsSupersededMap = new HashMap<Integer, Boolean>();
+		ArrayList<Item> dataFiles = new ArrayList<Item>();
 		for (DCValue fileStatusMDV : fileStatusMDVs) {
 			fileIsSupersededMap.put(Integer.valueOf(fileStatusMDV.value), (fileStatusMDV.confidence == Choices.CF_REJECTED));
 		}
@@ -1487,14 +1488,15 @@ public class FlowUtils {
 				if (obj != null) {
 					Boolean isSuperseded = fileIsSupersededMap.get(obj.getID());
 					if (isSuperseded == null) isSuperseded = false;
-					dataFiles.put((Item) obj, isSuperseded);
+					dataFileSupersededStatus.put(obj.getID(), isSuperseded);
+					dataFiles.add((Item) obj);
 				}
 			}
 		}
 		ArrayList<Item> hasPartsList = new ArrayList<Item>();
 		ArrayList<Item> supersededList = new ArrayList<Item>();
-		for (Item obj : dataFiles.keySet()) {
-			if (dataFiles.get(obj)) {
+		for (Item obj : dataFiles) {
+			if (dataFileSupersededStatus.get(obj.getID())) {
 				supersededList.add(obj);
 			} else {
 				hasPartsList.add(obj);
