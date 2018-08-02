@@ -205,8 +205,11 @@ public class XOAI {
             while (iterator.hasNext()) {
                 try {
                     Item item = iterator.next();
-                    server.add(this.index(item));
-
+                    if (item.getHandle() == null) {
+                        log.warn("Skipped item without handle: " + item.getID());
+                    } else {
+                        server.add(this.index(item));
+                    }
                     //Uncache the item to keep memory consumption low
                     context.uncacheEntity(item);
 

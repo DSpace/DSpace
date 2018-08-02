@@ -236,7 +236,7 @@ public class OREDisseminationCrosswalk
                     bs.getName()) + "?sequence=" + bs.getSequenceID());
                 arLink.setAttribute("title", bs.getName());
                 arLink.setAttribute("type", bs.getFormat(context).getMIMEType());
-                arLink.setAttribute("length", Long.toString(bs.getSize()));
+                arLink.setAttribute("length", Long.toString(bs.getSizeBytes()));
 
                 aggregation.addContent(arLink);
 

@@ -11,6 +11,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Service;
@@ -33,4 +34,5 @@ public interface RestAuthenticationService {
 
     void invalidateAuthenticationData(HttpServletRequest request, Context context) throws Exception;
 
+    AuthenticationService getAuthenticationService();
 }
