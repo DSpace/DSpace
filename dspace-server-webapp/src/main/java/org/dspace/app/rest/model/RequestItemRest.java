@@ -24,9 +24,9 @@ import org.dspace.app.rest.converter.ItemConverter;
 @Named
 public class RequestItemRest
         extends BaseObjectRest {
-    public static final String NAME = "copy_request";
+    public static final String NAME = "copyRequest";
 
-    public static final String CATEGORY = RestAddressableModel.COPY_REQUEST;
+    public static final String CATEGORY = RestAddressableModel.TOOLS;
 
     @Inject
     private BitstreamConverter bitstreamConverter;
