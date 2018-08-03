@@ -34,7 +34,7 @@ public class BitstreamMatcher {
                 BitstreamMetadataMatcher.matchTitle(bitstream.getName()),
                 BitstreamMetadataMatcher.matchDescription(bitstream.getDescription())
             )),
-            hasJsonPath("$.sizeBytes", is((int) bitstream.getSize())),
+            hasJsonPath("$.sizeBytes", is((int) bitstream.getSizeBytes())),
             hasJsonPath("$.checkSum", matchChecksum()),
             hasJsonPath("$._embedded.format", matchFormat()),
             //Check links

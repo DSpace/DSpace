@@ -124,12 +124,12 @@ public class RestRepositoryUtils {
         MultiValueMap<String, Object> result = new LinkedMultiValueMap<String, Object>(parameters);
         MethodParameters methodParameters = new MethodParameters(method, PARAM_ANNOTATION);
 
-        for (MethodParameter parameter : methodParameters.getParametersWith(Parameter.class)) {
+        for (MethodParameter parameter : methodParameters.getParameters()) {
             final Parameter parameterAnnotation = parameter.getParameterAnnotation(Parameter.class);
-            final String paramName = parameter.getParameterName();
+            String paramName = getParamName(parameter, parameterAnnotation);
             List<Object> value = parameters.get(paramName);
             if (value == null) {
-                if (parameterAnnotation.required()) {
+                if (parameterAnnotation != null && parameterAnnotation.required()) {
                     throw new MissingParameterException(
                             String.format("Required Parameter[%s] Missing",
                                     parameter.getParameterName()));
@@ -188,8 +188,8 @@ public class RestRepositoryUtils {
             } else if (Sort.class.isAssignableFrom(targetType)) {
                 result[i] = sortToUse;
             } else {
-
-                String parameterName = param.getParameterName();
+                final Parameter parameterAnnotation = param.getParameterAnnotation(Parameter.class);
+                String parameterName = getParamName(param, parameterAnnotation);
 
                 if (StringUtils.isBlank(parameterName)) {
                     throw new IllegalArgumentException(
@@ -203,6 +203,18 @@ public class RestRepositoryUtils {
         }
 
         return result;
+    }
+
+    private String getParamName(MethodParameter parameter, final Parameter parameterAnnotation) {
+        String paramName = null;
+
+        if (parameterAnnotation != null) {
+            paramName = parameterAnnotation.value();
+        }
+        if (paramName == null) {
+            paramName = parameter.getParameterName();
+        }
+        return paramName;
     }
 
     /**

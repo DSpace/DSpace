@@ -40,4 +40,15 @@ public class MetadataFieldMatcher {
             hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields"))
         );
     }
+
+    public static Matcher<? super Object> matchMetadataFieldByKeys(String schema, String element, String qualifier) {
+        return allOf(
+            hasJsonPath("$.element", is(element)),
+            hasJsonPath("$.qualifier", is(qualifier)),
+            hasJsonPath("$.type", is("metadatafield")),
+            hasJsonPath("$._embedded.schema.prefix", is(schema)),
+            hasJsonPath("$._links.schema.href", Matchers.containsString("/api/core/metadatafields")),
+            hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields"))
+        );
+    }
 }

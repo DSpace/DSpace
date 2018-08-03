@@ -71,8 +71,8 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         try {
             collectionService.update(context, collection);
             context.dispatchEvents();
-
             indexingService.commit();
+
         } catch (Exception e) {
             return handleException(e);
         }
