@@ -57,18 +57,12 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 		pqs.setNsPrefix("rdf", NS_RDF);
 		pqs.setNsPrefix("sioc", NS_SIOC);
 
-		pqs.setCommandText("CONSTRUCT { ?person a foaf:Person. ?person foaf:givenName ?name . ?person foaf:mbox ?mail . ?person foaf:surname ?surname. ?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio. ?link cerif:endDate ?fin . ?link foaf:Organization ?org . ?org foaf:name ?affiliation. ?org sioc:id ?id. }\n");
+		pqs.setCommandText("CONSTRUCT { ?person a foaf:Person. ?person foaf:givenName ?name . ?person foaf:surname ?surname . }\n");
 		pqs.append("WHERE {\n");
 		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:surname ?surname .\n");
-		pqs.append("	OPTIONAL {\n");
-		pqs.append("	?person foaf:mbox ?mail . \n");
-		pqs.append("	} . \n");
-		pqs.append("	OPTIONAL {\n");
-		pqs.append("	?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio; cerif:endDate ?fin; foaf:Organization ?org . ?org foaf:name ?affiliation; sioc:id ?id\n");
-		pqs.append("	}\n");
 		pqs.append("FILTER(REGEX(?person, ?key, \"i\"))\n");
 		pqs.append("}\n");
-		pqs.append("ORDER BY ?surname ?link\n");
+		pqs.append("ORDER BY ?surname \n");
 
 		pqs.setLiteral("key", key);
 		return pqs;
