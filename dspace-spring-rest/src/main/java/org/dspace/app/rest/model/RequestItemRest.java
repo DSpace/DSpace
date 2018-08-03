@@ -27,7 +27,7 @@ import org.dspace.content.Item;
 @Named
 public class RequestItemRest
         extends BaseObjectRest {
-    public static final String NAME = "copyRequest";
+    public static final String NAME = "copyrequest";
 
     public static final String CATEGORY = RestAddressableModel.TOOLS;
 
