@@ -26,7 +26,8 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 	protected static final String NS_SIOC = "http://rdfs.org/sioc/ns#";
 	protected static final String NS_CERIF = "http://spi-fm.uca.es/neologism/cerif/1.3#";
 	protected static final String NS_SCHEMA = "http://schema.org/";
-
+	protected static final String NS_SEDICI = "http://sedici.unlp.edu.ar/";
+	
 	private QuerySolutionMap globalParameters;
 
 	public SPARQLAuthorityProvider() {
