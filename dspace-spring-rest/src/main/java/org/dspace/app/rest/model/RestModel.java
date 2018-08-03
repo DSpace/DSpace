@@ -28,7 +28,7 @@ public interface RestModel extends Serializable {
     public static final String INTEGRATION = "integration";
     public static final String SUBMISSION = "submission";
     public static final String AUTHORIZATION = "authz";
-    public static final String COPY_REQUEST = "copy_request";
+    public static final String TOOLS = "tools";
 
     public String getType();
 
