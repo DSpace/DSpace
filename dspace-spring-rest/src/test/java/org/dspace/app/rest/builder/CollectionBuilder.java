@@ -79,6 +79,12 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return collection;
     }
 
+    /**
+    * Creates a TemplateItem for a given collection.
+    * 
+    * @param context DSpace Context
+    * @param collection DSpace Collection
+    */
     public static Item createTemplateItem(final Context context, final Collection collection) {
         CollectionBuilder builder = new CollectionBuilder(context);
         return builder.create_template_item(collection);
