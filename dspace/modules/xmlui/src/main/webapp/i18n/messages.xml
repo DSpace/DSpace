@@ -2406,6 +2406,12 @@
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.claimaction">SEDICI review</message>
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.editaction">SEDICI review</message>
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniWF.SeDiCILevelReview.claimaction">SEDICI Review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniWF.SeDiCILevelReview.editaction">SEDICI Review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaWF.SeDiCILevelReview.claimaction">SEDICI Review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaWF.SeDiCILevelReview.editaction">SEDICI Review</message>
+<message key="xmlui.XMLWorkflow.MuseoBibliotecaPublicaWF.SeDiCILevelReview.claimaction">SEDICI Review</message>
+<message key="xmlui.XMLWorkflow.MuseoBibliotecaPublicaWF.SeDiCILevelReview.editaction">SEDICI Review</message>
 
 <message key="xmlui.XMLWorkflow.selectSingleReviewer.selectReviewerStep.claimaction">Step of the revisor assignment</message>
 <message key="xmlui.XMLWorkflow.selectSingleReviewer.selectReviewerStep.selectrevieweraction">Assign revisor</message>

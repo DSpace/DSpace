@@ -2873,6 +2873,12 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.editaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.selectcollectionaction">Seleccione una colección</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniWF.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniWF.SeDiCILevelReview.editaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaWF.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaWF.SeDiCILevelReview.editaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoBibliotecaPublicaWF.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoBibliotecaPublicaWF.SeDiCILevelReview.editaction">Revisión SEDICI</message>
 
 <message key="xmlui.XMLWorkflow.workflow.ClaimAction.info1">Acciones que puedes realizar en esta tarea:</message>
 <message key="xmlui.XMLWorkflow.workflow.ClaimAction.take_help">Asignar esta tarea a uno mismo.</message>
