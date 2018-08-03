@@ -56,7 +56,7 @@ public class CommunityMatcher {
                                                                             Collection col) {
         return allOf(
             matchProperties(name, uuid, handle),
-            hasJsonPath("$._embedded.collections._embedded[0]",
+            hasJsonPath("$._embedded.collections._embedded.collections[0]",
                         CollectionMatcher
                             .matchCollectionEntry(col.getName(), col.getID(), col.getHandle(), col.getLogo())),
             hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),

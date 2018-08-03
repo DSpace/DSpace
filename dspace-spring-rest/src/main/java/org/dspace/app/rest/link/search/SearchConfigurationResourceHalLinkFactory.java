@@ -36,7 +36,7 @@ public class SearchConfigurationResourceHalLinkFactory
                 .getSearchConfiguration(data.getScope(), data.getConfigurationName())));
 
             list.add(buildLink("objects", getMethodOn().getSearchObjects(null, null, null, null, null, null)));
-            list.add(buildLink("facets", getMethodOn().getFacets(null, null, null, null, null)));
+            list.add(buildLink("facets", getMethodOn().getFacets(null, null, null, null, null, null)));
         }
     }
 

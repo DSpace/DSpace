@@ -99,7 +99,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
         DefaultMockMvcBuilder mockMvcBuilder = webAppContextSetup(webApplicationContext)
             //Always log the response to debug
-            .alwaysDo(MockMvcResultHandlers.log())
+            .alwaysDo(MockMvcResultHandlers.print())
             //Add all filter implementations
             .addFilters(new ErrorPageFilter())
             .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]));
