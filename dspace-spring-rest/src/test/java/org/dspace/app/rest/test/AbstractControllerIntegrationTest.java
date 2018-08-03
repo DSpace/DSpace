@@ -16,9 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 import javax.servlet.Filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Application;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.junit.Assert;
@@ -39,6 +42,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.web.context.WebApplicationContext;
@@ -119,5 +123,21 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
         return getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER);
     }
 
+    public String getPatchContent(List<Operation> ops) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(ops);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static RequestPostProcessor ip(final String ipAddress) {
+        return request -> {
+            request.setRemoteAddr(ipAddress);
+            return request;
+        };
+    }
 }
 

@@ -24,6 +24,11 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
 
     private MetadataSchema metadataSchema;
 
+    @Override
+    protected int getPriority() {
+        return Integer.MAX_VALUE;
+    }
+
     protected MetadataSchemaBuilder(Context context) {
         super(context);
     }

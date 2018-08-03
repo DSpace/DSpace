@@ -106,6 +106,11 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         jwtTokenHandler.invalidateToken(token, request, context);
     }
 
+    @Override
+    public AuthenticationService getAuthenticationService() {
+        return authenticationService;
+    }
+
     private void addTokenToResponse(final HttpServletResponse response, final String token) throws IOException {
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
