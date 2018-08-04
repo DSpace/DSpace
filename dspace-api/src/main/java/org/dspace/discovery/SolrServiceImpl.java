@@ -44,7 +44,6 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -1786,11 +1785,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 for (String val : (String[])solrParameter.getValue()) {
                     postParameters.add(new BasicNameValuePair(solrParameter.getKey(), val));
                 }
-            }
-            else if (solrParameter.getValue() instanceof String) {
+            } else if (solrParameter.getValue() instanceof String) {
                 postParameters.add(new BasicNameValuePair(solrParameter.getKey(), solrParameter.getValue().toString()));
-            }
-            else {
+            } else {
                 log.warn("Search parameters contain non-string value: " + solrParameter.getValue().toString());
             }
         }
