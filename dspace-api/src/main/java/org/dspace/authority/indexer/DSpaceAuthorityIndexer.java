@@ -9,8 +9,6 @@ package org.dspace.authority.indexer;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -74,14 +72,12 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
 
     @Override
     public List<AuthorityValue> getAuthorityValues(Context context, Item item)
-            throws SQLException, AuthorizeException
-    {
+            throws SQLException, AuthorizeException {
         return getAuthorityValues(context, item, null);
     }
 
     public List<AuthorityValue> getAuthorityValues(Context context, Item item, Map<String, AuthorityValue> cache)
-            throws SQLException, AuthorizeException
-    {
+            throws SQLException, AuthorizeException {
         List<AuthorityValue> values = new ArrayList<>();
         for (String metadataField : metadataFields) {
             List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(item, metadataField);
@@ -104,10 +100,9 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                 if (value != null) {
                     if (requiresItemUpdate) {
                         value.updateItem(context, item, metadataValue);
-                         try {
+                        try {
                             itemService.update(context, item);
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             log.error("Error creating a metadatavalue's authority", e);
                         }
                     }
@@ -115,16 +110,15 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                         cache.put(content, value);
                     }
                     values.add(value);
-                }
-                else {
+                } else {
                     log.error("Error getting an authority value for " +
                             "the metadata value \"" + content + "\" " +
                             "in the field \"" + metadataField + "\" " +
                             "of the item " + item.getHandle());
                 }
             }
-         }
-         return values;
+        }
+        return values;
     }
     /**
      * This method looks at the authority of a metadata value.
@@ -141,8 +135,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
      * @param metadataAuthorityKey Existing authority of the metadata value.
      */
     private AuthorityValue getAuthorityValue(Context context, String metadataField,
-            String metadataContent, String metadataAuthorityKey)
-    {
+            String metadataContent, String metadataAuthorityKey) {
         if (StringUtils.isNotBlank(metadataAuthorityKey) &&
                 !metadataAuthorityKey.startsWith(AuthorityValueService.GENERATE)) {
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly
