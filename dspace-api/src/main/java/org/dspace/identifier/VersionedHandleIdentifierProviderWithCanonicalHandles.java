@@ -490,7 +490,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         // we want to exchange the old handle against the new one. To do so, we
         // load all identifiers, clear the metadata field, re add all
         // identifiers which are not from type handle and add the new handle.
-    	String handleref = handleService.getCanonicalForm(handle);
+        String handleref = handleService.getCanonicalForm(handle);
         List<MetadataValue> identifiers = itemService
             .getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
         itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
