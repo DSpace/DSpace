@@ -93,6 +93,31 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
+    public Bitstream clone(Context context, Bitstream bitstream)
+            throws SQLException {
+        // Create a new bitstream with a new ID.
+        Bitstream clonedBitstream = bitstreamDAO.create(context, new Bitstream());
+        // Set the internal identifier, file size, checksum, and
+        // checksum algorithm as same as the given bitstream.
+        clonedBitstream.setInternalId(bitstream.getInternalId());
+        clonedBitstream.setSizeBytes(bitstream.getSizeBytes());
+        clonedBitstream.setChecksum(bitstream.getChecksum());
+        clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+        try {
+            //Update our bitstream but turn off the authorization system since permissions
+            //haven't been set at this point in time.
+            context.turnOffAuthorisationSystem();
+            update(context, clonedBitstream);
+        } catch (AuthorizeException e) {
+            log.error(e);
+            //Can never happen since we turn off authorization before we update
+        } finally {
+            context.restoreAuthSystemState();
+        }
+        return clonedBitstream;
+    }
+
+    @Override
     public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException {
         return bitstreamDAO.findAll(context, limit, offset);
     }

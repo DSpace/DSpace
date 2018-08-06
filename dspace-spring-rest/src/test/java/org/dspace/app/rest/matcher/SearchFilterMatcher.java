@@ -73,6 +73,22 @@ public class SearchFilterMatcher {
         );
     }
 
+    public static Matcher<? super Object> hasFileNameInOriginalBundleFilter() {
+        return allOf(
+                hasJsonPath("$.filter", is("original_bundle_filenames")),
+                checkOperators()
+
+        );
+    }
+
+    public static Matcher<? super Object> hasFileDescriptionInOriginalBundleFilter() {
+        return allOf(
+                hasJsonPath("$.filter", is("original_bundle_descriptions")),
+                checkOperators()
+
+        );
+    }
+
     public static Matcher<? super Object> checkOperators() {
         return allOf(
                 hasJsonPath("$.operators",  containsInAnyOrder(
