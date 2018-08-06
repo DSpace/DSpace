@@ -318,7 +318,6 @@
                 <script type="text/x-mathjax-config">
                     MathJax.Hub.Config({
                       tex2jax: {
-                        inlineMath: [['$','$'], ['\\(','\\)']],
                         ignoreClass: "detail-field-data|detailtable|exception"
                       },
                       TeX: {
@@ -328,7 +327,7 @@
                       }
                     });
                 </script>
-                <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
+                <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
             </xsl:if>
 
         </head>
