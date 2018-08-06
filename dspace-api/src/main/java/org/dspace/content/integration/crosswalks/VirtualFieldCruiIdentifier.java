@@ -38,6 +38,12 @@ public class VirtualFieldCruiIdentifier
         mds = item.getMetadata("dc", "identifier", "eissn", "*");
         if(mds != null && mds.length > 0)
             element = mds[0].value;
+        mds = item.getMetadata("dc", "identifier", "isbn", "*");
+        if(mds != null && mds.length > 0)
+            element = mds[0].value;
+        mds = item.getMetadata("dc", "identifier", "eisbn", "*");
+        if(mds != null && mds.length > 0)
+            element = mds[0].value;
         String handle = item.getHandle();
         if(StringUtils.isNotBlank(handle))
             fieldCache.put("virtual.cruiidentifier", (new StringBuilder(String.valueOf(element))).append("/").append(handle.substring(6)).toString());
