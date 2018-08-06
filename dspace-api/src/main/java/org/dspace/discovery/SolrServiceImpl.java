@@ -1982,7 +1982,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (filterquery != null) {
                 solrQuery.addFilterQuery(filterquery);
             }
-            QueryResponse rsp = getSolr().query(solrQuery);
+            QueryResponse rsp = getSolr().query(solrQuery, SolrRequest.METHOD.POST);
             SolrDocumentList docs = rsp.getResults();
 
             Iterator iter = docs.iterator();
