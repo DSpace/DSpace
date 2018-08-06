@@ -344,6 +344,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                                    + " (item: " + item.getHandle() + ")");
         }
 
+        System.out.println("File: " + newName);
+
         // start filtering of the bitstream, using try with resource to close all InputStreams properly
         try (
                 // get the source stream
