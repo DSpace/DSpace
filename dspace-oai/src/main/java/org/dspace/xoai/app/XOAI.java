@@ -17,9 +17,13 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
+
 import javax.xml.stream.XMLStreamException;
 
 import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
@@ -38,6 +42,7 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -173,13 +178,49 @@ public class XOAI {
         System.out
             .println("Incremental import. Searching for documents modified after: "
                          + last.toString());
-        // Index both in_archive items AND withdrawn items. Withdrawn items will be flagged withdrawn
-        // (in order to notify external OAI harvesters of their new status)
+        /*
+         * Index all changed or new items or items whose visibility is viable to
+         * change due to an embargo.
+         */
         try {
-            Iterator<Item> iterator = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(
-                context, last);
-            return this.index(iterator);
+            Iterator<Item> discoverableChangedItems = itemService
+                    .findInArchiveOrWithdrawnDiscoverableModifiedSince(context, last);
+            Iterator<Item> nonDiscoverableChangedItems = itemService
+                    .findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context, last);
+            Iterator<Item> possiblyChangedItems = getItemsWithPossibleChangesBefore(last);
+            return this.index(discoverableChangedItems) + this.index(nonDiscoverableChangedItems)
+                    + this.index(possiblyChangedItems);
         } catch (SQLException ex) {
+            throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Get all items already in the index which are viable to change visibility
+     * due to an embargo. Only consider those which haven't been modified
+     * anyways since the last update, so they aren't updated twice in one import
+     * run.
+     * 
+     * @param last
+     *            maximum date for an item to be considered for an update
+     * @return Iterator over list of items which might have changed their
+     *         visibility since the last update.
+     * @throws DSpaceSolrIndexerException
+     */
+    private Iterator<Item> getItemsWithPossibleChangesBefore(Date last) throws DSpaceSolrIndexerException {
+        try {
+            SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id");
+            SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
+            List<Item> items = new LinkedList<Item>();
+            for (int i = 0; i < documents.getNumFound(); i++) {
+                Item item = itemService.find(context,
+                        UUID.fromString((String) documents.get(i).getFieldValue("item.id")));
+                if (item.getLastModified().before(last)) {
+                    items.add(item);
+                }
+            }
+            return items.iterator();
+        } catch (SolrServerException | SQLException | DSpaceSolrException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }
@@ -187,13 +228,54 @@ public class XOAI {
     private int indexAll() throws DSpaceSolrIndexerException {
         System.out.println("Full import");
         try {
-            // Index both in_archive items AND withdrawn items. Withdrawn items will be flagged withdrawn
+            // Index both in_archive items AND withdrawn items. Withdrawn items
+            // will be flagged withdrawn
             // (in order to notify external OAI harvesters of their new status)
-            Iterator<Item> iterator = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(
-                context, null);
-            return this.index(iterator);
+            Iterator<Item> discoverableItems = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+                    null);
+            Iterator<Item> nonDiscoverableItems = itemService
+                    .findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context, null);
+            return this.index(discoverableItems) + this.index(nonDiscoverableItems);
         } catch (SQLException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Check if an item is already indexed. Using this, it is possible to check
+     * if withdrawn or nondiscoverable items have to be indexed at all.
+     * 
+     * @param item
+     *            Item that should be checked for its presence in the index.
+     * @return has it been indexed?
+     */
+    private boolean checkIfIndexed(Item item) {
+        SolrQuery params = new SolrQuery("item.id:" + item.getID().toString()).addField("item.id");
+        try {
+            SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
+            return documents.getNumFound() == 1;
+        } catch (DSpaceSolrException | SolrServerException e) {
+            return false;
+        }
+    }
+     /**
+     * Check if an item is flagged visible in the index.
+     * 
+     * @param item
+     *            Item that should be checked for its presence in the index.
+     * @return has it been indexed?
+     */
+    private boolean checkIfVisibleInOAI(Item item) {
+        SolrQuery params = new SolrQuery("item.id:" + item.getID().toString()).addField("item.public");
+        try {
+            SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
+            if (documents.getNumFound() == 1) {
+                return (boolean) documents.get(0).getFieldValue("item.public");
+            } else {
+                return false;
+            }
+        } catch (DSpaceSolrException | SolrServerException e) {
+            return false;
         }
     }
 
@@ -230,35 +312,103 @@ public class XOAI {
         }
     }
 
+    private Date getMostRecentModificationDate(Item item) throws SQLException {
+        List<Date> dates = new LinkedList<Date>();
+        List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
+        for (ResourcePolicy policy : policies) {
+            if (policy.getGroup().getName().equals("Anonymous")) {
+                if (policy.getStartDate() != null) {
+                    dates.add(policy.getStartDate());
+                }
+                if (policy.getEndDate() != null) {
+                    dates.add(policy.getEndDate());
+                }
+            }
+        }
+        dates.add(item.getLastModified());
+        Collections.sort(dates);
+        Date now = new Date();
+        Date lastChange = null;
+        for (Date d : dates) {
+            if (d.before(now)) {
+                lastChange = d;
+            }
+        }
+        return lastChange;
+    }
+
     private SolrInputDocument index(Item item)
-        throws SQLException, MetadataBindException, ParseException, XMLStreamException, WritingXmlException {
+            throws SQLException, MetadataBindException, ParseException, XMLStreamException, WritingXmlException {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("item.id", item.getID());
-        boolean pub = this.isPublic(item);
-        doc.addField("item.public", pub);
+
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
-        doc.addField("item.lastmodified", item.getLastModified());
+
+        boolean isEmbargoed = !this.isPublic(item);
+        boolean isCurrentlyVisible = this.checkIfVisibleInOAI(item);
+        boolean isIndexed = this.checkIfIndexed(item);
+
+        /*
+         * If the item is not under embargo, it should be visible. If it is,
+         * make it invisible if this is the first time it is indexed. For
+         * subsequent index runs, keep the current status, so that if the item
+         * is embargoed again, it is flagged as deleted instead and does not
+         * just disappear, or if it is still under embargo, it won't become
+         * visible and be known to harvesters as deleted before it gets
+         * disseminated for the first time. The item has to be indexed directly
+         * after publication even if it is still embargoed, because its
+         * lastModified date will not change when the embargo end date (or start
+         * date) is reached. To circumvent this, an item which will change its
+         * status in the future will be marked as such.
+         */
+
+        boolean isPublic = isEmbargoed ? (isIndexed ? isCurrentlyVisible : false) : true;
+        
+        doc.addField("item.public", isPublic);
+
+        // if the visibility of the item will change in the future due to an
+        // embargo, mark it as such.
+
+        doc.addField("item.willChangeStatus", willChangeStatus(item));
+
+        /*
+         * Mark an item as deleted not only if it is withdrawn, but also if it
+         * is made private, because items should not simply disappear from OAI
+         * with a transient deletion policy. Do not set the flag for still
+         * invisible embargoed items, because this will override the item.public
+         * flag.
+         */
+
+        doc.addField("item.deleted",
+                (item.isWithdrawn() || !item.isDiscoverable() || (isEmbargoed ? isPublic : false)));
+
+        /*
+         * An item that is embargoed will potentially not be harvested by
+         * incremental harvesters if the from and until params do not encompass
+         * both the standard lastModified date and the anonymous-READ resource
+         * policy start date. The same is true for the end date, where
+         * harvesters might not get a tombstone record. Therefore, consider all
+         * relevant policy dates and the standard lastModified date and take the
+         * most recent of those which have already passed.
+         */
+        doc.addField("item.lastmodified", this.getMostRecentModificationDate(item));
+
         if (item.getSubmitter() != null) {
             doc.addField("item.submitter", item.getSubmitter().getEmail());
         }
-        doc.addField("item.deleted", item.isWithdrawn() ? "true" : "false");
-        for (Collection col : item.getCollections()) {
-            doc.addField("item.collections",
-                         "col_" + col.getHandle().replace("/", "_"));
+
+        for (Collection col: item.getCollections()) {
+            doc.addField("item.collections", "col_" + col.getHandle().replace("/", "_"));
         }
         for (Community com : collectionsService.flatParentCommunities(context, item)) {
-            doc.addField("item.communities",
-                         "com_" + com.getHandle().replace("/", "_"));
+            doc.addField("item.communities", "com_" + com.getHandle().replace("/", "_"));
         }
 
-        List<MetadataValue> allData = itemService.getMetadata(item,
-                                                              Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        List<MetadataValue> allData = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (MetadataValue dc : allData) {
             MetadataField field = dc.getMetadataField();
-            String key = "metadata."
-                + field.getMetadataSchema().getName() + "."
-                + field.getElement();
+            String key = "metadata." + field.getMetadataSchema().getName() + "." + field.getElement();
             if (field.getQualifier() != null) {
                 key += "." + field.getQualifier();
             }
@@ -281,17 +431,35 @@ public class XOAI {
         doc.addField("item.compile", out.toString());
 
         if (verbose) {
-            println(String.format("Item %s with handle %s indexed",
-                    item.getID().toString(), handle));
+            println("Item with handle " + handle + " indexed");
         }
 
         return doc;
     }
 
+    private boolean willChangeStatus(Item item) throws SQLException {
+        List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
+       for (ResourcePolicy policy : policies) {
+           if (policy.getGroup().getName().equals("Anonymous")) {
+               
+               if (policy.getStartDate() != null && policy.getStartDate().after(new Date())) {
+                   
+                   return true;
+               }
+               if (policy.getEndDate() != null && policy.getEndDate().after(new Date())) {
+                   
+                   return true;
+               }
+           }
+       }
+       
+       return false;
+   }
+
     private boolean isPublic(Item item) {
         boolean pub = false;
         try {
-            //Check if READ access allowed on this Item
+            // Check if READ access allowed on this Item
             pub = authorizeService.authorizeActionBoolean(context, item, Constants.READ);
         } catch (SQLException ex) {
             log.error(ex.getMessage());
