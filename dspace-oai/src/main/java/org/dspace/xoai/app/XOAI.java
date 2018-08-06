@@ -364,7 +364,6 @@ public class XOAI {
          */
 
         boolean isPublic = isEmbargoed ? (isIndexed ? isCurrentlyVisible : false) : true;
-        
         doc.addField("item.public", isPublic);
 
         // if the visibility of the item will change in the future due to an
