@@ -179,7 +179,7 @@ public class XSLTIngestionCrosswalk
         }
         try
         {
-            JDOMSource source = new JDOMSource(new Document((Element)root.cloneContent()));
+            JDOMSource source = new JDOMSource(new Document((Element)root.clone()));
             JDOMResult result = new JDOMResult();
             xform.transform(source, result);
             Document dimDoc = result.getDocument();

@@ -63,7 +63,7 @@
             <!--
                  For EZID we need an empty field here.
             -->
-                <identifier type='DOI'/>
+                <identifier identifierType='DOI'/>
 
             <!--
                 DataCite (2)

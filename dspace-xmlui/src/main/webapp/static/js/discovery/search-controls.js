@@ -57,6 +57,12 @@
 
                     mainForm.find('input[name="' + param + '"]').val(value);
                 }
+
+                //DS-3835 ensure that the current scope is passed as form field "scope"
+                mainForm.find('input[name="current-scope"]')
+                    .val($('select[name="scope"]').val())
+                    .attr("name","scope");
+
                 //Clear the page param
                 mainForm.find('input[name="page"]').val('1');
 

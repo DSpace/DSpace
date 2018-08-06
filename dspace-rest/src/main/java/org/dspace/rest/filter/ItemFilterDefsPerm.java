@@ -35,7 +35,7 @@ public class ItemFilterDefsPerm implements ItemFilterList {
 	        public boolean testItem(Context context, Item item) {
 	            try {
 	                for(Bundle bundle: item.getBundles()){
-	                	if (!bundle.getName().equals(BundleName.ORIGINAL)) {
+	                	if (!bundle.getName().equals(BundleName.ORIGINAL.name())) {
 	                		continue;
 	                	}
 	                    for(Bitstream bit: bundle.getBitstreams()) {
@@ -55,7 +55,7 @@ public class ItemFilterDefsPerm implements ItemFilterList {
 	        public boolean testItem(Context context, Item item) {
 	            try {
 	                for(Bundle bundle: item.getBundles()){
-	                	if (!bundle.getName().equals(BundleName.THUMBNAIL)) {
+	                	if (!bundle.getName().equals(BundleName.THUMBNAIL.name())) {
 	                		continue;
 	                	}
 	                    for(Bitstream bit: bundle.getBitstreams()) {
