@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -98,15 +99,20 @@ public class Harvest {
         discoverQuery.addFilterQueries("search.resourcetype:" + Constants.ITEM);
 
         if (scope != null) {
-            discoverQuery.addFieldPresentQueries("location:" + scope.getID());
+            if (scope instanceof Community) {
+                discoverQuery.addFilterQueries("location:m" + scope.getID());
+            } else if (scope instanceof Collection) {
+                discoverQuery.addFilterQueries("location:l" + scope.getID());
+            }
         }
 
-        if (startDate != null) {
-            discoverQuery.addFilterQueries("lastModified => " + new DCDate(startDate).toString());
-        }
-
-        if (endDate != null) {
-            discoverQuery.addFilterQueries("lastModified <= " + new DCDate(startDate).toString());
+        if (startDate != null && endDate != null) {
+            discoverQuery.addFilterQueries("lastModified:[" + new DCDate(startDate).toString()
+                                                   + " TO " + new DCDate(endDate).toString()+ "]");
+        } else if (startDate != null) {
+            discoverQuery.addFilterQueries("lastModified:[" + new DCDate(startDate).toString() + " TO *]");
+        } else if (endDate != null) {
+            discoverQuery.addFilterQueries("lastModified:[* TO " + new DCDate(endDate).toString()+ " ]");
         }
 
         if (!withdrawn) {
