@@ -811,31 +811,33 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //When calling this root endpoint
         getClient().perform(get("/api/discover/search"))
-                //** THEN **
-                //The status has to be 200 OK
-                .andExpect(status().isOk())
-                //The type has to be 'discover'
-                .andExpect(jsonPath("$.type", is("discover")))
-                //There needs to be a link to the objects that contains a string as specified below
-                .andExpect(jsonPath("$._links.objects.href", containsString("api/discover/search/objects")))
-                //There always needs to be a self link available
-                .andExpect(jsonPath("$._links.self.href", containsString("api/discover/search")))
-                //There needs to be a section where these filters as specified as they're the default filters
-                // given in the configuration
-                .andExpect(jsonPath("$.filters", containsInAnyOrder(
-                        SearchFilterMatcher.titleFilter(),
-                        SearchFilterMatcher.authorFilter(),
-                        SearchFilterMatcher.subjectFilter(),
-                        SearchFilterMatcher.dateIssuedFilter(),
-                        SearchFilterMatcher.hasContentInOriginalBundleFilter()
-                )))
-                //These sortOptions need to be present as it's the default in the configuration
-                .andExpect(jsonPath("$.sortOptions", containsInAnyOrder(
-                        SortOptionMatcher.titleSortOption(),
-                        SortOptionMatcher.dateIssuedSortOption(),
-                        SortOptionMatcher.dateAccessionedSortOption(),
-                        SortOptionMatcher.scoreSortOption()
-                )));
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //There needs to be a link to the objects that contains a string as specified below
+                   .andExpect(jsonPath("$._links.objects.href", containsString("api/discover/search/objects")))
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("api/discover/search")))
+                   //There needs to be a section where these filters as specified as they're the default filters
+                   // given in the configuration
+                   .andExpect(jsonPath("$.filters", containsInAnyOrder(
+                       SearchFilterMatcher.titleFilter(),
+                       SearchFilterMatcher.authorFilter(),
+                       SearchFilterMatcher.subjectFilter(),
+                       SearchFilterMatcher.dateIssuedFilter(),
+                       SearchFilterMatcher.hasContentInOriginalBundleFilter(),
+                       SearchFilterMatcher.hasFileNameInOriginalBundleFilter(),
+                       SearchFilterMatcher.hasFileDescriptionInOriginalBundleFilter()
+                   )))
+                   //These sortOptions need to be present as it's the default in the configuration
+                   .andExpect(jsonPath("$.sortOptions", containsInAnyOrder(
+                       SortOptionMatcher.titleSortOption(),
+                       SortOptionMatcher.dateIssuedSortOption(),
+                       SortOptionMatcher.dateAccessionedSortOption(),
+                       SortOptionMatcher.scoreSortOption()
+                   )));
     }
 
     @Test
