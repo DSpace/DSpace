@@ -108,11 +108,11 @@ public class Harvest {
 
         if (startDate != null && endDate != null) {
             discoverQuery.addFilterQueries("lastModified:[" + new DCDate(startDate).toString()
-                                                   + " TO " + new DCDate(endDate).toString()+ "]");
+                                                   + " TO " + new DCDate(endDate).toString() + "]");
         } else if (startDate != null) {
             discoverQuery.addFilterQueries("lastModified:[" + new DCDate(startDate).toString() + " TO *]");
         } else if (endDate != null) {
-            discoverQuery.addFilterQueries("lastModified:[* TO " + new DCDate(endDate).toString()+ " ]");
+            discoverQuery.addFilterQueries("lastModified:[* TO " + new DCDate(endDate).toString() + " ]");
         }
 
         if (!withdrawn) {
