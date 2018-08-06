@@ -42,10 +42,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -189,7 +193,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         .setQuery(RESOURCE_TYPE_FIELD + ":2 AND " + RESOURCE_ID_FIELD + ":1");
                     // Only return obj identifier fields in result doc
                     solrQuery.setFields(RESOURCE_TYPE_FIELD, RESOURCE_ID_FIELD);
-                    solrServer.query(solrQuery);
+                    solrServer.query(solrQuery, SolrRequest.METHOD.POST);
 
                     // As long as Solr initialized, check with DatabaseUtils to see
                     // if a reindex is in order. If so, reindex everything
@@ -477,7 +481,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 // returning just their handle
                 query.setFields(HANDLE_FIELD);
                 query.setQuery(RESOURCE_TYPE_FIELD + ":[2 TO 4]");
-                QueryResponse rsp = getSolr().query(query);
+                QueryResponse rsp = getSolr().query(query, SolrRequest.METHOD.POST);
                 SolrDocumentList docs = rsp.getResults();
 
                 Iterator iter = docs.iterator();
@@ -543,7 +547,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             SolrQuery solrQuery = new SolrQuery();
             solrQuery.set("spellcheck", true);
             solrQuery.set(SpellingParams.SPELLCHECK_BUILD, true);
-            getSolr().query(solrQuery);
+            getSolr().query(solrQuery, SolrRequest.METHOD.POST);
         } catch (SolrServerException e) {
             //Make sure to also log the exception since this command is usually run from a crontab.
             log.error(e, e);
@@ -620,7 +624,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (getSolr() == null) {
                 return false;
             }
-            rsp = getSolr().query(query);
+            rsp = getSolr().query(query, SolrRequest.METHOD.POST);
         } catch (SolrServerException e) {
             throw new SearchServiceException(e.getMessage(), e);
         }
@@ -1595,7 +1599,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             SolrQuery solrQuery = resolveToSolrQuery(context, discoveryQuery, includeUnDiscoverable);
 
 
-            QueryResponse queryResponse = getSolr().query(solrQuery);
+            QueryResponse queryResponse = getSolr().query(solrQuery, SolrRequest.METHOD.POST);
             return retrieveResult(context, discoveryQuery, queryResponse);
 
         } catch (Exception e) {
@@ -1765,12 +1769,30 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         solrQuery.setParam(CommonParams.WT, "json");
 
         StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(((HttpSolrServer) getSolr()).getBaseURL()).append("/select?");
-        urlBuilder.append(solrQuery.toString());
+        //urlBuilder.append(getSolr().getBaseURL()).append("/select?");
+        //urlBuilder.append(solrQuery.toString());
+         // New url without any query params appended
+        urlBuilder.append(((HttpSolrServer)getSolr()).getBaseURL()).append("/select");
+         // Post setup
+        NamedList<Object> solrParameters = solrQuery.toNamedList();
+        List<NameValuePair> postParameters = new ArrayList<>();
+        for (Map.Entry<String, Object> solrParameter : solrParameters) {
+            if (solrParameter.getValue() instanceof String[]) {
+                // Multi-valued solr parameter
+                for (String val : (String[])solrParameter.getValue()) {
+                    postParameters.add(new BasicNameValuePair(solrParameter.getKey(), val));
+                }
+            } else if (solrParameter.getValue() instanceof String) {
+                postParameters.add(new BasicNameValuePair(solrParameter.getKey(), solrParameter.getValue().toString()));
+            } else {
+                log.warn("Search parameters contain non-string value: " + solrParameter.getValue().toString());
+            }
+        }
 
         try {
-            HttpGet get = new HttpGet(urlBuilder.toString());
-            HttpResponse response = new DefaultHttpClient().execute(get);
+            HttpPost post = new HttpPost(urlBuilder.toString());
+            post.setEntity(new UrlEncodedFormEntity(postParameters));
+            HttpResponse response = new DefaultHttpClient().execute(post);
             return response.getEntity().getContent();
 
         } catch (Exception e) {
@@ -1957,7 +1979,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (filterquery != null) {
                 solrQuery.addFilterQuery(filterquery);
             }
-            QueryResponse rsp = getSolr().query(solrQuery);
+            QueryResponse rsp = getSolr().query(solrQuery, SolrRequest.METHOD.POST);
             SolrDocumentList docs = rsp.getResults();
 
             Iterator iter = docs.iterator();
@@ -2065,7 +2087,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if (getSolr() == null) {
                 return Collections.emptyList();
             }
-            QueryResponse rsp = getSolr().query(solrQuery);
+            QueryResponse rsp = getSolr().query(solrQuery, SolrRequest.METHOD.POST);
             NamedList mltResults = (NamedList) rsp.getResponse().get("moreLikeThis");
             if (mltResults != null && mltResults.get(item.getType() + "-" + item.getID()) != null) {
                 SolrDocumentList relatedDocs = (SolrDocumentList) mltResults.get(item.getType() + "-" + item.getID());
