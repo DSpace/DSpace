@@ -578,7 +578,7 @@ public class BitstreamStorageManager
             try {
                 //get tomorrow's date:
                 Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.DAY_OF_YEAR, 1);
+                calendar.add(Calendar.DAY_OF_YEAR, 2);
                 URL url = s3Service.generatePresignedUrl(s3BucketName, key, calendar.getTime());
                 resultInputStream = url.openStream();
             } catch (Exception e) {
