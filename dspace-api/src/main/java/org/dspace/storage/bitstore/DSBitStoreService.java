@@ -120,22 +120,17 @@ public class DSBitStoreService implements BitStoreService {
             FileOutputStream fos = new FileOutputStream(file);
 
             // Read through a digest input stream that will work out the MD5
-            DigestInputStream dis = null;
-
-            try {
-                dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
-            } catch (NoSuchAlgorithmException nsae) {
-                // Should never happen
-                log.warn("Caught NoSuchAlgorithmException", nsae);
-            }
+            DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
 
             Utils.bufferedCopy(dis, fos);
-            fos.close();
             in.close();
 
             bitstream.setSizeBytes(file.length());
             bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
             bitstream.setChecksumAlgorithm(CSA);
+        } catch (NoSuchAlgorithmException nsae) {
+            // Should never happen
+            log.warn("Caught NoSuchAlgorithmException", nsae);
         } catch (Exception e) {
             log.error("put(" + bitstream.getInternalId() + ", inputstream)", e);
             throw new IOException(e);
