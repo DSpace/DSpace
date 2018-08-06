@@ -13,12 +13,10 @@ public class InstitutionAuthority extends SimpleSPARQLAuthorityProvider {
 
 		pqs.setNsPrefix("foaf", NS_FOAF);
 		pqs.setNsPrefix("dc", NS_DC);
-		pqs.setNsPrefix("sioc", NS_SIOC);
 
-		pqs.setCommandText("SELECT ?institution ?label ?initials \n");
+		pqs.setCommandText("SELECT ?institution ?label \n");
 		pqs.append("WHERE {\n");
 		pqs.append("?institution a foaf:Organization ; foaf:name ?label .\n");
-		pqs.append("OPTIONAL { ?institution sioc:id ?initials} . \n");
 		pqs.append("FILTER(REGEX(?institution, ?key, \"i\"))\n");
 		pqs.append("}\n");
 
