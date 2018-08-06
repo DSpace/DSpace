@@ -60,7 +60,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
     }
 
     @Override
-    public void indexContent(AuthorityValue value, boolean force) {
+    public void indexContent(AuthorityValue value) {
         SolrInputDocument doc = value.getSolrInputDocument();
 
         try {

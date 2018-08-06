@@ -29,6 +29,12 @@ public class SortOptionMatcher {
         );
     }
 
+    public static Matcher<? super Object> dateAccessionedSortOption() {
+        return allOf(
+                hasJsonPath("$.name", is("dc.date.accessioned"))
+        );
+    }
+
     public static Matcher<? super Object> scoreSortOption() {
         return allOf(
             hasJsonPath("$.name", is("score"))

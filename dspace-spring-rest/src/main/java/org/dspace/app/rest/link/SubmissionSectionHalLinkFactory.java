@@ -38,8 +38,8 @@ public class SubmissionSectionHalLinkFactory extends HalLinkFactory<SubmissionSe
         if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(sd.getSectionType())) {
             UriComponentsBuilder uriComponentsBuilder = linkTo(
                 getMethodOn(SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME)
-                    .findRel(null, SubmissionFormRest.CATEGORY, English.plural(SubmissionFormRest.NAME), sd.getId(), "",
-                             null, null, null))
+                    .findRel(null, null, SubmissionFormRest.CATEGORY, English.plural(SubmissionFormRest.NAME),
+                            sd.getId(), "", null, null, null))
                 .toUriComponentsBuilder();
             String uribuilder = uriComponentsBuilder.build().toString();
             list.add(
@@ -48,8 +48,8 @@ public class SubmissionSectionHalLinkFactory extends HalLinkFactory<SubmissionSe
         if (SubmissionStepConfig.UPLOAD_STEP_NAME.equals(sd.getSectionType())) {
             UriComponentsBuilder uriComponentsBuilder = linkTo(
                 getMethodOn(RestResourceController.class, SubmissionUploadRest.CATEGORY, SubmissionUploadRest.NAME)
-                    .findRel(null, SubmissionUploadRest.CATEGORY, English.plural(SubmissionUploadRest.NAME), sd.getId(),
-                             "", null, null, null))
+                    .findRel(null, null, SubmissionUploadRest.CATEGORY, English.plural(SubmissionUploadRest.NAME),
+                           sd.getId(), "", null, null, null))
                 .toUriComponentsBuilder();
             String uribuilder = uriComponentsBuilder.build().toString();
             list.add(

@@ -22,7 +22,6 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
@@ -178,6 +177,9 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                        .containsString("/api/core/communities/" + parentCommunity.getID().toString() + "/logo")))
                    .andExpect(jsonPath("$._links.collections.href", Matchers
                        .containsString("/api/core/communities/" + parentCommunity.getID().toString() + "/collections")))
+                   .andExpect(jsonPath("$._links.subcommunities.href", Matchers
+                        .containsString("/api/core/communities/" + parentCommunity.getID().toString() +
+                                "/subcommunities")))
         ;
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/logo"))
@@ -185,14 +187,23 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(content().contentType(contentType));
 
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/logo"))
-                   .andExpect(status().isOk());
+                   .andExpect(status().isNoContent());
 
+        //Main community has no collections, therefore contentType is not set
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/collections"))
-                   .andExpect(status().isOk());
+                   .andExpect(status().isNoContent());
 
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/collections"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType));
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/subcommunities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType));
+
+        //child1 subcommunity has no subcommunities, therefore contentType is not set
+        getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/subcommunities"))
+                   .andExpect(status().isNoContent());
     }
 
 
@@ -362,47 +373,18 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ;
     }
 
-    //TODO The test fails, 404 resource not found. remove @Ignore when this is implemented
     @Test
-    @Ignore
     public void findAllSubCommunitiesWithoutUUID() throws Exception {
-
-        //We turn off the authorization system in order to create the structure as defined below
-        context.turnOffAuthorisationSystem();
-
-        //** GIVEN **
-        //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .withLogo("ThisIsSomeDummyText")
-                                          .build();
-
-        Community parentCommunity2 = CommunityBuilder.createCommunity(context)
-                                                     .withName("Parent Community 2")
-                                                     .withLogo("SomeTest")
-                                                     .build();
-
-        Community parentCommunityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-
-        Community parentCommunityChild1Child1 = CommunityBuilder.createSubCommunity(context, parentCommunityChild1)
-                .withName("Sub Sub Community")
-                .build();
-
-        Community parentCommunity2Child1 = CommunityBuilder.createSubCommunity(context, parentCommunity2)
-                .withName("Sub2 Community")
-                .build();
-
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunityChild1)
-                                           .withName("Collection 1")
-                                           .build();
-
         getClient().perform(get("/api/core/communities/search/subCommunities"))
-                   .andExpect(status().isUnprocessableEntity())
-        ;
+                 .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
+    public void findAllSubCommunitiesWithUnexistentUUID() throws Exception {
+        getClient().perform(get("/api/core/communities/search/subCommunities")
+                 .param("parent", UUID.randomUUID().toString()))
+                 .andExpect(status().isNotFound());
+    }
 
     @Test
     public void findOneTestWrongUUID() throws Exception {

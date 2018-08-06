@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.rest.converter.BitstreamConverter;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.authorize.AuthorizeException;
@@ -26,7 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
+
 
 /**
  * This is the repository responsible to manage Bitstream Rest object
@@ -58,6 +61,13 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         if (bit == null) {
             return null;
         }
+        try {
+            if (bit.isDeleted() == true) {
+                throw new ResourceNotFoundException();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
         return converter.fromModel(bit);
     }
 
@@ -87,6 +97,24 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
     @Override
     public BitstreamResource wrapResource(BitstreamRest bs, String... rels) {
         return new BitstreamResource(bs, utils, rels);
+    }
+
+    @Override
+    protected void delete(Context context, UUID id) throws AuthorizeException {
+        Bitstream bit = null;
+        try {
+            bit = bs.find(context, id);
+            if (bit.getCommunity() != null | bit.getCollection() != null) {
+                throw new UnprocessableEntityException("The bitstream cannot be deleted it is a logo");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        try {
+            bs.delete(context, bit);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public InputStream retrieve(UUID uuid) {

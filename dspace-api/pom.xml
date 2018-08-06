@@ -81,6 +81,7 @@
                         <exclude>**/src/test/resources/**</exclude>
                         <exclude>**/src/test/data/**</exclude>
                         <exclude>**/.gitignore</exclude>
+                        <exclude>**/src/main/resources/rebel.xml</exclude>
                         <exclude>src/test/data/dspaceFolder/config/spiders/**</exclude>
                         <exclude>src/main/java/org/apache/solr/handler/extraction/ExtractingParams.java</exclude>
                     </excludes>
@@ -362,8 +363,8 @@
             <artifactId>commons-codec</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -733,6 +734,18 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- For ORCID v2 integration -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>orcid-jaxb-api</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180130</version>
         </dependency>
     </dependencies>
 

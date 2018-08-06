@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
 /**
  * This class' purpose is to store the information that'll be shown on the /search endpoint.
@@ -104,7 +105,11 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     public static class Filter {
         private String filter;
+        private boolean hasFacets = false;
+        private String type;
+        private boolean isOpenByDefault = false;
         private List<Operator> operators = new LinkedList<>();
+        private int pageSize;
 
         public static final String OPERATOR_EQUALS = "equals";
         public static final String OPERATOR_NOTEQUALS = "notequals";
@@ -112,7 +117,47 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         public static final String OPERATOR_NOTAUTHORITY = "notauthority";
         public static final String OPERATOR_CONTAINS = "contains";
         public static final String OPERATOR_NOTCONTAINS = "notcontains";
+        public static final String OPERATOR_QUERY = "query";
 
+        public boolean isHasFacets() {
+            return hasFacets;
+        }
+        public void setHasFacets(boolean hasFacets) {
+            this.hasFacets = hasFacets;
+        }
+
+        public int getPageSize() {
+            return pageSize;
+        }
+
+        public void setPageSize(int pageSize) {
+            this.pageSize = pageSize;
+        }
+
+        /**
+         * This is the same type as described in {@link DiscoverySearchFilter#getType()}
+         * @return  The type of this filter
+         */
+        public String getType() {
+            return type;
+        }
+
+        /**
+         * This is the same type as described in {@link org.dspace.discovery.configuration.DiscoverySearchFilter#setType(String)}
+         *
+         * @param type  The type for this Filter to be set to
+         */
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public boolean isOpenByDefault() {
+            return isOpenByDefault;
+        }
+
+        public void setOpenByDefault(boolean openByDefault) {
+            isOpenByDefault = openByDefault;
+        }
 
         public void setFilter(String filter) {
             this.filter = filter;
@@ -137,6 +182,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
             operators.add(new Operator(OPERATOR_NOTAUTHORITY));
             operators.add(new Operator(OPERATOR_CONTAINS));
             operators.add(new Operator(OPERATOR_NOTCONTAINS));
+            operators.add(new Operator(OPERATOR_QUERY));
         }
 
         @Override

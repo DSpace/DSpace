@@ -8,12 +8,15 @@
 package org.dspace.app.rest;
 
 import static java.lang.Thread.sleep;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,12 +25,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Base64;
 
 import org.dspace.app.rest.builder.GroupBuilder;
+import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 /**
  * Integration test that covers various authentication scenarios
@@ -42,12 +47,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     public static final String[] PASS_ONLY = {"org.dspace.authenticate.PasswordAuthentication"};
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.ShibAuthentication"};
+    public static final String[] SHIB_AND_IP =
+            {"org.dspace.authenticate.IPAuthentication",
+            "org.dspace.authenticate.ShibAuthentication"};
 
     @Before
     public void setup() throws Exception {
         super.setUp();
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
-   }
+    }
 
     @Test
     public void testStatusAuthenticated() throws Exception {
@@ -64,7 +72,9 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")))
 
                         .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
-                        .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())));
+                        .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())))
+                        .andExpect(jsonPath("$._embedded.eperson.groups", contains(
+                                GroupMatcher.matchGroupWithName("Anonymous"))));
     }
 
     @Test
@@ -173,7 +183,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         getClient(token).perform(get("/api/authn/logout"))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isNoContent());
 
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
@@ -219,7 +229,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         //Sleep so tokens are different
         sleep(1200);
 
-        String newToken = getClient(token).perform(get("/api/authn/login"))
+        String newToken = getClient(token).perform(post("/api/authn/login"))
                                           .andExpect(status().isOk())
                                           .andReturn().getResponse().getHeader("Authorization");
 
@@ -237,19 +247,32 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testReuseTokenWithDifferentIP() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
+        getClient(token).perform(get("/api/authn/status"))
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.okay", is(true)))
+                .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.type", is("status")));
+
         getClient(token).perform(get("/api/authn/status")
                                      .header("X-FORWARDED-FOR", "1.1.1.1"))
-
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
                         .andExpect(jsonPath("$.type", is("status")));
 
+
+        getClient(token).perform(get("/api/authn/status")
+                                    .with(ip("1.1.1.1")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.okay", is(true)))
+                .andExpect(jsonPath("$.authenticated", is(false)))
+                .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
     public void testFailedLoginResponseCode() throws Exception {
-        getClient().perform(get("/api/authn/login")
+        getClient().perform(post("/api/authn/login")
                                 .param("user", eperson.getEmail()).param("password", "fakePassword"))
 
                    .andExpect(status().isUnauthorized());
@@ -282,7 +305,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         //Logout
         getClient(token).perform(get("/api/authn/logout"))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isNoContent());
 
         //Check if we are actually logged out
         getClient(token).perform(get("/api/authn/status"))
@@ -306,24 +329,45 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testLoginEmptyRequest() throws Exception {
-        getClient().perform(get("/api/authn/login"))
+        getClient().perform(post("/api/authn/login"))
                    .andExpect(status().isUnauthorized())
                    .andExpect(status().reason(containsString("Login failed")));
     }
 
     @Test
-    public void testShibbolethLoginRequest() throws Exception {
+    public void testLoginGetRequest() throws Exception {
+       getClient().perform(get("/api/authn/login")
+            .param("user", eperson.getEmail())
+            .param("password", password))
+            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void testShibbolethLoginRequestAttribute() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
 
-        getClient().perform(get("/api/authn/login").header("Referer", "http://my.uni.edu"))
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
                 .andExpect(status().isUnauthorized())
-                .andExpect(header().string("Location", "/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu"))
-                .andReturn().getResponse().getHeader("Location");
+                .andExpect(header().string("WWW-Authenticate",
+                        "shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu\""));
 
         //Simulate that a shibboleth authentication has happened
 
-        String token = getClient().perform(get("/api/authn/login")
-                .requestAttr("SHIB-MAIL", eperson.getEmail()))
+        String token = getClient().perform(post("/api/authn/login")
+                    .requestAttr("SHIB-MAIL", eperson.getEmail())
+                    .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
@@ -335,7 +379,67 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.authenticated", is(true)))
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())));
+                .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())))
+                .andExpect(jsonPath("$._embedded.eperson.groups", containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("Anonymous"), GroupMatcher.matchGroupWithName("Reviewers"))));
+    }
+
+    @Test
+    public void testShibbolethLoginRequestHeaderWithIpAuthentication() throws Exception {
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_AND_IP);
+        configurationService.setProperty("authentication-ip.Administrator", "123.123.123.123");
+
+
+        getClient().perform(post("/api/authn/login")
+                            .header("Referer", "http://my.uni.edu")
+                            .with(ip("123.123.123.123")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "ip realm=\"DSpace REST API\", shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu\""));
+
+        //Simulate that a shibboleth authentication has happened
+        String token = getClient().perform(post("/api/authn/login")
+                    .with(ip("123.123.123.123"))
+                    .header("SHIB-MAIL", eperson.getEmail()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
+
+        getClient(token).perform(get("/api/authn/status")
+                                    .with(ip("123.123.123.123")))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.okay", is(true)))
+                .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.type", is("status")))
+                .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())))
+                .andExpect(jsonPath("$._embedded.eperson.groups", containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("Administrator"),
+                        GroupMatcher.matchGroupWithName("Anonymous"))));
+
+        //Simulate that a new shibboleth authentication has happened from another IP
+        token = getClient().perform(post("/api/authn/login")
+                .with(ip("234.234.234.234"))
+                .header("SHIB-MAIL", eperson.getEmail()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
+
+        getClient(token).perform(get("/api/authn/status")
+                .with(ip("234.234.234.234")))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.okay", is(true)))
+                .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.type", is("status")))
+                .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())))
+                .andExpect(jsonPath("$._embedded.eperson.groups", contains(
+                        GroupMatcher.matchGroupWithName("Anonymous"))));
     }
 
 }

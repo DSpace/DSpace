@@ -217,6 +217,15 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <version>${spring-boot.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- Temporary exclusion to avoid dependency conflict with version of org.json:json used by dspace-api.
+                     NOTE: THIS CAN BE REMOVED ONCE WE UPGRADE TO SPRING-BOOT v1.5 (or above), see DS-3802
+                     As of Spring-Boot 1.5, org.json:json is no longer used by spring-boot-starter-test -->
+                <exclusion>
+                    <groupId>org.json</groupId>
+                    <artifactId>json</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>

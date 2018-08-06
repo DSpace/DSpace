@@ -9,6 +9,7 @@ package org.dspace.authenticate;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -164,7 +164,7 @@ public class IPAuthentication implements AuthenticationMethod {
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
         throws SQLException {
         if (request == null) {
-            return ListUtils.EMPTY_LIST;
+            return Collections.EMPTY_LIST;
         }
         List<Group> groups = new ArrayList<Group>();
 
@@ -275,5 +275,10 @@ public class IPAuthentication implements AuthenticationMethod {
     public String loginPageURL(Context context, HttpServletRequest request,
                                HttpServletResponse response) {
         return null;
+    }
+
+    @Override
+    public String getName() {
+        return "ip";
     }
 }

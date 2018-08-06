@@ -76,31 +76,39 @@ public class AuthenticationRestController implements InitializingBean {
         Context context = ContextUtil.obtainContext(request);
         EPersonRest ePersonRest = null;
         if (context.getCurrentUser() != null) {
-            ePersonRest = ePersonConverter.fromModel(context.getCurrentUser());
+            ePersonRest = ePersonConverter.fromModelWithGroups(context, context.getCurrentUser());
         }
+
         AuthenticationStatusResource authenticationStatusResource = new AuthenticationStatusResource(
             new AuthenticationStatusRest(ePersonRest), utils);
+
         halLinkService.addLinks(authenticationStatusResource);
+
         return authenticationStatusResource;
     }
 
-    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/login", method = {RequestMethod.POST})
     public ResponseEntity login(HttpServletRequest request, @RequestParam(name = "user", required = false) String user,
                                 @RequestParam(name = "password", required = false) String password) {
         //If you can get here, you should be authenticated, the actual login is handled by spring security
         //see org.dspace.app.rest.security.StatelessLoginFilter
 
         //If we don't have an EPerson here, this means authentication failed and we should return an error message.
-
         return getLoginResponse(request,
                                 "Authentication failed for user " + user + ": The credentials you provided are not " +
                                     "valid.");
     }
 
+    @RequestMapping(value = "/login", method = { RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH,
+            RequestMethod.DELETE })
+    public ResponseEntity login() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for login requests.");
+    }
+
     @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity logout() {
         //This is handled by org.dspace.app.rest.security.CustomLogoutHandler
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     protected ResponseEntity getLoginResponse(HttpServletRequest request, String failedMessage) {
@@ -111,6 +119,8 @@ public class AuthenticationRestController implements InitializingBean {
 
 
         if (context == null || context.getCurrentUser() == null) {
+            // Note that the actual HTTP status in this case is set by
+            // org.dspace.app.rest.security.StatelessLoginFilter.unsuccessfulAuthentication()
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                                  .body(failedMessage);
         } else {
@@ -118,6 +128,4 @@ public class AuthenticationRestController implements InitializingBean {
             return ResponseEntity.ok().build();
         }
     }
-
-
 }
