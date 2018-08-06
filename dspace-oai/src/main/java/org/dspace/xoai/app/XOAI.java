@@ -312,6 +312,16 @@ public class XOAI {
         }
     }
 
+    /**
+     * Method to get the most recent date on which the item changed concerning
+     * the OAI deleted status (policy start and end dates for all anonymous READ
+     * policies and the standard last modification date)
+     *
+     * @param item
+     *            Item
+     * @return date
+     * @throws SQLException
+     */
     private Date getMostRecentModificationDate(Item item) throws SQLException {
         List<Date> dates = new LinkedList<Date>();
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
@@ -430,7 +440,8 @@ public class XOAI {
         doc.addField("item.compile", out.toString());
 
         if (verbose) {
-            println("Item with handle " + handle + " indexed");
+            println(String.format("Item %s with handle %s indexed",
+                    item.getID().toString(), handle));
         }
 
         return doc;
