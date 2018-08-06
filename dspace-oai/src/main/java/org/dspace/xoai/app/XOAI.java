@@ -439,22 +439,19 @@ public class XOAI {
 
     private boolean willChangeStatus(Item item) throws SQLException {
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
-       for (ResourcePolicy policy : policies) {
-           if (policy.getGroup().getName().equals("Anonymous")) {
-               
-               if (policy.getStartDate() != null && policy.getStartDate().after(new Date())) {
-                   
-                   return true;
-               }
-               if (policy.getEndDate() != null && policy.getEndDate().after(new Date())) {
-                   
-                   return true;
-               }
-           }
-       }
-       
-       return false;
-   }
+        for (ResourcePolicy policy : policies) {
+            if (policy.getGroup().getName().equals("Anonymous")) {
+
+                if (policy.getStartDate() != null && policy.getStartDate().after(new Date())) {
+                    return true;
+                }
+                if (policy.getEndDate() != null && policy.getEndDate().after(new Date())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     private boolean isPublic(Item item) {
         boolean pub = false;
