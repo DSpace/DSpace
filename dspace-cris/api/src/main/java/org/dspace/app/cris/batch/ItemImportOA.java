@@ -910,13 +910,15 @@ public class ItemImportOA
         // display
         if (value == null)
             value = "";
-
+        String impSchema = n.getStringColumn("imp_schema");
         String element = n.getStringColumn("imp_element");
         String qualifier = n.getStringColumn("imp_qualifier");
         String authority = n.getStringColumn("imp_authority");
         int confidence = n.getIntColumn("imp_confidence");
         String language = "";
-
+        if (StringUtils.isNotBlank(impSchema)) {
+        	schema = impSchema;
+        }
         language = n.getStringColumn("TEXT_LANG");
 
         System.out.println("\tSchema: " + schema + " Element: " + element
