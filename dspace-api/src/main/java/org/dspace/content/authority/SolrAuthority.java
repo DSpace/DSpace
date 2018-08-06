@@ -21,8 +21,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CommonParams;
 import org.dspace.authority.AuthoritySearchService;
 import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.authority.factory.AuthorityServiceFactory;
-import org.dspace.authority.rest.RestSource;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
@@ -37,8 +37,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class SolrAuthority implements ChoiceAuthority {
 
     private static final Logger log = Logger.getLogger(SolrAuthority.class);
-    protected RestSource source = DSpaceServicesFactory.getInstance().getServiceManager()
-                                                       .getServiceByName("AuthoritySource", RestSource.class);
+    protected SolrAuthorityInterface source =
+        DSpaceServicesFactory.getInstance().getServiceManager()
+                             .getServiceByName("AuthoritySource", SolrAuthorityInterface.class);
     protected boolean externalResults = false;
     protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
                                                                                          .getAuthorityValueService();

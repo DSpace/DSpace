@@ -31,11 +31,12 @@ import org.apache.commons.cli.PosixParser;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * Provides some batch editing capabilities for items in DSpace:
@@ -78,6 +79,7 @@ public class ItemUpdate {
 
     protected static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     static {
         filterAliases.put("ORIGINAL", "org.dspace.app.itemupdate.OriginalBitstreamFilter");
@@ -330,10 +332,7 @@ public class ItemUpdate {
             iu.setEPerson(context, iu.eperson);
             context.turnOffAuthorisationSystem();
 
-            HANDLE_PREFIX = ConfigurationManager.getProperty("handle.canonical.prefix");
-            if (HANDLE_PREFIX == null || HANDLE_PREFIX.length() == 0) {
-                HANDLE_PREFIX = "http://hdl.handle.net/";
-            }
+            HANDLE_PREFIX = handleService.getCanonicalPrefix();
 
             iu.processArchive(context, sourcedir, itemField, metadataIndexName, alterProvenance, isTest);
 

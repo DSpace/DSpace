@@ -702,7 +702,7 @@ public class SwordAuthenticator {
                 }
 
                 // get the "ORIGINAL" bundle(s)
-                List<Bundle> bundles = item.getBundles();
+                List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
 
                 // look up the READ policy on the community.  This will include determining if the user is an
                 // administrator
@@ -719,14 +719,11 @@ public class SwordAuthenticator {
                             Constants.ADD);
                     } else {
                         for (Bundle bundle : bundles) {
-                            if (Constants.CONTENT_BUNDLE_NAME
-                                .equals(bundle.getName())) {
-                                add = authorizeService.authorizeActionBoolean(
-                                    swordContext.getAuthenticatorContext(),
-                                    bundle, Constants.ADD);
-                                if (!add) {
-                                    break;
-                                }
+                            add = authorizeService.authorizeActionBoolean(
+                                swordContext.getAuthenticatorContext(),
+                                bundle, Constants.ADD);
+                            if (!add) {
+                                break;
                             }
                         }
                     }
@@ -874,19 +871,17 @@ public class SwordAuthenticator {
             boolean write = authorizeService
                 .authorizeActionBoolean(allowContext, item, Constants.WRITE);
 
-            List<Bundle> bundles = item.getBundles();
+            List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
             boolean add = false;
             if (bundles.isEmpty()) {
                 add = authorizeService.authorizeActionBoolean(
                     allowContext, item, Constants.ADD);
             } else {
                 for (Bundle bundle : bundles) {
-                    if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
-                        add = authorizeService.authorizeActionBoolean(
-                            allowContext, bundle, Constants.ADD);
-                        if (!add) {
-                            break;
-                        }
+                    add = authorizeService.authorizeActionBoolean(
+                        allowContext, bundle, Constants.ADD);
+                    if (!add) {
+                        break;
                     }
                 }
             }
