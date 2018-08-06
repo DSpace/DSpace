@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CollectionResource;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -26,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -85,13 +87,18 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
     }
 
     @SearchRestMethod(name = "findAuthorizedByCommunity")
-    public Page<CollectionRest> findAuthorizedByCommunity(@Param(value = "uuid") UUID communityUuid,
-                                                          Pageable pageable) {
+    public Page<CollectionRest> findAuthorizedByCommunity(
+            @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable) {
         Context context = obtainContext();
         List<Collection> it = null;
         List<Collection> collections = new ArrayList<Collection>();
         try {
             Community com = communityService.find(context, communityUuid);
+            if (com == null) {
+                throw new ResourceNotFoundException(
+                        CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
+                        + " not found");
+            }
             it = cs.findAuthorized(context, com, Constants.ADD);
             for (Collection c : it) {
                 collections.add(c);

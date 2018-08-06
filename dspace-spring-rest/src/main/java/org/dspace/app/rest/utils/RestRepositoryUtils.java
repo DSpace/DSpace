@@ -10,10 +10,12 @@ package org.dspace.app.rest.utils;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.MissingParameterException;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.core.AnnotationAttribute;
@@ -43,9 +44,11 @@ import org.springframework.util.ReflectionUtils;
  */
 @Component
 public class RestRepositoryUtils {
-    private static final AnnotationAttribute PARAM_ANNOTATION = new AnnotationAttribute(Param.class);
+    private static final AnnotationAttribute PARAM_ANNOTATION = new AnnotationAttribute(Parameter.class);
     private static final String NAME_NOT_FOUND = "Unable to detect parameter names for query method %s! Use @Param or" +
         " compile with -parameters on JDK 8.";
+
+    private static final Logger log = Logger.getLogger(RestRepositoryUtils.class);
 
     @Autowired(required = true)
     @Qualifier(value = "mvcConversionService")
@@ -119,17 +122,22 @@ public class RestRepositoryUtils {
                                      Method method, Pageable pageable, Sort sort, PagedResourcesAssembler assembler) {
 
         MultiValueMap<String, Object> result = new LinkedMultiValueMap<String, Object>(parameters);
-        MethodParameters methodParameters = new MethodParameters(method, new AnnotationAttribute(Param.class));
+        MethodParameters methodParameters = new MethodParameters(method, PARAM_ANNOTATION);
 
-        for (Entry<String, List<Object>> entry : parameters.entrySet()) {
-
-            MethodParameter parameter = methodParameters.getParameter(entry.getKey());
-
-            if (parameter == null) {
+        for (MethodParameter parameter : methodParameters.getParameters()) {
+            final Parameter parameterAnnotation = parameter.getParameterAnnotation(Parameter.class);
+            String paramName = getParamName(parameter, parameterAnnotation);
+            List<Object> value = parameters.get(paramName);
+            if (value == null) {
+                if (parameterAnnotation != null && parameterAnnotation.required()) {
+                    throw new MissingParameterException(
+                            String.format("Required Parameter[%s] Missing",
+                                    parameter.getParameterName()));
+                }
                 continue;
             }
 
-            result.put(parameter.getParameterName(), entry.getValue());
+            result.put(paramName, value);
         }
 
         return invokeQueryMethod(repository, method, result, pageable, sort);
@@ -180,8 +188,8 @@ public class RestRepositoryUtils {
             } else if (Sort.class.isAssignableFrom(targetType)) {
                 result[i] = sortToUse;
             } else {
-
-                String parameterName = param.getParameterName();
+                final Parameter parameterAnnotation = param.getParameterAnnotation(Parameter.class);
+                String parameterName = getParamName(param, parameterAnnotation);
 
                 if (StringUtils.isBlank(parameterName)) {
                     throw new IllegalArgumentException(
@@ -195,6 +203,18 @@ public class RestRepositoryUtils {
         }
 
         return result;
+    }
+
+    private String getParamName(MethodParameter parameter, final Parameter parameterAnnotation) {
+        String paramName = null;
+
+        if (parameterAnnotation != null) {
+            paramName = parameterAnnotation.value();
+        }
+        if (paramName == null) {
+            paramName = parameter.getParameterName();
+        }
+        return paramName;
     }
 
     /**

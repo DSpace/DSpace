@@ -30,13 +30,13 @@ public class DiscoverFacetResultsConverter {
 
     private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
 
-    public FacetResultsRest convert(Context context, String facetName, String query, String dsoType, String dsoScope,
-                                    List<SearchFilter> searchFilters, DiscoverResult searchResult,
+    public FacetResultsRest convert(Context context, String facetName, String prefix, String query, String dsoType,
+                                    String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult,
                                     DiscoveryConfiguration configuration, Pageable page) {
         FacetResultsRest facetResultsRest = new FacetResultsRest();
 
-        setRequestInformation(context, facetName, query, dsoType, dsoScope, searchFilters, searchResult, configuration,
-                              facetResultsRest, page);
+        setRequestInformation(context, facetName, prefix, query, dsoType, dsoScope, searchFilters, searchResult,
+                configuration, facetResultsRest, page);
 
         addToFacetResultList(facetName, searchResult, facetResultsRest, configuration, page);
 
@@ -65,11 +65,12 @@ public class DiscoverFacetResultsConverter {
         return facetValueConverter.convert(value);
     }
 
-    private void setRequestInformation(Context context, String facetName, String query, String dsoType, String dsoScope,
-                                       List<SearchFilter> searchFilters, DiscoverResult searchResult,
+    private void setRequestInformation(Context context, String facetName, String prefix, String query, String dsoType,
+                                       String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult,
                                        DiscoveryConfiguration configuration, FacetResultsRest facetResultsRest,
                                        Pageable page) {
         facetResultsRest.setQuery(query);
+        facetResultsRest.setPrefix(prefix);
         facetResultsRest.setScope(dsoScope);
         facetResultsRest.setDsoType(dsoType);
 

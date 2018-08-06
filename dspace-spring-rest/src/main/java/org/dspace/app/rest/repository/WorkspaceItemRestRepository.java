@@ -13,13 +13,14 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
-import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.app.rest.model.patch.Operation;
@@ -51,7 +52,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -122,7 +122,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     }
 
     @SearchRestMethod(name = "findBySubmitter")
-    public Page<WorkspaceItemRest> findBySubmitter(@Param(value = "uuid") UUID submitterID, Pageable pageable) {
+    public Page<WorkspaceItemRest> findBySubmitter(@Parameter(value = "uuid", required = true) UUID submitterID,
+            Pageable pageable) {
         List<WorkspaceItem> witems = null;
         int total = 0;
         try {
@@ -304,16 +305,12 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     }
 
     @Override
-    protected void delete(Context context, Integer id) throws RepositoryMethodNotImplementedException {
+    protected void delete(Context context, Integer id) throws AuthorizeException {
         WorkspaceItem witem = null;
         try {
             witem = wis.find(context, id);
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        try {
             wis.deleteAll(context, witem);
-        } catch (SQLException | AuthorizeException | IOException e) {
+        } catch (SQLException | IOException e) {
             log.error(e.getMessage(), e);
         }
     }

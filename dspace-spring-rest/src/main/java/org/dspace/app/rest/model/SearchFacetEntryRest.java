@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.dspace.app.rest.DiscoveryRestController;
 
 /**
@@ -27,6 +28,14 @@ public class SearchFacetEntryRest implements RestAddressableModel {
     @JsonIgnore
     private Boolean hasMore = null;
     private int facetLimit;
+
+    @JsonIgnore
+    private boolean exposeMinMax = false;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String minValue;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String maxValue;
 
     @JsonIgnore
     private List<SearchFacetValueRest> values = new LinkedList<>();
@@ -86,5 +95,29 @@ public class SearchFacetEntryRest implements RestAddressableModel {
 
     public void setFacetLimit(final int facetLimit) {
         this.facetLimit = facetLimit;
+    }
+
+    public boolean exposeMinAndMaxValue() {
+        return exposeMinMax;
+    }
+
+    public void setExposeMinMax(boolean exposeMinMax) {
+        this.exposeMinMax = exposeMinMax;
+    }
+
+    public String getMinValue() {
+        return minValue;
+    }
+
+    public void setMinValue(String minValue) {
+        this.minValue = minValue;
+    }
+
+    public String getMaxValue() {
+        return maxValue;
+    }
+
+    public void setMaxValue(String maxValue) {
+        this.maxValue = maxValue;
     }
 }

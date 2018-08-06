@@ -14,6 +14,7 @@ import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,14 +46,25 @@ public class CommunityConverter
             com.setLogo(bitstreamConverter.convert(logo));
         }
         List<Collection> collections = obj.getCollections();
+        List<CollectionRest> collectionsRest = new ArrayList<CollectionRest>();
         if (collections != null) {
-            List<CollectionRest> collectionsRest = new ArrayList<CollectionRest>();
             for (Collection col : collections) {
                 CollectionRest colrest = collectionConverter.fromModel(col);
                 collectionsRest.add(colrest);
             }
-            com.setCollections(collectionsRest);
         }
+        com.setCollections(collectionsRest);
+
+        List<Community> subCommunities = obj.getSubcommunities();
+        List<CommunityRest> communityRest = new ArrayList<CommunityRest>();
+        if (subCommunities != null) {
+            for (Community scom : subCommunities) {
+                CommunityRest scomrest = this.fromModel(scom);
+                communityRest.add(scomrest);
+            }
+        }
+        com.setSubCommunities(communityRest);
+
         return com;
     }
 
