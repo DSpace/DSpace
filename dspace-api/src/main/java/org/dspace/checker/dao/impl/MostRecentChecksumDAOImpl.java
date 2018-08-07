@@ -53,8 +53,8 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         criteria.add(
                 Restrictions.and(
                         Restrictions.eq("toBeProcessed", false),
-                        Restrictions.le("processStartDate", startDate),
-                        Restrictions.gt("processStartDate", endDate)
+                        Restrictions.le("processStartDate", endDate),
+                        Restrictions.gt("processStartDate", startDate)
                 )
         );
         criteria.addOrder(Order.asc("bitstream.id"));
@@ -84,8 +84,8 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         criteria.add(
                 Restrictions.and(
                         Restrictions.eq("checksumResult.resultCode", resultCode),
-                        Restrictions.le("processStartDate", startDate),
-                        Restrictions.gt("processStartDate", endDate)
+                        Restrictions.le("processStartDate", endDate),
+                        Restrictions.gt("processStartDate", startDate)
                 )
         );
         criteria.addOrder(Order.asc("bitstream.id"));
