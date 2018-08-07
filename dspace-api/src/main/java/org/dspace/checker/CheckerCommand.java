@@ -270,10 +270,15 @@ public final class CheckerCommand
                 if(checksumMap.containsKey("checksum_algorithm")) {
                     info.setChecksumAlgorithm(checksumMap.get("checksum_algorithm").toString());
                 }
-            }
 
-            // compare new checksum to previous checksum
-            info.setChecksumResult(compareChecksums(info.getExpectedChecksum(), info.getCurrentChecksum()));
+                // compare new checksum to previous checksum
+                info.setChecksumResult(compareChecksums(info.getExpectedChecksum(), info.getCurrentChecksum()));
+            } else {
+                info.setCurrentChecksum("");
+                // bitstream located, but file missing from asset store
+                info.setChecksumResult(getChecksumResultByCode(ChecksumResultCode.BITSTREAM_NOT_FOUND));
+                info.setToBeProcessed(false);
+            }
         }
         catch (IOException e)
         {
