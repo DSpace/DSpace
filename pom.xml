@@ -1023,6 +1023,14 @@
             </dependency>
 
             <!-- DSpace third Party Dependencies -->
+
+            <!-- Solr introduces multiple versions of zookeeper. So, we specify the version we want -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.4.11</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
