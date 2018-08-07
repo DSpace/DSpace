@@ -1093,15 +1093,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
-        //1. A community with one collection.
+        //1. A community.
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
 
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        //2. A collection with one template item.
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withTemplateItem()
+                .build();
 
-        //2. One template item.
-        Item templateItem = CollectionBuilder.createTemplateItem(context, col1);
+
+        Item templateItem = col1.getTemplateItem();
 
         String token = getAuthToken(admin.getEmail(), password);
 
