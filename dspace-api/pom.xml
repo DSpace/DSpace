@@ -712,15 +712,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- S3 also wanted jackson... -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
 
         <!-- For ORCID v2 integration -->
         <dependency>
