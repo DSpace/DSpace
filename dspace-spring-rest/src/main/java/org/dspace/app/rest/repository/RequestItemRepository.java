@@ -8,15 +8,20 @@
 
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.model.hateoas.RequestItemResource;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -28,6 +33,8 @@ import org.springframework.data.domain.Pageable;
 @Named(RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME)
 public class RequestItemRepository
         extends DSpaceRestRepository<RequestItemRest, String> {
+    private static final Logger LOG = LoggerFactory.getLogger(RequestItemRepository.class);
+
     @Inject
     protected RequestItemService requestItemService;
 
@@ -44,6 +51,26 @@ public class RequestItemRepository
     public Page<RequestItemRest> findAll(Context context, Pageable pageable) {
         // TODO ? There is no enumerator in RequestItemService
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public RequestItemRest save(Context context, RequestItemRest ri) {
+        try {
+            requestItemService.createRequest(context, ri.getBitstream(),
+                    ri.getItem(), ri.isAllfiles(), ri.getReqEmail(),
+                    ri.getReqName(), ri.getReqMessage());
+        } catch (SQLException ex) {
+            LOG.error("New RequestItem not saved.", ex);
+            // TODO how to inform caller that request was not saved?
+        }
+        return ri;
+    }
+
+    // NOTICE:  there is no service method for this -- requests are never deleted?
+    @Override
+    public void delete(Context context, String token)
+            throws AuthorizeException, RepositoryMethodNotImplementedException {
+        throw new RepositoryMethodNotImplementedException("RequestItemRest", "delete");
     }
 
     @Override
