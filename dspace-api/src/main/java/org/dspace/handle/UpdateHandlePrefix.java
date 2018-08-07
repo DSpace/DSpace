@@ -98,7 +98,7 @@ public class UpdateHandlePrefix {
                         MetadataValueService metadataValueService = ContentServiceFactory.getInstance()
                                                                                          .getMetadataValueService();
 
-                        String handlePrefix = configurationService.getProperty("handle.canonical.prefix");
+                        String handlePrefix = handleService.getCanonicalPrefix();
                         Iterator<MetadataValue> metadataValues = metadataValueService
                             .findByValueLike(context, handlePrefix + oldH);
 
