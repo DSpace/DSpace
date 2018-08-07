@@ -71,13 +71,10 @@ public class OrcidQueueListener
 		        ACrisNestedObject crisNestedObject = (ACrisNestedObject)object;
 		        
 		        if(crisNestedObject instanceof RPNestedObject) {
-		            crisNestedObject.getTypo().getShortName();
-		            ResearcherPage rp = (ResearcherPage)crisNestedObject.getParent();
-		            
-		            orcidPreferencesUtils.prepareOrcidQueue(rp.getCrisID(), rp);
+		            orcidPreferencesUtils.prepareOrcidQueueByNested(crisNestedObject);
 		        }		        
 		    }
-			if (object instanceof ACrisObject) {
+		    else if (object instanceof ACrisObject) {
 				ACrisObject crisObj = (ACrisObject) object;
 				if (crisObj.getType() == CrisConstants.RP_TYPE_ID
 						|| crisObj.getType() == CrisConstants.PROJECT_TYPE_ID) {
@@ -258,58 +255,62 @@ public class OrcidQueueListener
     {
 
         Object object = event.getEntity();
-        if (object instanceof ResearcherPage)
+        if (object instanceof ACrisObject)
         {
-            log.debug("Call onPostLoad " + OrcidQueueListener.class);
-
-            ResearcherPage rp = (ResearcherPage) object;
-
-            List<RPProperty> propsPublications = rp.getAnagrafica4view()
-                    .get(ORCID_PUBLICATIONS_PREFS);
-            List<RPProperty> propsProjects = rp.getAnagrafica4view()
-                    .get(ORCID_PROJECTS_PREFS);
-
-            for (RPProperty prop : propsPublications)
+            ACrisObject crisObj = (ACrisObject) object;
+            if (crisObj.getType() == CrisConstants.RP_TYPE_ID)
             {
-                rp.setOldOrcidPublicationsPreference(prop.toString());
-            }
-            for (RPProperty prop : propsProjects)
-            {
-                rp.setOldOrcidProjectsPreference(prop.toString());
-            }
+                log.debug("Call onPostLoad " + OrcidQueueListener.class);
 
-            List<RPPropertiesDefinition> metadataDefinitions = orcidPreferencesUtils
-                    .getApplicationService()
-                    .likePropertiesDefinitionsByShortName(
-                            RPPropertiesDefinition.class,
-                            PREFIX_ORCID_PROFILE_PREF);
-            for (RPPropertiesDefinition rppd : metadataDefinitions)
-            {
-                String metadataShortnameINTERNAL = rppd.getShortName()
-                        .replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
-                List<RPProperty> propsRps = rp.getAnagrafica4view()
-                        .get(rppd.getShortName());
-                for (RPProperty prop : propsRps)
+                ResearcherPage rp = (ResearcherPage) crisObj;
+
+                List<RPProperty> propsPublications = rp.getAnagrafica4view()
+                        .get(ORCID_PUBLICATIONS_PREFS);
+                List<RPProperty> propsProjects = rp.getAnagrafica4view()
+                        .get(ORCID_PROJECTS_PREFS);
+
+                for (RPProperty prop : propsPublications)
                 {
-                    BooleanValue booleanValue = (BooleanValue) (prop
-                            .getValue());
-                    if (booleanValue.getObject())
+                    rp.setOldOrcidPublicationsPreference(prop.toString());
+                }
+                for (RPProperty prop : propsProjects)
+                {
+                    rp.setOldOrcidProjectsPreference(prop.toString());
+                }
+
+                List<RPPropertiesDefinition> metadataDefinitions = orcidPreferencesUtils
+                        .getApplicationService()
+                        .likePropertiesDefinitionsByShortName(
+                                RPPropertiesDefinition.class,
+                                PREFIX_ORCID_PROFILE_PREF);
+                for (RPPropertiesDefinition rppd : metadataDefinitions)
+                {
+                    String metadataShortnameINTERNAL = rppd.getShortName()
+                            .replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
+                    List<RPProperty> propsRps = rp.getAnagrafica4view()
+                            .get(rppd.getShortName());
+                    for (RPProperty prop : propsRps)
                     {
-                        rp.getOldOrcidProfilePreference()
-                                .add(metadataShortnameINTERNAL);
-                        List<String> listProps = new ArrayList<String>();
-                        for (RPProperty props : rp.getAnagrafica4view()
-                                .get(metadataShortnameINTERNAL))
+                        BooleanValue booleanValue = (BooleanValue) (prop
+                                .getValue());
+                        if (booleanValue.getObject())
                         {
-                            // manage only first value
-                            listProps.add(props.toString());
+                            rp.getOldOrcidProfilePreference()
+                                    .add(metadataShortnameINTERNAL);
+                            List<String> listProps = new ArrayList<String>();
+                            for (RPProperty props : rp.getAnagrafica4view()
+                                    .get(metadataShortnameINTERNAL))
+                            {
+                                // manage only first value
+                                listProps.add(props.toString());
+                            }
+                            rp.getOldMapOrcidProfilePreference()
+                                    .put(metadataShortnameINTERNAL, listProps);
                         }
-                        rp.getOldMapOrcidProfilePreference()
-                                .put(metadataShortnameINTERNAL, listProps);
                     }
                 }
+                log.debug("End onPostLoad " + OrcidQueueListener.class);
             }
-            log.debug("End onPostLoad " + OrcidQueueListener.class);
         }
     }
 
@@ -329,31 +330,7 @@ public class OrcidQueueListener
         ACrisNestedObject crisNestedObject = (ACrisNestedObject) object;
 
         if(crisNestedObject instanceof RPNestedObject) {
-            String shortname = crisNestedObject.getTypo().getShortName();
-            ResearcherPage rp = (ResearcherPage)crisNestedObject.getParent();
-            List<RPPropertiesDefinition> metadataDefinitions = orcidPreferencesUtils
-                    .getApplicationService()
-                    .likePropertiesDefinitionsByShortName(
-                            RPPropertiesDefinition.class,
-                            PREFIX_ORCID_PROFILE_PREF);
-            for (RPPropertiesDefinition rppd : metadataDefinitions)
-            {
-                String metadataShortnameINTERNAL = rppd.getShortName()
-                        .replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
-                List<RPProperty> propsRps = rp.getAnagrafica4view()
-                        .get(rppd.getShortName());
-                for (RPProperty prop : propsRps)
-                {
-                    BooleanValue booleanValue = (BooleanValue) (prop
-                            .getValue());
-                    if (booleanValue.getObject())
-                    {
-                        if(metadataShortnameINTERNAL.contains(shortname)) {
-                            
-                        }
-                    }
-                }
-            }
+            orcidPreferencesUtils.prepareOrcidQueueByNested(crisNestedObject);
         }
 
     }

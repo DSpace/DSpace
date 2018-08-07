@@ -584,7 +584,7 @@ public class ApplicationService extends ExtendedTabService
 			Element element = cacheRpByEPerson.getQuiet(id);
 			if (element != null) {
 				ResearcherPage rp = (ResearcherPage) element.getValue();
-				if (!isExpiredCache(ResearcherPage.class, element, id, rp)) {
+				if (!isExpiredCache(ResearcherPage.class, element, rp.getId(), rp)) {
 					return rp;
 				}
 				else if (rp != null) {
@@ -832,14 +832,13 @@ public class ApplicationService extends ExtendedTabService
 		Date now = new Date();
 		if (rp == null) {
 			return true;
-		}
-		SingleTimeStampInfo timestampLastModified = rp.getTimeStampInfo().getTimestampLastModified();
-		long lastModCache = timestampLastModified != null?timestampLastModified.getTimestamp().getTime():-1;
+		}		
+		long lastModCache = element.getLastUpdateTime();
 		
 		if ( now.getTime() - element.getLastAccessTime() > 1000) {
 			Date uniqueLastModifiedTimeStamp = uniqueLastModifiedTimeStamp(model, objectId);
 			long lastModDb = uniqueLastModifiedTimeStamp != null? uniqueLastModifiedTimeStamp.getTime():-1;
-			if (lastModCache == lastModDb) {
+			if (lastModCache >= lastModDb) {
 				element.updateAccessStatistics();
 				return false;
 			}
@@ -847,7 +846,6 @@ public class ApplicationService extends ExtendedTabService
 				return true;
 			}
 		}
-		element.updateAccessStatistics();
 		return false;
 	}
 

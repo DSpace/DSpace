@@ -121,7 +121,7 @@ public class PubmedEuropeService
                 client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
 
                 URIBuilder uriBuilder = new URIBuilder(
-                        "http://www.ebi.ac.uk/europepmc/webservices/rest/search");
+                        "https://www.ebi.ac.uk/europepmc/webservices/rest/search");
                 uriBuilder.addParameter("format", "xml");
                 uriBuilder.addParameter("resulttype", "core");
                 uriBuilder.addParameter("pageSize", "1000");

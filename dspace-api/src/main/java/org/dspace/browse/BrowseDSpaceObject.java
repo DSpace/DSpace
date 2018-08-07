@@ -10,6 +10,7 @@ package org.dspace.browse;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 
@@ -29,6 +30,15 @@ public class BrowseDSpaceObject extends BrowseItem
             String qualifier, String lang)
     {
         return browseObject.getMetadata(schema, element, qualifier, lang);
+    }
+    
+    public Metadatum[] getMetadataWithoutPlaceholder(String schema, String element,
+            String qualifier, String lang){
+    	if(browseObject instanceof Item){
+    		return ((Item) browseObject).getMetadataWithoutPlaceholder(schema, element, qualifier, lang);
+    	}else{
+    		return browseObject.getMetadata(schema, element, qualifier, lang);
+    	}
     }
 
     public List<String> getMetadataValue(String mdString)

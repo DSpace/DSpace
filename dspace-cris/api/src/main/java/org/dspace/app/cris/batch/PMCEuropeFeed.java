@@ -86,9 +86,9 @@ public class PMCEuropeFeed
 
     private static final Logger log = Logger.getLogger(PMCEuropeFeed.class);
 
-    private static final String PMCEUROPE_ENDPOINT_SEARCH = "http://www.ebi.ac.uk/europepmc/webservices/rest/search";
+    private static final String PMCEUROPE_ENDPOINT_SEARCH = "https://www.ebi.ac.uk/europepmc/webservices/rest/search";
 
-    private static final String PMCEUROPE_ENDPOINT_PDF = "http://europepmc.org/articles/";
+    private static final String PMCEUROPE_ENDPOINT_PDF = "https://europepmc.org/articles/";
 
     private static final String QUERY_FIXED_PARAM = "format=xml&resulttype=idlist";
 

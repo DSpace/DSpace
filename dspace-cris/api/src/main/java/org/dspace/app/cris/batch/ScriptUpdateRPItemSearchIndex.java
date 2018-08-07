@@ -170,8 +170,7 @@ public class ScriptUpdateRPItemSearchIndex
                                 + rp);
                 rps = new LinkedList<ResearcherPage>();
                 ResearcherPage researcher = applicationService
-                        .get(ResearcherPage.class, Integer.parseInt(rp
-                                .substring(2)));
+                        .getResearcherByAuthorityKey(rp);
                 rps.add(researcher);
                 reIndexItems(rps, applicationService);
             }

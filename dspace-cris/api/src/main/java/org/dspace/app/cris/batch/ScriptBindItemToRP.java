@@ -193,8 +193,7 @@ public class ScriptBindItemToRP
                                 + rp);
                 rps = new LinkedList<ResearcherPage>();
                 ResearcherPage researcher = applicationService
-                        .get(ResearcherPage.class, Integer.parseInt(rp
-                                .substring(2)));
+                        .getResearcherByAuthorityKey(rp);
                 rps.add(researcher);
                 BindItemToRP.work(rps, relationPreferenceService);
             }

@@ -15,7 +15,6 @@
 <c:set var="root"><%=request.getContextPath()%></c:set>
 <c:if test="${!empty anagraficaObject.anagrafica4view['orcid']}">
 
-
 <script type="text/javascript">
 
 fnServerObjectToArray = function ()
@@ -51,6 +50,15 @@ fnServerObjectToArray = function ()
 };
 
 var oTable;
+
+
+function showPleaseWait() {  
+    j("#pleaseWaitDialog").modal("show");
+}
+
+function hidePleaseWait() {
+    j("#pleaseWaitDialog").modal("hide");
+}
 
 jQuery(document).ready(function() {
 	
@@ -106,6 +114,7 @@ jQuery(document).ready(function() {
 			var uuid = j(this).data("uuid");
 			var owner = j(this).data("owner");
 			var ttext = j(this).data("ttext");
+			showPleaseWait();
 			j.ajax({
 				  type: "POST", //or GET
 				  url: "<%= request.getContextPath() %>/json/orcidqueue/rest/"+ttext,
@@ -116,10 +125,12 @@ jQuery(document).ready(function() {
 		          },
 				  success: function(response){
 					  if(response.status==false) {
-						  alert(j("#orciderror").text());  
+						  hidePleaseWait();
+						  j("#modalerrors").modal('show');  
 					  }
 					  else {
-						  alert(j("#orcidsuccess").text());
+						  hidePleaseWait();
+						  j("#modalsuccess").modal('show');
 					  }
 					  oTable = drawOrcidDatatable();
 				  }
@@ -158,7 +169,9 @@ jQuery(document).ready(function() {
 								<c:otherwise>
 									<span class="label label-info"><fmt:message key="jsp.orcid.custom.box.label.preferences.batch"/></span>											
 								</c:otherwise>
-							</c:choose>
+							</c:choose>							
+							<hr/>
+							<span><fmt:message key="jsp.orcid.custom.box.label.preferences.warning.v2"/></span>
 							<hr/>
 							<div class="clearfix">&nbsp;</div>
 							<table id="orcidQueueTable" class="table table-striped table-bordered">
@@ -175,7 +188,43 @@ jQuery(document).ready(function() {
 		</div>
 	</div>
 </div>
+
 <span id="orcidmanualsend" style="display: none;"><fmt:message key="jsp.orcid.custom.box.label.preferences.button.manual"/></span>
-<span id="orcidsuccess" style="display: none;"><fmt:message key="jsp.orcid.custom.box.label.send.success"/></span>
-<span id="orciderror" style="display: none;"><fmt:message key="jsp.orcid.custom.box.label.send.error"/></span>
+
+ <!-- Modal -->
+  <div class="modal fade" id="modalsuccess" tabindex="-1" role="dialog" aria-labelledby="myModalSuccessLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title" id="myModalSuccessLabel"><fmt:message key="jsp.orcid.custom.box.label.send.success.title"/></h4>
+       </div>
+       <div class="modal-body" id="errorSuccess" style="overflow-x: scroll;">
+			<fmt:message key="jsp.orcid.custom.box.label.send.success"/>
+       </div>
+    </div>
+   </div>
+ </div>
+ <div class="modal fade" id="modalerrors" tabindex="-1" role="dialog" aria-labelledby="myModalErrorLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title" id="myModalErrorLabel"><fmt:message key="jsp.orcid.custom.box.label.send.error.title"/></h4>
+       </div>
+       <div class="modal-body" id="errorMessage" style="overflow-x: scroll;">
+			<fmt:message key="jsp.orcid.custom.box.label.send.error"/>
+       </div>
+    </div>
+   </div>
+ </div>
+<div class="modal" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false" role="dialog">
+	<div class="modal-dialog">
+      <div class="modal-content">
+      	<div class="modal-header">
+      		<fmt:message key="jsp.orcid.custom.box.label.plaisewait"/>
+      	</div>
+	  </div>
+    </div>
+</div> 
 </c:if>

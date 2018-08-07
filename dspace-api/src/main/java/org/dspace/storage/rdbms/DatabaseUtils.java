@@ -441,6 +441,12 @@ public class DatabaseUtils
                 flyway.setTarget(targetVersion);
             }
 
+            boolean runDSpaceCRISUpgrade = true;
+            //We have to run DSpace-CRIS configuration upgrade? Or it is a new installation
+            if(!tableExists(connection, "cris_rpage")) {
+                runDSpaceCRISUpgrade = false; 
+            }
+                
             // Does the necessary Flyway table ("schema_version") exist in this database?
             // If not, then this is the first time Flyway has run, and we need to initialize
             // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
@@ -482,7 +488,9 @@ public class DatabaseUtils
 
                 // Flag that Discovery will need reindexing, since database was updated
                 setReindexDiscovery(true);
-                setRebuildCrisConfiguration(true);
+                if(runDSpaceCRISUpgrade) {
+                    setRebuildCrisConfiguration(true);
+                }
             }
             else
                 log.info("DSpace database schema is up to date");

@@ -439,7 +439,9 @@ public class BrowseListTag extends TagSupport
 
                 // Output the known column widths
                 out.print("<colgroup>");
-
+    			if (inputName != null) { // cilea, add the checkbox column
+    				out.print("<col width=\"3\" />");
+    			}
                 for (int w = 0; w < widthArr.length; w++)
                 {
                     out.print("<col width=\"");
@@ -740,17 +742,17 @@ public class BrowseListTag extends TagSupport
                     else {
 	                    if (qualifier.equals("*"))
 	                    {
-	                        metadataArray = items[i].getMetadata(schema, element,
+	                        metadataArray = items[i].getMetadataWithoutPlaceholder(schema, element,
 	                                Item.ANY, Item.ANY);
 	                    }
 	                    else if (qualifier.equals(""))
 	                    {
-	                        metadataArray = items[i].getMetadata(schema, element,
+	                        metadataArray = items[i].getMetadataWithoutPlaceholder(schema, element,
 	                                null, Item.ANY);
 	                    }
 	                    else
 	                    {
-	                        metadataArray = items[i].getMetadata(schema, element,
+	                        metadataArray = items[i].getMetadataWithoutPlaceholder(schema, element,
 	                                qualifier, Item.ANY);
 	                    }
                     }
