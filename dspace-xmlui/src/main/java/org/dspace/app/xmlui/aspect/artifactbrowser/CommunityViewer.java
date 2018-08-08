@@ -11,10 +11,15 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
+import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -34,6 +39,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
@@ -49,6 +55,8 @@ import org.xml.sax.SAXException;
  */
 public class CommunityViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+    private static final Logger log = Logger.getLogger(CommunityViewer.class);
+
     /** Language Strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
@@ -68,7 +76,37 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     private SourceValidity validity;
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private ItemCounter itemCounter = null;
+    private boolean showCount = configurationService.getBooleanProperty("webui.strengths.show");
 
+    /**
+     * Set the component up, pulling any configuration values from the sitemap
+     * parameters.
+     *
+     * @param resolver source resolver.
+     * @param objectModel object model.
+     * @param src source.
+     * @param parameters sitemap parameters.
+     * @throws org.apache.cocoon.ProcessingException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws java.io.IOException passed through.
+     */
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src,
+                      Parameters parameters)
+            throws ProcessingException, SAXException, IOException
+    {
+        super.setup(resolver, objectModel, src, parameters);
+
+        if (showCount) {
+            try {
+                itemCounter = new ItemCounter(context);
+            } catch (ItemCountException e) {
+                log.error(e);
+            }
+        }
+    }
 
     /**
      * Generate the unique caching key.
@@ -130,11 +168,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	                validity.add(context, subCommunity);
 	                
 	                // Include the item count in the validity, only if the value is shown.
-	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
 	                if (showCount)
 	        		{
 	                    try {	
-	                    	int size = new ItemCounter(context).getCount(subCommunity);
+	                    	int size = itemCounter.getCount(subCommunity);
 	                    	validity.add("size:"+size);
 	                    } catch(ItemCountException e) { /* ignore */ }
 	        		}
@@ -149,7 +186,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	                if (showCount)
 	        		{
 	                    try {
-	                    	int size = new ItemCounter(context).getCount(collection);
+	                    	int size = itemCounter.getCount(collection);
 	                    	validity.add("size:"+size);
 	                    } catch(ItemCountException e) { /* ignore */ }
 	        		}
