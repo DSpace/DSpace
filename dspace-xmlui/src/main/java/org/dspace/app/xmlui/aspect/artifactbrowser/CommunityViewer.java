@@ -10,10 +10,15 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Map;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
+import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -46,6 +51,8 @@ import org.xml.sax.SAXException;
  */
 public class CommunityViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+    private static Logger log = Logger.getLogger(CommunityViewer.class);
+
     /** Language Strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
@@ -59,10 +66,32 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     
     private static final Message T_head_sub_collections =
         message("xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections");
-    
 
     /** Cached validity object */
     private SourceValidity validity;
+
+    /** Whether to display collection and community strengths (i.e. item counts) */
+    private boolean showCount;
+    private ItemCounter itemCounter = null;
+
+    /**
+     * Set the component up, pulling any configuration values from the sitemap
+     * parameters.
+     */
+    public void setup(SourceResolver resolver, Map objectModel, String src,
+                      Parameters parameters) throws ProcessingException, SAXException,
+            IOException
+    {
+        super.setup(resolver, objectModel, src, parameters);
+        showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
+        if (showCount) {
+            try {
+                itemCounter = new ItemCounter(context);
+            } catch (ItemCountException e) {
+                log.error(e);
+            }
+        }
+    }
 
     /**
      * Generate the unique caching key.
@@ -124,11 +153,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	                validity.add(subCommunity);
 	                
 	                // Include the item count in the validity, only if the value is shown.
-	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
 	                if (showCount)
 	        		{
 	                    try {	
-	                    	int size = new ItemCounter(context).getCount(subCommunity);
+	                    	int size = itemCounter.getCount(subCommunity);
 	                    	validity.add("size:"+size);
 	                    } catch(ItemCountException e) { /* ignore */ }
 	        		}
