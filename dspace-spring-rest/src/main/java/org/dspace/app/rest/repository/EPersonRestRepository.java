@@ -22,7 +22,6 @@ import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -79,13 +78,6 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
                 es.setPassword(eperson, epersonRest.getPassword());
             }
             es.update(context, eperson);
-            if (epersonRest.getMetadata() != null) {
-                for (MetadataEntryRest mer : epersonRest.getMetadata()) {
-                    String[] metadatakey = mer.getKey().split("\\.");
-                    es.addMetadata(context, eperson, metadatakey[0], metadatakey[1],
-                            metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
-                }
-            }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

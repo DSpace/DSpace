@@ -192,6 +192,8 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
                 | InvocationTargetException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
+
+            utils.getMetadataRestRepository().addMetadataSubresource(this, true);
         }
     }
 

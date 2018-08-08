@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -20,13 +22,16 @@ public class MetadataValueRest {
 
     String value;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     String language;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     String authority;
 
-    int confidence;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    Integer confidence;
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonIgnore
     int place;
 
     public String getValue() {
@@ -53,7 +58,7 @@ public class MetadataValueRest {
         this.authority = authority;
     }
 
-    public int getConfidence() {
+    public Integer getConfidence() {
         return confidence;
     }
 

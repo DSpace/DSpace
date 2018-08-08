@@ -10,7 +10,6 @@ package org.dspace.app.rest.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 
@@ -34,15 +33,6 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
             resource.setUuid(obj.getID().toString());
         }
         resource.setName(obj.getName());
-        List<MetadataEntryRest> metadata = new ArrayList<MetadataEntryRest>();
-        for (MetadataValue mv : obj.getMetadata()) {
-            MetadataEntryRest me = new MetadataEntryRest();
-            me.setKey(mv.getMetadataField().toString('.'));
-            me.setValue(mv.getValue());
-            me.setLanguage(mv.getLanguage());
-            metadata.add(me);
-        }
-        resource.setMetadata(metadata);
         return resource;
     }
 

@@ -23,6 +23,7 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
+import org.dspace.app.rest.repository.MetadataRestRepository;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -41,6 +42,9 @@ import org.springframework.stereotype.Component;
 public class Utils {
     @Autowired
     ApplicationContext applicationContext;
+
+    @Autowired
+    MetadataRestRepository metadataRestRepository;
 
     public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
         int total = fullContents.size();
@@ -83,6 +87,10 @@ public class Utils {
         } catch (NoSuchBeanDefinitionException e) {
             throw new RepositoryNotFoundException(apiCategory, model);
         }
+    }
+
+    public MetadataRestRepository getMetadataRestRepository() {
+        return metadataRestRepository;
     }
 
     public String[] getRepositories() {
