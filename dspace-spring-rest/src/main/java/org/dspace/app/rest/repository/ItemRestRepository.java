@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -55,6 +56,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
      */
     @Autowired
     ItemPatch itemPatch;
+
 
     public ItemRestRepository() {
         System.out.println("Repository initialized by Spring");
@@ -114,6 +116,29 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     @Override
     public ItemResource wrapResource(ItemRest item, String... rels) {
         return new ItemResource(item, utils, rels);
+    }
+
+    @Override
+    protected void delete(Context context, UUID id) throws AuthorizeException {
+        Item item = null;
+        try {
+            item = is.find(context, id);
+            if (is.isInProgressSubmission(context, item)) {
+                throw new UnprocessableEntityException("The item cannot be deleted. "
+                        + "It's part of a in-progress submission.");
+            }
+            if (item.getTemplateItemOf() != null) {
+                throw new UnprocessableEntityException("The item cannot be deleted. "
+                        + "It's a template for a collection");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        try {
+            is.delete(context, item);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
 }
