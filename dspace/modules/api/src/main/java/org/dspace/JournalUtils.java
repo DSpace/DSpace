@@ -54,7 +54,7 @@ public class JournalUtils {
     }
 
     public final static String crossRefApiRoot = "https://api.crossref.org/";
-    public final static String nsfApiRoot = "http://api.nsf.gov/services/v1/awards/";
+    public final static String nsfApiRoot = "https://api.nsf.gov/services/v1/awards/";
 
     public static final String archivedDataPackageIds    = "SELECT * FROM ArchivedPackageItemIdsByJournal(?,?);";
     public static final String archivedDataPackageIdsCol =               "archivedpackageitemidsbyjournal";
