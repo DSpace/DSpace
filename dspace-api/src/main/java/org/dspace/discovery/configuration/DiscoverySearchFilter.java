@@ -43,22 +43,22 @@ public class DiscoverySearchFilter {
     }
 
     /**
-     * Returns the type of the DiscoverySearchFilter
-     * @return  The type of the DiscoverySearchFilter
-     */
+      * Returns the type of the DiscoverySearchFilter
+      * @return  The type of the DiscoverySearchFilter
+      */
     public String getType() {
         return type;
     }
 
     /**
-     * Sets the type of the DiscoverySearchFilter to the one given in the parameter if it matches
-     * a set of possible types
-     * The possible types are described in: {@link org.dspace.discovery.configuration.DiscoveryConfigurationParameters}
-     * For the DiscoverySearchFilter only the TYPE_TEXT, TYPE_DATE and TYPE_HIERARCHICAL are allowed
-     *
-     * @param type  The type for this DiscoverySearchFilter
-     * @throws DiscoveryConfigurationException  If none of the types match, this error will be thrown indiciating this
-     */
+      * Sets the type of the DiscoverySearchFilter to the one given in the parameter if it matches
+      * a set of possible types
+      * The possible types are described in: {@link org.dspace.discovery.configuration.DiscoveryConfigurationParameters}
+      * For the DiscoverySearchFilter only the TYPE_TEXT, TYPE_DATE and TYPE_HIERARCHICAL are allowed
+      *
+      * @param type  The type for this DiscoverySearchFilter
+      * @throws DiscoveryConfigurationException  If none of the types match, this error will be thrown indiciating this
+      */
     public void setType(String type) throws DiscoveryConfigurationException {
         if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_TEXT)) {
             this.type = DiscoveryConfigurationParameters.TYPE_TEXT;
