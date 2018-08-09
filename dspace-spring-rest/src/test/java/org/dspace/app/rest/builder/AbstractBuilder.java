@@ -180,6 +180,11 @@ public abstract class AbstractBuilder<T, S> {
 
     protected abstract S getService();
 
+    protected <B> B handleException(final Exception e) {
+        log.error(e.getMessage(), e);
+        return null;
+    }
+
     /**
      * Method to completely delete a bitstream from the database and asset store.
      *
