@@ -74,9 +74,6 @@ public class HierarchyResource extends Resource {
 		
         try {
             context = createContext();
-            if (!configurationService.getBooleanProperty("rest.hierarchy-authenticate", true)) {
-                context.turnOffAuthorisationSystem();            	
-            }
 
             Site site = siteService.findSite(context);
             repo.setId(site.getID().toString());

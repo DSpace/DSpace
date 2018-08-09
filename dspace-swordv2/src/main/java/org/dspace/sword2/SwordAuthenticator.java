@@ -67,7 +67,7 @@ public class SwordAuthenticator
 
     protected ItemService itemService = ContentServiceFactory.getInstance()
             .getItemService();
-    
+
     protected ConfigurationService configurationService = DSpaceServicesFactory
             .getInstance().getConfigurationService();
 
@@ -291,7 +291,7 @@ public class SwordAuthenticator
      * @throws DSpaceSwordException
      */
     public boolean canSubmit(SwordContext swordContext, DSpaceObject dso,
-            VerboseDescription msg)
+                             VerboseDescription msg)
             throws DSpaceSwordException, SwordError
     {
         // determine if we can submit
@@ -547,7 +547,7 @@ public class SwordAuthenticator
      * @throws DSpaceSwordException
      */
     public List<Community> getCommunities(SwordContext swordContext,
-            Community community)
+                                          Community community)
             throws DSpaceSwordException
     {
         // a community is allowed if the following conditions are met
@@ -731,7 +731,7 @@ public class SwordAuthenticator
      * @throws DSpaceSwordException
      */
     public List<Item> getAllowedItems(SwordContext swordContext,
-            org.dspace.content.Collection collection)
+                                      org.dspace.content.Collection collection)
             throws DSpaceSwordException
     {
         // an item is allowed if the following conditions are met
@@ -765,7 +765,7 @@ public class SwordAuthenticator
                 }
 
                 // get the "ORIGINAL" bundle(s)
-                List<Bundle> bundles = item.getBundles();
+                List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
 
                 // look up the READ policy on the community.  This will include determining if the user is an administrator
                 // so we do not need to check that separately
@@ -786,16 +786,12 @@ public class SwordAuthenticator
                     {
                         for (Bundle bundle : bundles)
                         {
-                            if (Constants.CONTENT_BUNDLE_NAME
-                                    .equals(bundle.getName()))
+                            add = authorizeService.authorizeActionBoolean(
+                                    swordContext.getAuthenticatorContext(),
+                                    bundle, Constants.ADD);
+                            if (!add)
                             {
-                                add = authorizeService.authorizeActionBoolean(
-                                        swordContext.getAuthenticatorContext(),
-                                        bundle, Constants.ADD);
-                                if (!add)
-                                {
-                                    break;
-                                }
+                                break;
                             }
                         }
                     }
@@ -874,7 +870,7 @@ public class SwordAuthenticator
      * @throws DSpaceSwordException
      */
     public boolean canSubmitTo(SwordContext swordContext,
-            org.dspace.content.Collection collection)
+                               org.dspace.content.Collection collection)
             throws DSpaceSwordException
     {
         // a user can submit to a collection in the following conditions:
@@ -966,7 +962,7 @@ public class SwordAuthenticator
                     .authorizeActionBoolean(allowContext, item,
                             Constants.WRITE);
 
-            List<Bundle> bundles = item.getBundles();
+            List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
             boolean add = false;
             if (bundles.isEmpty())
             {
@@ -978,15 +974,12 @@ public class SwordAuthenticator
             {
                 for (Bundle bundle : bundles)
                 {
-                    if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
+                    add = authorizeService
+                            .authorizeActionBoolean(allowContext, bundle,
+                                    Constants.ADD);
+                    if (!add)
                     {
-                        add = authorizeService
-                                .authorizeActionBoolean(allowContext, bundle,
-                                        Constants.ADD);
-                        if (!add)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }

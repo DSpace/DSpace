@@ -372,21 +372,6 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         return prefix;
     }
 
-    protected static String getCanonicalForm(String handle)
-    {
-
-        // Let the admin define a new prefix, if not then we'll use the
-        // CNRI default. This allows the admin to use "hdl:" if they want to or
-        // use a locally branded prefix handle.myuni.edu.
-        String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
-        if (handlePrefix == null || handlePrefix.length() == 0)
-        {
-            handlePrefix = "http://hdl.handle.net/";
-        }
-
-        return handlePrefix + handle;
-    }
-
     protected String createNewIdentifier(Context context, DSpaceObject dso, String handleId) throws SQLException {
         if(handleId == null)
         {
@@ -443,7 +428,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     protected void populateHandleMetadata(Context context, Item item, String handle)
             throws SQLException, IOException, AuthorizeException
     {
-        String handleref = getCanonicalForm(handle);
+        String handleref = handleService.getCanonicalForm(handle);
         // we want to remove the old handle and insert the new. To do so, we 
         // load all identifiers, clear the metadata field, re add all 
         // identifiers which are not from type handle and add the new handle.

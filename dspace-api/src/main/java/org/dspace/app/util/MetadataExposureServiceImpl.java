@@ -7,15 +7,19 @@
  */
 package org.dspace.app.util;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Static utility class to manage configuration for exposure (hiding) of
@@ -64,6 +68,9 @@ public class MetadataExposureServiceImpl implements MetadataExposureService
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     protected MetadataExposureServiceImpl()
     {
@@ -132,12 +139,11 @@ public class MetadataExposureServiceImpl implements MetadataExposureService
             hiddenElementSets = new HashMap<>();
             hiddenElementMaps = new HashMap<>();
 
-            Enumeration pne = ConfigurationManager.propertyNames();
-            while (pne.hasMoreElements())
-            {
-                String key = (String)pne.nextElement();
+            List<String> propertyKeys = configurationService.getPropertyKeys();
+            for (String key : propertyKeys) {
                 if (key.startsWith(CONFIG_PREFIX))
                 {
+                    if (configurationService.getBooleanProperty(key, true)){
                     String mdField = key.substring(CONFIG_PREFIX.length());
                     String segment[] = mdField.split("\\.", 3);
 
@@ -173,6 +179,7 @@ public class MetadataExposureServiceImpl implements MetadataExposureService
                         log.warn("Bad format in hidden metadata directive, field=\""+mdField+"\", config property="+key);
                     }
                 }
+            }
             }
         }
     }

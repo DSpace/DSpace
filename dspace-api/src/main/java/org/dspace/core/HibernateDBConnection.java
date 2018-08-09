@@ -24,7 +24,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 /**
- * Hibernate implementation of the DBConnection
+ * Hibernate implementation of the DBConnection.
  *
  * @author kevinvandevelde at atmire.com
  */

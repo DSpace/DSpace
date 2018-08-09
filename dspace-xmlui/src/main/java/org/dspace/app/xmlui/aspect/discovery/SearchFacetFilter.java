@@ -252,7 +252,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     }
 
     private SORT getSortOrder(Request request) {
-        String sortOrderString = request.getParameter("order");
+        String sortOrderString = request.getParameter("filterorder");
         // First check for an already configured sortOrder (provided a new one is not being set)
         if(sortOrder!=null && StringUtils.isBlank(sortOrderString)){
             return sortOrder;
@@ -261,7 +261,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         if(StringUtils.isBlank(sortOrderString) || SORT.valueOf(sortOrderString.toUpperCase())==null){
             sortOrder= SORT.VALUE;
         }else{
-            sortOrder= SORT.valueOf(request.getParameter("order").toUpperCase());
+            sortOrder= SORT.valueOf(request.getParameter("filterorder").toUpperCase());
         }
         return sortOrder;
     }

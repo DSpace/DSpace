@@ -27,14 +27,14 @@
     <!--If multiple importServices have been configured here but only one is to be used during the lookup step (StartSubmissionLookupStep),
         this can be accomplished by specifying the property "publication-lookup.url" to the baseAddress of the required importService
         So for example
-        publication-lookup.url=http://eutils.ncbi.nlm.nih.gov/entrez/eutils/
+        publication-lookup.url=https://eutils.ncbi.nlm.nih.gov/entrez/eutils/
         Will result in using the PubmedImportService for the lookup step
         Omitting this property will default to searching over all configured ImportService implementations
     -->
 
     <bean id="PubmedImportService" class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
-        <property name="baseAddress" value="http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+        <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
 
     </bean>
     <bean id="PubmedMetadataFieldMapping"

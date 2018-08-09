@@ -93,7 +93,9 @@ public abstract class AbstractCurationTask implements CurationTask
                 Iterator<Item> iter = itemService.findByCollection(Curator.curationContext(), (Collection) dso);
                 while (iter.hasNext())
                 {
-                    performObject(iter.next());
+                    Item item = iter.next();
+                    performObject(item);
+                    Curator.curationContext().uncacheEntity(item);
                 }
             }
             else if (Constants.COMMUNITY == type)
@@ -147,7 +149,7 @@ public abstract class AbstractCurationTask implements CurationTask
         if(dso.getType()==Constants.ITEM)
         {
             performItem((Item)dso);
-        }    
+        }
         
         //no-op for all other types of DSpace Objects
     }

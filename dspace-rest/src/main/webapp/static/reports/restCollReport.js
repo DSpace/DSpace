@@ -9,6 +9,15 @@ var CollReport = function() {
     Report.call(this);
     //If sortable.js is included, uncomment the following
     //this.hasSorttable = function(){return true;}
+
+    //Indicate if Password Authentication is supported
+    //this.makeAuthLink = function(){return true;};
+    //Indicate if Shibboleth Authentication is supported
+    //this.makeShibLink = function(){return true;};
+
+    this.getLangSuffix = function(){
+      return "[en]";
+    }
     
     this.COLL_LIMIT = 20;
     this.TOOBIG = 10000;
@@ -17,9 +26,13 @@ var CollReport = function() {
     this.THREADSP = 11;
     this.ACCIDX_COLL = 1;
     this.ACCIDX_ITEM = 2;
+    this.IACCIDX_META = 0;
+    this.IACCIDX_BIT  = 1;
+    this.IACCIDX_ITEM = 2;
     this.getDefaultParameters = function(){
         return {
-            "show_fields[]" : [],
+            "show_fields[]" : [], 
+            "show_fields_bits[]" : [],
             filters       : "",
             limit         : this.COUNT_LIMIT,
             offset        : 0,
@@ -30,6 +43,7 @@ var CollReport = function() {
     this.getCurrentParameters = function(){
         return {
             "show_fields[]" : this.myMetadataFields.getShowFields(),
+            "show_fields_bits[]" : this.myBitstreamFields.getShowFieldsBits(),
             filters         : this.myFilters.getFilterList(),
             limit           : this.myReportParameters.getLimit(),
             offset          : this.myReportParameters.getOffset(),
@@ -46,17 +60,16 @@ var CollReport = function() {
         $("#itemResults").accordion({
             heightStyle: "content",
             collapsible: true,
-            active: 1
+            active: 2
         });
     }
     
     this.myAuth.callback = function(data) {
         self.createCollectionTable();
-        $("#table tbody tr").remove();
         $(".showCollections").bind("click", function(){
             self.loadData();
         });
-        $("#refresh-fields").bind("click", function(){
+        $("#refresh-fields,#refresh-fields-bits").bind("click", function(){
             self.drawItemTable($("#icollection").val(), $("#ifilter").val(), 0);
         });
     }
@@ -399,13 +412,28 @@ var CollReport = function() {
                 self.myHtmlUtil.addTh(tr, field + self.getLangSuffix());        
             });        
         }
+        var bitfields = $("#show-fields-bits select").val();
+        if (bitfields != null) {
+          $.each(bitfields, function(index, bitf){
+            self.myHtmlUtil.addTh(tr, bitf);    
+          });   
+        }
+    
+        var expand = "items";
+        if (fields != null) {
+          expand += ",metadata";
+        }
+        if (bitfields != null) {
+          expand += ",bitstreams";
+        }
 
         var params = {
-            expand: fields == null ? "items" : "items,metadata",
+            expand: expand,
             limit: self.ITEM_LIMIT,
             filters: filter,
             offset: offset,
             "show_fields[]" : fields,
+            "show_fields_bits[]" : bitfields,
         }
         
         $.ajax({
@@ -426,16 +454,22 @@ var CollReport = function() {
                     if (fields != null) {
                         $.each(fields, function(index, field){
                             var text = "";        
+                            var td = self.myHtmlUtil.addTd(tr, "");
                             $.each(item.metadata, function(mindex,mv){
                                 if (mv.key == field) {
-                                    if (text != "") {
-                                        text += "<hr/>";
-                                    }
-                                    text += mv.value;
+                                    td.append($("<div>"+mv.value+"</div>"));
                                 }
                             });
-                            self.myHtmlUtil.addTd(tr, text);
-                        });        
+                        });    
+                    }
+                    if (bitfields != null) {
+                      $.each(bitfields, function(index, bitfield){
+                        var td = self.myHtmlUtil.addTd(tr, "");
+                        var fieldtext = self.myBitstreamFields.getKeyText(bitfield, item, bitfields);
+                        for(var j=0; j<fieldtext.length; j++) {
+                          td.append($("<div>"+fieldtext[j]+"</div>"));
+                        }
+                      });
                     }
                 });
                 self.displayItems(filter + " Items in " + data.name, 
@@ -456,7 +490,8 @@ var CollReport = function() {
             },
             complete: function(xhr, status) {
                 self.spinner.stop();
-                  $(".showCollections").attr("disabled", false);
+                $(".showCollections").attr("disabled", false);
+                $("#itemResults").accordion("option", "active", self.IACCIDX_ITEM);
             }
         });
     }

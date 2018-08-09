@@ -138,10 +138,10 @@
             boolean required = authority && mam.isAuthorityRequired(fieldName);
             boolean isSelect = "select".equals(cam.getPresentation(fieldName)) && !isName;
 
-            // if this is not the only or last input, append index to input @names
+            // Append index to input @names
             String authorityName = fieldName + "_authority";
             String confidenceName = fieldName + "_confidence";
-            if (repeatable && !isSelect && idx != fieldCount-1)
+            if (repeatable)
             {
                 fieldInput += '_'+String.valueOf(idx+1);
                 authorityName += '_'+String.valueOf(idx+1);
@@ -231,8 +231,8 @@
                   .append(contextPath).append("/tools/lookup.jsp','")
                   .append(fieldName).append("','edit_metadata','")
                   .append(fieldInput).append("','").append(authorityName).append("','")
-                  .append(confIndID).append("',")
-                  .append(String.valueOf(collection.getID())).append(",")
+                  .append(confIndID).append("','")
+                  .append(String.valueOf(collection.getID())).append("',")
                   .append(String.valueOf(isName)).append(",false);\"")
                         .append(" title=\"")
                   .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.lookup"))

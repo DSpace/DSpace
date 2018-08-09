@@ -10,6 +10,15 @@ var QueryReport = function() {
     
     //If sortable.js is included, uncomment the following
     //this.hasSorttable = function(){return true;}
+
+    //Indicate if Password Authentication is supported
+    //this.makeAuthLink = function(){return true;};
+    //Indicate if Shibboleth Authentication is supported
+    //this.makeShibLink = function(){return true;};
+
+    this.getLangSuffix = function(){
+      return "[en]";
+    }
     
     this.getDefaultParameters = function(){
         return {
@@ -18,12 +27,17 @@ var QueryReport = function() {
             "query_op[]"    : [],
             "query_val[]"   : [],
             "show_fields[]" : [],
+            "show_fields_bits[]" : [],
             "filters"       : "",
             "limit"         : this.ITEM_LIMIT,
             "offset"        : 0,          
         };
     }
     this.getCurrentParameters = function(){
+    var expand = "parentCollection,metadata";
+    if (this.myBitstreamFields.hasBitstreamFields()) {
+      expand += ",bitstreams";
+    }
         var params = {
             "query_field[]" : [],
             "query_op[]"    : [],
@@ -31,9 +45,10 @@ var QueryReport = function() {
             "collSel[]"     : ($("#collSel").val() == null) ? [""] : $("#collSel").val(),
             limit           : this.myReportParameters.getLimit(),
             offset          : this.myReportParameters.getOffset(),
-            "expand"        : "parentCollection,metadata",
+            "expand"        : expand,
             filters         : this.myFilters.getFilterList(),
             "show_fields[]" : this.myMetadataFields.getShowFields(),
+            "show_fields_bits[]" : this.myBitstreamFields.getShowFieldsBits(),
         };
         $("select.query-tool,input.query-tool").each(function() {
             var paramArr = params[$(this).attr("name")];
@@ -45,6 +60,7 @@ var QueryReport = function() {
 
     this.init = function() {
         this.baseInit();    
+        var communitySelector = new CommunitySelector(this, $("#collSelector"), this.myReportParameters.params["collSel[]"]);
     }
     
     this.initMetadataFields = function() {
@@ -52,7 +68,6 @@ var QueryReport = function() {
         this.myMetadataFields.load();        
     }
     this.myAuth.callback = function(data) {
-        var communitySelector = new CommunitySelector(self, $("#collSelector"), self.myReportParameters.params["collSel[]"]);
         $(".query-button").click(function(){self.runQuery();})
     }
 
@@ -66,16 +81,17 @@ var QueryReport = function() {
             headers: self.myAuth.getHeaders(),
             success: function(data){
                 data.metadata = $("#show-fields select").val();
+                data.bitfields = $("#show-fields-bits select").val();
                 self.drawItemFilterTable(data);
                 self.spinner.stop();
-                  $("button").not("#next,#prev").attr("disabled", false);
+                $("button").not("#next,#prev").attr("disabled", false);
             },
             error: function(xhr, status, errorThrown) {
                 alert("Error in /rest/filtered-items "+ status+ " " + errorThrown);
             },
             complete: function(xhr, status, errorThrown) {
                 self.spinner.stop();
-                  $("button").not("#next,#prev").attr("disabled", false);
+                $("button").not("#next,#prev").attr("disabled", false);
             }
         });
     }
@@ -100,6 +116,15 @@ var QueryReport = function() {
             });            
         }
         
+        if (data.bitfields) {
+          $.each(data.bitfields, function(index, bitfield) {
+            if (bitfield != "") {
+              self.myHtmlUtil.addTh(tr,bitfield).addClass("returnFields");
+              mdCols[mdCols.length] = bitfield;      
+            }
+          });     
+        }
+
         $.each(data.items, function(index, item){
             var tr = self.myHtmlUtil.addTr(itbl);
             tr.addClass(index % 2 == 0 ? "odd data" : "even data");
@@ -124,6 +149,10 @@ var QueryReport = function() {
                         }
                     }
                 });
+                var fieldtext = self.myBitstreamFields.getKeyText(key, item, data.bitfields);
+                for(var j=0; j<fieldtext.length; j++) {
+                  td.append($("<div>"+fieldtext[j]+"</div>"))
+                }
             }
         });
         

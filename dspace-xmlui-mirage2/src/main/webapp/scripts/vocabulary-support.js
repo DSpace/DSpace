@@ -36,6 +36,7 @@
             var vocabularyDialog = $('div#'+id);
             if(0 < vocabularyDialog.length){
                 //Open the modal
+                vocabularyDialog.find('input[type="hidden"][name="metadataFieldName"]').val(inputFieldName);
                 vocabularyDialog.modal('show')
             }else{
 

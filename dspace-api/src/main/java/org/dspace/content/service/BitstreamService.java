@@ -28,6 +28,22 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     public List<Bitstream> findAll(Context context) throws SQLException;
 
     /**
+     * Clone the given bitstream by firstly creating a new bitstream, with a new ID.
+     * Then set the internal identifier, file size, checksum, and 
+     * checksum algorithm as same as the given bitstream. 
+     * This allows multiple bitstreams to share the same internal identifier of assets . 
+     * An example of such a use case scenario is versioning.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param bitstream
+     *            Bitstream to be cloned
+     * @return the clone 
+     * @throws SQLException if database error
+     */
+    public Bitstream clone(Context context, Bitstream bitstream) throws SQLException; 
+   
+    /**
      * Create a new bitstream, with a new ID. The checksum and file size are
      * calculated. No authorization checks are made in this method.
      * The newly created bitstream has the "unknown" format.
@@ -62,7 +78,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * @throws AuthorizeException if authorization error
      */
     public Bitstream create(Context context, Bundle bundle, InputStream is) throws IOException, SQLException, AuthorizeException;
-
+ 
     /**
      * Register a new bitstream, with a new ID.  The checksum and file size
      * are calculated. The newly created bitstream has the "unknown"
