@@ -45,7 +45,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
     /** Current DSpaceObject for which to generate the statistics. */
     private DSpaceObject currentDso;
     /** Variable used to indicate of how many months an average is required (-1 is inactive) **/
-    private int averageMonths = -1;
+    private long averageMonths = -1;
     
     DSpace dspace = new DSpace();
 
@@ -98,7 +98,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
 
                 dataset = new Dataset(topCounts.length, (averageMonths != -1 ? 3 : 2));
                 dataset.setColLabel(0, "step");
-                dataset.setColLabel(1, "performed");
+                dataset.setColLabel(1, "count");
                 if(averageMonths != -1){
                     dataset.setColLabel(2, "average");
                 }
@@ -109,12 +109,12 @@ public class StatisticsDataWorkflow extends StatisticsData {
                     dataset.addValueToMatrix(i, 1, topCount.getCount());
                     if(averageMonths != -1){
                         //Calculate the average of one month
-                        long monthlyAverage = 0;
+                        float monthlyAverage = 0;
                         if(totalFieldCounts.get(topCount.getValue()) != null){
                             monthlyAverage = totalFieldCounts.get(topCount.getValue()) / monthDifference;
                         }
                         //We multiple our average for one month by the number of
-                        dataset.addValueToMatrix(i, 2, (monthlyAverage * averageMonths));
+                        dataset.addValueToMatrix(i, 2, (monthlyAverage));
                     }
 
                 }
@@ -146,9 +146,20 @@ public class StatisticsDataWorkflow extends StatisticsData {
     }
 
     private int getMonthsDifference(Date date1, Date date2) {
-        int m1 = date1.getYear() * 12 + date1.getMonth();
-        int m2 = date2.getYear() * 12 + date2.getMonth();
-        return m2 - m1 + 1;
+		Calendar cal = Calendar.getInstance();
+		// default will be Gregorian in US Locales
+		cal.setTime(date1);
+		int minuendMonth =  cal.get(Calendar.MONTH);
+		int minuendYear = cal.get(Calendar.YEAR);
+		cal.setTime(date2);
+		int subtrahendMonth =  cal.get(Calendar.MONTH);
+		int subtrahendYear = cal.get(Calendar.YEAR);
+		 
+		// the following will work okay for Gregorian but will not
+		// work correctly in a Calendar where the number of months 
+		// in a year is not constant
+		return ((minuendYear - subtrahendYear) * cal.getMaximum(Calendar.MONTH)) +  
+		(minuendMonth - subtrahendMonth);
     }
 
 
