@@ -119,9 +119,19 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         public static final String OPERATOR_NOTCONTAINS = "notcontains";
         public static final String OPERATOR_QUERY = "query";
 
+        /**
+         * Specifies whether this filter has facets or not
+         * @return  A boolean indicating whether this filter has facets or not
+         */
         public boolean isHasFacets() {
             return hasFacets;
         }
+
+        /**
+         * Sets the hasFacets property of the filter class to the given boolean
+         *
+         * @param hasFacets The boolean that the hasFacets property will be set to
+         */
         public void setHasFacets(boolean hasFacets) {
             this.hasFacets = hasFacets;
         }
@@ -150,11 +160,15 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         public void setType(String type) {
             this.type = type;
         }
-
+        /**
+         * See documentantion at {@link DiscoverySearchFilter#isOpenByDefault()}
+         */
         public boolean isOpenByDefault() {
             return isOpenByDefault;
         }
-
+        /**
+         * See documentantion at {@link DiscoverySearchFilter#setIsOpenByDefault(boolean)}
+         */
         public void setOpenByDefault(boolean openByDefault) {
             isOpenByDefault = openByDefault;
         }
