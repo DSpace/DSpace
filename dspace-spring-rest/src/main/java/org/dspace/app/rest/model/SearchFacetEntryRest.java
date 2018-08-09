@@ -13,6 +13,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
 /**
  * This class' purpose is to create a container for the information used in the SearchFacetEntryResource
@@ -97,26 +98,47 @@ public class SearchFacetEntryRest implements RestAddressableModel {
         this.facetLimit = facetLimit;
     }
 
+    /**
+     * See documentation at {@link DiscoverySearchFilterFacet#exposeMinAndMaxValue()}
+     */
     public boolean exposeMinAndMaxValue() {
         return exposeMinMax;
     }
-
+    /**
+     * See documentation at {@link DiscoverySearchFilterFacet#setExposeMinAndMaxValue(boolean)}
+     */
     public void setExposeMinMax(boolean exposeMinMax) {
         this.exposeMinMax = exposeMinMax;
     }
 
+    /**
+     * Returns the smallest value that can be found for this value in solr
+     * @return  The smallest value for this facet as a String
+     */
     public String getMinValue() {
         return minValue;
     }
 
+    /**
+     * Sets the minValue property for the SearchFacetEntryRest to the given parameter
+     * @param minValue  The String that the minValue will be set to
+     */
     public void setMinValue(String minValue) {
         this.minValue = minValue;
     }
 
+    /**
+     * Returns the highest value that can be found for this value in solr
+     * @return  The highest value for this facet as a String
+     */
     public String getMaxValue() {
         return maxValue;
     }
 
+    /**
+     * Sets the maxValue property for the SearchFacetEntryRest to the given parameter
+     * @param maxValue  The String that the maxValue will be set to
+     */
     public void setMaxValue(String maxValue) {
         this.maxValue = maxValue;
     }
