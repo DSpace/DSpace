@@ -90,6 +90,22 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     @Override
     public UUID store(Context context, Bitstream bitstream, InputStream is) throws SQLException, IOException
     {
+		if (bitstream.getInternalId() != null) {
+	        // Clone the bitstream to keep a pointer to the old file in assetstore
+	        Bitstream clonedBitstream = bitstreamService.clone(context, bitstream);
+			clonedBitstream.setDeleted(true);
+	        try {
+	            //Update the clone but turn off the authorization system since permissions haven't been set at this point in time.
+	            context.turnOffAuthorisationSystem();
+	            bitstreamService.update(context, clonedBitstream);
+	        } catch (AuthorizeException e) {
+	            log.error(e);
+	            //Can never happen since we turn off authorization before we update
+	        } finally {
+	            context.restoreAuthSystemState();
+	        }
+		}
+
         // Create internal ID
         String id = Utils.generateKey();
 
