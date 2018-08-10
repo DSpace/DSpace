@@ -101,7 +101,7 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 			if (tokens.length > 1 && tokens[0].trim().length() > 0 && tokens[1].trim().length() > 0) {
 				pqs.append("FILTER(REGEX(?name, ?text2, \"i\") && REGEX(?surname, ?text1, \"i\"))\n");
 				pqs.setLiteral("text1", tokens[0].trim());
-				pqs.setLiteral("text2", tokens[1].trim());
+				pqs.setLiteral("text2", "^" + tokens[1].trim());
 			} else {
 				pqs.append("FILTER(REGEX(?name, ?text, \"i\") || REGEX(?surname, ?text, \"i\") || REGEX(?id, ?text, \"i\"))\n");
 				pqs.setLiteral("text", tokens[0]);
