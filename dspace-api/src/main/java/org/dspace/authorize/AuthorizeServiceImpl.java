@@ -736,8 +736,11 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
         if (embargoDate != null || (embargoDate == null && dso instanceof Bitstream))
         {
-
-            List<Group> authorizedGroups = getAuthorizedGroups(context, owningCollection, Constants.DEFAULT_ITEM_READ);
+            int actionID = Constants.DEFAULT_ITEM_READ;
+            if (dso instanceof Bitstream) {
+                actionID = Constants.DEFAULT_BITSTREAM_READ;
+            }
+            List<Group> authorizedGroups = getAuthorizedGroups(context, owningCollection, actionID);
 
             removeAllPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
 
