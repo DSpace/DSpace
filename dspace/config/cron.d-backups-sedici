@@ -53,7 +53,7 @@ MYSQL_sedici_dspace_PWD='XXX'
 ##################################################################################
 
 #backups de drupal para autoridades (de lunes a viernes a las 4:50AM)
-50 4 * * 1,2,3,4,5	root	drush -r /var/www/auth archive-dump --destination=$DSPACE_BACKUP_DIR/auth/auth.$($DATESTR).tar.gz -q > /dev/null
+50 4 * * 1,2,3,4,5	root	/usr/local/bin/drush -r /var/www/auth archive-dump --destination=$DSPACE_BACKUP_DIR/auth/auth.$($DATESTR).tar.gz -q > /dev/null
 
 #rotación de backups de drupal (todos los dias a las 05:00hs). Se eliminan aquellos mas antiguos a 30 dias de creación pero se conservan los de primero de cada mes
 0 5 * * 1,2,3,4,5       root  find $DSPACE_BACKUP_DIR/auth -maxdepth 1 -name "auth.*.tar.gz" -mtime +30 -not -name "auth.20??-??-01*.tar.gz" -exec rm {} \; > /dev/null
