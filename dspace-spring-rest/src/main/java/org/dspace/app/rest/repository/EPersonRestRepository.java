@@ -20,7 +20,6 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
-import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
@@ -57,12 +56,12 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     @Override
     protected EPersonRest createAndReturn(Context context)
             throws AuthorizeException {
-        // this need to be revisited we should receive a mock EPersonRest as input
+        // this need to be revisited we should receive an EPersonRest as input
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
-        EPersonRest mock = null;
+        EPersonRest epersonRest = null;
         try {
-            mock = mapper.readValue(req.getInputStream(), EPersonRest.class);
+            epersonRest = mapper.readValue(req.getInputStream(), EPersonRest.class);
         } catch (IOException e1) {
             throw new UnprocessableEntityException("error parsing the body... maybe this is not the right error code");
         }
@@ -72,16 +71,16 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
             eperson = es.create(context);
 
             // this should be probably moved to the converter (a merge method?)
-            eperson.setCanLogIn(mock.isCanLogIn());
-            eperson.setRequireCertificate(mock.isRequireCertificate());
-            eperson.setEmail(mock.getEmail());
-            eperson.setNetid(mock.getNetid());
-            if (mock.getPassword() != null) {
-                es.setPassword(eperson, mock.getPassword());
+            eperson.setCanLogIn(epersonRest.isCanLogIn());
+            eperson.setRequireCertificate(epersonRest.isRequireCertificate());
+            eperson.setEmail(epersonRest.getEmail());
+            eperson.setNetid(epersonRest.getNetid());
+            if (epersonRest.getPassword() != null) {
+                es.setPassword(eperson, epersonRest.getPassword());
             }
             es.update(context, eperson);
-            if (mock.getMetadata() != null) {
-                for (MetadataEntryRest mer : mock.getMetadata()) {
+            if (epersonRest.getMetadata() != null) {
+                for (MetadataEntryRest mer : epersonRest.getMetadata()) {
                     String[] metadatakey = mer.getKey().split("\\.");
                     es.addMetadata(context, eperson, metadatakey[0], metadatakey[1],
                             metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
@@ -178,7 +177,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     }
 
     @Override
-    protected void delete(Context context, UUID id) throws AuthorizeException, RepositoryMethodNotImplementedException {
+    protected void delete(Context context, UUID id) throws AuthorizeException {
         EPerson eperson = null;
         try {
             eperson = es.find(context, id);
