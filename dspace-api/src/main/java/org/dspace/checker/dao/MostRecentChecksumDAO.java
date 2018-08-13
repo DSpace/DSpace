@@ -33,6 +33,8 @@ public interface MostRecentChecksumDAO extends GenericDAO<MostRecentChecksum> {
     public List<MostRecentChecksum> findByResultTypeInDateRange(Context context, Instant startDate, Instant endDate,
                                                                 ChecksumResultCode resultCode) throws SQLException;
 
+    public int updateMissingBitstreams(Context context) throws SQLException;
+
     public void deleteByBitstream(Context context, Bitstream bitstream) throws SQLException;
 
     public MostRecentChecksum getOldestRecord(Context context) throws SQLException;
