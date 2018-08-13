@@ -74,13 +74,6 @@ DSPACE=/var/dspace/install
 #Backup en AIP una vez por semana
 #5 22 * *	dspace	sun date && $DSPACE/bin/dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 $DSPACE/backups/aip/aip-site.zip && date
 
-# ########## STATS ######################
-0 1 * * *	dspace	$DSPACE/bin/dspace stat-general
-0 1 * * *	dspace	$DSPACE/bin/dspace stat-monthly
-# Los reportes son innecesarios para XMLUI
-#0 2 * * *	dspace	$DSPACE/bin/dspace stat-report-general
-#0 2 * * *	dspace	$DSPACE/bin/dspace stat-report-monthly
-
 # ########## POSTGRES ######################
 # Clean up the database nightly at 4.20am 
 # 20 4 * * *	dspace	vacuumdb --analyze dspace > /dev/null 2>&1
