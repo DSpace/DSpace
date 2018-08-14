@@ -222,8 +222,10 @@ public class LDAPAuthentication
             {
                 return BAD_ARGS;
             }
+            
+            int ldapCode = ldap.ldapAuthenticate(dn, password, context);
 
-            if (ldap.ldapAuthenticate(dn, password, context))
+            if (ldapCode == 1)
             {
                 context.setCurrentUser(eperson);
 
@@ -234,8 +236,11 @@ public class LDAPAuthentication
                     .getHeader(context, "authenticate", "type=ldap"));
                 return SUCCESS;
             }
-            else
+            else if (ldapCode != 0)
             {
+                return ldapCode;
+            }
+            else {
                 return BAD_CREDENTIALS;
             }
         }
@@ -243,8 +248,10 @@ public class LDAPAuthentication
         {
             // the user does not already exist so try and authenticate them
             // with ldap and create an eperson for them
+            
+            int ldapCode = ldap.ldapAuthenticate(dn, password, context);
 
-            if (ldap.ldapAuthenticate(dn, password, context))
+            if (ldapCode == 1)
             {
                 // Register the new user automatically
                 log.info(LogManager.getHeader(context,
@@ -358,6 +365,9 @@ public class LDAPAuthentication
                     }
                 }
             }
+            else if (ldapCode != 0) {
+                return ldapCode;
+            }
         }
         return BAD_ARGS;
     }
@@ -449,9 +459,10 @@ public class LDAPAuthentication
                     ctrls.setSearchScope(ldap_search_scope_value);
 
                     NamingEnumeration<SearchResult> answer = ctx.search(
-                            ldap_provider_url + ldap_search_context,
-                            "(&({0}={1}))", new Object[] { ldap_id_field,
-                                    netid }, ctrls);
+                        ldap_provider_url + ldap_search_context,
+                        "(&({0}={1}))", new Object[] { ldap_id_field, netid },
+                        ctrls
+                    ); 
 
                     while (answer.hasMoreElements()) {
                         SearchResult sr = answer.next();
@@ -552,7 +563,7 @@ public class LDAPAuthentication
         /**
          * contact the ldap server and attempt to authenticate
          */
-        protected boolean ldapAuthenticate(String netid, String password,
+        protected int ldapAuthenticate(String netid, String password,
                         Context context) {
             if (!password.equals("")) {
                 // Set up environment for creating initial context
@@ -575,7 +586,19 @@ public class LDAPAuthentication
                 } catch (NamingException e) {
                     log.warn(LogManager.getHeader(context,
                             "ldap_authentication", "type=failed_auth " + e));
-                    return false;
+                            
+                    // Get LDAP error code
+                    String exceptionMessage = e.toString();
+                    int dataIndex = exceptionMessage.indexOf("data ");
+                    String ldapCodeString = exceptionMessage.substring(dataIndex + 5, dataIndex + 8);
+                    
+                    // Parse it as a hexadecimal number
+                    int ldapCode = Integer.parseInt(ldapCodeString, 16);
+                    
+                    // Convert it to negative due to priority
+                    ldapCode *= -1;
+                            
+                    return ldapCode;
                 } finally {
                     // Close the context when we're done
                     try {
@@ -587,10 +610,10 @@ public class LDAPAuthentication
                     }
                 }
             } else {
-                return false;
+                return 0;
             }
 
-            return true;
+            return 1;
         }        
     }
 
