@@ -68,10 +68,10 @@
 	<div class="pull-right">
 		<span class="label label-info"><fmt:message key="view.statistics.range.from" /></span> &nbsp; 
 			<c:if test="${empty data.stats_from_date}"><fmt:message key="view.statistics.range.no-start-date" /></c:if>
-			${data.stats_from_date} &nbsp;&nbsp;&nbsp; 
+			${fn:escapeXml(data.stats_from_date)} &nbsp;&nbsp;&nbsp; 
 		<span class="label label-info"><fmt:message key="view.statistics.range.to" /></span> &nbsp; 
 			<c:if test="${empty data.stats_to_date}"><fmt:message key="view.statistics.range.no-end-date" /></c:if>
-			${data.stats_to_date} &nbsp;&nbsp;&nbsp;
+			${fn:escapeXml(data.stats_to_date)} &nbsp;&nbsp;&nbsp;
 		<a class="btn btn-default" data-toggle="modal" data-target="#stats-date-change-dialog"><fmt:message key="view.statistics.change-range" /></a>
 	</div>	
 

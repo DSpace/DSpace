@@ -68,10 +68,10 @@
 	<div class="pull-right">
 		<span class="label label-info"><fmt:message key="view.statistics.range.from" /></span> &nbsp; 
 			<c:if test="${empty data.stats_from_date}"><fmt:message key="view.statistics.range.no-start-date" /></c:if>
-			${data.stats_from_date} &nbsp;&nbsp;&nbsp; 
+			${fn:escapeXml(data.stats_from_date)} &nbsp;&nbsp;&nbsp; 
 		<span class="label label-info"><fmt:message key="view.statistics.range.to" /></span> &nbsp; 
 			<c:if test="${empty data.stats_to_date}"><fmt:message key="view.statistics.range.no-end-date" /></c:if>
-			${data.stats_to_date} &nbsp;&nbsp;&nbsp;
+			${fn:escapeXml(data.stats_to_date)} &nbsp;&nbsp;&nbsp;
 		<a class="btn btn-default" data-toggle="modal" data-target="#stats-date-change-dialog"><fmt:message key="view.statistics.change-range" /></a>
 	</div>	
 
@@ -91,10 +91,10 @@
 			<div class="list-group">
 				<c:forEach var="child" items="${data.childrenObjects}">
 				<c:if test="${child.type eq 3}">
-					<a class="list-group-item" href="${contextPath}/stats/collection.html?handle=${child.handle}&type=${type}&stats_from_date=${data.stats_from_date}&stats_to_date=${data.stats_to_date}"><fmt:message key="view.${data.jspKey}.${type}.childrenStats"><fmt:param>${child.name}</fmt:param></fmt:message></a>
+					<a class="list-group-item" href="${contextPath}/stats/collection.html?handle=${child.handle}&type=${type}&stats_from_date=${fn:escapeXml(data.stats_from_date)}&stats_to_date=${fn:escapeXml(data.stats_to_date)}"><fmt:message key="view.${data.jspKey}.${type}.childrenStats"><fmt:param>${child.name}</fmt:param></fmt:message></a>
 				</c:if>
 				<c:if test="${child.type eq 4}">
-					<a class="list-group-item" href="${contextPath}/stats/community.html?handle=${child.handle}&type=${type}&stats_from_date=${data.stats_from_date}&stats_to_date=${data.stats_to_date}"><fmt:message key="view.${data.jspKey}.${type}.childrenStats"><fmt:param>${child.name}</fmt:param></fmt:message></a>
+					<a class="list-group-item" href="${contextPath}/stats/community.html?handle=${child.handle}&type=${type}&stats_from_date=${fn:escapeXml(data.stats_from_date)}&stats_to_date=${fn:escapeXml(data.stats_to_date)}"><fmt:message key="view.${data.jspKey}.${type}.childrenStats"><fmt:param>${child.name}</fmt:param></fmt:message></a>
 				</c:if>	
 				</c:forEach>
 			</div>

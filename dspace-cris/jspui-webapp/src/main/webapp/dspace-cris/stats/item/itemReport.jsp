@@ -57,10 +57,10 @@
 	<div class="pull-right">
 		<span class="label label-info"><fmt:message key="view.statistics.range.from" /></span> &nbsp; 
 			<c:if test="${empty data.stats_from_date}"><fmt:message key="view.statistics.range.no-start-date" /></c:if>
-			${data.stats_from_date} &nbsp;&nbsp;&nbsp; 
+			${fn:escapeXml(data.stats_from_date)} &nbsp;&nbsp;&nbsp; 
 		<span class="label label-info"><fmt:message key="view.statistics.range.to" /></span> &nbsp; 
 			<c:if test="${empty data.stats_to_date}"><fmt:message key="view.statistics.range.no-end-date" /></c:if>
-			${data.stats_to_date} &nbsp;&nbsp;&nbsp;
+			${fn:escapeXml(data.stats_to_date)} &nbsp;&nbsp;&nbsp;
 		<a class="btn btn-default" data-toggle="modal" data-target="#stats-date-change-dialog"><fmt:message key="view.statistics.change-range" /></a>
 	</div>	
 
@@ -75,7 +75,7 @@
 	<%@ include file="/dspace-cris/stats/item/_itemReport.jsp" %>
 <div class="bottom">
 			<c:if test="${data.seeParentObject}">			
-				<c:set var="parentLink">${contextPath}/cris/stats/collection.html?handle=${data.parentObject.handle}&type=${type}&stats_from_date=${data.stats_from_date}&stats_to_date=${data.stats_to_date}</c:set>
+				<c:set var="parentLink">${contextPath}/cris/stats/collection.html?handle=${data.parentObject.handle}&type=${type}&stats_from_date=${fn:escapeXml(data.stats_from_date)}&stats_to_date=${fn:escapeXml(data.stats_to_date)}</c:set>
 				<div class="list-group">
 					<a class="list-group-item" href="${parentLink}"><fmt:message key="view.${data.jspKey}.${type}.parentStats"><fmt:param>${data.parentObject.name}</fmt:param></fmt:message></a>
 				</div>
