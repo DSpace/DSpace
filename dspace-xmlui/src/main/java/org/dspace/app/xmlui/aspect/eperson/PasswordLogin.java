@@ -79,6 +79,27 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
     public static final Message T_register_link = 
         message("xmlui.EPerson.PasswordLogin.register_link");
     
+    // LDAP
+    public static final Message T_error_login_530 = 
+        message("xmlui.EPerson.PasswordLogin.error_login_530");
+
+    public static final Message T_error_login_531 = 
+        message("xxmlui.EPerson.PasswordLogin.error_login_531");
+        
+    public static final Message T_error_login_532 = 
+        message("xmlui.EPerson.PasswordLogin.error_login_532");
+        
+    public static final Message T_error_login_533 = 
+        message("xmlui.EPerson.PasswordLogin.error_login_533");
+        
+    public static final Message T_error_login_701 = 
+        message("xmlui.EPerson.PasswordLogin.error_login_701");
+        
+    public static final Message T_error_login_773 = 
+        message("xmlui.EPerson.PasswordLogin.error_login_773");
+        
+    public static final Message T_error_login_775 = 
+        message("xmlui.EPerson.PasswordLogin.error_login_775");
     
     /**
      * Generate the unique caching key.
@@ -201,13 +222,66 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
         email.setAutofocus("autofocus");
         email.setRequired();
         email.setLabel(T_email_address);
-        if (previousEmail != null)
-        {
-            email.setValue(previousEmail);
-            email.addError(T_error_bad_login);
+        
+        // Get stored login code
+        int loginCode = 0;
+
+        if (request.getAttribute("login_code") != null) {
+            loginCode = (int) request.getAttribute("login_code");
         }
         
-
+        /*
+        1. SUCCESS: authenticated OK.
+        2. CERT_REQUIRED: not allowed to login this way without X.509 cert.
+        3. NO_SUCH_USER: user not found using this method.
+        4. BAD_ARGS: user/password not appropriate for this method
+        */
+        
+        if (loginCode != 0) {
+            email.setValue(previousEmail);
+            
+            if (loginCode > 1 && loginCode <= 4) {
+                // DSpace
+                email.addError(T_error_bad_login);
+            }
+            else if (loginCode == -1326) {
+                // LDAP: Bad credentials
+                email.addError(T_error_bad_login);
+            }
+            else if (loginCode == -1328) {
+                // LDAP: Login not permitted at this time
+                email.addError(T_error_login_530);
+            }
+            else if (loginCode == -1329) {
+                // LDAP: Login not permitted from this workstation
+                email.addError(T_error_login_531);
+            }
+            else if (loginCode == -1330) {
+                // LDAP: Password has expired
+                email.addError(T_error_login_532);
+            }
+            else if (loginCode == -1331) {
+                // LDAP: Account disabled
+                email.addError(T_error_login_533);
+            }
+            else if (loginCode == -1793) {
+                // LDAP: Account expired
+                email.addError(T_error_login_701);
+            }
+            else if (loginCode == -1907) {
+                // LDAP: Password must be changed
+                email.addError(T_error_login_773);
+            }
+            else if (loginCode == -1909) {
+                // LDAP: Account locked
+                email.addError(T_error_login_775);
+            }
+            else {
+                // LDAP: Other error
+                email.addError(T_error_bad_login);
+            }
+        }
+                
         Item item = list.addItem();
         Password password = item.addPassword("login_password");
         password.setRequired();

@@ -94,6 +94,10 @@ public class AuthenticationUtil
 
         int implicitStatus = AuthenticationManager.authenticateImplicit(
                 context, null, null, null, request);
+        
+        // Store login code
+        // as a request attribute
+        request.setAttribute("login_code", implicitStatus);
 
         if (implicitStatus == AuthenticationMethod.SUCCESS)
         {
@@ -106,6 +110,10 @@ public class AuthenticationUtil
 
             int explicitStatus = AuthenticationManager.authenticate(context,
                     email, password, realm, request);
+
+            // Store login code
+            // as a request attribute
+            request.setAttribute("login_code", explicitStatus);
 
             if (explicitStatus == AuthenticationMethod.SUCCESS)
             {
