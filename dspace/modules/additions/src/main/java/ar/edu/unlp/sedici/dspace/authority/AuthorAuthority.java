@@ -85,7 +85,7 @@ public class AuthorAuthority extends AdvancedSPARQLAuthorityProvider {
 		pqs.append("?person a foaf:Person ; foaf:givenName ?name; foaf:surname ?surname. \n");
 		pqs.append("	OPTIONAL { ?person foaf:mbox ?mail . } . \n"); 
 		pqs.append("	OPTIONAL { " // begin 2do optional
-				+ "?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio; cerif:endDate ?fin; foaf:Organization ?org . ?org foaf:name ?affiliation; sioc:id ?id "
+				+ "?person cerif:linksToOrganisationUnit ?link . ?link cerif:startDate ?inicio; cerif:endDate ?fin; foaf:Organization ?org . ?org foaf:name ?affiliation. OPTIONAL { ?org sioc:id ?id }. "
 					+ "  OPTIONAL { ?org skos:broader ?parent. ?parent foaf:name ?parentName . OPTIONAL {?parent sioc:id ?idParent} . " //begin 3er optional
 					+ "    OPTIONAL { ?parent skos:broader ?gParent. ?gParent foaf:name ?gParentName . OPTIONAL {?gParent sioc:id ?idGParent} . } "
 					+ "} \n"); // end 3er optional
