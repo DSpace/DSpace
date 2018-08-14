@@ -1012,7 +1012,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         doc.addField("withdrawn", item.isWithdrawn());
         doc.addField("discoverable", item.isDiscoverable());
-
+        doc.addField("lastModified", item.getLastModified());
+        
         //Keep a list of our sort values which we added, sort values can only be added once
         List<String> sortFieldsAdded = new ArrayList<String>();
         Map<String, List<DiscoverySearchFilter>> searchFilters = null;

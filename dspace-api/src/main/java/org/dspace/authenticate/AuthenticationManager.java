@@ -19,6 +19,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -179,6 +181,16 @@ public class AuthenticationManager
 //                    {
 //                        log.error("Could not update last-active stamp", ex);
 //                    }
+                    // login is ok if password matches:
+                    
+                    if(request != null){
+                        new DSpace().getEventService().fireEvent(
+                                new UsageEvent(
+                                        UsageEvent.Action.LOGIN,
+                                        request,
+                                        context,
+                                        context.getCurrentUser()));
+                    }
                     return ret;
                 }
                 if (ret < bestRet)

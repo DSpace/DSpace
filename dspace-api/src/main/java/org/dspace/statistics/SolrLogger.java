@@ -117,7 +117,8 @@ public class SolrLogger
    		VIEW ("view"),
    		SEARCH ("search"),
    		SEARCH_RESULT ("search_result"),
-        WORKFLOW("workflow");
+        WORKFLOW("workflow"),
+    	LOGIN("login");
 
    		private final String text;
 
@@ -239,6 +240,43 @@ public class SolrLogger
         postView(dspaceObject, request,  currentUser);
     }
 
+    
+    /**
+     * Store a usage event into Solr.
+     *
+     * @param dspaceObject the object used.
+     * @param request the current request context.
+     * @param currentUser the current session's user.
+     */
+    public void postLogin(DSpaceObject dspaceObject, HttpServletRequest request,
+                                EPerson currentUser)
+    {
+    	if (getSolr() == null)
+        {
+            return;
+        }
+
+        try
+        {
+            SolrInputDocument doc1 = getCommonSolrDocByRequest(dspaceObject, request, currentUser);
+            if (doc1 == null) return;
+
+            doc1.addField("statistics_type", StatisticsType.LOGIN.text());
+
+            solr.add(doc1);
+            //commits are executed automatically using the solr autocommit
+//            solr.commit(false, false);
+
+        }
+        catch (RuntimeException re)
+        {
+            throw re;
+        }
+        catch (Exception e)
+        {
+        	log.error(e.getMessage(), e);
+        }
+    }    
     /**
      * Store a usage event into Solr.
      *

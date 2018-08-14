@@ -63,6 +63,8 @@ public class UsageEvent extends Event {
 	private transient DSpaceObject object;
 
 	private Action action;
+	
+	private String otherInfo;
 			
 	private static String checkParams(Action action, HttpServletRequest request, Context context, DSpaceObject object)
 	{
@@ -200,6 +202,11 @@ public class UsageEvent extends Event {
 		this.object = object;
 	}
 
+	public UsageEvent (Action action, HttpServletRequest request, Context context, DSpaceObject object, String otherInfo)
+	{
+		this(action,request,context,object);
+		this.otherInfo = otherInfo;
+	}	
 	
 	public HttpServletRequest getRequest() {
 		return request;
@@ -252,5 +259,9 @@ public class UsageEvent extends Event {
 	public Action getAction() {
 		return this.action;
 	}
+	
+	public String getOtherInfo () {
+		return this.otherInfo;
+	}	
 	
 }

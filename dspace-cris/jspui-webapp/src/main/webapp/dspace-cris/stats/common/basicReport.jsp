@@ -77,7 +77,7 @@
 				j("li.ui-tabs-active").toggleClass("ui-tabs-active ui-state-active active");
 			},
 			"beforeActivate": function( event, ui ) {
-   			 j("li.active").toggleClass("active");
+   			 j("#statstab-menu").find("li.active").toggleClass("active");
 			},
 	   		"create": function( event, ui ) {
 	               j("div.ui-tabs").toggleClass("ui-tabs ui-widget ui-widget-content ui-corner-all tabbable");
