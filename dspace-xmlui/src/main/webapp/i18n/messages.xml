@@ -513,6 +513,15 @@
 	<message key="xmlui.EPerson.LDAPLogin.error_bad_login">The user name and/or password supplied were not valid.</message>
 	<message key="xmlui.EPerson.LDAPLogin.password">Password</message>
 	<message key="xmlui.EPerson.LDAPLogin.submit">Sign in</message>
+	
+	<!-- LDAP error messages -->
+	<message key="xmlui.EPerson.PasswordLogin.error_login_530">Login not permitted at this time.</message>
+	<message key="xmlui.EPerson.PasswordLogin.error_login_531">Login not permitted from this workstation.</message>
+	<message key="xmlui.EPerson.PasswordLogin.error_login_532">Password has expired.</message>
+	<message key="xmlui.EPerson.PasswordLogin.error_login_533">Account disabled.</message>
+	<message key="xmlui.EPerson.PasswordLogin.error_login_701">Account expired.</message>
+	<message key="xmlui.EPerson.PasswordLogin.error_login_773">Password must be changed.</message>
+	<message key="xmlui.EPerson.PasswordLogin.error_login_775">Account locked.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.LoginChooser.java -->
 	<message key="xmlui.EPerson.LoginChooser.title">Choose a Login Method</message>
