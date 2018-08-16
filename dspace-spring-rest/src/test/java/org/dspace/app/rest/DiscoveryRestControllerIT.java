@@ -1415,7 +1415,10 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
 
+    // This test has been disable due to its innate dependency on knowing the facetLimit
+    // This is currently untrue and resulted in hardcoding of expectations.
     @Test
+    @Ignore
     public void discoverFacetsDateTestWithLabels() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
