@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
@@ -496,6 +497,171 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                                                             "Item 6", "2016-01-13"),
                                                 ItemMatcher.matchItemWithTitleAndDateIssued(item7,
                                                                                             "Item 7", "2016-01-12")
+                                       )));
+    }
+
+
+    @Test
+    public void testBrowseByStartsWith() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. 7 public items that are readable by Anonymous
+        Item item1 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Alan Turing")
+                                .withAuthor("Alan Mathison Turing")
+                                .withIssueDate("1912-06-23")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Blade Runner")
+                                .withAuthor("Ridley Scott")
+                                .withIssueDate("1982-06-25")
+                                .withSubject("Science Fiction")
+                                .build();
+
+        Item item5 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Python")
+                                .withAuthor("Guido van Rossum")
+                                .withIssueDate("1990")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item4 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Java")
+                                .withAuthor("James Gosling")
+                                .withIssueDate("1995-05-23")
+                                .withSubject("Computing")
+                                .build();
+        
+        Item item6 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Zeta Reticuli")
+                                .withAuthor("Universe")
+                                .withIssueDate("2018-01-01")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item7 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Moon")
+                                .withAuthor("Universe")
+                                .withIssueDate("2018-01-02")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item3 = ItemBuilder.createItem(context, col1)
+                                .withTitle("T-800")
+                                .withAuthor("James Cameron")
+                                .withIssueDate("2029")
+                                .withSubject("Science Fiction")
+                                .build();
+
+        // ---- BROWSES BY ITEM ----
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by date issued endpoint
+        //with startsWith set to 1990
+        getClient().perform(get("/api/discover/browses/dateissued/items")
+                                .param("startsWith", "1990"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the "remaining" five items to be present
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index jumps to the "Python" item.
+                   .andExpect(jsonPath("$._embedded.items",
+                                       contains(ItemMatcher.matchItemWithTitleAndDateIssued(item5,
+                                                                                            "Python", "1990"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item4,
+                                                                                            "Java", "1995-05-23"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item6,
+                                                                                            "Zeta Reticuli", "2018-01-01"),
+                                               ItemMatcher.matchItemWithTitleAndDateIssued(item7,
+                                                                                            "Moon", "2018-01-02"),
+                                               ItemMatcher.matchItemWithTitleAndDateIssued(item3,
+                                                                                            "T-800", "2029")
+                                       )));
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by Title endpoint
+        //with startsWith set to Blade
+        getClient().perform(get("/api/discover/browses/title/items")
+                                .param("startsWith", "T"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the "T-800" and "Zeta Reticuli" items to be present
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index jumps to the "T-800" item.
+                   .andExpect(jsonPath("$._embedded.items",
+                                       contains(ItemMatcher.matchItemWithTitleAndDateIssued(item3,
+                                                                                            "T-800", "2029"),
+                                               ItemMatcher.matchItemWithTitleAndDateIssued(item6,
+                                                                                            "Zeta Reticuli", "2018-01-01")
+                                       )));
+        // ---- BROWSES BY ENTRIES ----
+
+        //** WHEN **
+        //An anonymous user browses the entries in the Browse by Author endpoint
+        //with startsWith set to J
+        getClient().perform(get("/api/discover/browses/author/entries")
+                                .param("startsWith", "J"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the entries "James Cameron" and "James Gosling" to be present
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index filters to the "James'" items.
+                   .andExpect(jsonPath("$._embedded.browseEntries",
+                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("James Cameron", 1),
+                                               BrowseEntryResourceMatcher.matchBrowseEntry("James Gosling", 1)
+                                       )));
+        //** WHEN **
+        //An anonymous user browses the entries in the Browse by Subject endpoint
+        //with startsWith set to C
+        getClient().perform(get("/api/discover/browses/subject/entries")
+                                .param("startsWith", "C"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the entry "Computing" to be present
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index filters to the "Computing'" items.
+                   .andExpect(jsonPath("$._embedded.browseEntries",
+                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Computing", 3)
                                        )));
     }
 }
