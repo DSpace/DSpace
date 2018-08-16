@@ -188,6 +188,13 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
         email.setRequired();
         email.setAutofocus("autofocus");
         email.setLabel(T_userName);
+        
+        // Get stored login code
+        int loginCode = 0;
+
+        if (request.getAttribute("login_code") != null) {
+            loginCode = (int) request.getAttribute("login_code");
+        }
 
         // Add error reason
         if (loginCode != 0) {
