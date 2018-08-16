@@ -520,10 +520,25 @@ public class LDAPAuthentication
                     {
                         searchName = ldap_provider_url + ldap_search_context;
                     }
-                    NamingEnumeration<SearchResult> answer = ctx.search(
-                            searchName,
-                            "(&({0}={1}))", new Object[] { ldap_id_field,
-                                    netid }, ctrls);
+                             
+                    String groupFilter = ConfigurationManager.getProperty("authentication-ldap", "search_filter");
+                    NamingEnumeration<SearchResult> answer = null;
+                    
+                    if (groupFilter == null) {
+                        answer = ctx.search(
+                                ldap_provider_url + ldap_search_context,
+                                "(&({0}={1}))", new Object[] { ldap_id_field, netid },
+                                ctrls
+                        );
+                    }
+                    else {
+                        answer = ctx.search(
+                                ldap_provider_url + ldap_search_context,
+                                "(&(objectClass=user)({0}={1})(memberOf={2}))",
+                                new Object[] { ldap_id_field, netid, groupFilter },
+                                ctrls
+                        );
+                    }
 
                     while (answer.hasMoreElements()) {
                         SearchResult sr = answer.next();
