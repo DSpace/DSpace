@@ -252,8 +252,10 @@ public class LDAPAuthentication
             {
                 return BAD_ARGS;
             }
+            
+            int loginCode = ldap.ldapAuthenticate(dn, password, context);
 
-            if (ldap.ldapAuthenticate(dn, password, context))
+            if (loginCode == 1)
             {
                 context.setCurrentUser(eperson);
 
@@ -266,15 +268,17 @@ public class LDAPAuthentication
             }
             else
             {
-                return BAD_CREDENTIALS;
+                return loginCode;
             }
         }
         else
         {
             // the user does not already exist so try and authenticate them
             // with ldap and create an eperson for them
+            
+            int loginCode = ldap.ldapAuthenticate(dn, password, context);
 
-            if (ldap.ldapAuthenticate(dn, password, context))
+            if (loginCode == 1)
             {
                 // Register the new user automatically
                 log.info(LogManager.getHeader(context,
@@ -387,6 +391,10 @@ public class LDAPAuthentication
                         context.restoreAuthSystemState();
                     }
                 }
+            }
+            else
+            {
+                return loginCode;
             }
         }
         return BAD_ARGS;
@@ -620,7 +628,7 @@ public class LDAPAuthentication
         /**
          * contact the ldap server and attempt to authenticate
          */
-        protected boolean ldapAuthenticate(String netid, String password,
+        protected int ldapAuthenticate(String netid, String password,
                         Context context) {
             if (!password.equals("")) {
                 
@@ -672,10 +680,21 @@ public class LDAPAuthentication
                 }
                 catch (NamingException | IOException e)
                 {
-                    // something went wrong (like wrong password) so return false
                     log.warn(LogManager.getHeader(context,
                             "ldap_authentication", "type=failed_auth " + e));
-                    return false;
+                            
+                    // Get LDAP error code
+                    String exceptionMessage = e.toString();
+                    int dataIndex = exceptionMessage.indexOf("data ");
+                    String ldapCodeString = exceptionMessage.substring(dataIndex + 5, dataIndex + 8);
+                    
+                    // Parse it as a hexadecimal number
+                    int ldapCode = Integer.parseInt(ldapCodeString, 16);
+                    
+                    // Convert it to negative due to priority
+                    ldapCode *= -1;
+                            
+                    return ldapCode;
                 } finally 
                 {
                     // Close the context when we're done
@@ -692,10 +711,10 @@ public class LDAPAuthentication
                 }
             } else 
             {
-                return false;
+                return BAD_CREDENTIALS;
             }
 
-            return true;
+            return 1;
         }        
     }
 
