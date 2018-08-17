@@ -513,6 +513,7 @@
 					<string>Resumen</string>
 					<string>Edicion de Revista</string>
 					<string>Boletin</string>
+					<string>Conjunto de datos</string>
                 </list>
             </Configuration>
         </CustomCondition>
@@ -592,6 +593,7 @@
 			    	<string>Resumen</string>
 				    <string>Edicion de revista</string>
     				<string>Boletin</string>
+    				<string>Conjunto de datos</string>
     			</list>
 			</Configuration>
 		</CustomCondition>

@@ -135,6 +135,9 @@
 			<xsl:when test="$subtype='Objeto de conferencia'">
 				documento de conferencia
 			</xsl:when>
+			<xsl:when test="$subtype='Conjunto de datos'">
+				conjunto de datos
+			</xsl:when>
 			<!-- No se exportan
 			<xsl:when test="$subtype='Documento institucional'">
 				otros

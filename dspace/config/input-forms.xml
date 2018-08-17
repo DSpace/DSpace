@@ -184,6 +184,17 @@
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
 					<type-bind>Publicacion seriada</type-bind>
 				</field>
+				
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Conjunto de datos (*)</label>
+					<input-type value-pairs-name="common_subtypes_conjunto_de_datos">dropdown</input-type>
+					<hint>Seleccione el tipo de conjunto de datos que desea cargar</hint>
+					<required-on-group>Bibliotecarios</required-on-group>
+					<visibility-on-group>Bibliotecarios</visibility-on-group>
+					<type-bind>Conjunto de datos</type-bind>
+				</field>
 
 				<!-- /////////////////// FIN DE LOS TYPES Y SUBTYPES /////////////////// -->
 
@@ -306,7 +317,7 @@
 					<input-type>date</input-type>
 					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. No debe confundirse con la fecha de entrega o defensa de una tesis, que debe cargarse en el campo Fecha de Presentación. Los valores posibles para este campo son día/mes, mes/año o día/mes/año.</hint>
 					<visibility>submit</visibility>
-					<type-bind>!Objeto Fisico,Objeto de conferencia,Objeto de aprendizaje</type-bind>
+					<type-bind>!Objeto Fisico,Objeto de conferencia,Objeto de aprendizaje,Conjunto de datos</type-bind>
 				</field>
 
 				<!-- Fecha de publicación (solo en el workflow, para todos los tipos de documento) -->
@@ -318,7 +329,7 @@
 					<input-type>date</input-type>
 					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. No debe confundirse con la fecha de entrega o defensa de una tesis, que debe cargarse en el campo Fecha de Presentación. Los valores posibles para este campo son día/mes, mes/año o día/mes/año.</hint>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
-					<type-bind>!Objeto Fisico</type-bind>
+					<type-bind>!Objeto Fisico,Conjunto de datos</type-bind>
 				</field>
 
 				<!-- Fecha de creación de un objeto -->
@@ -331,6 +342,17 @@
 					<input-type>date</input-type>
 					<type-bind>Objeto Fisico</type-bind>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
+				</field>
+				
+				<!-- Fecha de creación del conjunto de datos -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>created</dc-qualifier>
+					<label>Fecha de Creación</label>
+					<hint>Se puede indicar el año, año y mes, o año,mes y día. En caso de incertidumbre, indicar el año más próximo considerado y aclarar luego en las notas acerca de esta situación con c (circa), década o siglo. Ejemplo: c. 1910, Siglo XX</hint>
+					<input-type>date</input-type>
+					<type-bind>Conjunto de datos</type-bind>
 				</field>
 
 				<!-- Localización fisica -->
@@ -382,6 +404,16 @@
 					<hint>Inscripciones existentes en el objeto, observaciones  sobre las piezas, etc.</hint>
 					<type-bind>Objeto Fisico</type-bind>
 				</field>
+				
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>format</dc-element>
+					<repeatable>true</repeatable>
+					<label>Descripción física</label>
+					<input-type>textarea</input-type>
+					<hint>Descripción sobre la estructuración del conjunto de datos. Por ejemplo: "El conjunto de datos se compone de varios archivos .zip, donde cada uno contiene varias imágenes sobre..."</hint>
+					<type-bind>Conjunto de datos</type-bind>
+				</field>
 
 				<!-- Descripción Física / Extension -->
 				<field>
@@ -406,6 +438,17 @@
 					<hint>Material en que está hecho el objeto, técnica usada para fabricarlo. Ejemplo: madera, bronce, plástico</hint>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
 					<type-bind>Objeto Fisico</type-bind>
+				</field>
+				
+				<!-- Materiales / Técnicas de recolección utilizadas-->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>format</dc-element>
+					<dc-qualifier>medium</dc-qualifier>
+					<label>Materiales / Técnicas</label>
+					<input-type>textarea</input-type>
+					<hint>Materiales / Técnicas de recolección utilizadas para la generación del conjunto de datos.</hint>
+					<type-bind>Conjunto de datos</type-bind>
 				</field>
 
 				<!-- Fulltext -->
@@ -1215,6 +1258,10 @@
 				<displayed-value>Publicación seriada</displayed-value>
 				<stored-value>Publicacion seriada</stored-value>
 			</pair>
+			<pair>
+				<displayed-value>Conjunto de datos</displayed-value>
+				<stored-value>Conjunto de datos</stored-value>
+			</pair>
 		</value-pairs>
 		
 		<value-pairs value-pairs-name="common_subtypes_articulo" dc-term="type">
@@ -1431,6 +1478,13 @@
 			<pair>
 				<displayed-value>Boletín</displayed-value>
 				<stored-value>Boletin</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_conjunto_de_datos" dc-term="type">
+			<pair>
+				<displayed-value>Conjunto de datos</displayed-value>
+				<stored-value>Conjunto de datos</stored-value>
 			</pair>
 		</value-pairs>
 
