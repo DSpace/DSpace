@@ -590,7 +590,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                 ItemMatcher.matchItemWithTitleAndDateIssued(item4,
                                                                                             "Java", "1995-05-23"),
                                                 ItemMatcher.matchItemWithTitleAndDateIssued(item5,
-                                                                                            "Zeta Reticuli", 
+                                                                                            "Zeta Reticuli",
                                                                                             "2018-01-01"),
                                                 ItemMatcher.matchItemWithTitleAndDateIssued(item6,
                                                                                             "Moon", "2018-01-02"),
@@ -618,7 +618,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item7,
                                                                                             "T-800", "2029"),
                                                ItemMatcher.matchItemWithTitleAndDateIssued(item5,
-                                                                                            "Zeta Reticuli", 
+                                                                                            "Zeta Reticuli",
                                                                                             "2018-01-01")
                                        )));
         //** WHEN **
@@ -641,7 +641,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Verify that the index jumps to the "Blade Runner" item.
                    .andExpect(jsonPath("$._embedded.items",
                                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item2,
-                                                                                            "Blade Runner", 
+                                                                                            "Blade Runner",
                                                                                             "1982-06-25"),
                                                ItemMatcher.matchItemWithTitleAndDateIssued(item3,
                                                                                             "Python", "1990")
