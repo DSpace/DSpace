@@ -142,6 +142,7 @@ public class StructBuilder {
         }
 
         // Otherwise, analyze the command.
+        // Must be import or export.
         if (!(line.hasOption('f') || line.hasOption('x'))) {
             giveHelp(options);
             System.exit(1);
@@ -157,13 +158,14 @@ public class StructBuilder {
 
         if (line.hasOption('e')) {
             eperson = line.getOptionValue('e');
+        } else { // EPerson is required
+            usage(options);
+            System.exit(1);
         }
 
         if (line.hasOption('o')) {
             output = line.getOptionValue('o');
-        }
-
-        if (output == null) {
+        } else { // output is required
             usage(options);
             System.exit(1);
         }
@@ -186,10 +188,6 @@ public class StructBuilder {
         if (line.hasOption('x')) { // export
             exportStructure(context, outputStream);
         } else { // Must be import
-            if (eperson == null) {
-                usage(options);
-                System.exit(1);
-            }
             InputStream inputStream;
             if ("-".equals(input)) {
                 inputStream = System.in;
