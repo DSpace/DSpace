@@ -7,10 +7,11 @@
  */
 package org.dspace.administer;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -42,7 +43,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -69,8 +69,6 @@ import org.xml.sax.SAXException;
  * that make up the community and collection metadata.  See the system
  * documentation for more details.
  * 
- * @author Richard Jones
- *
  * @author Richard Jones
  */
 
@@ -108,7 +106,7 @@ public class StructBuilder {
 
     /**
      * Main method to be run from the command line to import a structure into
-     * DSpace.  This is of the form:
+     * DSpace or export existing structure to a file.  The command is of the form:
      *
      * <p>{@code StructBuilder -f [XML source] -e [administrator email] -o [output file]}</p>
      *
@@ -116,8 +114,8 @@ public class StructBuilder {
      *
      * <p>{@code StructBuilder -x -e [administrator email] -o [output file]}</p>
      *
-     * <p>to export.  The output file will contain exactly the same as the source XML document, but
-     * with the handle for each imported item added as an attribute.
+     * <p>to export.  The output will contain exactly the same as the source XML
+     * document, but with the Handle for each imported item added as an attribute.
      *
      * @param argv command line arguments
      * @throws Exception if an error occurs
@@ -144,12 +142,17 @@ public class StructBuilder {
         }
 
         // Otherwise, analyze the command.
-        String file = null;
+        if (!(line.hasOption('f') || line.hasOption('x'))) {
+            giveHelp(options);
+            System.exit(1);
+        }
+
+        String input = null;
         String eperson = null;
         String output = null;
 
         if (line.hasOption('f')) {
-            file = line.getOptionValue('f');
+            input = line.getOptionValue('f');
         }
 
         if (line.hasOption('e')) {
@@ -165,6 +168,14 @@ public class StructBuilder {
             System.exit(1);
         }
 
+        // Open the output stream.
+        OutputStream outputStream;
+        if ("-".equals(output)) {
+            outputStream = System.out;
+        } else {
+            outputStream = new FileOutputStream(output);
+        }
+
         // create a context
         Context context = new Context();
 
@@ -172,19 +183,21 @@ public class StructBuilder {
         context.setCurrentUser(ePersonService.findByEmail(context, eperson));
 
         // Export? Import?
-        if (line.hasOption('x')) {
-            exportStructure(context, output);
-        } else if (line.hasOption('f')) {
+        if (line.hasOption('x')) { // export
+            exportStructure(context, outputStream);
+        } else { // Must be import
             if (eperson == null) {
                 usage(options);
                 System.exit(1);
             }
-            importStructure(context, file, output);
-        } else {
-            usage(options);
-            System.exit(1);
+            InputStream inputStream;
+            if ("-".equals(input)) {
+                inputStream = System.in;
+            } else {
+                inputStream = new FileInputStream(input);
+            }
+            importStructure(context, inputStream, outputStream);
         }
-
         System.exit(0);
     }
 
@@ -201,11 +214,11 @@ public class StructBuilder {
      * @throws SQLException
      * @throws AuthorizeException
      */
-    private static void importStructure(Context context, String input, String output)
+    static void importStructure(Context context, InputStream input, OutputStream output)
             throws IOException, ParserConfigurationException, SAXException,
             TransformerException, SQLException, AuthorizeException {
         // load the XML
-        Document document = loadXML(input);
+        org.w3c.dom.Document document = loadXML(input);
 
         // run the preliminary validation, to be sure that the the XML document
         // is properly structured
@@ -245,12 +258,13 @@ public class StructBuilder {
             root.addContent(element);
         }
 
-        // finally write the string into the output file
+        // finally write the string into the output file.
         final org.jdom.Document xmlOutput = new org.jdom.Document(root);
-        try (BufferedWriter out = new BufferedWriter(new FileWriter(output))) {
-            out.write(new XMLOutputter().outputString(xmlOutput));
+        try {
+            new XMLOutputter().output(xmlOutput, output);
         } catch (IOException e) {
-            System.out.println("Unable to write to output file " + output);
+            System.out.printf("Unable to write to output file %s:  %s%n",
+                    output, e.getMessage());
             System.exit(1);
         }
 
@@ -260,7 +274,7 @@ public class StructBuilder {
     /**
      * Write out the existing Community/Collection structure.
      */
-    private static void exportStructure(Context context, String output) {
+    static void exportStructure(Context context, OutputStream output) {
         // Build a document from the Community/Collection hierarchy.
         Element rootElement = new Element(INPUT_ROOT);  // To be read by importStructure, perhaps
 
@@ -279,9 +293,9 @@ public class StructBuilder {
 
         // Now write the structure out.
         org.jdom.Document xmlOutput = new org.jdom.Document(rootElement);
-        try (BufferedWriter out = new BufferedWriter(new FileWriter(output))) {
+        try {
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-            outputter.output(xmlOutput, out);
+            outputter.output(xmlOutput, output);
         } catch (IOException e) {
             System.out.printf("Unable to write to output file %s:  %s%n",
                     output, e.getMessage());
@@ -509,17 +523,17 @@ public class StructBuilder {
     }
 
     /**
-     * Load in the XML from file.
+     * Load the XML document from input.
      *
-     * @param filename the filename to load from
-     * @return the DOM representation of the XML file
+     * @param input the input source to load from.
+     * @return the DOM representation of the XML input.
      */
-    private static org.w3c.dom.Document loadXML(String filename)
+    private static org.w3c.dom.Document loadXML(InputStream input)
         throws IOException, ParserConfigurationException, SAXException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance()
                                                         .newDocumentBuilder();
 
-        org.w3c.dom.Document document = builder.parse(new File(filename));
+        org.w3c.dom.Document document = builder.parse(input);
 
         return document;
     }
