@@ -129,7 +129,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     private Division createMain(Body body) throws WingException
     {
-        Division main = body.addInteractiveDivision("view-verion-history", contextPath+"/item/versionhistory", Division.METHOD_POST, "view version history");
+        Division main = body.addInteractiveDivision("view-version-history", contextPath+"/item/versionhistory", Division.METHOD_POST, "view version history");
         main.setHead(T_head2);
         return main;
     }

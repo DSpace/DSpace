@@ -199,7 +199,7 @@ public class IdentifierServiceImpl implements IdentifierService {
                         && !identifiers.contains("hdl:" + handle)
                         && !identifiers.contains(handleService.getCanonicalForm(handle)))
                 {
-                    // The VerionedHandleIdentifierProvider gets loaded by default
+                    // The VersionedHandleIdentifierProvider gets loaded by default
                     // it returns handles without any scheme (neither hdl: nor http:).
                     // If the VersionedHandleIdentifierProvider is not loaded,
                     // we adds the handle in way it would.
