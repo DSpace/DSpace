@@ -8,13 +8,13 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Harvesting Error
-Collection {0} failed on harvest:
+Subject: DSpace: Błąd zbierania danych
+Zbiór {0} zawiódł podczas zbierania danych:
 
-Date:       	{1}
-Status Flag: 	{2}
+Data:       	{1}
+Status: 	{2}
 
 {3}
 
-Exception:
+Wyjątek:
 {4}

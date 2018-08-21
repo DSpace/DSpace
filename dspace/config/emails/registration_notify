@@ -8,10 +8,10 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Registration Notification
+Subject: DSpace: Powiadomienie o rejestracji
 
-A new user has registered on {0} at {1}:
+Zarejestrował się nowy użytkownik na {0} przez {1}:
 
-Name:                   {2}
-Email:                  {3}
-Date:                   {4}
+Imię i nazwisko:         {2}
+E-mail:                  {3}
+Data:                    {4}

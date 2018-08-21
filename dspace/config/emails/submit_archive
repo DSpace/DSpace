@@ -4,18 +4,18 @@
 # {1}  Name of collection
 # {2}  handle 
 #
-Subject: DSpace: Submission Approved and Archived 
+Subject: DSpace: Zgłoszenie przyjęte i zarchiwizowane
 
-You submitted: {0}
+Zgłosiłeś/aś: {0}
 
-To collection: {1}
+Do zbioru:    {1}
 
-Your submission has been accepted and archived in DSpace,
-and it has been assigned the following identifier:
+Twoje zgłoszenie zostało przyjęte i zarchiwizowane w DSpace,
+otrzymując następujący identyfikator:
 {2}
 
-Please use this identifier when citing your submission.
+Użyj tego identyfikatora cytując zgłoszoną pracę.
 
-Many thanks!
+Dziękujemy!
 
-DSpace
+Ekipa DSpace

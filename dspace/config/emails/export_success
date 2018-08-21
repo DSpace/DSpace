@@ -5,14 +5,14 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace - Item export requested is ready for download
-The item export you requested from the repository is now ready for download.
+Subject: DSpace - Weksportowana pozycja gotowa do pobrania
+Pozycja, o której eksport z repozytorium poprosiłeś/aś jest gotowa do pobrania.
 
-You may download the compressed file using the following link:
+Możesz pobrać skompresowany plik korzystając z adresu:
 {0}
 
-This file will remain available for at least {1} hours.  
+Ten plik pozostanie dostępny przez przynajmniej {1} godzin.
 
 
-The DSpace Team
+Ekipa DSpace
 
