@@ -109,7 +109,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
 
         getClient().perform(get("/api/eperson/epersons"))
-                   .andExpect(status().isForbidden())
+                   .andExpect(status().isUnauthorized())
         ;
     }
 
@@ -183,7 +183,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
 
         getClient().perform(get("/api/eperson/epersons"))
-                   .andExpect(status().isForbidden())
+                   .andExpect(status().isUnauthorized())
         ;
     }
 
@@ -263,7 +263,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/eperson/epersons/" + eperson.getID())));
 
     }
-
 
     @Test
     public void findOneTestWrongUUID() throws Exception {

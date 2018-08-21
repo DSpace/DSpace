@@ -260,7 +260,7 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
             getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
 
                        //** THEN **
-                       .andExpect(status().isForbidden());
+                       .andExpect(status().isUnauthorized());
 
             //An unauthorized request should not log statistics
             checkNumberOfStatsRecords(bitstream, 0);
@@ -306,7 +306,7 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
             getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
 
                        //** THEN **
-                       .andExpect(status().isForbidden());
+                       .andExpect(status().isUnauthorized());
 
             //An unauthorized request should not log statistics
             checkNumberOfStatsRecords(bitstream, 0);

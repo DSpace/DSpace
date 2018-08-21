@@ -31,7 +31,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
         //When we call the root endpoint as anonymous user
         getClient().perform(get("/api/config/submissionforms"))
                    //The status has to be 403 Not Authorized
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isUnauthorized());
 
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -62,7 +62,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
         //When we call the root endpoint as anonymous user
         getClient().perform(get("/api/config/submissionforms/traditionalpageone"))
                    //The status has to be 403 Not Authorized
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isUnauthorized());
 
 
         String token = getAuthToken(admin.getEmail(), password);

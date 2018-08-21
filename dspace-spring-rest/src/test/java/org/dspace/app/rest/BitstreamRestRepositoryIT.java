@@ -177,7 +177,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                    )));
 
         getClient().perform(get("/api/core/bitstreams/"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     //TODO Re-enable test after https://jira.duraspace.org/browse/DS-3774 is fixed

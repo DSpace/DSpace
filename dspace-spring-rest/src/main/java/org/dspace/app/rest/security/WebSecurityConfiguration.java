@@ -77,6 +77,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             //Disable CSRF as our API can be used by clients on an other domain, we are also protected against this,
             // since we pass the token in a header
             .csrf().disable()
+            //Return 401 on authorization failures
+            .exceptionHandling().authenticationEntryPoint(
+                    new DSpace401AuthenticationEntryPoint(restAuthenticationService))
+            .and()
 
             //Logout configuration
             .logout()
