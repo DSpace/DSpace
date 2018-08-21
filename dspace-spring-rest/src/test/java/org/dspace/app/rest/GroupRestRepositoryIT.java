@@ -34,7 +34,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/eperson/groups"))
                    //The status has to be 403 Not Authorized
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isUnauthorized());
 
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -59,7 +59,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/eperson/groups"))
                    //The status has to be 403 Not Authorized
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isUnauthorized());
 
 
         String token = getAuthToken(admin.getEmail(), password);

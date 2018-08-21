@@ -37,7 +37,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
         //When we call the root endpoint as anonymous user
         getClient().perform(get("/api/config/submissiondefinitions"))
                    //The status has to be 403 Not Authorized
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isUnauthorized());
 
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -67,7 +67,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
         getClient().perform(get("/api/config/submissiondefinitions/traditional"))
                    //The status has to be 403 Not Authorized
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isUnauthorized());
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -98,7 +98,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                                     .param("uuid", col1.getID().toString()))
                    //** THEN **
                    //The status has to be 200
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isUnauthorized());
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -122,7 +122,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
         //Match only that a section exists with a submission configuration behind
         getClient().perform(get("/api/config/submissiondefinitions/traditional/collections"))
                    //The status has to be 403 Not Authorized
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isUnauthorized());
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -141,7 +141,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
         getClient().perform(get("/api/config/submissiondefinitions/traditional/sections"))
                    //The status has to be 403 Not Authorized
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isUnauthorized());
 
         String token = getAuthToken(admin.getEmail(), password);
 

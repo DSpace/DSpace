@@ -99,7 +99,7 @@ public class RestRepositoryUtils {
      */
     public Method getSearchMethod(String searchMethodName, DSpaceRestRepository repository) {
         Method searchMethod = null;
-        Method[] methods = org.springframework.util.ClassUtils.getUserClass(repository.getClass()).getMethods();
+        Method[] methods = ClassUtils.getUserClass(repository.getClass()).getMethods();
         for (Method method : methods) {
             SearchRestMethod ann =
                     AnnotationUtils.findAnnotation(method, SearchRestMethod.class);
