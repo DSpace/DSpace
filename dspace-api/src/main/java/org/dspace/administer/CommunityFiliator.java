@@ -206,15 +206,11 @@ public class CommunityFiliator
         // second test - circularity: parent's parents can't include proposed
         // child
         List<Community> parentDads = parent.getParentCommunities();
-
-        for (int i = 0; i < parentDads.size(); i++)
+        if (parentDads.contains(child))
         {
-            if (parentDads.get(i).getID().equals(child.getID()))
-            {
-                System.out
-                        .println("Error, circular parentage - child is parent of parent");
-                System.exit(1);
-            }
+            System.out.println(
+                    "Error, circular parentage - child is parent of parent");
+            System.exit(1);
         }
 
         // everthing's OK
@@ -240,19 +236,7 @@ public class CommunityFiliator
     {
         // verify that child is indeed a child of parent
         List<Community> parentKids = parent.getSubcommunities();
-        boolean isChild = false;
-
-        for (int i = 0; i < parentKids.size(); i++)
-        {
-            if (parentKids.get(i).getID().equals(child.getID()))
-            {
-                isChild = true;
-
-                break;
-            }
-        }
-
-        if (!isChild)
+        if (!parentKids.contains(child))
         {
             System.out
                     .println("Error, child community not a child of parent community");
