@@ -170,7 +170,7 @@ public class SolrLogger
 
         DatabaseReader service = null;
         // Get the db file for the location
-        String dbPath = ConfigurationManager.getProperty("usage-statistics.dbfile");
+        String dbPath = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         if (dbPath != null) {
             try {
                 File dbFile = new File(dbPath);
