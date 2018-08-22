@@ -49,22 +49,21 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 
     @Override
     @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'READ')")
-    public CommunityRest findOne(UUID id) {
+    public CommunityRest findOne(Context context, UUID id) {
         Community community = null;
         try {
-            community = cs.find(obtainContext(), id);
+            community = cs.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         if (community == null) {
-            throw new ResourceNotFoundException();
+            return null;
         }
         return converter.fromModel(community);
     }
 
     @Override
-    public Page<CommunityRest> findAll(Pageable pageable) {
-        Context context = obtainContext();
+    public Page<CommunityRest> findAll(Context context, Pageable pageable) {
         List<Community> it = null;
         List<Community> communities = new ArrayList<Community>();
         int total = 0;

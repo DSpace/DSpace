@@ -95,10 +95,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'READ')")
     @Override
-    public WorkspaceItemRest findOne(Integer id) {
+    public WorkspaceItemRest findOne(Context context, Integer id) {
         WorkspaceItem witem = null;
         try {
-            witem = wis.find(obtainContext(), id);
+            witem = wis.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -110,8 +110,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     //TODO @PreAuthorize("hasAuthority('ADMIN')")
     @Override
-    public Page<WorkspaceItemRest> findAll(Pageable pageable) {
-        Context context = obtainContext();
+    public Page<WorkspaceItemRest> findAll(Context context, Pageable pageable) {
         List<WorkspaceItem> witems = null;
         int total = 0;
         try {

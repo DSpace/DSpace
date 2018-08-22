@@ -16,6 +16,7 @@ import org.dspace.app.rest.model.hateoas.ResourcePolicyResource;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,10 +42,10 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
-    public ResourcePolicyRest findOne(Integer id) {
+    public ResourcePolicyRest findOne(Context context, Integer id) {
         ResourcePolicy source = null;
         try {
-            source = resourcePolicyService.find(obtainContext(), id);
+            source = resourcePolicyService.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -56,7 +57,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
-    public Page<ResourcePolicyRest> findAll(Pageable pageable) {
+    public Page<ResourcePolicyRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException(ResourcePolicyRest.NAME, "findAll");
     }
 

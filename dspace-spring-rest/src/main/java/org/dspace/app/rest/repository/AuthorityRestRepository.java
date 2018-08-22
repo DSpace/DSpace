@@ -16,6 +16,7 @@ import org.dspace.app.rest.model.hateoas.AuthorityResource;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,7 +40,7 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
-    public AuthorityRest findOne(String name) {
+    public AuthorityRest findOne(Context context, String name) {
         ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(name);
         AuthorityRest result = authorityUtils.convertAuthority(source, name);
         return result;
@@ -47,7 +48,7 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
-    public Page<AuthorityRest> findAll(Pageable pageable) {
+    public Page<AuthorityRest> findAll(Context context, Pageable pageable) {
         Set<String> authoritiesName = cas.getChoiceAuthoritiesNames();
         List<AuthorityRest> results = new ArrayList<AuthorityRest>();
         for (String authorityName : authoritiesName) {
