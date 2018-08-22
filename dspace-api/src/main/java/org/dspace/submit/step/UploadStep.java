@@ -31,6 +31,9 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
+import org.dspace.fileaccess.factory.*;
+import org.dspace.fileaccess.service.*;
+import org.dspace.services.factory.*;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -77,6 +80,8 @@ public class UploadStep extends AbstractProcessingStep
     // error - no files uploaded!
     public static final int STATUS_NO_FILES_ERROR = 5;
 
+    public static final int STATUS_NO_FIlE_ACCESS_ERROR = 6;
+
     // format of uploaded file is unknown
     public static final int STATUS_UNKNOWN_FORMAT = 10;
 
@@ -99,6 +104,8 @@ public class UploadStep extends AbstractProcessingStep
     protected boolean fileRequired = configurationService.getBooleanProperty("webui.submit.upload.required", true);
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+
+    protected FileAccessFromMetadataService fileAccessFromMetadataService = FileAccessServiceFactory.getInstance().getFileAccessFromMetadataService();
 
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -177,7 +184,8 @@ public class UploadStep extends AbstractProcessingStep
         // (or canceled editing information)
         // ---------------------------------------------
         // check if we're already editing a specific bitstream
-        if (request.getParameter("bitstream_id") != null)
+        String bitstreamId = request.getParameter("bitstream_id");
+        if (StringUtils.isNotBlank(bitstreamId))
         {
             if (buttonPressed.equals(CANCEL_EDIT_BUTTON))
             {
@@ -337,6 +345,36 @@ public class UploadStep extends AbstractProcessingStep
             if (status != STATUS_COMPLETE)
             {
                 return status;
+            }
+        }
+
+        if(DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.file.access.enabled")) {
+            if (bitstreamId != null) {
+                String fileAccess = request.getParameter("file-access");
+                if (fileAccess == null) {
+                    return STATUS_NO_FIlE_ACCESS_ERROR;
+                } else {
+                    Bitstream b = bitstreamService
+                            .find(context, UUID.fromString(bitstreamId));
+                    bitstreamService.setMetadataSingleValue(context, b, "workflow", "fileaccess", null, null, fileAccess);
+
+                    if (fileAccess.equals("embargo")) {
+                        DCDate embargoDate = fileAccessFromMetadataService.getEmbargoDate(request);
+
+                        if (embargoDate.toDate() != null) {
+                            bitstreamService.setMetadataSingleValue(context, b, "workflow", "fileaccess", "date", null, embargoDate.toString());
+                        }
+
+                        if (fileAccessFromMetadataService.fileAccessIdentical(context, b)) {
+                            bitstreamService.setMetadataSingleValue(context, b, "workflow", "fileaccess", "overruled", null, "false");
+
+                        } else {
+                            bitstreamService.setMetadataSingleValue(context, b, "workflow", "fileaccess", "overruled", null, "true");
+                        }
+                    }
+
+                    bitstreamService.update(context, b);
+                }
             }
         }
 
@@ -532,6 +570,13 @@ public class UploadStep extends AbstractProcessingStep
                     return STATUS_INTEGRITY_ERROR;
                 }
 
+                if(DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.file.access.enabled")) {
+                    // file access
+                    String fileAccess = request.getParameter("file-access");
+                    if (fileAccess == null) {
+                        return STATUS_NO_FIlE_ACCESS_ERROR;
+                    }
+                }
 
                 // Create the bitstream
                 Item item = subInfo.getSubmissionItem().getItem();
@@ -571,6 +616,26 @@ public class UploadStep extends AbstractProcessingStep
                 // Identify the format
                 bf = bitstreamFormatService.guessFormat(context, b);
                 b.setFormat(context, bf);
+
+                if(DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.file.access.enabled")) {
+                    String fileAccess = request.getParameter("file-access");
+                    bitstreamService.addMetadata(context, b, "workflow", "fileaccess", null, null, fileAccess);
+
+                    if (fileAccess.equals("embargo")) {
+                        DCDate embargoDate = fileAccessFromMetadataService.getEmbargoDate(request);
+
+                        if (embargoDate.toDate() != null) {
+                            bitstreamService.setMetadataSingleValue(context, b, "workflow", "fileaccess", "date", null, embargoDate.toString());
+                        }
+
+                        if (fileAccessFromMetadataService.fileAccessIdentical(context, b)) {
+                            bitstreamService.setMetadataSingleValue(context, b, "workflow", "fileaccess", "overruled", null, "false");
+
+                        } else {
+                            bitstreamService.setMetadataSingleValue(context, b, "workflow", "fileaccess", "overruled", null, "true");
+                        }
+                    }
+                }
 
                 // Update to DB
                 bitstreamService.update(context, b);

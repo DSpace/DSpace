@@ -258,6 +258,26 @@ it, please enter the types and the actual numbers or codes.</hint>
        <displayed-value>ISBN</displayed-value>
        <stored-value>isbn</stored-value>
      </pair>
+     <pair>
+       <displayed-value>DOI</displayed-value>
+       <stored-value>doi</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>PII</displayed-value>
+       <stored-value>pii</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>EID</displayed-value>
+       <stored-value>eid</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Scopus ID</displayed-value>
+       <stored-value>scopusid</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Pubmed ID</displayed-value>
+       <stored-value>pubmedid</stored-value>
+     </pair>
    </value-pairs>
 
    <value-pairs value-pairs-name="common_types" dc-term="type">

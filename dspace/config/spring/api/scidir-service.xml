@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+ http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource,*Map">
+
+    <context:annotation-config/>
+
+    <bean id="ScidirImportService" class="org.dspace.importer.external.scidir.ScidirImportSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="ScidirMetadataFieldMapping"/>
+        <property name="name" value="ScienceDirect"/>
+        <property name="importFields" ref="scidirImportFields"/>
+        <property name="idField" value="dc.identifier.eid"/>
+        <property name="generateQueryForItem" ref="DOIBasedService"/>
+    </bean>
+
+    <bean id="ScidirMetadataFieldMapping" class="org.dspace.importer.external.scidir.ScidirMetadataFieldMapping"/>
+
+    <util:map id="scidirImportFields" value-type="java.lang.String" key-type="java.lang.String">
+        <entry key="affiliation" value="aff"/>
+        <entry key="title" value="ttl"/>
+        <entry key="author" value="aut"/>
+        <entry key="doi" value="doi"/>
+    </util:map>
+
+    <bean name="LiveImportUtils" class="org.dspace.importer.external.elsevier.util.LiveImportUtils" />
+
+    <util:map id="FullprefixMapping" key-type="java.lang.String" value-type="java.lang.String">
+        <description>Defines the namespace mappin for the SimpleXpathMetadatum contributors</description>
+        <entry key="http://purl.org/dc/elements/1.1/" value="dc"/>
+        <entry key="http://prismstandard.org/namespaces/basic/2.0/" value="prism"/>
+        <entry key="http://a9.com/-/spec/opensearch/1.1/" value="opensearch"/>
+        <entry key="http://www.w3.org/2005/Atom" value="x"/>
+    </util:map>
+
+
+    <util:map id="scidirMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="dc.identifier" value-ref="identifierContrib"/>
+        <entry key-ref="dc.identifier.uri" value-ref="uriContrib"/>
+        <entry key-ref="dc.identifier.doi" value-ref="doiContrib"/>
+        <entry key-ref="dc.identifier.issn" value-ref="issnContrib"/>
+        <entry key-ref="dc.identifier.isbn" value-ref="isbnContrib"/>
+        <entry key-ref="dc.identifier.pii" value-ref="piiContrib"/>
+        <entry key-ref="dc.identifier.eid" value-ref="eidContrib"/>
+        <entry key-ref="dc.identifier.scopusid" value-ref="scidirScopusIdContrib"/>
+        <entry key-ref="dc.identifier.pubmedid" value-ref="pubmedIdContrib"/>
+        <entry key-ref="dc.title" value-ref="titleContrib"/>
+        <entry key-ref="dc.type" value-ref="scidirTypeContrib"/>
+        <entry key-ref="dc.description.abstract" value-ref="abstractContrib"/>
+        <entry key-ref="dc.subject" value-ref="keywordContrib"/>
+        <entry key-ref="dc.creator" value-ref="creatorContrib"/>
+        <entry key-ref="dc.contributor.author" value-ref="authorContrib"/>
+        <entry key-ref="dc.date.issued" value-ref="dateIssuedContrib"/>
+        <entry key-ref="dc.rights" value-ref="copyrightContrib"/>
+        <entry key-ref="dc.rights.uri" value-ref="openaccessuserlicenseContrib"/>
+        <entry key-ref="dc.relation.ispartofseries" value-ref="issueContrib"/>
+        <entry key-ref="dc.relation.ispartof" value-ref="publicationContrib"/>
+        <entry key-ref="dc.relation.volume" value-ref="volumeContrib"/>
+    </util:map>
+
+    <bean id="scidirScopusIdContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.scopusid"/>
+        <property name="query" value="x:scopus-id"/>
+    </bean>
+
+    <bean id="scidirTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.TypeMappingXpathMetadatumContributor">
+        <property name="field" ref="dc.type"/>
+        <property name="query" value="x:pubType"/>
+        <property name="defaultValue" value="Other"/>
+        <property name="typeMapping">
+            <map>
+                <entry key="*Article*" value="Article" />
+                <entry key="*Communication*" value="Article" />
+                <entry key="*Letter*" value="Article" />
+                <entry key="Research paper" value="Article" />
+                <entry key="*News*" value="Article" />
+                <entry key="*Report*" value="Article" />
+                <entry key="*Investigation*" value="Article" />
+            </map>
+        </property>
+    </bean>
+
+    <bean class="java.lang.Long" id="interRequestTime">
+        <description>Defines the throttling interval for requests to scidir</description>
+        <constructor-arg value="1000"/>
+    </bean>
+
+    <bean class="java.lang.Integer" id="maxRetry">
+        <constructor-arg value="2"/>
+    </bean>
+
+</beans>

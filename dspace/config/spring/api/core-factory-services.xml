@@ -42,6 +42,8 @@
 
     <bean id="versionServiceFactory" class="org.dspace.versioning.factory.VersionServiceFactoryImpl"/>
 
+    <bean id="fileAccessServiceFactory" class="org.dspace.fileaccess.factory.FileAccessServiceFactoryImpl"/>
+
     <!--Basic workflow services, comment or remove when switching to the configurable workflow -->
     <bean id="workflowServiceFactory" class="org.dspace.workflowbasic.factory.BasicWorkflowServiceFactoryImpl"/>
     <!--Configurable workflow services, uncomment to enable-->

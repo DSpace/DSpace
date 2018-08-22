@@ -53,6 +53,11 @@
 
         <xsl:copy-of select="$SFXLink" />
         <!-- Generate the bitstream information from the file section -->
+
+        <xsl:if test='confman:getProperty("external-sources.elsevier.embed.link.position") = "top"'>
+            <xsl:apply-templates select="$document//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']" mode="apply-full"/>
+        </xsl:if>
+
         <xsl:choose>
             <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']/mets:file">
                 <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
@@ -81,6 +86,10 @@
                 </table>
             </xsl:otherwise>
         </xsl:choose>
+
+        <xsl:if test='confman:getProperty("external-sources.elsevier.embed.link.position") = "bottom"'>
+            <xsl:apply-templates select="$document//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']" mode="apply-full"/>
+        </xsl:if>
 
         <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default)-->
         <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
@@ -322,6 +331,10 @@
         <table class="ds-includeSet-table detailtable">
 		    <xsl:apply-templates mode="itemDetailView-DIM"/>
 		</table>
+
+        <xsl:if test='confman:getProperty("external-sources.elsevier.embed.link.position") = "top"'>
+            <xsl:apply-templates select="$document//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']" mode="apply-full"/>
+        </xsl:if>
         <span class="Z3988">
             <xsl:attribute name="title">
                  <xsl:call-template name="renderCOinS"/>
@@ -682,4 +695,98 @@
         </div>
     </xsl:template>
 
+    <xsl:template match="//dri:div[@n='item-view']//dri:p[@n='entitlement']"/>
+    <xsl:template match="//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']"/>
+    <xsl:template match="//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']" mode="apply-full">
+
+
+        <div id="elsevier-embed-wrapper" class="clearfix">
+            <div class="access hidden">
+                <div class="thumbnail-wrapper" style="width: {$thumbnail.maxwidth}px;">
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:call-template name="elsevier-url"/>
+                        </xsl:attribute>
+                        <img alt="Icon" src="{concat($theme-path, '/images/app-pdf.png')}" style="max-height: {$thumbnail.maxheight}px;"/>
+                    </a>
+                </div>
+                <div class="file-metadata" style="max-height: {$thumbnail.maxheight}px;">
+                    <div>
+                        <a class="publiserVersionLink hidden">
+                            <xsl:attribute name="href">
+                                <xsl:call-template name="elsevier-url"/>
+                            </xsl:attribute>
+                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_view</i18n:text>
+                        </a>
+                    </div>
+                    <div>
+                        <span class="full-text-access hidden">
+                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_access</i18n:text>
+                        </span>
+                        <span class="open-access hidden">
+                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_openaccess</i18n:text>
+                        </span>
+                        <xsl:if test='confman:getProperty("external-sources.elsevier.embed.display") = "true"'>
+                            <span class="checkmark">
+                                <a>
+                                    <xsl:attribute name="href">
+                                        <xsl:call-template name="elsevier-url"/>
+                                    </xsl:attribute>
+                                    <img alt="Icon" src="{concat($theme-path, '/images/greenArrowInBox.svg')}" style="height: 14px;"/>
+                                </a>
+                            </span>
+                        </xsl:if>
+                    </div>
+                </div>
+            </div>
+            <div class="noaccess">
+                <div class="thumbnail-wrapper" style="width: {$thumbnail.maxwidth}px;">
+                    <a class="no_accessThumbnailLinking">
+                        <xsl:attribute name="href">
+                            <xsl:call-template name="linkToArticleUrl"/>
+                        </xsl:attribute>
+                        <img alt="Icon" src="{concat($theme-path, '/images/app-pdf.png')}" style="max-height: {$thumbnail.maxheight}px;"/>
+                    </a>
+
+                </div>
+                <div class="file-metadata" style="max-height: {$thumbnail.maxheight}px;">
+                    <div>
+                        <a class="publiserVersionLink hidden">
+                            <xsl:attribute name="href">
+                                <xsl:call-template name="linkToArticleUrl"/>
+                            </xsl:attribute>
+                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_view</i18n:text>
+                        </a>
+                    </div>
+                    <div>
+                        <span>
+                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_noaccess</i18n:text>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <a class="embeddedViewOpenLink hidden">
+                <xsl:attribute name="href">
+                    <xsl:call-template name="elsevier-url"/>
+                </xsl:attribute>
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
+            </a>
+
+        </div>
+    </xsl:template>
+
+    <xsl:template name="elsevier-url">
+        <xsl:choose>
+            <xsl:when test='confman:getProperty("external-sources.elsevier.embed.display")  = "true"'>
+                <xsl:value-of select="$document//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']/dri:xref/@target"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="linkToArticleUrl"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="linkToArticleUrl">
+        <xsl:value-of select="$document//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']/dri:field[@n='embeddedLink']"/>
+    </xsl:template>
 </xsl:stylesheet>

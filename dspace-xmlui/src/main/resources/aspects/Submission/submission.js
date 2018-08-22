@@ -39,6 +39,7 @@ importClass(Packages.org.dspace.app.util.SubmissionConfigReader);
 importClass(Packages.org.dspace.app.util.SubmissionInfo);
 
 importClass(Packages.org.dspace.submit.AbstractProcessingStep);
+importClass(Packages.org.dspace.submit.step.SourceChoiceStep);
 
 /* Global variable which stores a comma-separated list of all fields 
  * which errored out during processing of the last step.
@@ -331,8 +332,21 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
     	//-----------------------------------------------------------
         // User clicked "Next->" button (or a Non-interactive Step - i.e. no UI)
         // Only step forward to next page if no errors on this page
-        if ((cocoon.request.get(AbstractProcessingStep.NEXT_BUTTON) || !stepHasUI(stepConfig))  && (response_flag==AbstractProcessingStep.STATUS_COMPLETE))
-        {
+
+        //special case for skipping next step when no import source
+        var NEXT_BUTTON = cocoon.request.get(AbstractProcessingStep.NEXT_BUTTON);
+        var JUMP_TO = null;
+
+        if ((cocoon.request.get(SourceChoiceStep.CONDITIONAL_NEXT_IMPORT))) {
+            if (!isEmpty(cocoon.request.get('source'))) {
+                NEXT_BUTTON = "NEXT";
+            }
+            else {
+                JUMP_TO = (step + 2) + ".1";
+            }
+        }
+
+        if ((NEXT_BUTTON || !stepHasUI(stepConfig)) && (response_flag == AbstractProcessingStep.STATUS_COMPLETE)) {
            	state.progressIterator++;
 
            	var totalSteps = stepsInSubmission.length;
@@ -406,17 +420,18 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
         if(response_flag==AbstractProcessingStep.STATUS_COMPLETE || maxStepAndPage.equals(state.stepAndPage))
         {
 	        var names = cocoon.request.getParameterNames();
-	        while(names.hasMoreElements())
-	        {
+            while (names.hasMoreElements() && isEmpty(JUMP_TO))
+			{
 	            var name = names.nextElement(); 
-	            if (name.startsWith(AbstractProcessingStep.PROGRESS_BAR_PREFIX))
-	            {
-	                var newStepAndPage = name.substring(AbstractProcessingStep.PROGRESS_BAR_PREFIX.length());
-	                newStepAndPage = new StepAndPage(newStepAndPage);
+                if (name.startsWith(AbstractProcessingStep.PROGRESS_BAR_PREFIX))
+                {
+                    JUMP_TO = name.substring(AbstractProcessingStep.PROGRESS_BAR_PREFIX.length());
 
-	                //only allow a jump to a page user has already been to
-	                if (newStepAndPage.isSet() && (newStepAndPage.compareTo(maxStepAndPage) <= 0))
-	                {
+                }//end if submit_jump pressed
+            }//end while more elements
+            if (!isEmpty(JUMP_TO)) {
+                var newStepAndPage = new StepAndPage(JUMP_TO);
+
 	                   state.stepAndPage = newStepAndPage;
 
 					   cocoon.log.debug("Jump To Step & Page=" + state.stepAndPage);
@@ -431,8 +446,6 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 	                   		}
 	                   }
 	                }
-	            }//end if submit_jump pressed
-	        }//end while more elements
         }//end if no errors
     } while ( 1 == 1)
 
@@ -763,4 +776,8 @@ function doWorkflowEditMetadata() {
         getDSContext().complete();
         cocoon.exit();
     }
+}
+
+function isEmpty(str) {
+    return (!str || 0 === str.length || str == "");
 }

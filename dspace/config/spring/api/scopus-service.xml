@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+ http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource,*Map">
+
+    <context:annotation-config/>
+    <util:map id="scopusImportFields">
+        <entry key="affiliation" value="affil"/>
+        <entry key="title" value="title"/>
+        <entry key="author" value="auth"/>
+        <entry key="doi" value="doi"/>
+    </util:map>
+
+
+    <bean id="ScopusImportService" class="org.dspace.importer.external.scopus.ScopusImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="ScopusMetadataFieldMapping"/>
+        <property name="name" value="Scopus"/>
+        <property name="importFields" ref="scopusImportFields"/>
+        <property name="idField" value="dc.identifier.eid"/>
+        <property name="generateQueryForItem" ref="DOIBasedService"/>
+    </bean>
+
+    <bean id="ScopusMetadataFieldMapping" class="org.dspace.importer.external.scopus.ScopusMetadataFieldMapping"/>
+
+    <util:map id="scopusMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="dc.identifier" value-ref="identifierContrib"/>
+        <entry key-ref="dc.identifier.uri" value-ref="scopusUriContrib"/>
+        <entry key-ref="dc.identifier.doi" value-ref="doiContrib"/>
+        <entry key-ref="dc.identifier.issn" value-ref="issnContrib"/>
+        <entry key-ref="dc.identifier.isbn" value-ref="isbnContrib"/>
+        <entry key-ref="dc.identifier.pii" value-ref="piiContrib"/>
+        <entry key-ref="dc.identifier.eid" value-ref="eidContrib"/>
+        <entry key-ref="dc.identifier.scopusid" value-ref="scopusIdContrib"/>
+        <entry key-ref="dc.identifier.pubmedid" value-ref="pubmedIdContrib"/>
+        <entry key-ref="dc.title" value-ref="titleContrib"/>
+        <entry key-ref="dc.type" value-ref="scopusTypeContrib"/>
+        <entry key-ref="dc.subject" value-ref="keywordContrib"/>
+        <entry key-ref="dc.creator" value-ref="creatorContrib"/>
+        <entry key-ref="dc.contributor.author" value-ref="scopusAuthorContrib"/>
+        <entry key-ref="dc.date.issued" value-ref="dateIssuedContrib"/>
+        <entry key-ref="dc.relation.ispartofseries" value-ref="issueIdentifierContrib"/>
+        <entry key-ref="dc.relation.ispartof" value-ref="publicationContrib"/>
+        <entry key-ref="dc.relation.volume" value-ref="volumeContrib"/>
+        <!--
+            According to Scopus' policies, abstracts may not be displayed publically.
+            If you would like to import Scopus abstracts, uncomment the following line
+            and make sure the field gets only displayed to affiliated users.
+            
+            https://dev.elsevier.com/policy.html
+        -->
+        <!-- <entry key-ref="dc.description.abstract" value-ref="abstractContrib"/> -->
+    </util:map>
+
+    <bean id="scopusIdContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.scopusid"/>
+        <property name="query" value="dc:identifier"/>
+    </bean>
+
+    <bean id="scopusAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.CombinedMetadatumContributor">
+        <property name="separator" value=", "/>
+        <property name="metadatumContributors" ref="scopusCombinedauthorList"/>
+        <property name="field" ref="dc.contributor.author"/>
+    </bean>
+
+    <util:list id="scopusCombinedauthorList" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor" list-class="java.util.LinkedList">
+        <ref bean="scopusLastNameContrib"/>
+        <ref bean="scopusFirstNameContrib"/>
+    </util:list>
+
+    <bean id="scopusLastNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.contributor.author"/>
+        <property name="query" value="x:author/x:surname"/>
+    </bean>
+
+    <bean id="scopusFirstNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.contributor.author"/>
+        <property name="query" value="x:author/x:given-name"/>
+    </bean>
+
+    <bean id="scopusTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.TypeMappingXpathMetadatumContributor">
+        <property name="field" ref="dc.type"/>
+        <property name="query" value="prism:aggregationType"/>
+        <property name="defaultValue" value="Other"/>
+        <property name="typeMapping">
+            <map>
+                <entry key="Blog" value="Other" />
+                <entry key="Book" value="Book" />
+                <entry key="Bookazine" value="Book" />
+                <entry key="Catalog" value="Other" />
+                <entry key="Feed" value="Other" />
+                <entry key="Journal" value="Article" />
+                <entry key="Magazine" value="Article" />
+                <entry key="Manual" value="Other" />
+                <entry key="Newsletter" value="Other" />
+                <entry key="Newspaper" value="Other" />
+                <entry key="Other" value="Other" />
+                <entry key="Report" value="Article" />
+                <entry key="Pamphlet" value="Other" />
+                <entry key="Vook" value="Video" />
+                <entry key="Whitepaper" value="Other" />
+            </map>
+        </property>
+    </bean>
+
+
+    <bean name="identifyingMetadataField" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <description>For autowiring the DOI based service.</description>
+        <constructor-arg ref="identifyingField"/>
+    </bean>
+
+    <bean name="fallbackIdentifyingMetadataField" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <description>For autowiring the DOI based service.</description>
+        <constructor-arg ref="fallbackIdentifyingField"/>
+    </bean>
+
+    <bean class="java.lang.String" id="identifyingField"  autowire-candidate="true"> <constructor-arg value="dc.identifier.other"/></bean>
+    <bean class="java.lang.String" id="fallbackIdentifyingField"  autowire-candidate="true"> <constructor-arg value="dc.identifier.doi"/></bean>
+
+
+    <bean class="org.dspace.importer.external.scopus.GenerateDOIQueryForItem_Scopus" id="DOIBasedScopusService">
+        <description>Defines how an org.dspace.content.Item is mapped to a query in scopus. Please note that exactly one of
+            these must be present. If multiple are present the result is undefined.
+        </description>
+    </bean>
+
+    <bean id="scopusUriContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.uri"/>
+        <property name="query" value="x:link[@ref='scopus']/@href"/>
+    </bean>
+
+</beans>

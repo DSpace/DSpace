@@ -477,4 +477,48 @@ public interface AuthorizeService {
 	void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction)
 			throws SQLException, AuthorizeException;
 
+    /**
+     * Create a policy for a particular group and action for a DSpace object,
+     * if the policy does not yet exist for that DSpace object.
+     * @param context the current context
+     * @param dSpaceObject the DSpaceObject
+     * @param action the policy action
+     * @param group the user group of the policy
+     * @throws AuthorizeException
+     * @throws SQLException
+     */
+	public void addPolicyOnce(Context context, DSpaceObject dSpaceObject, int action, Group group) throws AuthorizeException, SQLException;
+
+    /**
+     * Create a policy for a particular group and action and with a specific start date for a DSpace object,
+     * if the policy does not yet exist for that DSpace object.
+     * @param context the current context
+     * @param dSpaceObject the DSpaceObject
+     * @param action the policy action
+     * @param group the user group of the policy
+     * @param startDate the start date of the policy
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public void addPolicyOnce(Context context, DSpaceObject dSpaceObject, int action, Group group, Date startDate) throws SQLException, AuthorizeException;
+
+    /**
+     * Check if a policy exists for a particular group, action and DSpace object.
+     * @param context the current context
+     * @param dSpaceObject the DSpace object
+     * @param action the policy action
+     * @param group the user group of the policy
+     * @return {@code true} if policy already exists for the DSpace object
+     * @throws SQLException
+     */
+    public boolean groupActionCheck(Context context, DSpaceObject dSpaceObject, int action, Group group) throws SQLException;
+
+    /**
+     * Check if a a policy exists for the provided DSpace object and action, in the provided list of policies.
+     * @param dSpaceObject the DSpace object
+     * @param action the policy action
+     * @param policies the list of policies
+     * @return {@code true} if the list with policies contains a policy with for the provided DSpace object and action.
+     */
+    public boolean resourceAndActionCheck(DSpaceObject dSpaceObject, int action, List<ResourcePolicy> policies);
 }

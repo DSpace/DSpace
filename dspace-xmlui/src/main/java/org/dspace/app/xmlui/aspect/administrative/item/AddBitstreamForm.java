@@ -7,34 +7,28 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.UUID;
-import org.apache.commons.lang.ArrayUtils;
-
-import org.dspace.app.xmlui.aspect.submission.submit.AccessStepUtil;
-import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Division;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+import org.apache.commons.lang.*;
+import org.dspace.app.xmlui.aspect.administrative.fileaccess.*;
+import org.dspace.app.xmlui.aspect.submission.submit.*;
+import org.dspace.app.xmlui.cocoon.*;
+import org.dspace.app.xmlui.utils.*;
+import org.dspace.app.xmlui.wing.*;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.File;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Bundle;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.core.Constants;
-import org.xml.sax.SAXException;
+import org.dspace.authorize.*;
+import org.dspace.authorize.factory.*;
+import org.dspace.authorize.service.*;
+import org.dspace.content.*;
+import org.dspace.content.factory.*;
+import org.dspace.content.service.*;
+import org.dspace.core.*;
+import org.dspace.services.factory.*;
+import org.xml.sax.*;
 
 /**
  * 
@@ -143,6 +137,12 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
             if (bundleCount == 0) {
                 upload.addItem().addContent(T_no_bundles);
+            }
+
+            if(DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.file.access.enabled"))
+            {
+                FileAccessUI.addAccessSelection(upload, "file-access", false);
+                FileAccessUI.addEmbargoDateField(upload, "");
             }
 
             // EMBARGO FIELD

@@ -240,6 +240,12 @@
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Show full item record</message>
 
         <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed">Publisher version</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_view">View publisher version</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_access">Access full-text PDF</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_openaccess">Open Access</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_noaccess">Check access options</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_entitlement">entitlement</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
         <!-- Note: As of DSpace 6.0, org.dspace.app.xmlui.aspect.artifactbrowser.Navigation has been removed. -->
@@ -613,6 +619,7 @@
 	<message key="xmlui.Submission.general.submission.previous">&lt; Previous</message>
 	<message key="xmlui.Submission.general.submission.save">Save &amp; Exit</message>
 	<message key="xmlui.Submission.general.submission.next">Next &gt;</message>
+	<message key="xmlui.Submission.general.submission.skip">Skip import &gt;&gt;</message>
 	<message key="xmlui.Submission.general.submission.complete">Complete submission</message>
 	<message key="xmlui.Submission.general.workflow.title">Item submission</message>
 	<message key="xmlui.Submission.general.workflow.trail">Item submission</message>
@@ -1003,6 +1010,7 @@
     <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>
     <message key="xmlui.administrative.Navigation.context_export_metadata">Export Metadata</message>
     <message key="xmlui.administrative.Navigation.context_search_export_metadata">Export Search Metadata</message>
+    <message key="xmlui.administrative.Navigation.context_liveimport">External Source Import</message>
 
 	<!-- Site administrator options -->
 	<message key="xmlui.administrative.Navigation.administrative_head">Administrative</message>
@@ -2218,6 +2226,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-description">Description</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-access">Access</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">Kb</message>
@@ -2500,8 +2509,87 @@
     <message key="xmlui.Submission.submit.StartSubmissionLookupStep.submit_lookup">Search</message>
     <message key="xmlui.Submission.submit.StartSubmissionLookupStep.title">Publication Search</message>
     <message key="xmlui.Submission.submit.StartSubmissionLookupStep.lookup_help">Fill in a publication ID, DOI, Title or Author and then press "Search".  A list of all matching publications will be shown to you to select in order to proceed with the submission process.</message>
-    <message key="xmlui.Submission.submit.StartSubmissionLookupStep.submit_publication_item">Imported publication Record</message>
+    <message key="xmlui.Submission.submit.StartSubmissionLookupStep.submit_publication_item">Imported publication record</message>
     <message key="xmlui.Submission.submit.progressbar.lookup">Lookup</message>
 
+    <message key="xmlui.administrative.importer.external.external-import.trail">External Source Import</message>
+    <message key="xmlui.administrative.importer.external.external-import.head">External Source Import</message>
+    <message key="xmlui.administrative.importer.external.external-import.affiliation">Affiliation</message>
+    <message key="xmlui.administrative.importer.external.external-import.affiliation_hint"><p>The name of the institution the publication is connected to.</p><p>Example: "broad institute"</p></message>
+    <message key="xmlui.administrative.importer.external.external-import.title">Title</message>
+    <message key="xmlui.administrative.importer.external.external-import.title_hint"><p>The publication's title.</p><p>Example: "Integrating phenotypic small-molecule profiling and human genetics"</p></message>
+    <message key="xmlui.administrative.importer.external.external-import.author">Author</message>
+    <message key="xmlui.administrative.importer.external.external-import.author_hint"><p>The name of one of the publication's authors.</p><p>Example: "Bridget K., Wagner"</p></message>
+    <message key="xmlui.administrative.importer.external.external-import.doi">DOI</message>
+    <message key="xmlui.administrative.importer.external.external-import.doi_hint"><p>The publication's DOI.</p><p>Example: "10.1016/j.tig.2014.11.002"</p></message>
+    <message key="xmlui.administrative.importer.external.external-import.submit">Search</message>
+	<message key="xmlui.administrative.importer.external.external-import.pubmedsearch">Search</message>
+	<message key="xmlui.administrative.importer.external.external-import.pubmedsearch_hint"><p>Fill in a publication ID, DOI, Title or Author and then press “Search”.</p></message>
+	<message key="xmlui.administrative.importer.external.import-source.trail">External Source Import</message>
+
+	<message key="xmlui.administrative.importer.external.import-source.head">Choose an Import Source</message>
+	<message key="xmlui.administrative.importer.external.import-source.title">Choose an Import Source</message>
+	<message key="xmlui.administrative.importer.external.import-source.submit">Next</message>
+	<message key="xmlui.administrative.importer.external.external-import-result.submit">Back</message>
+    <message key="xmlui.administrative.importer.external.external-import-result.submit-next">Next</message>
+    <message key="xmlui.administrative.importer.external.external-import-result.no-fields-error">You must fill in one of the fields before starting the import.</message>
+    <message key="xmlui.administrative.importer.external.external-import-result.records-found">{0} records found, now showing {1} to {2}</message>
+    <message key="xmlui.administrative.importer.external.external-import-result.no-records-found">No records found</message>
+    <message key="xmlui.administrative.importer.external.external-import-result.records-selected">{0} records selected on all pages (will be updated when switching the page)</message>
+
+    <message key="xmlui.administrative.importer.external.external-import-selected.records-selected">{0} records selected:</message>
+    <message key="xmlui.administrative.importer.external.external-import-selected.import-action-workspace">Send imported items to workspace</message>
+    <message key="xmlui.administrative.importer.external.external-import-selected.import-action-workflow">Send imported items to workflow</message>
+    <message key="xmlui.administrative.importer.external.external-import-selected.import-action-archive">Archive imported items</message>
+    <message key="xmlui.administrative.importer.external.external-import-selected.submit-cancel">Cancel</message>
+    <message key="xmlui.administrative.importer.external.external-import-selected.submit-import">Import</message>
+    <message key="xmlui.administrative.importer.external.external-import-selected.collection">Select collection:</message>
+    <message key="xmlui.administrative.importer.external.external-import-selected.action">Select action:</message>
+
+    <message key="xmlui.administrative.importer.external.external-import-action.success">Import finished successful</message>
+    <message key="xmlui.administrative.importer.external.external-import-action.failure">Import failed</message>
+
+    <message key="xmlui.Submission.submit.SourceImportStep.submit_lookup">Search</message>
+    <message key="xmlui.Submission.submit.SourceImportStep.title">Search {0}</message>
+    <message key="xmlui.Submission.submit.SourceImportStep.lookup_help"><p>Fill in at least one of the following fields and press "Search". A list of all matching publications will be shown. Import a publication by clicking "import".</p><p>Importing a publication will delete all metadata that was already added to this item!</p></message>
+	<message key="xmlui.Submission.submit.SourceImportStep.lookup_help2">Use the "Search" button to search publications in the chosen import source. Continue without importing using the "Next" button.</message>
+	<message key="xmlui.Submission.submit.SourceImportStep.submit_import_item">Imported Publication:</message>
+    <message key="xmlui.Submission.submit.SourceImportStep.records-found">{0} records found, now showing {1} to {2}:</message>
+    <message key="xmlui.Submission.submit.SourceImportStep.no-records">No records found</message>
+    <message key="xmlui.Submission.submit.SourceImportStep.submit_results">Search results</message>
+	<message key="xmlui.Submission.submit.SourceImportStep..missing_import_source">Please return to the previous step to select an import source.</message>
+	<message key="xmlui.Submission.submit.progressbar.sourceimport">External Source Import</message>
+
+	<message key="xmlui.administrative.importer.external.source-import.select_help"><p>The external source import allows you to import items from multiple sources.</p><p>Select the preferred source in the dropdown and click "Next" to continue to the search page.</p></message>
+	<message key="xmlui.administrative.importer.external.source-import.results">Publication Results</message>
+	<message key="xmlui.administrative.importer.external.source-import.results_next">Next Results</message>
+	<message key="xmlui.administrative.importer.external.source-import.results_previous">Previous Results</message>
+	<message key="xmlui.administrative.importer.external.source-import.results_help">Help</message>
+	<message key="xmlui.administrative.importer.external.source-import.results_close">Close</message>
+
+    <message key="xmlui.aspect.embed.ElsevierEmbed.title">Embedded view</message>
+    <message key="xmlui.aspect.embed.ElsevierEmbed.trail">Embedded view</message>
+    <message key="xmlui.aspect.embed.ElsevierEmbed.title_error">The embed page cannot be rendered</message>
+    <message key="xmlui.aspect.embed.ElsevierEmbed.error.embed_page_disabled">The embed pages have been disabled</message>
+    <message key="xmlui.aspect.embed.ElsevierEmbed.error.not_an_item">There is no item associated with this URL</message>
+    <message key="xmlui.aspect.embed.ElsevierEmbed.error.invalid_identifier">The given identifier does not match with the item</message>
+	<message key="xmlui.aspect.embed.ElsevierEmbed.error.invalid_type">The given identifier type does not exist</message>
+
+    <message key="xmlui.file-access.FileAccessUI.label">File Access</message>
+	<message key="xmlui.file-access.FileAccessUI.embargo_date">Embargo End Date</message>
+	<message key="xmlui.file-access.FileAccessUI.embargo_date_help">Please enter the embargo end date if file access is set to "embargo".</message>
+	<message key="xmlui.file-access.FileAccessUI.option.public">public</message>
+    <message key="xmlui.file-access.FileAccessUI.option.restricted">restricted</message>
+	<message key="xmlui.file-access.FileAccessUI.option.embargo">embargo</message>
+
+    <message key="xmlui.Submission.submit.UploadStep.open_access">This record is identified as being Open Access</message>
+    <message key="xmlui.Submission.submit.UploadStep.restricted_access">This record is identified as being Restricted Access</message>
+
+
+	<message key="xmlui.Submission.submit.SourceChoiceStep.title">Choose an Import Source</message>
+	<message key="xmlui.Submission.submit.SourceChoiceStep.admin_help"><i><strong>Administrator notice - Did you know?</strong></i><br/>
+		Additional external import sources can be enabled in the DSpace configuration. <a href="https://wiki.duraspace.org/display/DSPACE/DSpace+Elsevier+API+integration">Learn more</a></message>
+
+	<message key="xmlui.Submission.submit.progressbar.sourcechoice">Import Source</message>
 
 </catalogue>

@@ -8,50 +8,47 @@
 
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.SourceResolver;
-import org.apache.cocoon.generation.AbstractGenerator;
-import org.apache.cocoon.xml.dom.DOMStreamer;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.wing.WingConstants;
-import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.core.Context;
-import org.dspace.importer.external.datamodel.ImportRecord;
-import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.dspace.importer.external.service.ImportService;
-import org.dspace.utils.DSpace;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.IOException;
-import java.sql.SQLException;
+import java.io.*;
+import java.net.*;
+import java.sql.*;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
+import javax.xml.*;
+import javax.xml.parsers.*;
+import org.apache.avalon.framework.parameters.*;
+import org.apache.cocoon.*;
+import org.apache.cocoon.environment.*;
+import org.apache.cocoon.generation.*;
+import org.apache.cocoon.xml.dom.*;
+import org.apache.commons.lang.*;
+import org.apache.log4j.*;
+import org.dspace.app.xmlui.utils.*;
+import org.dspace.app.xmlui.wing.*;
+import org.dspace.content.*;
+import org.dspace.content.factory.*;
+import org.dspace.content.service.*;
+import org.dspace.core.Context;
+import org.dspace.importer.external.datamodel.*;
+import org.dspace.importer.external.metadatamapping.*;
+import org.dspace.importer.external.service.*;
+import org.dspace.utils.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
 
 /**
  * Created by jonas - jonas@atmire.com on 06/11/15.
  */
 public class JSONLookupSearcher extends AbstractGenerator {
+    private Map<String, AbstractImportMetadataSourceService> sources = new DSpace().getServiceManager().getServiceByName("ImportServices", HashMap.class);
+
+
     private ImportService importService;
 
     private String lookupURI = null;
 
     private static Logger log = Logger.getLogger(JSONLookupSearcher.class);
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private AbstractImportMetadataSourceService source;
 
     private Request request;
     private Context context;
@@ -60,6 +57,7 @@ public class JSONLookupSearcher extends AbstractGenerator {
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters par) throws ProcessingException, SAXException, IOException {
         super.setup(resolver, objectModel, src, par);
         request = ObjectModelHelper.getRequest(objectModel);
+        source = sources.get(request.getParameter("source"));
         try {
             context = ContextUtil.obtainContext(objectModel);
         } catch (SQLException e) {
@@ -70,7 +68,31 @@ public class JSONLookupSearcher extends AbstractGenerator {
 
     @Override
     public void generate() throws IOException, SAXException, ProcessingException {
-        String query = request.getParameter("search");
+
+        String query = "";
+        Map<String, String> fields = source.getImportFields();
+        for (String field : fields.keySet()) {
+            String queryString = request.getParameter(field);
+
+            if(StringUtils.isNotBlank(queryString)){
+                if(StringUtils.isNotBlank(query.toString())) {
+                    query += " AND ";
+                }
+                query += fields.get(field);
+                if (StringUtils.isNotBlank(fields.get(field))) {
+                    query += ("(" + queryString + ")");
+                } else {
+                    query += queryString ;
+                }
+            }
+                }
+
+        try {
+            query = URLEncoder.encode(query, "UTF-8");
+            query = query.replace("+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            log.error(e.getMessage(), e);
+        }
 
         int start = 0;
         String startString = request.getParameter("start");
@@ -82,12 +104,13 @@ public class JSONLookupSearcher extends AbstractGenerator {
         }
 
         try {
-            int total = importService.getNbRecords(getLookupURI(), query);
-            Collection<ImportRecord> records = importService.getRecords(getLookupURI(), query, start, 20);
+            int total = importService.getNbRecords(source.getImportSource(), query);
+            Collection<ImportRecord> records = importService.getRecords(source.getImportSource(), query, start, 20);
 
+            MetadataFieldConfig importIdField = new MetadataFieldConfig(source.getIdField());
             DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-            org.w3c.dom.Document document = docBuilder.newDocument();
+            Document document = docBuilder.newDocument();
 
             Element rootnode = document.createElement("root");
             document.appendChild(rootnode);
@@ -101,12 +124,14 @@ public class JSONLookupSearcher extends AbstractGenerator {
             startNode.setTextContent(String.valueOf(start));
             rootnode.appendChild(startNode);
 
+            Element idFieldNode = document.createElement("identifier");
+            idFieldNode.setTextContent(importIdField.getField());
+            rootnode.appendChild(idFieldNode);
+
             Element recordsNode = document.createElement("records");
             recordsNode.setAttribute("array", "true");
             rootnode.appendChild(recordsNode);
             recordsNode.setAttribute("array", "true");
-
-            MetadataFieldConfig importIdField = new DSpace().getServiceManager().getServiceByName("lookupID", MetadataFieldConfig.class);
 
             for (ImportRecord record : records) {
                 Element recordWrapperNode = document.createElement("recordWrapper");
@@ -119,12 +144,13 @@ public class JSONLookupSearcher extends AbstractGenerator {
                 HashMap<String,Element> metadatumValueNodes = new HashMap();
 
                 for (MetadatumDTO metadatum : record.getValueList()) {
-                    if(!metadatumValueNodes.containsKey(getField(metadatum))) {
-                        Element metadatumNode = document.createElement(getField(metadatum));
+                    if (StringUtils.isNotBlank(metadatum.getValue())) {
+                        if (!metadatumValueNodes.containsKey(metadatum.getField())) {
+                            Element metadatumNode = document.createElement(metadatum.getField());
                         metadatumNode.setAttribute("array", "true");
-                        metadatumValueNodes.put(getField(metadatum), metadatumNode);
+                            metadatumValueNodes.put(metadatum.getField(), metadatumNode);
 
-                        if (getField(metadatum).equals(importIdField.getField())) {
+                            if (metadatum.getField().equals(importIdField.getField())) {
                                 Iterator<Item> iterator = itemService.findByMetadataField(context, importIdField.getSchema(), importIdField.getElement(), importIdField.getQualifier(), metadatum.getValue());
 
                             if(iterator.hasNext()){
@@ -136,9 +162,14 @@ public class JSONLookupSearcher extends AbstractGenerator {
                     }
 
                     Element metadatumValueNode = document.createElement("metadatumValue");
-                    metadatumValueNode.setTextContent(metadatum.getValue());
+                        String value = metadatum.getValue();
+                        if(value.startsWith("0")) {
+                            value = "\"" + value + "\"";
+                        }
+                        metadatumValueNode.setTextContent(value);
 
-                    metadatumValueNodes.get(getField(metadatum)).appendChild(metadatumValueNode);
+                        metadatumValueNodes.get(metadatum.getField()).appendChild(metadatumValueNode);
+                    }
                 }
 
                 for (Element element : metadatumValueNodes.values()) {
@@ -155,20 +186,5 @@ public class JSONLookupSearcher extends AbstractGenerator {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
-    }
-
-    private String getField(MetadatumDTO metadatum) {
-        return metadatum.getSchema()+"."+metadatum.getElement()+((metadatum.getQualifier()!=null)?"."+metadatum.getQualifier():"");
-    }
-
-    public String getLookupURI() {
-        if(lookupURI ==null){
-            lookupURI = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("publication-lookup.url", "*");
-        }
-        return lookupURI;
-    }
-
-    public void setLookupURI(String lookupURI) {
-        this.lookupURI = lookupURI;
     }
 }

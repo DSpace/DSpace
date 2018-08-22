@@ -108,7 +108,7 @@
   </xsl:template>
 
 
-    <xsl:template match="dri:div[@id='aspect.general.NoticeTransformer.div.general-message']">
+    <xsl:template match="dri:div[@n='general-message']">
         <div>
             <xsl:call-template name="copy-attributes"/>
             <xsl:attribute name="rend">

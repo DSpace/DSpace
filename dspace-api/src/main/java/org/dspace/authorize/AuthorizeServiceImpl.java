@@ -831,4 +831,57 @@ public class AuthorizeServiceImpl implements AuthorizeService
         return policy;
     }
 
+    @Override
+    public void addPolicyOnce(Context context, DSpaceObject dSpaceObject, int action, Group group) throws AuthorizeException, SQLException {
+        boolean present = groupActionCheck(context, dSpaceObject, action, group);
+        if (!present) {
+            addPolicy(context, dSpaceObject, action, group);
+        }
+    }
+
+    @Override
+    public void addPolicyOnce(Context context, DSpaceObject dSpaceObject, int action, Group group, Date startDate) throws SQLException, AuthorizeException {
+        boolean present = false;
+        List<ResourcePolicy> policiesForGroup = getPoliciesForGroup(context, group);
+        for (ResourcePolicy resourcePolicy : policiesForGroup) {
+            if (resourcePolicy.getdSpaceObject() != null && dSpaceObject!=null && dSpaceObject.getType() == resourcePolicy.getdSpaceObject().getType()
+                    && resourcePolicy.getdSpaceObject().getID() == dSpaceObject.getID()
+                    && resourcePolicy.getAction() == action
+                    && ((resourcePolicy.getStartDate()==null && startDate==null)
+                    || (resourcePolicy.getStartDate()!=null && resourcePolicy.getStartDate().equals(startDate)))) {
+                present = true;
+            }
+        }
+        if (!present) {
+            ResourcePolicy resourcePolicy = resourcePolicyService.create(context);
+            resourcePolicy.setdSpaceObject(dSpaceObject);
+            resourcePolicy.setAction(action);
+            resourcePolicy.setGroup(group);
+            resourcePolicy.setRpType(null);
+            resourcePolicy.setStartDate(startDate);
+            resourcePolicyService.update(context,resourcePolicy);
+            serviceFactory.getDSpaceObjectService(dSpaceObject).updateLastModified(context,dSpaceObject);
+        }
+    }
+
+    @Override
+    public boolean groupActionCheck(Context context, DSpaceObject dSpaceObject, int action, Group group) throws SQLException {
+        List<ResourcePolicy> policiesForGroup = getPoliciesForGroup(context, group);
+        return resourceAndActionCheck(dSpaceObject, action, policiesForGroup);
+    }
+
+    @Override
+    public boolean resourceAndActionCheck(DSpaceObject dSpaceObject, int action, List<ResourcePolicy> policies) {
+        boolean present = false;
+        for (ResourcePolicy resourcePolicy : policies) {
+
+            if (resourcePolicy.getdSpaceObject() != null && dSpaceObject.getType() == resourcePolicy.getdSpaceObject().getType()
+                    && resourcePolicy.getdSpaceObject().getID().equals(dSpaceObject.getID())
+                    && resourcePolicy.getAction() == action) {
+                present = true;
+            }
+        }
+        return present;
+    }
+
 }

@@ -7,32 +7,25 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.UUID;
-
-import org.dspace.app.xmlui.aspect.submission.submit.AccessStepUtil;
-import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+import org.dspace.app.xmlui.aspect.administrative.plugins.*;
+import org.dspace.app.xmlui.aspect.submission.submit.*;
+import org.dspace.app.xmlui.cocoon.*;
+import org.dspace.app.xmlui.utils.*;
+import org.dspace.app.xmlui.wing.*;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.BitstreamService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.xml.sax.SAXException;
+import org.dspace.authorize.*;
+import org.dspace.authorize.factory.*;
+import org.dspace.authorize.service.*;
+import org.dspace.content.*;
+import org.dspace.content.factory.*;
+import org.dspace.content.service.*;
+import org.dspace.core.*;
+import org.dspace.services.factory.*;
+import org.xml.sax.*;
 
 /**
  * 
@@ -144,13 +137,24 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		description.setHelp(T_description_help);
 		description.setValue(bitstream.getDescription());
 
-        // EMBARGO FIELD
-        // if AdvancedAccessPolicy=false: add Embargo Fields.
-        if(!isAdvancedFormEnabled){
-            AccessStepUtil asu = new AccessStepUtil(context);
-            // if the item is embargoed default value will be displayed.
-            asu.addEmbargoDateDisplayOnly(bitstream, edit);
-        }
+		EditBitstreamFormAddition editFormAddition = null;
+
+		if(DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.file.access.enabled")) {
+			editFormAddition = EditBitstreamFormAdditionsManager.getInstance().findeditBitstreamFormAddition(Constants.BITSTREAM, "file_access");
+		}
+
+		if( editFormAddition!=null){
+			editFormAddition.addBodyHook(context, bitstream, edit);
+		}
+		else {
+			// EMBARGO FIELD
+			// if AdvancedAccessPolicy=false: add Embargo Fields.
+			if (!isAdvancedFormEnabled) {
+				AccessStepUtil asu = new AccessStepUtil(context);
+				// if the item is embargoed default value will be displayed.
+				asu.addEmbargoDateDisplayOnly(bitstream, edit);
+			}
+		}
 
 		edit.addItem(T_para1);
 

@@ -78,26 +78,29 @@
         </xsl:apply-templates>
     </xsl:template>
 
-    <xsl:template match="dri:div[@n='lookup-modal']" priority="2">
+    <xsl:template match="dri:div[@n='lookup-modal']" priority="2"/>
+
+    <xsl:template match="dri:div[@n='lookup-modal']" priority="2" mode="outside">
         <div id="lookup-search-results" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&#215;</button>
-                        <h4 class="modal-title">Publication Results</h4>
+                        <h4 class="modal-title"><i18n:text>xmlui.administrative.importer.external.source-import.results</i18n:text></h4>
                     </div>
                     <div class="modal-body">
-                        <p class="help-block">help</p>
+                        <p class="help-block"><i18n:text>xmlui.administrative.importer.external.source-import.results_help</i18n:text></p>
                     </div>
                     <div class="modal-footer">
-                        <button class="ds-button-field btn btn-default pull-left" id="publication-pagination-previous">Previous results</button>
-                        <button class="ds-button-field btn btn-default pull-left" id="publication-pagination-next">Next results</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button class="ds-button-field btn btn-default pull-left" id="publication-pagination-previous"><i18n:text>xmlui.administrative.importer.external.source-import.results_previous</i18n:text></button>
+                        <button class="ds-button-field btn btn-default pull-left" id="publication-pagination-next"><i18n:text>xmlui.administrative.importer.external.source-import.results_next</i18n:text></button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><i18n:text>xmlui.administrative.importer.external.source-import.results_close</i18n:text></button>
                     </div>
                 </div>
             </div>
         </div>
     </xsl:template>
+
     <!-- Special case for divs tagged as "notice" -->
     <xsl:template match="dri:div[@n='general-message']" priority="3">
         <div>
@@ -779,5 +782,32 @@
         <xsl:apply-templates select="dri:item/dri:field"/>
     </xsl:template>
 
+    <xsl:template match="dri:xref">
+        <a>
+            <xsl:if test="@target">
+                <xsl:attribute name="href"><xsl:value-of select="@target"/></xsl:attribute>
+            </xsl:if>
+
+            <xsl:if test="@rend">
+                <xsl:attribute name="class"><xsl:value-of select="@rend"/></xsl:attribute>
+            </xsl:if>
+
+            <xsl:if test="@n">
+                <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
+            </xsl:if>
+
+            <xsl:if test="@onclick">
+                <xsl:attribute name="onclick"><xsl:value-of select="@onclick"/></xsl:attribute>
+            </xsl:if>
+
+            <xsl:if test="@rend='external'">
+                <xsl:attribute name="target">
+                    <xsl:text>_blank</xsl:text>
+                </xsl:attribute>
+            </xsl:if>
+
+            <xsl:apply-templates />
+        </a>
+    </xsl:template>
 
 </xsl:stylesheet>

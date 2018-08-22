@@ -279,6 +279,46 @@
 
   <!-- Used by system: do not remove -->
   <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>eid</qualifier>
+    <scope_note>Elsevier Identifier</scope_note>
+  </dc-type>
+
+  <!-- Used by system: do not remove -->
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>pii</qualifier>
+    <scope_note>Publisher Item Identifier</scope_note>
+  </dc-type>
+
+  <!-- Used by system: do not remove -->
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>doi</qualifier>
+    <scope_note>Digital Object Identifier</scope_note>
+  </dc-type>
+
+  <!-- Used by system: do not remove -->
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>pubmedid</qualifier>
+    <scope_note>PubMed Identifier</scope_note>
+  </dc-type>
+
+  <!-- Used by system: do not remove -->
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>scopusid</qualifier>
+    <scope_note>Scopus Identifier</scope_note>
+  </dc-type>
+
+  <!-- Used by system: do not remove -->
+  <dc-type>
 	<schema>dc</schema>
     <element>description</element>
     <!-- unqualified -->
@@ -478,6 +518,13 @@
     <element>relation</element>
     <qualifier>uri</qualifier>
     <scope_note>References Uniform Resource Identifier for related item.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>relation</element>
+    <qualifier>volume</qualifier>
+    <scope_note>References related volume.</scope_note>
   </dc-type>
 
   <dc-type>

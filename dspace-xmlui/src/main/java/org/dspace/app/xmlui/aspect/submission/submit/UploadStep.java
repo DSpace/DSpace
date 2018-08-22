@@ -7,43 +7,36 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
+import java.io.*;
+import java.sql.*;
 import java.util.*;
-
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.environment.SourceResolver;
-import org.apache.commons.collections.CollectionUtils;
-import org.dspace.app.sherpa.SHERPAJournal;
-import org.dspace.app.sherpa.SHERPAPublisher;
-import org.dspace.app.sherpa.SHERPAResponse;
-import org.dspace.app.sherpa.submit.SHERPASubmitService;
-import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.Radio;
-import org.dspace.app.xmlui.wing.element.CheckBox;
-import org.dspace.app.xmlui.wing.element.Division;
+import org.apache.avalon.framework.parameters.*;
+import org.apache.cocoon.*;
+import org.apache.cocoon.environment.*;
+import org.apache.commons.collections.*;
+import org.apache.commons.lang3.*;
+import org.dspace.app.sherpa.*;
+import org.dspace.app.sherpa.submit.*;
+import org.dspace.app.util.*;
+import org.dspace.app.xmlui.aspect.administrative.fileaccess.*;
+import org.dspace.app.xmlui.aspect.submission.*;
+import org.dspace.app.xmlui.utils.*;
+import org.dspace.app.xmlui.wing.*;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.File;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.app.util.Util;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.*;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
-import org.xml.sax.SAXException;
+import org.dspace.content.Item;
+import org.dspace.content.factory.*;
+import org.dspace.content.service.*;
+import org.dspace.fileaccess.factory.*;
+import org.dspace.fileaccess.service.*;
+import org.dspace.importer.external.elsevier.entitlement.*;
+import org.dspace.services.factory.*;
+import org.dspace.utils.*;
+import org.xml.sax.*;
 
 /**
  * This is a step of the item submission processes. The upload
@@ -137,11 +130,21 @@ public class UploadStep extends AbstractSubmissionStep
     protected static final Message T_sherpa_more =
             message("xmlui.aspect.sherpa.submission.more");
 
+    protected static final Message T_file_access =
+            message("xmlui.file-access.FileAccessUI.label");
+    protected static final Message T_open_access =
+            message("xmlui.Submission.submit.UploadStep.open_access");
+    protected static final Message T_restricted_access =
+            message("xmlui.Submission.submit.UploadStep.restricted_access");
+
+    protected FileAccessFromMetadataService fileAccessFromMetadataService = FileAccessServiceFactory.getInstance().getFileAccessFromMetadataService();
+
+
     /**
      * Global reference to edit file page
      * (this is used when a user requests to edit a bitstream)
      **/
-    private EditFileStep editFile = null;
+    protected EditFileStep editFile = null;
 
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
@@ -211,12 +214,32 @@ public class UploadStep extends AbstractSubmissionStep
         div.setHead(T_submission_head);
         addSubmissionProgressList(div);
 
+        OpenAccessArticleCheck openAccessArticleCheck = null;
+        ArticleAccess openAccess = null;
+
+        if(DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.file.access.enabled")) {
+            openAccessArticleCheck = OpenAccessArticleCheck.getInstance();
+            openAccess = openAccessArticleCheck.check(item);
+        }
+
         List upload = null;
-        if (!disableFileEditing)
-        {
+        if (!disableFileEditing) {
             // Only add the upload capabilities for new item submissions
             upload = div.addList("submit-upload-new", List.TYPE_FORM);
             upload.setHead(T_head);
+
+            if (openAccess != null) {
+                String link = openAccessArticleCheck.getLink();
+                if ("Public".equals(openAccess.getAudience())) {
+                    upload.addLabel(T_open_access);
+                } else {
+                    upload.addLabel(T_restricted_access);
+                }
+
+                if (StringUtils.isNotBlank(link)) {
+                    upload.addItem().addXref(link, link, "external");
+                }
+            }
 
             File file = upload.addItem().addFile("file");
             file.setLabel(T_file);
@@ -224,26 +247,22 @@ public class UploadStep extends AbstractSubmissionStep
             file.setRequired();
 
             // if no files found error was thrown by processing class, display it!
-            if (this.errorFlag==org.dspace.submit.step.UploadStep.STATUS_NO_FILES_ERROR)
-            {
+            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_NO_FILES_ERROR) {
                 file.addError(T_file_error);
             }
 
             // if an upload error was thrown by processing class, display it!
-            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_UPLOAD_ERROR)
-            {
+            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_UPLOAD_ERROR) {
                 file.addError(T_upload_error);
             }
 
             // if virus checking was attempted and failed in error then let the user know
-            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_VIRUS_CHECKER_UNAVAILABLE)
-            {
+            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_VIRUS_CHECKER_UNAVAILABLE) {
                 file.addError(T_virus_checker_error);
             }
 
             // if virus checking was attempted and a virus found then let the user know
-            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_CONTAINS_VIRUS)
-            {
+            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_CONTAINS_VIRUS) {
                 file.addError(T_virus_error);
             }
 
@@ -251,8 +270,25 @@ public class UploadStep extends AbstractSubmissionStep
             description.setLabel(T_description);
             description.setHelp(T_description_help);
 
-            Button uploadSubmit = upload.addItem().addButton("submit_upload");
-            uploadSubmit.setValue(T_submit_upload);
+            if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.file.access.enabled")) {
+                boolean fileAccessError = this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_NO_FIlE_ACCESS_ERROR;
+                Radio radio = FileAccessUI.addAccessSelection(upload, "file-access", fileAccessError);
+
+                FileAccessUI.addEmbargoDateField(upload, openAccess);
+
+                if (openAccess != null) {
+                    if ("Public".equals(openAccess.getAudience()) && StringUtils.isNotBlank(openAccess.getStartDate())) {
+                        radio.setOptionSelected("embargo");
+                    } else if ("Public".equals(openAccess.getAudience())) {
+                        radio.setOptionSelected("public");
+                    } else {
+                        radio.setOptionSelected("restricted");
+                    }
+                }
+
+                Button uploadSubmit = upload.addItem().addButton("submit_upload");
+                uploadSubmit.setValue(T_submit_upload);
+            }
         }
 
         make_sherpaRomeo_submission(item, div);
@@ -271,6 +307,9 @@ public class UploadStep extends AbstractSubmissionStep
             header.addCellContent(T_column3); // size
             header.addCellContent(T_column4); // description
             header.addCellContent(T_column5); // format
+            if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.file.access.enabled")) {
+                header.addCellContent(T_file_access);
+            }
             header.addCellContent(T_column6); // edit button
 
             for (Bitstream bitstream : bitstreams)
@@ -342,6 +381,11 @@ public class UploadStep extends AbstractSubmissionStep
                             cell.addContent(T_unsupported);
                             break;
                     }
+                }
+
+                if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.file.access.enabled")) {
+                    ArticleAccess fileAccess = fileAccessFromMetadataService.getFileAccess(context, bitstream);
+                    row.addCell().addContent(fileAccess.getAudience());
                 }
 
                 Button edit = row.addCell().addButton("submit_edit_"+id);
@@ -510,7 +554,7 @@ public class UploadStep extends AbstractSubmissionStep
      * @param bitstream The bitstream to link to
      * @returns a String link to the bitstream
      */
-    private String makeBitstreamLink(Item item, Bitstream bitstream)
+    protected String makeBitstreamLink(Item item, Bitstream bitstream)
     {
         String name = bitstream.getName();
         StringBuilder result = new StringBuilder(contextPath);

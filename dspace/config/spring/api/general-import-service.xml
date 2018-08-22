@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+ http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource,*Map">
+
+    <context:annotation-config/>
+
+    <util:map id="ImportServices">
+        <!-- <entry key="science" value-ref="ScidirImportService"/> -->
+        <!-- <entry key="scopus" value-ref="ScopusImportService"/> -->
+        <entry key="pubmed" value-ref="PubmedImportService"/>
+    </util:map>
+
+    <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
+          lazy-init="false" autowire="byType" destroy-method="destroy"/>
+
+    <bean class="org.dspace.importer.external.metadatamapping.transform.GenerateQueryForItem" id="DOIBasedService">
+        <description>Defines how an org.dspace.content.Item is mapped to a query in ISI. Please note that exactly one of
+            these must be present. If multiple are present the result is undefined.
+        </description>
+        <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+
+    <!-- Metadatafields-->
+
+    <bean id="dc.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+
+    <bean id="dc.identifier.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+    <bean id="dc.identifier.uri" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.uri"/>
+    </bean>
+
+    <bean id="dc.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier"/>
+    </bean>
+
+    <bean id="dc.identifier.eid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.eid"/>
+    </bean>
+
+    <bean id="dc.creator" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.creator"/>
+    </bean>
+
+    <bean id="dc.relation.ispartof" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.ispartof"/>
+    </bean>
+
+    <bean id="dc.identifier.issn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.issn"/>
+    </bean>
+
+    <bean id="dc.identifier.isbn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.isbn"/>
+    </bean>
+
+    <bean id="dc.relation.volume" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.volume"/>
+    </bean>
+
+    <bean id="dc.relation.ispartofseries" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.ispartofseries"/>
+    </bean>
+
+    <bean id="dc.date.issued" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.date.issued"/>
+    </bean>
+
+    <bean id="dc.rights.uri" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.rights.uri"/>
+    </bean>
+
+    <bean id="dc.type" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.type"/>
+    </bean>
+
+    <bean id="dc.identifier.pii" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.pii"/>
+    </bean>
+
+    <bean id="dc.contributor.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="dc.description.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description.abstract"/>
+    </bean>
+
+    <bean id="dc.identifier.scopusid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.scopusid"/>
+    </bean>
+
+    <bean id="dc.identifier.pubmedid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.pubmedid"/>
+    </bean>
+
+    <bean id="dc.subject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+
+    <bean id="dc.language.iso" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+
+    <bean id="dc.identifier.other" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
+
+    <!-- Metadata Contributors-->
+
+    <bean id="titleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.title"/>
+        <property name="query" value="dc:title"/>
+    </bean>
+
+    <bean id="doiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.doi"/>
+        <property name="query" value="prism:doi"/>
+    </bean>
+
+    <bean id="uriContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.uri"/>
+        <property name="query" value="x:link[@ref='scidir']/@href"/>
+    </bean>
+
+    <bean id="identifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier"/>
+        <property name="query" value="dc:identifier"/>
+    </bean>
+
+    <bean id="eidContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.eid"/>
+        <property name="query" value="x:eid"/>
+    </bean>
+
+    <bean id="creatorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.creator"/>
+        <property name="query" value="dc:creator"/>
+    </bean>
+
+    <bean id="publicationContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.relation.ispartof"/>
+        <property name="query" value="prism:publicationName"/>
+    </bean>
+
+    <bean id="issnContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.issn"/>
+        <property name="query" value="prism:issn"/>
+    </bean>
+
+    <bean id="isbnContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.isbn"/>
+        <property name="query" value="prism:isbn"/>
+    </bean>
+
+    <bean id="volumeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.relation.volume"/>
+        <property name="query" value="prism:volume"/>
+    </bean>
+
+    <bean id="dateIssuedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.date.issued"/>
+        <property name="query" value="prism:coverDate"/>
+    </bean>
+
+    <bean id="openaccessuserlicenseContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.rights.uri"/>
+        <property name="query" value="x:openaccessUserLicense"/>
+    </bean>
+
+    <bean id="piiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.pii"/>
+        <property name="query" value="x:pii"/>
+    </bean>
+
+    <bean id="issueContrib" class="org.dspace.importer.external.metadatamapping.contributor.CombinedMetadatumContributor">
+        <property name="separator" value=";"/>
+        <property name="metadatumContributors" ref="combinedseriesList"/>
+        <property name="field" ref="dc.relation.ispartofseries"/>
+    </bean>
+
+    <bean id="authorContrib" class="org.dspace.importer.external.metadatamapping.contributor.CombinedMetadatumContributor">
+        <property name="separator" value=", "/>
+        <property name="metadatumContributors" ref="combinedauthorList"/>
+        <property name="field" ref="dc.contributor.author"/>
+    </bean>
+
+    <util:list id="combinedauthorList" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor" list-class="java.util.LinkedList">
+        <ref bean="lastNameContrib"/>
+        <ref bean="firstNameContrib"/>
+    </util:list>
+
+    <util:list id="combinedseriesList" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor" list-class="java.util.LinkedList">
+        <ref bean="issueNameContrib"/>
+        <ref bean="issueIdentifierContrib"/>
+    </util:list>
+
+    <bean id="issueIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.relation.ispartofseries"/>
+        <property name="query" value="prism:issueIdentifier"/>
+    </bean>
+    <bean id="issueNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.relation.ispartofseries"/>
+        <property name="query" value="prism:issueName"/>
+    </bean>
+
+    <bean id="lastNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.contributor.author"/>
+        <property name="query" value="x:authors/x:author/x:surname"/>
+    </bean>
+
+    <bean id="firstNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.contributor.author"/>
+        <property name="query" value="x:authors/x:author/x:given-name"/>
+    </bean>
+
+    <bean id="abstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleStartSubstringXpathMetadatumContributor">
+        <property name="field" ref="dc.description.abstract"/>
+        <property name="startString" value="Abstract "/>
+        <property name="query" value="dc:description"/>
+    </bean>
+
+    <bean id="copyrightContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.rights"/>
+        <property name="query" value="prism:copyright"/>
+    </bean>
+
+    <bean id="keywordContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleSeparatedXpathMetadatumContributor">
+        <property name="field" ref="dc.subject"/>
+        <property name="query" value="x:authkeywords"/>
+        <property name="separator" value="|"/>
+    </bean>
+
+    <bean id="pubmedIdContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.pubmedid"/>
+        <property name="query" value="x:pubmed-id"/>
+    </bean>
+
+</beans>

@@ -7,38 +7,28 @@
  */
 package org.dspace.app.xmlui.objectmanager;
 
-import org.dspace.app.util.Util;
-import org.dspace.app.util.factory.UtilServiceFactory;
-import org.dspace.app.util.service.MetadataExposureService;
-import org.dspace.app.xmlui.wing.AttributeMap;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.*;
-import org.dspace.content.authority.Choices;
-import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BundleService;
-import org.dspace.content.service.ItemService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.output.SAXOutputter;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
+import java.io.*;
+import java.sql.*;
 import java.util.*;
+import org.dspace.app.util.*;
+import org.dspace.app.util.factory.*;
+import org.dspace.app.util.service.*;
+import org.dspace.app.xmlui.cocoon.plugins.adapter.decorators.*;
+import org.dspace.app.xmlui.wing.*;
+import org.dspace.authorize.*;
+import org.dspace.authorize.factory.*;
+import org.dspace.authorize.service.*;
+import org.dspace.content.*;
+import org.dspace.content.authority.*;
+import org.dspace.content.crosswalk.*;
+import org.dspace.content.factory.*;
+import org.dspace.content.service.*;
+import org.dspace.core.*;
+import org.dspace.services.factory.*;
+import org.jdom.*;
+import org.jdom.output.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 /**
  * This is an adapter which translates a DSpace item into a METS document
@@ -830,6 +820,9 @@ public class ItemAdapter extends AbstractAdapter
             // End the bundle's file group
             endElement(METS,"fileGrp");
         }
+
+        AdapterDecoratorManager manager = AdapterDecoratorManager.getInstance();
+        manager.decorateElement(context, Constants.ITEM, AdapterDecoratorManager.FILE_SEC, this);
 
         // //////////////////////
         // End the file section

@@ -50,6 +50,12 @@
     <bean class="org.dspace.content.SupervisedItemServiceImpl"/>
     <bean class="org.dspace.content.WorkspaceItemServiceImpl"/>
 
+    <!--<bean class="org.dspace.fileaccess.FileAccessFromMetadataServiceImpl"/>-->
+    <!--<bean class="org.dspace.fileaccess.ItemMetadataServiceImpl"/>-->
+
+    <bean class="org.dspace.fileaccess.ElsevierFileAccessFromMetadataServiceImpl"/>
+    <bean class="org.dspace.fileaccess.ElsevierItemMetadataServiceImpl"/>
+
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
 

@@ -794,6 +794,16 @@
             <xsl:text>window.orcid.themePath= '</xsl:text><xsl:value-of select="$theme-path"/><xsl:text>';</xsl:text>
         </script>
 
+        <script type="text/javascript">
+            <xsl:text>if(typeof window.DSpace === 'undefined'){
+                    window.DSpace={};
+                  };</xsl:text>
+            <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='window.DSpace']"><xsl:text>
+                window.DSpace.</xsl:text><xsl:value-of select="@qualifier"/><xsl:text>= '</xsl:text><xsl:value-of select="text()"/><xsl:text>';</xsl:text>
+            </xsl:for-each>
+        </script>
+
+
     </xsl:template>
     
     <xsl:template name="addJavascript-google-analytics">
