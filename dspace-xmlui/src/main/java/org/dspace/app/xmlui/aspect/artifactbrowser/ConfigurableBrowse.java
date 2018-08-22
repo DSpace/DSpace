@@ -7,11 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.*;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
@@ -28,25 +23,9 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.*;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseEngine;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowseItem;
-import org.dspace.browse.BrowserScope;
-import org.dspace.sort.SortOption;
-import org.dspace.sort.SortException;
+import org.dspace.browse.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -55,9 +34,18 @@ import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
 import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implements all the browse functionality (browse by title, subject, authors,
@@ -122,6 +110,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     /** The options for results per page */
     private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
     private int currentOffset = 0;
+    private String currentOrder;
 
     /** Cached validity object */
     private SourceValidity validity;
@@ -275,6 +264,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         }
 
         BrowseInfo info = getBrowseInfo();
+        currentOrder = params.scope.getOrder();
 
         String type = info.getBrowseIndex().getName();
 
@@ -501,7 +491,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
         queryParams.putAll(params.getCommonParameters());
 
-        Division controls = div.addInteractiveDivision("browse-controls", BROWSE_URL_BASE,
+
+        Division controls = div.addInteractiveDivision("browse-controls", BROWSE_URL_BASE+(StringUtils.contains(BROWSE_URL_BASE,"?")?"&resetOffset=true":"?resetOffset=true"),
                 Division.METHOD_POST, "browse controls");
 
         // Add all the query parameters as hidden fields on the form
@@ -833,7 +824,14 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         } catch (ResourceNotFoundException e) {
             return null;
         }
+        String paramsOrder = params.scope.getOrder();
+        boolean orderingUpdated = !StringUtils.equals(currentOrder, paramsOrder);
 
+        if (orderingUpdated) {
+            if (ObjectModelHelper.getRequest(objectModel).getParameters().containsKey("resetOffset")) {
+                params.scope.setOffset(0);
+            }
+        }
         try
         {
             // Create a new browse engine, and perform the browse
@@ -1043,7 +1041,9 @@ class BrowseParams
             paramMap.put(scope.getAuthorityValue() != null?
                     BrowseParams.FILTER_VALUE[1]:BrowseParams.FILTER_VALUE[0], scope.getFilterValue());
         }
-
+        if(StringUtils.isNotBlank(scope.getStartsWith())){
+            paramMap.put(STARTS_WITH,scope.getStartsWith());
+        }
         if (scope.getFilterValueLang() != null)
         {
             paramMap.put(BrowseParams.FILTER_VALUE_LANG, scope.getFilterValueLang());
