@@ -57,10 +57,10 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 
     @Override
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'READ')")
-    public CollectionRest findOne(UUID id) {
+    public CollectionRest findOne(Context context, UUID id) {
         Collection collection = null;
         try {
-            collection = cs.find(obtainContext(), id);
+            collection = cs.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -71,8 +71,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
     }
 
     @Override
-    public Page<CollectionRest> findAll(Pageable pageable) {
-        Context context = obtainContext();
+    public Page<CollectionRest> findAll(Context context, Pageable pageable) {
         List<Collection> it = null;
         List<Collection> collections = new ArrayList<Collection>();
         int total = 0;

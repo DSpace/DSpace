@@ -15,6 +15,7 @@ import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,10 +41,10 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     }
 
     @Override
-    public BitstreamFormatRest findOne(Integer id) {
+    public BitstreamFormatRest findOne(Context context, Integer id) {
         BitstreamFormat bit = null;
         try {
-            bit = bfs.find(obtainContext(), id);
+            bit = bfs.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -54,10 +55,10 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     }
 
     @Override
-    public Page<BitstreamFormatRest> findAll(Pageable pageable) {
+    public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
         List<BitstreamFormat> bit = null;
         try {
-            bit = bfs.findAll(obtainContext());
+            bit = bfs.findAll(context);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

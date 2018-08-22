@@ -65,23 +65,22 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
     @Override
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
-    public ItemRest findOne(UUID id) {
+    public ItemRest findOne(Context context, UUID id) {
         Item item = null;
         try {
-            item = is.find(obtainContext(), id);
+            item = is.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         if (item == null) {
-            throw new ResourceNotFoundException();
+            return null;
         }
         return converter.fromModel(item);
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<ItemRest> findAll(Pageable pageable) {
-        Context context = obtainContext();
+    public Page<ItemRest> findAll(Context context, Pageable pageable) {
         Iterator<Item> it = null;
         List<Item> items = new ArrayList<Item>();
         int total = 0;
@@ -105,7 +104,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException,
         ResourceNotFoundException {
 
-        ItemRest restModel = findOne(uuid);
+        ItemRest restModel = findOne(context, uuid);
         if (restModel == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
         }

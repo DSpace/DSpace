@@ -53,10 +53,10 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 
     @Override
     @PreAuthorize("hasPermission(#id, 'BITSTREAM', 'READ')")
-    public BitstreamRest findOne(UUID id) {
+    public BitstreamRest findOne(Context context, UUID id) {
         Bitstream bit = null;
         try {
-            bit = bs.find(obtainContext(), id);
+            bit = bs.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -75,8 +75,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<BitstreamRest> findAll(Pageable pageable) {
-        Context context = obtainContext();
+    public Page<BitstreamRest> findAll(Context context, Pageable pageable) {
         List<Bitstream> bit = new ArrayList<Bitstream>();
         Iterator<Bitstream> it = null;
         int total = 0;

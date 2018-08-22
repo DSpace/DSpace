@@ -40,10 +40,10 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
 
     @Override
     @PreAuthorize("hasPermission(#id, 'GROUP', 'READ')")
-    public GroupRest findOne(UUID id) {
+    public GroupRest findOne(Context context, UUID id) {
         Group group = null;
         try {
-            group = gs.find(obtainContext(), id);
+            group = gs.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -55,8 +55,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @Override
-    public Page<GroupRest> findAll(Pageable pageable) {
-        Context context = obtainContext();
+    public Page<GroupRest> findAll(Context context, Pageable pageable) {
         List<Group> groups = null;
         int total = 0;
         try {

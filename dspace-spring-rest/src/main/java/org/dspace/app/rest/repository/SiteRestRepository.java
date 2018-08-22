@@ -17,6 +17,7 @@ import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.hateoas.SiteResource;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -43,10 +44,10 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
     }
 
     @Override
-    public SiteRest findOne(UUID id) {
+    public SiteRest findOne(Context context, UUID id) {
         Site site = null;
         try {
-            site = sitesv.find(obtainContext(), id);
+            site = sitesv.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -57,11 +58,11 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
     }
 
     @Override
-    public Page<SiteRest> findAll(Pageable pageable) {
+    public Page<SiteRest> findAll(Context context, Pageable pageable) {
         List<Site> sites = new ArrayList<Site>();
         int total = 1;
         try {
-            sites.add(sitesv.findSite(obtainContext()));
+            sites.add(sitesv.findSite(context));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

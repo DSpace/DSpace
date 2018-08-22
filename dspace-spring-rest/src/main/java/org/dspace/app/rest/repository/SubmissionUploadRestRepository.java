@@ -64,10 +64,10 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
-    public SubmissionUploadRest findOne(String submitName) {
+    public SubmissionUploadRest findOne(Context context, String submitName) {
         UploadConfiguration config = uploadConfigurationService.getMap().get(submitName);
         try {
-            return convert(obtainContext(), config);
+            return convert(context, config);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -76,7 +76,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
-    public Page<SubmissionUploadRest> findAll(Pageable pageable) {
+    public Page<SubmissionUploadRest> findAll(Context context, Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
         subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), pageable.getOffset());
         List<SubmissionUploadRest> results = new ArrayList<>();
@@ -87,7 +87,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
                     UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(step.getId());
                     if (uploadConfig != null) {
                         try {
-                            results.add(convert(obtainContext(), uploadConfig));
+                            results.add(convert(context, uploadConfig));
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                         }
