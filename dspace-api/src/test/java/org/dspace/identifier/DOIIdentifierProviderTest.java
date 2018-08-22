@@ -255,7 +255,7 @@ public class DOIIdentifierProviderTest
      */
     @Test
     public void testSupports_Class() {
-        Class<? extends Identifier> identifier = DOI.class;
+        Class<?> identifier = DOI.class;
         assertTrue("DOI should be supported", provider.supports(identifier));
     }
 

@@ -31,7 +31,7 @@ import org.dspace.core.ReloadableEntity;
 @Entity
 @Table(name = "doi")
 public class DOI
-    implements Identifier, ReloadableEntity<Integer> {
+    implements ReloadableEntity<Integer> {
     public static final String SCHEME = "doi:";
 
     public static final String RESOLVER = "http://dx.doi.org";

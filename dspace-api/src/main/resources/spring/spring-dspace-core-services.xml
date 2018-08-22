@@ -37,6 +37,12 @@
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean>
 
+    <bean id="org.dspace.identifier.UUIDIdentifierProvider"
+        class="org.dspace.identifier.UUIDIdentifierProvider"
+        scope="singleton">
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+    </bean>
+
     <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true"/>
 
     <!-- Register all our Flyway callback classes (which run before/after database migrations) -->

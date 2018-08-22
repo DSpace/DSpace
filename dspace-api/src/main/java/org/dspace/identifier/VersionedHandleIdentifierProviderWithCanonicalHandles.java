@@ -65,7 +65,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     private ItemService itemService;
 
     @Override
-    public boolean supports(Class<? extends Identifier> identifier) {
+    public boolean supports(Class<?> identifier) {
         return Handle.class.isAssignableFrom(identifier);
     }
 

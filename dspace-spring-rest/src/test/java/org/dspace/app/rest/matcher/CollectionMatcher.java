@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.is;
 import java.util.UUID;
 
 import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -22,6 +23,9 @@ public class CollectionMatcher {
 
     private CollectionMatcher() { }
 
+    public static Matcher<? super Object> matchCollectionEntry(Collection collection) {
+        return matchCollectionEntry(collection.getName(), collection.getID(), collection.getHandle());
+    }
     public static Matcher<? super Object> matchCollectionEntry(String name, UUID uuid, String handle) {
         return matchCollectionEntry(name, uuid, handle, null);
     }

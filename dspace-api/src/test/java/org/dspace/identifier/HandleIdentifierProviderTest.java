@@ -104,7 +104,7 @@ public class HandleIdentifierProviderTest
     public void testSupports_Class()
     {
         System.out.println("supports(Class)");
-        Class<? extends Identifier> identifier = null;
+        Class<?> identifier = null;
         HandleIdentifierProvider instance = new HandleIdentifierProvider();
         boolean expResult = false;
         boolean result = instance.supports(identifier);

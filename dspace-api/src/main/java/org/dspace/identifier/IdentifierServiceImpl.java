@@ -122,7 +122,7 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Override
-    public String lookup(Context context, DSpaceObject dso, Class<? extends Identifier> identifier) {
+    public String lookup(Context context, DSpaceObject dso, Class<?> identifier) {
         for (IdentifierProvider service : providers) {
             if (service.supports(identifier)) {
                 try {

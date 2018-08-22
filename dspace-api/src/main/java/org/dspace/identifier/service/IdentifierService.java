@@ -13,7 +13,6 @@ import java.util.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.identifier.Identifier;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
@@ -35,7 +34,7 @@ public interface IdentifierService {
      * @return the matching identifier, or the site identifier if the object
      * is a Site, or null if no matching identifier is found.
      */
-    String lookup(Context context, DSpaceObject dso, Class<? extends Identifier> identifier);
+    String lookup(Context context, DSpaceObject dso, Class<?> identifier);
 
     /**
      * Gets the identifiers all registered IdentifierProvider returns if asked
