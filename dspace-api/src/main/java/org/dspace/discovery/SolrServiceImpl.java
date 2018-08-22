@@ -7,31 +7,6 @@
  */
 package org.dspace.discovery;
 
-import org.dspace.util.MultiFormatDateParser;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.Vector;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.Transformer;
@@ -60,38 +35,29 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.*;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.handler.extraction.ExtractingParams;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
-import org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration;
-import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
-import org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration;
-import org.dspace.discovery.configuration.DiscoverySearchFilter;
-import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
-import org.dspace.discovery.configuration.DiscoverySortConfiguration;
-import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
-import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
+import org.dspace.core.*;
+import org.dspace.discovery.configuration.*;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseUtils;
+import org.dspace.util.MultiFormatDateParser;
 import org.dspace.utils.DSpace;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * SolrIndexer contains the methods that index Items and their metadata,
@@ -1740,6 +1706,25 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             solrQuery.setParam(FacetParams.FACET_OFFSET, String.valueOf(discoveryQuery.getFacetOffset()));
         }
+        List<DiscoverDateFacetField> discoverDateFacetFields = discoveryQuery.getDateFacetFields();
+        if(discoverDateFacetFields!=null && discoverDateFacetFields.size()>0){
+            for(DiscoverDateFacetField discoverDateFacetField : discoverDateFacetFields){
+                String dateType = discoverDateFacetField.getGap();
+                int dateStart= -discoverDateFacetField.getStart();
+                int dateEnd= discoverDateFacetField.getEnd();
+                solrQuery.setParam("facet.date", discoverDateFacetField.getField())
+                        .
+                        // EXAMPLE: NOW/MONTH+1MONTH
+                                setParam("facet.date.end",
+                                "NOW/" + dateType + "+"+dateEnd + dateType).setParam(
+                        "facet.date.gap", "+1" + dateType)
+                        .
+                        // EXAMPLE: NOW/MONTH-" + nbMonths + "MONTHS
+                                setParam("facet.date.start",
+                                "NOW/" + dateType + dateStart + dateType + "S")
+                        .setFacet(true);
+            }
+        }
 
         if(0 < discoveryQuery.getHitHighlightingFields().size())
         {
@@ -1900,7 +1885,19 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     }
                 }
             }
+            if(solrQueryResponse.getFacetDates()!=null){
+                List<FacetField> facetDates = solrQueryResponse.getFacetDates();
+                for(FacetField facetField : facetDates){
+                    List<FacetField.Count> values =  facetField.getValues();
+                    String fieldName = facetField.getName();
+                    for(FacetField.Count value: values){
+                        value.getName();
+                        value.getCount();
+                        result.addFacetDateResult(fieldName, new DiscoverResult.FacetDateResult(value.getName(), value.getCount()));
+                    }
 
+                }
+            }
             if(solrQueryResponse.getFacetQuery() != null)
             {
 				// just retrieve the facets in the order they where requested!

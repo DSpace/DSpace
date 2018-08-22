@@ -37,6 +37,7 @@ public class DiscoverQuery {
 
     /** Attributes required for the faceting of values **/
     private List<DiscoverFacetField> facetFields;
+    private List<DiscoverDateFacetField> dateFacetFields;
     private List<String> facetQueries;
     private int facetLimit = -1;
     private int facetMinCount = -1;
@@ -55,6 +56,7 @@ public class DiscoverQuery {
         this.fieldPresentQueries = new ArrayList<String>();
 
         this.facetFields = new ArrayList<DiscoverFacetField>();
+        this.dateFacetFields = new ArrayList<DiscoverDateFacetField>();
         this.facetQueries = new ArrayList<String>();
         this.searchFields = new ArrayList<String>();
         this.hitHighlighting = new HashMap<String, DiscoverHitHighlightingField>();
@@ -184,6 +186,22 @@ public class DiscoverQuery {
      */
     public List<DiscoverFacetField> getFacetFields() {
         return facetFields;
+    }
+
+    /**
+     * Adds a new date facet field
+     * @param datefacetField the new datefacet field to be added
+     */
+    public void addDateFacetField(DiscoverDateFacetField datefacetField){
+        dateFacetFields.add(datefacetField);
+    }
+
+    /**
+     * Gets the facets fields configured
+     * @return the facet fields for this query
+     */
+    public List<DiscoverDateFacetField> getDateFacetFields() {
+        return dateFacetFields;
     }
 
     /**
