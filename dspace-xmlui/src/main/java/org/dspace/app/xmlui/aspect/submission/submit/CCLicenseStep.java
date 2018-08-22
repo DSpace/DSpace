@@ -35,6 +35,7 @@ import org.dspace.license.CCLookup;
 import org.dspace.license.CCLicense;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
+import org.apache.log4j.Logger;
 
 /**
  * This is an optional page of the item submission processes. The Creative 
@@ -56,6 +57,8 @@ import org.xml.sax.SAXException;
  */
 public class CCLicenseStep extends AbstractSubmissionStep
 {
+	private static Logger log = Logger.getLogger(CCLicenseStep.class);
+	
 	/** Language Strings **/
     protected static final Message T_head = 
         message("xmlui.Submission.submit.CCLicenseStep.head");
@@ -77,6 +80,7 @@ public class CCLicenseStep extends AbstractSubmissionStep
 
     /** CC specific variables */
     private String ccLocale;
+    private String ccJurisdiction;
 
 
 	/**
@@ -87,8 +91,11 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    this.requireSubmission = true;
 	    this.requireStep = true;
         this.ccLocale = ConfigurationManager.getProperty("cc.license.locale");
-        /** Default locale to 'en' */
+        this.ccJurisdiction = ConfigurationManager.getProperty("cc.license.jurisdiction");
+        /** Default locale to 'en' **/
         this.ccLocale = (this.ccLocale != null) ? this.ccLocale : "en";
+        /** Default jurisdiction to '' **/
+        this.ccJurisdiction = (this.ccJurisdiction != null) ? this.ccJurisdiction : "";
 	}
 	
 	
@@ -141,32 +148,46 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    	if (cclookup.getLicenseFields(selectedLicense, ccLocale) == null ) {
 	    		// do nothing
 	    	} 
-	    	else 
-	    	{
-		    Iterator outerIterator = cclookup.getLicenseFields(selectedLicense, ccLocale).iterator();
-		    while (outerIterator.hasNext()) 
-		    {
-			CCLicenseField cclicensefield = (CCLicenseField)outerIterator.next();
-			if (cclicensefield.getId().equals("jurisdiction"))  
-			    continue;
-			    List edit = div.addList("selectlist", List.TYPE_SIMPLE, "horizontalVanilla");
-			    edit.addItem(cclicensefield.getLabel());
-			    edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", cclicensefield.getDescription(), "information");
-			    List subList = div.addList("sublist", List.TYPE_SIMPLE, "horizontalVanilla");
-			    Radio radio  = subList.addItem().addRadio(cclicensefield.getId() + "_chooser");
-			    radio.setRequired();
-			    Iterator fieldMapIterator = cclicensefield.getEnum().entrySet().iterator();
-			    while (fieldMapIterator.hasNext()) 
-			    {
-			        Map.Entry pairs = (Map.Entry)fieldMapIterator.next();
-				String key      = (String) pairs.getKey();
-				String value 	= (String) pairs.getValue();
-				radio.addOption(key, value);
-			    }
-				div.addSimpleHTMLFragment(true, "&#160;");
-			}
-		    }
-        	}    
+	    	else {
+	    		Iterator outerIterator = cclookup.getLicenseFields(selectedLicense, ccLocale).iterator();
+	    		while (outerIterator.hasNext()) {
+	    			CCLicenseField cclicensefield = (CCLicenseField)outerIterator.next();	    			
+	    			if (cclicensefield.getId().equals("jurisdiction")) {
+	    				if(this.ccJurisdiction == "")
+		    				continue;
+	    				List licenseList = div.addList("licenselist", List.TYPE_SIMPLE, "horizontalVanilla");
+	    				licenseList.addItem("Jurisdiction: ");
+	    				licenseList.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", cclicensefield.getDescription(), "information");	    				
+	    				
+	    				Radio licenseRadio = licenseList.addItem().addRadio("version_chooser");
+	    				licenseRadio.setRequired();
+	    				licenseRadio.addOption("CC3", "CC 3.0 " + this.ccJurisdiction);
+	    				licenseRadio.addOption("CC4", "CC 4.0 international");	
+	    				div.addSimpleHTMLFragment(true, "&#160;");
+	    				continue;
+	    			}
+	    			
+	    			List edit = div.addList("selectlist", List.TYPE_SIMPLE, "horizontalVanilla");
+	    			edit.addItem(cclicensefield.getLabel());	    				    			
+	    			edit.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", cclicensefield.getDescription(), "information");
+	    				    		    			
+	    			List subList = div.addList("sublist", List.TYPE_SIMPLE, "horizontalVanilla");
+	    			Radio radio  = subList.addItem().addRadio(cclicensefield.getId() + "_chooser");
+	    			radio.setRequired();
+	    			Iterator fieldMapIterator = cclicensefield.getEnum().entrySet().iterator();
+	    			while (fieldMapIterator.hasNext()) 
+	    			{
+	    				Map.Entry pairs = (Map.Entry)fieldMapIterator.next();
+	    				String key      = (String) pairs.getKey();
+	    				String value 	= (String) pairs.getValue();
+	    				radio.addOption(key, value);
+	    			}
+
+    				div.addSimpleHTMLFragment(true, "&#160;");
+	    		}
+	    	}
+	    }   
+	    
 		Division statusDivision = div.addDivision("statusDivision");
 		List statusList = statusDivision.addList("statusList", List.TYPE_FORM);
 		String licenseUri = CreativeCommons.getCCField("uri").ccItemValue(item);
@@ -229,3 +250,4 @@ public class CCLicenseStep extends AbstractSubmissionStep
 		super.recycle();
 	}
 }
+

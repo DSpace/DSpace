@@ -263,24 +263,27 @@ public class CCLookup {
 		// Assemble the "answers" document
 		String answer_doc = "<answers>\n<locale>" + lang + "</locale>\n" + "<license-" + licenseId + ">\n";
 		Iterator keys = answers.keySet().iterator();
-
-		try {
-			String current = (String)keys.next();
-
-			while (true) {
-				answer_doc += "<" + current + ">" + (String)answers.get(current) + "</" + current + ">\n";
-				current = (String)keys.next();
-			}
-
-
-		} catch (NoSuchElementException e) {
-			// exception indicates we've iterated through the
-			// entire collection; just swallow and continue
-		}
-		// answer_doc +=	"<jurisdiction></jurisidiction>\n";  FAILS with jurisdiction argument
-		answer_doc +=						"</license-" + licenseId + ">\n</answers>\n";
+		
+		String jurisdiction = "";
+		while(keys.hasNext()) {
+    		String key = (String)keys.next();
+    		String value = (String)answers.get(key);
+    		if(key.equals("version")) {
+    			if(value.equals("CC3"))
+    				answer_doc = answer_doc.replace("<jurisdiction></jurisdiction>\n","<jurisdiction>" + jurisdiction + "</jurisdiction>\n");
+    		}
+    		else {
+    			if(key.equals("jurisdiction")) {
+    				jurisdiction = value;
+    				answer_doc += "<jurisdiction></jurisdiction>\n";
+    			}	
+    			else
+    				answer_doc += "<" + key + ">" + value + "</" + key + ">\n";
+    		}
+		}		
+		answer_doc += "</license-" + licenseId + ">\n</answers>\n";		
+		
 		String post_data;
-
 		try {
 			post_data = URLEncoder.encode("answers", "UTF-8") + "=" + URLEncoder.encode(answer_doc, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -328,8 +331,8 @@ public class CCLookup {
 		throws IOException{
 
 		// Determine the issue URL
-                 // Example: http://api.creativecommons.org/rest/1.5/details?
-                //  license-uri=http://creativecommons.org/licenses/by-nc-sa/3.0/
+        // Example: http://api.creativecommons.org/rest/1.5/details?
+        //  license-uri=http://creativecommons.org/licenses/by-nc-sa/3.0/
 		String issueUrl = cc_root + "/details?license-uri=" + licenseURI;
 		// todo : modify for post as in the above issue
 		String post_data;
@@ -338,7 +341,7 @@ public class CCLookup {
 		} catch (UnsupportedEncodingException e) {
 			return;
 		}
-                //end todo
+        //end todo
 		URL request_url;
 		try {
 			request_url = new URL(issueUrl);
@@ -369,7 +372,7 @@ public class CCLookup {
 		String text = null;
 		try {
 			JDOMXPath xp_LicenseName = new JDOMXPath("//result/license-uri");
-		    text =  ((Element)xp_LicenseName.selectSingleNode(this.license_doc)).getText();
+		    text = ((Element)xp_LicenseName.selectSingleNode(this.license_doc)).getText();
 		}
 		catch (Exception e) {
 			log.warn(e.getMessage());
@@ -391,7 +394,7 @@ public class CCLookup {
 		String text = null;
 		try {
 			JDOMXPath xp_LicenseName = new JDOMXPath("//result/license-name");
-			text =  ((Element)xp_LicenseName.selectSingleNode(this.license_doc)).getText();
+			text = ((Element)xp_LicenseName.selectSingleNode(this.license_doc)).getText();
 		}
 		catch (Exception e) {
 			log.warn(e.getMessage());
@@ -415,12 +418,12 @@ public class CCLookup {
 		java.io.ByteArrayOutputStream outputstream = new java.io.ByteArrayOutputStream();
 		try {
 			outputstream.write("<result>\n".getBytes()); 
-			JDOMXPath xpathRdf 				= new JDOMXPath("//result/rdf");
-			JDOMXPath xpathLicenseRdf 				= new JDOMXPath("//result/licenserdf");
-			XMLOutputter xmloutputter 	= new XMLOutputter();
-			Element rdfParent     				= ((Element)xpathRdf.selectSingleNode(this.license_doc));
+			JDOMXPath xpathRdf = new JDOMXPath("//result/rdf");
+			JDOMXPath xpathLicenseRdf = new JDOMXPath("//result/licenserdf");
+			XMLOutputter xmloutputter = new XMLOutputter();
+			Element rdfParent = ((Element)xpathRdf.selectSingleNode(this.license_doc));
 			xmloutputter.output(rdfParent, outputstream);
-			Element licenseRdfParent       = ((Element)xpathLicenseRdf.selectSingleNode(this.license_doc));
+			Element licenseRdfParent = ((Element)xpathLicenseRdf.selectSingleNode(this.license_doc));
 			outputstream.write("\n".getBytes());
 			xmloutputter.output(licenseRdfParent, outputstream);
 			outputstream.write("\n</result>\n".getBytes());
@@ -463,3 +466,4 @@ public class CCLookup {
 	}
 
 }
+
