@@ -59,9 +59,8 @@ public class Resource
      * a problem with authorization to read from the database. Throws Exception
      * if there was a problem creating context.
      * 
-     * @param person
-     *            User which will be logged in context.
-     * @return Newly created context with the logged in user unless the specified user was null.
+     *
+     * @param httpHeaders@return Newly created context with the logged in user unless the specified user was null.
      *         If user is null, create the context without a logged in user.
      * @throws ContextException
      *             Thrown in case of a problem creating context. Can be caused by
@@ -69,7 +68,7 @@ public class Resource
      *             log in. Can be caused by AuthorizeException if there was a
      *             problem authorizing the found user.
      */
-    protected static org.dspace.core.Context createContext(EPerson person) throws ContextException
+    protected static org.dspace.core.Context createContext(HttpHeaders httpHeaders) throws ContextException
     {
 
         org.dspace.core.Context context = null;
@@ -78,6 +77,7 @@ public class Resource
         {
             context = new org.dspace.core.Context();
             context.getDBConnection().setAutoCommit(false); // Disable autocommit.
+            EPerson person = getUser(context, httpHeaders);
 
             if (person != null)
             {
@@ -247,14 +247,12 @@ public class Resource
      * @return Return EPerson logged under token in headers. If token was wrong
      *         or header rest-dspace-token was missing, returns null.
      */
-    protected static EPerson getUser(HttpHeaders headers)
+    protected static EPerson getUser(org.dspace.core.Context context, HttpHeaders headers)
     {
-        List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
-        String token = null;
-        if ((list != null) && (list.size() > 0))
+        String token = getToken(headers);
+        if (token != null)
         {
-            token = list.get(0);
-            return TokenHolder.getEPerson(token);
+            return TokenHolder.getEPerson(context, token);
         }
         return null;
     }

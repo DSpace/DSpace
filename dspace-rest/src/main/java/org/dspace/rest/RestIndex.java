@@ -172,11 +172,11 @@ public class RestIndex {
         List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
         String token = null;
         boolean logout = false;
-        EPerson ePerson = null;
+        String ePersonMail = null;
         if (list != null)
         {
             token = list.get(0);
-            ePerson = TokenHolder.getEPerson(token);
+            ePersonMail = TokenHolder.getEMail(token);
             logout = TokenHolder.logout(token);
         }
         if ((token == null) || (!logout))
@@ -184,8 +184,8 @@ public class RestIndex {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        if(ePerson != null) {
-            log.info("REST Logout: " + ePerson.getEmail());
+        if(ePersonMail != null) {
+            log.info("REST Logout: " + ePersonMail);
         }
         return Response.ok().build();
     }
@@ -207,24 +207,18 @@ public class RestIndex {
         org.dspace.core.Context context = null;
 
         try {
-            context = Resource.createContext(Resource.getUser(headers));
+            context = Resource.createContext(headers);
             EPerson ePerson = context.getCurrentUser();
 
             if(ePerson != null) {
-                //DB EPerson needed since token won't have full info, need context
-                EPerson dbEPerson = EPerson.findByEmail(context, ePerson.getEmail());
                 String token = Resource.getToken(headers);
-                Status status = new Status(dbEPerson.getEmail(), dbEPerson.getFullName(), token);
+                Status status = new Status(ePerson.getEmail(), ePerson.getFullName(), token);
                 return status;
             }
 
         } catch (ContextException e)
         {
             Resource.processException("Status context error: " + e.getMessage(), context);
-        } catch (SQLException e) {
-            Resource.processException("Status eperson db lookup error: " + e.getMessage(), context);
-        } catch (AuthorizeException e) {
-            Resource.processException("Status eperson authorize exception: " + e.getMessage(), context);
         } finally {
             context.abort();
         }
