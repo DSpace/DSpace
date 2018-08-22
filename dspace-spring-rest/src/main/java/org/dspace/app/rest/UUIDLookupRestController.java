@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.GenericDSpaceObjectConverter;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -93,7 +92,7 @@ public class UUIDLookupRestController implements InitializingBean {
                 DSpaceObject dso = dSpaceObjectService.find(context, uuid);
                 if (dso != null) {
                     DSpaceObjectRest dsor = converter.convert(dso);
-                    URI link = linkTo(dsor.getController(), dsor.getCategory(), English.plural(dsor.getType()))
+                    URI link = linkTo(dsor.getController(), dsor.getCategory(), dsor.getTypePlural())
                             .slash(dsor.getId()).toUri();
                     response.setStatus(HttpServletResponse.SC_FOUND);
                     response.sendRedirect(link.toString());
