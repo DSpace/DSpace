@@ -26,6 +26,7 @@ import org.dspace.authority.orcid.jaxb.common.OrcidId;
 import org.dspace.authority.orcid.jaxb.common.SourceType;
 import org.dspace.authority.orcid.jaxb.common.Url;
 import org.dspace.authority.orcid.jaxb.personaldetails.NameCtype;
+import org.dspace.authority.orcid.jaxb.personaldetails.NameCtype.GivenNames;
 import org.dspace.authority.orcid.jaxb.personaldetails.PersonalDetails;
 import org.dspace.authority.orcid.jaxb.work.Citation;
 import org.dspace.authority.orcid.jaxb.work.CitationType;
@@ -239,16 +240,24 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
             NameCtype name = personalDetails.getName();
             if (name != null)
             {
+            	String value = "Undefined";
                 CreditName cname = name.getCreditName();
                 if (cname != null)
                 {
-                    authNames.add(new StringValue(cname.getValue()));
+                    value = cname.getValue();
+					
                 }
                 else
                 {
-                    authNames.add(new StringValue(name.getFamilyName() + ", "
-                            + name.getGivenNames()));
+                    try {
+						GivenNames givenNames = name.getGivenNames();
+						value = name.getFamilyName().getValue()
+								+ (givenNames != null ? ", " + givenNames.getValue() : "");
+					} catch (NullPointerException e) {
+						// the family name is missing! left it as Undefined
+					}
                 }
+                authNames.add(new StringValue(value));
             }
             authOrcid.add(new StringValue(orcid));
         }
