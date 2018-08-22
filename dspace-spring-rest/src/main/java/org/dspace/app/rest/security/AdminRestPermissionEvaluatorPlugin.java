@@ -9,20 +9,14 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.UUID;
 
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +33,6 @@ public class AdminRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEv
 
     private static final Logger log = LoggerFactory.getLogger(DSpaceObjectPermissionEvaluatorPlugin.class);
 
-
     @Autowired
     private AuthorizeService authorizeService;
 
@@ -48,9 +41,6 @@ public class AdminRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEv
 
     @Autowired
     private EPersonService ePersonService;
-
-    @Autowired
-    private ContentServiceFactory contentServiceFactory;
 
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
@@ -66,23 +56,15 @@ public class AdminRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEv
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
 
             if (ePerson != null) {
+
                 //Check if user is a repository admin
                 if (authorizeService.isAdmin(context, ePerson)) {
                     return true;
-                } else {
-
-                    //Check if the user is an admin of the current DSpace Object
-
-                    UUID dsoId = UUIDUtils.fromString(targetId.toString());
-                    DSpaceObjectService dSpaceObjectService = contentServiceFactory.getDSpaceObjectService(
-                            Constants.getTypeID(targetType));
-
-                    if (dSpaceObjectService != null && dsoId != null) {
-                        DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
-
-                        return authorizeService.isAdmin(context, ePerson, dSpaceObject);
-                    }
                 }
+
+                //We don't check the DSO Admin level here as this is action specific.
+                //For example see org.dspace.authorize.AuthorizeConfiguration.canCollectionAdminPerformItemDeletion
+
             }
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
