@@ -38,9 +38,9 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.content.WorkspaceItem;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -1125,7 +1125,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .andExpect(status().is(422));
 
         //Check templateItem is available after failed deletion
-        getClient().perform(get("/api/core/items/" + templateItem.getID()))
+        getClient(token).perform(get("/api/core/items/" + templateItem.getID()))
                    .andExpect(status().isOk());
     }
 
@@ -1151,8 +1151,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(delete("/api/core/items/" + workspaceItem.getItem().getID()))
                     .andExpect(status().is(422));
 
-        //Check templateItem is available after failed deletion
-        getClient().perform(get("/api/core/items/" + workspaceItem.getID()))
+        //Check workspaceItem is available after failed deletion
+        getClient(token).perform(get("/api/core/items/" + workspaceItem.getItem().getID()))
                    .andExpect(status().isOk());
     }
 

@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.xmlbeans.impl.regex.Match;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
@@ -35,18 +34,13 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+
 
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
-
-    @Autowired
-    EPersonService ePersonService;
 
     @Test
     public void createTest() throws Exception {
@@ -260,7 +254,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$", is(
                         EPersonMatcher.matchEPersonOnEmail(eperson.getEmail())
                 )))
-                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/eperson/epersons/" + eperson.getID())));
+                .andExpect(jsonPath("$._links.self.href",
+                                    Matchers.containsString("/api/eperson/epersons/" + eperson.getID())));
 
     }
 

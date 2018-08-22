@@ -55,7 +55,8 @@ import org.springframework.web.context.WebApplicationContext;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {Application.class, ApplicationConfig.class, WebSecurityConfiguration.class, MethodSecurityConfig.class})
+@SpringBootTest(classes = {Application.class, ApplicationConfig.class, WebSecurityConfiguration.class,
+        MethodSecurityConfig.class})
 @TestExecutionListeners( {DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
     TransactionalTestExecutionListener.class})
 @DirtiesContext

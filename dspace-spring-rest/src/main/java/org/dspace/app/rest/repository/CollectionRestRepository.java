@@ -99,7 +99,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
             if (com == null) {
                 throw new ResourceNotFoundException(
                         CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
-                                + " not found");
+                        + " not found");
             }
             it = cs.findAuthorized(context, com, Constants.ADD);
             for (Collection c : it) {

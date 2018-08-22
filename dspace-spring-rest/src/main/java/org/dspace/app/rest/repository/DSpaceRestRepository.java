@@ -141,7 +141,6 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     }
 
-
     @Override
     public Iterable<T> findAll(Sort sort) {
         throw new RuntimeException("findAll MUST be paginated");
