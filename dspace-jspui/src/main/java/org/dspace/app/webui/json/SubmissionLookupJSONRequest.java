@@ -310,6 +310,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest
                 {
                     if(!valueMap.get("provider_loader").equals("pdf") || !skipPreview){
                     	file.delete();
+                    	filepath="";
                     }
                 }
             }
