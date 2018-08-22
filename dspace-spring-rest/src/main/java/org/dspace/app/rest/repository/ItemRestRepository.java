@@ -105,7 +105,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException,
         ResourceNotFoundException {
 
-        ItemRest restModel = findOne(context, uuid);
+        ItemRest restModel = findOne(uuid);
         if (restModel == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
         }

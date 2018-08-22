@@ -25,7 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * An authenicated user is allowed to view and update his or her own data. This {@link RestPermissionEvaluatorPlugin}
+ * An authenicated user is allowed to view, update or delete his or her own data. This {@link RestPermissionEvaluatorPlugin}
  * implemenents that requirement.
  */
 @Component
@@ -39,19 +39,20 @@ public class EPersonRestPermissionEvaluatorPlugin extends DSpaceObjectPermission
     @Autowired
     private EPersonService ePersonService;
 
-    /**
-     * Alternative method for evaluating a permission where only the identifier of the
-     * target object is available, rather than the target instance itself.
-     *
-     * @param authentication represents the user in question. Should not be null.
-     * @param targetId the UUID for the DSpace object
-     * @param targetType represents the DSpace object type of the target object. Not null.
-     * @param permission a representation of the permission object as supplied by the
-     * expression system. This corresponds to the DSpace action. Not null.
-     * @return true if the permission is granted by one of the plugins, false otherwise
-     */
+    @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId,
                                  String targetType, Object permission) {
+        //For now this plugin only evaluates READ access
+        DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
+        if (!DSpaceRestPermission.READ.equals(restPermission)
+                && !DSpaceRestPermission.WRITE.equals(restPermission)
+                && !DSpaceRestPermission.DELETE.equals(restPermission)) {
+            return false;
+        }
+        if (Constants.getTypeID(targetType) != Constants.EPERSON) {
+            return false;
+        }
+
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getServletRequest());
         EPerson ePerson = null;
@@ -59,14 +60,14 @@ public class EPersonRestPermissionEvaluatorPlugin extends DSpaceObjectPermission
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
             UUID dsoId = UUID.fromString(targetId.toString());
 
-            if (Constants.getTypeID(targetType) == Constants.EPERSON) {
-                if (dsoId.equals(ePerson.getID())) {
-                    return true;
-                }
+            if (dsoId.equals(ePerson.getID())) {
+                return true;
             }
+
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
+
         return false;
     }
 }
