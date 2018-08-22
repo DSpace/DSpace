@@ -22,6 +22,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
+import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,26 +49,43 @@ public class AdminRestPermissionEvaluatorPlugin extends DSpaceObjectPermissionEv
     @Autowired
     private EPersonService ePersonService;
 
+    @Autowired
+    private ContentServiceFactory contentServiceFactory;
+
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
                                  Object permission) {
+
+        //We do not check the "permission" object here because administrators are allowed to do everything
+
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getServletRequest());
         EPerson ePerson = null;
+
         try {
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
 
-            UUID dsoId = UUID.fromString(targetId.toString());
-            DSpaceObjectService<DSpaceObject> dSpaceObjectService =
-                    ContentServiceFactory.getInstance()
-                                         .getDSpaceObjectService(
-                                                 Constants.getTypeID(
-                                                         targetType));
-            DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
+            if (ePerson != null) {
+                //Check if user is a repository admin
+                if (authorizeService.isAdmin(context, ePerson)) {
+                    return true;
+                } else {
 
-            return authorizeService.isAdmin(context, ePerson, dSpaceObject);
+                    //Check if the user is an admin of the current DSpace Object
+
+                    UUID dsoId = UUIDUtils.fromString(targetId.toString());
+                    DSpaceObjectService dSpaceObjectService = contentServiceFactory.getDSpaceObjectService(
+                            Constants.getTypeID(targetType));
+
+                    if (dSpaceObjectService != null && dsoId != null) {
+                        DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
+
+                        return authorizeService.isAdmin(context, ePerson, dSpaceObject);
+                    }
+                }
+            }
         } catch (SQLException e) {
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }
         return false;
     }

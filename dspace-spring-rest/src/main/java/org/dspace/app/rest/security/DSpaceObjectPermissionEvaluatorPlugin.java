@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 public abstract class DSpaceObjectPermissionEvaluatorPlugin  implements RestPermissionEvaluatorPlugin {
 
     /**
+     * Utility implementation to make the implementation of DSpace Object Permission evaluator plugins more easy.
      *
      * @param authentication represents the user in question. Should not be null.
      * @param targetDomainObject the DSpace object for which permissions should be

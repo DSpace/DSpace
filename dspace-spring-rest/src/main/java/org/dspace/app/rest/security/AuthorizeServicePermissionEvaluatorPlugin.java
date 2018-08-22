@@ -22,6 +22,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
+import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,40 +48,44 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends DSpaceObjectPermi
     @Autowired
     private EPersonService ePersonService;
 
-    /**
-     * Alternative method for evaluating a permission where only the identifier of the
-     * target object is available, rather than the target instance itself.
-     *
-     * @param authentication represents the user in question. Should not be null.
-     * @param targetId the UUID for the DSpace object
-     * @param targetType represents the DSpace object type of the target object. Not null.
-     * @param permission a representation of the permission object as supplied by the
-     * expression system. This corresponds to the DSpace action. Not null.
-     * @return true if the permission is granted by one of the plugins, false otherwise
-     */
+    @Autowired
+    private ContentServiceFactory contentServiceFactory;
+
+    @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
                                  Object permission) {
+
+        DSpaceRestPermission restPermission = DSpaceRestPermission.convert(permission);
+        if (restPermission == null) {
+            return false;
+        }
+
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getServletRequest());
         EPerson ePerson = null;
         try {
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
 
-            UUID dsoId = UUID.fromString(targetId.toString());
-            DSpaceObjectService<DSpaceObject> dSpaceObjectService =
-                    ContentServiceFactory.getInstance()
-                                         .getDSpaceObjectService(Constants.getTypeID(targetType));
-            DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
+            UUID dsoId = UUIDUtils.fromString(targetId.toString());
+            DSpaceObjectService dSpaceObjectService =
+                    contentServiceFactory.getDSpaceObjectService(Constants.getTypeID(targetType));
 
-            //If the dso is null then we give permission so we can throw another status code instead
-            if (dSpaceObject == null) {
-                return true;
+            if (dSpaceObjectService != null && dsoId != null) {
+                DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
+
+                //If the dso is null then we give permission so we can throw another status code instead
+                if (dSpaceObject == null) {
+                    return true;
+                }
+
+                return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,
+                        restPermission.getDspaceApiActionId(), false);
             }
-            int action = Constants.getActionID((String) permission);
-            return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject, action, false);
+
         } catch (SQLException e) {
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }
+
         return false;
     }
 }
