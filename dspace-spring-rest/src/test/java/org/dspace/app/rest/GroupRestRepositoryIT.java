@@ -48,8 +48,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$._embedded.groups", hasSize(2)))
                    // The default groups should consist of "Anonymous" and "Anonymous"
                    .andExpect(jsonPath("$._embedded.groups", Matchers.containsInAnyOrder(
-                           GroupMatcher.matchGroupWithName("Administrator"),
-                           GroupMatcher.matchGroupWithName("Anonymous")
+                       GroupMatcher.matchGroupWithName("Administrator"),
+                       GroupMatcher.matchGroupWithName("Anonymous")
                    )))
         ;
     }
@@ -90,19 +90,19 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         String generatedGroupId = group.getID().toString();
         String groupIdCall = "/api/eperson/groups/" + generatedGroupId;
         getClient(token).perform(get(groupIdCall))
-                        //The status has to be 200 OK
-                        .andExpect(status().isOk())
-                        .andExpect(content().contentType(contentType))
-                        .andExpect(jsonPath("$", Matchers.is(
-                                GroupMatcher.matchGroupEntry(group.getID(), group.getName())
-                        )))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                       GroupMatcher.matchGroupEntry(group.getID(), group.getName())
+                   )))
         ;
         getClient(token).perform(get("/api/eperson/groups"))
-                        //The status has to be 200 OK
-                        .andExpect(status().isOk())
-                        .andExpect(content().contentType(contentType))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
 
-                        .andExpect(jsonPath("$.page.totalElements", is(3)));
+                   .andExpect(jsonPath("$.page.totalElements", is(3)));
 
     }
 
@@ -119,7 +119,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                    .addMember(eperson)
                                    .build();
 
-//Admin can access
+        //Admin can access
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/eperson/groups/" + group2.getID()))
                         .andExpect(status().isOk())

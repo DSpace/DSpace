@@ -87,7 +87,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         } catch (SQLException se) {
             log.error("Error initializing database", se);
             fail("Error initializing database: " + se.getMessage()
-                         + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
+                     + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
         }
     }
 
@@ -122,6 +122,9 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 ePersonService.update(context, eperson);
             }
 
+            // Set our global test EPerson as the current user in DSpace
+            context.setCurrentUser(eperson);
+
             // If our Anonymous/Administrator groups aren't initialized, initialize them as well
             EPersonServiceFactory.getInstance().getGroupService().initDefaultGroupNames(context);
 
@@ -142,9 +145,6 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 Group adminGroup = groupService.findByName(context, Group.ADMIN);
                 groupService.addMember(context, adminGroup, admin);
             }
-
-            // Set our global test EPerson as the current user in DSpace
-            context.setCurrentUser(admin);
 
             context.restoreAuthSystemState();
         } catch (AuthorizeException ex) {
