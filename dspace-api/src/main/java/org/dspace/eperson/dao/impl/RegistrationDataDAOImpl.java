@@ -39,7 +39,7 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
         Root<RegistrationData> registrationDataRoot = criteriaQuery.from(RegistrationData.class);
         criteriaQuery.select(registrationDataRoot);
         criteriaQuery.where(criteriaBuilder.equal(registrationDataRoot.get(RegistrationData_.email), email));
-        return uniqueResult(context, criteriaQuery, true, RegistrationData.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, RegistrationData.class, -1, -1);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
         Root<RegistrationData> registrationDataRoot = criteriaQuery.from(RegistrationData.class);
         criteriaQuery.select(registrationDataRoot);
         criteriaQuery.where(criteriaBuilder.equal(registrationDataRoot.get(RegistrationData_.token), token));
-        return uniqueResult(context, criteriaQuery, true, RegistrationData.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, RegistrationData.class, -1, -1);
     }
 
     @Override

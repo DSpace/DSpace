@@ -46,7 +46,7 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
         criteriaQuery.where(criteriaBuilder.equal(join.get(MetadataField_.id), metadataField.getID()));
 
 
-        return list(context, criteriaQuery, true, MetadataValue.class, -1, -1);
+        return list(context, criteriaQuery, false, MetadataValue.class, -1, -1);
     }
 
     @Override

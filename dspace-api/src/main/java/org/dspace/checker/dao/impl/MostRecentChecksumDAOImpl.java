@@ -14,13 +14,16 @@ import java.util.List;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
 import org.dspace.checker.ChecksumHistory;
 import org.dspace.checker.ChecksumHistory_;
+import org.dspace.checker.ChecksumResult;
 import org.dspace.checker.ChecksumResultCode;
+import org.dspace.checker.ChecksumResult_;
 import org.dspace.checker.MostRecentChecksum;
 import org.dspace.checker.MostRecentChecksum_;
 import org.dspace.checker.dao.MostRecentChecksumDAO;
@@ -82,11 +85,15 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
+        Join<MostRecentChecksum, ChecksumResult> mostRecentResult =
+            mostRecentChecksumRoot.join(MostRecentChecksum_.checksumResult);
+
         criteriaQuery.select(mostRecentChecksumRoot);
         criteriaQuery.where(criteriaBuilder.and(
-            criteriaBuilder.equal(mostRecentChecksumRoot.get("checksumResult.resultCode"), resultCode),
-            criteriaBuilder.lessThanOrEqualTo(mostRecentChecksumRoot.get("processStartDate"), startDate),
-            criteriaBuilder.greaterThan(mostRecentChecksumRoot.get("processStartDate"), endDate)
+            criteriaBuilder.equal(mostRecentResult.get(ChecksumResult_.resultCode), resultCode),
+            criteriaBuilder.lessThanOrEqualTo(
+                mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), startDate),
+            criteriaBuilder.greaterThan(mostRecentChecksumRoot.get(MostRecentChecksum_.processStartDate), endDate)
                             )
         );
         List<Order> orderList = new LinkedList<>();
@@ -112,8 +119,8 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         criteriaQuery.select(mostRecentChecksumRoot);
         criteriaQuery.where(criteriaBuilder.equal(mostRecentChecksumRoot.get(MostRecentChecksum_.toBeProcessed), true));
         List<Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream)));
         orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.processEndDate)));
+        orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream)));
         criteriaQuery.orderBy(orderList);
         return singleResult(context, criteriaQuery);
     }
