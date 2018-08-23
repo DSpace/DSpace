@@ -91,7 +91,7 @@
     %><p>Can't update author!<br/> <%
         }
     %>
-        <br/><input type="button" value="Return back" onClick="history.go(-2)"></p>
+        <br/><a href = "authors.jsp">Return Back</a></p>
         <%
         } else if (action.equals("new")) {
             try {
@@ -114,7 +114,7 @@
     %><p>Can't add author!<br/><%
         }
     %>
-        <br/><input type="button" value="Return back" onClick="history.go(-2)"></p>
+        <br/><a href = "authors.jsp">Return Back</a></p>
         <%
         } else {
             boolean newAuthor = false;
@@ -162,8 +162,9 @@
             }
         %>
         <p>
-            <strong>Edit author: </strong><%=surname %>, <%=initials %>
-
+            <blockquote class="blockquote text-center">
+                <p class="mb-0">Edit author: <%=surname %>, <%=initials %></p>
+            </blockquote>
             <input type="hidden" name="old_surname_en" value="<%=surname %>"/>
             <input type="hidden" name="old_initials_en" value="<%=initials %>"/>
             <input type="hidden" name="old_surname_uk" value="<%=surname_uk %>"/>
@@ -175,41 +176,63 @@
         </p>
         <%
             }
-        %><table align="center" width="95%">
-        <tr>
-            <td>Surname EN</td>
-            <td><input type="text" name="surname_en" value="<%=surname_en %>"/></td>
-            <td>Initials EN</td>
-            <td><input type="text" name="initials_en" size="35" value="<%=initials_en %>"/></td>
-        </tr>
-        <tr>
-            <td>Surname UK</td>
-            <td><input type="text" name="surname_uk" value="<%=surname_uk %>"/></td>
-            <td>Initials UK</td>
-            <td><input type="text" name="initials_uk" size="35" value="<%=initials_uk %>"/></td>
-        </tr>
-        <tr>
-            <td>Surname RU</td>
-            <td><input type="text" name="surname_ru" value="<%=surname_ru %>"/></td>
-            <td>Initials RU</td>
-            <td><input type="text" name="initials_ru" size="35" value="<%=initials_ru %>"/></td>
-        </tr>
-        <tr>
-            <td>ORCID</td>
-            <td colspan ="3"><input type="text" name="orcid" value="<%= orcid %>" size="100"/></td>
-        </tr>
-    </table>
+        %>
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group row">
+                    <label for="surname_en" class="col-sm-3 col-form-label">Surname EN</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="surname_en" id="surname_en" placeholder="Surname EN" value="<%=surname_en %>">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="surname_uk" class="col-sm-3 col-form-label">Surname UK</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="surname_uk" id="surname_uk" placeholder="Surname UK" value="<%=surname_uk %>">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="surname_ru" class="col-sm-3 col-form-label">Surname RU</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="surname_ru" id="surname_ru" placeholder="Surname RU" value="<%=surname_ru %>">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="orcid" class="col-sm-3 col-form-label">ORCID</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="orcid" id="orcid" placeholder="ORCID" value="<%=orcid %>">
+                    </div>
+                </div>
+            </div>
 
-        <p>
-            <input type="submit" name="submit" value="<%= newAuthor ? "Add author" : "Update author" %>"/>
-            <%
-                if (!newAuthor) {
-            %>
-            <input type="submit" name="submit" value="Update and fix"/>
-            <%
-                }
-            %>
-            <input type="button" value="Return back" onClick="history.go(-1)">
+            <div class="col-md-5 col-md-offset-1">
+                <div class="form-group row">
+                    <label for="initials_en" class="col-sm-3 col-form-label">Initials EN</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="initials_en" id="initials_en" placeholder="Initials EN" value="<%=initials_en %>">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="initials_uk" class="col-sm-3 col-form-label">Initials UK</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="initials_uk" id="initials_uk" placeholder="Initials UK" value="<%=initials_uk %>">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="initials_ru" class="col-sm-3 col-form-label">Initials RU</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="initials_ru" id="initials_ru" placeholder="Initials RU" value="<%=initials_ru %>">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="pull-right">
+            <input class="btn btn-success" type="submit" name="submit" value="Save"/>
+            <input class="btn btn-info" type="button" name="button" value="Back" onclick="window.location.href='authors.jsp'"/>
+            <div class="col-md-1">&nbsp;</div>
         </p>
 
         <%

@@ -55,6 +55,7 @@
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.min.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/treeview.css" type="text/css"/>
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/pagination.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css"/>
 <%
     if (!"NONE".equals(feedRef))
     {
