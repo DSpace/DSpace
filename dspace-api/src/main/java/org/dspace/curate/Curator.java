@@ -14,8 +14,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -69,16 +71,12 @@ public class Curator {
         INTERACTIVE, BATCH, ANY
     }
 
-    ;
-
     // transaction scopes
     public static enum TxScope {
         OBJECT, CURATION, OPEN
     }
 
-    ;
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Curator.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<>();
 
@@ -86,7 +84,7 @@ public class Curator {
     protected Map<String, TaskRunner> trMap = new HashMap<>();
     protected List<String> perfList = new ArrayList<>();
     protected TaskQueue taskQ = null;
-    protected String reporter = null;
+    protected Appendable reporter = null;
     protected Invoked iMode = null;
     protected TaskResolver resolver = new TaskResolver();
     protected TxScope txScope = TxScope.OPEN;
@@ -193,7 +191,7 @@ public class Curator {
      *                 causes reporting to standard out.
      * @return return self (Curator instance) with reporter set
      */
-    public Curator setReporter(String reporter) {
+    public Curator setReporter(Appendable reporter) {
         this.reporter = reporter;
         return this;
     }
@@ -346,9 +344,10 @@ public class Curator {
      * @param message the message to output to the reporting stream.
      */
     public void report(String message) {
-        // Stub for now
-        if ("-".equals(reporter)) {
-            System.out.println(message);
+        try {
+            reporter.append(message);
+        } catch (IOException ex) {
+            log.error("Task reporting failure", ex);
         }
     }
 

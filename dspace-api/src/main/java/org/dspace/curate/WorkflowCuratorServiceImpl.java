@@ -14,8 +14,14 @@ import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +62,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class WorkflowCuratorServiceImpl implements WorkflowCuratorService {
 
     /**
-     * log4j logger
+     * Logging category
      */
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkflowCuratorServiceImpl.class);
+    private static final Logger log
+        = org.apache.logging.log4j.LogManager.getLogger();
 
     protected Map<String, TaskSet> tsMap = new HashMap<String, TaskSet>();
 
@@ -118,6 +125,7 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService {
             Curator curator = new Curator();
             // are we going to perform, or just put on queue?
             if (step.queue != null) {
+                // The queue runner will call setReporter
                 for (Task task : step.tasks) {
                     curator.addTask(task.name);
                 }
@@ -125,7 +133,15 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService {
                 basicWorkflowItemService.update(c, wfi);
                 return false;
             } else {
-                return curate(curator, c, wfi);
+                Date now = GregorianCalendar.getInstance().getTime();
+                SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMDDThhmmssSSS");
+                String filename = String.format("curation-%s.log", sdf.format(now));
+                Path logPath = Paths.get(
+                        configurationService.getProperty("dspace.dir"), "logs", filename);
+                try (PrintWriter reporter = new PrintWriter(logPath.toFile())) {
+                    curator.setReporter(reporter);
+                    return curate(curator, c, wfi);
+                }
             }
         }
         return true;
