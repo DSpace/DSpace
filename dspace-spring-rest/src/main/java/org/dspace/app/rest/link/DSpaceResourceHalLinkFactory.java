@@ -21,6 +21,7 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
@@ -45,7 +46,7 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
                 Method readMethod = pd.getReadMethod();
                 String name = pd.getName();
                 if (readMethod != null && !"class".equals(name)) {
-                    LinkRest linkAnnotation = readMethod.getAnnotation(LinkRest.class);
+                    LinkRest linkAnnotation = AnnotationUtils.findAnnotation(readMethod, LinkRest.class);
 
                     if (linkAnnotation != null) {
                         if (StringUtils.isNotBlank(linkAnnotation.name())) {
@@ -57,10 +58,9 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
                         if (StringUtils.isBlank(linkAnnotation.method())) {
                             Object linkedObject = readMethod.invoke(data);
 
-                            if (linkedObject instanceof RestAddressableModel && linkAnnotation.linkClass()
-                                                                                              .isAssignableFrom(
-                                                                                                  linkedObject
-                                                                                                      .getClass())) {
+                            if (linkedObject instanceof RestAddressableModel
+                                    && linkAnnotation.linkClass().isAssignableFrom(linkedObject.getClass())) {
+
                                 linkToSubResource = utils
                                     .linkToSingleResource((RestAddressableModel) linkedObject, name);
                             }

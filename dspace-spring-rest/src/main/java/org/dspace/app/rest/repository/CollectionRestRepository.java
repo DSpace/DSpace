@@ -29,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -55,6 +56,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'COLLECTION', 'READ')")
     public CollectionRest findOne(Context context, UUID id) {
         Collection collection = null;
         try {

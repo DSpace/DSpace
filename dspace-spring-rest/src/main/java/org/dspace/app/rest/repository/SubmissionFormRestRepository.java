@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,6 +42,7 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         inputReader = new DCInputsReader();
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public SubmissionFormRest findOne(Context context, String submitName) {
         DCInputSet inputConfig;
@@ -55,6 +57,7 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         return converter.convert(inputConfig);
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionFormRest> findAll(Context context, Pageable pageable) {
         List<DCInputSet> subConfs = new ArrayList<DCInputSet>();

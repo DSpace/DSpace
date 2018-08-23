@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,6 +48,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'READ')")
     public CommunityRest findOne(Context context, UUID id) {
         Community community = null;
         try {

@@ -47,8 +47,7 @@ public class ItemMatcher {
             hasJsonPath("$._links.self.href", startsWith(REST_SERVER_URL)),
             hasJsonPath("$._links.bitstreams.href", startsWith(REST_SERVER_URL)),
             hasJsonPath("$._links.owningCollection.href", startsWith(REST_SERVER_URL)),
-            hasJsonPath("$._links.templateItemOf.href", startsWith(REST_SERVER_URL)),
-            hasJsonPath("$._links.self.href", startsWith(REST_SERVER_URL))
+            hasJsonPath("$._links.templateItemOf.href", startsWith(REST_SERVER_URL))
         );
     }
 

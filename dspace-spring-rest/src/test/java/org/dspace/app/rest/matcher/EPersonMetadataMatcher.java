@@ -31,4 +31,10 @@ public class EPersonMetadataMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchLanguage(String language) {
+        return allOf(
+                hasJsonPath("$.key", is("eperson.language")),
+                hasJsonPath("$.value", is(language))
+        );
+    }
 }
