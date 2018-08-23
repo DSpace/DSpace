@@ -8,7 +8,7 @@
 package org.dspace.app.rest.security;
 
 import static org.dspace.app.rest.security.WebSecurityConfiguration.ADMIN_GRANT;
-import static org.dspace.app.rest.security.WebSecurityConfiguration.EPERSON_GRANT;
+import static org.dspace.app.rest.security.WebSecurityConfiguration.AUTHENTICATED_GRANT;
 
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -150,7 +150,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                 authorities.add(new SimpleGrantedAuthority(ADMIN_GRANT));
             }
 
-            authorities.add(new SimpleGrantedAuthority(EPERSON_GRANT));
+            authorities.add(new SimpleGrantedAuthority(AUTHENTICATED_GRANT));
         }
 
         return authorities;

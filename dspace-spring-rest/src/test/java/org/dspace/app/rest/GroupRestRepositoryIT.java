@@ -31,8 +31,16 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllTest() throws Exception {
-        //When we call the root endpoint
+
         getClient().perform(get("/api/eperson/groups"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isUnauthorized());
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/eperson/groups"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -48,8 +56,16 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllPaginationTest() throws Exception {
-        context.turnOffAuthorisationSystem();
+
         getClient().perform(get("/api/eperson/groups"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isUnauthorized());
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/eperson/groups"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -69,9 +85,11 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                   .withName(testGroupName)
                                   .build();
 
+        String token = getAuthToken(admin.getEmail(), password);
+
         String generatedGroupId = group.getID().toString();
         String groupIdCall = "/api/eperson/groups/" + generatedGroupId;
-        getClient().perform(get(groupIdCall))
+        getClient(token).perform(get(groupIdCall))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -79,7 +97,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                        GroupMatcher.matchGroupEntry(group.getID(), group.getName())
                    )))
         ;
-        getClient().perform(get("/api/eperson/groups"))
+        getClient(token).perform(get("/api/eperson/groups"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -89,7 +107,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findOneRelsTest() throws Exception {
+    public void readGroupAuthorizationTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Group group = GroupBuilder.createGroup(context)
@@ -98,21 +116,42 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Group group2 = GroupBuilder.createGroup(context)
                                    .withName("Group2")
+                                   .addMember(eperson)
                                    .build();
 
-        getClient().perform(get("/api/eperson/groups/" + group2.getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$", Matchers.is(
-                       GroupMatcher.matchGroupEntry(group2.getID(), group2.getName())
-                   )))
-                   .andExpect(jsonPath("$", Matchers.not(
-                       Matchers.is(
-                           GroupMatcher.matchGroupEntry(group.getID(), group.getName())
-                       )
-                   )))
-                   .andExpect(jsonPath("$._links.self.href",
-                                       Matchers.containsString("/api/eperson/groups/" + group2.getID())));
+        //Admin can access
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/eperson/groups/" + group2.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", Matchers.is(
+                                GroupMatcher.matchGroupEntry(group2.getID(), group2.getName())
+                        )))
+                        .andExpect(jsonPath("$", Matchers.not(
+                                Matchers.is(
+                                        GroupMatcher.matchGroupEntry(group.getID(), group.getName())
+                                )
+                        )))
+                        .andExpect(jsonPath("$._links.self.href",
+                                        Matchers.containsString("/api/eperson/groups/" + group2.getID())));
+
+
+        //People in group should be able to access token
+        token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/eperson/groups/" + group2.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", Matchers.is(
+                                GroupMatcher.matchGroupEntry(group2.getID(), group2.getName())
+                        )))
+                        .andExpect(jsonPath("$", Matchers.not(
+                                Matchers.is(
+                                        GroupMatcher.matchGroupEntry(group.getID(), group.getName())
+                                )
+                        )))
+                        .andExpect(jsonPath("$._links.self.href",
+                                        Matchers.containsString("/api/eperson/groups/" + group2.getID())));
     }
 
     @Test
