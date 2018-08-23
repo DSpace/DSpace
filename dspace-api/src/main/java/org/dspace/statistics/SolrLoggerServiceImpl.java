@@ -82,6 +82,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.statistics.util.DnsLookup;
@@ -115,8 +116,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     protected DatabaseReader locationService;
 
-    protected boolean useProxies;
-
     private static List<String> statisticYearCores = new ArrayList<String>();
     private static boolean statisticYearCoresInit = false;
 
@@ -126,6 +125,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     protected ContentServiceFactory contentServiceFactory;
     @Autowired(required = true)
     private ConfigurationService configurationService;
+    @Autowired(required = true)
+    private ClientInfoService clientInfoService;
 
     public static enum StatisticsType {
         VIEW("view"),
@@ -192,9 +193,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
         }
         locationService = service;
-
-        useProxies = configurationService.getBooleanProperty("useProxies");
-        log.info("useProxies=" + useProxies);
     }
 
     @Override
@@ -296,26 +294,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         // Save our basic info that we already have
 
         if (request != null) {
-            String ip = request.getRemoteAddr();
-
-            if (isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
-                /* This header is a comma delimited list */
-                for (String xfip : request.getHeader("X-Forwarded-For").split(",")) {
-                    /* proxy itself will sometime populate this header with the same value in
-                    remote address. ordering in spec is vague, we'll just take the last
-                    not equal to the proxy
-                    */
-                    if (!request.getHeader("X-Forwarded-For").contains(ip)) {
-                        ip = xfip.trim();
-                    }
-                }
-            }
-            if (!isUseProxies() && request.getHeader("X-Forwarded-For") != null) {
-                log.warn(
-                    "X-Forwarded-For header detected but useProxies is not enabled. If your dspace is behind a proxy " +
-                        "set it to true");
-            }
-
+            String ip = clientInfoService.getClientIp(request);
             doc1.addField("ip", ip);
 
             //Also store the referrer
@@ -391,65 +370,48 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         SolrInputDocument doc1 = new SolrInputDocument();
         // Save our basic info that we already have
 
-        if (!isUseProxies() && xforwardedfor != null) {
-            log.warn(
-                "X-Forwarded-For header detected but useProxies is not enabled. If your dspace is behind a proxy set " +
-                    "it to true");
+        ip = clientInfoService.getClientIp(ip, xforwardedfor);
+        doc1.addField("ip", ip);
+
+        try {
+            String dns = DnsLookup.reverseDns(ip);
+            doc1.addField("dns", dns.toLowerCase());
+        } catch (Exception e) {
+            log.info("Failed DNS Lookup for IP:" + ip);
+            log.debug(e.getMessage(), e);
         }
-        if (isUseProxies() && xforwardedfor != null) {
-            /* This header is a comma delimited list */
-            for (String xfip : xforwardedfor.split(",")) {
-                    /* proxy itself will sometime populate this header with the same value in
-                    remote address. ordering in spec is vague, we'll just take the last
-                    not equal to the proxy
-                    */
-                if (!xforwardedfor.contains(ip)) {
-                    ip = xfip.trim();
-                }
-            }
-
-            doc1.addField("ip", ip);
-
+        if (userAgent != null) {
+            doc1.addField("userAgent", userAgent);
+        }
+        doc1.addField("isBot", isSpiderBot);
+        // Save the location information if valid, save the event without
+        // location information if not valid
+        if (locationService != null) {
             try {
-                String dns = DnsLookup.reverseDns(ip);
-                doc1.addField("dns", dns.toLowerCase());
-            } catch (Exception e) {
-                log.info("Failed DNS Lookup for IP:" + ip);
-                log.debug(e.getMessage(), e);
-            }
-            if (userAgent != null) {
-                doc1.addField("userAgent", userAgent);
-            }
-            doc1.addField("isBot", isSpiderBot);
-            // Save the location information if valid, save the event without
-            // location information if not valid
-            if (locationService != null) {
-                try {
-                    InetAddress ipAddress = InetAddress.getByName(ip);
-                    CityResponse location = locationService.city(ipAddress);
-                    String countryCode = location.getCountry().getIsoCode();
-                    double latitude = location.getLocation().getLatitude();
-                    double longitude = location.getLocation().getLongitude();
-                    if (!(
-                            "--".equals(countryCode)
-                            && latitude == -180
-                            && longitude == -180)
-                    ) {
-                        try {
-                            doc1.addField("continent", LocationUtils
+                InetAddress ipAddress = InetAddress.getByName(ip);
+                CityResponse location = locationService.city(ipAddress);
+                String countryCode = location.getCountry().getIsoCode();
+                double latitude = location.getLocation().getLatitude();
+                double longitude = location.getLocation().getLongitude();
+                if (!(
+                        "--".equals(countryCode)
+                                && latitude == -180
+                                && longitude == -180)
+                ) {
+                    try {
+                        doc1.addField("continent", LocationUtils
                                 .getContinentCode(countryCode));
-                        } catch (Exception e) {
-                            System.out
+                    } catch (Exception e) {
+                        System.out
                                 .println("COUNTRY ERROR: " + countryCode);
-                        }
-                        doc1.addField("countryCode", countryCode);
-                        doc1.addField("city", location.getCity().getName());
-                        doc1.addField("latitude", latitude);
-                        doc1.addField("longitude", longitude);
                     }
-                } catch (GeoIp2Exception | IOException e) {
-                    log.error("Unable to get location of request:  {}", e.getMessage());
+                    doc1.addField("countryCode", countryCode);
+                    doc1.addField("city", location.getCity().getName());
+                    doc1.addField("latitude", latitude);
+                    doc1.addField("longitude", longitude);
                 }
+            } catch (GeoIp2Exception | IOException e) {
+                log.error("Unable to get location of request:  {}", e.getMessage());
             }
         }
 
@@ -604,7 +566,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public boolean isUseProxies() {
-        return useProxies;
+        return clientInfoService.isUseProxiesEnabled();
     }
 
     @Override
