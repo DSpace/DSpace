@@ -138,7 +138,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         Predicate orPredicate = criteriaBuilder.or(orPredicates.toArray(new Predicate[] {}));
         criteriaQuery.select(communityRoot);
         criteriaQuery.where(
-            criteriaBuilder.and(criteriaBuilder.equal(join.get(ResourcePolicy_.resourceTypeId), Constants.COLLECTION),
+            criteriaBuilder.and(criteriaBuilder.equal(join.get(ResourcePolicy_.resourceTypeId), Constants.COMMUNITY),
                                 criteriaBuilder.equal(join.get(ResourcePolicy_.eperson), ePerson),
                                 orPredicate
             )
