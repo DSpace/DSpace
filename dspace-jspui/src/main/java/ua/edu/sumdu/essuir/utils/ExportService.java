@@ -10,6 +10,7 @@ import ua.edu.sumdu.essuir.entity.Publication;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ExportService {
     public ExportService() {
@@ -36,11 +37,14 @@ public class ExportService {
     private Publication parseData(BrowseItem item) {
         List<String> authors = Arrays.stream(item.getMetadata("dc", "contributor", "author", null)).map(it -> it.value).collect(Collectors.toList());
         List<String> localizedAuthors = AuthorCache.getLocalizedAuthors(authors, "uk");
+        String itemType = Stream.of(item.getMetadata("dc", "type", null, null))
+                .map(type -> EssuirUtils.getTypeLocalized(type.value, "uk"))
+                .findFirst().orElse("");
         return new Publication.Builder()
                 .withAuthors(localizedAuthors.stream().map(author -> author.replaceAll(",", "")).collect(Collectors.joining(";\r\n")))
                 .withCitation(item.getMetadata("dc", "identifier", "citation", null)[0].value)
                 .withTitle(item.getMetadata("dc", "title", null, null)[0].value)
-                .withType(EssuirUtils.getTypeLocalized(item.getMetadata("dc", "type", null, null)[0].value, "uk"))
+                .withType(itemType)
                 .build();
     }
 }
