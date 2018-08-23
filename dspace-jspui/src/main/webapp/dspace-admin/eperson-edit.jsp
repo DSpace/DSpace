@@ -221,9 +221,8 @@
 
                 <script type="text/javascript">
                     var syncList1 = new syncList;
-
+                    startIndex = <%= chairid %>;
                     syncList1.dataList = <%= new GsonBuilder().create().toJson(EssuirUtils.getChairListByFaculties()) %>;
-
                     syncList1.sync("faculty", "chair_id");
                 </script>
             </div>

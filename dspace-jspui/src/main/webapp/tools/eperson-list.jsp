@@ -202,6 +202,7 @@ function clearEPeople()
    else
    {  %>
         <tr>
+			<th id="t0">&nbsp;</th>
             <th id="t1"><fmt:message key="jsp.tools.eperson-list.th.id" /></th>
             <th id="t2"><fmt:message key="jsp.tools.eperson-list.th.email" /></th>
             <th id="t3"><fmt:message key="jsp.tools.eperson-list.th.lastname" /></th>

@@ -24,7 +24,7 @@ syncList.prototype._sync = function (firstSelectId, secondSelectId)
     for (var key in optionData || null) secondSelect.options[secondSelect.length] = new Option(optionData[key], key);
     
     if (firstSelect.selectedIndex == -1) setTimeout( function(){ firstSelect.options[startIndex].selected = true;}, 1 );
-    if (secondSelect.length>0) setTimeout( function(){ secondSelect.options[startIndex].selected = true;}, 1 );
+    if (secondSelect.length>0) setTimeout( function(){ secondSelect.value = startIndex;}, 1 );
 
     if (count == 2)
       startIndex = 0;
