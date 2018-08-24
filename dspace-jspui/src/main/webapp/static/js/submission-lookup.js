@@ -29,6 +29,7 @@ submissionLookupIdentifiers = function(identInputs){
 			{
 				j('#result-list').hide();
 				j('#empty-result').show();
+				j('#result-form').hide();
 			}
 			else
 			{
@@ -111,6 +112,7 @@ submissionLookupDetails = function(button, suffixID){
 submissionLookupShowResult = function(info, suffixID){
 	j('#result-list').show();
 	j('#empty-result').hide();
+	j('#result-form').show();
 	j('#result-list').html(" ");
 	for (var i=0;i<info.result.length;i++)
 	{
