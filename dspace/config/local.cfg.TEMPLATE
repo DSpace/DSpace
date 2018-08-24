@@ -38,7 +38,6 @@ solr.server = https://localhost:8984/solr
 discovery.search.server = ${solr.server}/drum-search
 solr-statistics.server = ${solr.server}/drum-statistics
 oai.solr.url=${solr.server}/drum-oai
-solr.authority.server=${solr.server}/drum-authority
 
 ##########################
 # DATABASE CONFIGURATION #
