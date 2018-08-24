@@ -134,7 +134,7 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService {
                 return false;
             } else {
                 Date now = GregorianCalendar.getInstance().getTime();
-                SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMDDThhmmssSSS");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddThhmmssSSS");
                 String filename = String.format("curation-%s.log", sdf.format(now));
                 Path logPath = Paths.get(
                         configurationService.getProperty("dspace.dir"), "logs", filename);
