@@ -46,9 +46,7 @@ import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.dspace.authority.AuthorityValue;
-import org.dspace.authority.factory.AuthorityServiceFactory;
-import org.dspace.authority.service.AuthorityValueService;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -66,7 +64,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -198,10 +195,6 @@ public class EtdLoader
     private final static AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     protected static EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
-
-    protected static AuthorityValueService authorityValueService =  AuthorityServiceFactory.getInstance().getAuthorityValueService();
-
-    protected static AuthorityValue orcidAuthority = authorityValueService.getAuthorityValueType("orcid");
 
     /***************************************************************** main */
     /**
@@ -432,37 +425,15 @@ public class EtdLoader
         for (Iterator i = l.iterator(); i.hasNext();)
         {
             Node ndc = (Node) i.next();
-            
+
             String value = ndc.getText();
-            
-            String authority = null;
-            
-            int confidence = Choices.CF_NOVALUE;
-            
+
             String element = getXPath("@element").selectSingleNode(ndc)
-            .getText();
-            
+                    .getText();
+
             Node n = getXPath("@qualifier").selectSingleNode(ndc);
             String qualifier = ((n == null || n.getText().equals("none")) ? null
-            : n.getText());
-
-            if ("author".equals(qualifier)) {
-                n = getXPath("@orcid").selectSingleNode(ndc);
-                String orcid_id = (n == null) ? null : n.getText();
-                log.info("Checking ORCID for Author metadata!");
-                if (orcid_id != null && !orcid_id.isEmpty()) {
-                    AuthorityValue authorityValue = authorityValueService.findByOrcidID(context, orcid_id);
-                    if (authorityValue != null) {
-                        log.debug("Authority record found in Solr for orcid_id: " + orcid_id);
-                        authority = authorityValue.getId();
-                    } else {
-                        log.debug("Authority record not found in Solr for orcid_id: " + orcid_id);
-                        authority = orcidAuthority.generateString() + orcid_id;
-                        log.debug("Authority value to be generated: " + authority);
-                    }
-                    confidence = Choices.CF_ACCEPTED;
-                }
-            }
+                    : n.getText());
 
             n = getXPath("@language").selectSingleNode(ndc);
             String language = ((n == null || n.getText().equals("none")) ? null
@@ -472,8 +443,8 @@ public class EtdLoader
                 language = configurationService.getProperty("default.language");
             }
 
-            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, element, qualifier, language, value, authority, confidence);
-            log.debug(element + ":" + qualifier + ":" + language + ":" + value + ":" + authority + ":" + confidence);
+            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, element, qualifier, language, value);
+            log.debug(element + ":" + qualifier + ":" + language + ":" + value);
         }
     }
 

@@ -23,11 +23,6 @@
 
    <xsl:template match="DISS_author">
      <dcvalue element="contributor" qualifier="author">
-       <xsl:if test="DISS_orcid/text()">
-         <xsl:attribute name="orcid">
-           <xsl:value-of select="DISS_orcid/text()"/>
-         </xsl:attribute>
-       </xsl:if>
        <xsl:apply-templates select="DISS_name"/>
      </dcvalue>
    </xsl:template>
