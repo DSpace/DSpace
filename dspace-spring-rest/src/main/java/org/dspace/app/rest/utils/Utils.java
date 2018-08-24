@@ -9,6 +9,13 @@ package org.dspace.app.rest.utils;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +30,7 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
+import org.dspace.core.ConfigurationManager;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -31,6 +39,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Collection of utility methods
@@ -154,5 +163,24 @@ public class Utils {
      */
     public String getMetadataKey(String schema, String element, String qualifier) {
         return org.dspace.core.Utils.standardize(schema, element, qualifier, ".");
+    }
+
+    public static File getFile(MultipartFile multipartFile, String prefixTempName, String suffixTempName)
+            throws IOException, FileNotFoundException {
+        // TODO after change item-submission into
+        String tempDir = (ConfigurationManager.getProperty("upload.temp.dir") != null)
+                ? ConfigurationManager.getProperty("upload.temp.dir")
+                : System.getProperty("java.io.tmpdir");
+        File uploadDir = new File(tempDir);
+        if (!uploadDir.exists()) {
+            if (!uploadDir.mkdir()) {
+                uploadDir = null;
+            }
+        }
+        File file = File.createTempFile(prefixTempName + "-" + suffixTempName, ".temp", uploadDir);
+        InputStream io = new BufferedInputStream(multipartFile.getInputStream());
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+        org.dspace.core.Utils.bufferedCopy(io, out);
+        return file;
     }
 }

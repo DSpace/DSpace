@@ -25,7 +25,7 @@ import org.dspace.services.model.Request;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public interface AbstractRestProcessingStep {
+public interface AbstractRestProcessingStep extends ListenerProcessingStep {
 
     public static final String DESCRIBE_STEP_METADATA_OPERATION_ENTRY = "itemmetadata";
     public static final String COLLECTION_STEP_OPERATION_ENTRY = "collection";

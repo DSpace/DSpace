@@ -148,6 +148,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
+    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
+        throws SQLException {
+        return workspaceItemDAO.findByEPerson(context, ep, limit, offset);
+    }
+
+    @Override
     public List<WorkspaceItem> findByCollection(Context context, Collection collection) throws SQLException {
         return workspaceItemDAO.findByCollection(context, collection);
     }
@@ -229,6 +235,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public int countTotal(Context context) throws SQLException {
         return workspaceItemDAO.countRows(context);
+    }
+
+    @Override
+    public int countByEPerson(Context context, EPerson ep) throws SQLException {
+        return workspaceItemDAO.countRows(context, ep);
     }
 
     @Override
