@@ -25,6 +25,7 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -44,6 +45,13 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     implements PagingAndSortingRepository<T, ID> {
 
     private static final Logger log = Logger.getLogger(DSpaceRestRepository.class);
+
+    //Trick to make inner-calls to ourselves that are checked by Spring security
+    //See:
+    // https://stackoverflow.com/questions/13564627/spring-aop-not-working-for-method-call-inside-another-method
+    // https://docs.spring.io/spring/docs/4.3.18.RELEASE/spring-framework-reference/htmlsingle/#aop-understanding-aop-proxies
+    @Autowired
+    private DSpaceRestRepository<T, ID> thisRepository;
 
     @Override
     public <S extends T> S save(S entity) {
@@ -74,7 +82,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     @Override
     public T findOne(ID id) {
         Context context = obtainContext();
-        return findOne(context, id);
+        return thisRepository.findOne(context, id);
     }
 
     public abstract T findOne(Context context, ID id);
@@ -105,7 +113,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     public void delete(ID id) {
         Context context = obtainContext();
         try {
-            delete(context, id);
+            thisRepository.delete(context, id);
             context.commit();
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
@@ -143,7 +151,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     @Override
     public Page<T> findAll(Pageable pageable) {
         Context context = obtainContext();
-        return findAll(context, pageable);
+        return thisRepository.findAll(context, pageable);
     }
 
     public abstract Page<T> findAll(Context context, Pageable pageable);
@@ -156,7 +164,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         Context context = null;
         try {
             context = obtainContext();
-            T entity = createAndReturn(context);
+            T entity = thisRepository.createAndReturn(context);
             context.commit();
             return entity;
         } catch (AuthorizeException e) {
@@ -180,7 +188,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, PatchBadRequestException {
         Context context = obtainContext();
         try {
-            patch(context, request, apiCategory, model, id, patch);
+            thisRepository.patch(context, request, apiCategory, model, id, patch);
             context.commit();
         } catch (AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);

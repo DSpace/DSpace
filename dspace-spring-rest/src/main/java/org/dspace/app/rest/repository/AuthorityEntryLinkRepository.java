@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,6 +55,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
         return new AuthorityEntryResource(model);
     }
 
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<AuthorityEntryRest> query(HttpServletRequest request, String name,
                                           Pageable pageable, String projection) {
         Context context = obtainContext();

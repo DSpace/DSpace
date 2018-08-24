@@ -1735,7 +1735,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
-                .makePrivate()
+                .makeUnDiscoverable()
                 .build();
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
@@ -1987,7 +1987,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
-                .makePrivate()
+                .makeUnDiscoverable()
                 .build();
 
         UUID scope = col2.getID();
@@ -2142,7 +2142,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("AnotherTest").withSubject("ExtraEntry")
-                .makePrivate()
+                .makeUnDiscoverable()
                 .build();
 
 

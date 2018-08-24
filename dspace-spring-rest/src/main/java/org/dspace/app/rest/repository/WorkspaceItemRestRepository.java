@@ -111,6 +111,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         submissionConfigReader = new SubmissionConfigReader();
     }
 
+    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'READ')")
     @Override
     public WorkspaceItemRest findOne(Context context, Integer id) {
         WorkspaceItem witem = null;
@@ -125,6 +126,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return converter.fromModel(witem);
     }
 
+    //TODO @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public Page<WorkspaceItemRest> findAll(Context context, Pageable pageable) {
         List<WorkspaceItem> witems = null;
@@ -139,6 +141,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return page;
     }
 
+    //TODO @PreAuthorize("hasPermission(#submitterID, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "findBySubmitter")
     public Page<WorkspaceItemRest> findBySubmitter(@Parameter(value = "uuid", required = true) UUID submitterID,
             Pageable pageable) {
@@ -212,6 +215,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return new WorkspaceItemResource(witem, utils, rels);
     }
 
+    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public WorkspaceItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
                                     String extraField, MultipartFile file) throws Exception {
@@ -264,6 +268,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return wsi;
     }
 
+    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
                       Patch patch) throws SQLException, AuthorizeException {
@@ -325,6 +330,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         }
     }
 
+    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")
     @Override
     protected void delete(Context context, Integer id) throws AuthorizeException {
         WorkspaceItem witem = null;
