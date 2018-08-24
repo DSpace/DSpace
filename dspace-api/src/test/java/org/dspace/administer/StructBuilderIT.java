@@ -99,14 +99,18 @@ public class StructBuilderIT
             "<import_structure>\n" +
             "  <community>\n" +
             "    <name>Top Community 0</name>\n" +
+            "    <description/><intro/><copyright/><sidebar/>" +
             "    <community>\n" +
-            "        <name>Sub Community 0.0</name>\n" +
-            "        <collection>\n" +
-            "            <name>Collection 0.0.0</name>\n" +
-            "        </collection>\n" +
+            "      <name>Sub Community 0.0</name>\n" +
+            "      <description/><intro/><copyright/><sidebar/>" +
+            "      <collection>\n" +
+            "        <name>Collection 0.0.0</name>\n" +
+            "        <description/><intro/><copyright/><sidebar/><license/><provenance/>" +
+            "      </collection>\n" +
             "    </community>\n" +
             "    <collection>\n" +
             "      <name>Collection 0.1</name>\n" +
+            "      <description/><intro/><copyright/><sidebar/><license/><provenance/>" +
             "    </collection>\n" +
             "  </community>\n" +
             "</import_structure>\n";
@@ -163,24 +167,20 @@ public class StructBuilderIT
                         IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8)));
         Diff myDiff = DiffBuilder.compare(reference).withTest(output)
                 .normalizeWhitespace()
-                .withNodeFilter(new MyNodeFilter())
+//                .withNodeFilter(new MyNodeFilter())
                 .withAttributeFilter((Attr attr) ->
                         !attr.getName().equals("identifier"))
                 .checkForIdentical()
                 .build();
 
         // Was there a difference?
+        // Always output differences -- one is expected.
         ComparisonFormatter formatter = new DefaultComparisonFormatter();
         for (Difference difference : myDiff.getDifferences()) {
             System.err.println(difference.toString(formatter));
         }
-        if (isDifferent(myDiff)) {
-            // ComparisonFormatter formatter = new DefaultComparisonFormatter();
-            for (Difference difference : myDiff.getDifferences()) {
-                System.err.println(difference.toString(formatter));
-            }
-            assertFalse("Output does not match input.", true);
-        }
+        // Test for *significant* differences.
+        assertFalse("Output does not match input.", isDifferent(myDiff));
 
         // TODO spot-check some objects.
     }
