@@ -55,20 +55,20 @@ import org.xml.sax.SAXException;
  *
  * <pre>{@code
  * <import_structure>
- * <community>
- * <name>....</name>
- * <community>...</community>
- * <collection>
- * <name>....</name>
- * </collection>
- * </community>
+ *   <community>
+ *     <name>....</name>
+ *     <community>...</community>
+ *     <collection>
+ *       <name>....</name>
+ *     </collection>
+ *   </community>
  * </import_structure>
  * }</pre>
- * 
+ *
  * It can be arbitrarily deep, and supports all the metadata elements
  * that make up the community and collection metadata.  See the system
  * documentation for more details.
- * 
+ *
  * @author Richard Jones
  */
 
@@ -542,7 +542,7 @@ public class StructBuilder {
      * @param node the node from which we want to extract the string value
      * @return the string value of the node
      */
-    public static String getStringValue(Node node) {
+    private static String getStringValue(Node node) {
         String value = node.getNodeValue();
 
         if (node.hasChildNodes()) {
