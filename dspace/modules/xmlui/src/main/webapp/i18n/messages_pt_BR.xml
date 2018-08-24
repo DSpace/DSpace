@@ -2079,6 +2079,7 @@
   <message key="xmlui.authority.confidence.description.cf_ambiguous">Existem multiplos valores correspondentes de valor equivalente na autoridade</message>
   <message key="xmlui.authority.confidence.description.cf_uncertain">O valor é singular e válido porém não foi revisado e aceito por um usuário então continua incerto</message>
   <message key="xmlui.authority.confidence.description.cf_accepted">Este valor de autoridade foi confirmado como preciso por um usuário</message>
+  <message key="xmlui.authority.confidence.description.cf_acceptedvariant">Esses metadados estão conectados a uma autoridade, mas seu valor varia em relação ao valor armazenado.</message>
   <!-- help message on "unlock" button in EditItemMetadata display -->
   <message key="xmlui.authority.confidence.unlock.help">Destrava a a chave de aturoridade para edição manual, ou trava novamente</message>
 

@@ -2564,6 +2564,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.authority.confidence.description.cf_ambiguous">Hay múltiples valores de autoridad conformes de igual validez</message>
 <message key="xmlui.authority.confidence.description.cf_uncertain">El valor es único y válido, pero no ha sido visto ni aceptado por ningún usuario por lo que es aún incierto</message>
 <message key="xmlui.authority.confidence.description.cf_accepted">Se ha confirmado la validez de este valor de autoridad por un usuario</message>
+<message key="xmlui.authority.confidence.description.cf_acceptedvariant">Este metadato está contectado a una autoridad, sin embargo su valor varía en relación al valor almacenado.</message>
 
   <!-- help message on "unlock" button in EditItemMetadata display -->
  <message key="xmlui.authority.confidence.unlock.help">Desbloquear el valor de la clave de Autoridad para la edición manual, o cambiarlo para bloquearlo de nuevo</message>

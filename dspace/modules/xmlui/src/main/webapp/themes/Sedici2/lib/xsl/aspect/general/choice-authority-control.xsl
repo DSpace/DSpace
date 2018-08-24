@@ -429,7 +429,7 @@ No redefino todos los templates, solo los que necesito redefinir.
 			</xsl:when>	
 			<xsl:otherwise>
 			 <xsl:call-template name="authorityConfidenceIcon">
-                <xsl:with-param name="confidence">failed</xsl:with-param>
+                <xsl:with-param name="confidence">acceptedvariant</xsl:with-param>
                 <xsl:with-param name="id" select="$confidenceIndicatorID"/>
              </xsl:call-template>
 			</xsl:otherwise>
