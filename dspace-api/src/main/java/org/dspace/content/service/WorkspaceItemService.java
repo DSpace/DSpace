@@ -27,19 +27,7 @@ import org.dspace.workflow.WorkflowItem;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface WorkspaceItemService extends InProgressSubmissionService<WorkspaceItem> {
-
-    /**
-     * Get a workspace item from the database. The item, collection and
-     * submitter are loaded into memory.
-     *
-     * @param context DSpace context object
-     * @param id      ID of the workspace item
-     * @return the workspace item, or null if the ID is invalid.
-     * @throws SQLException if database error
-     */
-    public WorkspaceItem find(Context context, int id) throws SQLException;
-
+public interface WorkspaceItemService extends InProgressSubmissionService<WorkspaceItem, Integer> {
 
     /**
      * Create a new workspace item, with a new ID. An Item is also created. The
@@ -70,6 +58,21 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * @throws SQLException if database error
      */
     public List<WorkspaceItem> findByEPerson(Context context, EPerson ep)
+        throws SQLException;
+
+    /**
+     * Get a page of workspace items for a particular e-person. These are ordered by
+     * workspace item ID, since this should likely keep them in the order in
+     * which they were created.
+     *
+     * @param context the context object
+     * @param ep      the eperson
+     * @param limit   the max number of workspaceitems to return
+     * @param offset  the offset
+     * @return the corresponding workspace items
+     * @throws SQLException if database error
+     */
+    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
         throws SQLException;
 
     /**
@@ -146,4 +149,8 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * @throws SQLException if database error
      */
     List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException;
+
+
+    public int countByEPerson(Context context, EPerson ep) throws SQLException;
+
 }

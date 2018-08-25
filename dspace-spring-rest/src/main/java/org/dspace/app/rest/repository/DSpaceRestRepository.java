@@ -7,8 +7,11 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -19,7 +22,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.model.step.UploadStatusResponse;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -172,11 +174,12 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         }
     }
 
-    protected T createAndReturn(Context context) throws AuthorizeException, RepositoryMethodNotImplementedException {
+    protected T createAndReturn(Context context)
+            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
-    public <U extends UploadStatusResponse> U upload(HttpServletRequest request, String apiCategory, String model,
+    public T upload(HttpServletRequest request, String apiCategory, String model,
                                                      ID id, String extraField, MultipartFile file) throws Exception {
         throw new RuntimeException("No implementation found; Method not allowed!");
     }
@@ -199,6 +202,31 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
                          Patch patch)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
+    }
+
+    public T action(HttpServletRequest request, ID id) throws SQLException, IOException, AuthorizeException {
+        Context context = obtainContext();
+        T entity = action(context, request, id);
+        context.commit();
+        return entity;
+    }
+
+    protected T action(Context context, HttpServletRequest request, ID id)
+        throws SQLException, IOException, AuthorizeException {
+        throw new RuntimeException("No implementation found; Method not allowed!");
+    }
+
+    public Iterable<T> upload(HttpServletRequest request, MultipartFile uploadfile)
+        throws SQLException, FileNotFoundException, IOException, AuthorizeException {
+        Context context = obtainContext();
+        Iterable<T> entity = upload(context, request, uploadfile);
+        context.commit();
+        return entity;
+    }
+
+    protected Iterable<T> upload(Context context, HttpServletRequest request, MultipartFile uploadfile)
+        throws SQLException, FileNotFoundException, IOException, AuthorizeException {
+        throw new RuntimeException("No implementation found; Method not allowed!");
     }
 
 }

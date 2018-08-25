@@ -19,6 +19,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
@@ -306,5 +307,11 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
             }
             context.restoreAuthSystemState();
         }
+    }
+
+    @Override
+    public List<ResourcePolicy> findExceptRpType(Context c, BrowsableDSpaceObject o, int actionID, String rpType)
+        throws SQLException {
+        return resourcePolicyDAO.findByDSoAndActionExceptRpType(c, o, actionID, rpType);
     }
 }

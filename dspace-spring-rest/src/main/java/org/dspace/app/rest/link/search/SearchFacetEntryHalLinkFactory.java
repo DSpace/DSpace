@@ -40,10 +40,11 @@ public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<
         String query = searchData == null ? null : searchData.getQuery();
         String dsoType = searchData == null ? null : searchData.getDsoType();
         String scope = searchData == null ? null : searchData.getScope();
+        String configuration = searchData == null ? null : searchData.getConfigurationName();
 
         UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
                                                          .getFacetValues(facetData.getName(), null, query, dsoType,
-                                                                 scope, null, null));
+                                                                 scope, configuration, null, null));
 
         addFilterParams(uriBuilder, searchData);
 

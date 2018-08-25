@@ -96,13 +96,8 @@
 
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
-    <!--Basic workflow services, comment or remove when switching to the configurable workflow -->
-    <bean class="org.dspace.workflowbasic.TaskListItemServiceImpl"/>
-    <bean class="org.dspace.workflowbasic.BasicWorkflowItemServiceImpl"/>
-    <bean class="org.dspace.workflowbasic.BasicWorkflowServiceImpl"/>
-
-    <!--Configurable workflow services, uncomment the xml workflow beans below to enable the configurable workflow-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
+    <!--Configurable workflow services -->
+    <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.InProgressUserServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.PoolTaskServiceImpl"/>
@@ -110,6 +105,6 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItemServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
-    <bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>-->
+    <bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>
 
 </beans>

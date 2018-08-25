@@ -42,4 +42,8 @@ public class SubmissionLookupDTO implements Serializable {
         }
         return null;
     }
+
+    public List<ItemSubmissionLookupDTO> getItems() {
+        return items;
+    }
 }

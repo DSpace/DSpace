@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,6 +27,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
@@ -48,7 +51,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Table(name = "community")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Community extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Community extends DSpaceObject implements DSpaceObjectLegacySupport, BrowsableDSpaceObject<UUID> {
     /**
      * log4j category
      */
@@ -252,6 +255,11 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     @Override
+    public String getTypeText() {
+        return Constants.typeText[Constants.COMMUNITY];
+    }
+
+    @Override
     public String getName() {
         String value = getCommunityService()
             .getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
@@ -269,4 +277,15 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         }
         return communityService;
     }
+
+    @Override
+    public boolean isArchived() {
+        return true;
+    }
+
+    @Override
+    public boolean isDiscoverable() {
+        return true;
+    }
+
 }

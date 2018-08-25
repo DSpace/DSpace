@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
@@ -66,4 +67,7 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
     public void deleteByDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson) throws SQLException;
 
     public void deleteByDsoAndTypeNotEqualsTo(Context c, DSpaceObject o, String type) throws SQLException;
+
+    public List<ResourcePolicy> findByDSoAndActionExceptRpType(Context c, BrowsableDSpaceObject o, int actionID,
+            String rpType) throws SQLException;
 }

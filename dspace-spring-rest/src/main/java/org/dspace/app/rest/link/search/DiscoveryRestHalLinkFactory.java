@@ -26,47 +26,48 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
      * @return      The link without extra filters to the endpoint for this data
      */
     public UriComponentsBuilder buildSearchBaseLink(final DiscoveryResultsRest data) {
+        UriComponentsBuilder uriBuilder;
         try {
-            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
+            uriBuilder = uriBuilder(getMethodOn()
                     .getSearchObjects(data.getQuery(), data.getDsoType(),
                             data.getScope(), data.getConfigurationName(),
                             null, null));
-
-            return addFilterParams(uriBuilder, data);
-        } catch (Exception ex) {
-            //The method throwing the exception is never really executed, so this exception can never occur
-            return null;
+        } catch (Exception e) {
+            // The method throwing the exception is never really executed, so this exception can never occur
+            throw new RuntimeException(e.getMessage(), e);
         }
+
+        return addFilterParams(uriBuilder, data);
     }
 
     protected UriComponentsBuilder buildFacetBaseLink(final FacetResultsRest data) throws Exception {
         try {
-            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                                                         .getFacetValues(data.getFacetEntry().getName(),
-                                                                         data.getPrefix(), data.getQuery(),
-                                                                         data.getDsoType(), data.getScope(),
-                                                                 null, null));
-
-            return addFilterParams(uriBuilder, data);
-        } catch (Exception ex) {
-            //The method throwing the exception is never really executed, so this exception can never occur
-            return null;
-        }
-    }
-
-    protected UriComponentsBuilder buildSearchFacetsBaseLink(final SearchResultsRest data) {
-        try {
-            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                    .getFacets(data.getQuery(), data.getDsoType(), data.getScope(),
-                            data.getConfigurationName(), null, null));
-
+            UriComponentsBuilder uriBuilder = uriBuilder(
+                    getMethodOn().getFacetValues(data.getFacetEntry().getName(), data.getPrefix(), data.getQuery(),
+                            data.getDsoType(), data.getScope(), data.getConfigurationName(), null, null));
             uriBuilder = addSortingParms(uriBuilder, data);
 
             return addFilterParams(uriBuilder, data);
         } catch (Exception ex) {
-            //The method throwing the exception is never really executed, so this exception can never occur
-            return null;
+            // The method throwing the exception is never really executed, so this exception can never occur
+            throw new RuntimeException(ex.getMessage(), ex);
         }
+    }
+
+    protected UriComponentsBuilder buildSearchFacetsBaseLink(final SearchResultsRest data) {
+        UriComponentsBuilder uriBuilder;
+        try {
+            uriBuilder = uriBuilder(getMethodOn()
+                    .getFacets(data.getQuery(), data.getDsoType(), data.getScope(),
+                            data.getConfigurationName(), null, null));
+        } catch (Exception e) {
+            // The method throwing the exception is never really executed, so this exception can never occur
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        uriBuilder = addSortingParms(uriBuilder, data);
+
+        return addFilterParams(uriBuilder, data);
     }
 
     protected UriComponentsBuilder addFilterParams(UriComponentsBuilder uriComponentsBuilder,

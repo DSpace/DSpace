@@ -25,7 +25,7 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
 
     private String scope;
 
-    private String configurationName;
+    private String configuration;
 
     @JsonIgnore
     private LinkedList<SearchFacetEntryRest> sidebarFacets = new LinkedList<>();
@@ -50,12 +50,12 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
         this.scope = scope;
     }
 
-    public String getConfigurationName() {
-        return configurationName;
+    public String getConfiguration() {
+        return configuration;
     }
 
-    public void setConfigurationName(String configurationName) {
-        this.configurationName = configurationName;
+    public void setConfiguration(String configurationName) {
+        this.configuration = configurationName;
     }
 
     public List<SearchFacetEntryRest> getSidebarFacets() {
@@ -73,8 +73,8 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
                                .append(this.getType(), ((FacetConfigurationRest) object).getType())
                                .append(this.getController(), ((FacetConfigurationRest) object).getController())
                                .append(this.getScope(), ((FacetConfigurationRest) object).getScope())
-                               .append(this.getConfigurationName(),
-                                       ((FacetConfigurationRest) object).getConfigurationName())
+                               .append(this.getConfiguration(),
+                                       ((FacetConfigurationRest) object).getConfiguration())
                                .append(this.getSidebarFacets(), ((FacetConfigurationRest) object).getSidebarFacets())
                                .isEquals());
     }
@@ -86,7 +86,7 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
             .append(this.getType())
             .append(this.getController())
             .append(this.getScope())
-            .append(this.getConfigurationName())
+            .append(this.getConfiguration())
             .append(this.getSidebarFacets())
             .toHashCode();
     }

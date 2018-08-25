@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +30,9 @@ import org.dspace.core.Context;
 import org.dspace.disseminate.service.CitationDocumentService;
 import org.dspace.services.EventService;
 import org.dspace.usage.UsageEvent;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +57,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + BitstreamRest.CATEGORY + "/" + BitstreamRest.PLURAL_NAME
     + "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/content")
-public class BitstreamContentRestController {
+public class BitstreamContentRestController implements InitializingBean {
 
     private static final Logger log = Logger.getLogger(BitstreamContentRestController.class);
 
@@ -69,6 +72,9 @@ public class BitstreamContentRestController {
 
     @Autowired
     private CitationDocumentService citationDocumentService;
+
+    @Autowired
+    private DiscoverableEndpointsService discoverableEndpointsService;
 
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
@@ -170,5 +176,11 @@ public class BitstreamContentRestController {
         Response.Status.Family responseCode = Response.Status.Family.familyOf(response.getStatus());
         return responseCode.equals(Response.Status.Family.SUCCESSFUL)
             || responseCode.equals(Response.Status.Family.REDIRECTION);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        discoverableEndpointsService.register(this,
+            Arrays.asList(new Link("/api/" + BitstreamRest.CATEGORY + "/" + BitstreamRest.PLURAL_NAME)));
     }
 }
