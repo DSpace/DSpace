@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -173,5 +174,17 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         query.setParameter("dso", dso);
         query.setParameter("rptype", type);
         query.executeUpdate();
+    }
+
+    @Override
+    public List<ResourcePolicy> findByDSoAndActionExceptRpType(Context context, BrowsableDSpaceObject dso, int action,
+            String rpType) throws SQLException {
+        Criteria criteria = createCriteria(context, ResourcePolicy.class);
+        criteria.add(Restrictions.and(
+            Restrictions.eq("dSpaceObject", dso),
+            Restrictions.eq("actionId", action)
+        ));
+        criteria.add(Restrictions.and(Restrictions.not(Restrictions.eq("rptype", rpType))));
+        return list(criteria);
     }
 }

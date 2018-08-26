@@ -12,23 +12,16 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
-import org.dspace.app.rest.model.DSpaceObjectRest;
-import org.dspace.app.rest.model.SearchFacetEntryRest;
-import org.dspace.app.rest.model.SearchFacetValueRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.content.DSpaceObject;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -43,12 +36,11 @@ public class DiscoverResultConverter {
     private static final Logger log = Logger.getLogger(DiscoverResultConverter.class);
 
     @Autowired
-    private List<DSpaceObjectConverter> converters;
-
+    private List<BrowsableDSpaceObjectConverter> converters;
     @Autowired
-    private SearchService searchService;
-
-    private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
+    private DiscoverFacetsConverter facetConverter;
+    @Autowired
+    private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
     public SearchResultsRest convert(final Context context, final String query, final String dsoType,
                                      final String configurationName, final String scope,
@@ -69,74 +61,16 @@ public class DiscoverResultConverter {
     }
 
     private void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
-                                final DiscoveryConfiguration configuration) {
-
-        List<DiscoverySearchFilterFacet> facets = configuration.getSidebarFacets();
-        for (DiscoverySearchFilterFacet field : CollectionUtils.emptyIfNull(facets)) {
-            List<DiscoverResult.FacetResult> facetValues = searchResult.getFacetResult(field);
-
-            SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(field.getIndexFieldName());
-            int valueCount = 0;
-            facetEntry.setHasMore(false);
-            facetEntry.setFacetLimit(field.getFacetLimit());
-            if (field.exposeMinAndMaxValue()) {
-                handleExposeMinMaxValues(context,field,facetEntry);
-            }
-            facetEntry.setExposeMinMax(field.exposeMinAndMaxValue());
-            for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
-                //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
-                //more results available.
-                if (valueCount < field.getFacetLimit()) {
-                    SearchFacetValueRest valueRest = facetValueConverter.convert(value);
-
-                    facetEntry.addValue(valueRest);
-                } else {
-                    facetEntry.setHasMore(true);
-                }
-
-                if (StringUtils.isBlank(facetEntry.getFacetType())) {
-                    facetEntry.setFacetType(value.getFieldType());
-                }
-
-                valueCount++;
-            }
-
-            resultsRest.addFacetEntry(facetEntry);
-        }
+            final DiscoveryConfiguration configuration) {
+        facetConverter.addFacetValues(context, searchResult, resultsRest, configuration);
     }
 
-    /**
-     * This method will fill the facetEntry with the appropriate min and max values if they're not empty
-     * @param context       The relevant DSpace context
-     * @param field         The DiscoverySearchFilterFacet field to search for this value in solr
-     * @param facetEntry    The SearchFacetEntryRest facetEntry for which this needs to be filled in
-     */
-    private void handleExposeMinMaxValues(Context context,DiscoverySearchFilterFacet field,
-                                          SearchFacetEntryRest facetEntry) {
-        try {
-            String minValue = searchService.calculateExtremeValue(context,
-                                                                  field.getIndexFieldName() + "_min",
-                                                                  field.getIndexFieldName() + "_min_sort",
-                                                                  DiscoverQuery.SORT_ORDER.asc);
-            String maxValue = searchService.calculateExtremeValue(context,
-                                                                  field.getIndexFieldName() + "_max",
-                                                                  field.getIndexFieldName() + "_max_sort",
-                                                                  DiscoverQuery.SORT_ORDER.desc);
-
-            if (StringUtils.isNotBlank(minValue) && StringUtils.isNotBlank(maxValue)) {
-                facetEntry.setMinValue(minValue);
-                facetEntry.setMaxValue(maxValue);
-            }
-        } catch (SearchServiceException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
     private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
-        for (DSpaceObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getDspaceObjects())) {
+        for (BrowsableDSpaceObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getDspaceObjects())) {
             SearchResultEntryRest resultEntry = new SearchResultEntryRest();
 
             //Convert the DSpace Object to its REST model
-            resultEntry.setDspaceObject(convertDSpaceObject(dspaceObject));
+            resultEntry.setRObject(convertDSpaceObject(dspaceObject));
 
             //Add hit highlighting for this DSO if present
             DiscoverResult.DSpaceObjectHighlightResult highlightedResults = searchResult
@@ -152,10 +86,10 @@ public class DiscoverResultConverter {
         }
     }
 
-    private DSpaceObjectRest convertDSpaceObject(final DSpaceObject dspaceObject) {
-        for (DSpaceObjectConverter converter : converters) {
+    private RestAddressableModel convertDSpaceObject(final BrowsableDSpaceObject dspaceObject) {
+        for (BrowsableDSpaceObjectConverter<BrowsableDSpaceObject, RestAddressableModel> converter : converters) {
             if (converter.supportsModel(dspaceObject)) {
-                return converter.fromModel(dspaceObject);
+                return converter.convert(dspaceObject);
             }
         }
         return null;
@@ -179,11 +113,10 @@ public class DiscoverResultConverter {
         List<SearchFilter> transformedFilters = searchQueryConverter.convert(searchFilters);
 
         SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter =
-            new SearchFilterToAppliedFilterConverter();
+                new SearchFilterToAppliedFilterConverter();
         for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(transformedFilters)) {
-
             resultsRest
-                .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
+                    .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
         }
     }
 }

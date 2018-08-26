@@ -39,13 +39,11 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
         }
     }
 
-    protected UriComponentsBuilder buildFacetBaseLink(final FacetResultsRest data) throws Exception {
+    protected UriComponentsBuilder buildFacetBaseLink(final FacetResultsRest data) {
         try {
-            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                                                         .getFacetValues(data.getFacetEntry().getName(),
-                                                                         data.getPrefix(), data.getQuery(),
-                                                                         data.getDsoType(), data.getScope(),
-                                                                 null, null));
+            UriComponentsBuilder uriBuilder = uriBuilder(
+                    getMethodOn().getFacetValues(data.getFacetEntry().getName(), data.getPrefix(), data.getQuery(),
+                            data.getDsoType(), data.getScope(), data.getConfigurationName(), null, null));
 
             return addFilterParams(uriBuilder, data);
         } catch (Exception ex) {
@@ -56,9 +54,8 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
 
     protected UriComponentsBuilder buildSearchFacetsBaseLink(final SearchResultsRest data) {
         try {
-            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                    .getFacets(data.getQuery(), data.getDsoType(), data.getScope(),
-                            data.getConfigurationName(), null, null));
+            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn().getFacets(data.getQuery(), data.getDsoType(),
+                    data.getScope(), data.getConfigurationName(), null, null));
 
             uriBuilder = addSortingParms(uriBuilder, data);
 
@@ -75,7 +72,7 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
             for (SearchResultsRest.AppliedFilter filter : data.getAppliedFilters()) {
                 //TODO Make sure the filter format is defined in only one place
                 uriComponentsBuilder
-                        .queryParam("f." + filter.getFilter(), filter.getValue() + "," + filter.getOperator());
+                    .queryParam("f." + filter.getFilter(), filter.getValue() + "," + filter.getOperator());
             }
         }
 

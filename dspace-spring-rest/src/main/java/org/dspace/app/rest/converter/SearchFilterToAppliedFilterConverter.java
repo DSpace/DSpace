@@ -13,10 +13,12 @@ import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class' purpose is to convert the SearchFilter object into a SearchResultsRest.AppliedFilter object
  */
+@Component
 public class SearchFilterToAppliedFilterConverter {
 
     @Autowired

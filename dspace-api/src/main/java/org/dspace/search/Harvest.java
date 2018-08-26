@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -139,9 +140,10 @@ public class Harvest {
             DiscoverResult discoverResult = SearchUtils.getSearchService().search(context, discoverQuery);
 
             // Process results of query into HarvestedItemInfo objects
-            Iterator<DSpaceObject> dsoIterator = discoverResult.getDspaceObjects().iterator();
+            Iterator<BrowsableDSpaceObject> dsoIterator = discoverResult.getDspaceObjects().iterator();
             while (dsoIterator.hasNext() && ((limit == 0) || (itemCounter < limit))) {
-                DSpaceObject dso = dsoIterator.next();
+                // the query is limited to ITEM
+                DSpaceObject dso = (DSpaceObject) dsoIterator.next();
                 HarvestedItemInfo itemInfo = new HarvestedItemInfo();
                 itemInfo.context = context;
                 itemInfo.handle = dso.getHandle();

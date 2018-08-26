@@ -343,7 +343,6 @@
                         <exclude>**/README*</exclude>
                         <exclude>**/readme*</exclude>
                         <exclude>**/.gitignore</exclude>
-                        <exclude>**/src/main/resources/rebel.xml</exclude>
                     </excludes>
                     <mapping>
                         <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin:

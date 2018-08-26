@@ -67,7 +67,7 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends DSpaceObjectPermi
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
 
             UUID dsoId = UUIDUtils.fromString(targetId.toString());
-            DSpaceObjectService dSpaceObjectService =
+            DSpaceObjectService<DSpaceObject> dSpaceObjectService =
                     contentServiceFactory.getDSpaceObjectService(Constants.getTypeID(targetType));
 
             if (dSpaceObjectService != null && dsoId != null) {

@@ -21,6 +21,7 @@ import gr.ekt.bte.core.OutputGenerator;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.Value;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInput;
@@ -28,6 +29,7 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.AdditionalMetadataUpdateProcessPlugin;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -38,6 +40,7 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -197,7 +200,23 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
                 }
             }
             itemService.update(context, item);
-        } catch (SQLException e) {
+
+            String providerName = "";
+            List<Value> providerNames = itemLookup.getValues("provider_name_field");
+            if (providerNames != null && providerNames.size() > 0) {
+                providerName = providerNames.get(0).getAsString();
+            }
+            List<AdditionalMetadataUpdateProcessPlugin> additionalMetadataUpdateProcessPlugins =
+                (List<AdditionalMetadataUpdateProcessPlugin>) DSpaceServicesFactory
+                    .getInstance()
+                    .getServiceManager().getServicesByType(AdditionalMetadataUpdateProcessPlugin.class);
+            for (AdditionalMetadataUpdateProcessPlugin additionalMetadataUpdateProcessPlugin :
+                additionalMetadataUpdateProcessPlugins) {
+                additionalMetadataUpdateProcessPlugin.process(this.context, item, providerName);
+            }
+
+            itemService.update(context, item);
+        } catch (SQLException | NullPointerException e) {
             log.error(e.getMessage(), e);
         } catch (AuthorizeException e) {
             log.error(e.getMessage(), e);
@@ -275,13 +294,15 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
                                  String qualifier) throws DCInputsReaderException {
         List<DCInputSet> dcinputsets = new DCInputsReader().getInputsBySubmissionName(formName);
         for (DCInputSet dcinputset : dcinputsets) {
-            for (DCInput dcinput : dcinputset.getFields()) {
-                if (dcinput.getSchema().equals(schema)
-                    && dcinput.getElement().equals(element)
-                    && ((dcinput.getQualifier() != null && dcinput
-                    .getQualifier().equals(qualifier))
-                    || (dcinput.getQualifier() == null && qualifier == null))) {
-                    return dcinput;
+            for (DCInput[] dcrow : dcinputset.getFields()) {
+                for (DCInput dcinput : dcrow) {
+                    if (dcinput.getSchema().equals(schema)
+                        && dcinput.getElement().equals(element)
+                        && ((dcinput.getQualifier() != null && dcinput
+                        .getQualifier().equals(qualifier))
+                        || (dcinput.getQualifier() == null && qualifier == null))) {
+                        return dcinput;
+                    }
                 }
             }
         }

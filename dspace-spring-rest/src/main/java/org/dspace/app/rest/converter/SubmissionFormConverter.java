@@ -17,11 +17,14 @@ import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.app.rest.model.SubmissionFormInputTypeRest;
 import org.dspace.app.rest.model.SubmissionFormRest;
+import org.dspace.app.rest.model.SubmissionFormRowRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
+import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
+import org.dspace.core.Utils;
 import org.dspace.submit.model.LanguageFormField;
 import org.dspace.submit.model.SelectableMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,25 +47,35 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
     @Autowired
     private AuthorityUtils authorityUtils;
 
+    @Autowired
+    private SubmissionFormRestRepository submissionFormRestRepository;
+
     @Override
     public SubmissionFormRest fromModel(DCInputSet obj) {
         SubmissionFormRest sd = new SubmissionFormRest();
         sd.setName(obj.getFormName());
-        DCInput[] step = obj.getFields();
-        List<SubmissionFormFieldRest> fields = getPage(step);
-        sd.setFields(fields);
+        DCInput[][] step = obj.getFields();
+        List<SubmissionFormRowRest> rows = getPage(step, obj.getFormName());
+        sd.setRows(rows);
         return sd;
     }
 
-    private List<SubmissionFormFieldRest> getPage(DCInput[] page) {
-        List<SubmissionFormFieldRest> fields = new LinkedList<SubmissionFormFieldRest>();
-        for (DCInput dcinput : page) {
-            fields.add(getField(dcinput));
+    private List<SubmissionFormRowRest> getPage(DCInput[][] page, String formName) {
+        List<SubmissionFormRowRest> rows = new LinkedList<SubmissionFormRowRest>();
+
+        for (DCInput[] row : page) {
+            List<SubmissionFormFieldRest> fields = new LinkedList<SubmissionFormFieldRest>();
+            SubmissionFormRowRest rowRest = new SubmissionFormRowRest();
+            rowRest.setFields(fields);
+            rows.add(rowRest);
+            for (DCInput dcinput : row) {
+                fields.add(getField(dcinput, formName));
+            }
         }
-        return fields;
+        return rows;
     }
 
-    private SubmissionFormFieldRest getField(DCInput dcinput) {
+    private SubmissionFormFieldRest getField(DCInput dcinput, String formName) {
         SubmissionFormFieldRest inputField = new SubmissionFormFieldRest();
         List<SelectableMetadata> selectableMetadata = new ArrayList<SelectableMetadata>();
 
@@ -97,19 +110,23 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
             String inputType = dcinput.getInputType();
 
             SelectableMetadata selMd = new SelectableMetadata();
-            if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
-                inputRest.setType(
-                    getPresentation(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), inputType));
-                selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
-                                                    dcinput.getQualifier(), dcinput.getPairsType(),
-                                                    dcinput.getVocabulary()));
-                selMd.setClosed(
-                    authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+            inputRest.setType(inputType);
+            if (StringUtils.equalsIgnoreCase(dcinput.getInputType(), "group")) {
+                inputField.setRows(submissionFormRestRepository.findOne(formName + "-" + Utils
+                    .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "-")));
             } else {
-                inputRest.setType(inputType);
+                if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+                    inputRest.setType(
+                        getPresentation(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), inputType));
+                    selMd.setAuthority(
+                        getAuthorityName(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
+                            dcinput.getPairsType(), dcinput.getVocabulary()));
+                    selMd.setClosed(
+                        authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+                }
             }
             selMd.setMetadata(org.dspace.core.Utils
-                                  .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
+                .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
             selectableMetadata.add(selMd);
 
         } else {
@@ -119,11 +136,10 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
                 SelectableMetadata selMd = new SelectableMetadata();
                 selMd.setLabel((String) pairs.get(idx));
                 selMd.setMetadata(org.dspace.core.Utils
-                                      .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
+                    .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
                 if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
-                    selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
-                                                        pairs.get(idx + 1), dcinput.getPairsType(),
-                                                        dcinput.getVocabulary()));
+                    selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1),
+                        dcinput.getPairsType(), dcinput.getVocabulary()));
                     selMd.setClosed(
                         authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
                 }
@@ -160,8 +176,7 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
         } else if (StringUtils.isNotBlank(vocabularyName)) {
             return vocabularyName;
         }
-        return authorityUtils.getAuthorityName(schema, element,
-                                               qualifier);
+        return authorityUtils.getAuthorityName(schema, element, qualifier);
     }
 
     @Override

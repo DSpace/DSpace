@@ -100,17 +100,19 @@ public class RequiredMetadata extends AbstractCurationTask {
             reqList = new ArrayList<String>();
             List<DCInputSet> inputSet = reader.getInputsByCollectionHandle(handle);
             for (DCInputSet inputs : inputSet) {
-                for (DCInput input : inputs.getFields()) {
-                    if (input.isRequired()) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(input.getSchema()).append(".");
-                        sb.append(input.getElement()).append(".");
-                        String qual = input.getQualifier();
-                        if (qual == null) {
-                            qual = "";
+                for (DCInput[] row : inputs.getFields()) {
+                    for (DCInput input : row) {
+                        if (input.isRequired()) {
+                            StringBuilder sb = new StringBuilder();
+                            sb.append(input.getSchema()).append(".");
+                            sb.append(input.getElement()).append(".");
+                            String qual = input.getQualifier();
+                            if (qual == null) {
+                                qual = "";
+                            }
+                            sb.append(qual);
+                            reqList.add(sb.toString());
                         }
-                        sb.append(qual);
-                        reqList.add(sb.toString());
                     }
                 }
                 reqMap.put(inputs.getFormName(), reqList);

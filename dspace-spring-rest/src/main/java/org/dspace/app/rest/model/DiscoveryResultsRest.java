@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.parameter.SearchFilter;
 
@@ -28,6 +29,9 @@ public abstract class DiscoveryResultsRest extends BaseObjectRest<String> {
     private SearchResultsRest.Sorting sort;
     @JsonIgnore
     private String dsoType;
+    @JsonIgnore
+    private List<SearchFilter> searchFilters;
+    private String configurationName;
 
     public String getCategory() {
         return CATEGORY;
@@ -98,11 +102,9 @@ public abstract class DiscoveryResultsRest extends BaseObjectRest<String> {
         return configurationName;
     }
 
-    public void setConfigurationName(final String configurationName) {
-        this.configurationName = configurationName;
+    public void setConfigurationName(final String configuration) {
+        this.configurationName = configuration;
     }
-
-    private String configurationName;
 
     public void setSearchFilters(final List<SearchFilter> searchFilters) {
         this.searchFilters = searchFilters;
@@ -112,6 +114,5 @@ public abstract class DiscoveryResultsRest extends BaseObjectRest<String> {
         return searchFilters;
     }
 
-    @JsonIgnore
-    private List<SearchFilter> searchFilters;
+
 }

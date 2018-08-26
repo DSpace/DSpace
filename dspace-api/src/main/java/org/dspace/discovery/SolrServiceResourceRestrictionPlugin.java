@@ -11,12 +11,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -53,9 +55,14 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     protected ResourcePolicyService resourcePolicyService;
 
     @Override
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
+    public void additionalIndex(Context context, BrowsableDSpaceObject bdso, SolrInputDocument document) {
+        if (!(bdso instanceof DSpaceObject)) {
+            return;
+        }
+        DSpaceObject dso = (DSpaceObject) bdso;
         try {
-            List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, Constants.READ);
+            List<ResourcePolicy> policies = authorizeService
+                .getPoliciesActionFilterExceptRpType(context, dso, Constants.READ, ResourcePolicy.TYPE_WORKFLOW);
             for (ResourcePolicy resourcePolicy : policies) {
                 String fieldValue;
                 if (resourcePolicy.getGroup() != null) {
@@ -81,39 +88,67 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     @Override
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
         try {
-            if (!authorizeService.isAdmin(context)) {
-                StringBuilder resourceQuery = new StringBuilder();
-                //Always add the anonymous group id to the query
-                Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
-                String anonGroupId = "";
-                if (anonymousGroup != null) {
-                    anonGroupId = anonymousGroup.getID().toString();
-                }
-                resourceQuery.append("read:(g" + anonGroupId);
+            if (context != null && !authorizeService.isAdmin(context)) {
+
+                boolean isInProgessSubmission = false;
                 EPerson currentUser = context.getCurrentUser();
-                if (currentUser != null) {
-                    resourceQuery.append(" OR e").append(currentUser.getID());
-                }
-
-                //Retrieve all the groups the current user is a member of !
+                // Retrieve all the groups the current user is a member of !
                 Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
-                for (Group group : groups) {
-                    resourceQuery.append(" OR g").append(group.getID());
+
+                if (currentUser != null) {
+                    if (StringUtils.isNotBlank(discoveryQuery.getDiscoveryConfigurationName())) {
+                        if (discoveryQuery.getDiscoveryConfigurationName().startsWith("workspace")) {
+                            // insert filter by submitter
+                            solrQuery
+                                .addFilterQuery("read:(e" + currentUser.getID() + " OR ws" + currentUser.getID() + ")");
+                            isInProgessSubmission = true;
+                        } else if (discoveryQuery.getDiscoveryConfigurationName().startsWith("workflow")) {
+                            // insert filter by controllers
+                            StringBuilder controllerQuery = new StringBuilder();
+                            controllerQuery.append("read:(we" + currentUser.getID());
+                            for (Group group : groups) {
+                                controllerQuery.append(" OR wg").append(group.getID());
+                            }
+                            controllerQuery.append(")");
+                            solrQuery.addFilterQuery(controllerQuery.toString());
+                            isInProgessSubmission = true;
+                        }
+                    }
                 }
 
-                resourceQuery.append(")");
+                if (!isInProgessSubmission) {
+                    StringBuilder resourceQuery = new StringBuilder();
+                    //Always add the anonymous group id to the query
+                    Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+                    String anonGroupId = "";
+                    if (anonymousGroup != null) {
+                        anonGroupId = anonymousGroup.getID().toString();
+                    }
+                    resourceQuery.append("read:(g" + anonGroupId);
 
-                if (authorizeService.isCommunityAdmin(context)
-                    || authorizeService.isCollectionAdmin(context)) {
-                    resourceQuery.append(" OR ");
-                    resourceQuery.append(DSpaceServicesFactory.getInstance()
-                                                              .getServiceManager()
-                                                              .getServiceByName(SearchService.class.getName(),
-                                                                                SearchService.class)
-                                                              .createLocationQueryForAdministrableItems(context));
+                    if (currentUser != null) {
+                        resourceQuery.append(" OR e").append(currentUser.getID());
+                    }
+
+                    //Retrieve all the groups the current user is a member of !
+                    for (Group group : groups) {
+                        resourceQuery.append(" OR g").append(group.getID());
+                    }
+
+                    resourceQuery.append(")");
+
+                    if (authorizeService.isCommunityAdmin(context)
+                        || authorizeService.isCollectionAdmin(context)) {
+                        resourceQuery.append(" OR ");
+                        resourceQuery.append(DSpaceServicesFactory.getInstance()
+                                                                  .getServiceManager()
+                                                                  .getServiceByName(SearchService.class.getName(),
+                                                                                    SearchService.class)
+                                                                  .createLocationQueryForAdministrableItems(context));
+                    }
+
+                    solrQuery.addFilterQuery(resourceQuery.toString());
                 }
-
-                solrQuery.addFilterQuery(resourceQuery.toString());
             }
         } catch (SQLException e) {
             log.error(LogManager.getHeader(context, "Error while adding resource policy information to query", ""), e);

@@ -70,7 +70,7 @@ public class DiscoveryRestController implements InitializingBean {
     @RequestMapping(method = RequestMethod.GET)
     public SearchSupportResource getSearchSupport(@RequestParam(name = "scope", required = false) String dsoScope,
                                                   @RequestParam(name = "configuration", required = false) String
-                                                      configurationName)
+                                                  configuration)
         throws Exception {
 
         SearchSupportRest searchSupportRest = discoveryRestRepository.getSearchSupport();
@@ -82,14 +82,14 @@ public class DiscoveryRestController implements InitializingBean {
     @RequestMapping(method = RequestMethod.GET, value = "/search")
     public SearchConfigurationResource getSearchConfiguration(
         @RequestParam(name = "scope", required = false) String dsoScope,
-        @RequestParam(name = "configuration", required = false) String configurationName) throws Exception {
+        @RequestParam(name = "configuration", required = false) String configuration) throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Retrieving search configuration for scope " + StringUtils.trimToEmpty(dsoScope)
-                          + " and configuration name " + StringUtils.trimToEmpty(configurationName));
+                          + " and configuration name " + StringUtils.trimToEmpty(configuration));
         }
 
         SearchConfigurationRest searchConfigurationRest = discoveryRestRepository
-            .getSearchConfiguration(dsoScope, configurationName);
+            .getSearchConfiguration(dsoScope, configuration);
 
         SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(
             searchConfigurationRest);
@@ -175,6 +175,8 @@ public class DiscoveryRestController implements InitializingBean {
                                           @RequestParam(name = "query", required = false) String query,
                                           @RequestParam(name = "dsoType", required = false) String dsoType,
                                           @RequestParam(name = "scope", required = false) String dsoScope,
+                                          @RequestParam(name = "configuration", required = false) String
+                                              configurationName,
                                           List<SearchFilter> searchFilters,
                                           Pageable page) throws Exception {
         if (log.isTraceEnabled()) {
@@ -187,7 +189,7 @@ public class DiscoveryRestController implements InitializingBean {
         }
 
         FacetResultsRest facetResultsRest = discoveryRestRepository
-            .getFacetObjects(facetName, prefix, query, dsoType, dsoScope, searchFilters, page);
+            .getFacetObjects(facetName, prefix, query, dsoType, dsoScope, configurationName, searchFilters, page);
 
         FacetResultsResource facetResultsResource = new FacetResultsResource(facetResultsRest);
 

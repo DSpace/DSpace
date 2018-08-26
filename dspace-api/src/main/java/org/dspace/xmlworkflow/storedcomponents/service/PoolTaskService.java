@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.service.BrowsableObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.service.DSpaceCRUDService;
@@ -25,7 +26,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface PoolTaskService extends DSpaceCRUDService<PoolTask> {
+public interface PoolTaskService extends DSpaceCRUDService<PoolTask>, BrowsableObjectService<PoolTask, Integer> {
     public List<PoolTask> findByEperson(Context context, EPerson ePerson)
         throws SQLException, AuthorizeException, IOException;
 

@@ -16,7 +16,7 @@
         <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
 
         <!--Debug property that can be used to display the sql-->
-        <property name="show_sql">false</property>
+        <property name="hibernate.show_sql">false</property>
 
         <!--Second level cache configuration-->
         <property name="hibernate.cache.use_query_cache">true</property>
@@ -68,17 +68,13 @@
 
         <mapping class="org.dspace.app.requestitem.RequestItem"/>
 
-        <!--Basic workflow services, comment or remove when switching to the configurable workflow -->
-        <mapping class="org.dspace.workflowbasic.BasicWorkflowItem"/>
-        <mapping class="org.dspace.workflowbasic.TaskListItem"/>
-
-        <!--Configurable workflow services, uncomment the xml workflow classes below to enable the configurable workflow-->
-        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.ClaimedTask"/>
+        <!--Configurable workflow services -->
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.ClaimedTask"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.CollectionRole"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.InProgressUser"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.PoolTask"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>
-        <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>-->
+        <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>
 
     </session-factory>
 </hibernate-configuration>

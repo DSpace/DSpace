@@ -74,7 +74,9 @@ public class DCInputsReader {
      * Reference to the forms definitions map, computed from the forms
      * definition file
      */
-    private Map<String, List<Map<String, String>>> formDefns = null;
+    private Map<String, List<List<Map<String, String>>>> formDefns = null;
+
+    private Map<String, List<String>> formHeadings = null;
 
     /**
      * Reference to the value-pairs map, computed from the forms definition file
@@ -86,6 +88,8 @@ public class DCInputsReader {
      * form-interleaved, there will be a modest win.
      */
     private DCInputSet lastInputSet = null;
+
+    private Map<String, List<String>> mappedValuePairs = new HashMap<String, List<String>>();
 
     /**
      * Parse an XML encoded submission forms template file, and create a hashmap
@@ -115,8 +119,9 @@ public class DCInputsReader {
 
     private void buildInputs(String fileName)
         throws DCInputsReaderException {
-        formDefns = new HashMap<String, List<Map<String, String>>>();
+        formDefns = new HashMap<String, List<List<Map<String, String>>>>();
         valuePairs = new HashMap<String, List<String>>();
+        formHeadings = new HashMap<String, List<String>>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -212,12 +217,12 @@ public class DCInputsReader {
             return lastInputSet;
         }
         // cache miss - construct new DCInputSet
-        List<Map<String, String>> pages = formDefns.get(formName);
+        List<List<Map<String, String>>> pages = formDefns.get(formName);
+        List<String> headings = formHeadings.get(formName);
         if (pages == null) {
             throw new DCInputsReaderException("Missing the " + formName + " form");
         }
-        lastInputSet = new DCInputSet(formName,
-                                      pages, valuePairs);
+        lastInputSet = new DCInputSet(formName, headings, pages, valuePairs);
         return lastInputSet;
     }
 
@@ -292,8 +297,8 @@ public class DCInputsReader {
 
     /**
      * Process the form-definitions section of the XML file. Each element is
-     * formed thusly: <form name="formname">...pages...</form> Each pages
-     * subsection is formed: <page number="#"> ...fields... </page> Each field
+     * formed thusly: <form name="formname">...row...</form> Each rows
+     * subsection is formed: <row> ...fields... </row> Each field
      * is formed from: dc-element, dc-qualifier, label, hint, input-type name,
      * required text, and repeatable flag.
      */
@@ -311,26 +316,26 @@ public class DCInputsReader {
                 if (formName == null) {
                     throw new SAXException("form element has no name attribute");
                 }
-                List<Map<String, String>> fields = new ArrayList<Map<String, String>>(); // the form contains fields
-                formDefns.put(formName, fields);
+                List<List<Map<String, String>>> rows = new ArrayList<List<Map<String, String>>>(); // the form
+                // contains rows of fields
+                formDefns.put(formName, rows);
+                List<String> headings = new ArrayList<String>();
+                formHeadings.put(formName, headings);
                 NodeList pl = nd.getChildNodes();
                 int lenpg = pl.getLength();
                 for (int j = 0; j < lenpg; j++) {
                     Node npg = pl.item(j);
-
-                    if (npg.getNodeName().equals("field")) {
-                        // process each field definition
-                        Map<String, String> field = new HashMap<String, String>();
-                        processField(formName, npg, field);
-                        fields.add(field);
-                        // we omit the duplicate validation, allowing multiple
-                        // fields definition for
-                        // the same metadata and different visibility/type-bind
+                    if (npg.getNodeName().equals("row")) {
+                        List<Map<String, String>> fields = new ArrayList<Map<String, String>>(); // the fields in the
+                        // row
+                        // process each row definition
+                        processRow(formName, j, npg, fields);
+                        rows.add(fields);
                     }
                 }
                 // sanity check number of fields
-                if (fields.size() < 1) {
-                    throw new DCInputsReaderException("Form " + formName + " has no fields");
+                if (rows.size() < 1) {
+                    throw new DCInputsReaderException("Form " + formName + " has no rows");
                 }
             }
         }
@@ -338,6 +343,64 @@ public class DCInputsReader {
             throw new DCInputsReaderException("No form definition found");
         }
     }
+
+    /**
+     * Process parts of a row
+     */
+    private void processRow(String formName, int rowIdx, Node n, List<Map<String, String>> fields)
+        throws SAXException, DCInputsReaderException {
+
+        NodeList pl = n.getChildNodes();
+        int lenpg = pl.getLength();
+        for (int j = 0; j < lenpg; j++) {
+            Node npg = pl.item(j);
+
+            if (npg.getNodeName().equals("field")) {
+                // process each field definition
+                Map<String, String> field = new HashMap<String, String>();
+                processField(formName, npg, field);
+                fields.add(field);
+                String key = field.get(PAIR_TYPE_NAME);
+                if (StringUtils
+                    .isNotBlank(key)) {
+                    String schema = field.get("dc-schema");
+                    String element = field.get("dc-element");
+                    String qualifier = field
+                        .get("dc-qualifier");
+                    String metadataField = schema + "."
+                        + element;
+                    if (StringUtils.isNotBlank(qualifier)) {
+                        metadataField += "." + qualifier;
+                    }
+
+                    if (mappedValuePairs.containsKey(
+                        key)) {
+                        if (!mappedValuePairs
+                            .get(key).contains(metadataField)) {
+                            mappedValuePairs
+                                .get(key).add(metadataField);
+                        }
+
+                    } else {
+                        List<String> newval = new ArrayList<String>();
+                        newval.add(metadataField);
+                        mappedValuePairs.put(
+                            key,
+                            newval);
+                    }
+                }
+
+                // we omit the duplicate validation, allowing multiple
+                // fields definition for
+                // the same metadata and different visibility/type-bind
+            }
+        }
+        // sanity check number of fields
+        if (fields.size() < 1) {
+            throw new DCInputsReaderException("Form " + formName + "row " + rowIdx + " has no fields");
+        }
+    }
+
 
     /**
      * Process parts of a field
@@ -537,26 +600,29 @@ public class DCInputsReader {
         Iterator<String> ki = formDefns.keySet().iterator();
         while (ki.hasNext()) {
             String idName = ki.next();
-            List<Map<String, String>> fields = formDefns.get(idName);
-            for (int i = 0; i < fields.size(); i++) {
-                Map<String, String> fld = fields.get(i);
-                // verify reference in certain input types
-                String type = fld.get("input-type");
-                if (type.equals("dropdown")
-                    || type.equals("qualdrop_value")
-                    || type.equals("list")) {
-                    String pairsName = fld.get(PAIR_TYPE_NAME);
-                    List<String> v = valuePairs.get(pairsName);
-                    if (v == null) {
-                        String errString = "Cannot find value pairs for " + pairsName;
-                        throw new DCInputsReaderException(errString);
+            List<List<Map<String, String>>> rows = formDefns.get(idName);
+            for (int j = 0; j < rows.size(); j++) {
+                List<Map<String, String>> fields = rows.get(j);
+                for (int i = 0; i < fields.size(); i++) {
+                    Map<String, String> fld = fields.get(i);
+                    // verify reference in certain input types
+                    String type = fld.get("input-type");
+                    if (type.equals("dropdown")
+                        || type.equals("qualdrop_value")
+                        || type.equals("list")) {
+                        String pairsName = fld.get(PAIR_TYPE_NAME);
+                        List<String> v = valuePairs.get(pairsName);
+                        if (v == null) {
+                            String errString = "Cannot find value pairs for " + pairsName;
+                            throw new DCInputsReaderException(errString);
+                        }
                     }
-                }
 
-                // we omit the "required" and "visibility" validation, provided this must be checked in the
-                // processing class
-                // only when it makes sense (if the field isn't visible means that it is not applicable, therefore it
-                // can't be required)
+                    // we omit the "required" and "visibility" validation, provided this must be checked in the
+                    // processing class
+                    // only when it makes sense (if the field isn't visible means that it is not applicable,
+                    // therefore it can't be required)
+                }
             }
         }
     }
@@ -622,7 +688,7 @@ public class DCInputsReader {
     }
 
     public String getInputFormNameByCollectionAndField(Collection collection, String field)
-        throws DCInputsReaderException {
+            throws DCInputsReaderException {
         List<DCInputSet> inputSets = getInputsByCollectionHandle(collection.getHandle());
         for (DCInputSet inputSet : inputSets) {
             String[] tokenized = Utils.tokenize(field);
@@ -638,5 +704,9 @@ public class DCInputsReader {
             }
         }
         throw new DCInputsReaderException("No field configuration found!");
+    }
+
+    public Map<String, List<String>> getMappedValuePairs() {
+        return mappedValuePairs;
     }
 }

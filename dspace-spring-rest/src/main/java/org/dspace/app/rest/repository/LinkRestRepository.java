@@ -7,7 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
-import org.dspace.app.rest.model.RestModel;
+import java.io.Serializable;
+
 import org.dspace.app.rest.model.hateoas.HALResource;
 
 /**
@@ -15,7 +16,7 @@ import org.dspace.app.rest.model.hateoas.HALResource;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface LinkRestRepository<L extends RestModel> {
+public interface LinkRestRepository<L extends Serializable> {
     public abstract HALResource wrapResource(L model, String... rels);
 
     public default boolean isEmbeddableRelation(Object data, String name) {
