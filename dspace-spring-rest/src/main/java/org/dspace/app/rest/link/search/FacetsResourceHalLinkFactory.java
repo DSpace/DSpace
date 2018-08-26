@@ -8,9 +8,13 @@
 package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.dspace.app.rest.model.SearchResultsRest;
+import org.dspace.app.rest.model.hateoas.EmbeddedPageHeader;
 import org.dspace.app.rest.model.hateoas.FacetsResource;
+import org.dspace.app.rest.model.hateoas.SearchFacetEntryResource;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
@@ -19,11 +23,18 @@ import org.springframework.stereotype.Component;
 public class FacetsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<FacetsResource> {
 
     protected void addLinks(FacetsResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
-        SearchResultsRest data = halResource.getContent();
+        List<SearchFacetEntryResource> data = halResource.getFacetResources();
+        SearchResultsRest content = halResource.getContent();
 
 
-        if (data != null) {
-            list.add(buildLink(Link.REL_SELF, buildSearchFacetsBaseLink(data).build().toUriString()));
+        if (content != null && data != null && pageable != null) {
+
+            PageImpl<SearchFacetEntryResource> page = new PageImpl<SearchFacetEntryResource>(
+                    data, pageable, data.size());
+
+            halResource.setPageHeader(new EmbeddedPageHeader(buildSearchBaseLink(content), page));
+
+            list.add(buildLink(Link.REL_SELF, buildSearchFacetsBaseLink(content).build().toUriString()));
         }
     }
 

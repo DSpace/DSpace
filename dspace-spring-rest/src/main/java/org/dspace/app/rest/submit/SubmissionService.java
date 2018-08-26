@@ -157,7 +157,7 @@ public class SubmissionService {
         checksum.setCheckSumAlgorithm(source.getChecksumAlgorithm());
         checksum.setValue(source.getChecksum());
         data.setCheckSum(checksum);
-        data.setSizeBytes(source.getSize());
+        data.setSizeBytes(source.getSizeBytes());
         data.setUrl(configurationService.getProperty("dspace.url") + "/api/" + BitstreamRest.CATEGORY + "/" + English
             .plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
         return data;

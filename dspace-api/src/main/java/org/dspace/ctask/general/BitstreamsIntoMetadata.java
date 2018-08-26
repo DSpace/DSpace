@@ -116,7 +116,7 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
     protected void addMetadata(Item item, Bitstream bitstream, String type) throws SQLException {
         String value = bitstream.getFormat(Curator.curationContext()).getMIMEType() + "##";
         value += bitstream.getName() + "##";
-        value += bitstream.getSize() + "##";
+        value += bitstream.getSizeBytes() + "##";
         value += item.getHandle() + "##";
         value += bitstream.getSequenceID() + "##";
         value += bitstream.getChecksum() + "##";

@@ -65,13 +65,18 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         }
     }
 
+    public CollectionBuilder withTemplateItem() throws SQLException, AuthorizeException {
+        collectionService.createTemplateItem(context, collection);
+        return this;
+    }
+
     @Override
     public Collection build() {
         try {
             collectionService.update(context, collection);
             context.dispatchEvents();
-
             indexingService.commit();
+
         } catch (Exception e) {
             return handleException(e);
         }

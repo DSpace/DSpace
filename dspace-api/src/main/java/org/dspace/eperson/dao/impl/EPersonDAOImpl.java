@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataField;
 import org.dspace.core.AbstractHibernateDSODAO;
@@ -84,7 +83,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     @Override
     public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException {
         String queryString = "SELECT count(*) FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();
-        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, ListUtils.EMPTY_LIST, null);
+        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, Collections.EMPTY_LIST, null);
 
         return count(hibernateQuery);
     }
@@ -96,14 +95,14 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
                                                       .toLowerCase() + " FROM EPerson as " + EPerson.class
             .getSimpleName().toLowerCase();
 
-        List<MetadataField> sortFields = ListUtils.EMPTY_LIST;
+        List<MetadataField> sortFields = Collections.EMPTY_LIST;
 
         if (metadataSortField != null) {
             sortFields = Collections.singletonList(metadataSortField);
         }
 
-        Query query = getSearchQuery(context, queryString, null, ListUtils.EMPTY_LIST, sortFields, sortField, pageSize,
-                                     offset);
+        Query query = getSearchQuery(context, queryString, null, Collections.EMPTY_LIST, sortFields,
+                                     sortField, pageSize, offset);
         return list(query);
 
     }
@@ -165,7 +164,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
             addMetadataValueWhereQuery(queryBuilder, queryFields, "like",
                                        EPerson.class.getSimpleName().toLowerCase() + ".email like :queryParam");
         }
-        if (!CollectionUtils.isEmpty(sortFields)) {
+        if (!CollectionUtils.isEmpty(sortFields) || StringUtils.isNotBlank(sortField)) {
             addMetadataSortQuery(queryBuilder, sortFields, Collections.singletonList(sortField));
         }
 

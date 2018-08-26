@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
@@ -21,6 +32,9 @@
     
     <!-- Additional indexing plugin make filtering by has content in original bundle (like pdf's, images) posible via SOLR -->
     <bean id="hasContentInOriginalBundle" class="org.dspace.discovery.SolrServiceContentInOriginalBundleFilterPlugin"/>
+
+    <!-- Additional indexing plugin enables searching by filenames and by file descriptions for files in ORIGINAL bundle -->
+    <bean id="solrServiceFileInfoPlugin" class="org.dspace.discovery.SolrServiceFileInfoPlugin"/>
 
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
@@ -104,6 +118,8 @@
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
 		        <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterFileNameInOriginalBundle" />
+                <ref bean="searchFilterFileDescriptionInOriginalBundle" />
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -116,6 +132,7 @@
                     <list>
                         <ref bean="sortTitle" />
                         <ref bean="sortDateIssued" />
+                        <ref bean="sortDateAccessioned"/>
                     </list>
                 </property>
             </bean>
@@ -157,11 +174,14 @@
                             <property name="maxSize" value="250"/>
                             <property name="snippets" value="2"/>
                         </bean>
+                        <!-- By default, full text snippets are disabled, as snippets of embargoed/restricted bitstreams
+                             may appear in search results when the Item is public. See DS-3498
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
                             <property name="field" value="fulltext"/>
                             <property name="maxSize" value="250"/>
                             <property name="snippets" value="2"/>
                         </bean>
+                        -->
                     </list>
                 </property>
             </bean>
@@ -212,6 +232,8 @@
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
 		        <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterFileNameInOriginalBundle" />
+                <ref bean="searchFilterFileDescriptionInOriginalBundle" />
             </list>
         </property>
         <!--The sort filters for the discovery search (same as defaultConfiguration above)-->
@@ -224,6 +246,7 @@
                     <list>
                         <ref bean="sortTitle" />
                         <ref bean="sortDateIssued" />
+                        <ref bean="sortDateAccessioned" />
                     </list>
                 </property>
             </bean>
@@ -262,11 +285,14 @@
                             <property name="maxSize" value="250"/>
                             <property name="snippets" value="2"/>
                         </bean>
+                         <!-- By default, full text snippets are disabled, as snippets of embargoed/restricted bitstreams
+                             may appear in search results when the Item is public. See DS-3498
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
                             <property name="field" value="fulltext"/>
                             <property name="maxSize" value="250"/>
                             <property name="snippets" value="2"/>
                         </bean>
+                        -->
                     </list>
                 </property>
             </bean>
@@ -587,6 +613,8 @@
                 <value>dc.title</value>
             </list>
         </property>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
     </bean>
 
     <bean id="searchFilterAuthor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -597,9 +625,13 @@
                 <value>dc.creator</value>
             </list>
         </property>
-        <property name="facetLimit" value="10"/>
+        <property name="facetLimit" value="5"/>
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+
     </bean>
 
     <bean id="searchFilterSubject" class="org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration">
@@ -609,10 +641,11 @@
                 <value>dc.subject.*</value>
             </list>
         </property>
-        <property name="facetLimit" value="10"/>
+        <property name="facetLimit" value="5"/>
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
         <property name="splitter" value="::"/>
+
     </bean>
 
     <bean id="searchFilterIssued" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -623,8 +656,13 @@
             </list>
         </property>
         <property name="type" value="date"/>
+        <property name="facetLimit" value="5"/>
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+
     </bean>
     
     <bean id="searchFilterContentInOriginalBundle" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -636,6 +674,23 @@
         <property name="type" value="standard"/>
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+
+    </bean>
+
+    <bean id="searchFilterFileNameInOriginalBundle" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="original_bundle_filenames"/>
+        <property name="metadataFields">
+            <list/>
+        </property>
+    </bean>
+
+    <bean id="searchFilterFileDescriptionInOriginalBundle" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="original_bundle_descriptions"/>
+        <property name="metadataFields">
+            <list/>
+        </property>
     </bean>
 
 	<bean id="searchFilterType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -687,5 +742,8 @@
         <property name="metadataField" value="dc.date.issued"/>
         <property name="type" value="date"/>
     </bean>
-    
+    <bean id="sortDateAccessioned" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+        <property name="metadataField" value="dc.date.accessioned"/>
+        <property name="type" value="date"/>
+    </bean>
 </beans>

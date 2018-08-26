@@ -9,11 +9,11 @@ package org.dspace.authenticate;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
@@ -151,7 +151,7 @@ public class PasswordAuthentication
                                                       "password_specialgroup",
                                                       "Group defined in modules/authentication-password.cfg login" +
                                                           ".specialgroup does not exist"));
-                        return ListUtils.EMPTY_LIST;
+                        return Collections.EMPTY_LIST;
                     } else {
                         return Arrays.asList(specialGroup);
                     }
@@ -160,7 +160,7 @@ public class PasswordAuthentication
         } catch (Exception e) {
             log.error(LogManager.getHeader(context, "getSpecialGroups", ""), e);
         }
-        return ListUtils.EMPTY_LIST;
+        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -241,5 +241,10 @@ public class PasswordAuthentication
                                HttpServletRequest request,
                                HttpServletResponse response) {
         return null;
+    }
+
+    @Override
+    public String getName() {
+        return "password";
     }
 }

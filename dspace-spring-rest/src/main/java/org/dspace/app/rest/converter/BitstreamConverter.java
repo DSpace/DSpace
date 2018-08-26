@@ -58,7 +58,7 @@ public class BitstreamConverter
             throw new RuntimeException(e);
         }
         b.setFormat(format);
-        b.setSizeBytes(obj.getSize());
+        b.setSizeBytes(obj.getSizeBytes());
         return b;
     }
 

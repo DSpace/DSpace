@@ -132,4 +132,21 @@ public interface SearchService {
     FacetYearRange getFacetYearRange(Context context, BrowsableDSpaceObject scope, DiscoverySearchFilterFacet facet,
             List<String> filterQueries, DiscoverQuery parentQuery)
                     throws SearchServiceException;
+
+    /**
+     * This method returns us either the highest or lowest value for the field that we give to it
+     * depending on what sortOrder we give this method.
+     *
+     * @param context       The relevant DSpace context
+     * @param valueField    The field in solr for which we'll calculate the extreme value
+     * @param sortField     The field in solr for which we'll sort the calculated extreme value on
+     *                      This is typically the valueField appended with "_sort"
+     * @param sortOrder     Entering ascending will return the minimum value
+     *                      Entering descending will return the maximum value
+     * @return              Returns the min or max value based on the field in the parameters.
+     * @throws SearchServiceException
+     */
+    String calculateExtremeValue(Context context, String valueField,
+                                 String sortField, DiscoverQuery.SORT_ORDER sortOrder)
+        throws SearchServiceException;
 }

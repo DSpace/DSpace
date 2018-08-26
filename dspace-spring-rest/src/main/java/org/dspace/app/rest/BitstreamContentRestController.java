@@ -23,11 +23,9 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.MultipartFileSender;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.disseminate.service.CitationDocumentService;
 import org.dspace.services.EventService;
@@ -35,6 +33,7 @@ import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -72,14 +71,12 @@ public class BitstreamContentRestController implements InitializingBean {
     private EventService eventService;
 
     @Autowired
-    private AuthorizeService authorizeService;
-
-    @Autowired
     private CitationDocumentService citationDocumentService;
 
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
 
+    @PreAuthorize("hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
     public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
                          HttpServletRequest request) throws IOException, SQLException, AuthorizeException {
@@ -87,9 +84,9 @@ public class BitstreamContentRestController implements InitializingBean {
 
         Context context = ContextUtil.obtainContext(request);
 
-        Bitstream bit = getBitstream(context, uuid, response);
+        Bitstream bit = bitstreamService.find(context, uuid);
         if (bit == null) {
-            //The bitstream was not found or we're not authorized to read it.
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
@@ -145,7 +142,7 @@ public class BitstreamContentRestController implements InitializingBean {
         if (citationDocumentService.isCitationEnabledForBitstream(bit, context)) {
             return generateBitstreamWithCitation(context, bit);
         } else {
-            return Pair.of(bitstreamService.retrieve(context, bit),bit.getSize());
+            return Pair.of(bitstreamService.retrieve(context, bit),bit.getSizeBytes());
         }
     }
 
@@ -173,18 +170,6 @@ public class BitstreamContentRestController implements InitializingBean {
             }
         }
         return name;
-    }
-
-    private Bitstream getBitstream(Context context, @PathVariable UUID uuid, HttpServletResponse response)
-        throws SQLException, IOException, AuthorizeException {
-        Bitstream bit = bitstreamService.find(context, uuid);
-        if (bit == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        } else {
-            authorizeService.authorizeAction(context, bit, Constants.READ);
-        }
-
-        return bit;
     }
 
     private boolean isNotAnErrorResponse(HttpServletResponse response) {

@@ -145,7 +145,11 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
         init();
         log.debug("Getting matches for '" + text + "'");
-        String xpathExpression = String.format(xpathTemplate, text.replaceAll("'", "&apos;").toLowerCase());
+        String xpathExpression = "";
+        String[] textHierarchy = text.split(hierarchyDelimiter, -1);
+        for (int i = 0; i < textHierarchy.length; i++) {
+            xpathExpression += String.format(xpathTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
+        }
         XPath xpath = XPathFactory.newInstance().newXPath();
         Choice[] choices;
         try {

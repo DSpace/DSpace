@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -90,6 +90,31 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public List<Bitstream> findAll(Context context) throws SQLException {
         return bitstreamDAO.findAll(context, Bitstream.class);
+    }
+
+    @Override
+    public Bitstream clone(Context context, Bitstream bitstream)
+            throws SQLException {
+        // Create a new bitstream with a new ID.
+        Bitstream clonedBitstream = bitstreamDAO.create(context, new Bitstream());
+        // Set the internal identifier, file size, checksum, and
+        // checksum algorithm as same as the given bitstream.
+        clonedBitstream.setInternalId(bitstream.getInternalId());
+        clonedBitstream.setSizeBytes(bitstream.getSizeBytes());
+        clonedBitstream.setChecksum(bitstream.getChecksum());
+        clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+        try {
+            //Update our bitstream but turn off the authorization system since permissions
+            //haven't been set at this point in time.
+            context.turnOffAuthorisationSystem();
+            update(context, clonedBitstream);
+        } catch (AuthorizeException e) {
+            log.error(e);
+            //Can never happen since we turn off authorization before we update
+        } finally {
+            context.restoreAuthSystemState();
+        }
+        return clonedBitstream;
     }
 
     @Override

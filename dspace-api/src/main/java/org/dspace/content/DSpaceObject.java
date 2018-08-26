@@ -24,7 +24,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.core.ReloadableEntity;

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -142,6 +143,12 @@ public abstract class AbstractBuilder<T, S> {
     }
 
     public static void cleanupObjects() throws Exception {
+        builders.sort(new Comparator<AbstractBuilder>() {
+            @Override
+            public int compare(AbstractBuilder o1, AbstractBuilder o2) {
+                return o1.getPriority() - o2.getPriority();
+            }
+        });
         for (AbstractBuilder builder : builders) {
             builder.cleanup();
         }
@@ -161,6 +168,10 @@ public abstract class AbstractBuilder<T, S> {
         }
     }
 
+    protected int getPriority() {
+        return 0;
+    }
+
     protected abstract void cleanup() throws Exception;
 
     public abstract T build();
@@ -168,6 +179,11 @@ public abstract class AbstractBuilder<T, S> {
     public abstract void delete(T dso) throws Exception;
 
     protected abstract S getService();
+
+    protected <B> B handleException(final Exception e) {
+        log.error(e.getMessage(), e);
+        return null;
+    }
 
     /**
      * Method to completely delete a bitstream from the database and asset store.

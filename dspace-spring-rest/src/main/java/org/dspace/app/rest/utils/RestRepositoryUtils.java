@@ -21,6 +21,7 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.convert.ConversionException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
@@ -60,7 +61,11 @@ public class RestRepositoryUtils {
      */
     public boolean haveSearchMethods(DSpaceRestRepository repository) {
         for (Method method : repository.getClass().getMethods()) {
-            SearchRestMethod ann = method.getAnnotation(SearchRestMethod.class);
+            // We need to use AnnotationUtils because the DSpaceRestRepository is possibly enhanced by a Spring AOP
+            // proxy. The regular "method.getAnnotation()" method would then search the proxy instead of the
+            // underlying actual class. The proxy does not inherit the annotations.
+            SearchRestMethod ann =
+                    AnnotationUtils.findAnnotation(method, SearchRestMethod.class);
             if (ann != null) {
                 return true;
             }
@@ -75,7 +80,10 @@ public class RestRepositoryUtils {
     public List<String> listSearchMethods(DSpaceRestRepository repository) {
         List<String> searchMethods = new LinkedList<String>();
         for (Method method : repository.getClass().getMethods()) {
-            SearchRestMethod ann = method.getAnnotation(SearchRestMethod.class);
+            // We need to use AnnotationUtils because the DSpaceRestRepository is possibly enhanced by a Spring AOP
+            // proxy. The regular "method.getAnnotation()" method would then search the proxy instead of the
+            // underlying actual class. The proxy does not inherit the annotations.
+            SearchRestMethod ann = AnnotationUtils.findAnnotation(method, SearchRestMethod.class);
             if (ann != null) {
                 String name = ann.name();
                 if (name.isEmpty()) {
@@ -96,8 +104,15 @@ public class RestRepositoryUtils {
      */
     public Method getSearchMethod(String searchMethodName, DSpaceRestRepository repository) {
         Method searchMethod = null;
-        for (Method method : repository.getClass().getMethods()) {
-            SearchRestMethod ann = method.getAnnotation(SearchRestMethod.class);
+        // DSpaceRestRepository is possibly enhanced with a Spring AOP proxy. Therefor use ClassUtils to determine
+        // the underlying implementation class.
+        Method[] methods = ClassUtils.getUserClass(repository.getClass()).getMethods();
+        for (Method method : methods) {
+            // We need to use AnnotationUtils because the DSpaceRestRepository is possibly enhanced by a Spring AOP
+            // proxy. The regular "method.getAnnotation()" method would then search the proxy instead of the
+            // underlying actual class. The proxy does not inherit the annotations.
+            SearchRestMethod ann =
+                    AnnotationUtils.findAnnotation(method, SearchRestMethod.class);
             if (ann != null) {
                 String name = ann.name();
                 if (name.isEmpty()) {
@@ -124,12 +139,12 @@ public class RestRepositoryUtils {
         MultiValueMap<String, Object> result = new LinkedMultiValueMap<String, Object>(parameters);
         MethodParameters methodParameters = new MethodParameters(method, PARAM_ANNOTATION);
 
-        for (MethodParameter parameter : methodParameters.getParametersWith(Parameter.class)) {
+        for (MethodParameter parameter : methodParameters.getParameters()) {
             final Parameter parameterAnnotation = parameter.getParameterAnnotation(Parameter.class);
-            final String paramName = parameter.getParameterName();
+            String paramName = getParamName(parameter, parameterAnnotation);
             List<Object> value = parameters.get(paramName);
             if (value == null) {
-                if (parameterAnnotation.required()) {
+                if (parameterAnnotation != null && parameterAnnotation.required()) {
                     throw new MissingParameterException(
                             String.format("Required Parameter[%s] Missing",
                                     parameter.getParameterName()));
@@ -188,8 +203,8 @@ public class RestRepositoryUtils {
             } else if (Sort.class.isAssignableFrom(targetType)) {
                 result[i] = sortToUse;
             } else {
-
-                String parameterName = param.getParameterName();
+                final Parameter parameterAnnotation = param.getParameterAnnotation(Parameter.class);
+                String parameterName = getParamName(param, parameterAnnotation);
 
                 if (StringUtils.isBlank(parameterName)) {
                     throw new IllegalArgumentException(
@@ -203,6 +218,18 @@ public class RestRepositoryUtils {
         }
 
         return result;
+    }
+
+    private String getParamName(MethodParameter parameter, final Parameter parameterAnnotation) {
+        String paramName = null;
+
+        if (parameterAnnotation != null) {
+            paramName = parameterAnnotation.value();
+        }
+        if (paramName == null) {
+            paramName = parameter.getParameterName();
+        }
+        return paramName;
     }
 
     /**

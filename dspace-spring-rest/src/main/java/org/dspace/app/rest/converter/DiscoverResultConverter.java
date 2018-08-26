@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
@@ -31,6 +33,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscoverResultConverter {
 
+    private static final Logger log = Logger.getLogger(DiscoverResultConverter.class);
+
     @Autowired
     private List<BrowsableDSpaceObjectConverter> converters;
     @Autowired
@@ -39,26 +43,26 @@ public class DiscoverResultConverter {
     private SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter;
 
     public SearchResultsRest convert(final Context context, final String query, final String dsoType,
-                                     final String configuration, final String scope,
+                                     final String configurationName, final String scope,
                                      final List<SearchFilter> searchFilters, final Pageable page,
-            final DiscoverResult searchResult, final DiscoveryConfiguration discoveryConfiguration) {
+                                     final DiscoverResult searchResult, final DiscoveryConfiguration configuration) {
 
         SearchResultsRest resultsRest = new SearchResultsRest();
 
-        setRequestInformation(context, query, dsoType, configuration, scope, searchFilters, page, resultsRest);
+        setRequestInformation(context, query, dsoType, configurationName, scope, searchFilters, page, resultsRest);
 
         addSearchResults(searchResult, resultsRest);
 
-        addFacetValues(searchResult, resultsRest, discoveryConfiguration);
+        addFacetValues(context, searchResult, resultsRest, configuration);
 
         resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
 
         return resultsRest;
     }
 
-    private void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest resultsRest,
+    private void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
             final DiscoveryConfiguration configuration) {
-        facetConverter.addFacetValues(searchResult, resultsRest, configuration);
+        facetConverter.addFacetValues(context, searchResult, resultsRest, configuration);
     }
 
     private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
@@ -92,11 +96,11 @@ public class DiscoverResultConverter {
     }
 
     private void setRequestInformation(final Context context, final String query, final String dsoType,
-                                       final String configuration, final String scope,
+                                       final String configurationName, final String scope,
                                        final List<SearchFilter> searchFilters, final Pageable page,
                                        final SearchResultsRest resultsRest) {
         resultsRest.setQuery(query);
-        resultsRest.setConfiguration(configuration);
+        resultsRest.setConfigurationName(configurationName);
         resultsRest.setDsoType(dsoType);
 
         resultsRest.setScope(scope);
@@ -105,10 +109,14 @@ public class DiscoverResultConverter {
             Sort.Order order = page.getSort().iterator().next();
             resultsRest.setSort(order.getProperty(), order.getDirection().name());
         }
-        for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
+        SearchQueryConverter searchQueryConverter = new SearchQueryConverter();
+        List<SearchFilter> transformedFilters = searchQueryConverter.convert(searchFilters);
 
+        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter =
+                new SearchFilterToAppliedFilterConverter();
+        for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(transformedFilters)) {
             resultsRest
-                .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
+                    .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
         }
     }
 }

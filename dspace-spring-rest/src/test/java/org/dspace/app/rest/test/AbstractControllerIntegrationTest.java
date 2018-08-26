@@ -16,9 +16,13 @@ import java.util.Arrays;
 import java.util.List;
 import javax.servlet.Filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Application;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.security.MethodSecurityConfig;
 import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.junit.Assert;
@@ -39,6 +43,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.web.context.WebApplicationContext;
@@ -50,7 +55,8 @@ import org.springframework.web.context.WebApplicationContext;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {Application.class, ApplicationConfig.class, WebSecurityConfiguration.class})
+@SpringBootTest(classes = {Application.class, ApplicationConfig.class, WebSecurityConfiguration.class,
+        MethodSecurityConfig.class})
 @TestExecutionListeners( {DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
     TransactionalTestExecutionListener.class})
 @DirtiesContext
@@ -58,7 +64,10 @@ import org.springframework.web.context.WebApplicationContext;
 public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";
-    protected static final String AUTHORIZATION_TYPE = "Bearer";
+
+    //The Authorization header contains a value like "Bearer TOKENVALUE". This constant string represents the part that
+    //sits before the actual authentication token and can be used to easily compose or parse the Authorization header.
+    protected static final String AUTHORIZATION_TYPE = "Bearer ";
 
     public static final String REST_SERVER_URL = "http://localhost/api/";
 
@@ -95,13 +104,14 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
         DefaultMockMvcBuilder mockMvcBuilder = webAppContextSetup(webApplicationContext)
             //Always log the response to debug
-            .alwaysDo(MockMvcResultHandlers.log())
+            .alwaysDo(MockMvcResultHandlers.print())
             //Add all filter implementations
             .addFilters(new ErrorPageFilter())
             .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]));
 
         if (StringUtils.isNotBlank(authToken)) {
-            mockMvcBuilder.defaultRequest(get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + " " + authToken));
+            mockMvcBuilder.defaultRequest(
+                    get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
         }
 
         return mockMvcBuilder
@@ -116,8 +126,26 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     }
 
     public String getAuthToken(String user, String password) throws Exception {
-        return getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER);
+        return StringUtils.substringAfter(
+                getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER),
+                AUTHORIZATION_TYPE);
     }
 
+    public String getPatchContent(List<Operation> ops) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(ops);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static RequestPostProcessor ip(final String ipAddress) {
+        return request -> {
+            request.setRemoteAddr(ipAddress);
+            return request;
+        };
+    }
 }
 

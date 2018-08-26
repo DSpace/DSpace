@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -89,6 +90,8 @@ public class SolrBrowseDAO implements BrowseDAO {
      * value to start browse from in focus field
      */
     private String focusValue = null;
+
+    private String startsWith = null;
 
     /**
      * field to look for value in
@@ -176,9 +179,16 @@ public class SolrBrowseDAO implements BrowseDAO {
             addLocationScopeFilter(query);
             addStatusFilter(query);
             if (distinct) {
-                DiscoverFacetField dff = new DiscoverFacetField(facetField,
-                                                                DiscoveryConfigurationParameters.TYPE_TEXT, -1,
-                                                                DiscoveryConfigurationParameters.SORT.VALUE);
+                DiscoverFacetField dff;
+                if (StringUtils.isNotBlank(startsWith)) {
+                    dff = new DiscoverFacetField(facetField,
+                        DiscoveryConfigurationParameters.TYPE_TEXT, -1,
+                        DiscoveryConfigurationParameters.SORT.VALUE, startsWith);
+                } else {
+                    dff = new DiscoverFacetField(facetField,
+                        DiscoveryConfigurationParameters.TYPE_TEXT, -1,
+                        DiscoveryConfigurationParameters.SORT.VALUE);
+                }
                 query.addFacetField(dff);
                 query.setFacetMinCount(1);
                 query.setMaxResults(0);
@@ -444,7 +454,17 @@ public class SolrBrowseDAO implements BrowseDAO {
         return focusValue;
     }
 
-    /*
+    @Override
+    public void setStartsWith(String startsWith) {
+        this.startsWith = startsWith;
+    }
+
+    @Override
+    public String getStartsWith() {
+        return startsWith;
+    }
+
+     /*
      * (non-Javadoc)
      *
      * @see org.dspace.browse.BrowseDAO#getLimit()

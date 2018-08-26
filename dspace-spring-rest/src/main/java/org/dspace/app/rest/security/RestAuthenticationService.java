@@ -11,6 +11,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Service;
@@ -32,5 +33,15 @@ public interface RestAuthenticationService {
     boolean hasAuthenticationData(HttpServletRequest request);
 
     void invalidateAuthenticationData(HttpServletRequest request, Context context) throws Exception;
+
+    AuthenticationService getAuthenticationService();
+
+    /**
+     * Return the value that should be passed in the WWWW-Authenticate header for 4xx responses to the client
+     * @param request The current client request
+     * @param response The response being build for the client
+     * @return A string value that should be set in the WWWW-Authenticate header
+     */
+    String getWwwAuthenticateHeaderValue(HttpServletRequest request, HttpServletResponse response);
 
 }

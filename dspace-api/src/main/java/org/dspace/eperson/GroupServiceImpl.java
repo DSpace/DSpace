@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -376,7 +376,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public int searchResultCount(Context context, String groupIdentifier) throws SQLException {
         int result = 0;
         UUID uuid = UUIDUtils.fromString(groupIdentifier);
-        if (uuid == null && StringUtils.isNotBlank(groupIdentifier)) {
+        if (uuid == null) {
             //Search by group name
             result = groupDAO.countByNameLike(context, groupIdentifier);
         } else {

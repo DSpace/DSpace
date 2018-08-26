@@ -25,6 +25,7 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.Link;
@@ -69,7 +70,8 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
                                     // TODO add support for single linked object other than for collections
                                     Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m
                                         .invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
-                                    EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
+                                    EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult,
+                                                                       null, name);
                                     embedded.put(name, ep);
                                     found = true;
                                 }
@@ -90,7 +92,7 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
                     Method readMethod = pd.getReadMethod();
                     String name = pd.getName();
                     if (readMethod != null && !"class".equals(name)) {
-                        LinkRest linkAnnotation = readMethod.getAnnotation(LinkRest.class);
+                        LinkRest linkAnnotation = AnnotationUtils.findAnnotation(readMethod, LinkRest.class);
 
                         if (linkAnnotation != null) {
                             if (StringUtils.isNotBlank(linkAnnotation.name())) {
@@ -125,7 +127,7 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
                                             PageImpl<RestAddressableModel> page = new PageImpl(linkedRMList);
                                             wrapObject = new EmbeddedPage(linkToSubResource.getHref(),
                                                                           page.map(resourceRepository::wrapResource),
-                                                                          linkedRMList);
+                                                                          linkedRMList, name);
                                         } else {
                                             wrapObject = null;
                                         }
@@ -150,7 +152,7 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
                                                     .invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null,
                                                             null);
                                                 EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(),
-                                                                                   pageResult, null);
+                                                                                   pageResult, null, name);
                                                 embedded.put(name, ep);
                                             } else {
                                                 RestAddressableModel object = (RestAddressableModel) m

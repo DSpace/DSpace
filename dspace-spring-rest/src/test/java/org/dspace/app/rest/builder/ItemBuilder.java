@@ -24,6 +24,7 @@ import org.dspace.eperson.Group;
  */
 public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
+    private boolean withdrawn = false;
     private WorkspaceItem workspaceItem;
     private Item item;
     private Group readerGroup = null;
@@ -66,8 +67,19 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchema.DC_SCHEMA, "subject", null, subject);
     }
 
-    public ItemBuilder makePrivate() {
+    public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
+        return this;
+    }
+
+    /**
+     * Withdrawn the item under build. Please note that an user need to be loggedin the context to avoid NPE during the
+     * creation of the provenance metadata
+     *
+     * @return the ItemBuilder
+     */
+    public ItemBuilder withdrawn() {
+        withdrawn = true;
         return this;
     }
 
@@ -89,6 +101,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             //Check if we need to make this item private. This has to be done after item install.
             if (readerGroup != null) {
                 setOnlyReadPermission(workspaceItem.getItem(), readerGroup, null);
+            }
+
+            if (withdrawn) {
+                itemService.withdraw(context, item);
             }
 
             context.dispatchEvents();

@@ -129,9 +129,9 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         return discoverSearchSupportConverter.convert();
     }
 
-    public FacetResultsRest getFacetObjects(String facetName, String query, String dsoType, String dsoScope,
-            final String configuration, List<SearchFilter> searchFilters, Pageable page)
-        throws InvalidRequestException {
+    public FacetResultsRest getFacetObjects(String facetName, String prefix, String query, String dsoType,
+            String dsoScope, final String configuration, List<SearchFilter> searchFilters, Pageable page)
+            throws InvalidRequestException {
 
         Context context = obtainContext();
 
@@ -142,9 +142,8 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         DiscoverResult searchResult = null;
         DiscoverQuery discoverQuery = null;
         try {
-            discoverQuery = queryBuilder
-                    .buildFacetQuery(context, scopeObject, discoveryConfiguration, query, searchFilters, dsoType, page,
-                            facetName);
+            discoverQuery = queryBuilder.buildFacetQuery(context, scopeObject, discoveryConfiguration, prefix, query,
+                    searchFilters, dsoType, page, facetName);
             searchResult = searchService.search(context, scopeObject, discoverQuery);
 
         } catch (SearchServiceException e) {
@@ -152,8 +151,8 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
             //TODO TOM handle search exception
         }
 
-        FacetResultsRest facetResultsRest = discoverFacetResultsConverter.convert(context, facetName, query, dsoType,
-                dsoScope, searchFilters, searchResult, discoveryConfiguration, page);
+        FacetResultsRest facetResultsRest = discoverFacetResultsConverter.convert(context, facetName, prefix, query,
+                dsoType, dsoScope, searchFilters, searchResult, discoveryConfiguration, page);
         return facetResultsRest;
     }
 

@@ -37,6 +37,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -95,6 +97,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     protected final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     /**
      * Fill in the plugin alias table from DSpace configuration entries
@@ -418,7 +421,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     protected List<MockMetadataValue> site2Metadata(Site site) {
         List<MockMetadataValue> metadata = new ArrayList<>();
 
-        String identifier_uri = "http://hdl.handle.net/"
+        String identifier_uri = handleService.getCanonicalPrefix()
             + site.getHandle();
         String title = site.getName();
         String url = site.getURL();
@@ -452,7 +455,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         String description = communityService.getMetadata(community, "introductory_text");
         String description_abstract = communityService.getMetadata(community, "short_description");
         String description_table = communityService.getMetadata(community, "side_bar_text");
-        String identifier_uri = "http://hdl.handle.net/"
+        String identifier_uri = handleService.getCanonicalPrefix()
             + community.getHandle();
         String rights = communityService.getMetadata(community, "copyright_text");
         String title = communityService.getMetadata(community, "name");
@@ -495,7 +498,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         String description = collectionService.getMetadata(collection, "introductory_text");
         String description_abstract = collectionService.getMetadata(collection, "short_description");
         String description_table = collectionService.getMetadata(collection, "side_bar_text");
-        String identifier_uri = "http://hdl.handle.net/"
+        String identifier_uri = handleService.getCanonicalPrefix()
             + collection.getHandle();
         String provenance = collectionService.getMetadata(collection, "provenance_description");
         String rights = collectionService.getMetadata(collection, "copyright_text");

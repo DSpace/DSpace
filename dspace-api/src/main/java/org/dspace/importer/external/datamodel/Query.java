@@ -10,7 +10,7 @@ package org.dspace.importer.external.datamodel;
 
 import java.util.Collection;
 
-import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.commons.collections4.map.MultiValueMap;
 
 /**
  * Represents a query to a source. Subclasses may enforce stricter typing or more verbose setting of parameters.

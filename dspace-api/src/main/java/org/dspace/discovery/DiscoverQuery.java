@@ -9,6 +9,7 @@ package org.dspace.discovery;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -340,7 +341,8 @@ public class DiscoverQuery {
                 this.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), 10,
                                                           facet.getSortOrderSidebar()));
             } else {
-                List<String> facetQueries = buildFacetQueriesWithGap(newestYear, oldestYear, dateFacet, gap, topYear);
+                List<String> facetQueries = buildFacetQueriesWithGap(newestYear, oldestYear, dateFacet, gap, topYear,
+                                                                     facet.getFacetLimit());
                 for (String facetQuery : CollectionUtils.emptyIfNull(facetQueries)) {
                     this.addFacetQuery(facetQuery);
                 }
@@ -349,10 +351,9 @@ public class DiscoverQuery {
     }
 
     private List<String> buildFacetQueriesWithGap(int newestYear, int oldestYear, String dateFacet, int gap,
-                                                  int topYear) {
+                                                  int topYear, int facetLimit) {
         List<String> facetQueries = new LinkedList<>();
-        //Create facet queries but limit them to 11 (11 == when we need to show a "show more" url)
-        for (int year = topYear; year > oldestYear && (facetQueries.size() < 11); year -= gap) {
+        for (int year = topYear; year > oldestYear && (facetQueries.size() < facetLimit); year -= gap) {
             //Add a filter to remove the last year only if we aren't the last year
             int bottomYear = year - gap;
             //Make sure we don't go below our last year found
@@ -370,6 +371,7 @@ public class DiscoverQuery {
             }
             facetQueries.add(dateFacet + ":[" + bottomYear + " TO " + currentTop + "]");
         }
+        Collections.reverse(facetQueries);
         return facetQueries;
     }
 
