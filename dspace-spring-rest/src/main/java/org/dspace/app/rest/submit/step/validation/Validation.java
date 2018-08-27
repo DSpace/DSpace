@@ -14,7 +14,7 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.InProgressSubmission;
 
 /**
  * Interface to support validation on submission process
@@ -27,7 +27,7 @@ public interface Validation {
 
     String getName();
 
-    List<? extends ErrorRest> validate(SubmissionService submissionService, WorkspaceItem obj,
+    List<? extends ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
                                        SubmissionStepConfig config) throws DCInputsReaderException, SQLException;
 
 }

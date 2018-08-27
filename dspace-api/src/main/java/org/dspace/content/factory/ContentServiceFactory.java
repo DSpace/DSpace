@@ -7,13 +7,16 @@
  */
 package org.dspace.content.factory;
 
+import java.io.Serializable;
 import java.util.List;
 
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BrowsableObjectService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -38,6 +41,8 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  * @author kevinvandevelde at atmire.com
  */
 public abstract class ContentServiceFactory {
+
+    public abstract List<BrowsableObjectService> getBrowsableDSpaceObjectServices();
 
     public abstract List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices();
 
@@ -86,14 +91,27 @@ public abstract class ContentServiceFactory {
         return manager;
     }
 
-    public DSpaceObjectService getDSpaceObjectService(int type) {
+    @SuppressWarnings("unchecked")
+    public <T extends DSpaceObject> DSpaceObjectService<T> getDSpaceObjectService(int type) {
         for (int i = 0; i < getDSpaceObjectServices().size(); i++) {
-            DSpaceObjectService objectService = getDSpaceObjectServices().get(i);
+            DSpaceObjectService<? extends DSpaceObject> objectService = getDSpaceObjectServices().get(i);
             if (objectService.getSupportsTypeConstant() == type) {
-                return objectService;
+                return (DSpaceObjectService<T>) objectService;
             }
         }
         throw new UnsupportedOperationException("Unknown DSpace type: " + type);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends BrowsableDSpaceObject<PK>, PK extends Serializable> BrowsableObjectService<T, PK>
+        getBrowsableDSpaceObjectService(int type) {
+        for (int i = 0; i < getBrowsableDSpaceObjectServices().size(); i++) {
+            BrowsableObjectService objectService = getBrowsableDSpaceObjectServices().get(i);
+            if (objectService.getSupportsTypeConstant() == type) {
+                return (BrowsableObjectService<T, PK>) objectService;
+            }
+        }
+        throw new UnsupportedOperationException("Unknown Browsable DSpace type: " + type);
     }
 
     public DSpaceObjectLegacySupportService<? extends DSpaceObject> getDSpaceLegacyObjectService(int type) {

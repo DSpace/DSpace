@@ -16,7 +16,6 @@ import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.Value;
 import gr.ekt.bte.dataloader.FileDataLoader;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -43,7 +42,7 @@ public class ExtractMetadataStep extends ExtractionStep implements UploadableSte
 
     @Override
     public ErrorRest upload(Context context, SubmissionService submissionService, SubmissionStepConfig stepConfig,
-            InProgressSubmission wsi, MultipartFile multipartFile, String extraField)
+                            InProgressSubmission wsi, MultipartFile multipartFile, String extraField)
         throws IOException {
 
         Item item = wsi.getItem();

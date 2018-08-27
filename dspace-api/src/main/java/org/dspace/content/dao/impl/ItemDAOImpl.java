@@ -14,7 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -26,6 +28,7 @@ import org.dspace.eperson.EPerson;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -313,5 +316,47 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
         return count(query);
+    }
+
+    @Override
+    public List<Bundle> findBundlesByName(Context context, Item item, String name) throws SQLException {
+        String hqlQueryString = "SELECT bundles FROM Item as item join item.bundles bundles join bundles.metadata " +
+            "metadatavalue WHERE item = :item";
+        if (StringUtils.isNotBlank(name)) {
+            hqlQueryString += " AND STR(metadatavalue.value) = :text_value ";
+        }
+        Query query = createQuery(context, hqlQueryString);
+
+        query.setParameter("item", item);
+        if (StringUtils.isNotBlank(name)) {
+            query.setParameter("text_value", name);
+        }
+        return query.list();
+    }
+
+    @Override
+    public List<Item> findBySubmitter(Context context, EPerson eperson, Integer limit, Integer offset)
+        throws SQLException {
+        Criteria criteria = createCriteria(context, Item.class);
+        criteria.addOrder(Order.asc("lastModified"));
+        criteria.add(Restrictions.eq("inArchive", true));
+        criteria.add(Restrictions.eq("withdrawn", false));
+        criteria.add(Restrictions.eq("submitter.id", eperson.getID()));
+        criteria.setFirstResult(offset);
+        criteria.setMaxResults(limit);
+        return list(criteria);
+    }
+
+    @Override
+    public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
+        throws SQLException {
+        Query query = createQuery(context,
+                                  "SELECT count(*) FROM Item i join i.submitter submitter WHERE i" +
+                                      ".inArchive=:in_archive AND i.withdrawn=:withdrawn AND submitter = :submitter");
+        query.setParameter("submitter", submitter);
+        query.setParameter("in_archive", includeArchived);
+        query.setParameter("withdrawn", includeWithdrawn);
+        return count(query);
+
     }
 }

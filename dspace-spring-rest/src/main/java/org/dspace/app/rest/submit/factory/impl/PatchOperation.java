@@ -10,11 +10,11 @@ package org.dspace.app.rest.submit.factory.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
-import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Class to abstract the HTTP PATCH method operation
@@ -24,7 +24,8 @@ import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
  */
 public abstract class PatchOperation<T extends Object> {
 
-    public abstract void perform(Context context, Request currentRequest, WorkspaceItem source, Operation operation)
+    public abstract void perform(Context context, Request currentRequest, InProgressSubmission source,
+            Operation operation)
         throws Exception;
 
     public List<T> evaluateArrayObject(LateObjectEvaluator value) {
