@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.app.rest.model.MetadataEntryRest;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 
@@ -24,7 +25,7 @@ import org.dspace.content.MetadataValue;
  */
 public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends org.dspace.app.rest.model
     .DSpaceObjectRest>
-    extends DSpaceConverter<M, R> {
+    extends BrowsableDSpaceObjectConverter<M, R> {
 
     @Override
     public R fromModel(M obj) {
@@ -51,7 +52,7 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
         return null;
     }
 
-    public boolean supportsModel(DSpaceObject object) {
+    public boolean supportsModel(BrowsableDSpaceObject object) {
         return object != null && object.getClass().equals(getModelClass());
     }
 

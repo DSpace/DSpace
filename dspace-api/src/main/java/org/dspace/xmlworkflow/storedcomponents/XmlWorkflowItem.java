@@ -8,6 +8,7 @@
 package org.dspace.xmlworkflow.storedcomponents;
 
 import java.sql.SQLException;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,12 +21,16 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * Class representing an item going through the workflow process in DSpace
@@ -37,7 +42,7 @@ import org.dspace.workflow.WorkflowItem;
  */
 @Entity
 @Table(name = "cwf_workflowitem")
-public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> {
+public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>, BrowsableDSpaceObject<Integer> {
 
     @Id
     @Column(name = "workflowitem_id")
@@ -132,6 +137,51 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer> 
     @Override
     public void setPublishedBefore(boolean b) {
         this.publishedBefore = b;
+    }
+
+    @Override
+    public void update() throws SQLException, AuthorizeException {
+
+        Context context = null;
+        try {
+            context = new Context();
+            WorkflowServiceFactory.getInstance().getWorkflowItemService().update(context, this);
+        } finally {
+            if (context != null && context.isValid()) {
+                context.abort();
+            }
+        }
+    }
+
+    @Override
+    public int getState() {
+        // FIXME
+        return 0;
+    }
+
+    @Override
+    public String getTypeText() {
+        return "workflowitem";
+    }
+
+    @Override
+    public int getType() {
+        return Constants.WORKFLOWITEM;
+    }
+
+    @Override
+    public boolean isArchived() {
+        return false;
+    }
+
+    @Override
+    public boolean isDiscoverable() {
+        return false;
+    }
+
+    @Override
+    public String getHandle() {
+        return getType() + "-" + getID();
     }
 
 }

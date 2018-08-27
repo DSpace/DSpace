@@ -17,6 +17,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -53,6 +54,11 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     }
 
     @Override
+    public int getSupportsTypeConstant() {
+        return Constants.WORKFLOWITEM;
+    }
+
+    @Override
     public BasicWorkflowItem create(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException {
         if (findByItem(context, item) != null) {
@@ -67,7 +73,7 @@ public class BasicWorkflowItemServiceImpl implements BasicWorkflowItemService {
     }
 
     @Override
-    public BasicWorkflowItem find(Context context, int id) throws SQLException {
+    public BasicWorkflowItem find(Context context, Integer id) throws SQLException {
         BasicWorkflowItem workflowItem = workflowItemDAO.findByID(context, BasicWorkflowItem.class, id);
 
         if (workflowItem == null) {

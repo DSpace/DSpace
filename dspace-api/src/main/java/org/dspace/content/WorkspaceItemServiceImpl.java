@@ -60,7 +60,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public WorkspaceItem find(Context context, int id) throws SQLException {
+    public int getSupportsTypeConstant() {
+        return Constants.WORKSPACEITEM;
+    }
+
+    @Override
+    public WorkspaceItem find(Context context, Integer id) throws SQLException {
         WorkspaceItem workspaceItem = workspaceItemDAO.findByID(context, WorkspaceItem.class, id);
 
         if (workspaceItem == null) {
