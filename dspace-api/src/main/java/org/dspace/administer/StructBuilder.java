@@ -74,13 +74,13 @@ import org.xml.sax.SAXException;
 
 public class StructBuilder {
     /** Name of the root element for the document to be imported. */
-    private static final String INPUT_ROOT = "import_structure";
+    static final String INPUT_ROOT = "import_structure";
 
     /**
      * Name of the root element for the document produced by importing.
      * Community and collection elements are annotated with their identifiers.
      */
-    private static final String RESULT_ROOT = "imported_structure";
+    static final String RESULT_ROOT = "imported_structure";
 
     /**
      * A table to hold metadata for the collection being worked on.

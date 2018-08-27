@@ -27,6 +27,7 @@ import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -83,10 +84,12 @@ public class StructBuilderIT
     @Before
     public void setUp() throws SQLException, AuthorizeException, IOException {
         // Clear out all communities and collections.
+        context.turnOffAuthorisationSystem();
         for (Community community : communityService.findAllTop(context)) {
             deleteSubCommunities(community);
             communityService.delete(context, community);
         }
+        context.restoreAuthSystemState();
     }
 
     @After
@@ -111,6 +114,19 @@ public class StructBuilderIT
             "    <collection>\n" +
             "      <name>Collection 0.1</name>\n" +
             "      <description/><intro/><copyright/><sidebar/><license/><provenance/>" +
+            "    </collection>\n" +
+            "  </community>\n" +
+            "</import_structure>\n";
+
+    private static final String EXPORT_DOCUMENT =
+            "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<import_structure>\n" +
+            "  <community>\n" +
+            "    <name>Top Community 0</name>" +
+            "    <description/><intro/><copyright/><sidebar/>" +
+            "    <collection>\n" +
+            "      <name>Collection 0.0</name>" +
+            "      <description/><intro/><copyright/><sidebar/><license/>" +
             "    </collection>\n" +
             "  </community>\n" +
             "</import_structure>\n";
@@ -186,6 +202,80 @@ public class StructBuilderIT
     }
 
     /**
+     * Test of exportStructure method, of class StructBuilder.
+     * @throws ParserConfigurationException passed through.
+     * @throws org.xml.sax.SAXException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     */
+    @Test
+    public void testExportStructure()
+            throws ParserConfigurationException, SAXException, IOException,
+            SQLException, AuthorizeException {
+        // Create some structure to test.
+        context.turnOffAuthorisationSystem();
+        Community community0 = communityService.create(null, context);
+        communityService.setMetadataSingleValue(context, community0,
+                MetadataSchema.DC_SCHEMA, "title", null,
+                null, "Top Community 0");
+        Collection collection0_0 = collectionService.create(context, community0);
+        collectionService.setMetadataSingleValue(context, collection0_0,
+                MetadataSchema.DC_SCHEMA, "title", null,
+                null, "Collection 0.0");
+
+        // Export the current structure.
+        System.out.println("exportStructure");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        StructBuilder.exportStructure(context, outputStream);
+
+        context.restoreAuthSystemState();
+
+        // Compare the output to the expected output.
+        Source output = new StreamSource(
+                new ByteArrayInputStream(outputStream.toByteArray()));
+        Source reference = new StreamSource(
+                new ByteArrayInputStream(
+                        EXPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8)));
+        Diff myDiff = DiffBuilder.compare(reference).withTest(output)
+                .normalizeWhitespace()
+//                .withNodeFilter(new MyNodeFilter())
+                .withAttributeFilter((Attr attr) ->
+                        !attr.getName().equals("identifier"))
+                .checkForIdentical()
+                .build();
+
+        // Was there a difference?
+        // Always output differences -- one is expected.
+        ComparisonFormatter formatter = new DefaultComparisonFormatter();
+        for (Difference difference : myDiff.getDifferences()) {
+            System.err.println(difference.toString(formatter));
+        }
+        // Test for *significant* differences.
+        assertFalse("Output does not match input.", myDiff.hasDifferences());
+    }
+
+    /**
+     * Delete all child communities and collections of a given community.
+     * All descendant collections must be empty of Items.
+     *
+     * @param c the Community to be pruned of all descendants.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     * @throws IOException passed through.
+     */
+    private void deleteSubCommunities(Community c)
+            throws SQLException, AuthorizeException, IOException {
+        for (Community subCommunity : c.getSubcommunities()) {
+            deleteSubCommunities(subCommunity);
+            communityService.delete(context, subCommunity);
+        }
+        for (Collection collection : c.getCollections()) {
+            collectionService.delete(context, collection);
+        }
+    }
+
+    /**
      * Test that the documents are not different, except that their root
      * elements have specific different names.
      *
@@ -222,40 +312,6 @@ public class StructBuilderIT
 
         // There must be at most one difference.
         return diffIterator.hasNext();
-    }
-
-    /**
-     * Test of exportStructure method, of class StructBuilder.
-     */
-/*
-    @Test
-    public void testExportStructure() {
-        System.out.println("exportStructure");
-        OutputStream output = null;
-        StructBuilder.exportStructure(context, output);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Delete all child communities and collections of a given community.
-     * All descendant collections must be empty of Items.
-     *
-     * @param c the Community to be pruned of all descendants.
-     * @throws SQLException passed through.
-     * @throws AuthorizeException passed through.
-     * @throws IOException passed through.
-     */
-    private void deleteSubCommunities(Community c)
-            throws SQLException, AuthorizeException, IOException {
-        for (Community subCommunity : c.getSubcommunities()) {
-            deleteSubCommunities(subCommunity);
-            communityService.delete(context, subCommunity);
-        }
-        for (Collection collection : c.getCollections()) {
-            collectionService.delete(context, collection);
-        }
     }
 
     /**
