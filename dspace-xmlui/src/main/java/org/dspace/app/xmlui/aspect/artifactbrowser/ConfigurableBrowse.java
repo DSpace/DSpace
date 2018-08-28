@@ -412,7 +412,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         // Add all the query parameters as hidden fields on the form
         for (Map.Entry<String, String> param : queryParamsPOST.entrySet())
         {
-            jump.addHidden(param.getKey()).setValue(param.getValue());
+            //Not necessary to hide the start-with param because it's added later
+            if (param.getKey() != BrowseParams.STARTS_WITH)
+                jump.addHidden(param.getKey()).setValue(param.getValue());
         }
 
         // If this is a date based browse, render the date navigation
