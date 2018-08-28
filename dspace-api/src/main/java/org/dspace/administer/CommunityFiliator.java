@@ -7,7 +7,6 @@
  */
 package org.dspace.administer;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -150,8 +149,6 @@ public class CommunityFiliator {
         } catch (AuthorizeException authE) {
             System.out.println("Error - Authorize exception: "
                                    + authE.toString());
-        } catch (IOException ioE) {
-            System.out.println("Error - IO exception: " + ioE.toString());
         }
     }
 
@@ -161,10 +158,9 @@ public class CommunityFiliator {
      * @param child  child community
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorize error
-     * @throws IOException        if IO error
      */
     public void filiate(Context c, Community parent, Community child)
-        throws SQLException, AuthorizeException, IOException {
+        throws SQLException, AuthorizeException {
         // check that a valid filiation would be established
         // first test - proposed child must currently be an orphan (i.e.
         // top-level)
@@ -204,10 +200,9 @@ public class CommunityFiliator {
      * @param child  child community
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorize error
-     * @throws IOException        if IO error
      */
     public void defiliate(Context c, Community parent, Community child)
-        throws SQLException, AuthorizeException, IOException {
+        throws SQLException, AuthorizeException {
         // verify that child is indeed a child of parent
         List<Community> parentKids = parent.getSubcommunities();
         boolean isChild = false;
