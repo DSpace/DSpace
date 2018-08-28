@@ -249,13 +249,12 @@ public class CommunityFiliator {
 
         if (communityID.indexOf('/') != -1) {
             // has a / must be a handle
-            community = (Community) handleService.resolveToObject(c,
-                                                                  communityID);
+            DSpaceObject dso = handleService.resolveToObject(c,
+                                                             communityID);
 
             // ensure it's a community
-            if ((community == null)
-                || (community.getType() != Constants.COMMUNITY)) {
-                community = null;
+            if ((dso != null) && (dso.getType() == Constants.COMMUNITY)) {
+                community = (Community)dso;
             }
         } else {
             community = communityService.find(c, UUID.fromString(communityID));
