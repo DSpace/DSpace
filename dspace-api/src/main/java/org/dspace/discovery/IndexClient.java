@@ -36,6 +36,8 @@ public class IndexClient {
 
     private static final Logger log = Logger.getLogger(IndexClient.class);
 
+    public static boolean FULLTEXT = true;
+
     /**
      * When invoked as a command-line tool, creates, updates, removes content
      * from the whole index
@@ -50,7 +52,7 @@ public class IndexClient {
         Context context = new Context(Context.Mode.READ_ONLY);
         context.turnOffAuthorisationSystem();
 
-        String usage = "org.dspace.discovery.IndexClient [-cbhf] | [-r <handle>] | [-i <handle>] or nothing to update/clean an existing index.";
+        String usage = "org.dspace.discovery.IndexClient [-cbhfx] | [-r <handle>] | [-i <handle>] or nothing to update/clean an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
@@ -98,6 +100,12 @@ public class IndexClient {
 
         options.addOption(OptionBuilder.isRequired(false).withDescription(
                 "optimize search core").create("o"));
+        options
+                .addOption(OptionBuilder
+                        .isRequired(false)
+                        .withDescription(
+                                "Exclude Text from indexing")
+                        .create("x"));
 
         try {
             line = new PosixParser().parse(options, args);
@@ -128,6 +136,7 @@ public class IndexClient {
             indexer.cleanIndex(line.hasOption("f"));
         } else if (line.hasOption("b")) {
             log.info("(Re)building index from scratch.");
+            FULLTEXT = !line.hasOption("x");
             indexer.createIndex(context);
             checkRebuildSpellCheck(line, indexer);
         } else if (line.hasOption("o")) {
@@ -142,13 +151,18 @@ public class IndexClient {
                 throw new IllegalArgumentException("Cannot resolve " + handle + " to a DSpace object");
             }
             log.info("Forcibly Indexing " + handle);
+            FULLTEXT = !line.hasOption("x");
+            // Enable batch mode; we may be indexing a large number of items
+            context.enableBatchMode(true);
             final long startTimeMillis = System.currentTimeMillis();
             final long count = indexAll(indexer,  ContentServiceFactory.getInstance().getItemService(), context, dso);
             final long seconds = (System.currentTimeMillis() - startTimeMillis ) / 1000;
             log.info("Indexed " + count + " DSpace object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
         } else {
             log.info("Updating and Cleaning Index");
-            indexer.cleanIndex(line.hasOption("f"));
+            // should not clear index prior to rebuild, use "-b" or "-cf" for that
+            //indexer.cleanIndex(false);
+            FULLTEXT = !line.hasOption("x");
             indexer.updateIndex(context, line.hasOption("f"));
             checkRebuildSpellCheck(line, indexer);
         }

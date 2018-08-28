@@ -1418,7 +1418,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         // write the index and close the inputstreamreaders
         try {
-            writeDocument(doc, new FullTextContentStreams(context, item));
+            writeDocument(doc, IndexClient.FULLTEXT ? new FullTextContentStreams(context, item) : null);
             log.info("Wrote Item: " + handle + " to Index");
         } catch (RuntimeException e)
         {
