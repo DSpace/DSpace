@@ -1,4 +1,3 @@
-
 RewriteEngine on
 
 ###################################################
@@ -7,12 +6,12 @@ RewriteEngine on
 
 #External redirect para accessos phpoai de sedici2003
 RewriteRule ^phpoai/oai2.php(.*)$ /oai/request$1 [L,R=301]
- 
+
 #De: /ARG-UNLP-EBook-0000000001/1789.pdf
 RewriteRule ^([a-zA-Z0-9\-]+)/([0-9]+)\.[a-z]{3}$ /discover?query="$1" [L,R=301]
- 
-#De: /?id=ARG-UNLP-EBook-0000000001 
-RewriteCond %{QUERY_STRING} id=([a-zA-Z0-9\-]+)(.*)    
+
+#De: /?id=ARG-UNLP-EBook-0000000001
+RewriteCond %{QUERY_STRING} id=([a-zA-Z0-9\-]+)(.*)
 RewriteRule ^$ /discover?query="%1" [L,R=301]
 
 #De: /index.php?id=ARG-UNLP-ART-0000008109
@@ -28,6 +27,10 @@ RewriteRule ^rss.php$ /feed/rss_2.0/site [L,R=301]
 RewriteRule ^recorrido/recorrido.php /community-list [L,R=301]
 
 RewriteRule ^search/(.*).php /discover [L,R=301]
+
+RewriteRule ^xoai/(.*)$ /oai/$1 [R=301,NC,L]
+
+RewriteRule ^blog(.*)$ http://blog.sedici.unlp.edu.ar$1 [R=301,NC,L]
 
 ###################################################
 ###################################################
