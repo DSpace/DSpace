@@ -1173,7 +1173,7 @@ public class MetadataImport
      */
     private static boolean isAuthorityControlledField(String md)
     {
-        String mdf = StringUtils.substringAfter(md, ":");
+        String mdf = md.contains(":") ? StringUtils.substringAfter(md, ":") : md;
         mdf = StringUtils.substringBefore(mdf, "[");
         return authorityControlled.contains(mdf);
     }
