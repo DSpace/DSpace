@@ -10,6 +10,7 @@ package org.dspace.curate;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -82,6 +83,7 @@ public class Curator {
 
     protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<>();
 
+    protected final Map<String, String> runParameters = new HashMap<>();
     protected Map<String, TaskRunner> trMap = new HashMap<>();
     protected List<String> perfList = new ArrayList<>();
     protected TaskQueue taskQ = null;
@@ -100,6 +102,24 @@ public class Curator {
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
+    }
+
+    /**
+     * Set a parameter visible to all tasks in this Curator instance.
+     * @param name the parameter's name.
+     * @param value the parameter's value.
+     */
+    public void addParameter(String name, String value) {
+        runParameters.put(name, value);
+    }
+
+    /**
+     * Look up a run parameter.
+     * @param name the name of the desired parameter.
+     * @return the value of the named parameter.
+     */
+    public String getRunParameter(String name) {
+        return runParameters.get(name);
     }
 
     /**
