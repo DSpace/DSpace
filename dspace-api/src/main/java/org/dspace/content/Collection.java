@@ -288,7 +288,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         setModified();
     }
 
-    void removeCommunity(Community community) {
+    public void removeCommunity(Community community) {
         this.communities.remove(community);
         setModified();
     }

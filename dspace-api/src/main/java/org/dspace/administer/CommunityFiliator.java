@@ -18,8 +18,11 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -37,10 +40,12 @@ import org.dspace.handle.service.HandleService;
 public class CommunityFiliator {
 
     protected CommunityService communityService;
+    protected CollectionService collectionService;
     protected HandleService handleService;
 
     public CommunityFiliator() {
         communityService = ContentServiceFactory.getInstance().getCommunityService();
+        collectionService = ContentServiceFactory.getInstance().getCollectionService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
     }
 
@@ -123,9 +128,9 @@ public class CommunityFiliator {
         c.turnOffAuthorisationSystem();
 
         try {
-            // validate and resolve the parent and child IDs into commmunities
+            // validate and resolve the parent and child IDs into commmunities or collections
             Community parent = filiator.resolveCommunity(c, parentID);
-            Community child = filiator.resolveCommunity(c, childID);
+            DSpaceObject child = filiator.resolveCommunityOrCollection(c, childID);
 
             if (parent == null) {
                 System.out.println("Error, parent community cannot be found: "
@@ -134,7 +139,7 @@ public class CommunityFiliator {
             }
 
             if (child == null) {
-                System.out.println("Error, child community cannot be found: "
+                System.out.println("Error, child object cannot be found: "
                                        + childID);
                 System.exit(1);
             }
@@ -149,6 +154,28 @@ public class CommunityFiliator {
         } catch (AuthorizeException authE) {
             System.out.println("Error - Authorize exception: "
                                    + authE.toString());
+        }
+    }
+
+    /**
+     * @param c      context
+     * @param parent parent Community
+     * @param child  child DSpaceObject
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorize error
+     */
+    public void filiate(Context c, Community parent, DSpaceObject child)
+        throws SQLException, AuthorizeException {
+
+        if (child.getType() == Constants.COMMUNITY) {
+            Community childCommunity = (Community)child;
+            filiate(c, parent, childCommunity);
+        } else if (child.getType() == Constants.COLLECTION) {
+            Collection childCollection = (Collection)child;
+            filiate(c, parent, childCollection);
+        } else {
+            throw new IllegalArgumentException("Invalid child object type: "
+                                                   + child.getType());
         }
     }
 
@@ -197,6 +224,57 @@ public class CommunityFiliator {
     /**
      * @param c      context
      * @param parent parent Community
+     * @param child  child collection
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorize error
+     */
+    public void filiate(Context c, Community parent, Collection child)
+        throws SQLException, AuthorizeException {
+        // check that a valid filiation would be established
+        // proposed child must currently be an orphan (i.e. top-level)
+        Community childDad = CollectionUtils.isNotEmpty(child.getCommunities()) ? child.getCommunities()
+                                                                                       .iterator().next() : null;
+
+        if (childDad != null) {
+            System.out.println("Error, collection: " + child.getID()
+                                   + " already a child of: " + childDad.getID());
+            System.exit(1);
+        }
+
+        // everthing's OK
+        communityService.addCollection(c, parent, child);
+
+        // complete the pending transaction
+        c.complete();
+        System.out.println("Filiation complete. Community: '" + parent.getID()
+                               + "' is parent of collection: '" + child.getID() + "'");
+    }
+
+    /**
+     * @param c      context
+     * @param parent parent Community
+     * @param child  child DSpaceObject
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorize error
+     */
+    public void defiliate(Context c, Community parent, DSpaceObject child)
+        throws SQLException, AuthorizeException {
+
+        if (child.getType() == Constants.COMMUNITY) {
+            Community childCommunity = (Community)child;
+            defiliate(c, parent, childCommunity);
+        } else if (child.getType() == Constants.COLLECTION) {
+            Collection childCollection = (Collection)child;
+            defiliate(c, parent, childCollection);
+        } else {
+            throw new IllegalArgumentException("Invalid child object type: "
+                                                   + child.getType());
+        }
+    }
+
+    /**
+     * @param c      context
+     * @param parent parent Community
      * @param child  child community
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorize error
@@ -236,6 +314,37 @@ public class CommunityFiliator {
     }
 
     /**
+     * @param c      context
+     * @param parent parent Community
+     * @param child  child collection
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorize error
+     */
+    public void defiliate(Context c, Community parent, Collection child)
+        throws SQLException, AuthorizeException {
+        // verify that child is indeed a child of parent
+        List<Collection> parentKids = parent.getCollections();
+        if (!parentKids.contains(child)) {
+            System.out
+                .println("Error, collection not a child of parent community");
+            System.exit(1);
+        }
+
+        // OK remove the mappings - but leave the community, which will become
+        // top-level
+        child.removeCommunity(parent);
+        parent.removeCollection(child);
+        collectionService.update(c, child);
+        communityService.update(c, parent);
+
+        // complete the pending transaction
+        c.complete();
+        System.out.println("Defiliation complete. Collection: '" + child.getID()
+                               + "' is no longer a child of community: '" + parent.getID()
+                               + "'");
+    }
+
+    /**
      * Find a community by ID
      *
      * @param c           context
@@ -261,5 +370,40 @@ public class CommunityFiliator {
         }
 
         return community;
+    }
+
+    /**
+     * Find a community or collection by ID
+     *
+     * @param c     context
+     * @param dsoID community or collection ID
+     * @return DSpaceObject object
+     * @throws SQLException if database error
+     */
+    protected DSpaceObject resolveCommunityOrCollection(Context c, String dsoID)
+        throws SQLException {
+        DSpaceObject dso = null;
+
+        if (dsoID.indexOf('/') != -1) {
+            // has a / must be a handle
+            dso = handleService.resolveToObject(c, dsoID);
+
+            // ensure it's a community or collection
+            if ((dso != null)
+                && (dso.getType() != Constants.COMMUNITY)
+                && (dso.getType() != Constants.COLLECTION)) {
+                dso = null;
+            }
+        } else {
+            Community community = communityService.find(c, UUID.fromString(dsoID));
+
+            if (community != null) {
+                dso = community;
+            } else {
+                dso = collectionService.find(c, UUID.fromString(dsoID));
+            }
+        }
+
+        return dso;
     }
 }
