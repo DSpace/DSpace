@@ -53,6 +53,7 @@ public class InstitutionAuthority extends SimpleSPARQLAuthorityProvider {
 	protected Choice extractChoice(QuerySolution solution) {
 		String key = solution.getResource("institution").getURI();
 		String label = "";
+		String value = solution.getLiteral("label").getString();
 		if (solution.contains("labelpadre") && !"".equals(solution.getLiteral("labelpadre").getString())) {
 			label += solution.getLiteral("labelpadre").getString();
 			if (solution.contains("initpadre") && !"".equals(solution.getLiteral("initpadre").getString())) {
@@ -62,13 +63,12 @@ public class InstitutionAuthority extends SimpleSPARQLAuthorityProvider {
 			label += " - ";
 		}
 		label += solution.getLiteral("label").getString();
-		
 		if (solution.contains("initials") && !"".equals(solution.getLiteral("initials").getString())) {
 			String initials = solution.getLiteral("initials").getString();
 			label += " (" + initials + ")";
 		}
 
 
-		return new Choice(key, label, label);
+		return new Choice(key, value, label);
 	}
 }
