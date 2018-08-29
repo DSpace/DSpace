@@ -7,12 +7,54 @@
  */
 HAL.Http.Client = function(opts) {
     this.vent = opts.vent;
-    this.defaultHeaders = { 'Accept': 'application/hal+json, application/json, */*; q=0.01' };
-    cookie = document.cookie.match('(^|;)\\s*' + 'MyHalBrowserToken' + '\\s*=\\s*([^;]+)');
-    cookie ? this.defaultHeaders.Authorization = 'Bearer ' + cookie.pop() : '';
+    this.defaultHeaders = {'Accept': 'application/hal+json, application/json, */*; q=0.01'};
+    var authorizationHeader = getAuthorizationHeader();
+    authorizationHeader ? this.defaultHeaders.Authorization = authorizationHeader : '';
     console.log(this.defaultHeaders);
     this.headers = this.defaultHeaders;
 };
+
+function getAuthorizationHeader() {
+    var cookie = document.cookie.match('(^|;)\\s*' + 'MyHalBrowserToken' + '\\s*=\\s*([^;]+)');
+    if(cookie != undefined) {
+        return 'Bearer ' + cookie.pop();
+    } else {
+        return undefined;
+    }
+}
+function downloadFile(url) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'blob';
+    var authorizationHeader = getAuthorizationHeader();
+    if (authorizationHeader != undefined) {
+        request.setRequestHeader("Authorization", authorizationHeader);
+    }
+    request.onload = function () {
+        // Only handle status code 200
+        if (request.status === 200) {
+            // Try to find out the filename from the content disposition `filename` value
+            var disposition = request.getResponseHeader('content-disposition');
+            var matches = /"([^"]*)"/.exec(disposition);
+            var filename = (matches != null && matches[1] ? matches[1] : 'file.pdf');
+            // The actual download
+            var contentTypeHeader = request.getResponseHeader("content-type");
+            if (contentTypeHeader === undefined || contentTypeHeader === "") {
+                contentTypeHeader = "application/octet-stream";
+            }
+            var blob = new Blob([request.response], {type: contentTypeHeader});
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        // some error handling should be done here...
+    };
+    request.send();
+}
+
 
 HAL.Http.Client.prototype.get = function(url) {
     var self = this;
@@ -31,9 +73,14 @@ HAL.Http.Client.prototype.get = function(url) {
                 headers: jqXHR.getAllResponseHeaders()
             });
         }
-    }).error(function() {
-        self.vent.trigger('fail-response', { jqxhr: jqxhr });
-    });
+    }).error(function (response) {
+        self.vent.trigger('fail-response', {jqxhr: jqxhr});
+        var contentTypeResponseHeader = jqxhr.getResponseHeader("content-type");
+        if (contentTypeResponseHeader != undefined
+                && !contentTypeResponseHeader.startsWith("application/hal")
+                && !contentTypeResponseHeader.startsWith("application/json")) {
+            downloadFile(url);
+        }});
 };
 
 HAL.Http.Client.prototype.request = function(opts) {
