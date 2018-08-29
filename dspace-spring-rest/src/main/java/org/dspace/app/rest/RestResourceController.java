@@ -757,10 +757,11 @@ public class RestResourceController implements InitializingBean {
 
         } else {
             if (resource.getEmbeddedResources().get(rel) == null) {
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                response.setStatus(HttpServletResponse.SC_OK);
+                return new ResourceSupport();
+            } else {
+                return (ResourceSupport) resource.getEmbeddedResources().get(rel);
             }
-
-            return (ResourceSupport) resource.getEmbeddedResources().get(rel);
         }
 
     }
