@@ -56,6 +56,7 @@
  * 
  *	var icono_new='ambiguous';
  *	var icono_accepted='accepted';
+ *  var icono_accepted_variant='acceptedvariant';
  *  var icono_change='failed';
  *  var icono_rejected='notfound';
  *  var icono_search='search';
@@ -69,7 +70,8 @@
 function verificarConfianzaInicial(inputID, authorityLabelID, confidenceIndicatorID, confidenceName){
 	if ($('#'+confidenceName).val()==confianza_600){ 
 		if ($('#'+inputID).val()!=$('#'+authorityLabelID).val()){
-			DSpaceUpdateConfidence(document, confidenceIndicatorID, icono_change);
+			//Variante
+			DSpaceUpdateConfidence(document, confidenceIndicatorID, icono_accepted_variant);
 		}
 	} else {
 		if ($('#'+confidenceName).val()==confianza_300){ 
@@ -209,7 +211,7 @@ function DSpaceSetupAutocomplete(formID, args) {
                 			if (isAuthorityControlled){                        		
                         		if ($('#' + authorityID).val() != ''){   
                         			//en este caso es una variacion de un authority key
-                        			cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_change, args.confidenceName, confianza_600, null, null);
+                        			cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted_variant, args.confidenceName, confianza_600, null, null);
                         		 } else {
                         			//es un nuevo elemento
      	            				cambiarAuthority(inputID, authorityID, '', args.confidenceIndicatorID, icono_new, args.confidenceName, confianza_300, null, null);
@@ -224,7 +226,7 @@ function DSpaceSetupAutocomplete(formID, args) {
                         			//en este caso es una variacion de un authority key
                         			//permito agregar variante porque estoy sobre un authority cerrado
                         			//en este caso es una variacion de un authority key
-                        			cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_change, args.confidenceName, confianza_600, null, null);
+                        			cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted_variant, args.confidenceName, confianza_600, null, null);
                         		} else {
                         			//Como es cerrado y no tengo selecionado un authority key freno las tratativas
         	                    	cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_rejected, args.confidenceName, confianza_100, null, null);
@@ -260,7 +262,7 @@ function DSpaceSetupAutocomplete(formID, args) {
 	            		if (isAuthorityControlled){
 	            			if ($('#' + authorityID).val() != ''){
 	            				//en este caso es una variacion de un authority key
-	            				cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_change, args.confidenceName, confianza_600, null, null);
+	            				cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted_variant, args.confidenceName, confianza_600, null, null);
 		            		} else {
 	            				//No hay authority key, por lo que debo notificar del error
 		            			cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_rejected, args.confidenceName, confianza_100, null, null);
@@ -280,7 +282,7 @@ function DSpaceSetupAutocomplete(formID, args) {
 		            				cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted, args.confidenceName, confianza_600, null, null);
 	            				} else {
 	            					//es una variacion  del authority key
-	            					cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_change, args.confidenceName, confianza_600, authorityLabelID, $('#' + authorityLabelID).val());
+	            					cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted_variant, args.confidenceName, confianza_600, authorityLabelID, $('#' + authorityLabelID).val());
 	            				
 	            				}
 	            			} else {

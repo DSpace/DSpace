@@ -1,6 +1,7 @@
 //--------------------- Variables para el manejo de las confianzas y los iconos
 var icono_new='ambiguous';
 var icono_accepted='accepted';
+var icono_accepted_variant='acceptedvariant';
 var icono_change='failed';
 var icono_rejected='notfound';
 var icono_search='search';
@@ -528,7 +529,9 @@ function DSpaceUpdateConfidence(doc, confIndicatorID, newValue) {
      }
      if (!found)
          newClasses += "cf-" + newValue + " ";
+     //Set the new confidence class and the related title
      confElt.className = newClasses;
+     confElt.title=confidenceMessages['cf_'+newValue];
  }
 }
 

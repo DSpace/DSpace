@@ -70,7 +70,7 @@ img.ds-authority-confidence.cf-uncertain
 img.ds-authority-confidence.cf-accepted
   { background: transparent url(../../images/authority_control/confidence/6-thumb2.gif); }
 img.ds-authority-confidence.cf-acceptedvariant
-  { background: transparent url(../../images/authority_control/confidence/2-advisetriangle.gif); }
+  { background: transparent url(../../images/authority_control/confidence/2-warningtriangle.gif); }
 img.ds-authority-confidence.cf-search
   { background: transparent url(../../images/authority_control/suggest-indicator.gif); }
 
