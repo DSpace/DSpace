@@ -41,8 +41,8 @@ public class MultipartFileSender {
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
     private static final String CONTENT_TYPE_MULTITYPE_WITH_BOUNDARY = "multipart/byteranges; boundary=" +
         MULTIPART_BOUNDARY;
-    private static final String CONTENT_DISPOSITION_INLINE = "inline";
-    private static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment";
+    public static final String CONTENT_DISPOSITION_INLINE = "inline";
+    public static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment";
     private static final String IF_NONE_MATCH = "If-None-Match";
     private static final String IF_MODIFIED_SINCE = "If-Modified-Since";
     private static final String ETAG = "ETag";
@@ -134,6 +134,10 @@ public class MultipartFileSender {
         }
         return this;
     }
+    public MultipartFileSender withDisposition(String contentDisposition) {
+        this.disposition = contentDisposition;
+        return this;
+    }
 
     public void serveResource() throws IOException {
 
@@ -172,9 +176,9 @@ public class MultipartFileSender {
                     CONTENT_DISPOSITION_ATTACHMENT;
             }
 
-            response.setHeader(CONTENT_DISPOSITION, String.format(CONTENT_DISPOSITION_FORMAT, disposition, fileName));
-            log.debug("Content-Disposition : {}", disposition);
         }
+        response.setHeader(CONTENT_DISPOSITION, String.format(CONTENT_DISPOSITION_FORMAT, disposition, fileName));
+        log.debug("Content-Disposition : {}", disposition);
 
         // Content phase
         if (METHOD_HEAD.equals(request.getMethod())) {
@@ -193,9 +197,6 @@ public class MultipartFileSender {
                 log.debug("Return full file");
                 response.setContentType(contentType);
                 response.setHeader(CONTENT_LENGTH, String.valueOf(length));
-                if (length > 10000) {
-                    response.setHeader(CONTENT_DISPOSITION, String.format(CONTENT_DISPOSITION_FORMAT, CONTENT_DISPOSITION_ATTACHMENT, fileName));
-                }
                 Range.copy(inputStream, output, length, 0, length, bufferSize);
 
             } else if (ranges.size() == 1) {
