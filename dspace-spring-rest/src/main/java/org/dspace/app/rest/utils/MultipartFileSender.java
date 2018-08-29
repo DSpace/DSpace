@@ -193,6 +193,9 @@ public class MultipartFileSender {
                 log.debug("Return full file");
                 response.setContentType(contentType);
                 response.setHeader(CONTENT_LENGTH, String.valueOf(length));
+                if (length > 10000) {
+                    response.setHeader(CONTENT_DISPOSITION, String.format(CONTENT_DISPOSITION_FORMAT, CONTENT_DISPOSITION_ATTACHMENT, fileName));
+                }
                 Range.copy(inputStream, output, length, 0, length, bufferSize);
 
             } else if (ranges.size() == 1) {
