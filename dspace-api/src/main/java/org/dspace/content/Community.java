@@ -16,7 +16,10 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
-import org.dspace.core.*;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
@@ -27,7 +30,9 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.MissingResourceException;
 
 /**
  * Class representing a community
@@ -352,17 +357,13 @@ public class Community extends DSpaceObject
             {
                 TableRow row = tri.next(context);
 
-                // First check the cache
-                Community fromCache = (Community) context.fromCache(
+                Community aCommunity = (Community) context.fromCache(
                         Community.class, row.getIntColumn("community_id"));
-
-                if (fromCache != null)
-                {
-                    topCommunities.add(fromCache);
+                if (aCommunity == null) {
+                    aCommunity = new Community(context, row);
                 }
-                else
-                {
-                    topCommunities.add(new Community(context, row));
+                if (AuthorizeManager.authorizeActionBoolean(context, aCommunity, Constants.READ)) {
+                    topCommunities.add(aCommunity);
                 }
             }
         }
@@ -686,16 +687,13 @@ public class Community extends DSpaceObject
                 TableRow row = tri.next(ourContext);
 
                 // First check the cache
-                Collection fromCache = (Collection) ourContext.fromCache(
+                Collection aCollection = (Collection) ourContext.fromCache(
                         Collection.class, row.getIntColumn("collection_id"));
-
-                if (fromCache != null)
-                {
-                    collections.add(fromCache);
+                if (aCollection == null) {
+                    aCollection = new Collection(ourContext, row);
                 }
-                else
-                {
-                    collections.add(new Collection(ourContext, row));
+                if (AuthorizeManager.authorizeActionBoolean(ourContext, aCollection, Constants.READ)) {
+                    collections.add(aCollection);
                 }
             }
         }
@@ -760,16 +758,13 @@ public class Community extends DSpaceObject
                 TableRow row = tri.next(ourContext);
 
                 // First check the cache
-                Community fromCache = (Community) ourContext.fromCache(
+                Community aCommunity = (Community) ourContext.fromCache(
                         Community.class, row.getIntColumn("community_id"));
-
-                if (fromCache != null)
-                {
-                    subcommunities.add(fromCache);
+                if (aCommunity == null) {
+                    aCommunity = new Community(ourContext, row);
                 }
-                else
-                {
-                    subcommunities.add(new Community(ourContext, row));
+                if (AuthorizeManager.authorizeActionBoolean(ourContext, aCommunity, Constants.READ)) {
+                    subcommunities.add(aCommunity);
                 }
             }
         }
