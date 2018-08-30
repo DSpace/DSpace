@@ -717,23 +717,23 @@ placeholders for header images -->
 
                 });
             </script>
-            
-            <!-- Script para actualizar los mensajes de confidence de las authorities 
-            		al editar los metadatos en el DescribeStep  -->
-            <script text="javascript">
-            	//Global variable to keep the i18n messages for every possible value of confidence
-            	confidenceMessages = [];
-            	confidenceMessages['cf_unset']='<i18n:text>xmlui.authority.confidence.description.cf_unset</i18n:text>';
-				confidenceMessages['cf_novalue']='<i18n:text>xmlui.authority.confidence.description.cf_novalue</i18n:text>';
-				confidenceMessages['cf_rejected']='<i18n:text>xmlui.authority.confidence.description.cf_rejected</i18n:text>';
-				confidenceMessages['cf_failed']='<i18n:text>xmlui.authority.confidence.description.cf_failed</i18n:text>';
-				confidenceMessages['cf_notfound']='<i18n:text>xmlui.authority.confidence.description.cf_notfound</i18n:text>';
-				confidenceMessages['cf_ambigous']='<i18n:text>xmlui.authority.confidence.description.cf_ambiguous</i18n:text>';
-				confidenceMessages['cf_uncertain']='<i18n:text>xmlui.authority.confidence.description.cf_uncertain</i18n:text>';
-				confidenceMessages['cf_accepted']='<i18n:text>xmlui.authority.confidence.description.cf_accepted</i18n:text>';
-				confidenceMessages['cf_acceptedvariant']='<i18n:text>xmlui.authority.confidence.description.cf_acceptedvariant</i18n:text>';
-            </script>
         </xsl:if>
+        
+         <!-- Script para actualizar los mensajes de confidence de las authorities 
+         		al editar los metadatos en el DescribeStep  -->
+         <script text="javascript">
+           	//Global variable to keep the i18n messages for every possible value of authority confidence
+           	confidenceMessages = [];
+           	confidenceMessages['cf_unset']='<i18n:text>xmlui.authority.confidence.description.cf_unset</i18n:text>';
+			confidenceMessages['cf_novalue']='<i18n:text>xmlui.authority.confidence.description.cf_novalue</i18n:text>';
+			confidenceMessages['cf_rejected']='<i18n:text>xmlui.authority.confidence.description.cf_rejected</i18n:text>';
+			confidenceMessages['cf_failed']='<i18n:text>xmlui.authority.confidence.description.cf_failed</i18n:text>';
+			confidenceMessages['cf_notfound']='<i18n:text>xmlui.authority.confidence.description.cf_notfound</i18n:text>';
+			confidenceMessages['cf_ambigous']='<i18n:text>xmlui.authority.confidence.description.cf_ambiguous</i18n:text>';
+			confidenceMessages['cf_uncertain']='<i18n:text>xmlui.authority.confidence.description.cf_uncertain</i18n:text>';
+			confidenceMessages['cf_accepted']='<i18n:text>xmlui.authority.confidence.description.cf_accepted</i18n:text>';
+			confidenceMessages['cf_acceptedvariant']='<i18n:text>xmlui.authority.confidence.description.cf_acceptedvariant</i18n:text>';
+        </script>
 
         <!-- When on submission process, disable buttons on submission -->
         <xsl:if test="dri:body/dri:div[contains(@rend,'administrative community') or contains(@rend,'administrative collection')]">
