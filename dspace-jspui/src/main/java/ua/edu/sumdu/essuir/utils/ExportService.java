@@ -40,9 +40,15 @@ public class ExportService {
         String itemType = Stream.of(item.getMetadata("dc", "type", null, null))
                 .map(type -> EssuirUtils.getTypeLocalized(type.value, "uk"))
                 .findFirst().orElse("");
+
+        String citation = Stream.of(item.getMetadata("dc", "identifier", "citation", null))
+                .findFirst()
+                .map(citationText -> citationText.value)
+                .orElse("");
+
         return new Publication.Builder()
                 .withAuthors(localizedAuthors.stream().map(author -> author.replaceAll(",", "")).collect(Collectors.joining(";\r\n")))
-                .withCitation(item.getMetadata("dc", "identifier", "citation", null)[0].value)
+                .withCitation(citation)
                 .withTitle(item.getMetadata("dc", "title", null, null)[0].value)
                 .withType(itemType)
                 .build();
