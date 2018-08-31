@@ -17,9 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
@@ -179,7 +181,7 @@ public class BitstreamServlet extends DSpaceServlet
         				request, 
         				context, 
         				bitstream));
-        
+
         // Modification date
         // Only use last-modified if this is an anonymous access
         // - caching content that may be generated under authorisation
@@ -202,28 +204,29 @@ public class BitstreamServlet extends DSpaceServlet
                 return;
             }
         }
-        
-        // Pipe the bits
-        InputStream is = bitstream.retrieve();
-     
-		// Set the response MIME type
-        response.setContentType(bitstream.getFormat().getMIMEType());
+        if(AuthorizeManager.authorizeActionBoolean(context, item.getOwningCollection(), Constants.READ)
+                || Authenticate.startAuthentication(context, request, response)) {
+            // Pipe the bits
+            InputStream is = bitstream.retrieve();
 
-        // Response length
-        response.setHeader("Content-Length", String
-                .valueOf(bitstream.getSize()));
+            // Set the response MIME type
+            response.setContentType(bitstream.getFormat().getMIMEType());
 
-		if(threshold != -1 && bitstream.getSize() >= threshold)
-		{
-			UIUtil.setBitstreamDisposition(bitstream.getName(), request, response);
-		}
+            // Response length
+            response.setHeader("Content-Length", String
+                    .valueOf(bitstream.getSize()));
 
-        //DO NOT REMOVE IT - WE NEED TO FREE DB CONNECTION TO AVOID CONNECTION POOL EXHAUSTION FOR BIG FILES AND SLOW DOWNLOADS
-        context.complete();
+            if (threshold != -1 && bitstream.getSize() >= threshold) {
+                UIUtil.setBitstreamDisposition(bitstream.getName(), request, response);
+            }
 
-        Utils.bufferedCopy(is, response.getOutputStream());
-        is.close();
-        response.getOutputStream().flush();
-        ua.edu.sumdu.essuir.statistics.EssuirStatistics.updateBitstream(request, item.getID(), bitstream.getSequenceID());
+            //DO NOT REMOVE IT - WE NEED TO FREE DB CONNECTION TO AVOID CONNECTION POOL EXHAUSTION FOR BIG FILES AND SLOW DOWNLOADS
+            context.complete();
+
+            Utils.bufferedCopy(is, response.getOutputStream());
+            is.close();
+            response.getOutputStream().flush();
+            ua.edu.sumdu.essuir.statistics.EssuirStatistics.updateBitstream(request, item.getID(), bitstream.getSequenceID());
+        }
     }
 }
