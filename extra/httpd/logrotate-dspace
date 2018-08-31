@@ -24,7 +24,7 @@
   dateformat .%Y-%m-%d
   dateyesterday
   compress
-  olddir old-logs
+  olddir /var/dspace/backups/old-logs
 
   #postrotate
         #comprime los logs de antes de ayer
