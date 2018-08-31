@@ -1206,6 +1206,7 @@
 		                        	<xsl:choose>
 		                        		<xsl:when test="$file_type = 'image'">mime_img.png</xsl:when>
 		                        		<xsl:when test="$file_type = 'audio'">mime_audio.png</xsl:when>
+		                        		<xsl:when test="$file_type = 'video'">mime_video.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'pdf'">mime_pdf.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'msword'">mime_msword.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'epub+zip'">mime_epub.png</xsl:when>
