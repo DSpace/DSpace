@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.MetadataExposure;
 import org.dspace.app.util.Util;
+import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.StyleSelection;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeManager;
@@ -25,7 +26,9 @@ import org.dspace.handle.HandleManager;
 import ua.edu.sumdu.essuir.cache.AuthorCache;
 import ua.edu.sumdu.essuir.statistics.EssuirStatistics;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
@@ -264,18 +267,19 @@ public class ItemTag extends TagSupport
     {
         try
         {
-            if (style == null || style.equals(""))
-            {
-                style = styleSelection.getStyleForItem(item);
-            }
+            HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+            Context context = UIUtil.obtainContext(request);
+            if(AuthorizeManager.authorizeActionBoolean(context, item.getOwningCollection(), Constants.READ)
+                    || Authenticate.startAuthentication(context, request, (HttpServletResponse) pageContext.getResponse())) {
+                if (style == null || style.equals("")) {
+                    style = styleSelection.getStyleForItem(item);
+                }
 
-            if (style.equals("full"))
-            {
-                renderFull();
-            }
-            else
-            {
-                render();
+                if (style.equals("full")) {
+                    renderFull();
+                } else {
+                    render();
+                }
             }
         }
         catch (SQLException sqle)
@@ -289,9 +293,9 @@ public class ItemTag extends TagSupport
         catch (DCInputsReaderException ex)
         {
             throw new JspException(ex);
+        } catch (ServletException e) {
+            e.printStackTrace();
         }
-
-
         return SKIP_BODY;
     }
 
