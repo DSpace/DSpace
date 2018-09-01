@@ -165,6 +165,10 @@ public class OrcidService extends RestSource
     public static final String SYSTEM_ORCID_TOKEN_PROFILE_CREATE_SCOPE = "system-orcid-token-person-update";
 
     public static final String SYSTEM_ORCID_TOKEN_ACTIVITIES_CREATE_SCOPE = "system-orcid-token-activities-update";
+    
+    public static final String SYSTEM_ORCID_TOKEN_READ_LIMITED_SCOPE = "system-orcid-token-read-limited";
+    
+    public static final String SYSTEM_ORCID_TOKEN_ACCESS = "system-orcid-token-authenticate";
 
     public static final String ORCID_MODE_APPEND = "POST";
 

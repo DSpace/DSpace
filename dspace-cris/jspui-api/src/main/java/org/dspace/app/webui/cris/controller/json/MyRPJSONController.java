@@ -30,6 +30,7 @@ import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authority.orcid.OrcidService;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
@@ -72,17 +73,26 @@ public class MyRPJSONController extends MultiActionController
 			rp.setEpersonID(currentUser.getID());
             
             Metadatum[] md = currentUser.getMetadata("eperson", "orcid", null, null);
+            String orcid = null;
             if (md != null && md.length > 0) {
             	Metadatum[] mdToken = currentUser.getMetadata("eperson", "orcid", "accesstoken", null);
             	String token = null;
             	if (mdToken != null && mdToken.length > 0) {
             		token = mdToken[0].value;
             	}
-            	String orcid = md[0].value;
+            	orcid = md[0].value;
+            	// try to use the access token to read-limited
 				boolean orcidPopulated = OrcidPreferencesUtils.populateRP(rp, orcid, token);
             	if (!orcidPopulated && token != null) {
+            		// ok, it was not allowed for read-limited, go for public info
             		orcidPopulated = OrcidPreferencesUtils.populateRP(rp, orcid);
-            	};
+            		ResearcherPageUtils.buildTextValue(rp, token, OrcidService.SYSTEM_ORCID_TOKEN_ACCESS);
+            	}
+            	else if (token != null){
+					// there are good chances that the access token is valid for the other
+					// configured scopes (at least it was valid for read-limited...)
+            		OrcidPreferencesUtils.setTokens(rp, token);
+            	}
             	
             	if (orcidPopulated) {
             		rp.setSourceRef("orcid");
@@ -96,7 +106,7 @@ public class MyRPJSONController extends MultiActionController
             
             List<RPProperty> proprietaDellaTipologia = rp.getProprietaDellaTipologia(fN);
 			if (proprietaDellaTipologia == null || proprietaDellaTipologia.size() == 0) {
-	            TextValue val = new TextValue();
+				TextValue val = new TextValue();
 	            val.setOggetto(currentUser.getFullName());
 	            RPProperty prop = rp.createProprieta(fN);
 	            prop.setValue(val);
@@ -109,11 +119,13 @@ public class MyRPJSONController extends MultiActionController
             
             proprietaDellaTipologia = rp.getProprietaDellaTipologia(email);
 			if (proprietaDellaTipologia == null || proprietaDellaTipologia.size() == 0) {
-	            TextValue valE = new TextValue();
-	            valE.setOggetto(currentUser.getEmail());
-	            RPProperty propE = rp.createProprieta(email);
-	            propE.setValue(valE);
-	            propE.setVisibility(VisibilityConstants.HIDE);
+				if (orcid == null || !orcid.equals(currentUser.getEmail())) {
+					TextValue valE = new TextValue();
+		            valE.setOggetto(currentUser.getEmail());
+		            RPProperty propE = rp.createProprieta(email);
+		            propE.setValue(valE);
+		            propE.setVisibility(VisibilityConstants.HIDE);
+				}
 			}
             applicationService.saveOrUpdate(ResearcherPage.class, rp);
         }
