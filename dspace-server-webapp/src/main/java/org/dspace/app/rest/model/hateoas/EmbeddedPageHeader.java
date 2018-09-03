@@ -25,6 +25,8 @@ public class EmbeddedPageHeader {
     protected boolean totalElementsIsKnown;
     protected UriComponentsBuilder self;
 
+
+
     public EmbeddedPageHeader(UriComponentsBuilder self, Page page, boolean totalElementsIsKnown) {
         this.page = page;
         this.self = self;
