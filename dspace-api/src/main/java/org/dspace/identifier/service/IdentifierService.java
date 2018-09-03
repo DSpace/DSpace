@@ -77,9 +77,10 @@ public interface IdentifierService {
     void reserve(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException;
 
     /**
-     * Used to Reserve a Specific Identifier (for example a Handle,  hdl:1234.5/6) The provider is responsible for
-     * Detecting and Processing the appropriate identifier, all Providers are interrogated, multiple providers
-     * can process the same identifier.
+     * This method allows you to reserve a specific Identifier. The IdentifierService ask all Identifier Providers that
+     * support the specified identifier to reserve it. You should also call {@link #reserve(Context, DSpaceObject)} to
+     * reserve any other identifier the repository is configured to reserve (e.g. if you specify a handle here and the
+     * repository is supposed to use DOIs too, you must also call the named method to create and reserve a new DOI).
      *
      * @param context    The relevant DSpace Context.
      * @param dso        DSpace object to be reserved
@@ -101,10 +102,11 @@ public interface IdentifierService {
     void register(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException;
 
     /**
-     * Used to Register a specific Identifier (for example a Handle, hdl:1234.5/6)
-     * The provider is responsible for detecting and processing the appropriate
-     * identifier.  All Providers are interrogated.  Multiple providers
-     * can process the same identifier.
+     * This method allows you to register a specific Identifier. The IdentifierService ask all Identifier Providers
+     * that support the specified identifier to register it. You should also call
+     * {@link #reserve(Context, DSpaceObject)} to register any other identifier the repository is configured to
+     * register (e.g. if you specify a handle here and the repository is supposed to use DOIs too, you must also call
+     * the named method to create and register a new DOI).
      *
      * @param context    The relevant DSpace Context.
      * @param dso        DSpace object to be registered
