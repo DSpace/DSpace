@@ -265,6 +265,17 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public Iterator<Item> findByCollectionMapping(Context context, Collection collection, Integer limit, Integer offset)
+        throws SQLException {
+        return itemDAO.findArchivedByCollectionExcludingOwning(context, collection, limit, offset);
+    }
+
+    @Override
+    public int countByCollectionMapping(Context context, Collection collection) throws SQLException {
+        return itemDAO.countArchivedByCollectionExcludingOwning(context, collection);
+    }
+
+    @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
         return itemDAO.findAllByCollection(context, collection);
     }

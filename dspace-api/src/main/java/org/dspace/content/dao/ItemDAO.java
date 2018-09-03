@@ -63,6 +63,11 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     public Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit,
                                                    Integer offset) throws SQLException;
 
+    public Iterator<Item> findArchivedByCollectionExcludingOwning(Context context, Collection collection, Integer limit,
+                                                                  Integer offset) throws SQLException;
+
+    public int countArchivedByCollectionExcludingOwning(Context context, Collection collection) throws SQLException;
+
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
     public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
