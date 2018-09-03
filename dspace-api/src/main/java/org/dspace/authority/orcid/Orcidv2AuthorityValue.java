@@ -83,9 +83,13 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
             return null;
         }
         Orcidv2AuthorityValue authority = Orcidv2AuthorityValue.create();
-
-        authority.setValues(person);
-
+        try {
+            authority.setValues(person);
+            return authority;
+        } catch (Exception e) {
+            return null;
+        }
+        
         return authority;
     }
 
