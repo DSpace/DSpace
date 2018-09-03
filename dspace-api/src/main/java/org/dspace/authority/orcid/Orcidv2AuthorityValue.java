@@ -7,6 +7,7 @@
  */
 package org.dspace.authority.orcid;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -149,6 +150,25 @@ public class Orcidv2AuthorityValue extends PersonAuthorityValue {
 
     }
 
+    /**
+     * set value including orcid information in metadata from solr document 
+     */
+    @Override
+    public void setValues(SolrDocument document) {
+        super.setValues(document);
+        this.setOrcid_id(ObjectUtils.toString(document.getFieldValue("orcid_id")));
+		for (String fieldName : document.getFieldNames()) {
+			String labelPrefix = "label_";
+			if (fieldName.startsWith(labelPrefix)) {
+				String label = fieldName.substring(labelPrefix.length());
+				Collection<Object> fieldValues = document.getFieldValues(fieldName);
+				for (Object o : fieldValues) {
+					addOtherMetadata(label,String.valueOf(o));
+				}
+			}
+		}
+    }
+    
     /**
      * Makes an instance of the AuthorityValue with the given information.
      * @param info string info
