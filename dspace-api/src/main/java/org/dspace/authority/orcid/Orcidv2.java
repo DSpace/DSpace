@@ -157,7 +157,7 @@ public class Orcidv2 implements SolrAuthorityInterface {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
 
-        String searchPath = "search?q=" + URLEncoder.encode(text) + "&start=" + start + "&rows=" + rows;
+        String searchPath = "search?q=" + URLEncoder.encode(text, "UTF-8") + "&start=" + start + "&rows=" + rows;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = restConnector.get(searchPath, accessToken);
         XMLtoBio converter = new XMLtoBio();
