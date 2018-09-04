@@ -269,7 +269,7 @@ public class ItemTag extends TagSupport
         {
             HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
             Context context = UIUtil.obtainContext(request);
-            if(AuthorizeManager.authorizeActionBoolean(context, item.getOwningCollection(), Constants.READ)
+            if(item.isInProgressSubmission() || AuthorizeManager.authorizeActionBoolean(context, item.getOwningCollection(), Constants.READ)
                     || Authenticate.startAuthentication(context, request, (HttpServletResponse) pageContext.getResponse())) {
                 if (style == null || style.equals("")) {
                     style = styleSelection.getStyleForItem(item);

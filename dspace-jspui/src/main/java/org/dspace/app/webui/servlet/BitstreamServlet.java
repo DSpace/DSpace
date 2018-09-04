@@ -204,7 +204,7 @@ public class BitstreamServlet extends DSpaceServlet
                 return;
             }
         }
-        if(AuthorizeManager.authorizeActionBoolean(context, item.getOwningCollection(), Constants.READ)
+        if(item.isInProgressSubmission() || AuthorizeManager.authorizeActionBoolean(context, item.getOwningCollection(), Constants.READ)
                 || Authenticate.startAuthentication(context, request, response)) {
             // Pipe the bits
             InputStream is = bitstream.retrieve();
