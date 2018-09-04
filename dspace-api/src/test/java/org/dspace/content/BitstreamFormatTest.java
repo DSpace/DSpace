@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import mockit.NonStrictExpectations;
-import org.apache.commons.collections.ListUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;

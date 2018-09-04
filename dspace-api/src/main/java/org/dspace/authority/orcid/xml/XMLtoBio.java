@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Logger;
 import org.dspace.authority.orcid.Orcidv2;
 import org.dspace.utils.DSpace;
 import org.orcid.jaxb.model.common_v2.OrcidId;
@@ -19,7 +20,6 @@ import org.orcid.jaxb.model.record_v2.Person;
 import org.orcid.jaxb.model.search_v2.Result;
 import org.orcid.jaxb.model.search_v2.Search;
 import org.xml.sax.SAXException;
-import org.apache.logging.log4j.Logger;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)

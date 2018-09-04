@@ -169,6 +169,10 @@
                     <artifactId>jetty-xml</artifactId>
                     <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+		    <artifactId>zookeeper</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -225,6 +229,10 @@
                     <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.apache.zookeeper</groupId>
                     <artifactId>zookeeper</artifactId>
                 </exclusion>
@@ -237,15 +245,11 @@
             <artifactId>zookeeper</artifactId>
 	    <version>3.4.6</version>
 	    <exclusions>
-		<exclusion>
-                    <groupId>log4j</groupId>
-		    <artifactId>log4j</artifactId>
-	        </exclusion>
                 <exclusion>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-log4j12</artifactId>
-		</exclusion>
-	    </exclusions>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Replace J.U.L. logging with log4j -->
@@ -257,7 +261,13 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <scope>runtime</scope>
+	    <scope>runtime</scope>
+	    <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
