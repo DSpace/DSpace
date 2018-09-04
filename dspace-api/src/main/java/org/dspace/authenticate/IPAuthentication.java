@@ -17,7 +17,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
