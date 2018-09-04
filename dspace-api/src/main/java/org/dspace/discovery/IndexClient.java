@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
@@ -64,52 +64,30 @@ public class IndexClient {
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
 
-        options.addOption(OptionBuilder
-                              .withArgName("handle to remove")
-                              .hasArg(true)
-                              .withDescription(
-                                  "remove an Item, Collection or Community from index based on its handle")
-                              .create("r"));
+        options.addOption(Option.builder("r")
+                .hasArg()
+                .argName("handle to remove")
+                .desc("remove an Item, Collection or Community from index " +
+                        "based on its handle")
+                .build());
 
-        options.addOption(OptionBuilder
-                              .withArgName("handle to add or update")
-                              .hasArg(true)
-                              .withDescription(
-                                  "add or update an Item, Collection or Community based on its handle")
-                              .create("i"));
+        options.addOption(Option.builder("i")
+                .hasArg()
+                .argName("handle to add or update")
+                .desc("add or update an Item, Collection or Community based " +
+                        "on its handle")
+                .build());
 
-        options.addOption(OptionBuilder
-                              .isRequired(false)
-                              .withDescription(
-                                  "clean existing index removing any documents that no longer exist in the db")
-                              .create("c"));
-
-        options.addOption(OptionBuilder
-                              .isRequired(false)
-                              .withDescription(
-                                  "(re)build index, wiping out current one if it exists")
-                              .create("b"));
-
-        options.addOption(OptionBuilder
-                              .isRequired(false)
-                              .withDescription(
-                                  "Rebuild the spellchecker, can be combined with -b and -f.")
-                              .create("s"));
-
-        options.addOption(OptionBuilder
-                              .isRequired(false)
-                              .withDescription(
-                                  "if updating existing index, force each handle to be reindexed even if uptodate")
-                              .create("f"));
-
-        options.addOption(OptionBuilder
-                              .isRequired(false)
-                              .withDescription(
-                                  "print this help message")
-                              .create("h"));
-
-        options.addOption(OptionBuilder.isRequired(false).withDescription(
-            "optimize search core").create("o"));
+        options.addOption("c","clean existing index removing any " +
+                "documents that no longer exist in the db");
+        options.addOption("b","(re)build index, wiping out current " +
+                "one if it exists");
+        options.addOption("s", "Rebuild the spellchecker, can be " +
+                "combined with -b and -f.");
+        options.addOption("f", "if updating existing index, force each " +
+                "handle to be reindexed even if uptodate");
+        options.addOption("h", "print this help message");
+        options.addOption("o", "optimize search core");
 
         try {
             line = new PosixParser().parse(options, args);

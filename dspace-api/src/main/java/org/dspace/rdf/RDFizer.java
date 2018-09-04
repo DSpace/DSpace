@@ -21,7 +21,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
@@ -708,38 +707,39 @@ public class RDFizer {
             "depending on the number of stored communties, collections and " +
             "items. Existing information in the triple store will be updated.");
 
-        Option optIdentifiers = OptionBuilder.withLongOpt("identifiers")
-                                             .hasArgs()
-                                             .withArgName("handle")
-                                             .withValueSeparator(' ')
-                                             .withDescription("Only convert these DSpace Objects. If you specify "
-                                                                  + "a Community or Collection all of their Items " +
-                                                                  "will be "
-                                                                  + "converted as well. Separate multiple identifiers" +
-                                                                  " with a "
-                                                                  + "space.")
-                                             .create('i');
+        Option optIdentifiers = Option.builder("i").longOpt("identifiers")
+                .hasArgs()
+                .argName("handle")
+                .valueSeparator(' ')
+                .desc("Only convert these DSpace Objects. If you specify " +
+                      "a Community or Collection all of their Items will be " +
+                      "converted as well. Separate multiple identifiers with " +
+                      "a space.")
+                .build();
+
         options.addOption(optIdentifiers);
 
-        Option optDelete = OptionBuilder.withLongOpt("delete")
-                                        .hasArgs()
-                                        .withArgName("hdl:handle | URI")
-                                        .withValueSeparator(' ')
-                                        .withDescription("Delete previously converted data. Specify "
-                                                             + "either the handle of a DSpaceObject in the format "
-                                                             + "'hdl:<handle>' or the URI used to identify the rdf "
-                                                             + "data in the triplestore. If you specify a Community, "
-                                                             + "Collection or Item by its handle all converted "
-                                                             + "information about attached Subcommunities, "
-                                                             + "Collections, Items, Bundles and Bitstreams will be "
-                                                             + "deleted as well. Separate multiple identifiers with "
-                                                             + "a space.")
-                                        .create();
+        Option optDelete = Option.builder().longOpt("delete")
+                .hasArgs()
+                .argName("hdl:handle | URI")
+                .valueSeparator(' ')
+                .desc("Delete previously converted data. Specify " +
+                      "either the handle of a DSpaceObject in the format " +
+                      "'hdl:<handle>' or the URI used to identify the rdf " +
+                      "data in the triplestore. If you specify a Community, " +
+                      "Collection or Item by its handle all converted " +
+                      "information about attached Subcommunities, " +
+                      "Collections, Items, Bundles and Bitstreams will be " +
+                      "deleted as well. Separate multiple identifiers with " +
+                      "a space.")
+                .build();
+
         options.addOption(optDelete);
 
-        Option optDeleteAll = OptionBuilder.withLongOpt("delete-all")
-                                           .withDescription("Delete all converted data from the triplestore.")
-                                           .create();
+        Option optDeleteAll = Option.builder().longOpt("delete-all")
+                .desc("Delete all converted data from the triplestore.")
+                .build();
+
         options.addOption(optDeleteAll);
 
         return options;

@@ -19,7 +19,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
@@ -101,19 +100,23 @@ public final class ChecksumChecker {
         options.addOption("a", "handle", true, "Specify a handle to check");
         options.addOption("v", "verbose", false, "Report all processing");
 
-        OptionBuilder.withArgName("bitstream-ids").hasArgs().withDescription(
-            "Space separated list of bitstream ids");
-        Option useBitstreamIds = OptionBuilder.create('b');
+        Option useBitstreamIds = Option.builder("b")
+                .hasArg()
+                .argName("bitstream-ids")
+                .desc("Space separated list of bitstream ids")
+                .build();
 
         options.addOption(useBitstreamIds);
 
-        options.addOption("p", "prune", false, "Prune configuration file");
-        options.addOption(OptionBuilder
-                              .withArgName("prune")
-                              .hasOptionalArgs(1)
-                              .withDescription(
-                                  "Prune old results (optionally using specified properties file for configuration)")
-                              .create('p'));
+        Option prune = Option.builder("p").longOpt("prune")
+                .hasArg()
+                .optionalArg(true)
+                .argName("prune")
+                .desc("Prune old results (optionally using specified properties file for configuration)")
+                .build();
+
+        options.addOption(prune);
+
 
         try {
             line = parser.parse(options, args);

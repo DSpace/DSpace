@@ -19,7 +19,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.ArrayUtils;
@@ -85,26 +84,26 @@ public class MediaFilterCLITool {
         options.addOption("h", "help", false, "help");
 
         //create a "plugin" option (to specify specific MediaFilter plugins to run)
-        OptionBuilder.withLongOpt("plugins");
-        OptionBuilder.withValueSeparator(',');
-        OptionBuilder.withDescription(
-            "ONLY run the specified Media Filter plugin(s)\n" +
-                "listed from '" + MEDIA_FILTER_PLUGINS_KEY + "' in dspace.cfg.\n" +
-                "Separate multiple with a comma (,)\n" +
-                "(e.g. MediaFilterManager -p \n\"Word Text Extractor\",\"PDF Text Extractor\")");
-        Option pluginOption = OptionBuilder.create('p');
-        pluginOption.setArgs(Option.UNLIMITED_VALUES); //unlimited number of args
+        Option pluginOption  = Option.builder("p").longOpt("plugins")
+                .hasArgs()
+                .valueSeparator(',')
+                .desc("ONLY run the specified Media Filter plugin(s)\n" +
+                      "listed from '" + MEDIA_FILTER_PLUGINS_KEY + "' in dspace.cfg.\n" +
+                      "Separate multiple with a comma (,)\n" +
+                      "(e.g. MediaFilterManager -p \n\"Word Text Extractor\",\"PDF Text Extractor\")")
+                .build();
+
         options.addOption(pluginOption);
 
         //create a "skip" option (to specify communities/collections/items to skip)
-        OptionBuilder.withLongOpt("skip");
-        OptionBuilder.withValueSeparator(',');
-        OptionBuilder.withDescription(
-            "SKIP the bitstreams belonging to identifier\n" +
-                "Separate multiple identifiers with a comma (,)\n" +
-                "(e.g. MediaFilterManager -s \n 123456789/34,123456789/323)");
-        Option skipOption = OptionBuilder.create('s');
-        skipOption.setArgs(Option.UNLIMITED_VALUES); //unlimited number of args
+        Option skipOption = Option.builder("s").longOpt("skip")
+                .hasArgs()
+                .valueSeparator(',')
+                .desc("SKIP the bitstreams belonging to identifier\n" +
+                      "Separate multiple identifiers with a comma (,)\n" +
+                      "(e.g. MediaFilterManager -s \n 123456789/34,123456789/323)")
+                .build();
+
         options.addOption(skipOption);
 
         boolean isVerbose = false;
