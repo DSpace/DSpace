@@ -742,9 +742,9 @@ public class RestResourceController implements InitializingBean {
             int start = page.getOffset();
             int end = (start + page.getPageSize()) > fullList.size() ? fullList.size() : (start + page.getPageSize());
             DSpaceRestRepository<RestAddressableModel, ?> resourceRepository = utils
-                .getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
+                    .getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
             PageImpl<RestAddressableModel> pageResult = new PageImpl(fullList.subList(start, end), page,
-                                                                     fullList.size());
+                    fullList.size());
             result = assembler.toResource(pageResult.map(resourceRepository::wrapResource));
 
             for (Resource subObj : result) {
@@ -757,14 +757,18 @@ public class RestResourceController implements InitializingBean {
 
         } else {
             if (resource.getEmbeddedResources().get(rel) == null) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                return new ResourceSupport();
-            } else {
-                return (ResourceSupport) resource.getEmbeddedResources().get(rel);
+                if (model.equals("submissiondefinitions")) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    return new ResourceSupport();
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                }
             }
         }
-
+        
+        return (ResourceSupport) resource.getEmbeddedResources().get(rel);
     }
+
 
     /**
      * Find all

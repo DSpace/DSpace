@@ -130,9 +130,9 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
         //Match only that a section exists with a submission configuration behind
         getClient(token).perform(get("/api/config/submissiondefinitions/traditional/collections"))
                    //TODO - this method should return an empty page
-                   .andExpect(status().isNoContent());
+                   //.andExpect(status().isNoContent());
                    //this is the expected result
-                   //.andExpect(status().isOk())
+                   .andExpect(status().isOk());
                    //.andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
