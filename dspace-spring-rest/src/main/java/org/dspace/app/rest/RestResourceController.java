@@ -765,7 +765,6 @@ public class RestResourceController implements InitializingBean {
                 }
             }
         }
-        
         return (ResourceSupport) resource.getEmbeddedResources().get(rel);
     }
 
