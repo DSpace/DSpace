@@ -14,9 +14,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.xml.sax.SAXException;
-
 import org.apache.logging.log4j.Logger;
+import org.xml.sax.SAXException;
 
 /**
  * @param <T> type
