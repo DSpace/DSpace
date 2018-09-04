@@ -447,8 +447,9 @@ return decorator.generateDisplayValue(alternativeName, rp);
 		    discoverQuery.setDSpaceObjectFilter(CrisConstants.RP_TYPE_ID);
 		    String surnameQuery = "{!lucene q.op=AND df=rpsurnames}("
     			    + luceneQuery
-    			    + ") OR (\""
-    			    + luceneQuery.substring(0,luceneQuery.length() - 1) + "\")";
+    			    + ") OR ("
+    			    // no need for a phrase search, the default operator is now AND and we want to match surnames in any order
+    			    + luceneQuery.substring(0,luceneQuery.length() - 1) + ")";
 		    
 		    discoverQuery.setQuery(surnameQuery);
 		    discoverQuery.setMaxResults(MAX_RESULTS);
