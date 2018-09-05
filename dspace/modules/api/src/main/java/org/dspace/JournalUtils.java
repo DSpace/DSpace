@@ -685,7 +685,7 @@ public class JournalUtils {
         return numMatched;
     }
 
-    public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode) throws RESTModelException {
+    private static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode) throws RESTModelException {
         // manuscripts should only be returned if the crossref match is of type "journal-article"
         if (!jsonNode.path("type").isMissingNode()) {
             if (!"journal-article".equals(jsonNode.path("type").textValue())) {
