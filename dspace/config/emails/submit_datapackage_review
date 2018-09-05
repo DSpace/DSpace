@@ -51,19 +51,20 @@ YOUR DRYAD DOI:
 
 MODIFYING YOUR DRYAD SUBMISSION
 
-Should you need to modify your data package while it is in review, you may access it at https://datadryad.org/submissions. Do not create multiple Dryad submissions associated with the same manuscript.
+Should you need to modify your data package while it is in review, you may access it at https://datadryad.org/submissions. Please modify your existing submission: do not create multiple Dryad submissions associated with the same manuscript.
 
 The actions you can perform while a submission is in review are limited. Since article titles, authors, and abstracts often change during the publication process, we will confirm and update this information if/when the manuscript is accepted and published.
 
-Dryad does not allow files to be deleted while a manuscript is under review. We only allow additions during this time. This restriction ensures that reviewers see the files that were originally submitted.
+Dryad does not allow files to be deleted while a manuscript is under review. We only allow additions during this time; however, you can indicate which files are no longer needed and these will be removed before your data are archived. This restriction ensures that the change process is transparent and that reviewers see the files that were originally submitted.
 
 To add new or corrected files:
-  - Go to https://datadryad.org/submissions and log in. 
-  - Select the appropriate data package. At the bottom of the page for this package, you will see an option to "Add new data file".
-  - After you have finished adding data files, please send an email to help@datadryad.org (including your Dryad DOI) to indicate which files should be retained during the final curation process.
+  - Go to https://datadryad.org/submissions and log in. 
+  - Click on the title of your data package under "In Journal Review."
+  - Under "Your Data Files" use the "Add New Data file" button to upload new or revised files.
+  - Please check "Delete" next to any file that you would like us to remove at the end of the review process.
+  - When all changes are in place, click "Save" at the bottom of the screen.
 
-If/when your manuscript is accepted, Dryad curators will remove any files that you have indicated are duplicate or superseded. Your Dryad submission will automatically move into our queue for curation and archiving, and will no longer be accessible for modification. Should you need to make changes to the data after that point, please contact us at help@datadryad.org.
-
+If/when your manuscript is accepted, Dryad curators will remove any files that you have indicated should be deleted. Your Dryad submission will automatically move into our queue for curation and archiving and will no longer be accessible for modification. Should you need to make changes to the data after that point, please contact us at help@datadryad.org.
 
 CITING YOUR DRYAD DATA
 
