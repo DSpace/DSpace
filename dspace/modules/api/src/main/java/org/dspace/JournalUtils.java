@@ -639,15 +639,6 @@ public class JournalUtils {
 
             // sanity check:
             if (currentMatch != null) {
-                if (currentMatch.getPublicationDate() == null) {
-                    throw new RESTModelException("CrossRef match does not have a publication date");
-                }
-                if (currentMatch.getPublicationDate() != null && currentMatch.getPublicationDate().after(new Date())) {
-                    throw new RESTModelException("CrossRef match has publication date in the future");
-                }
-                if (currentMatch.getAuthorList() == null || currentMatch.getAuthorList().size() == 0) {
-                    throw new RESTModelException("CrossRef match does not have authors");
-                }
                 if (!queryManuscript.getJournalISSN().equals(currentMatch.getJournalISSN())) {
                     throw new RESTModelException("publication DOI listed for item does not belong to the correct journal");
                 }
@@ -698,7 +689,7 @@ public class JournalUtils {
         // manuscripts should only be returned if the crossref match is of type "journal-article"
         if (!jsonNode.path("type").isMissingNode()) {
             if (!"journal-article".equals(jsonNode.path("type").textValue())) {
-                throw new RESTModelException("crossref result is not of type journal-article: " + jsonNode.path("type").textValue());
+                throw new RESTModelException("Crossref result is not of type journal-article: " + jsonNode.path("type").textValue());
             }
         }
 
@@ -769,8 +760,16 @@ public class JournalUtils {
                 }
             }
         }
+
+        // sanity checks for manuscript format:
         if (manuscript.getJournalConcept() == null) {
-            throw new RESTModelException("couldn't find journal concept");
+            throw new RESTModelException("Couldn't find journal concept");
+        }
+        if (manuscript.getPublicationDate() == null) {
+            throw new RESTModelException("CrossRef match does not have a publication date");
+        }
+        if (manuscript.getAuthorList() == null || manuscript.getAuthorList().size() == 0) {
+            throw new RESTModelException("CrossRef match does not have authors");
         }
         manuscript.setStatus(Manuscript.STATUS_PUBLISHED);
         return manuscript;
