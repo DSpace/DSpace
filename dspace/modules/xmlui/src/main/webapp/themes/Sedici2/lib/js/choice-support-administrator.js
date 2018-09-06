@@ -69,7 +69,7 @@
 
 function verificarConfianzaInicial(inputID, authorityLabelID, confidenceIndicatorID, confidenceName){
 	if ($('#'+confidenceName).val()==confianza_600){ 
-		if ($('#'+inputID).val()!=$('#'+authorityLabelID).val()){
+		if ($('#'+inputID).val().trim()!=$('#'+authorityLabelID).val().trim()){
 			//Variante
 			DSpaceUpdateConfidence(document, confidenceIndicatorID, icono_accepted_variant);
 		}
@@ -210,8 +210,12 @@ function DSpaceSetupAutocomplete(formID, args) {
                 			//pero es tratado dependiendo si es authority controlled y si ya existe cargada una authority key
                 			if (isAuthorityControlled){                        		
                         		if ($('#' + authorityID).val() != ''){   
-                        			//en este caso es una variacion de un authority key
-                        			cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted_variant, args.confidenceName, confianza_600, null, null);
+                        			if ($('#'+inputID).val().trim()==$('#' + authorityLabelID).val().trim()){
+                        				cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted, args.confidenceName, confianza_600, null, null);
+                        			} else {
+                        				//en este caso es una variacion de un authority key
+                        				cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted_variant, args.confidenceName, confianza_600, null, null);
+                        			}
                         		 } else {
                         			//es un nuevo elemento
      	            				cambiarAuthority(inputID, authorityID, '', args.confidenceIndicatorID, icono_new, args.confidenceName, confianza_300, null, null);
@@ -223,10 +227,14 @@ function DSpaceSetupAutocomplete(formID, args) {
                         } else {
                         	if (isAuthorityControlled){                        		
                         		if ($('#' + authorityID).val() != ''){
-                        			//en este caso es una variacion de un authority key
-                        			//permito agregar variante porque estoy sobre un authority cerrado
-                        			//en este caso es una variacion de un authority key
-                        			cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted_variant, args.confidenceName, confianza_600, null, null);
+                        			if ($('#'+inputID).val().trim()==$('#' + authorityLabelID).val().trim()){
+                        				cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted, args.confidenceName, confianza_600, null, null);
+                        			} else {
+                        				//en este caso es una variacion de un authority key
+                        				//permito agregar variante porque estoy sobre un authority cerrado
+                        				//en este caso es una variacion de un authority key
+                        				cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted_variant, args.confidenceName, confianza_600, null, null);
+                        			}
                         		} else {
                         			//Como es cerrado y no tengo selecionado un authority key freno las tratativas
         	                    	cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_rejected, args.confidenceName, confianza_100, null, null);
@@ -261,8 +269,12 @@ function DSpaceSetupAutocomplete(formID, args) {
 	            	if (isClosed){
 	            		if (isAuthorityControlled){
 	            			if ($('#' + authorityID).val() != ''){
-	            				//en este caso es una variacion de un authority key
-	            				cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted_variant, args.confidenceName, confianza_600, null, null);
+	            				if ($('#'+inputID).val().trim()==$('#' + authorityLabelID).val().trim()){
+	            					cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted, args.confidenceName, confianza_600, null, null);
+	            				}else{
+	            					//en este caso es una variacion de un authority key
+	            					cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted_variant, args.confidenceName, confianza_600, null, null);
+	            				}
 		            		} else {
 	            				//No hay authority key, por lo que debo notificar del error
 		            			cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_rejected, args.confidenceName, confianza_100, null, null);
@@ -277,7 +289,7 @@ function DSpaceSetupAutocomplete(formID, args) {
 	            	} else {
 	            		if (isAuthorityControlled){
 	            			if ($('#' + authorityID).val() != ''){
-	            				if ($('#'+inputID).val()==$('#' + authorityLabelID).val()){
+	            				if ($('#'+inputID).val().trim()==$('#' + authorityLabelID).val().trim()){
 	            					//eesto esta al pedo, es por el plugvin de dias
 		            				cambiarAuthority(inputID, authorityID, $('#' + authorityID).val(), args.confidenceIndicatorID, icono_accepted, args.confidenceName, confianza_600, null, null);
 	            				} else {

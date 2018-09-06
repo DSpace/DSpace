@@ -43,7 +43,7 @@ function cambiarAuthority(inputID, authorityID, authorityValue, confidenceIndica
 	cambiarAuthorityConfidence(confidenceNameID, confidenceNameValue);
 	DSpaceUpdateConfidence(document, confidenceIndicatorID, confidenceIndicatorValue);
 	if (authorityLabelID != null){
-		if ($('#'+inputID).val()!=$('#' + authorityLabelID).val()){
+		if ($('#'+inputID).val().trim()!=$('#' + authorityLabelID).val().trim()){
 			$('#' + authorityLabelID).show();
 		}else{
 			$('#' + authorityLabelID).hide();
