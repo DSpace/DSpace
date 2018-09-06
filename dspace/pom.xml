@@ -213,6 +213,7 @@
                                     </jacocoReports>
                                     <sourceDirectories>
                                         <sourceDirectory>${project.parent.basedir}/dspace-api/src/main/java</sourceDirectory>
+                                        <sourceDirectory>${project.parent.basedir}/dspace-api/target/generated-sources/annotations</sourceDirectory>
                                         <sourceDirectory>${project.parent.basedir}/dspace-oai/src/main/java</sourceDirectory>
                                         <sourceDirectory>${project.parent.basedir}/dspace-rdf/src/main/java</sourceDirectory>
                                         <sourceDirectory>${project.parent.basedir}/dspace-rest/src/main/java</sourceDirectory>
