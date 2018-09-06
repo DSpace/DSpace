@@ -720,7 +720,7 @@ public class JournalUtils {
                 if (dateParts.has(2)) {
                     day = dateParts.get(2).asInt();
                     if (dateFormat.parse(year + "-" + month + "-" + day).after(new Date())) {
-                        throw new RESTModelException("CrossRef match has publication date in the future");
+                        throw new RESTModelException("CrossRef match has publication date in the future: " + year + "-" + month + "-" + day);
                     }
                 } else {
                     // adjust to the end of the month, if necessary:
