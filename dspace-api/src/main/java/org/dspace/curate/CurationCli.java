@@ -51,7 +51,7 @@ public class CurationCli {
         options.addOption("i", "id", true,
                           "Id (handle) of object to perform task on, or 'all' to perform on whole repository");
         options.addOption("p", "parameter", true,
-			  "a task parameter 'NAME=VALUE'");
+                          "a task parameter 'NAME=VALUE'");
         options.addOption("q", "queue", true,
                           "name of task queue to process");
         options.addOption("e", "eperson", true,
@@ -117,8 +117,8 @@ public class CurationCli {
                 if (parts.length > 1) {
                     value = parts[1];
                 } else {
-		    value = "true";
-		}
+                    value = "true";
+                }
                 parameters.put(name, value);
             }
         }
