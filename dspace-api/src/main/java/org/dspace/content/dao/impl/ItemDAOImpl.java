@@ -174,12 +174,12 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         },
         exists {
             public Criterion buildPredicate(String val, String regexClause) {
-                return OP.equals.buildPredicate(val, regexClause);
+                return Property.forName("mv.value").isNotNull();
             }
         },
         doesnt_exist {
             public Criterion buildPredicate(String val, String regexClause) {
-                return OP.not_equals.buildPredicate(val, regexClause);
+                return OP.exists.buildPredicate(val, regexClause);
             }
         },
         matches {
