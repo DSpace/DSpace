@@ -9,15 +9,16 @@ package org.dspace.core;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 
 /**
  * Hibernate implementation used by DSpaceObject Database Access Objects.
@@ -26,8 +27,8 @@ import org.hibernate.criterion.Restrictions;
  * <p>
  * Each DSO Database Access Object should extend this class to prevent code duplication.
  *
- * @param <T> type of DSO represented.
  * @author kevinvandevelde at atmire.com
+ * @param <T> type of DSO represented.
  */
 public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends AbstractHibernateDAO<T> {
     /**
@@ -36,27 +37,27 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * All DSOs now have UUID primary keys, and those should be used when available.
      * Each type derived from DSpaceObject had its own stream of record IDs, so
      * it is also necessary to know the specific type.
-     *
-     * @param context  current DSpace context.
+     * @param context current DSpace context.
      * @param legacyId the old integer record identifier.
-     * @param clazz    DSO subtype of record identified by {@link legacyId}.
+     * @param clazz DSO subtype of record identified by {@link legacyId}.
      * @return
      * @throws SQLException
      */
     public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException {
-        Criteria criteria = createCriteria(context, clazz);
-        criteria.add(Restrictions.eq("legacyId", legacyId));
-        return uniqueResult(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, clazz);
+        Root<T> root = criteriaQuery.from(clazz);
+        criteriaQuery.where(criteriaBuilder.equal(root.get("legacyId"), legacyId));
+        return uniqueResult(context, criteriaQuery, false, clazz, -1, -1);
     }
 
     /**
      * Add left outer join on all metadata fields which are passed to this function.
      * The identifier of the join will be the toString() representation of the metadata field.
      * The joined metadata fields can then be used to query or sort.
-     *
-     * @param query           the query string being built.
+     * @param query the query string being built.
      * @param tableIdentifier name of the table to be joined.
-     * @param metadataFields  names of the desired fields.
+     * @param metadataFields names of the desired fields.
      */
     protected void addMetadataLeftJoin(StringBuilder query, String tableIdentifier,
                                        Collection<MetadataField> metadataFields) {
@@ -72,9 +73,9 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * Values can be checked using a like or an "=" query, as determined by the "operator" parameter.
      * When creating a query, the "queryParam" string can be used set as parameter for the query.
      *
-     * @param query           the already existing query builder, all changes will be appended
-     * @param metadataFields  the metadata fields whose metadata value should be queried
-     * @param operator        can either be "=" or "like"
+     * @param query the already existing query builder, all changes will be appended
+     * @param metadataFields the metadata fields whose metadata value should be queried
+     * @param operator can either be "=" or "like"
      * @param additionalWhere additional where query
      */
     protected void addMetadataValueWhereQuery(StringBuilder query, List<MetadataField> metadataFields, String operator,
@@ -108,23 +109,21 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
     /**
      * Append ORDER BY clause based on metadata fields or column names.
      * All fields will be in ascending order.
-     *
-     * @param query              the query being built.
+     * @param query the query being built.
      * @param metadataSortFields fields on which to sort -- use this OR columnSortFields.
-     * @param columnSortFields   columns on which to sort -- use this OR metadataSortFields.
+     * @param columnSortFields columns on which to sort -- use this OR metadataSortFields.
      */
     protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields,
                                         List<String> columnSortFields) {
-        addMetadataSortQuery(query, metadataSortFields, columnSortFields, Collections.EMPTY_LIST);
+        addMetadataSortQuery(query, metadataSortFields, columnSortFields, ListUtils.EMPTY_LIST);
     }
 
     /**
      * Append ORDER BY clause based on metadata fields or column names.
-     *
-     * @param query              the query being built.
+     * @param query the query being built.
      * @param metadataSortFields fields on which to sort -- use this OR columnSortFields.
-     * @param columnSortFields   columns on which to sort -- use this OR metadataSortFields.
-     * @param direction          ASC or DESC for each field.  Unspecified fields will be ASC.
+     * @param columnSortFields columns on which to sort -- use this OR metadataSortFields.
+     * @param direction ASC or DESC for each field.  Unspecified fields will be ASC.
      */
     protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields,
                                         List<String> columnSortFields, List<String> direction) {
