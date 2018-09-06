@@ -9,7 +9,9 @@ package org.dspace.curate;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -48,6 +50,8 @@ public class CurationCli {
                           "file containing curation task names");
         options.addOption("i", "id", true,
                           "Id (handle) of object to perform task on, or 'all' to perform on whole repository");
+        options.addOption("p", "parameter", true,
+			  "a task parameter 'NAME=VALUE'");
         options.addOption("q", "queue", true,
                           "name of task queue to process");
         options.addOption("e", "eperson", true,
@@ -71,6 +75,7 @@ public class CurationCli {
         String reporterName = null;
         String scope = null;
         boolean verbose = false;
+        final Map<String, String> parameters = new HashMap<>();
 
         if (line.hasOption('h')) {
             HelpFormatter help = new HelpFormatter();
@@ -104,6 +109,19 @@ public class CurationCli {
             ePersonName = line.getOptionValue('e');
         }
 
+        if (line.hasOption('p')) { // parameter
+            for (String parameter : line.getOptionValues('p')) {
+                String[] parts = parameter.split("=", 2);
+                String name = parts[0];
+                String value;
+                if (parts.length > 1) {
+                    value = parts[1];
+                } else {
+		    value = "true";
+		}
+                parameters.put(name, value);
+            }
+        }
         if (line.hasOption('r')) { // report file
             reporterName = line.getOptionValue('r');
         }
@@ -154,6 +172,7 @@ public class CurationCli {
             Curator.TxScope txScope = Curator.TxScope.valueOf(scope.toUpperCase());
             curator.setTransactionScope(txScope);
         }
+        curator.addParameters(parameters);
         // we are operating in batch mode, if anyone cares.
         curator.setInvoked(Curator.Invoked.BATCH);
         // load curation tasks

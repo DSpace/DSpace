@@ -114,6 +114,14 @@ public class Curator {
     }
 
     /**
+     * Set many parameters visible to all tasks in this Curator instance.
+     * @param parameters parameter name/value pairs.
+     */
+    public void addParameters(Map<String, String> parameters) {
+        runParameters.putAll(parameters);
+    }
+
+    /**
      * Look up a run parameter.
      * @param name the name of the desired parameter.
      * @return the value of the named parameter.
