@@ -11,29 +11,28 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.Item_;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.MetadataValue_;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
+import org.hibernate.type.StandardBasicTypes;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Item object.
@@ -144,75 +143,79 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     enum OP {
         equals {
-            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
-                                            Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.equal(subqueryRoot.get(MetadataValue_.value), val);
+            public Criterion buildPredicate(String val, String regexClause) {
+                return Property.forName("mv.value").eq(val);
             }
         },
         not_equals {
-            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
-                                            Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.notEqual(subqueryRoot.get(MetadataValue_.value), val);
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.equals.buildPredicate(val, regexClause);
             }
         },
         like {
-            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
-                                            Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.like(subqueryRoot.get(MetadataValue_.value), val);
+            public Criterion buildPredicate(String val, String regexClause) {
+                return Property.forName("mv.value").like(val);
             }
         },
         not_like {
-            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
-                                            Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.notLike(subqueryRoot.get(MetadataValue_.value), val);
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.like.buildPredicate(val, regexClause);
             }
         },
         contains {
-            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
-                                            Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.like(subqueryRoot.get(MetadataValue_.value), "%" + val + "%");
+            public Criterion buildPredicate(String val, String regexClause) {
+                return Property.forName("mv.value").like("%" + val + "%");
             }
         },
         doesnt_contain {
-            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
-                                            Root<MetadataValue> subqueryRoot) {
-                return criteriaBuilder.notLike(subqueryRoot.get(MetadataValue_.value), "%" + val + "%");
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.contains.buildPredicate(val, regexClause);
             }
         },
         exists {
-            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
-                                            Root<MetadataValue> subqueryRoot) {
-                return OP.equals.buildPredicate(val, criteriaBuilder, subqueryRoot);
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.equals.buildPredicate(val, regexClause);
             }
         },
         doesnt_exist {
-            public Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
-                                            Root<MetadataValue> subqueryRoot) {
-                return OP.not_equals.buildPredicate(val, criteriaBuilder, subqueryRoot);
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.not_equals.buildPredicate(val, regexClause);
             }
+        },
+        matches {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return Restrictions.sqlRestriction(regexClause, val, StandardBasicTypes.STRING);
+            }
+        },
+        doesnt_match {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.matches.buildPredicate(val, regexClause);
+            }
+
         };
-        public abstract Predicate buildPredicate(String val, CriteriaBuilder criteriaBuilder,
-                                                 Root<MetadataValue> subqueryRoot);
+        public abstract Criterion buildPredicate(String val, String regexClause);
     }
 
     @Override
+    @Deprecated
     public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
-        Root<Item> itemRoot = criteriaQuery.from(Item.class);
-        criteriaQuery.select(itemRoot);
-
-
-        List<Predicate> predicateList = new LinkedList<>();
+        Criteria criteria = getHibernateSession(context).createCriteria(Item.class, "item");
+        criteria.setFirstResult(offset);
+        criteria.setMaxResults(limit);
 
         if (!collectionUuids.isEmpty()) {
-            predicateList.add(criteriaBuilder.isTrue(itemRoot.get(Item_.owningCollection).in(collectionUuids)));
+            DetachedCriteria dcollCriteria = DetachedCriteria.forClass(Collection.class, "coll");
+            dcollCriteria.setProjection(Projections.property("coll.id"));
+            dcollCriteria.add(Restrictions.eqProperty("coll.id", "item.owningCollection"));
+            dcollCriteria.add(Restrictions.in("coll.id", collectionUuids));
+            criteria.add(Subqueries.exists(dcollCriteria));
         }
 
         int index = Math.min(listFieldList.size(), Math.min(query_op.size(), query_val.size()));
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < index; i++) {
             OP op = OP.valueOf(query_op.get(i));
@@ -221,27 +224,33 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 continue;
             }
 
-            Subquery<DSpaceObject> subquery = criteriaQuery.subquery(DSpaceObject.class);
-            Root<MetadataValue> subqueryRoot = subquery.from(MetadataValue.class);
-            subquery.select(subqueryRoot.get(MetadataValue_.dSpaceObject));
-            List<Predicate> predicateListSubQuery = new LinkedList<>();
-
-            predicateListSubQuery
-                .add(criteriaBuilder.equal(subqueryRoot.get(MetadataValue_.dSpaceObject), itemRoot.get(Item_.id)));
-
-            if (!listFieldList.get(i).isEmpty()) {
-                predicateListSubQuery.add(
-                    criteriaBuilder.isTrue(subqueryRoot.get(MetadataValue_.metadataField).in(listFieldList.get(i))));
+            if (op == OP.matches || op == OP.doesnt_match) {
+                if (regexClause.isEmpty()) {
+                    log.warn("Skipping Unsupported Regex Operator: " + query_op.get(i));
+                    continue;
+                }
             }
 
-            predicateListSubQuery.add(op.buildPredicate(query_val.get(i), criteriaBuilder, subqueryRoot));
+            DetachedCriteria subcriteria = DetachedCriteria.forClass(MetadataValue.class, "mv");
+            subcriteria.add(Property.forName("mv.dSpaceObject").eqProperty("item.id"));
+            subcriteria.setProjection(Projections.property("mv.dSpaceObject"));
 
-            subquery.where(predicateListSubQuery.toArray(new Predicate[] {}));
-            predicateList.add(criteriaBuilder.isTrue(itemRoot.get(Item_.id).in(subquery)));
+            if (!listFieldList.get(i).isEmpty()) {
+                subcriteria.add(Restrictions.in("metadataField", listFieldList.get(i)));
+            }
+
+            subcriteria.add(op.buildPredicate(query_val.get(i), regexClause));
+
+            if (op == OP.exists || op == OP.equals || op == OP.like || op == OP.contains || op == OP.matches) {
+                criteria.add(Subqueries.exists(subcriteria));
+            } else {
+                criteria.add(Subqueries.notExists(subcriteria));
+            }
         }
-        criteriaQuery.where(predicateList.toArray(new Predicate[] {}));
+        log.debug(String.format("Running custom query with %d filters", index));
 
-        return list(context, criteriaQuery, false, Item.class, limit, offset).iterator();
+        return ((List<Item>) criteria.list()).iterator();
+
     }
 
     @Override
