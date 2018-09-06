@@ -28,7 +28,7 @@
         <postgresql.driver.version>42.2.1</postgresql.driver.version>
         <solr.version>4.10.4</solr.version>
 	<jena.version>2.13.0</jena.version>
-	<log4j.version>2.11.0</log4j.version>
+	<log4j.version>2.6.2</log4j.version>
         <slf4j.version>1.7.22</slf4j.version>
         <jackson.version>2.8.11</jackson.version>
         <jersey.version>2.26</jersey.version>
