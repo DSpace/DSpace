@@ -709,17 +709,26 @@ public class JournalUtils {
         if (!dateNode.isMissingNode()) {
             //2016-04-11T17:53:39Z
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date today = new Date();
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(today);
             try {
                 JsonNode dateParts = dateNode.path("date-parts").get(0);
                 int year = dateParts.get(0).asInt();
+                if (year > calendar.get(Calendar.YEAR)) {
+                    throw new RESTModelException("CrossRef match has publication date in the future: " + year);
+                }
                 int month = 12;
-                int day = 1;
                 if (dateParts.has(1)) {
                     month = dateParts.get(1).asInt();
+                    if (month > calendar.get(Calendar.MONTH)) {
+                        throw new RESTModelException("CrossRef match has publication date in the future: " + year + "-" + month);
+                    }
                 }
+                int day = 1;
                 if (dateParts.has(2)) {
                     day = dateParts.get(2).asInt();
-                    if (dateFormat.parse(year + "-" + month + "-" + day).after(new Date())) {
+                    if (day > calendar.get(Calendar.DATE)) {
                         throw new RESTModelException("CrossRef match has publication date in the future: " + year + "-" + month + "-" + day);
                     }
                 } else {
