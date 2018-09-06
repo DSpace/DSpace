@@ -639,15 +639,6 @@ public class JournalUtils {
 
             // sanity check:
             if (currentMatch != null) {
-                if (currentMatch.getPublicationDate() == null) {
-                    throw new RESTModelException("CrossRef match does not have a publication date");
-                }
-                if (currentMatch.getPublicationDate() != null && currentMatch.getPublicationDate().after(new Date())) {
-                    throw new RESTModelException("CrossRef match has publication date in the future");
-                }
-                if (currentMatch.getAuthorList() == null || currentMatch.getAuthorList().size() == 0) {
-                    throw new RESTModelException("CrossRef match does not have authors");
-                }
                 if (!queryManuscript.getJournalISSN().equals(currentMatch.getJournalISSN())) {
                     throw new RESTModelException("publication DOI listed for item does not belong to the correct journal");
                 }
@@ -694,11 +685,11 @@ public class JournalUtils {
         return numMatched;
     }
 
-    public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode) throws RESTModelException {
+    private static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode) throws RESTModelException {
         // manuscripts should only be returned if the crossref match is of type "journal-article"
         if (!jsonNode.path("type").isMissingNode()) {
             if (!"journal-article".equals(jsonNode.path("type").textValue())) {
-                throw new RESTModelException("crossref result is not of type journal-article: " + jsonNode.path("type").textValue());
+                throw new RESTModelException("Crossref result is not of type journal-article: " + jsonNode.path("type").textValue());
             }
         }
 
@@ -718,16 +709,28 @@ public class JournalUtils {
         if (!dateNode.isMissingNode()) {
             //2016-04-11T17:53:39Z
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date today = new Date();
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(today);
             try {
                 JsonNode dateParts = dateNode.path("date-parts").get(0);
                 int year = dateParts.get(0).asInt();
+                if (year > calendar.get(Calendar.YEAR)) {
+                    throw new RESTModelException("CrossRef match has publication date in the future: " + year);
+                }
                 int month = 12;
-                int day = 1;
                 if (dateParts.has(1)) {
                     month = dateParts.get(1).asInt();
+                    if (month > calendar.get(Calendar.MONTH)) {
+                        throw new RESTModelException("CrossRef match has publication date in the future: " + year + "-" + month);
+                    }
                 }
+                int day = 1;
                 if (dateParts.has(2)) {
                     day = dateParts.get(2).asInt();
+                    if (day > calendar.get(Calendar.DATE)) {
+                        throw new RESTModelException("CrossRef match has publication date in the future: " + year + "-" + month + "-" + day);
+                    }
                 } else {
                     // adjust to the end of the month, if necessary:
                     LocalDate date = LocalDate.of(year, month, day);
@@ -769,8 +772,16 @@ public class JournalUtils {
                 }
             }
         }
+
+        // sanity checks for manuscript format:
         if (manuscript.getJournalConcept() == null) {
-            throw new RESTModelException("couldn't find journal concept");
+            throw new RESTModelException("Couldn't find journal concept");
+        }
+        if (manuscript.getPublicationDate() == null) {
+            throw new RESTModelException("CrossRef match does not have a publication date");
+        }
+        if (manuscript.getAuthorList() == null || manuscript.getAuthorList().size() == 0) {
+            throw new RESTModelException("CrossRef match does not have authors");
         }
         manuscript.setStatus(Manuscript.STATUS_PUBLISHED);
         return manuscript;
