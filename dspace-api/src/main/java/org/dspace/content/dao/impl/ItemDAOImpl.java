@@ -234,6 +234,24 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
+    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException {
+        Query query = createQuery(context, "select i from Item i join i.collections c WHERE :collection IN c");
+        query.setParameter("collection", collection);
+
+        if(offset != null)
+        {
+            query.setFirstResult(offset);
+        }
+        if(limit != null)
+        {
+            query.setMaxResults(limit);
+        }
+ 
+        return iterate(query);
+    }
+
+    
+    @Override
     public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn) throws SQLException {
         Query query = createQuery(context, "select count(i) from Item i join i.collections c WHERE :collection IN c AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
         query.setParameter("collection", collection);

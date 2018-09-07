@@ -291,7 +291,7 @@ function clearEPeople()
 			<td headers="t1">
 			    <input class="btn btn-success" type="button" value="<%
 			if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
-			else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson('<%= e.getID() %>', '<%= email %>', '<%= fullname %>');<%= closeWindow %>"/></td>
+			else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson('<%= e.getID() %>', '<%= email %>', '<%= Utils.addEntities(fullname) %>');<%= closeWindow %>"/></td>
 			<td headers="t2"><%= e.getID() %></td>
 			<td headers="t3"><%= (e.getEmail() == null ? "" : Utils.addEntities(e.getEmail())) %></td>
             <td headers="t4">

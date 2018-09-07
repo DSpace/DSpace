@@ -109,6 +109,8 @@
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.abstract">Abstract</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.language">Language (ISO)</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.has_content_in_original_bundle">Has File(s)</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.original_bundle_filenames">Filename</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.original_bundle_descriptions">File description</message>
 
 
     <message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Now showing items {0}-{1}</message>

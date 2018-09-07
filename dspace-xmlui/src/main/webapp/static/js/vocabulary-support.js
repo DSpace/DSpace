@@ -35,6 +35,7 @@
             var vocabularyDialog = $('div#aspect_submission_ControlledVocabularyTransformer_div_vocabulary_dialog_' + vocabularyIdentifier);
             if(0 < vocabularyDialog.length){
                 //Open the dialog
+                vocabularyDialog.find('input[type="hidden"][name="metadataFieldName"]').val(inputFieldName);
                 vocabularyDialog.dialog( 'open' );
             }else{
                 //No dialog window found, create a new one by requesting our data by json

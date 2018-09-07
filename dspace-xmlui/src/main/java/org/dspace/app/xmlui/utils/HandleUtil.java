@@ -58,7 +58,8 @@ public class HandleUtil
         Request request = ObjectModelHelper.getRequest(objectModel);
 
         DSpaceObject dso = (DSpaceObject) request.getAttribute(DSPACE_OBJECT);
-
+        Context context = ContextUtil.obtainContext(objectModel);
+        
         if (dso == null)
         {
             String uri = request.getSitemapURI();
@@ -88,13 +89,12 @@ public class HandleUtil
 
             handle = handle.substring(0, secondSlash);
 
-            Context context = ContextUtil.obtainContext(objectModel);
             dso = handleService.resolveToObject(context, handle);
 
             request.setAttribute(DSPACE_OBJECT, dso);
         }
 
-        return dso;
+        return context.reloadEntity(dso);
     }
 
     /**

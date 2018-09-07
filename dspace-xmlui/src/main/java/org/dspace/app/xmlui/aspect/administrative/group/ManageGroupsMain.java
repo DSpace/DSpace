@@ -115,7 +115,7 @@ public class ManageGroupsMain
         // Get all our parameters
         String baseURL = contextPath + "/admin/groups?administrative-continue="
                 + knot.getId();
-        String query = decodeFromURL(parameters.getParameter("query", ""));
+        String query = decodeFromURL(parameters.getParameter("query", null));
         int page = parameters.getParameterAsInteger("page", 0);
         String highlightID = parameters.getParameter("highlightID", null);
         int resultCount = groupService.searchResultCount(context, query);

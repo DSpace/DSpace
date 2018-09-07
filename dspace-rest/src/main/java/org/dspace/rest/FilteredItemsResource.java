@@ -114,9 +114,6 @@ public class FilteredItemsResource extends Resource {
         ItemFilter result = itemFilterSet.getAllFiltersFilter();
         try {
             context = createContext();
-            if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
-                context.turnOffAuthorisationSystem();            	
-            }
             
             int index = Math.min(query_field.size(), Math.min(query_op.size(), query_val.size()));
             List<ItemFilterQuery> itemFilterQueries = new ArrayList<ItemFilterQuery>();

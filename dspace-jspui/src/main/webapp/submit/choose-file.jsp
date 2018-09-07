@@ -442,7 +442,7 @@
                 </div>
                 <script>
                     $(document).ready(function(){
-                        var r = new Resumable({
+                        r = new Resumable({
                             target:'submit',
                             chunkSize:1024*1024,
                             simultaneousUploads:1,
@@ -520,14 +520,16 @@
                                 $('.progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
                             });
 
-                            function resume() {
-                                // Show pause, hide resume
-                                $('.resumable-progress .progress-resume-link').hide();
-                                $('.resumable-progress .progress-pause-link').show();
-                                r.upload();
-                            }
+                            
                         }
                     });
+			
+		    function resume() {
+                    	// Show pause, hide resume
+                        $('.resumable-progress .progress-resume-link').hide();
+                        $('.resumable-progress .progress-pause-link').show();
+                        r.upload();
+                    }
                 </script>
             <% } %>
             

@@ -83,7 +83,9 @@
 
             <map:select type="AuthenticatedSelector">
                 <map:when test="eperson">
-                    <map:transform type="Navigation"/>
+                    <map:transform type="Navigation">
+                        <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                    </map:transform>
 
                     <map:match pattern="item/version/create">
                         <map:transform type="VersionItemForm">
