@@ -721,14 +721,14 @@ public class JournalUtils {
                 int month = 12;
                 if (dateParts.has(1)) {
                     month = dateParts.get(1).asInt();
-                    if (month > calendar.get(Calendar.MONTH)) {
+                    if (year > calendar.get(Calendar.YEAR) && month > calendar.get(Calendar.MONTH)) {
                         throw new RESTModelException("CrossRef match has publication date in the future: " + year + "-" + month);
                     }
                 }
                 int day = 1;
                 if (dateParts.has(2)) {
                     day = dateParts.get(2).asInt();
-                    if (day > calendar.get(Calendar.DATE)) {
+                    if (year > calendar.get(Calendar.YEAR) && month > calendar.get(Calendar.MONTH) && day > calendar.get(Calendar.DATE)) {
                         throw new RESTModelException("CrossRef match has publication date in the future: " + year + "-" + month + "-" + day);
                     }
                 } else {
