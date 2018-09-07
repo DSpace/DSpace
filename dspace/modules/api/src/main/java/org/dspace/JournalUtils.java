@@ -721,7 +721,7 @@ public class JournalUtils {
                 JsonNode dateParts = dateNode.path("date-parts").get(0);
                 msDate.set(Calendar.YEAR, dateParts.get(0).asInt());
                 if (dateParts.has(1)) {
-                    msDate.set(Calendar.MONTH, dateParts.get(1).asInt());
+                    msDate.set(Calendar.MONTH, dateParts.get(1).asInt() - 1); // Calendar month is 0-based
                 }
                 if (dateParts.has(2)) {
                     msDate.set(Calendar.DATE, dateParts.get(2).asInt());
