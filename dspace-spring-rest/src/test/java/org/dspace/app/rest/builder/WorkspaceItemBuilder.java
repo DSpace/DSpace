@@ -8,6 +8,9 @@
 package org.dspace.app.rest.builder;
 
 import org.dspace.content.Collection;
+import org.dspace.content.DCDate;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
@@ -68,6 +71,44 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     @Override
     protected WorkspaceItemService getService() {
         return workspaceItemService;
+    }
+
+    protected WorkspaceItemBuilder addMetadataValue(final String schema,
+            final String element, final String qualifier, final String value) {
+        try {
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY, value);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return this;
+    }
+
+    protected WorkspaceItemBuilder setMetadataSingleValue(final String schema,
+            final String element, final String qualifier, final String value) {
+        try {
+            itemService.setMetadataSingleValue(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY,
+                    value);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+
+        return this;
+    }
+
+    public WorkspaceItemBuilder withTitle(final String title) {
+        return setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "title", null, title);
+    }
+
+    public WorkspaceItemBuilder withIssueDate(final String issueDate) {
+        return addMetadataValue(MetadataSchema.DC_SCHEMA, "date", "issued", new DCDate(issueDate).toString());
+    }
+
+    public WorkspaceItemBuilder withAuthor(final String authorName) {
+        return addMetadataValue(MetadataSchema.DC_SCHEMA, "contributor", "author", authorName);
+    }
+
+    public WorkspaceItemBuilder withSubject(final String subject) {
+        return addMetadataValue(MetadataSchema.DC_SCHEMA, "subject", null, subject);
     }
 
 }

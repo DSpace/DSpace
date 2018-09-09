@@ -64,6 +64,7 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     public List<WorkspaceItem> findByCollection(Context context, Collection c) throws SQLException {
         Criteria criteria = createCriteria(context, WorkspaceItem.class);
         criteria.add(Restrictions.eq("collection", c));
+        criteria.addOrder(Order.asc("workspaceItemId"));
         return list(criteria);
     }
 
@@ -78,14 +79,14 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     @Override
     public List<WorkspaceItem> findAll(Context context) throws SQLException {
         Criteria criteria = createCriteria(context, WorkspaceItem.class);
-        criteria.addOrder(Order.asc("item"));
+        criteria.addOrder(Order.asc("workspaceItemId"));
         return list(criteria);
     }
 
     @Override
     public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException {
         Criteria criteria = createCriteria(context, WorkspaceItem.class);
-        criteria.addOrder(Order.asc("item"));
+        criteria.addOrder(Order.asc("workspaceItemId"));
         criteria.setFirstResult(offset);
         criteria.setMaxResults(limit);
         return list(criteria);
@@ -105,6 +106,7 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
         criteria.createAlias("supervisorGroups", "supervisorGroup");
         criteria.createAlias("supervisorGroup.epeople", "person");
         criteria.add(Restrictions.eq("person.id", ePerson.getID()));
+        criteria.addOrder(Order.asc("workspaceItemId"));
         return list(criteria);
     }
 
