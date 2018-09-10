@@ -190,7 +190,7 @@
 		String browseJumpKey = "browse.nav.jump." + bix.getName();
 %>	
 		<label class="sr-only" for="starts_with"><fmt:message key="<%= browseNavKey %>"/></label>
-		<input type="text" name="starts_with" class="form-control" size="60" 
+		<input type="text" name="vfocus" class="form-control" size="60" 
 			placeholder="<fmt:message key="<%= browseStartKey %>" />" />
 		<input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>" />
 		<br/>

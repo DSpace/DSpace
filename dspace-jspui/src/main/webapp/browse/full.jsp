@@ -366,7 +366,7 @@ jQuery(document).ready(function() {
 	<label for="starts_with" class="sr-only">
 		<fmt:message key="<%= startWithKey %>"/>
 	</label>
-	<input class="form-control" type="text" name="starts_with" size="60" 
+	<input class="form-control" type="text" name="vfocus" size="60" 
 		placeholder="<fmt:message key="<%= startWithKey %>"/>" />
 	<input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>" />
 	<br/>	    					
