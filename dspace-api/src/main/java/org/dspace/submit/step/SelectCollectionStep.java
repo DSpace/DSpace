@@ -111,7 +111,7 @@ public class SelectCollectionStep extends AbstractProcessingStep
 
             // need to reload current submission process config,
             // since it is based on the Collection selected
-            subInfo.reloadSubmissionConfig(request);
+            subInfo.reloadSubmissionConfig(request, context);
         }
 
         // no errors occurred

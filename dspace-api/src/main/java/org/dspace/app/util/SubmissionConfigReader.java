@@ -497,6 +497,16 @@ public class SubmissionConfigReader
                             stepInfo = processStepChildNodes(
                                     "submission-process", nStep);
                         }
+                        
+                        //Check if nStep has an "scope" attribute. If true, overwrite any "scope" attribute declared in the step-definitions section.
+                        String stepScope = getAttribute(nStep, "scope");
+                        if (stepScope != null && stepScope.length() > 0)
+                        {
+                            //If the "scope" attribute exists, then copy the stepInfo Map to avoid modifying the original declaration of the step in the step-definitions section.
+                            HashMap<String, String> stepInfoCopy = new HashMap<String,String>(stepInfo);
+                            stepInfo = stepInfoCopy;
+                            stepInfo.put("scope", stepScope);
+                        }
 
                         steps.add(stepInfo);
 
@@ -569,6 +579,14 @@ public class SubmissionConfigReader
         if (stepID != null && stepID.length() > 0)
         {
             stepInfo.put("id", stepID);
+        }
+        
+        //Check for SCOPE specifications. The values accepted for this attribute must be some of the constants declared in the Constants.actionText array definition.
+        //The scope can be negated using the "!" symbol.
+        String stepScope = getAttribute(nStep, "scope");
+        if (stepScope != null && stepScope.length() > 0)
+        {
+            stepInfo.put("scope", stepScope);
         }
 
         // look for REQUIRED 'step' information

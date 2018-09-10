@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,10 +18,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
-
+import org.dspace.content.Item;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -102,10 +108,13 @@ public class SubmissionInfo extends HashMap
      * 
      * @return a SubmissionInfo object
      * 
+     * @param context
+     * 			  current DSpace context
+     * 
      * @throws ServletException
      *             if an error occurs
      */
-    public static SubmissionInfo load(HttpServletRequest request, InProgressSubmission subItem) throws ServletException
+    public static SubmissionInfo load(HttpServletRequest request, InProgressSubmission subItem, Context context) throws ServletException
     {
         boolean forceReload = false;
     	SubmissionInfo subInfo = new SubmissionInfo();
@@ -134,7 +143,7 @@ public class SubmissionInfo extends HashMap
         // load Submission Process config for this item's collection
         // (Note: this also loads the Progress Bar info, since it is
         // dependent on the Submission config)
-        loadSubmissionConfig(request, subInfo, forceReload);
+        loadSubmissionConfig(request, subInfo, forceReload, context);
 
         return subInfo;
     }
@@ -192,11 +201,13 @@ public class SubmissionInfo extends HashMap
      * 
      * @param request
      *            The HTTP Servlet Request object
+     * @param context
+     * 			  current DSpace context
      * 
      * @throws ServletException
      *             if an error occurs
      */
-    public void reloadSubmissionConfig(HttpServletRequest request)
+    public void reloadSubmissionConfig(HttpServletRequest request, Context context)
             throws ServletException
     {
         // Only if the submission item is created can we set its collection
@@ -208,7 +219,7 @@ public class SubmissionInfo extends HashMap
         this.setCollectionHandle(collectionHandle);
 
         // force a reload of the submission process configuration
-        loadSubmissionConfig(request, this, true);
+        loadSubmissionConfig(request, this, true, context);
     }
 
     /**
@@ -450,10 +461,13 @@ public class SubmissionInfo extends HashMap
      * @param forceReload
      *            If true, this method reloads from scratch (and overwrites
      *            cached progress bar info)
+     * @param context
+     * 			  current DSpace context
+     * @throws SQLException 
      * 
      */
     private static void loadProgressBar(HttpServletRequest request,
-            SubmissionInfo subInfo, boolean forceReload)
+            SubmissionInfo subInfo, boolean forceReload, Context context) throws SQLException
     {
         Map<String, String> progressBarInfo = null;
 
@@ -480,9 +494,10 @@ public class SubmissionInfo extends HashMap
             // loop through all steps
             for (int i = 0; i < subInfo.submissionConfig.getNumberOfSteps(); i++)
             {
-                // get the current step info
-                SubmissionStepConfig currentStep = subInfo.submissionConfig
-                        .getStep(i);
+              // get the current step info
+              SubmissionStepConfig currentStep = subInfo.submissionConfig
+                      .getStep(i);
+              if(canExecuteStep(currentStep, subInfo.getSubmissionItem(), context)) {
                 String stepNumber = Integer.toString(currentStep
                         .getStepNumber());
                 String stepHeading = currentStep.getHeading();
@@ -527,6 +542,7 @@ public class SubmissionInfo extends HashMap
                                 stepHeading);
                     }// end for each page
                 }
+              }
             }// end for each step
 
             log.debug("Loaded Progress Bar Info from scratch: "
@@ -589,10 +605,12 @@ public class SubmissionInfo extends HashMap
      * @param forceReload
      *            If true, this method reloads from scratch (and overwrites
      *            cached SubmissionConfig)
+     * @param context
+     * 			  current DSpace context
      * 
      */
     private static void loadSubmissionConfig(HttpServletRequest request,
-            SubmissionInfo subInfo, boolean forceReload)
+            SubmissionInfo subInfo, boolean forceReload, Context context)
             throws ServletException
     {
 
@@ -619,16 +637,24 @@ public class SubmissionInfo extends HashMap
                     subInfo.submissionConfig, subInfo.getCollectionHandle(),
                     subInfo.isInWorkflow());
 
-            // also must force reload Progress Bar info,
-            // since it's based on the Submission config
-            loadProgressBar(request, subInfo, true);
+            try {
+            	// also must force reload Progress Bar info,
+            	// since it's based on the Submission config
+				loadProgressBar(request, subInfo, true, context);
+			} catch (SQLException e) {
+				throw new ServletException(e);
+			}
         }
         else
         {
             log.debug("Found Submission Config in session cache!");
 
-            // try and reload progress bar from cache
-            loadProgressBar(request, subInfo, false);
+            try {
+            	// try and reload progress bar from cache
+				loadProgressBar(request, subInfo, false, context);
+			} catch (SQLException e) {
+				throw new ServletException(e);
+			}
         }
     }
 
@@ -697,6 +723,36 @@ public class SubmissionInfo extends HashMap
         {
             return null;
         }
+    }
+    
+    /**
+	 * Determines if a certain step can be executed, depending in its scope and the current user permissions. 
+	 * An scope is a permission (denied or not) that defines if an step must be executed by the current user. 
+	 * An user can execute a certain step  if it comply with the permission expression over the current item in submission.
+	 *
+	 * @param step
+	 * 			the step to ask for execution
+	 * @param subItem
+	 * 			the item being submitted
+	 * @param context
+	 * 			current DSpace context
+	 *
+	 * @return true if the current user can execute the specified step
+	 * @throws SQLException when some database operation failed.
+	 */
+    public static boolean canExecuteStep(SubmissionStepConfig step, InProgressSubmission subItem, Context context) throws SQLException{
+    	int actionID = Constants.getActionID(step.getScope());
+    	String collectionHandle = subItem.getCollection().getHandle();
+    	if(actionID != -1) {
+    		//Detect if we have the specified permission of action over the owner of the Item being submitted.
+    		Collection inSubmissionCollection = (Collection)HandleManager.resolveToObject(context, collectionHandle);
+    		boolean isAuthorized = AuthorizeManager.authorizeActionBoolean(context, inSubmissionCollection, actionID, true);
+    		return (step.isDenyScope())
+    					? !isAuthorized //If is denied...
+    					: isAuthorized; //if not...
+    	}
+    	//If nothing else stop it, then allow the scope execution...
+    	return true;
     }
     
 }

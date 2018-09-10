@@ -8,7 +8,14 @@
 package org.dspace.app.util;
 
 import java.util.Map;
+
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Item;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+
 import java.io.Serializable;
+import java.sql.SQLException;
 
 /**
  * Class representing configuration for a single step within an Item Submission
@@ -42,6 +49,17 @@ public class SubmissionStepConfig implements Serializable
      * <step-definitions> section)
      */
     private String id = null;
+    
+    /**
+     * The scope where this step can be executed (i.e. a step can be executed 
+     * when current user has ADMIN permission over the item being processed...).
+     */
+    private String scope = null;
+    
+    /**
+     * Determine if the current scope expression must be denied or not.
+     */
+    private boolean denyScope = false;
 
     /** the heading for this step */
     private String heading = null;
@@ -96,6 +114,16 @@ public class SubmissionStepConfig implements Serializable
         {
             workflowEditable = Boolean.parseBoolean(wfEditString);
         }
+        
+        String tmpScope = stepMap.get("scope");
+        if (tmpScope != null && tmpScope.length() > 0) {
+        	tmpScope = tmpScope.trim();
+        	if(tmpScope.startsWith("!")) {
+        		denyScope = true;
+        		tmpScope = tmpScope.substring(1).trim();
+        	} //By the default, the scope is not denied...
+        	scope = tmpScope;
+        }
     }
 
     /**
@@ -109,8 +137,24 @@ public class SubmissionStepConfig implements Serializable
     {
         return id;
     }
+    
+	/**
+	 * Get the scope of this step.
+	 * @return the scope
+	 */
+	public String getScope() {
+		return scope;
+	}
 
-    /**
+	/**
+	 * Returns true if the scope condi.
+	 * @return the denyScope
+	 */
+	public boolean isDenyScope() {
+		return denyScope;
+	}
+
+	/**
      * Get the heading for this step. This can either be a property from
      * Messages.properties, or the actual heading text. If this "heading"
      * contains a period(.) it is assumed to reference Messages.properties.
