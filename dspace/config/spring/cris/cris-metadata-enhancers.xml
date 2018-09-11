@@ -71,6 +71,9 @@
 				<entry key="fundingProgram">
 					<value>fundingProgram</value>
 				</entry>
+				<entry key="openAire">
+					<value>openaireid</value>
+				</entry>
 			</map>
 		</property>
 	</bean>	

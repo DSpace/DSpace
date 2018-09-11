@@ -147,6 +147,11 @@
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='source']/doc:element/doc:element/doc:field[@name='value']">
 				<dc:source><xsl:value-of select="." /></dc:source>
 			</xsl:for-each>
+			<!-- dc.relation Project OpenAire -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='crisitem']/doc:element[@name='project']/doc:element[@name='openAire']/doc:field[@name='value']">
+				<dc:relation><xsl:value-of select="." /></dc:relation>
+			</xsl:for-each>
+			
 		</oai_dc:dc>
 	</xsl:template>
 </xsl:stylesheet>

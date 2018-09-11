@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 //Results of first page
@@ -41,11 +42,15 @@ public class OpenAIREProjectService {
 	public static final String PROJECT_CODE="code";
 
 	public static final String PROJECT_FUNDING_PROGRAM = "fundingProgram";
+	
+	public static final String PROJECT_OPENAIRE_ID = "openaireid";
 
 	public static final String PROJECT_TITLE = "title";
 
 	public static final String QUERY_FIELD_ID = "grantID";
-	public static final String QUERY_FIELD_NAME = "name";
+	public static final String QUERY_FIELD_NAME = "keywords";
+	
+	public static final String OPENAIRE_INFO_PREFIX = "info:eu-repo/grantAgreement/";
 
 	public List<OpenAireProject> getProjects(String field, String text, int start, int max) {
 		if (client == null) {
@@ -150,7 +155,11 @@ public class OpenAIREProjectService {
 				result.add(pj);
 			}
 
-		} catch (URISyntaxException | IOException e) {
+		} catch (URISyntaxException e ) {
+			log.error(e.getMessage(), e);
+		}catch ( IOException e) {
+			log.error(e.getMessage(), e);
+		}catch (JSONException e) {
 			log.error(e.getMessage(), e);
 		}
 		return result;

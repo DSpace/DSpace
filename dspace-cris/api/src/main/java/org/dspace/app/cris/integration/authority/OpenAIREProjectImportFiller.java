@@ -100,6 +100,8 @@ public class OpenAIREProjectImportFiller extends ItemMetadataImportFiller {
 		} catch (SearchServiceException e) {
 			log.warn(e.getMessage());
 		}
+		String openAireid= OpenAIREProjectService.OPENAIRE_INFO_PREFIX+fundName+"/"+fundingProgram+"/"+code;
+		ResearcherPageUtils.buildTextValue(project, openAireid, OpenAIREProjectService.PROJECT_OPENAIRE_ID);
 		applicationService.saveOrUpdate(Project.class, project);
 	}
 }
