@@ -707,38 +707,29 @@ public class JournalUtils {
 
         JsonNode dateNode = jsonNode.path("issued");
         if (!dateNode.isMissingNode()) {
-            //2016-04-11T17:53:39Z
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date today = new Date();
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(today);
+            Calendar today = new GregorianCalendar();
+            today.setTime(new Date());
+
+            // Assume that any unspecified portion of the date is equivalent to today,
+            // e.g. if it's October 26, 2018, and the json date says Sept 2017, assume that Sept 26, 2017 is the date.
+            // This way, if the json date says Oct 2018, we would agree that Oct 26, 2018, is not in the future,
+            // but if the json date says Nov 2018, we would agree that Nov 26, 2018, is in the future.
+            Calendar msDate = new GregorianCalendar();
+            msDate.setTime(new Date());
+
             try {
                 JsonNode dateParts = dateNode.path("date-parts").get(0);
-                int year = dateParts.get(0).asInt();
-                if (year > calendar.get(Calendar.YEAR)) {
-                    throw new RESTModelException("CrossRef match has publication date in the future: " + year);
-                }
-                int month = 12;
+                msDate.set(Calendar.YEAR, dateParts.get(0).asInt());
                 if (dateParts.has(1)) {
-                    month = dateParts.get(1).asInt();
-                    if (month > calendar.get(Calendar.MONTH)) {
-                        throw new RESTModelException("CrossRef match has publication date in the future: " + year + "-" + month);
-                    }
+                    msDate.set(Calendar.MONTH, dateParts.get(1).asInt() - 1); // Calendar month is 0-based
                 }
-                int day = 1;
                 if (dateParts.has(2)) {
-                    day = dateParts.get(2).asInt();
-                    if (day > calendar.get(Calendar.DATE)) {
-                        throw new RESTModelException("CrossRef match has publication date in the future: " + year + "-" + month + "-" + day);
-                    }
-                } else {
-                    // adjust to the end of the month, if necessary:
-                    LocalDate date = LocalDate.of(year, month, day);
-                    date = date.with(lastDayOfMonth());
-                    day = date.getDayOfMonth();
+                    msDate.set(Calendar.DATE, dateParts.get(2).asInt());
                 }
-                Date date = dateFormat.parse(year + "-" + month + "-" + day);
-                manuscript.setPublicationDate(date);
+                if (msDate.after(today)) {
+                    throw new RESTModelException("CrossRef match has publication date in the future: " + msDate.get(Calendar.YEAR) + "-" + msDate.get(Calendar.MONTH) + "-" + msDate.get(Calendar.DATE));
+                }
+                manuscript.setPublicationDate(msDate.getTime());
             } catch (Exception e) {
                 log.error("exception calculating date: " + e.getClass().getName() + ", " + e.getMessage());
             }
