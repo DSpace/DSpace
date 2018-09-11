@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<dspace-dc-types>
+
+  <!-- Date a data package was successfully transferred to DASH -->
+    <dc-type>
+        <schema>dryad</schema>
+        <element>dashTransferDate</element>
+    </dc-type>
+
+</dspace-dc-types>
