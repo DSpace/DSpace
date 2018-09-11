@@ -28,6 +28,7 @@ public class SubmissionFormFieldRest {
     private SubmissionFormInputTypeRest input;
     private ScopeEnum scope;
     private SubmissionVisibilityRest visibility;
+
     private String label;
     private boolean mandatory;
     private boolean repeatable;
@@ -121,4 +122,5 @@ public class SubmissionFormFieldRest {
             this.visibility = visibility;
         }
     }
+
 }
