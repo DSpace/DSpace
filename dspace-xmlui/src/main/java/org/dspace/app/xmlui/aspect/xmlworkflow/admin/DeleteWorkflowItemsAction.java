@@ -25,6 +25,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.XmlWorkflowServiceImpl;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
@@ -56,13 +57,16 @@ public class DeleteWorkflowItemsAction extends AbstractAction {
         }
 
         int[] workflowIdentifiers = Util.getIntParameters(request, "workflow_id");
+        WorkflowRequirementsService workflowRequirementsService=XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService();
+
         if(workflowIdentifiers != null){
             for (int workflowIdentifier : workflowIdentifiers) {
                 XmlWorkflowItem workflowItem = xmlWorkflowItemService.find(context, workflowIdentifier);
                 if (workflowItem != null) {
-                    WorkspaceItem workspaceItem = xmlWorkflowService.sendWorkflowItemBackSubmission(context, workflowItem, context.getCurrentUser(), "Item sent back to the submisson process by admin", null);
-                    //Delete the workspaceItem
-                    workspaceItemService.deleteAll(context, workspaceItem);
+                    //Remove references from 'cwf_in_progress_user'
+                    workflowRequirementsService.clearInProgressUsers(context, workflowItem);
+                    //Delete workflow item
+                    xmlWorkflowItemService.delete(context, workflowItem);
                 }
             }
         }
