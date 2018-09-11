@@ -4,10 +4,11 @@
  <!ELEMENT input-forms (form-definitions, form-value-pairs) >
 
  <!ELEMENT form-definitions (form)+ >
- <!ELEMENT form (field)+ >
+ <!ELEMENT form (row)+ >
+ <!ELEMENT row (field)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
  
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
@@ -16,6 +17,7 @@
  
  <!ELEMENT repeatable (#PCDATA) >
  <!ELEMENT label (#PCDATA) >
+ <!ELEMENT style (#PCDATA) >
  <!ELEMENT input-type (#PCDATA)>
   
  <!ELEMENT hint (#PCDATA) >

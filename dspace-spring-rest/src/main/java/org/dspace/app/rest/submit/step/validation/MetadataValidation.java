@@ -55,43 +55,46 @@ public class MetadataValidation extends AbstractValidation {
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
 
         DCInputSet inputConfig = getInputReader().getInputsByFormName(config.getId());
-        for (DCInput input : inputConfig.getFields()) {
+        for (DCInput[] row : inputConfig.getFields()) {
+            for (DCInput input : row) {
+                String fieldKey =
+                    metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(), input.getQualifier());
+                boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
 
-            String fieldKey = metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(),
-                                                                    input.getQualifier());
-            boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
-
-            List<String> fieldsName = new ArrayList<String>();
-            if (input.isQualdropValue()) {
-                for (Object qualifier : input.getPairs()) {
-                    fieldsName.add(input.getFieldName() + "." + (String) qualifier);
-                }
-            } else {
-                fieldsName.add(input.getFieldName());
-            }
-
-            for (String fieldName : fieldsName) {
-                List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
-                for (MetadataValue md : mdv) {
-                    if (!(input.validate(md.getValue()))) {
-                        addError(ERROR_VALIDATION_REGEX, "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
-                            + config.getId() + "/" + input.getFieldName() + "/" + md.getPlace());
+                List<String> fieldsName = new ArrayList<String>();
+                if (input.isQualdropValue()) {
+                    for (Object qualifier : input.getPairs()) {
+                        fieldsName.add(input.getFieldName() + "." + (String) qualifier);
                     }
-                    if (isAuthorityControlled) {
-                        String authKey = md.getAuthority();
-                        if (metadataAuthorityService.isAuthorityRequired(fieldKey) && StringUtils.isNotBlank(authKey)) {
-                            addError(ERROR_VALIDATION_AUTHORITY_REQUIRED,
-                                     "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId()
-                                         + "/" + input.getFieldName() + "/" + md.getPlace());
+                } else {
+                    fieldsName.add(input.getFieldName());
+                }
+
+                for (String fieldName : fieldsName) {
+                    List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
+                    for (MetadataValue md : mdv) {
+                        if (!(input.validate(md.getValue()))) {
+                            addError(ERROR_VALIDATION_REGEX,
+                                "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                input.getFieldName() + "/" + md.getPlace());
+                        }
+                        if (isAuthorityControlled) {
+                            String authKey = md.getAuthority();
+                            if (metadataAuthorityService.isAuthorityRequired(fieldKey) &&
+                                StringUtils.isNotBlank(authKey)) {
+                                addError(ERROR_VALIDATION_AUTHORITY_REQUIRED,
+                                    "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() +
+                                    "/" + input.getFieldName() + "/" + md.getPlace());
+                            }
                         }
                     }
-                }
-
-                if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
-                    // since this field is missing add to list of error
-                    // fields
-                    addError(ERROR_VALIDATION_REQUIRED, "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
-                        + config.getId() + "/" + input.getFieldName());
+                    if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
+                        // since this field is missing add to list of error
+                        // fields
+                        addError(ERROR_VALIDATION_REQUIRED,
+                            "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                            input.getFieldName());
+                    }
                 }
             }
         }

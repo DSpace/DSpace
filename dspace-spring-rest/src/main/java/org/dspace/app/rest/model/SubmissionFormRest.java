@@ -23,7 +23,7 @@ public class SubmissionFormRest extends BaseObjectRest<String> {
 
     private String name;
 
-    private List<SubmissionFormFieldRest> fields;
+    private List<SubmissionFormRowRest> rows;
 
     @Override
     public String getId() {
@@ -53,11 +53,11 @@ public class SubmissionFormRest extends BaseObjectRest<String> {
         return CATEGORY;
     }
 
-    public List<SubmissionFormFieldRest> getFields() {
-        return fields;
+    public List<SubmissionFormRowRest> getRows() {
+        return rows;
     }
 
-    public void setFields(List<SubmissionFormFieldRest> fields) {
-        this.fields = fields;
+    public void setRows(List<SubmissionFormRowRest> rows) {
+        this.rows = rows;
     }
 }
