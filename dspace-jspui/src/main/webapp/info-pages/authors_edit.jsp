@@ -125,6 +125,7 @@
 
                     requestParameters.putAll(newValueNames
                             .stream()
+                            .filter(item -> Objects.nonNull(row.getStringColumn(item)))
                             .collect(Collectors.toMap(item -> item, row::getStringColumn)));
                 } finally {
                     if (tri != null)
