@@ -29,13 +29,13 @@ public class RequestItemConverter
     @Autowired(required=true)
     protected BitstreamConverter bitstreamConverter;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected ItemConverter itemConverter;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected RequestItemService requestItemService;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected RequestService requestService;
 
     @Override
