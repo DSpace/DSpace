@@ -8,7 +8,6 @@
 package org.dspace.app.rest.model;
 
 import java.util.Date;
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,6 +16,7 @@ import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Represent a user's request for a copy of an Item.
@@ -31,10 +31,10 @@ public class RequestItemRest
 
     public static final String CATEGORY = RestAddressableModel.TOOLS;
 
-    @Inject
+    @Autowired(required=true)
     private BitstreamConverter bitstreamConverter;
 
-    @Inject
+    @Autowired(required=true)
     private ItemConverter itemConverter;
 
     protected BitstreamRest bitstream;
