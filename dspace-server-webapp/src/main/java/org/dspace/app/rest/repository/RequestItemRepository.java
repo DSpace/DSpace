@@ -35,10 +35,10 @@ public class RequestItemRepository
         extends DSpaceRestRepository<RequestItemRest, String> {
     private static final Logger LOG = LoggerFactory.getLogger(RequestItemRepository.class);
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected RequestItemService requestItemService;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected RequestItemConverter requestItemConverter;
 
     @Override
