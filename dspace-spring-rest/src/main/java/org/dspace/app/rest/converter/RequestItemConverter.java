@@ -11,6 +11,7 @@ package org.dspace.app.rest.converter;
 import java.sql.SQLException;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -67,22 +68,26 @@ public class RequestItemConverter
     public RequestItem toModel(RequestItemRest obj) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
         Context context = ContextUtil.obtainContext(request);
-        String token = null;
-        try {
-            token = requestItemService.createRequest(context,
-                    obj.getBitstream(),
-                    obj.getItem(),
-                    obj.isAllfiles(),
-                    obj.getReqEmail(),
-                    obj.getReqName(),
-                    obj.getReqMessage());
-        } catch (SQLException ex) {
-            LOG.error(ex.getMessage(), ex);
-        }
+
+        // Did we receive a token?  That is:  are we updating an existing request?
+        String token = obj.getToken();
+        if (StringUtils.isBlank(token)) { // No token, so create a new request.
+            try {
+                token = requestItemService.createRequest(context,
+                        obj.getBitstream(),
+                        obj.getItem(),
+                        obj.isAllfiles(),
+                        obj.getReqEmail(),
+                        obj.getReqName(),
+                        obj.getReqMessage());
+            } catch (SQLException ex) {
+                LOG.error(ex.getMessage(), ex);
+            }
+        } // Otherwise (we have a token) this is updating an existing request.
+
         RequestItem requestItem = requestItemService.findByToken(context, token);
         requestItem.setAccept_request(obj.isAcceptRequest());
         requestItem.setDecision_date(obj.getDecisionDate());
         return requestItem;
     }
-
 }
