@@ -744,7 +744,7 @@ public class SubmissionInfo extends HashMap
     	int actionID = Constants.getActionID(step.getScope());
     	String collectionHandle = subItem.getCollection().getHandle();
     	if(actionID != -1) {
-    		//Detect if we have the specified permission of action over the owner of the Item being submitted.
+    		//Detect if we have the specified permission of action over the owner collection of the Item being submitted.
     		Collection inSubmissionCollection = (Collection)HandleManager.resolveToObject(context, collectionHandle);
     		boolean isAuthorized = AuthorizeManager.authorizeActionBoolean(context, inSubmissionCollection, actionID, true);
     		return (step.isDenyScope())

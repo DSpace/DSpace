@@ -121,7 +121,7 @@ public class SubmissionStepConfig implements Serializable
         	if(tmpScope.startsWith("!")) {
         		denyScope = true;
         		tmpScope = tmpScope.substring(1).trim();
-        	} //By the default, the scope is not denied...
+        	}
         	scope = tmpScope;
         }
     }
@@ -147,7 +147,7 @@ public class SubmissionStepConfig implements Serializable
 	}
 
 	/**
-	 * Returns true if the scope condi.
+	 * Returns true if the scope condition is denied (specified with the "!" symbol).
 	 * @return the denyScope
 	 */
 	public boolean isDenyScope() {
