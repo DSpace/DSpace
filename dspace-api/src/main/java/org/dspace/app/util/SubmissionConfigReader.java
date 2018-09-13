@@ -503,8 +503,7 @@ public class SubmissionConfigReader
                         if (stepScope != null && stepScope.length() > 0)
                         {
                             //If the "scope" attribute exists, then copy the stepInfo Map to avoid modifying the original declaration of the step in the step-definitions section.
-                            HashMap<String, String> stepInfoCopy = new HashMap<String,String>(stepInfo);
-                            stepInfo = stepInfoCopy;
+                            stepInfo = new HashMap<String,String>(stepInfo);
                             stepInfo.put("scope", stepScope);
                         }
 
