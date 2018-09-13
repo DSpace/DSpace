@@ -9,7 +9,6 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.dspace.app.requestitem.RequestItem;
@@ -22,6 +21,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -35,10 +35,10 @@ public class RequestItemRepository
         extends DSpaceRestRepository<RequestItemRest, String> {
     private static final Logger LOG = LoggerFactory.getLogger(RequestItemRepository.class);
 
-    @Inject
+    @Autowired(required=true)
     protected RequestItemService requestItemService;
 
-    @Inject
+    @Autowired(required=true)
     protected RequestItemConverter requestItemConverter;
 
     @Override

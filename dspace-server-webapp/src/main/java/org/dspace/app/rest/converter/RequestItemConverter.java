@@ -8,16 +8,14 @@
 
 package org.dspace.app.rest.converter;
 
-import java.sql.SQLException;
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.services.RequestService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Convert between {@link org.dspace.app.requestitem.RequestItem} and
@@ -28,16 +26,16 @@ import org.dspace.services.RequestService;
 @Named
 public class RequestItemConverter
         implements DSpaceConverter<RequestItem, RequestItemRest> {
-    @Inject
+    @Autowired(required=true)
     protected BitstreamConverter bitstreamConverter;
 
-    @Inject
+    @Autowired(required=true)
     protected ItemConverter itemConverter;
 
-    @Inject
+    @Autowired(required=true)
     protected RequestItemService requestItemService;
 
-    @Inject
+    @Autowired(required=true)
     protected RequestService requestService;
 
     @Override
