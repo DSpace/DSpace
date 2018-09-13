@@ -31,10 +31,10 @@ public class RequestItemRest
 
     public static final String CATEGORY = RestAddressableModel.TOOLS;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     private BitstreamConverter bitstreamConverter;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     private ItemConverter itemConverter;
 
     protected BitstreamRest bitstream;

@@ -11,8 +11,8 @@ package org.dspace.app.rest.converter;
 import java.sql.SQLException;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.model.RequestItemRest;
@@ -34,16 +34,16 @@ public class RequestItemConverter
         extends DSpaceConverter<RequestItem, RequestItemRest> {
     private static final Logger LOG = LoggerFactory.getLogger(RequestItemConverter.class);
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected BitstreamConverter bitstreamConverter;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected ItemConverter itemConverter;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected RequestItemService requestItemService;
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     protected RequestService requestService;
 
     @Override
