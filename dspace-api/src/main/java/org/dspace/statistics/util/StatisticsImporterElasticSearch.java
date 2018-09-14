@@ -7,8 +7,13 @@
  */
 package org.dspace.statistics.util;
 
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
+import java.io.*;
+import java.net.InetAddress;
+
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.model.CityResponse;
+
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
@@ -24,21 +29,16 @@ import org.dspace.statistics.SolrLogger;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.Client;
-
 import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 
-
-import java.io.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
-
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Class to load intermediate statistics files (produced from log files by <code>ClassicDSpaceLogConverter</code>) into Elastic Search
@@ -56,7 +56,7 @@ public class StatisticsImporterElasticSearch {
     //TODO ES Client
 
     /** GEOIP lookup service */
-    private static LookupService geoipLookup;
+    private static DatabaseReader geoipLookup;
 
     /** Metadata storage information */
     private static Map<String, String> metadataStorageInfo;
@@ -107,8 +107,8 @@ public class StatisticsImporterElasticSearch {
             String continent = "";
             String country = "";
             String countryCode = "";
-            float longitude = 0f;
-            float latitude = 0f;
+            double longitude = 0f;
+            double latitude = 0f;
             String city = "";
             String dns;
 
@@ -176,15 +176,15 @@ public class StatisticsImporterElasticSearch {
                 }
 
                 // Get the geo information for the user
-                Location location;
                 try {
-                    location = geoipLookup.getLocation(ip);
-                    city = location.city;
-                    country = location.countryName;
-                    countryCode = location.countryCode;
-                    longitude = location.longitude;
-                    latitude = location.latitude;
-                    if(verbose) {
+                    InetAddress ipAddress = InetAddress.getByName(ip);
+                    CityResponse cityResponse = geoipLookup.city(ipAddress);
+                    city = cityResponse.getCity().getName();
+                    country = cityResponse.getCountry().getName();
+                    countryCode = cityResponse.getCountry().getIsoCode();
+                    longitude = cityResponse.getLocation().getLongitude();
+                    latitude = cityResponse.getLocation().getLatitude();
+                    if (verbose) {
                         data += (", country = " + country);
                         data += (", city = " + city);
                         System.out.println(data);
@@ -198,7 +198,7 @@ public class StatisticsImporterElasticSearch {
                         }
                         continue;
                     }
-                } catch (Exception e) {
+                } catch (GeoIp2Exception | IOException e) {
                     // No problem - just can't look them up
                 }
 
@@ -386,20 +386,22 @@ public class StatisticsImporterElasticSearch {
         // Verbose option
         boolean verbose = line.hasOption('v');
 
-        String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
-        try
-        {
-            geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
+        String dbPath = ConfigurationManager.getProperty("usage-statistics", "dbfile");
+        try {
+            File dbFile = new File(dbPath);
+            geoipLookup = new DatabaseReader.Builder(dbFile).build();
+        } catch (FileNotFoundException fe) {
+            log.error(
+                "The GeoLite Database file is missing (" + dbPath + ")! ElasticSearch Statistics cannot generate location " +
+                    "based reports! Please see the DSpace installation instructions for instructions to install this " +
+                    "file.",
+                fe);
+        } catch (IOException e) {
+            log.error(
+                "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the DSpace " +
+                    "installation instructions for more details.",
+                e);
         }
-        catch (FileNotFoundException fe)
-        {
-            log.error("The GeoLite Database file is missing (" + dbfile + ")! Elastic Search  Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
-        }
-        catch (IOException e)
-        {
-            log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
-        }
-
 
         StatisticsImporterElasticSearch elasticSearchImporter = new StatisticsImporterElasticSearch();
         if (line.hasOption('m'))

@@ -1,0 +1,5 @@
+.git/
+.idea/
+.settings/
+*/target/
+dspace/modules/*/target/

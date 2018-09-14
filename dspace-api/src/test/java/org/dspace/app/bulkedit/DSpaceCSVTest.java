@@ -44,8 +44,9 @@ public class DSpaceCSVTest extends AbstractUnitTest
                             "2,2,Two authors,\"Lewis, Stuart||Bloggs, Joe\",Two people wrote this item",
                             "3,2,Three authors,\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\",Three people wrote this item",
                             "4,2,\"Two line\ntitle\",\"Lewis, Stuart\",abstract",
-                            "5,2,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",
-                            "6,2,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",};
+                            "5,2,\"Empty lines\n\nshould work too (DS-3245).\",\"Lewis, Stuart\",abstract",
+                            "6,2,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",
+                            "7,2,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",};
             // Write the string to a file
             String filename = "test.csv";
             BufferedWriter out = new BufferedWriter(
@@ -61,7 +62,7 @@ public class DSpaceCSVTest extends AbstractUnitTest
             // Test the CSV parsing was OK
             DSpaceCSV dcsv = new DSpaceCSV(new File(filename), context);
             String[] lines = dcsv.getCSVLinesAsStringArray();
-            assertThat("testDSpaceCSV Good CSV", lines.length, equalTo(7));
+            assertThat("testDSpaceCSV Good CSV", lines.length, equalTo(8));
 
             // Check the new lines are OK
             List<DSpaceCSVLine> csvLines = dcsv.getCSVLines();
@@ -99,7 +100,7 @@ public class DSpaceCSVTest extends AbstractUnitTest
                 assertThat("testDSpaceCSV Bad heading CSV", e.getMessage(), equalTo("Unknown metadata element in column 4: dc.contributor.foobar"));
             }
             lines = dcsv.getCSVLinesAsStringArray();
-            assertThat("testDSpaceCSV Good CSV", lines.length, equalTo(7));
+            assertThat("testDSpaceCSV Good CSV", lines.length, equalTo(8));
 
 
             // Test the CSV parsing with a bad heading schema value

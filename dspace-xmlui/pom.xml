@@ -11,7 +11,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>5.9-SNAPSHOT</version>
+      <version>5.10-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -211,6 +211,13 @@
             <artifactId>yuicompressor</artifactId>
             <version>2.3.6</version>
         </dependency>
+
+        <!--Latest spring version requires an up to date jackson core -->
+        <dependency>
+        	<groupId>com.fasterxml.jackson.core</groupId>
+        	<artifactId>jackson-core</artifactId>
+        </dependency>
+
         <!-- Needed for Form Validation -->
         <dependency>
             <groupId>commons-validator</groupId>
