@@ -17,6 +17,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.services.model.Event;
 import org.dspace.usage.AbstractUsageEventListener;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -109,11 +111,29 @@ class GoogleRunnable implements Runnable {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("v", "1"));
         nvps.add(new BasicNameValuePair("tid", analyticsKey));
-        nvps.add(new BasicNameValuePair("cid", "999"));
+
+        // Client Id, should uniquely identify the user or device. If we have a session id for the user
+        // then lets use it, else generate a UUID.
+        if(ue.getRequest().getSession(false) != null) {
+            nvps.add(new BasicNameValuePair("cid", ue.getRequest().getSession().getId()));
+
+        } else {
+            nvps.add(new BasicNameValuePair("cid", UUID.randomUUID().toString()));
+        }
         nvps.add(new BasicNameValuePair("t", "event"));
-        nvps.add(new BasicNameValuePair("dp", ue.getRequest().getRequestURI()));
+        nvps.add(new BasicNameValuePair("ua", ue.getRequest().getHeader("USER-AGENT")));
+        nvps.add(new BasicNameValuePair("dr", ue.getRequest().getHeader("referer")));
+        //Sometimes requesturi is null, so replace it with the baseUrl
+        try {
+            nvps.add(new BasicNameValuePair("dp", ue.getRequest().getRequestURI()));
+
+        } catch (NullPointerException e) {
+            log.debug("GoogleAnalyticsWorker, getRequestUri was null:" +e.getMessage());
+            nvps.add(new BasicNameValuePair("dp", ConfigurationManager.getProperty("dspace.baseUrl")));
+        }
         nvps.add(new BasicNameValuePair("ec", "bitstream"));
         nvps.add(new BasicNameValuePair("ea", "download"));
+
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(nvps));
         } catch (UnsupportedEncodingException e) {
@@ -130,6 +150,6 @@ class GoogleRunnable implements Runnable {
             log.debug(e.getMessage());
         }
 
-        log.debug("Posted to Google Analytics - " + ue.getRequest().getRequestURI());
+        log.debug("Posted to Google Analytics");
     }
 }
