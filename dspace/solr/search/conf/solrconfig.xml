@@ -1016,11 +1016,11 @@
          updateRequestProcessorChains that can be used by name 
          on each Update Request
       -->
-    <!--
-       <lst name="defaults">
-         <str name="update.chain">dedupe</str>
-       </lst>
-       -->
+      <lst name="defaults">
+        <!-- Underlying lucene index has a 32kb hard limit, so truncate long fields, so item will not be left unindexed -->
+        <!-- issue: https://issues.apache.org/jira/browse/LUCENE-5472 -->
+        <str name="update.chain">truncateChain</str>
+      </lst>
   </requestHandler>
 
   <!-- for back compat with clients using /update/json and /update/csv -->  
@@ -1829,6 +1829,16 @@
       <processor class="solr.RunUpdateProcessorFactory" />
     </updateRequestProcessorChain>
   -->
+
+  <!-- Truncate a field if it exceeds 7k chars -->
+  <updateRequestProcessorChain name="truncateChain">
+    <processor class="solr.TruncateFieldUpdateProcessorFactory">
+      <str name="typeClass">solr.TextField</str>
+      <int name="maxLength">7000</int>
+    </processor>
+    <processor class="solr.LogUpdateProcessorFactory"/>
+    <processor class="solr.RunUpdateProcessorFactory"/>
+  </updateRequestProcessorChain>
  
   <!-- Response Writers
 
