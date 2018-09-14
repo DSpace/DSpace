@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.UncategorizedSQLException;
 
 /**
  * Component to expose item requests.
@@ -61,7 +62,7 @@ public class RequestItemRepository
                     ri.getReqName(), ri.getReqMessage());
         } catch (SQLException ex) {
             LOG.error("New RequestItem not saved.", ex);
-            // TODO how to inform caller that request was not saved?
+            throw new UncategorizedSQLException("New RequestItem save", null, ex);
         }
         return ri;
     }
