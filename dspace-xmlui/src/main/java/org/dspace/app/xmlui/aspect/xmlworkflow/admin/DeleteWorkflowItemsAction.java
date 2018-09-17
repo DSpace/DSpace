@@ -45,7 +45,6 @@ public class DeleteWorkflowItemsAction extends AbstractAction {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
     protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
 
     @Override
@@ -63,10 +62,7 @@ public class DeleteWorkflowItemsAction extends AbstractAction {
             for (int workflowIdentifier : workflowIdentifiers) {
                 XmlWorkflowItem workflowItem = xmlWorkflowItemService.find(context, workflowIdentifier);
                 if (workflowItem != null) {
-                    //Remove references from 'cwf_in_progress_user'
-                    workflowRequirementsService.clearInProgressUsers(context, workflowItem);
-                    //Delete workflow item
-                    xmlWorkflowItemService.delete(context, workflowItem);
+                    xmlWorkflowService.sendWorkflowItemDelete(context,workflowItem);
                 }
             }
         }

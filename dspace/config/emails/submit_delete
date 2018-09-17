@@ -1,0 +1,15 @@
+# Deletion email message
+#
+# {0}  Title of submission
+# {1}  Name of collection
+#
+Subject: DSpace: Submission Deleted
+
+You submitted: {0}
+
+To collection: {1}
+
+Your submission has been deleted by a system administrator
+
+
+DSpace
