@@ -188,7 +188,7 @@ public class ScriptRetrieveCitation {
 							List<String> eids = doc.getSearchFieldValues(fieldScopusID);
 
 							log.debug(LogManager.getHeader(null, "retrieve_citation_scopus",
-									"lookup pmid:" + pmids + "lookup doi:" + dois + "lookup eid:" + eids));
+									"lookup pmid:" + pmids + ", lookup doi:" + dois + ", lookup eid:" + eids));
 
 							ScopusResponse response = sService.getCitations(sleep, pmids, dois, eids);
 
