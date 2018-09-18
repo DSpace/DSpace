@@ -197,6 +197,27 @@
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item.dateaccessioned">Navegar {0} por fecha de envío</message>
 
 
+
+	<!-- org.dspace.app.xmlui.administrative.WithdrawnItems.java -->
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.title">Withdrawn Items by Title</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.title">Withdrawn Items by Title</message>
+
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateissued">Withdrawn Items by Issue Date</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateissued">Withdrawn Items by Issue Date</message>
+
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateaccessioned">Withdrawn Items by Submit Date</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateaccessioned">Withdrawn Items by Submit Date</message>
+
+	<!-- org.dspace.app.xmlui.administrative.PrivateItems.java -->
+	<message key="xmlui.Administrative.PrivateItems.title.item.title">Private Items by Title</message>
+	<message key="xmlui.Administrative.PrivateItems.trail.item.title">Private Items by Title</message>
+
+	<message key="xmlui.Administrative.PrivateItems.title.item.dateissued">Private Items by Issue Date</message>
+	<message key="xmlui.Administrative.PrivateItems.trail.item.dateissued">Private Items by Issue Date</message>
+
+	<message key="xmlui.Administrative.PrivateItems.title.item.dateaccessioned">Private Items by Submit Date</message>
+	<message key="xmlui.Administrative.PrivateItems.trail.item.dateaccessioned">Private Items by Submit Date</message>
+
 	<!-- org.dspace.app.xmlui.artifactbrowser.CollectionViewer.java -->
 <message key="xmlui.ArtifactBrowser.CollectionViewer.search_scope">Ámbito de búsqueda</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.all_of_dspace">Todo SEDICI</message>
@@ -279,6 +300,7 @@
 <message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">Por fecha de envío</message>
 <message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">Esta colección</message>
 <message key="xmlui.ArtifactBrowser.Navigation.head_this_community">Esta comunidad</message>
+<message key="xmlui.ArtifactBrowser.Navigation.links_browse">Statics pages</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.SimpleSearch.java -->
 <message key="xmlui.ArtifactBrowser.SimpleSearch.title">Buscar</message>
@@ -846,6 +868,11 @@
 <message key="xmlui.Submission.submit.UploadStep.checksum">Verificación de archivo:</message>
 <message key="xmlui.Submission.submit.UploadStep.submit_remove">Eliminar los archivos seleccionados</message>
 
+    <message key="xmlui.Submission.submit.UploadStep.infoEmbargo">
+   <b>Note:</b> If you need that your work keeps temporarily hidden, you may request its embargo by 3, 6, 12, 18 or 24 months starting from the date of presentation of the work.   
+   The UNLP and repository of SEDICI fervently support the open access to the scientific-academic production and therefore <b>RECCOMEND NOT</b> apply this restriction unless it results strictly needed for pending patents, confidenciality conveins and similar situations. Have in mind that the deposit of your thesis into the repository not allow you to do derived publications with quality of inedit; a derived work is NOT the original work.
+   <br/>To apply this restriction, you will must attach over this step a note of embargo request that properly justify the request (see model <a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2015/12/Modelo-nota-de-embargo.doc">Here</a>).
+   </message>
 
 
 <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Subir Archivo(s)</message>
@@ -1517,6 +1544,7 @@
 <message key="xmlui.administrative.item.general.option_view">Ver ítem</message>
 <message key="xmlui.administrative.item.general.option_curate">Curar</message>
 <message key="xmlui.administrative.item.general.option_queue">Encolar</message>
+    <message key="xmlui.administrative.item.AddBitstreamForm.bundle.CC_LICENSE">Creative Commons licences</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.AddBitstreamForm -->
 <message key="xmlui.administrative.item.AddBitstreamForm.title">Subir archivo</message>
@@ -1534,7 +1562,6 @@
 <message key="xmlui.administrative.item.AddBitstreamForm.description_help">Si lo desea, puede describir brevemente el contenido de este archivo, por ejemplo "<i>Artículo principal</i>", o "<i>Lectura de los datos del documento</i>".</message>
 <message key="xmlui.administrative.item.AddBitstreamForm.submit_upload">Subir  </message>
 <message key="xmlui.administrative.item.AddBitstreamForm.no_bundles">Necesita los privilegios AÑADIR y ESCRIBIR  en al menos un bloque para poder cargar nuevos archivos.</message>
-<message key="xmlui.administrative.item.AddBitstreamForm.bundle.CC-LICENSE">Licencia de Creative Commons</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.DeleteBitstreamConfirm -->
 <message key="xmlui.administrative.item.DeleteBitstreamConfirm.title">Confirmar borrado</message>
@@ -2096,7 +2123,9 @@ Para asignar un item a esta colección, cerciórese de estar en la colección co
 <message key="xmlui.statistics.visits.cities">Ciudades con más visualizaciones</message>
 <message key="xmlui.statistics.visits.bitstreams">Visitas al archivo</message>
 <message key="xmlui.statistics.Navigation.title">Estadísticas</message>
+    <message key="xmlui.statistics.Navigation.view">View Statistics</message>
 <message key="xmlui.statistics.Navigation.usage.view">Ver Estadísticas de uso</message>
+    <message key="xmlui.statistics.Navigation.usage-Elasticsearch.view">View Usage Statistics</message>
 <message key="xmlui.statistics.Navigation.search.view">Ver Estadísticas de Búsquedas</message>
 <message key="xmlui.statistics.Navigation.workflow.view">Ver Estadísticas del flujo de trabajo</message>
 <message key="xmlui.statistics.trail">Estadísticas</message>
@@ -2410,14 +2439,30 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.presentation">OpenOffice Impress</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.spreadsheet">OpenOffice Calc</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.text">OpenOffice Writer</message>
-<message key="xmlui.dri2xhtml.mimetype.application/vnd.openxmlformats-officedocument.presentationml.presentation">Microsoft PowerPoint 2007</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.chart">OpenOffice Chart</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.graphics-template">OpenOffice Draw Template</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.image">OpenOffice Image</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.presentation-template">OpenOffice Impress Template</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.spreadsheet-template">OpenOffice Calc Template</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.text-master">OpenOffice Master Document</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.text-template">OpenOffice Writer Template</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.opendocument.text-web">OpenOffice Web Page Template</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.openofficeorg.extension">OpenOffice.org extension</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.openxmlformats-officedocument.presentationml.presentation">Microsoft PowerPoint 2007</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">Microsoft Excel 2007</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.openxmlformats-officedocument.wordprocessingml.document">Microsoft Word 2007</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.calc">OpenOffice Calc (1.x)</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.draw">OpenOffice Draw (1.x)</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.impress">OpenOffice Impress (1.x)</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.writer.global">OpenOffice Writer (1.x)</message>
-<message key="xmlui.dri2xhtml.mimetype.application/vnd.visio">Microsoft Visio</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.calc.template">OpenOffice Calc template (1.x)</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.draw.template">OpenOffice Draw template (1.x)</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.impress.template">OpenOffice Impress template (1.x)</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.math">OpenOffice Math (1.x)</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.writer">OpenOffice Writer (1.x)</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.writer.template">OpenOffice Writer template (1.x)</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/x-shockwave-flash">Shockwave Flash</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.visio">Microsoft Visio</message>
 <message key="xmlui.dri2xhtml.mimetype.application/wordperfect5.1">WordPerfect</message>
 <message key="xmlui.dri2xhtml.mimetype.application/x-dvi">TeX DVI</message>
 <message key="xmlui.dri2xhtml.mimetype.application/x-filemaker">FileMaker Pro</message>
@@ -2425,6 +2470,8 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.dri2xhtml.mimetype.application/x-latex">LaTeX</message>
 <message key="xmlui.dri2xhtml.mimetype.application/x-photoshop">Photoshop</message>
 <message key="xmlui.dri2xhtml.mimetype.application/x-tex">TeX</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/epub">ePub</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/mobi">MOBI</message>
 
   <!-- Audio-based formats -->
 <message key="xmlui.dri2xhtml.mimetype.audio/basic">Basic Audio</message>
@@ -2605,7 +2652,7 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.aspect.sherpa.submission.blue">azul</message>
 <message key="xmlui.aspect.sherpa.submission.white">blanco</message>
 <message key="xmlui.aspect.sherpa.submission.yellow">amarillo</message>
-
+<message key="xmlui.aspect.sherpa.submission.gray">gray</message>
     <!-- End Versioning -->
 
 
@@ -2953,7 +3000,7 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview">Revisión </message>
 <message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.editaction">Revisión SEDICI</message>
-<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.selectcollectionction">Seleccione una colección</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.selectcollectionaction">Seleccione una colección</message>
 
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview">Revisión Local</message>
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.claimaction">Revisión Local</message>
@@ -2961,7 +3008,7 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview">Revisión </message>
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.editaction">Revisión SEDICI</message>
-<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.selectcollectionction">Seleccione una colección</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.selectcollectionaction">Seleccione una colección</message>
 
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.claimaction">Revisión SEDICI</message>

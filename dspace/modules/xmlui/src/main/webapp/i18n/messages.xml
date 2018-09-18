@@ -2907,7 +2907,15 @@
 <message key="xmlui.ArtifactBrowser.AbstractSearch.rpp-selections">Results</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort-selections">Sort By</message>
 
-
+    <message key="xmlui.Discovery.AbstractSearch.rpp">Results per page:</message>
+    
+       <message key="xmlui.Discovery.AbstractSearch.filters.controls.add-filter">Add filter</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.apply-filters">Apply</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.remove-filter">Remove</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.new-filters.head">New filter:</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.current-filters.head">Current filters:</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.display">Add filtters</message>
+    
 <message key="xmlui.discovery.SearchFacetFilter.no-results">No values found according to the filters.</message>
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Refine your search</message>
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head_collection">Collection's content</message>
