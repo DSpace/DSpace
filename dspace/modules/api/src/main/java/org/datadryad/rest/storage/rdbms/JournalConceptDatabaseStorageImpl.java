@@ -77,6 +77,21 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
         if (row != null) {
             return DryadJournalConcept.getJournalConceptMatchingConceptID(context, row.getIntColumn(COLUMN_ID));
         }
+
+        // if the query was for an ISSN, try to see if it actually exists as a journal and, if so, make a concept
+        if (isISSN) {
+            try {
+                String journalName = JournalUtils.getCrossRefJournalForISSN(codeOrISSN);
+                DryadJournalConcept dryadJournalConcept = JournalUtils.createJournalConcept(journalName);
+                if (dryadJournalConcept != null) {
+                    dryadJournalConcept.setISSN(codeOrISSN);
+                    log.info("created a concept for " + codeOrISSN + ": " + journalName);
+                    return dryadJournalConcept;
+                }
+            } catch (Exception e) {
+                throw new SQLException("couldn't create a stub concept for " + codeOrISSN);
+            }
+        }
         return null;
     }
 
