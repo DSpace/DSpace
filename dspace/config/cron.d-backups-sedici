@@ -25,11 +25,7 @@ DATEMTH=date +%m
 0 21 * * *	root	sh $DSPACE_BACKUP_DIR/do_pgdump.sh > /dev/null
 
 #rotación de backups de postgres (todos los lunes a las 05:00hs). Se eliminan aquellos mas antiguos a 30 dias de creación pero se conservan los de primero de cada mes
-0 5 * * 1       dspace find $DSPACE_BACKUP_DIR/postgres -maxdepth 1 -name "dspace_sedici*.tgz" -mtime +30 -not -name "dspace_sedici-20??-??-01*.tgz" -exec rm {} \; > /dev/null
-
-#backup de la base de datos mysql con las autoridades de SEDICI (de lunes a viernes a las 1230)
-MYSQL_sedici_dspace_PWD='XXX'
-30 12 * * 1,2,3,4,5	root	mysqldump -usedici_dspace -p$MYSQL_sedici_dspace_PWD -hdata.sedici.unlp.edu.ar s2003_sedici | gzip -c > $DSPACE_BACKUP_DIR/mysql/s2003_sedici.sql.gz
+0 5 * * 1       dspace find $DSPACE_BACKUP_DIR/postgres -maxdepth 1 -name "dspace_sedici*-20??-??-??*.tgz" -mtime +30 -not -name "dspace_sedici*-20??-??-01*.tgz" -exec rm {} \; > /dev/null
 
 #backups de configuraciones (todos los 1ro de mes a las 4:38hs)
 38 4 1 * * 	root	tar --directory $DSPACE_INSTALL_DIR -czf $DSPACE_BACKUP_DIR/config/config.backup.$($DATESTR).tgz config/ 
