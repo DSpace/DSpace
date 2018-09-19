@@ -41,7 +41,7 @@ public class InstitutionAuthority extends SimpleSPARQLAuthorityProvider {
 		pqs.append("OPTIONAL { ?institution skos:broader ?padre . ?padre foaf:name ?labelpadre  OPTIONAL { ?padre sioc:id  ?initpadre } . } \n");    
 		if (!"".equals(text)) {
 			pqs.append("FILTER(REGEX(?label, ?text, \"i\") || REGEX(?initials, ?text, \"i\"))\n");
-			pqs.setLiteral("text", text);
+			pqs.setLiteral("text", text.trim());
 		}
 		pqs.append("}\n");
 		pqs.append("ORDER BY ASC(?label)\n");
