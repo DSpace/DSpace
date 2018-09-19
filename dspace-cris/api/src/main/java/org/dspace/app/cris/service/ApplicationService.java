@@ -47,13 +47,10 @@ import org.dspace.app.cris.model.ws.User;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.util.Util;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.hibernate.Session;
 
-import it.cilea.osd.common.core.SingleTimeStampInfo;
 import it.cilea.osd.common.model.Identifiable;
 import jxl.read.biff.BiffException;
 import net.sf.ehcache.Cache;
@@ -837,7 +834,7 @@ public class ApplicationService extends ExtendedTabService
 		
 		if ( now.getTime() - element.getLastAccessTime() > 1000) {
 			Date uniqueLastModifiedTimeStamp = uniqueLastModifiedTimeStamp(model, objectId);
-			long lastModDb = uniqueLastModifiedTimeStamp != null? uniqueLastModifiedTimeStamp.getTime():-1;
+			long lastModDb = uniqueLastModifiedTimeStamp != null? uniqueLastModifiedTimeStamp.getTime():Long.MAX_VALUE;
 			if (lastModCache >= lastModDb) {
 				element.updateAccessStatistics();
 				return false;

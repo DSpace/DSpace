@@ -1128,7 +1128,7 @@ public class DatabaseManager
                     break;
 
                 default:
-                    throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                    throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype + " for column " + name);
             }
 
             // Determines if the last column was null, and sets the tablerow accordingly
