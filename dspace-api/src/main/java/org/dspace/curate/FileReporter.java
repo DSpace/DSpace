@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 
 package org.dspace.curate;
 
@@ -26,7 +33,7 @@ public class FileReporter
 
     /**
      * Open a writer to a file in a directory named by the configuration
-     * property {@code reports.dir}, or in {@code [DSpace]/reports} if not
+     * property {@code report.dir}, or in {@code [DSpace]/reports} if not
      * configured.
      *
      * @throws IOException if there is a problem with the file path.
