@@ -27,6 +27,7 @@ importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
 importClass(Packages.org.dspace.app.xmlui.aspect.submission.FlowUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.submission.StepAndPage);
+importClass(Packages.org.dspace.app.util.SubmissionInfo);
 
 importClass(Packages.org.dspace.app.util.SubmissionConfig);
 importClass(Packages.org.dspace.app.util.SubmissionConfigReader);
@@ -301,9 +302,12 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 	  	//Load this step's configuration
 	  	var stepConfig = submissionInfo.getSubmissionConfig().getStep(step);
 
-    	//Pass it all the info it needs, including any response/error flags
-    	//in case an error occurred
-    	response_flag = doNextPage(collectionHandle, workspaceID, stepConfig, state.stepAndPage, response_flag);
+	  	//Send the current step to Cocoon for execute if the current user has permission to it...
+	  	if(SubmissionInfo.canExecuteStep(stepConfig,submissionInfo.getSubmissionItem(),getDSContext())){
+	  		//Pass it all the info it needs, including any response/error flags
+	  		//in case an error occurred
+	  		response_flag = doNextPage(collectionHandle, workspaceID, stepConfig, state.stepAndPage, response_flag);
+	  	}
 
     	var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
         var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
