@@ -2,7 +2,13 @@ package org.dspace.app.xmlui.aspect.submission;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpSession;
 
@@ -54,7 +60,7 @@ public class SediciAdministratorCCLicenseStep extends AbstractSubmissionStep
         protected static final Message Derivatives_question_answer_yes  = message("xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerYes");
         protected static final Message Derivatives_question_answer_sa  = message("xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerShareALike");
 		private static final String PropertiesFilename = "sedici-dspace";
-		private static HashMap<String, String> Licencias=null;
+		private static TreeMap<String, String> Licencias=null;
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.
 	 */
@@ -64,13 +70,76 @@ public class SediciAdministratorCCLicenseStep extends AbstractSubmissionStep
 	    this.requireStep = true;
 	}
 	
-	public static HashMap<String, String> GetLicenses(){
+	public static TreeMap<String, String> GetLicenses(){
 		if (Licencias==null || Licencias.size()<=1){
-				//cargo el map con las licencias
-				Licencias=new HashMap<String, String>();
+    			//cargo el map con las licencias
+		        //Create a logical order comparator. This logical order is defined by the following constraints: 
+		        // * (1)version number (i.e. code "2.5" is lesser than "4.0"), 
+		        // * (2)Code restriction (i.e. "by" is less restrictive than "by-nc" and "by-nc-sa"; "by-nc" and "by-sa" are considered with equal restriction level...)
+		        //Any license doesn't matching CC URI pattern, is considered bigger that those than match.
+    		    Licencias = new TreeMap<String, String>(new Comparator<String>() {
+    	            public int compare(String aLicense, String anotherLicense) {
+    	                String patternCCUri = "^http://creativecommons.org/licenses/([[by|nc|sa|nd]-]+)/(\\d\\.\\d)/.*$";
+    	                String patternCCCode = "^by-?(nc|sa|nd)?-?(sa|nd)?$";
+    	                String[] licenseVersions = new String[2];
+    	                String[] licenseCodes = new String[2];
+    	                int[] licenseCodesWeight = new int[2];
+    	                String[] licenses = new String[2];
+    	                Pattern pUri, pCode;
+    	                Matcher mUri, mCode;
+    	                
+    	                licenses[0] = aLicense; licenses[1] = anotherLicense;
+    	                for (int i = 0; i < 2; i++) {
+    	                    pUri = Pattern.compile(patternCCUri);
+    	                    mUri = pUri.matcher(licenses[i]);
+    	                    
+    	                    if(mUri.find()) {
+    	                        licenseVersions[i] = mUri.group(2);
+    	                        licenseCodes[i] = mUri.group(1);
+    	                        pCode = Pattern.compile(patternCCCode);
+    	                        mCode = pCode.matcher(mUri.group(1));
+    	                        mCode.find();
+    	                        licenseCodesWeight[i] = 1 + (mCode.group(1) != null ? 1 : 0) + (mCode.group(2) != null ? 1 : 0);
+    	                    }
+    	                }
+    	                
+    	                //Check if any of the licenses being compared doesn't match the CC URI pattern, and return the correct compare if this is the case
+    	                if(licenseVersions[0] == null || licenseVersions[1] == null) {
+    	                    //Example, if compare "http://creativecommons.org/licenses/by/3.0/" with "http://creativecommons.org/publicdomain/mark/1.0/" (doesn't match CC pattern), 
+    	                    //then comparison must returns "-1" indicating that the first license is lesser than the second
+    	                    if(licenseVersions[0] != null) {
+    	                        return -1;
+    	                    } else if(licenseVersions[1] != null){
+    	                        return 1;
+    	                    } else {
+    	                        //If both licenses doesn't match CC pattern, then compare syntactically
+    	                        return aLicense.compareTo(anotherLicense);
+    	                    }
+    	                }
+
+    	                //If both are CC licenses, then compare logically accordance with its components.
+    	                //Compare version numbers (i.e. "2.5", "3.0", etc.). This is the most relevant criteria for order definition.
+    	                if(licenseVersions[0].equals(licenseVersions[1])) {
+    	                    //If versions are the same, then compare the CC Code of each license (i.e. "by", "by-sa", etc.).
+    	                    if(licenseCodesWeight[0] == licenseCodesWeight[1]) {
+    	                        return licenseCodes[0].compareTo(licenseCodes[1]);
+    	                    } else {
+    	                        if(licenseCodesWeight[0] < licenseCodesWeight[1])
+    	                            return -1;
+    	                        else
+    	                            return 1;
+    	                    }
+    	                } else {
+    	                    //If CC versions differs, then compare the licenses versions syntactically (i.e. check "3.0".compareTo("2.5")) to determine the precedence; 
+    	                    //lesser version numbers must be at first place i.e. "2.5" < "3.0" < "4.0"
+    	                    return licenseVersions[0].compareTo(licenseVersions[1]);
+    	                }
+    	            }
+    	        });
 			    String values=ConfigurationManager.getProperty(PropertiesFilename, "map.licenses");
 		        String[] valores=values.split(",");
 		        String[] valor;
+		        //TODO falta ver porqué no levanta bien el Label de la PublicDomain...
 		        for (String entrada : valores) {
 					valor=entrada.split(" = ");
 					Licencias.put(valor[0], valor[1]);
