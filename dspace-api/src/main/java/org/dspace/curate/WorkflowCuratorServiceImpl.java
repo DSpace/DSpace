@@ -36,6 +36,8 @@ import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.curate.service.WorkflowCuratorService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -133,14 +135,15 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService {
                 basicWorkflowItemService.update(c, wfi);
                 return false;
             } else {
-                Date now = GregorianCalendar.getInstance().getTime();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddThhmmssSSS");
-                String filename = String.format("curation-%s.log", sdf.format(now));
-                Path logPath = Paths.get(
-                        configurationService.getProperty("dspace.dir"), "logs", filename);
-                try (PrintWriter reporter = new PrintWriter(logPath.toFile())) {
+                PluginService plugins = CoreServiceFactory.getInstance()
+                        .getPluginService();
+                try (Reporter reporter
+                        = (Reporter) plugins
+                        .getSinglePlugin(Reporter.class);) {
                     curator.setReporter(reporter);
                     return curate(curator, c, wfi);
+                } catch (Exception e) {
+                    log.error("Failed to close report", e);
                 }
             }
         }
