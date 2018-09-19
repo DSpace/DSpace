@@ -139,7 +139,6 @@ public class SediciAdministratorCCLicenseStep extends AbstractSubmissionStep
 			    String values=ConfigurationManager.getProperty(PropertiesFilename, "map.licenses");
 		        String[] valores=values.split(",");
 		        String[] valor;
-		        //TODO falta ver porqué no levanta bien el Label de la PublicDomain...
 		        for (String entrada : valores) {
 					valor=entrada.split(" = ");
 					Licencias.put(valor[0], valor[1]);
