@@ -2403,6 +2403,14 @@
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.editaction">SEDICI review</message>
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
 
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.CollectionLevelReview">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.CollectionLevelReview.claimaction">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.CollectionLevelReview.editaction">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.SeDiCILevelReview">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.SeDiCILevelReview.claimaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.SeDiCILevelReview.editaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
+
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview">SEDICI review</message>
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.claimaction">SEDICI review</message>
 <message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.editaction">SEDICI review</message>
