@@ -1,5 +1,7 @@
 package org.dspace.app.webui.cris.web.tag;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
@@ -26,11 +28,15 @@ public final class PropertyDefintionI18NWrapper implements MethodInterceptor {
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		if (locale != null) {
-			if (invocation.getMethod().getName().equals("getLabel")) {
+			String name = invocation.getMethod().getName();
+			if (name.equals("getLabel")) {
 				return getLabel(invocation);
-			} else if (invocation.getMethod().getName().equals("getReal")) {
+			} else if (name.equals("getReal")) {
 				return getWrapper((IPropertiesDefinition) invocation.proceed(), localeString);
+			} else if (name.equals("getMask")) {
+				return getMask(invocation);
 			}
+			
 		}
 		return invocation.proceed();
 	}
@@ -41,6 +47,15 @@ public final class PropertyDefintionI18NWrapper implements MethodInterceptor {
 		} catch (MissingResourceException mre) {
 			return invocation.proceed();
 		}
+	}
+
+	private Object getMask(MethodInvocation invocation) throws Throwable {
+		List wrappedList = new ArrayList<>();
+		List origList = (List) invocation.proceed();
+		for (Object o : origList) {
+			wrappedList.add(getWrapper((IPropertiesDefinition) o, localeString));
+		}
+		return wrappedList;
 	}
 
     public static IPropertiesDefinition getWrapper(IPropertiesDefinition pd, String locale) {
