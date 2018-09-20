@@ -2997,6 +2997,14 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.editaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.selectcollectionaction">Seleccione una colección</message>
 
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.CollectionLevelReview">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.CollectionLevelReview.claimaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.CollectionLevelReview.editaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.SeDiCILevelReview">Revisión </message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.SeDiCILevelReview.editaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoAstroGeofisicaWF.SeDiCILevelReview.selectcollectionction">Seleccione una colección</message>
+
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview">Revisión Local</message>
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.claimaction">Revisión Local</message>
 <message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.editaction">Revisión Local</message>

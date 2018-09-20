@@ -138,7 +138,7 @@ public class FlowUtils {
                     .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
             
                 // load submission info
-                subInfo = SubmissionInfo.load(httpRequest, submission);
+                subInfo = SubmissionInfo.load(httpRequest, submission, context);
     
                 // Set the session ID
                 context.setExtraLogInfo("session_id="

@@ -20,7 +20,10 @@
  <!ELEMENT step-definitions (step+) >
  
  <!ELEMENT step (heading?, processing-class?, jspui-binding?, xmlui-binding?, workflow-editable?) >
- <!ATTLIST step id NMTOKEN #IMPLIED>
+ <!-- The "scope" attribute values must be an optional not ("!" symbol) an the folowings next values: [READ,ADD,DELETE,ADMIN]. In example: "!ADMIN", "!READ", "READ", etc.-->
+ <!ATTLIST step 
+ 			id NMTOKEN #IMPLIED
+ 			scope CDATA #IMPLIED>
  
  <!ELEMENT heading (#PCDATA) >
  <!ELEMENT processing-class (#PCDATA)>

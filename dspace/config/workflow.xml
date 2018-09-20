@@ -5,6 +5,7 @@
         <name-map collection="10915/50" workflow="autoarchive"/>
         <name-map collection="10915/28975" workflow="autoarchive"/>
         <name-map handle="10915/27347" workflow="MuseoFisicaWF"/>
+        <name-map handle="10915/68094" workflow="MuseoAstroGeofisicaWF"/>
         <name-map handle="10915/27269" workflow="MuseoAzzariniWF"/>
         <name-map handle="10915/41027" workflow="MuseoBibliotecaPublicaWF"/>
         <name-map collection="10915/46286" workflow="autoarchiveTesisDeGrado"/>
@@ -105,6 +106,32 @@
             </actions>
         </step>
         
+    </workflow>
+
+    <workflow start="CollectionLevelReview" id="MuseoAstroGeofisicaWF">
+
+        <roles>
+            <role id="MuseoAstroGeofisicaAdmin" name="MuseoAstroGeofisicaAdmin" scope="repository" description="Este paso le permite a un revisor del museo de fisica, editar los metadatos y aceptar o rechazar el envío"/>
+            <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
+        </roles>
+
+        <!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
+        <step id="CollectionLevelReview" role="MuseoAstroGeofisicaAdmin" userSelectionMethod="acceptRoleOrNotAdmin">
+            <outcomes>
+                <step status="0">SeDiCILevelReview</step>
+            </outcomes>
+            <actions>
+                <action id="editaction"/>
+            </actions>
+        </step>
+
+        <!-- PASO 2: Revisión a nivel de SeDiCI (aplicable a todos los ítems de todo el repositorio) -->
+        <step id="SeDiCILevelReview" role="SeDiCIAdmin" userSelectionMethod="claimaction">
+            <actions>
+                <action id="editaction"/>
+            </actions>
+        </step>
+
     </workflow>
 
   <workflow start="CollectionLevelReview" id="MuseoAzzariniWF">

@@ -137,9 +137,18 @@
       <!--Step sediciUploadItem will be to Upload the item.-->
       <step id="sediciUploadItem">
         <heading>submit.progressbar.upload</heading>
+        <processing-class>org.dspace.submit.step.UploadStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
+        <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
+
+      <!--Step sediciUploadWithEmbargoItem will be to Upload the item.-->
+      <step id="sediciUploadWithEmbargoItem">
+        <heading>submit.progressbar.upload</heading>
         <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
         <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadWithEmbargoStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadWithEmbargoStep</xmlui-binding>
+        <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadWithEmbargoStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
       
@@ -273,8 +282,8 @@
       <!--Step 2 will be to Describe the item.-->
       <step id="sediciDescribeItem"/>
           
-      <!--Step 3 will be to Upload the item-->
-      <step id="sediciUploadItem"/>
+      <!--Step 3 will be to Upload the item with embargo option-->
+      <step id="sediciUploadWithEmbargoItem"/>
      
       <!--Step 4 will be to Verify/Review everything -->
  	  <step id="sediciVerifyItem"/>
@@ -298,8 +307,11 @@
       <!--Step 2 will be to Describe the item.-->
       <step id="sediciDescribeItem"/>
           
-      <!--Step 3 will be to Upload the item-->
-      <step id="sediciUploadItem"/>
+      <!--Step 3a will be to Upload the item-->
+      <step id="sediciUploadItem" scope="!ADMIN"/>
+      
+      <!--Step 3b (Only For users with ADMINs permission) will be to Upload the item-->
+      <step id="sediciUploadWithEmbargoItem" scope="ADMIN"/>
      
       <!--Step 4 will be to Verify/Review everything -->
  	  <step id="sediciVerifyItem"/>
