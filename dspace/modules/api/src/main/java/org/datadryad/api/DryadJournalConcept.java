@@ -225,7 +225,13 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public void setISSN(String value) {
+        if (getISSN().equals("")) {
+            // if there is only an empty placeholder, set that one to the value
+            setConceptMetadataValue(metadataProperties.getProperty(ISSN), value);
+            return;
+        }
         if (!getISSNs().contains(value)) {
+            // otherwise, add as another ISSN
             addConceptMetadataValue(metadataProperties.getProperty(ISSN), value);
         }
     }
