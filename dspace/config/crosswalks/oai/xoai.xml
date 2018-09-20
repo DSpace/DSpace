@@ -109,7 +109,7 @@
             <Filter ref="doajFilter"/>
 
             <Format ref="doaj" />
-            <Format ref="xoai"/>
+            <!--<Format ref="xoai"/> -->
 			
             <Description>
                 This contexts complies with DOAJ rules for exporting journal articles.
