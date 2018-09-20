@@ -197,26 +197,25 @@
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item.dateaccessioned">Navegar {0} por fecha de envío</message>
 
 
+<!-- org.dspace.app.xmlui.administrative.WithdrawnItems.java -->
+<message key="xmlui.Administrative.WithdrawnItems.title.item.title">Items retirados por Título</message>
+<message key="xmlui.Administrative.WithdrawnItems.trail.item.title">Items retirados por Título</message>
 
-	<!-- org.dspace.app.xmlui.administrative.WithdrawnItems.java -->
-	<message key="xmlui.Administrative.WithdrawnItems.title.item.title">Withdrawn Items by Title</message>
-	<message key="xmlui.Administrative.WithdrawnItems.trail.item.title">Withdrawn Items by Title</message>
+<message key="xmlui.Administrative.WithdrawnItems.title.item.dateissued">Items retirados por fecha de publicación</message>
+<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateissued">Items retirados por fecha de publicación</message>
 
-	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateissued">Withdrawn Items by Issue Date</message>
-	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateissued">Withdrawn Items by Issue Date</message>
+<message key="xmlui.Administrative.WithdrawnItems.title.item.dateaccessioned">Items retirados por fecha de carga</message>
+<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateaccessioned">Items retirados por fecha de carga</message>
 
-	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateaccessioned">Withdrawn Items by Submit Date</message>
-	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateaccessioned">Withdrawn Items by Submit Date</message>
+<!-- org.dspace.app.xmlui.administrative.PrivateItems.java -->
+<message key="xmlui.Administrative.PrivateItems.title.item.title">Items privados por Título</message>
+<message key="xmlui.Administrative.PrivateItems.trail.item.title">Items privados por Título</message>
 
-	<!-- org.dspace.app.xmlui.administrative.PrivateItems.java -->
-	<message key="xmlui.Administrative.PrivateItems.title.item.title">Private Items by Title</message>
-	<message key="xmlui.Administrative.PrivateItems.trail.item.title">Private Items by Title</message>
+<message key="xmlui.Administrative.PrivateItems.title.item.dateissued">Items privados por fecha de publicación</message>
+<message key="xmlui.Administrative.PrivateItems.trail.item.dateissued">Items privados por fecha de publicación</message>
 
-	<message key="xmlui.Administrative.PrivateItems.title.item.dateissued">Private Items by Issue Date</message>
-	<message key="xmlui.Administrative.PrivateItems.trail.item.dateissued">Private Items by Issue Date</message>
-
-	<message key="xmlui.Administrative.PrivateItems.title.item.dateaccessioned">Private Items by Submit Date</message>
-	<message key="xmlui.Administrative.PrivateItems.trail.item.dateaccessioned">Private Items by Submit Date</message>
+<message key="xmlui.Administrative.PrivateItems.title.item.dateaccessioned">Items privados por fecha de carga</message>
+<message key="xmlui.Administrative.PrivateItems.trail.item.dateaccessioned">Items privados por fecha de carga</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CollectionViewer.java -->
 <message key="xmlui.ArtifactBrowser.CollectionViewer.search_scope">Ámbito de búsqueda</message>
@@ -262,7 +261,7 @@
 <message key="xmlui.ArtifactBrowser.FeedbackForm.title">Sugerencias</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Sugerencias</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.head">Sugerencias</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Gracias por compartir sus sugerencias sobre DSpace. ¡Tendremos en cuenta sus comentarios!</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Gracias por compartir sus sugerencias sobre SEDICI. ¡Tendremos en cuenta sus comentarios!</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.para2">Recuerde que también puede contactarse con nosotros vía email a la direccion </message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.email">Su correo electrónico</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">Esta dirección será utilizada para seguimiento de su sugerencia.</message>
@@ -334,7 +333,6 @@
 <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn">El ítem seleccionado ha sido retirado y no está disponible</message>
 <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted_auth">El ítem seleccionado es de acceso restringido  y requiere de credenciales para su visualización. </message>
 <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted">Su usuario no dispone de permisos para ver el ítem. Para más información, contacte por favor con el administrador</message>
-<message key="xmlui.ArtifactBrowser.RestrictedItem.login">Proceda a loguearse</message>
 <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn_contact">Si considera que se trata de un error, sírvase escribir a </message>
         
 	<!-- Authentication messages used at the top of the login page:  -->
@@ -608,7 +606,7 @@
 	<!-- org.dspace.app.xmlui.eperson.StartForgotPassword.java -->
 <message key="xmlui.EPerson.StartForgotPassword.title">¿Olvidó la contraseña?</message>
 <message key="xmlui.EPerson.StartForgotPassword.head">¿Olvidó la contraseña?</message>
-<message key="xmlui.EPerson.StartForgotPassword.para1">Introduzca la dirección de correo electrónico que proporcionó cuando se registró con DSpace. Se le enviará un mensaje a esa dirección con las instrucciones pertinentes.</message>
+<message key="xmlui.EPerson.StartForgotPassword.para1">Introduzca la dirección de correo electrónico que proporcionó cuando se registró en el sitio. Se le enviará un mensaje a esa dirección con las instrucciones pertinentes.</message>
 <message key="xmlui.EPerson.StartForgotPassword.email_address">Dirección de correo electrónico</message>
 <message key="xmlui.EPerson.StartForgotPassword.email_address_help">Introduzca la misma dirección con la que se registró.</message>
 <message key="xmlui.EPerson.StartForgotPassword.error_not_found">Dirección de correo electrónico no encontrada.</message>
@@ -650,8 +648,8 @@
 
 
 	<!-- general submission aspect messages -->
-<message key="xmlui.Submission.general.mydspace_home">DSpace Principal</message>
-<message key="xmlui.Submission.general.go_mydspace">Mi DSpace</message>
+<message key="xmlui.Submission.general.mydspace_home">Página Principal</message>
+<message key="xmlui.Submission.general.go_mydspace">Mi SEDICI</message>
 <message key="xmlui.Submission.general.submission.title">Envío de ítems</message>
 <message key="xmlui.Submission.general.submission.trail">Envío de ítems</message>
 <message key="xmlui.Submission.general.submission.head">Envío de ítems</message>
@@ -867,13 +865,16 @@
 <message key="xmlui.Submission.submit.UploadStep.submit_edit">Editar</message>
 <message key="xmlui.Submission.submit.UploadStep.checksum">Verificación de archivo:</message>
 <message key="xmlui.Submission.submit.UploadStep.submit_remove">Eliminar los archivos seleccionados</message>
-
-    <message key="xmlui.Submission.submit.UploadStep.infoEmbargo">
-   <b>Note:</b> If you need that your work keeps temporarily hidden, you may request its embargo by 3, 6, 12, 18 or 24 months starting from the date of presentation of the work.   
-   The UNLP and repository of SEDICI fervently support the open access to the scientific-academic production and therefore <b>RECCOMEND NOT</b> apply this restriction unless it results strictly needed for pending patents, confidenciality conveins and similar situations. Have in mind that the deposit of your thesis into the repository not allow you to do derived publications with quality of inedit; a derived work is NOT the original work.
-   <br/>To apply this restriction, you will must attach over this step a note of embargo request that properly justify the request (see model <a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2015/12/Modelo-nota-de-embargo.doc">Here</a>).
-   </message>
-
+<message key="xmlui.Submission.submit.UploadStep.infoEmbargo">
+   <b>Nota:</b> Si precisa que su obra se mantenga oculta temporalmente puede solicitar el embargo de la misma 
+   durante 3, 6, 12, 18 o 24 meses, correderos a partir de la fecha de presentación del trabajo. 
+   La UNLP y el Repositorio SEDICI apoyan fervientemente el acceso abierto a la producción científico-académica y por tanto 
+   <b>RECOMIENDAN NO </b> aplicar esta restricción a no ser que resulte estrictamente necesario por patentes pendientes, 
+   convenios de confidencialidad y casos similares. Tenga en cuenta que el depósito de su tesis en el repositorio
+    no lo inhabilita a realizar publicaciones derivadas con calidad de inédito; una obra derivada NO es la obra original.
+   <br/>A fin de aplicar esta restricción, deberá adjuntar en este paso una nota de solicitud de embargo que justifique 
+   debidamente la solicitud (ver modelo <a href="http://blog.sedici.unlp.edu.ar/wp-content/uploads/sites/17/2018/09/Modelo-nota-de-embargo.doc">Aqui</a>).
+</message>
 
 <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Subir Archivo(s)</message>
 <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">Archivo</message>
@@ -2170,7 +2171,7 @@ Para asignar un item a esta colección, cerciórese de estar en la colección co
 <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.selectReviewerStep.claimaction">Pool de revisión por usuario</message>
 <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.autoassignAction">Acción de autoasignar por usuario</message>
 <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Acción de revisión por usario</message>
-    <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Single User Review Action</message>
+
 
 
     <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -2555,6 +2556,10 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.title">Buscar Termino del Tesauro Eurovoc</message>
 <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.nonauthority">Utilizar "@1@" (valor sin controlar)</message>
 
+<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.help">Nombre de una ubicación geográfica</message>
+<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.title">Ubicaciones geográficas</message>
+<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.nonauthority">Utilizar "@1@" (valor sin controlar)</message>
+
   <!-- Params are: search-value -->
 <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.nonauthority">No es valor de Autoridad: @1@</message>
 
@@ -2564,10 +2569,6 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.help.first">Nombre(s) p.ej. "Alfredo"</message>
 <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.title">Búsqueda de autores en la Name Authorithy</message>
 <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority">Valor local "@1@" (no se encuentra en la Autoridad)</message>
-
-<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.help">Nombre de una ubicación geográfica</message>
-<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.title">Ubicaciones geográficas</message>
-<message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.nonauthority">Utilizar "@1@" (valor sin controlar)</message>
 
   <!-- mobile theme -->
 <message key="xmlui.mobile.home_mobile">DSpace Móvil</message>
@@ -2758,8 +2759,6 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
   	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type_filter">Tipo de documento</message>
   	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.sedici.autor.direccion_filter">Direccion del autor</message>
   	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.sedici.autor.apellido_filter">Apellido del autor</message>
-  	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.title">Título</message>
-  	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Fecha de publicación</message>
   	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.persona">Personas</message>
   	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.institucion">Institución</message>
   	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subtipo">Subtipo</message>
@@ -2769,14 +2768,11 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 
  	<message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Mostrando items {0}-{1}</message> 
 
-
 	<message key="xmlui.Discovery.AbstractSearch.type_type">Filtrado por: Tipos de documento</message>
 	<message key="xmlui.Discovery.AbstractSearch.type_keywords">Filtrado por: Palabras clave</message>
 	<message key="xmlui.Discovery.AbstractSearch.type_author">Filtrar por: Autor</message> 
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Autor</message> 
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author_filter">Autor</message> 
 	<message key="xmlui.Discovery.AbstractSearch.type_subject">Filtrar por: Materia</message> 
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Materia</message> 
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject_filter">Materia</message> 
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued.year">Fecha de publicación</message> 
 
@@ -2971,7 +2967,6 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
     <message key="xmlui.swordclient.DepositAction.success">Ítem copiado</message>
     <message key="xmlui.swordclient.DepositAction.package_error">Error del Formato de Paquete</message>
     <message key="xmlui.swordclient.DepositAction.invalid_handle">Handle inválido</message>
-    <message key="xmlui.swordclient.DepositAction.package_error">Ocurrió un error al empaquetar el objeto</message>
     <message key="xmlui.swordclient.DepositAction.error">Ocurrió un error durante el depósito: {0}</message>
 
     <message key="xmlui.swordclient.SwordResponse.title">Respuesta Sword</message>
@@ -3194,8 +3189,6 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 
 <message key="xmlui.flashMessage.deleteItem.success">Se ha borrado permanente el item.</message>
 <message key="xmlui.flashMessage.deleteItem.failure">El item no se ha podido borrar.</message>
-
-<!-- De aca en mas estan en las dependencias de dspace -->
 
 
 </catalogue>

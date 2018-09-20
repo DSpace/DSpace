@@ -108,39 +108,17 @@
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.asc">ascending</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.desc">descending</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Results/page</message>
+
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp-selections">Results</message>
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort-selections">Sort By</message>	
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.tips_info_general">You can try with some of the following options:</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.tips_info1">If you are using quotation marks, try omitting them for generate a new search with individual words</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.tips_info2">Use broader terms for a new refined search using filters</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.tips_info3">Use some of the explorations availables</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.other_services_no_results">Besides, you can do a search in some of the services linstings below:  </message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.ispartof">Is part of</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.group_by">Results grouped by</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.group_by.none">None</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.group_by.publication_grp">Publication</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_dc.contributor.author_browse">Exploring by: Author</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_dc.title_browse">Exploring by: Title</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_dc.subject_browse">Exploring by: Subject</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_dc.description.abstract_browse">Exploring by: Summary</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_series_browse">Exploring by: Series</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_sponsor_browse">Exploring by: Sponsor</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_identifier_browse">Exploring by: Identificator</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_language_browse">Exploring by: Lenguage (ISO)</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_keyword_browse">Exploring by: Keyword</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_taxon_browse">Exploring by: Scientific name</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_contributor_browse">Exploring by: Jury</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_creator_browse">Exploring by: Author</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_subject_browse">Exploring by: Subject</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_description_browse">Exploring by: Description</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_relation_browse">Exploring by: Relation</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_mime_browse">Exploring by: File format</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_other_browse">Exploring by: Co-supervisor of thesis</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_advisor_browse">Exploring by: Supervisor of thesis</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_department_browse">Exploring by: Department</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.type_dateissued_dt_browse">Exploring by: Publication date</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.title_sort">Title</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Publication date</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.accessioned_dt">Issued date</message>
-		
 
     <!-- org.dspace.app.xmlui.artifactbrowser.AdvancedSearch.java -->
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.title">Advanced Search</message>
@@ -154,33 +132,24 @@
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author">Author</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Title</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keywords">Keyword</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Date Issued</message>	
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type">Document type</message>	
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_abstract">Abstract</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_series">Series</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_sponsor">Sponsor</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_identifier">Identifier</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_language">Language (ISO)</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keyword">Keyword</message>
+
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keywords">Keyword</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type">Document type</message>	
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_sedici.autor.apellido">Author's surname</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_sedici.autor.direccion">Author's address</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.contributor.author_filter">Author</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.subject_filter">Subject</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.type_filter">Content's type</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.date.issued">Publication date</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type_filter">Type</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_publisher_filter">Editorial</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_location.comm">Community</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_location.coll">Collection</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.relation.ispartofseries_filter">Series</message>
 	
 	
 
    <!--  some common other possibilities for Advanced Search Fields -->
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contributor">Contributor</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_creator">Creator</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_description">Description</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_relation">Relation</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_mime">Mime-Type</message>
@@ -343,14 +312,15 @@
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.head">Search</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.search_scope">Search Scope</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.full_text_search">Full Text Search</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type_filter">Document type</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keywords_filter">Keyword</message>  
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.persona">People</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.institucion">Institution</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subtipo">Subtype</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.descriptor">Descriptor</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.sedici.autor.direccion_filter">Author's address</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.sedici.autor.apellido_filter">Author's surname</message>
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author</message>
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.title">Title</message>
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Publication date</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.selected">Applied filters</message>
-	
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">This resource is restricted</message>
@@ -388,10 +358,6 @@
 
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.title">No reports currently available</message>
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.text">There are currently no reports available for this service.  Please check back later.</message>
-
-	<!-- Others -->
-	
-	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Last documents</message>
 
     <!-- Authentication messages used for bitstream authentication -->
 	<message key="xmlui.BitstreamReader.auth_header">The file is restricted</message>
@@ -915,9 +881,14 @@
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove">Remove selected files</message>
 
     <message key="xmlui.Submission.submit.UploadStep.infoEmbargo">
-   <b>Note:</b> If you need that your work keeps temporarily hidden, you may request its embargo by 3, 6, 12, 18 or 24 months starting from the date of presentation of the work.   
-   The UNLP and repository of SEDICI fervently support the open access to the scientific-academic production and therefore <b>RECCOMEND NOT</b> apply this restriction unless it results strictly needed for pending patents, confidenciality conveins and similar situations. Have in mind that the deposit of your thesis into the repository not allow you to do derived publications with quality of inedit; a derived work is NOT the original work.
-   <br/>To apply this restriction, you will must attach over this step a note of embargo request that properly justify the request (see model <a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2015/12/Modelo-nota-de-embargo.doc">Here</a>).
+   <b>Note:</b> If you need that your work keeps temporarily hidden, you may request its embargo 
+   by 3, 6, 12, 18 or 24 months starting from the date of presentation of the work.   
+   The UNLP and repository of SEDICI fervently support the open access to the scientific-academic production and therefore 
+   <b>RECCOMEND NOT</b> apply this restriction unless it results strictly needed for pending patents, 
+   confidenciality conveins and similar situations. Have in mind that the deposit of your thesis into the repository 
+   not allow you to do derived publications with quality of inedit; a derived work is NOT the original work.
+   <br/>To apply this restriction, you will must attach over this step a note of embargo request that properly justify 
+   the request (see model <a href="http://blog.sedici.unlp.edu.ar/wp-content/uploads/sites/17/2018/09/Modelo-nota-de-embargo.doc">Here</a>).
    </message>
 
 
@@ -1578,7 +1549,7 @@
 	<message key="xmlui.administrative.item.general.option_view">View Item</message>
         <message key="xmlui.administrative.item.general.option_curate">Curate</message>
         <message key="xmlui.administrative.item.general.option_queue">Queue</message>
-    <message key="xmlui.administrative.item.AddBitstreamForm.bundle.CC_LICENSE">Creative Commons licences</message>
+        <message key="xmlui.administrative.item.AddBitstreamForm.bundle.CC_LICENSE">Creative Commons licences</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.AddBitstreamForm -->
 	<message key="xmlui.administrative.item.AddBitstreamForm.title">Upload Bitstream</message>
@@ -2332,6 +2303,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.community-logo-alt">The community's logo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.no-logo-alt">No logo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.news">News</message>
+
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-ciclo">Cycle</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-creator-interprete">Performer</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-creators-interprete">Performers</message>
@@ -2499,15 +2471,6 @@
   <!-- Choice Lookup - sample config for dc.publisher field -->
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Name of Publisher</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Look up Publisher</message>
-  
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.help">Name of the term in DECS thesaurus</message>
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.title">Search a term in DECS thesaurus</message>
-  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.nonauthority">Use "@1@" (no controlled)</message>
-
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.help">Name of the term in Eurovoc thesaurus</message>
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.title">Search a term in Eurovoc thesaurus</message>
-	<message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.nonauthority">Use @1@" (value without controlling)"</message>
-
   <!-- Params are: search-value -->
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.nonauthority">Non-authority value: @1@</message>
 
@@ -2518,6 +2481,13 @@
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.title">LC Name Authority author lookup</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority">Local value "@1@" (not in Naming Authority)</message>
 
+  
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.help">Name of the term in DECS thesaurus</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.title">Search a term in DECS thesaurus</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_decs.nonauthority">Use "@1@" (no controlled)</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.help">Name of the term in Eurovoc thesaurus</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.title">Search a term in Eurovoc thesaurus</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.sedici_subject_eurovoc.nonauthority">Use @1@" (value without controlling)"</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.help">Geographic location name</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.title">Geographic locations</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.nonauthority">Use "@1@" (no controlled)</message>
@@ -2686,7 +2656,6 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-colaborator">Colaborator</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-language">Document language</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-produccion">Production</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Place of publication</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-affiliated-institution">Place of development</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-degree-name">Degree</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-degree-grantor">Grantor</message>
@@ -2803,9 +2772,6 @@
 <message key="xmlui.administrative.Navigation.context_edit_item_workflow">Edit item</message>
 <message key="xmlui.discovery.ver_filtros">See filters</message>
 <message key="xmlui.discovery.ocultar_filtros">Hide filters</message>
-<message key="xmlui.administrative.item.ViewItem.title">View item</message>
-<message key="xmlui.administrative.item.ViewItem.trail">View item</message>
-
 
 <message key="xmlui.forms.add">Add</message>
 <message key="xmlui.forms.remove_selected">Remove selected</message>
@@ -2830,7 +2796,9 @@
 
 <!-- De aca en mas estan en las dependencias de dspace -->
 
+<!-- ############################################################## -->
 <!-- extension al messages.xml de XmlWorkflow -->
+<!-- ############################################################## -->
 
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview">Local review</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.claimaction">Local review</message>
@@ -2838,15 +2806,6 @@
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview">SEDICI review</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.claimaction">SEDICI review</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">SEDICI review</message>
-<message key="xmlui.XMLWorkflow.default.reviewstep">Accept/Reject</message>
-<message key="xmlui.XMLWorkflow.default.reviewstep.claimaction">Accept/Reject</message>
-<message key="xmlui.XMLWorkflow.default.reviewstep.reviewaction">Accept/Reject</message>
-<message key="xmlui.XMLWorkflow.default.editstep">Accept/Edit/Reject step</message>
-<message key="xmlui.XMLWorkflow.default.editstep.claimaction">Accept/Edit/Reject</message>
-<message key="xmlui.XMLWorkflow.default.editstep.editaction">Accept/Edit/Reject</message>
-<message key="xmlui.XMLWorkflow.default.finaleditstep">Accept/Reject final</message>
-<message key="xmlui.XMLWorkflow.default.finaleditstep.claimaction">Accept/Reject final</message>
-<message key="xmlui.XMLWorkflow.default.finaleditstep.finaleditaction">Accept/Reject final</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
 
 <message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview">Local review</message>
@@ -2876,24 +2835,32 @@
 <message key="xmlui.XMLWorkflow.MuseoBibliotecaPublicaWF.SeDiCILevelReview.claimaction">SEDICI Review</message>
 <message key="xmlui.XMLWorkflow.MuseoBibliotecaPublicaWF.SeDiCILevelReview.editaction">SEDICI Review</message>
 
-<message key="xmlui.XMLWorkflow.selectSingleReviewer.selectReviewerStep.claimaction">Step of the revisor assignment</message>
-<message key="xmlui.XMLWorkflow.selectSingleReviewer.selectReviewerStep.selectrevieweraction">Assign revisor</message>
-<message key="xmlui.XMLWorkflow.selectSingleReviewer.singleUserReviewStep">Single user review step</message>
-<message key="xmlui.XMLWorkflow.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Revise deposit</message>
+<message key="sedici.XMLWorkflow.workflow.selectCollectionAction.head">Perform task: select collection</message>
+<message key="sedici.XMLWorkflow.workflow.selectCollectionAction.complete">Install document</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.selectcollectionction">Select collection</message>
 
-<message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep.claimaction">Result of the revision</message>
-<message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep.scorereviewaction">Result of the revision</message>
-<message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep">Result of the revision</message>
+<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview">Review </message>
+<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.claimaction">SEDICI Review</message>
+<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.editaction">SEDICI Review</message>
+<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.selectcollectionaction">Select collection</message>
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview.skipadminclaimaction">Local review</message>
+
+<message key="sedici.Submission.submit.SelectCollection.collection_help">Select the collection for install this item</message>
+
+<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_help">If you reviewed the item and found that its inclusion <strong>ISN'T</strong> correct and want to delete it permanently of the repository, select "Remove". This will remove the item of the repository totally without give to the depositor the option of modification and upload again. </message>
+<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_submit">Delete item</message>
+<message key="xmlui.Submission.workflow.DeleteTaskStep.info1">Are you sure?</message>
+<message key="xmlui.Submission.workflow.DeleteTaskStep.submit_delete">Delete</message>
+
+<message key="sedici.XMLWorkflow.workflowitem.notfound">Requested workflow item does not exist</message>
 
 
+<!-- ############################################################## -->
 <!-- extensión al messages.xml de discovery -->
+<!-- ############################################################## -->
 
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type_filter">Document type</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keywords_filter">Keyword</message>  
 <message key="xmlui.Discovery.AbstractSearch.type_type">Filtered by: Document types</message>
 <message key="xmlui.Discovery.AbstractSearch.type_keywords">Filtered by: Keywords</message>
-<message key="xmlui.Discovery.AbstractSearch.type_author">Filtered by: Author</message>
-<message key="xmlui.Discovery.AbstractSearch.type_subject">Filter by: Subject</message>
 <message key="xmlui.Discovery.AbstractSearch.startswith">Starts with</message>
 <message key="xmlui.Discovery.AbstractSearch.startswith.help">Or enter the beginning letters </message>
 <message key="xmlui.Discovery.SimpleSearch.filter_head">Filters</message>
@@ -2904,8 +2871,6 @@
 <message key="xmlui.Discovery.SimpleSearch.sort_apply">Apply</message>
 <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.accessioned_dt_asc">Accessioned Date Asc</message>
 <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.accessioned_dt_desc">Accessioned Date Desc</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp-selections">Results</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.sort-selections">Sort By</message>
 
     <message key="xmlui.Discovery.AbstractSearch.rpp">Results per page:</message>
     
@@ -2923,17 +2888,9 @@
 <message key="xmlui.discovery.SimpleSearch.search_label">Search</message>
 
 
-
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.persona">People</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.institucion">Institution</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subtipo">Subtype</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.descriptor">Descriptor</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author_filter">Author</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject_filter">Subject</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued.year">Publication date</message>
-
+<!-- ############################################################## -->
+<!-- messages de SEDICI solamente -->
+<!-- ############################################################## -->
 
 <message key="sedici.comunidades.header">Navigate our collections</message>
 <message key="sedici.comunidades.tesis.nombre">Thesis</message>
@@ -2964,78 +2921,6 @@
 <message key="sedici.noticias.verTodas">Show all news</message>
 <message key="sedici.comunidades.link.hintRSS">RSS with latest added documents</message>
 <message key="sedici.common.link.verTodos">show all</message>
-
-<message key="sedici.XMLWorkflow.workflow.selectCollectionAction.head">Perform task: select collection</message>
-<message key="sedici.XMLWorkflow.workflow.selectCollectionAction.complete">Install document</message>
-<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.selectcollectionction">Select collection</message>
-
-<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview">Review </message>
-<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.claimaction">SEDICI Review</message>
-<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.editaction">SEDICI Review</message>
-<message key="xmlui.XMLWorkflow.autoarchive.SeDiCILevelReview.selectcollectionaction">Select collection</message>
-<message key="xmlui.XMLWorkflow.default.CollectionLevelReview.skipadminclaimaction">Local review</message>
-<message key="xmlui.XMLWorkflow.step.unknown">Unknown state</message>
-<message key="xmlui.XMLWorkflow.Navigation.xmlworkflow_overview">General view for the workflow</message>
-
-<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.claimaction">SEDICI Review</message>
-<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.claimaction">SEDICI Review</message>
-
-<message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.trail">General view for the workflow</message>
-<message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.title">General view for the workflow</message>
-<message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column1"></message>
-<message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column2">Step</message>
-<message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column3">Item</message>
-<message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column4">Collection</message>
-<message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column5">Depositor</message>
-<message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.button.submit_submitter">Send items back to the depositor</message>
-<message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.button.submit_delete">Delete items</message>
-<message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.button.no_results">No results</message>
-
-<message key="xmlui.XMLWorkflow.WorkflowItemTransformer.title">Display workflow item: {0}</message>
-<message key="xmlui.XMLWorkflow.WorkflowItemTransformer.trail">Display workflow item: {0}</message>
-
-
-
-<message key="sedici.Submission.submit.SelectCollection.collection_help">Select the collection for install this item</message>
-
-<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_help">If you reviewed the item and found that its inclusion <strong>ISN'T</strong> correct and want to delete it permanently of the repository, select "Remove". This will remove the item of the repository totally without give to the depositor the option of modification and upload again. </message>
-<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_submit">Delete item</message>
-<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.head">Execute task: Accept/Reject item</message>
-<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.info1">Actions that you can realize in this task:</message>
-<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.reject_help">If you reviewed the item and found that its inclusion in the collection <strong>ISN'T</strong> correct and want to delete it permanently of the repository, select "Remove". It will ask you that enter a message telling why the item isn't appropiate, and if the depositor will must change something and upload again the item.</message>
-<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.reject_submit">Reject item</message>
-<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.approve_help">If you reviewed the item and found that its inclusion in the collection is correct, select "Approve item".</message>
-<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.approve_submit">Approve Item</message>
-<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.edit_help">Choose this option to change the metadata of the item.</message>
-<message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.edit_submit">Edit metadata</message>
-<message key="xmlui.Submission.workflow.DeleteTaskStep.info1">Are you sure?</message>
-<message key="xmlui.Submission.workflow.DeleteTaskStep.submit_delete">Delete</message>
-<message key="xmlui.XMLWorkflow.workflow.ClaimAction.info1">Actions that you can realize in this task:</message>
-<message key="xmlui.XMLWorkflow.workflow.ClaimAction.take_help">Assign this task to self.</message>
-<message key="xmlui.XMLWorkflow.workflow.ClaimAction.take_submit">Take task</message>
-<message key="xmlui.XMLWorkflow.workflow.ClaimAction.leave_help">Leave this task queued for another to take.</message>
-<message key="xmlui.XMLWorkflow.workflow.ClaimAction.leave_submit">Leave task</message>
-<message key="xmlui.XMLWorkflow.workflow.ClaimAction.back">Go back to the general view</message>
-<message key="xmlui.XMLWorkflow.workflow.ClaimAction.title">Accept/Reject this task</message>
-<message key="xmlui.XMLWorkflow.workflow.AcceptAction.head">Execute task: Accept/Reject item</message>
-<message key="xmlui.XMLWorkflow.workflow.AcceptAction.info1">Actions that you can realize in this task:</message>
-<message key="xmlui.XMLWorkflow.workflow.AcceptAction.reject_help">If you reviewed the item and found that its inclusion in the collection <strong>ISN'T</strong> correct and want to delete it permanently of the repository, select "Remove". It will ask you that enter a message telling why the item isn't appropiate, and if the depositor will must change something and upload again the item.</message>
-<message key="xmlui.XMLWorkflow.workflow.AcceptAction.reject_submit">Reject item</message>
-<message key="xmlui.XMLWorkflow.workflow.AcceptAction.approve_help">If you reviewed the item and found that its inclusion in the collection is correct, select "Approve item".</message>
-<message key="xmlui.XMLWorkflow.workflow.AcceptAction.approve_submit">Approve Item</message>
-<message key="xmlui.XMLWorkflow.workflow.SelectReviewerAction.head">Execute task: Assign revisor</message>
-<message key="xmlui.XMLWorkflow.workflow.SelectReviewerAction.help">Use the search located below for choose the user in charge of the task's revision</message>
-<message key="xmlui.XMLWorkflow.workflow.SelectReviewerAction.search.label">Search revisor</message>
-<message key="xmlui.XMLWorkflow.workflow.SelectReviewerAction.search.button">Search user</message>
-<message key="xmlui.XMLWorkflow.workflow.SelectReviewerAction.select-reviewer.button">Choose as revisor</message>
-<message key="xmlui.XMLWorkflow.workflow.SingleUserReviewAction.decline.help">If you aren't the correct person to revise this item, you can always reject this task by clicking the button "Reject Task".</message>
-<message key="xmlui.XMLWorkflow.workflow.SingleUserReviewAction.decline.button">Reject Task</message>
-<message key="xmlui.XMLWorkflow.workflow.ScoreReviewAction.head">Revise deposit</message>
-<message key="xmlui.XMLWorkflow.workflow.ScoreReviewAction.score.button">Revise deposit</message>
-<message key="xmlui.XMLWorkflow.workflow.ScoreReviewAction.help">Enter the result for this deposit</message>
-
-
-<message key="sedici.XMLWorkflow.workflowitem.notfound">Requested workflow item does not exist</message>
 
 <message key="sedici.common.dspace-info">Supported by</message>
 
