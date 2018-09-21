@@ -102,6 +102,13 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         return super.handleTypeMismatch(ex, headers, HttpStatus.UNPROCESSABLE_ENTITY, request);
     }
 
+    @ExceptionHandler(Exception.class)
+    protected void handleGenericException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws IOException {
+        sendErrorResponse(request, response, ex, "An Exception has occured",
+                          HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
     private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,
                                    final Exception ex, final String message, final int statusCode) throws IOException {
         //Make sure Spring picks up this exception
