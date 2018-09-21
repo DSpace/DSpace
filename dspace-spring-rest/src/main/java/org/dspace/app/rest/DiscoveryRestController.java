@@ -10,7 +10,6 @@ package org.dspace.app.rest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import javax.ws.rs.BadRequestException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -35,8 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -146,12 +143,8 @@ public class DiscoveryRestController implements InitializingBean {
 
         //Get the Search results in JSON format
         SearchResultsRest searchResultsRest = null;
-        try {
-            searchResultsRest = discoveryRestRepository
-                .getSearchObjects(query, dsoType, dsoScope, configurationName, searchFilters, page);
-        } catch (BadRequestException badRequestException) {
-            new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        searchResultsRest = discoveryRestRepository
+            .getSearchObjects(query, dsoType, dsoScope, configurationName, searchFilters, page);
 
         //Convert the Search JSON results to paginated HAL resources
         SearchResultsResource searchResultsResource = new SearchResultsResource(searchResultsRest, utils, page);
