@@ -20,6 +20,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  */
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
+
     @Autowired
     private RestAuthenticationService restAuthenticationService;
 
@@ -49,6 +51,12 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         } else {
             sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_UNAUTHORIZED);
         }
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected void handleIllegalArgumentException(HttpServletRequest request, HttpServletResponse response,
+                                                  Exception ex) throws IOException {
+        sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_BAD_REQUEST);
     }
 
     @ExceptionHandler(SQLException.class)
