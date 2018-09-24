@@ -31,6 +31,7 @@ import org.dspace.app.cris.model.jdyna.BoxDynamicObject;
 import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DynamicProperty;
+import org.dspace.app.cris.model.jdyna.EditTabDynamicObject;
 import org.dspace.app.cris.model.jdyna.TabDynamicObject;
 import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
 import org.dspace.app.cris.model.jdyna.TabProject;
@@ -110,6 +111,7 @@ public class DynamicObjectDetailsController
         }
         
         boolean isAdmin = CrisAuthorizeManager.isAdmin(context,dyn);
+        boolean canEdit = isAdmin || CrisAuthorizeManager.canEdit(context, applicationService, EditTabDynamicObject.class, dyn);
         if ((dyn.getStatus() == null || dyn.getStatus().booleanValue() == false)
                 && !isAdmin)
         {
@@ -138,6 +140,9 @@ public class DynamicObjectDetailsController
             model.put("do_page_menu", new Boolean(true));
         }
 
+		if (canEdit) {
+			model.put("canEdit", new Boolean(true));
+		}
         ModelAndView mvc = null;
 
         try

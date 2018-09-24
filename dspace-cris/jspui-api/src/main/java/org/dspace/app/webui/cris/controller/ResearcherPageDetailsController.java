@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.cris.integration.RPAuthority;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
+import org.dspace.app.cris.model.jdyna.EditTabResearcherPage;
 import org.dspace.app.cris.model.jdyna.RPAdditionalFieldStorage;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
@@ -178,7 +181,8 @@ public class ResearcherPageDetailsController
         }
         
         boolean isAdmin = CrisAuthorizeManager.isAdmin(context,researcher);
-      
+		boolean canEdit = isAdmin
+				|| CrisAuthorizeManager.canEdit(context, applicationService, EditTabResearcherPage.class, researcher);
         
         if (isAdmin
                 || (currUser != null && (researcher.getEpersonID() != null && currUser
@@ -251,7 +255,7 @@ public class ResearcherPageDetailsController
         List<ICrisHomeProcessor<ResearcherPage>> resultProcessors = new ArrayList<ICrisHomeProcessor<ResearcherPage>>();
         Map<String, Object> extraTotal = new HashMap<String, Object>();
         Map<String, ItemMetricsDTO> metricsTotal = new HashMap<String, ItemMetricsDTO>();
-        List<String> metricsTypeTotal = new ArrayList<String>();
+        HashSet<String> metricsTypeTotal = new LinkedHashSet<String>();
         for (ICrisHomeProcessor processor : processors)
         {
             if (ResearcherPage.class.isAssignableFrom(processor.getClazz()))
@@ -270,7 +274,9 @@ public class ResearcherPageDetailsController
                 }
             }
         }
-        extraTotal.put("metricTypes", metricsTypeTotal);
+        
+        List<String> metricsTypes = new ArrayList<String>( metricsTypeTotal);
+        extraTotal.put("metricTypes",metricsTypes );
         extraTotal.put("metrics", metricsTotal);
         request.setAttribute("extra", extraTotal);  
         
@@ -282,6 +288,10 @@ public class ResearcherPageDetailsController
                         ConfigurationManager
                                 .getBooleanProperty(SolrLogger.CFG_STAT_MODULE,"authorization.admin"));
         mvc.getModel().put("isAdmin", isAdmin);
+        if (canEdit)
+        {
+        	mvc.getModel().put("canEdit", new Boolean(true));
+        }
         
         // Fire usage event.
         request.setAttribute("sectionid", StatsConfig.DETAILS_SECTION);

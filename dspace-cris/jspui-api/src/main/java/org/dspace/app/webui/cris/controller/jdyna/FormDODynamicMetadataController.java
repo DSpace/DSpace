@@ -82,16 +82,33 @@ public class FormDODynamicMetadataController
         // visibility)
         DynamicObjectType typo = getApplicationService().get(DynamicObjectType.class, object.getTipologiaId());
         List<EditTabDynamicObject> tabs = getApplicationService()
-                .<BoxDynamicObject, DynamicObjectType, DynamicPropertiesDefinition, TabDynamicObject, EditTabDynamicObject>getEditTabsByVisibilityAndType(EditTabDynamicObject.class, isAdmin, typo);
+                .<BoxDynamicObject, DynamicObjectType, DynamicPropertiesDefinition, TabDynamicObject, EditTabDynamicObject>findEditTabByType(EditTabDynamicObject.class, typo);
 
+        Integer entityId = Integer.parseInt(request.getParameter("id"));
+                
+		if (entityId == null) {
+			return null;
+		}
+		Context context = UIUtil.obtainContext(request);
+		List<EditTabDynamicObject> authorizedTabs = new LinkedList<EditTabDynamicObject>();
+
+		for (EditTabDynamicObject tab : tabs) {
+			if (CrisAuthorizeManager.authorize(context, getApplicationService(), ResearchObject.class,
+					DynamicPropertiesDefinition.class, entityId, tab)) {
+				authorizedTabs.add(tab);
+			}
+		}
         // check if request tab from view is active (check on collection before)
         EditTabDynamicObject editT = getApplicationService().get(
-                EditTabDynamicObject.class, anagraficaObjectDTO.getTabId());
-        if (!tabs.contains(editT))
-        {
-            throw new AuthorizeException(
-                    "You not have needed authorization level to display this tab");
-        }
+				EditTabDynamicObject.class, anagraficaObjectDTO.getTabId());
+		if (!authorizedTabs.contains(editT)) {
+			if (authorizedTabs.size() > 0) {
+				editT = authorizedTabs.get(0);
+				anagraficaObjectDTO.setTabId(editT.getId());
+			} else {
+				throw new AuthorizeException("You not have needed authorization level to display this tab");
+			}
+		}
 
         // collection of boxs
         List<BoxDynamicObject> propertyHolders = new LinkedList<BoxDynamicObject>();
@@ -149,7 +166,7 @@ public class FormDODynamicMetadataController
         map.put("propertiesHolders", propertyHoldersCurrentAccessLevel);
         map.put("propertiesDefinitionsInTab", pDInTab);
         map.put("propertiesDefinitionsInHolder", mapBoxToContainables);
-        map.put("tabList", tabs);
+        map.put("tabList", authorizedTabs);
         map.put("simpleNameAnagraficaObject", getClazzAnagraficaObject()
                 .getSimpleName());
         map.put("addModeType", "edit");
@@ -172,30 +189,19 @@ public class FormDODynamicMetadataController
         ResearchObject entity = getApplicationService().get(ResearchObject.class,
                 id);
         Context context = UIUtil.obtainContext(request);
-        Boolean isAdmin = false;
-        if (CrisAuthorizeManager.isAdmin(context, entity))
+        boolean canEdit = false;
+        if (CrisAuthorizeManager.canEdit(context, getApplicationService(), EditTabDynamicObject.class, entity))
         {
-            isAdmin = true;
+        	canEdit = true;
         }
         else {
             throw new AuthorizeException("Only system admin can edit");
         }
 
-        Integer areaId;
+        Integer areaId = null;
         if (paramTabId == null)
         {
-            if (paramFuzzyTabId == null)
-            {
-                List<EditTabDynamicObject> tabs = getApplicationService()
-                        .<BoxDynamicObject, DynamicObjectType, DynamicPropertiesDefinition, TabDynamicObject, EditTabDynamicObject>getEditTabsByVisibilityAndType(EditTabDynamicObject.class,
-                                isAdmin, entity.getTypo());
-                if (tabs.isEmpty())
-                {
-                    throw new AuthorizeException("No tabs defined!!");
-                }
-                areaId = tabs.get(0).getId();
-            }
-            else
+            if (paramFuzzyTabId != null)
             {
                 EditTabDynamicObject fuzzyEditTab = (EditTabDynamicObject) ((ApplicationService) getApplicationService())
                         .<BoxDynamicObject, TabDynamicObject, EditTabDynamicObject, DynamicPropertiesDefinition>getEditTabByDisplayTab(
@@ -209,8 +215,31 @@ public class FormDODynamicMetadataController
             areaId = Integer.parseInt(paramTabId);
         }
 
-        EditTabDynamicObject editT = getApplicationService().get(
-                EditTabDynamicObject.class, areaId);
+        EditTabDynamicObject editT = null;
+		if (areaId != null) {
+			editT = getApplicationService().get(EditTabDynamicObject.class, areaId);
+		}
+		
+        List<EditTabDynamicObject> tabs = getApplicationService().findEditTabByType(EditTabDynamicObject.class, entity.getTypo());
+        List<EditTabDynamicObject> authorizedTabs = new LinkedList<EditTabDynamicObject>();
+        
+        for(EditTabDynamicObject tab : tabs) {
+            if(CrisAuthorizeManager.authorize(context, getApplicationService(), ResearchObject.class, DynamicPropertiesDefinition.class, id, tab)) {
+                authorizedTabs.add(tab);
+            }
+        }
+        if (!authorizedTabs.contains(editT))
+        {
+               if (authorizedTabs.size() > 0) {
+                       editT = authorizedTabs.get(0);
+                       areaId = editT.getId();
+               }
+               else {
+                   throw new AuthorizeException(
+                           "You not have needed authorization level to display this tab");
+               }
+        }
+
         List<BoxDynamicObject> propertyHolders = new LinkedList<BoxDynamicObject>();
         if (editT.getDisplayTab() != null)
         {

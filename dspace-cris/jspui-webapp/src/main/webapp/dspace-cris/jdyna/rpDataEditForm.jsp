@@ -362,7 +362,7 @@
 		            	
 		            	var valueCurrentEperson = j("#epersonID").val();
 		            	
-		            	if(ui.item.owneredRP!=0 && (ui.item.owneredRP!=${researcher.id} && ui.item.owneredRP!=valueCurrentEperson) ) {
+		            	if(ui.item.owneredRP!=0 && (ui.item.owneredRP!=${researcher!=null?researcher.id:"-1"} && ui.item.owneredRP!=valueCurrentEperson) ) {
 		            		j("#alert_eperson_dialog").dialog("open");
 		            		j("#alert_eperson_dialog").html(" ");
 		            		j("#alert_eperson_dialog").append("${messagealerteperson}");

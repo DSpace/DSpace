@@ -40,6 +40,10 @@
 	// Is the logged in user an admin
 	Boolean admin = (Boolean)request.getAttribute("isAdmin");
 	boolean isAdmin = (admin == null ? false : admin.booleanValue());
+	// Can the logged in user edit
+	Boolean bEdit = (Boolean)request.getAttribute("canEdit");
+	boolean canEdit = (bEdit == null ? false : bEdit.booleanValue());
+	
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);
     int c = currentPage.indexOf( '?' );
@@ -188,7 +192,7 @@
 			 	<a class="btn btn-default" href="<%= request.getContextPath() %>/open-search?query=dc.relation_authority:${authority}&amp;format=rss"><i class="fa fa-rss"></i> <fmt:message key="jsp.cris.detail.link.rssfeed" /></a>
 		 	 </div>
 		 
-		 <c:if test="${grant_page_menu && !empty project}"> 
+		 <c:if test="${(grant_page_menu || canEdit) && !empty project}"> 
 		 	<c:if test="${!empty addModeType && addModeType=='display'}">
 		 	<div class="btn-group">
 	 			<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/tools/project/editDynamicData.htm?id=${entity.id}&anagraficaId=${entity.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><i class="fa fa-pencil-square-o"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.edit.project"/></a>
