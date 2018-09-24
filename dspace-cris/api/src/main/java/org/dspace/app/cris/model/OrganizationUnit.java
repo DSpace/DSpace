@@ -31,6 +31,8 @@ import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUProperty;
 import org.dspace.app.cris.model.jdyna.OUTypeNestedObject;
 import org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage;
+import org.dspace.app.cris.model.jdyna.ProjectProperty;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 
 @Entity
@@ -269,8 +271,19 @@ public class OrganizationUnit extends
     @Override
     public boolean isOwner(EPerson eperson)
     {
-        // TODO not implemented
-        return false;
+    	String ownerProperty = ConfigurationManager.getProperty("cris", getTypeText() + ".owner");
+		if (ownerProperty != null) {
+			for (String propConf : ownerProperty.split("\\s*,\\s*")) {
+	    		List<OUProperty> props = getAnagrafica4view().get(propConf);
+	    		for (OUProperty p : props) {
+	    			ResearcherPage rp = (ResearcherPage) p.getObject();
+	    			if (eperson != null && rp.getEpersonID()!= null && eperson.getID() == rp.getEpersonID()) {
+	    				return true;
+	    			}
+	    		}
+			}
+    	}
+    	return false;
     }
 
 }

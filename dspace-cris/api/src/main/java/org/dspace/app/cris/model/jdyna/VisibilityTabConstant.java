@@ -52,6 +52,7 @@ public class VisibilityTabConstant
     public static List<Integer> getEditValues()
     {
         List<Integer> values = new LinkedList<Integer>();
+        values.add(POLICY);
         values.add(STANDARD);
         values.add(ADMIN);
         values.add(LOW);
@@ -60,10 +61,11 @@ public class VisibilityTabConstant
 
     public static List<Integer> getLimitedValues()
     {
-        List<Integer> values = new LinkedList<Integer>();
-        values.add(POLICY);
-        values.add(HIGH);
-        values.add(ADMIN);
-        return values;
+        return getValues();
+    }
+    
+    public static List<Integer> getLimitedEditValues()
+    {
+        return getEditValues();
     }
 }
