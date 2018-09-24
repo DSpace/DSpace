@@ -928,19 +928,10 @@
                 <artifactId>additions</artifactId>
                 <version>7.0-SNAPSHOT</version>
             </dependency>
-
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
                 <version>7.0-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-sword</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1236,10 +1227,9 @@
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
-                <artifactId>servlet-api</artifactId>
-                <version>2.5</version>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.1.0</version>
             </dependency>
-
             <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>

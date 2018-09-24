@@ -27,11 +27,6 @@ import org.purl.sword.base.SWORDException;
  */
 public class AtomDocumentServlet extends DepositServlet {
 
-    public AtomDocumentServlet()
-        throws ServletException {
-        super();
-    }
-
     /**
      * Process the get request.
      */
