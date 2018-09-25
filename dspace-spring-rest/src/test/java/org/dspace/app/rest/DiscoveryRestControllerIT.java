@@ -2678,4 +2678,99 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         ;
 
     }
+
+    @Test
+    public void discoverSearchObjectsTestWithDateIssuedQuery() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Test 2")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                                      .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            Bitstream bitstream = BitstreamBuilder.
+                                                      createBitstream(context, publicItem1, is)
+                                                  .withName("Bitstream")
+                                                  .withMimeType("text/plain")
+                                                  .build();
+        }
+
+        //Run the filter media to make the text in the bitstream searchable through the query
+        runDSpaceScript("filter-media", "-f", "-i", publicItem1.getHandle());
+
+        //** WHEN **
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("query", "dc.date.issued:2010-02-13"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
+                   )))
+                   //This is the only item that should be returned with the query given
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
+                   )))
+
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+
+        //** WHEN **
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("query", "dc.date.issued:2013-02-13"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
+                   )))
+
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
 }
