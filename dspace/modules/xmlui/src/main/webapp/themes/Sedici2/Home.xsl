@@ -52,6 +52,10 @@
 <!--          </div> -->
 
 		<!-- Por el momento mostramos una imagen estatica que simula ser el slideshow -->
+	     <div id='home_info'>
+	         <xsl:apply-templates select="dri:div[@n='news']/dri:p"/>
+	     </div>
+
 		<div id="home_slideshow" class="html_content">
 			<div class="html_slide">
 				<div id="slide_recursos" class="html_slide_item">
@@ -72,11 +76,7 @@
 				</div>
 			</div>
 		</div>
-
-	     <div id='home_info'>
-	         <xsl:apply-templates select="dri:div[@n='news']/dri:p"/>
-	     </div>
-	     
+     
 	     <div id='home_feed'>
 	         <xsl:apply-templates select="dri:div[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.div.feed']"/>
 	     </div>

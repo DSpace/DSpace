@@ -2693,5 +2693,20 @@
 
     <message key="xmlui.discovery.ocultar_filtros">Ocultar Filtros</message>
     <message key="xmlui.discovery.ver_filtros">Ver filtros</message></message>
+	
+	<message key="sedici.home.buscar_material.title">Material de pesquisa</message>
+	<message key="sedici.home.buscar_material.info_pre">Pesquise entre mais de </message>
+	<message key="sedici.home.buscar_material.info_post"> recursos disponíveis no repositório</message>
+	<message key="sedici.home.subir_material.title">Upload de material</message>
+	<message key="sedici.home.subir_material.info">Suba sus trabajos a SEDICI, para mejorar notoriamente su visibilidad e impacto</message>
+	<message key="sedici.home.subir_material.linktext">Publique o seu trabalho na SEDICI, para melhorar visivelmente a sua visibilidade e impacto</message>
+	<message key="sedici.home.slide_resources.title">Publicações acadêmicas e científicas</message>
+	<message key="sedici.home.slide_resources.info">Teses de graduação e pós-graduação, artigos, apresentações em conferências, recursos de aprendizagem, relatórios técnicos, livros e muito mais</message>
+	<message key="sedici.home.slide_digital_preservation.title">Coleções Patrimoniais</message>
+	<message key="sedici.home.slide_digital_preservation.info">Documentos históricos digitalizados, material de museu</message>
+	<message key="sedici.home.slide_work_visibility.title">Dados</message>
+	<message key="sedici.home.slide_work_visibility.info">Dados de pesquisa primária e secundária</message>
+	<message key="sedici.home.slide_pairs_contact.title">Documentos institucionais</message>
+	<message key="sedici.home.slide_pairs_contact.info">Documentos institucionais, informativos, normativos e administrativos da Universidade</message>
 
 </catalogue>

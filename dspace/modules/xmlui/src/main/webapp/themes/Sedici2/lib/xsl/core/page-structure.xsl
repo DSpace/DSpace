@@ -382,6 +382,7 @@ placeholders for header images -->
                 </a>
                 
                 <div id="unlp_logo">
+                	<a href="https://unlp.edu.ar/" target="_blank">
 			 		<img>
 			            <xsl:attribute name="src">
 			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
@@ -390,6 +391,7 @@ placeholders for header images -->
 			                <xsl:text>/images/logo_unlp_grande.png</xsl:text>
 			            </xsl:attribute>&#160;
 			 		</img>
+			 		</a>
                 </div>
             </div>
 

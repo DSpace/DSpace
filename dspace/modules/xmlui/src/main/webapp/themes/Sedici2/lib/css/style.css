@@ -93,14 +93,16 @@ margin:0 auto;
 }
 
 #ds-header-wrapper {
-	height:157px;
 	background-image:url(../../images/background_header_large.png);
 	background-repeat: no-repeat;
 	background-color:#7fbce5;
-/*	width:1350px;*/
 }
 
 #ds-header-wrapper #ds-header {
+	padding-left: 30px;
+	padding-right: 90px;
+	padding-top: 40px;
+	padding-bottom: 44px;
 }
 
 #ds-header-logo-link {
@@ -110,10 +112,8 @@ margin:0 auto;
 
 #ds-header-logo {
     float:left;
-    width: 211px;
-    height: 67px;
-    margin-top: 50px;
-    margin-left: 30px;
+    width: 436px;
+    height: 72px;
     background-image:url(../../images/sedici_logo.png);
     background-repeat: no-repeat;
     background-color: transparent;
@@ -121,7 +121,6 @@ margin:0 auto;
 
 #unlp_logo {
 	float: right;
-	margin-top: 8px;
 }
 
 #ds-header-logo-text {
@@ -201,7 +200,6 @@ min-width:500px;
 	padding-top: 10px;
 	padding-left: 10px;
 	padding-right: 20px;
-	background-image: url("../../images/fondo_repeat_izquierda.png");
 	background-repeat: repeat-x;
 	position:relative;
 	top:-1px;
@@ -1982,6 +1980,7 @@ border-radius:5px;
     float: right;
     position: relative;
 	right:89px;
+	padding-top: 4px;
 }
 
 #socialbar a{
@@ -1998,7 +1997,6 @@ border: 1px solid #E9EFFB;
 	font-size: 11px;
 	min-height: 54px;
 	margin-bottom:7px;
-	margin-top:-5px;
 }
 
 #login_box {

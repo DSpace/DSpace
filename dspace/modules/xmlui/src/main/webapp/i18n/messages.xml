@@ -2940,14 +2940,14 @@
 <message key="sedici.home.subir_material.title">Upload resources</message>
 <message key="sedici.home.subir_material.info">Upload your works to SEDICI to increase its visibility and improve its impact</message>
 <message key="sedici.home.subir_material.linktext">Upload a new document</message>
-<message key="sedici.home.slide_resources.title">Resources for your research</message>
-<message key="sedici.home.slide_resources.info">Access to more than 25.000 scientific and academic resources  developed in the UNLP.</message>
-<message key="sedici.home.slide_digital_preservation.title">Digital preservation</message>
-<message key="sedici.home.slide_digital_preservation.info">Ensure the long-term access of your work despite the technologic changes</message>
-<message key="sedici.home.slide_work_visibility.title">Visibility of your work</message>
-<message key="sedici.home.slide_work_visibility.info">By posting your works in SEDICI you will improve its visibility and impact</message>
-<message key="sedici.home.slide_pairs_contact.title">Contact with pairs</message>
-<message key="sedici.home.slide_pairs_contact.info">Contact with researchers that actually works in areas related to yours</message>
+<message key="sedici.home.slide_resources.title">Academic and Scientific Publications</message>
+<message key="sedici.home.slide_resources.info">Degree and postgraduate theses, articles, presentations at conferences, learning resources, technical reports, books and more</message>
+<message key="sedici.home.slide_digital_preservation.title">Patrimonial Collections</message>
+<message key="sedici.home.slide_digital_preservation.info">Digitized historical documents, museum material</message>
+<message key="sedici.home.slide_work_visibility.title">Data</message>
+<message key="sedici.home.slide_work_visibility.info">Primary and secondary research data</message>
+<message key="sedici.home.slide_pairs_contact.title">Institutional documents</message>
+<message key="sedici.home.slide_pairs_contact.info">Institutional, informative, normative and administrative documents of the University</message>
 
 <message key="sedici.items.handle.utilizacion_URI">Please, use this identificator(URI) for cite o linking this item: </message>
 <message key="sedici.common.camposObligatorios">(*) Mandatory fields</message>

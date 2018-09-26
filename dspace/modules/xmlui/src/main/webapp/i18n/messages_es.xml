@@ -3142,14 +3142,14 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="sedici.home.subir_material.title">Subir material</message>
 <message key="sedici.home.subir_material.info">Suba sus trabajos a SEDICI, para mejorar notoriamente su visibilidad e impacto</message>
 <message key="sedici.home.subir_material.linktext">Cargar un documento</message>
-<message key="sedici.home.slide_resources.title">Recursos para su investigación</message>
-<message key="sedici.home.slide_resources.info">Acceda a miles de recursos científicos y académicos producidos dentro de la UNLP</message>
-<message key="sedici.home.slide_digital_preservation.title">Preservación digital</message>
-<message key="sedici.home.slide_digital_preservation.info">Asegure el acceso a su obra a largo plazo, aún frente a los cambios tecnológicos</message>
-<message key="sedici.home.slide_work_visibility.title">Visibilidad de sus obras</message>
-<message key="sedici.home.slide_work_visibility.info">Al publicar sus trabajos en SEDICI aumentará la visibilidad e impacto de sus obras</message>
-<message key="sedici.home.slide_pairs_contact.title">Contacto con pares</message>
-<message key="sedici.home.slide_pairs_contact.info">Contáctese con investigadores que se encuentren trabajando en áreas relacionadas a la suya</message>
+<message key="sedici.home.slide_resources.title">Publicaciones Académicas y Cientificas</message>
+<message key="sedici.home.slide_resources.info">Tesis de grado y postgrado, artículos, presentaciones en congresos, recursos de aprendizaje, informes técnicos, libros y múcho más</message>
+<message key="sedici.home.slide_digital_preservation.title">Colecciones Patrimoniales</message>
+<message key="sedici.home.slide_digital_preservation.info">Documentos históricos digitalizados, material de museo</message>
+<message key="sedici.home.slide_work_visibility.title">Datos</message>
+<message key="sedici.home.slide_work_visibility.info">Datos de investigación primarios y secundarios</message>
+<message key="sedici.home.slide_pairs_contact.title">Documentos institucionales</message>
+<message key="sedici.home.slide_pairs_contact.info">Documentos de carácter institucional, informativos, normativos y administrativos de la Universidad</message>
 
 <message key="sedici.items.handle.utilizacion_URI">Por favor, utilice este identificador(URI) para citar o enlazar este ítem: </message>
 
