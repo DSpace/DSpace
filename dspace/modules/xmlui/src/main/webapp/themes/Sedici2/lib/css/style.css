@@ -3152,17 +3152,24 @@ margin-left: 5px;
 margin:0px 4px 0px 4px;
 }
 
-#como_llegar #mapa_grande {
-width: 624px;
-height: 420px;
-background: url(../../images/mapa_grande_2.jpg);
+#como_llegar{
+    float: left;
+}
+#mapa_grande {
+    width: 624px;
+    height: 420px;
+    background: url(../../images/mapa_grande_2.jpg);
 }
 
-#como_llegar #gmaps {
-	width: 158px;
-	height: 26px;
-	background: url(../../images/maps.png);
-	display: block;
+#mapa_detalle {
+    float: right;
+}
+
+#mapa_detalle img {
+	width: 450px;
+}
+#gmaps {
+	float: right;
 }
 
 .pagina_estatica {

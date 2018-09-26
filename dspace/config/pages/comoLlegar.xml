@@ -15,9 +15,6 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <div id='pagina_estatica' class="pagina_comoLlegar">
 
 <div id="como_llegar">
-
-<p><a href="static/resources/mapa_grande.png" target="_blank" title="Mapa de SEDICI"><img src="static/resources/mapa.jpg" title="Mapa de SEDICI" alt="Mapa"/></a></p>
-
 <h1>SEDICI - UNLP</h1>
 <p>
 	Calle 49 y 115 s/n 1er piso
@@ -28,9 +25,12 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	<br/>
 	Tel: (0221) 423-6696/6677 int. 141   
 </p>
-
-<a id="gmaps" href="http://maps.google.com.ar/maps/place?cid=8758148143025525123&amp;q=prebi+sedici&amp;hl=es&amp;dtab=0&amp;sll=-34.906329,-57.938526&amp;sspn=0.011139,0.026157&amp;ie=UTF8&amp;ll=-34.90075,-57.951615&amp;spn=0,0&amp;z=16" target="_blank"> </a>
-
+</div>
+<div id="gmaps">
+<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com.ar/maps?ie=UTF8&amp;cid=8758148143025525123&amp;q=PrEBI+and+SeDiCI+UNLP&amp;gl=AR&amp;hl=es-419&amp;t=m&amp;ll=-34.907261,-57.942431&amp;spn=0.006159,0.00912&amp;z=16&amp;iwloc=A&amp;output=embed">Map</iframe>
+</div>
+<div id="mapa_detalle">
+<a href="static/resources/mapa_grande.png" target="_blank" title="Mapa de SEDICI"><img src="static/resources/mapa_grande.png" title="Mapa de SEDICI" alt="Mapa"/></a>
 </div>
 
 </div>
