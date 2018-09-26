@@ -141,10 +141,10 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 		    select.addOption("", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.sinLicencia"));
 		    select.addOption("by", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by"));
 		    select.addOption("by-nc", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc"));
-		    select.addOption("by-nc-nd", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd"));
-		    select.addOption("by-nc-sa", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa"));
 		    select.addOption("by-nd", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd"));
 		    select.addOption("by-sa", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa"));
+		    select.addOption("by-nc-nd", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd"));
+		    select.addOption("by-nc-sa", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa"));
 		   
 	        if (carga.length>0){
 		    	dato=carga[0].value;
