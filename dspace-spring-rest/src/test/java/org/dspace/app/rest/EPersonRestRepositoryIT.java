@@ -126,7 +126,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(eperson.getEmail(), password);
         // Access endpoint logged in as an unprivileged user
         getClient(authToken).perform(get("/api/eperson/eperson"))
-                            .andExpect(status().isForbidden());
+                            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -242,7 +242,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         // Verify an unprivileged user cannot access information about a *different* user
         String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
-                               .andExpect(status().isForbidden());
+                               .andExpect(status().isUnauthorized());
 
         // Verify an unprivilegd user can access information about himself/herself
         getClient(epersonToken).perform(get("/api/eperson/epersons/" + eperson.getID()))

@@ -11,18 +11,21 @@ import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIB
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ForbiddenException;
 
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,7 +45,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @Autowired
     private RestAuthenticationService restAuthenticationService;
 
-    @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class})
+    @ExceptionHandler( {AuthorizeException.class, RESTAuthorizationException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
         if (restAuthenticationService.hasAuthenticationData(request)) {
@@ -73,7 +76,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler({MissingParameterException.class, QueryMethodParameterConversionException.class})
+    @ExceptionHandler( {MissingParameterException.class, QueryMethodParameterConversionException.class})
     protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
 
@@ -87,18 +90,21 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
-            HttpHeaders headers, HttpStatus status, WebRequest request) {
+                                                                          HttpHeaders headers, HttpStatus status,
+                                                                          WebRequest request) {
         // we want the 422 status for missing parameter as it seems to be the common behavior for REST application, see
-        // https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is-missing-a-required
+        // https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is
+        // -missing-a-required
         return super.handleMissingServletRequestParameter(ex, headers, HttpStatus.UNPROCESSABLE_ENTITY, request);
     }
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
-            HttpStatus status, WebRequest request) {
+                                                        HttpStatus status, WebRequest request) {
         // we want the 422 status for type mismatch on parameters as it seems to be the common behavior for REST
         // application, see
-        // https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is-missing-a-required
+        // https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is
+        // -missing-a-required
         return super.handleTypeMismatch(ex, headers, HttpStatus.UNPROCESSABLE_ENTITY, request);
     }
 
@@ -107,6 +113,45 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         throws IOException {
         sendErrorResponse(request, response, ex, "An Exception has occured",
                           HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler( {ResourceNotFoundException.class, RepositoryNotFoundException.class})
+    protected void handleResourceNotFoundException(HttpServletRequest request, HttpServletResponse response,
+                                                   Exception ex)
+        throws IOException {
+        sendErrorResponse(request, response, ex, "A ResourceNotFoundException has occured",
+                          HttpServletResponse.SC_NOT_FOUND);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    protected void handleAccessDeniedException(HttpServletRequest request, HttpServletResponse response,
+                                               Exception ex)
+        throws IOException {
+        sendErrorResponse(request, response, ex, "A ResourceNotFoundException has occured",
+                          HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(UnprocessableEntityException.class)
+    protected void handleUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
+                                                      Exception ex)
+        throws IOException {
+        sendErrorResponse(request, response, ex, "An UnprocessableEntityException has occured", 422);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    protected void handleForbiddenException(HttpServletRequest request, HttpServletResponse response,
+                                            Exception ex)
+        throws IOException {
+        sendErrorResponse(request, response, ex, "A ForbiddenException has occured", HttpServletResponse.SC_FORBIDDEN);
+    }
+
+
+    @ExceptionHandler(BadRequestException.class)
+    protected void handleBadRequestExceptionn(HttpServletRequest request, HttpServletResponse response,
+                                              Exception ex)
+        throws IOException {
+        sendErrorResponse(request, response, ex, "A BadRequestException has occured",
+                          HttpServletResponse.SC_BAD_REQUEST);
     }
 
     private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,
