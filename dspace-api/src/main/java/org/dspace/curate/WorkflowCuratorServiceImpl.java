@@ -135,7 +135,9 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService {
                         = (Reporter) plugins
                         .getSinglePlugin(Reporter.class);) {
                     curator.setReporter(reporter);
-                    return curate(curator, c, wfi);
+                    boolean status = curate(curator, c, wfi);
+                    reporter.close();
+                    return status;
                 } catch (Exception e) {
                     log.error("Failed to close report", e);
                 }
