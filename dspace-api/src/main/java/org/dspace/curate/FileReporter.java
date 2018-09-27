@@ -42,7 +42,7 @@ public class FileReporter
             throws IOException {
         // Calculate a unique(?) file name.
         Date now = GregorianCalendar.getInstance().getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddThhmmssSSS");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'hhmmssSSS");
         String filename = String.format("curation-%s.report", sdf.format(now));
 
         // Build a path to the directory which is to receive the file.
