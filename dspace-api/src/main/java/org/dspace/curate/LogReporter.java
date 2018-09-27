@@ -15,32 +15,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Write curation report records through the logging framework.
- * Whole lines (strings ending in '\n') are written to a log category named by
- * the task ID, for example "curation.virusscan".
+ * Whole lines (strings ending in '\n') are written to the log category "curation".
  * Any partial line is flushed when the reporter is {@code close()}d.
  *
  * @author mhwood
  */
 public class LogReporter
         implements Reporter {
-    private static Logger LOG;
-    private final String taskID;
+    private static final Logger LOG = LoggerFactory.getLogger("curation");
     private final StringBuilder buffer = new StringBuilder();
-
-    private LogReporter() {
-        taskID = null;
-    }
-
-    public LogReporter(String object, String task) {
-        taskID = task;
-    }
-
-    private Logger getLogger() {
-        if (null == LOG) {
-            LOG = LoggerFactory.getLogger("curation." + taskID);
-        }
-        return LOG;
-    }
 
     @Override
     public Appendable append(CharSequence cs)
@@ -48,7 +31,7 @@ public class LogReporter
         for (int pos = 0; pos < cs.length(); pos++) {
             char c = cs.charAt(pos);
             if (c == '\n') {
-                getLogger().info(buffer.toString());
+                LOG.info(buffer.toString());
                 buffer.delete(0, buffer.length()); // Clear the buffer
             } else {
                 buffer.append(c);
@@ -72,6 +55,6 @@ public class LogReporter
     @Override
     public void close()
             throws Exception {
-        getLogger().info(buffer.toString());
+        LOG.info(buffer.toString());
     }
 }
