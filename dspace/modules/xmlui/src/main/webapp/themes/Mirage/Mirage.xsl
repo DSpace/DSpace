@@ -246,7 +246,7 @@
                 <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Latest from @datadryad
                 </h1>
 
-                <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 475px; font-size: 14px;">
+                <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
                     <div id="connect-illustrated-prose">
               <a class="twitter-timeline" href="https://twitter.com/datadryad" data-widget-id="572434627277901824">Latest from @datadryad</a>
               <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script> 
