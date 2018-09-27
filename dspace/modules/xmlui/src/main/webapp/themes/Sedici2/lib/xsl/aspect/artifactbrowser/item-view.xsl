@@ -1176,6 +1176,7 @@
 		                        		<xsl:when test="$file_type = 'image'">mime_img.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'pdf'">mime_pdf.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'msword'">mime_msword.png</xsl:when>
+		                        		<xsl:when test="$file_subtype = 'zip'">mime_zip.png</xsl:when>
 		                        		<xsl:otherwise>mime.png</xsl:otherwise>
 		                        	</xsl:choose>
 									</xsl:variable>
@@ -1211,7 +1212,8 @@
 		                        		<xsl:when test="$file_subtype = 'msword'">mime_msword.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'epub+zip'">mime_epub.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'x-mobipocket-ebook'">mime_mobi.png</xsl:when>
-		                        		<xsl:otherwise>mime.png</xsl:otherwise>
+		                        		<xsl:when test="$file_subtype = 'zip'">mime_zip.png</xsl:when>
+										<xsl:otherwise>mime.png</xsl:otherwise>
 		                        	</xsl:choose>
 	                        	</xsl:variable>
 	                            <img alt="Icon" src="{concat($theme-path, '/images/',$img_path)}"/>
