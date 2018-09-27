@@ -1,5 +1,12 @@
 # This image will be published as dspace/dspace
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
+# 
+# This version is JDK8 compatible
+# - tomcat:8
+# - ANT 1.10.5
+# - maven:latest
+# - note: expose /solr to any host; provide /rest over http
+# - default tag for branch: dspace/dspace: dspace/dspace:dspace-5_x-jdk8-test
 
 # Step 1 - Run Maven Build
 FROM maven as build
@@ -13,7 +20,12 @@ USER dspace
 
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
+
 COPY --chown=dspace dspace/src/main/docker/build.properties /app/build.properties
+
+# Provide web.xml overrides to make webapps easier to test
+COPY dspace/src/main/docker/test/solr_web.xml /app/dspace-solr/src/main/webapp/WEB-INF/web.xml
+COPY dspace/src/main/docker/test/rest_web.xml /app/dspace-rest/src/main/webapp/WEB-INF/web.xml
 
 RUN mvn package -Dmirage2.on=true
 
