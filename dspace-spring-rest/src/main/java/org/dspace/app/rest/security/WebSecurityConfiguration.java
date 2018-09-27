@@ -84,23 +84,24 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
             //Logout configuration
             .logout()
-            //On logout, clear the "session" salt
-            .addLogoutHandler(customLogoutHandler)
-            //Configure the logout entry point
-            .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout"))
-            //When logout is successful, return OK (204) status
-            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
-            //Everyone can call this endpoint
-            .permitAll()
+                //On logout, clear the "session" salt
+                .addLogoutHandler(customLogoutHandler)
+                //Configure the logout entry point
+                .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout"))
+                //When logout is successful, return OK (204) status
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+                //Everyone can call this endpoint
+                .permitAll()
             .and()
 
             //Configure the URL patterns with their authentication requirements
-            .authorizeRequests()
-            //Allow POST by anyone on the login endpoint
-            .antMatchers(HttpMethod.POST,"/api/authn/login").permitAll()
-            //TRACE, CONNECT, OPTIONS, HEAD
-            //Everyone can call GET on the status endpoint
-            .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
+            //Enable Spring Security authorization on /api/ URLs only
+            .antMatcher("/api/**").authorizeRequests()
+                //Allow POST by anyone on the login endpoint
+                .antMatchers(HttpMethod.POST,"/api/authn/login").permitAll()
+                //TRACE, CONNECT, OPTIONS, HEAD
+                //Everyone can call GET on the status endpoint
+                .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
             .and()
 
             //Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
