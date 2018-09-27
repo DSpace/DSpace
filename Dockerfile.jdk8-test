@@ -5,8 +5,8 @@
 # - tomcat:8
 # - ANT 1.10.5
 # - maven:latest
-# - note: 
-# - default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x-jdk8
+# - note: expose /solr to any host; provide /rest over http
+# - default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x-jdk8-test
 
 # Step 1 - Run Maven Build
 FROM maven as build
@@ -15,6 +15,10 @@ WORKDIR /app
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
 ADD . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
+
+# Provide web.xml overrides to make webapps easier to test
+COPY dspace/src/main/docker/test/solr_web.xml /app/dspace-solr/src/main/webapp/WEB-INF/web.xml
+COPY dspace/src/main/docker/test/rest_web.xml /app/dspace-rest/src/main/webapp/WEB-INF/web.xml
 
 RUN mvn package
 
