@@ -21,8 +21,10 @@ import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.ItemPatch;
+import org.dspace.app.rest.repository.patch.ItemOperationFactory;
+import org.dspace.app.rest.repository.patch.impl.ResourcePatchOperation;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -52,11 +54,8 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     @Autowired
     ItemConverter converter;
 
-    /**
-     * Proposed helper class for Item patches.
-     */
     @Autowired
-    ItemPatch itemPatch;
+    ItemOperationFactory patchFactory;
 
 
     public ItemRestRepository() {
@@ -99,16 +98,24 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     }
 
     @Override
-    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid, Patch
-        patch)
-        throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException,
-        ResourceNotFoundException {
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
+                      Patch patch)
+            throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException,
+            ResourceNotFoundException {
 
-        ItemRest restModel = findOne(context, uuid);
-        if (restModel == null) {
+        Item item = is.find(context, uuid);
+        if (item == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
         }
-        itemPatch.patch(restModel, context, patch);
+
+        List<Operation> operations = patch.getOperations();
+        for (Operation operation : operations) {
+
+            ResourcePatchOperation<Item> patchOperation = patchFactory.getPatchOperationForPath(operation.getPath());
+            patchOperation.perform(context, item, operation);
+
+        }
+
     }
 
     @Override
