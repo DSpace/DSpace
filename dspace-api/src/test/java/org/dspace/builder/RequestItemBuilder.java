@@ -21,7 +21,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Manage the creation and cleanup of {@link RequestItem}s for testing.
@@ -30,9 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class RequestItemBuilder
         extends AbstractBuilder<RequestItem, RequestItemService> {
-    @Autowired(required = true)
-    protected RequestItemService requestItemService;
-
     public static final String REQ_EMAIL = "jsmith@example.com";
     public static final String REQ_NAME = "John Smith";
     public static final String REQ_MESSAGE = "Please send me a copy of this.";
@@ -58,7 +54,7 @@ public class RequestItemBuilder
 
     @Override
     public RequestItem build() {
-        InputStream is = new ByteArrayInputStream("".getBytes());
+        // Build all the other stuff we need, to request an Item.
         CommunityBuilder communityBuilder = CommunityBuilder.createCommunity(context);
         community = communityBuilder.build();
         CollectionBuilder collectionBuilder = CollectionBuilder.createCollection(context,
@@ -66,15 +62,20 @@ public class RequestItemBuilder
         collection = collectionBuilder.build();
         ItemBuilder itemBuilder = ItemBuilder.createItem(context, collection);
         item = itemBuilder.build();
+
+        // Request a copy of the Item that we just built.
         String token;
-        try {
-            BitstreamBuilder bitstreamBuilder = BitstreamBuilder.createBitstream(context, item, is);
+        try (InputStream is = new ByteArrayInputStream("".getBytes());) {
+            BitstreamBuilder bitstreamBuilder
+                    = BitstreamBuilder.createBitstream(context, item, is);
             bitstream = bitstreamBuilder.build();
             token = requestItemService.createRequest(context,
                     bitstream, item, true, REQ_EMAIL, REQ_NAME, REQ_MESSAGE);
         } catch (SQLException | AuthorizeException | IOException ex) {
             throw new RuntimeException(ex);
         }
+
+        // Return the request.
         return requestItemService.findByToken(context, token);
     }
 
