@@ -1,5 +1,12 @@
 # This image will be published as dspace/dspace
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
+# 
+# This version is JDK8 compatible
+# - tomcat:8
+# - ANT 1.10.5
+# - maven:latest
+# - note: 
+# - default tag for branch: dspace/dspace: dspace/dspace:dspace-6_x-jdk8
 
 # Step 1 - Run Maven Build
 FROM maven as build
