@@ -9,7 +9,6 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
-import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +21,7 @@ import org.dspace.services.RequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Convert between {@link org.dspace.app.requestitem.RequestItem} and
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-@Named
+@Component
 public class RequestItemConverter
         extends DSpaceConverter<RequestItem, RequestItemRest> {
     private static final Logger LOG = LoggerFactory.getLogger(RequestItemConverter.class);

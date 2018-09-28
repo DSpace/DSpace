@@ -9,7 +9,6 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import javax.inject.Named;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -25,13 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.UncategorizedSQLException;
+import org.springframework.stereotype.Component;
 
 /**
  * Component to expose item requests.
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-@Named(RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME)
+@Component(RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME)
 public class RequestItemRepository
         extends DSpaceRestRepository<RequestItemRest, String> {
     private static final Logger LOG = LoggerFactory.getLogger(RequestItemRepository.class);
