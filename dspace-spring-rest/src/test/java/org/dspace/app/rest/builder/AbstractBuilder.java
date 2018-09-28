@@ -13,6 +13,8 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -47,6 +49,8 @@ import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
  * Abstract builder class that holds references to all available services
  *
  * @author Jonas Van Goolen - (jonas@atmire.com)
+ * @param <T> Model object type.
+ * @param <S> Service for that type.
  */
 public abstract class AbstractBuilder<T, S> {
 
@@ -72,10 +76,11 @@ public abstract class AbstractBuilder<T, S> {
     static MetadataFieldService metadataFieldService;
     static MetadataSchemaService metadataSchemaService;
     static SiteService siteService;
+    static RequestItemService requestItemService;
 
     protected Context context;
 
-    private static List<AbstractBuilder> builders = new LinkedList<>();
+    private static final List<AbstractBuilder> builders = new LinkedList<>();
     /**
      * log4j category
      */
@@ -107,6 +112,7 @@ public abstract class AbstractBuilder<T, S> {
         metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
         metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
         siteService = ContentServiceFactory.getInstance().getSiteService();
+        requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
 
         // Temporarily disabled
         // TODO find a way to be able to test the XML and "default" workflow at the same time
@@ -140,6 +146,7 @@ public abstract class AbstractBuilder<T, S> {
         metadataFieldService = null;
         metadataSchemaService = null;
         siteService = null;
+        requestItemService = null;
     }
 
     public static void cleanupObjects() throws Exception {
