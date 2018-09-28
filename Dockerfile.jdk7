@@ -1,7 +1,7 @@
 # This image will be published as dspace/dspace
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
 # 
-# This version is JDK8 compatible
+# This version is JDK7 compatible
 # - tomcat:7.0.90-jre7
 # - ANT 1.9.13
 # - maven:latest
