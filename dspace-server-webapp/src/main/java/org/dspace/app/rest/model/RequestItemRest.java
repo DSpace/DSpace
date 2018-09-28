@@ -8,12 +8,12 @@
 package org.dspace.app.rest.model;
 
 import java.util.Date;
-import javax.inject.Named;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Represent a user's request for a copy of an Item.
@@ -21,9 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-@Named
+@Component
 public class RequestItemRest
-        extends BaseObjectRest {
+        extends BaseObjectRest<Integer> {
     public static final String NAME = "copyrequest";
 
     public static final String CATEGORY = RestAddressableModel.TOOLS;
