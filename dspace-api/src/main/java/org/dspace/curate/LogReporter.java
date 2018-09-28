@@ -55,6 +55,8 @@ public class LogReporter
     @Override
     public void close()
             throws Exception {
-        LOG.info(buffer.toString());
+        if (buffer.length() > 0) {
+            LOG.info(buffer.toString());
+        }
     }
 }
