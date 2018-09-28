@@ -13,9 +13,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 import org.dspace.app.requestitem.RequestItem;
-import org.dspace.builder.RequestItemBuilder;
-import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.repository.RequestItemRepositoryIT;
+import org.dspace.app.rest.model.RequestItemRest;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -30,10 +29,10 @@ public class RequestCopyMatcher {
         return allOf(
                 hasJsonPath("$.bitstream", Matchers.not(Matchers.empty())),
                 hasJsonPath("$.item", Matchers.not(Matchers.empty())),
-                hasJsonPath("$.allFiles", is("true")),
-                hasJsonPath("$.reqEmail", is(RequestItemBuilder.REQ_EMAIL)),
-                hasJsonPath("$.reqName", is(RequestItemBuilder.REQ_NAME)),
-                hasJsonPath("$.reqMessage", is(RequestItemBuilder.REQ_MESSAGE)),
+                hasJsonPath("$.allFiles", is(String.valueOf(request.isAllfiles()))),
+                hasJsonPath("$.reqEmail", is(request.getReqEmail())),
+                hasJsonPath("$.reqName", is(request.getReqName())),
+                hasJsonPath("$.reqMessage", is(request.getReqMessage())),
                 hasJsonPath("$.type", is(RequestItemRest.NAME)),
                 hasJsonPath("$._embedded.schema", Matchers.not(Matchers.empty())),
                 hasJsonPath("$._links.schema.href",
