@@ -65,6 +65,8 @@ public class RequestItemRepositoryIT
     public void testFindOne()
             throws Exception {
         System.out.println("findOne");
+        context.turnOffAuthorisationSystem();
+
         RequestItem request = new RequestItemBuilder(context).build();
 
         final String uri = URI_ROOT + '/'
@@ -74,6 +76,8 @@ public class RequestItemRepositoryIT
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
                        RequestCopyMatcher.matchRequestCopy(request))));
+
+        context.restoreAuthSystemState();
     }
 
     /**
