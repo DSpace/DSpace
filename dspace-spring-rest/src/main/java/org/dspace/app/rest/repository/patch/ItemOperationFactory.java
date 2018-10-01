@@ -33,7 +33,8 @@ public class ItemOperationFactory {
     private static final String OPERATION_PATH_DISCOVERABLE = "/discoverable";
 
     /**
-     * Returns the PatchOperation for the operation.
+     * Returns the PatchOperation instance for the operation based on the
+     * operation path.
      * @param path
      * @return
      */

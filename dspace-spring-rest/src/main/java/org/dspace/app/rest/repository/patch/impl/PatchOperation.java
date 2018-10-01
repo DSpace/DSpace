@@ -47,6 +47,16 @@ public abstract class PatchOperation<DSO extends DSpaceObject, T extends Object>
         return single;
     }
 
+    /**
+     * Throws PatchBadRequestException for missing operation value.
+     * @param value the value to check
+     */
+    public void checkOperationValue(T value) {
+        if (value == null) {
+            throw new PatchBadRequestException("No value provided for the operation.");
+        }
+    }
+
     protected abstract Class<T[]> getArrayClassForEvaluation();
 
     protected abstract Class<T> getClassForEvaluation();
