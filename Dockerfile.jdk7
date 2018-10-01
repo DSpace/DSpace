@@ -19,7 +19,7 @@ COPY dspace/src/main/docker/build.properties /app/build.properties
 RUN mvn package
 
 # Step 2 - Run Ant Deploy
-FROM tomcat:77-jre7 as ant_build
+FROM tomcat:7-jre7 as ant_build
 ARG TARGET_DIR=dspace-build
 COPY --from=build /app /dspace-src
 WORKDIR /dspace-src/dspace/target/${TARGET_DIR}
