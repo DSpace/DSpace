@@ -24,7 +24,7 @@
 
 <% 
 	Map<String, ComponentInfoDTO> mapInfo = ((Map<String, ComponentInfoDTO>)(request.getAttribute("componentinfomap"))); 
-	boolean showBadgeCount = ConfigurationManager.getBooleanProperty("webui.tab.show.count.for.firstcomponent", false);
+	boolean showBadgeCount = ConfigurationManager.getBooleanProperty("cris", "webui.tab.show.count.for.firstcomponent", false);
 %>
 	
 	<div id="tabs">
