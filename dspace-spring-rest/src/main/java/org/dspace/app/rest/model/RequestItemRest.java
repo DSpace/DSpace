@@ -11,12 +11,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import org.dspace.app.rest.converter.BitstreamConverter;
-import org.dspace.app.rest.converter.ItemConverter;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Item;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * Represent a user's request for a copy of an Item.
@@ -24,18 +19,11 @@ import org.springframework.stereotype.Component;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-@Component
 public class RequestItemRest
         extends BaseObjectRest<Integer> {
     public static final String NAME = "copyrequest";
 
     public static final String CATEGORY = RestAddressableModel.TOOLS;
-
-    @Autowired(required = true)
-    private BitstreamConverter bitstreamConverter;
-
-    @Autowired(required = true)
-    private ItemConverter itemConverter;
 
     protected BitstreamRest bitstream;
     protected Date decisionDate;
@@ -54,8 +42,8 @@ public class RequestItemRest
      */
     @LinkRest(linkClass = BitstreamRest.class)
     @JsonIgnore
-    public Bitstream getBitstream() {
-        return bitstreamConverter.toModel(bitstream);
+    public BitstreamRest getBitstream() {
+        return bitstream;
     }
 
     /**
@@ -98,8 +86,8 @@ public class RequestItemRest
      */
     @LinkRest(linkClass = ItemRest.class)
     @JsonIgnore
-    public Item getItem() {
-        return itemConverter.toModel(item);
+    public ItemRest getItem() {
+        return item;
     }
 
     /**
@@ -207,6 +195,10 @@ public class RequestItemRest
         this.allfiles = allfiles;
     }
 
+    /*
+     * Common REST object methods.
+     */
+
     @Override
     public String getCategory() {
         return CATEGORY;
@@ -214,7 +206,7 @@ public class RequestItemRest
 
     @Override
     public Class getController() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return RestResourceController.class;
     }
 
     @Override

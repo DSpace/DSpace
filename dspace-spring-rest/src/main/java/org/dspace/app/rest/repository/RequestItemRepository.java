@@ -9,6 +9,7 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -17,6 +18,10 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.model.hateoas.RequestItemResource;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +47,20 @@ public class RequestItemRepository
     @Autowired(required = true)
     protected RequestItemConverter requestItemConverter;
 
+    @Autowired(required = true)
+    protected BitstreamService bitstreamService;
+
+    @Autowired(required = true)
+    protected ItemService itemService;
+
     @Override
     public RequestItemRest findOne(Context context, String id) {
         RequestItem requestItem = requestItemService.findByToken(context, id);
-        return requestItemConverter.fromModel(requestItem);
+        if (null == requestItem) {
+            return null;
+        } else {
+            return requestItemConverter.fromModel(requestItem);
+        }
     }
 
     @Override
@@ -57,8 +72,12 @@ public class RequestItemRepository
     @Override
     public RequestItemRest save(Context context, RequestItemRest ri) {
         try {
-            requestItemService.createRequest(context, ri.getBitstream(),
-                    ri.getItem(), ri.isAllfiles(), ri.getReqEmail(),
+            Bitstream bitstream = bitstreamService.find(context,
+                    UUID.fromString(ri.getBitstream().getUuid()));
+            Item item = itemService.find(context,
+                    UUID.fromString(ri.getItem().getUuid()));
+            requestItemService.createRequest(context, bitstream,
+                    item, ri.isAllfiles(), ri.getReqEmail(),
                     ri.getReqName(), ri.getReqMessage());
         } catch (SQLException ex) {
             LOG.error("New RequestItem not saved.", ex);
