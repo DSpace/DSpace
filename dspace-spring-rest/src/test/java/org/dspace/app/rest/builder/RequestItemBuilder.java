@@ -59,7 +59,9 @@ public class RequestItemBuilder
         } catch (SQLException ex) {
             return handleException(ex);
         }
-        this.requestItem = requestItemService.findByToken(context, token);
+        requestItem = requestItemService.findByToken(context, token);
+        requestItem.setAccept_request(false);
+        requestItemService.update(context, requestItem);
         return this;
     }
 
