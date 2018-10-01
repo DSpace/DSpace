@@ -4000,6 +4000,7 @@ table.dropdown-table.ui-accordion tr:hover td{
   background: url("../../images/icon_google_scholar.png") no-repeat scroll left top;
   padding: 1px 0 0 18px;
   margin: 0 0 0 10px;
+  background-size: contain;
 }
 
 
