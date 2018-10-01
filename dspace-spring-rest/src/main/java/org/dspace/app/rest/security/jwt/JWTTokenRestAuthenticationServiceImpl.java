@@ -10,6 +10,7 @@ package org.dspace.app.rest.security.jwt;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.security.DSpaceAuthentication;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -109,6 +111,33 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Override
     public AuthenticationService getAuthenticationService() {
         return authenticationService;
+    }
+
+    @Override
+    public String getWwwAuthenticateHeaderValue(final HttpServletRequest request, final HttpServletResponse response) {
+        Iterator<AuthenticationMethod> authenticationMethodIterator
+                = authenticationService.authenticationMethodIterator();
+        Context context = ContextUtil.obtainContext(request);
+
+        StringBuilder wwwAuthenticate = new StringBuilder();
+        while (authenticationMethodIterator.hasNext()) {
+            AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
+
+            if (wwwAuthenticate.length() > 0) {
+                wwwAuthenticate.append(", ");
+            }
+
+            wwwAuthenticate.append(authenticationMethod.getName()).append(" realm=\"DSpace REST API\"");
+
+            String loginPageURL = authenticationMethod.loginPageURL(context, request, response);
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(loginPageURL)) {
+                // We cannot reply with a 303 code because may browsers handle 3xx response codes transparently. This
+                // means that the JavaScript client code is not aware of the 303 status and fails to react accordingly.
+                wwwAuthenticate.append(", location=\"").append(loginPageURL).append("\"");
+            }
+        }
+
+        return wwwAuthenticate.toString();
     }
 
     private void addTokenToResponse(final HttpServletResponse response, final String token) throws IOException {

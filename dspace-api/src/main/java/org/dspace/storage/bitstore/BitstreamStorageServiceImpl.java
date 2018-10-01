@@ -348,14 +348,18 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      */
     @Override
     public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException {
-        Bitstream clonedBitstream = bitstreamService.create(context, bitstreamService.retrieve(context, bitstream));
+        Bitstream clonedBitstream = bitstreamService.clone(context, bitstream);
+        clonedBitstream.setStoreNumber(bitstream.getStoreNumber());
+
         List<MetadataValue> metadataValues = bitstreamService
             .getMetadata(bitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+
         for (MetadataValue metadataValue : metadataValues) {
-            bitstreamService
-                .addMetadata(context, clonedBitstream, metadataValue.getMetadataField(), metadataValue.getLanguage(),
-                             metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence());
+            bitstreamService.addMetadata(context, clonedBitstream, metadataValue.getMetadataField(),
+                metadataValue.getLanguage(), metadataValue.getValue(), metadataValue.getAuthority(),
+                metadataValue.getConfidence());
         }
+        bitstreamService.update(context, clonedBitstream);
         return clonedBitstream;
 
     }
@@ -381,7 +385,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             log.info("Copying bitstream:" + bitstream
                 .getID() + " from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "] " +
                          "Name:" + bitstream
-                .getName() + ", SizeBytes:" + bitstream.getSize());
+                .getName() + ", SizeBytes:" + bitstream.getSizeBytes());
 
             InputStream inputStream = retrieve(context, bitstream);
             stores.get(assetstoreDestination).put(bitstream, inputStream);

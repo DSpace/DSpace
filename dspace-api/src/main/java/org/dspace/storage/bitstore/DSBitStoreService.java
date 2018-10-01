@@ -117,25 +117,21 @@ public class DSBitStoreService implements BitStoreService {
             //Create the corresponding file and open it
             file.createNewFile();
 
-            FileOutputStream fos = new FileOutputStream(file);
+            try (
+                    FileOutputStream fos = new FileOutputStream(file);
+                    // Read through a digest input stream that will work out the MD5
+                    DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
+            ) {
+                Utils.bufferedCopy(dis, fos);
+                in.close();
 
-            // Read through a digest input stream that will work out the MD5
-            DigestInputStream dis = null;
-
-            try {
-                dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
+                bitstream.setSizeBytes(file.length());
+                bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
+                bitstream.setChecksumAlgorithm(CSA);
             } catch (NoSuchAlgorithmException nsae) {
                 // Should never happen
                 log.warn("Caught NoSuchAlgorithmException", nsae);
             }
-
-            Utils.bufferedCopy(dis, fos);
-            fos.close();
-            in.close();
-
-            bitstream.setSizeBytes(file.length());
-            bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
-            bitstream.setChecksumAlgorithm(CSA);
         } catch (Exception e) {
             log.error("put(" + bitstream.getInternalId() + ", inputstream)", e);
             throw new IOException(e);

@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import javax.persistence.Query;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.checker.ChecksumResultCode;
@@ -23,7 +24,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.CoreHelpers;
 import org.dspace.core.HibernateDBConnection;
-import org.hibernate.Query;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -87,9 +87,9 @@ public class ChecksumHistoryDAOImplTest
         cal.add(Calendar.DATE, -1);
         Date matchDate = cal.getTime();
         checkId++;
-        qry.setInteger("id", checkId);
-        qry.setDate("date", matchDate);
-        qry.setString("result", ChecksumResultCode.CHECKSUM_MATCH.name());
+        qry.setParameter("id", checkId);
+        qry.setParameter("date", matchDate);
+        qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
         qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
@@ -97,9 +97,9 @@ public class ChecksumHistoryDAOImplTest
         cal.add(Calendar.DATE, -1);
         Date noMatchDate = cal.getTime();
         checkId++;
-        qry.setInteger("id", checkId);
-        qry.setDate("date", noMatchDate);
-        qry.setString("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
+        qry.setParameter("id", checkId);
+        qry.setParameter("date", noMatchDate);
+        qry.setParameter("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
         qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
@@ -107,9 +107,9 @@ public class ChecksumHistoryDAOImplTest
         cal.add(Calendar.DATE, +3);
         Date futureDate = cal.getTime();
         checkId++;
-        qry.setInteger("id", checkId);
-        qry.setDate("date", new java.sql.Date(futureDate.getTime()));
-        qry.setString("result", ChecksumResultCode.CHECKSUM_MATCH.name());
+        qry.setParameter("id", checkId);
+        qry.setParameter("date", new java.sql.Date(futureDate.getTime()));
+        qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
         qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
@@ -125,18 +125,18 @@ public class ChecksumHistoryDAOImplTest
             "SELECT COUNT(*) FROM ChecksumHistory WHERE process_end_date = :date");
         long count;
 
-        qry.setDate("date", matchDate);
-        count = (Long) qry.uniqueResult();
+        qry.setParameter("date", matchDate);
+        count = (Long) qry.getSingleResult();
         assertEquals("Should find no row at matchDate", count, 0);
 
         // See if nonmatching old row is still present.
-        qry.setDate("date", noMatchDate);
-        count = (Long) qry.uniqueResult();
+        qry.setParameter("date", noMatchDate);
+        count = (Long) qry.getSingleResult();
         assertEquals("Should find one row at noMatchDate", count, 1);
 
         // See if new row is still present.
-        qry.setDate("date", futureDate);
-        count = (Long) qry.uniqueResult();
+        qry.setParameter("date", futureDate);
+        count = (Long) qry.getSingleResult();
         assertEquals("Should find one row at futureDate", count, 1);
     }
 

@@ -168,7 +168,7 @@ public class DiscoverQueryBuilderTest {
                                                               Arrays.asList(searchFilter), "item", page);
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
-        assertThat(discoverQuery.getQuery(), is(query));
+        assertThat(discoverQuery.getQuery(), is("\"" + query + "\""));
         assertThat(discoverQuery.getDSpaceObjectFilter(), is(Constants.ITEM));
         assertThat(discoverQuery.getSortField(), is("dc.title_sort"));
         assertThat(discoverQuery.getSortOrder(), is(DiscoverQuery.SORT_ORDER.asc));
@@ -287,12 +287,13 @@ public class DiscoverQueryBuilderTest {
 
     @Test
     public void testBuildFacetQuery() throws Exception {
-        DiscoverQuery discoverQuery = queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration, query,
+        DiscoverQuery discoverQuery = queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration,
+                                                            "prefix", query,
                                                                    Arrays.asList(searchFilter), "item", page,
                                                                    "subject");
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
-        assertThat(discoverQuery.getQuery(), is(query));
+        assertThat(discoverQuery.getQuery(), is("\"" + query + "\""));
         assertThat(discoverQuery.getDSpaceObjectFilter(), is(Constants.ITEM));
         assertThat(discoverQuery.getSortField(), isEmptyOrNullString());
         assertThat(discoverQuery.getMaxResults(), is(0));
@@ -302,13 +303,13 @@ public class DiscoverQueryBuilderTest {
         assertThat(discoverQuery.getFacetFields(), hasSize(1));
         assertThat(discoverQuery.getFacetFields(), contains(
             new ReflectionEquals(new DiscoverFacetField("subject", DiscoveryConfigurationParameters.TYPE_TEXT, 11,
-                                                        DiscoveryConfigurationParameters.SORT.COUNT))
+                                                        DiscoveryConfigurationParameters.SORT.COUNT, "prefix"))
         ));
     }
 
     @Test(expected = InvalidSearchFacetException.class)
     public void testInvalidSearchFacet() throws Exception {
-        queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration, query,
+        queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration, null, query,
                                      Arrays.asList(searchFilter), "item", page, "test");
     }
 
