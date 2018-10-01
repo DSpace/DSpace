@@ -2680,7 +2680,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void discoverSearchObjectsTestWithDateIssuedQuery() throws Exception {
+    public void discoverSearchObjectsTestWithDateIssuedQueryTest() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
@@ -2770,6 +2770,190 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
                    //There always needs to be a self link available
                    .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsTestWithLuceneSyntaxQueryTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("TestItem2")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("azeazeazeazeazeaze")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                                      .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+        //** WHEN **
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("query", "((dc.date.issued:2010 OR dc.date.issued:1990-02-13)" +
+                                                                " AND (dc.title:Test OR dc.title:TestItem2))"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
+                   )))
+                   //This is the only item that should be returned with the query given
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Test"),
+                       SearchResultMatcher.matchOnItemName("item", "items", "TestItem2")
+                   )))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.not(Matchers.contains(
+                       SearchResultMatcher.matchOnItemName("item", "items", "azeazeazeazeazeaze")
+                   ))))
+
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsTestWithEscapedLuceneCharactersTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Faithful Infidel: Exploring Conformity (2nd edition)")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Test")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("NotAProperTestTitle")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                                      .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+        //** WHEN **
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("query", "Faithful Infidel\\: Exploring Conformity \\(2nd edition\\)"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //The type has to be 'discover'
+                   .andExpect(jsonPath("$.type", is("discover")))
+                   //The page object needs to look like this
+                   .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                       PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
+                   )))
+                   //This is the only item that should be returned with the query given
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
+                       SearchResultMatcher.matchOnItemName
+                           ("item", "items", "Faithful Infidel: Exploring Conformity (2nd edition)")
+                   )))
+                   .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+                                       Matchers.not(Matchers.containsInAnyOrder(
+                       SearchResultMatcher.matchOnItemName("item", "items", "Test"),
+                       SearchResultMatcher.matchOnItemName("item", "items", "NotAProperTestTitle")
+                   ))))
+
+                   //There always needs to be a self link available
+                   .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+    @Test
+    public void discoverSearchObjectsTestWithUnEscapedLuceneCharactersTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Faithful Infidel: Exploring Conformity (2nd edition)")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Test")
+                                      .withIssueDate("1990-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("NotAProperTestTitle")
+                                      .withIssueDate("2010-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                                      .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+        //** WHEN **
+        getClient().perform(get("/api/discover/search/objects")
+                                .param("query", "OR"))
+
+                   .andExpect(status().isBadRequest())
         ;
 
     }
