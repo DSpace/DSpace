@@ -2881,9 +2881,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
-        //** WHEN **
         getClient().perform(get("/api/discover/search/objects")
-                                .param("query", "Faithful Infidel\\: Exploring Conformity \\(2nd edition\\)"))
+                                .param("query", "\"Faithful Infidel: Exploring Conformity (2nd edition)\""))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -2901,9 +2900,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    )))
                    .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
                                        Matchers.not(Matchers.containsInAnyOrder(
-                       SearchResultMatcher.matchOnItemName("item", "items", "Test"),
-                       SearchResultMatcher.matchOnItemName("item", "items", "NotAProperTestTitle")
-                   ))))
+                                           SearchResultMatcher.matchOnItemName("item", "items", "Test"),
+                                           SearchResultMatcher.matchOnItemName("item", "items", "NotAProperTestTitle")
+                                       ))))
 
                    //There always needs to be a self link available
                    .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
