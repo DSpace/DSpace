@@ -7,9 +7,7 @@
  */
 package org.dspace.authority.rest;
 
-import java.util.List;
-
-import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.SolrAuthorityInterface;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -17,15 +15,11 @@ import org.dspace.authority.AuthorityValue;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public abstract class RestSource {
+public abstract class RestSource implements SolrAuthorityInterface {
 
     protected RESTConnector restConnector;
 
     public RestSource(String url) {
         this.restConnector = new RESTConnector(url);
     }
-
-    public abstract List<AuthorityValue> queryAuthorities(String text, int max);
-
-    public abstract AuthorityValue queryAuthorityID(String id);
 }

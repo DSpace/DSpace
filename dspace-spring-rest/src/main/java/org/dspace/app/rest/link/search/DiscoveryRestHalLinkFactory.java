@@ -19,32 +19,54 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, DiscoveryRestController> {
 
-    protected UriComponentsBuilder buildSearchBaseLink(final DiscoveryResultsRest data) throws Exception {
-        UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                                                         .getSearchObjects(data.getQuery(), data.getDsoType(),
-                                                                           data.getScope(), data.getConfigurationName(),
-                                                                           null, null));
+    /**
+     * This method will build the base search link for the data that's been given to it
+     *
+     * @param data  The data for which a link will be constructed
+     * @return      The link without extra filters to the endpoint for this data
+     */
+    public UriComponentsBuilder buildSearchBaseLink(final DiscoveryResultsRest data) {
+        try {
+            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
+                    .getSearchObjects(data.getQuery(), data.getDsoType(),
+                            data.getScope(), data.getConfigurationName(),
+                            null, null));
 
-        return addFilterParams(uriBuilder, data);
+            return addFilterParams(uriBuilder, data);
+        } catch (Exception ex) {
+            //The method throwing the exception is never really executed, so this exception can never occur
+            return null;
+        }
     }
 
     protected UriComponentsBuilder buildFacetBaseLink(final FacetResultsRest data) throws Exception {
-        UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
+        try {
+            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
                                                          .getFacetValues(data.getFacetEntry().getName(),
-                                                                         data.getQuery(), data.getDsoType(),
-                                                                         data.getScope(), null, null));
+                                                                         data.getPrefix(), data.getQuery(),
+                                                                         data.getDsoType(), data.getScope(),
+                                                                 null, null));
 
-        return addFilterParams(uriBuilder, data);
+            return addFilterParams(uriBuilder, data);
+        } catch (Exception ex) {
+            //The method throwing the exception is never really executed, so this exception can never occur
+            return null;
+        }
     }
 
-    protected UriComponentsBuilder buildSearchFacetsBaseLink(final SearchResultsRest data) throws Exception {
-        UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                                                         .getFacets(data.getQuery(), data.getDsoType(), data.getScope(),
-                                                                    data.getConfigurationName(), null));
+    protected UriComponentsBuilder buildSearchFacetsBaseLink(final SearchResultsRest data) {
+        try {
+            UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
+                    .getFacets(data.getQuery(), data.getDsoType(), data.getScope(),
+                            data.getConfigurationName(), null, null));
 
-        uriBuilder = addSortingParms(uriBuilder, data);
+            uriBuilder = addSortingParms(uriBuilder, data);
 
-        return addFilterParams(uriBuilder, data);
+            return addFilterParams(uriBuilder, data);
+        } catch (Exception ex) {
+            //The method throwing the exception is never really executed, so this exception can never occur
+            return null;
+        }
     }
 
     protected UriComponentsBuilder addFilterParams(UriComponentsBuilder uriComponentsBuilder,
@@ -53,7 +75,7 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
             for (SearchResultsRest.AppliedFilter filter : data.getAppliedFilters()) {
                 //TODO Make sure the filter format is defined in only one place
                 uriComponentsBuilder
-                    .queryParam("f." + filter.getFilter(), filter.getValue() + "," + filter.getOperator());
+                        .queryParam("f." + filter.getFilter(), filter.getValue() + "," + filter.getOperator());
             }
         }
 

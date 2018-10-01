@@ -20,6 +20,11 @@ public class FacetResultsRest extends DiscoveryResultsRest {
     @JsonUnwrapped
     private SearchFacetEntryRest facetEntry;
 
+    /**
+     * Every facet value needs to start with the given prefix
+     */
+    private String prefix;
+
     public void addToFacetResultList(SearchFacetValueRest facetResult) {
         facetEntry.addValue(facetResult);
     }
@@ -33,7 +38,15 @@ public class FacetResultsRest extends DiscoveryResultsRest {
         return facetEntry;
     }
 
-    public void setFacetEntry(final SearchFacetEntryRest facetEntry) {
+    public void setFacetEntry(SearchFacetEntryRest facetEntry) {
         this.facetEntry = facetEntry;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 }

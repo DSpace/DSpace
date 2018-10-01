@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -25,7 +26,10 @@ import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
@@ -34,6 +38,9 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -77,8 +84,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
+        String token = getAuthToken(admin.getEmail(), password);
 
-        getClient().perform(get("/api/core/items"))
+        getClient(token).perform(get("/api/core/items"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
                        ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "Public item 1", "2017-10-17"),
@@ -129,7 +137,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
-        getClient().perform(get("/api/core/items")
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items")
                    .param("size", "2"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
@@ -144,7 +154,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
         ;
 
-        getClient().perform(get("/api/core/items")
+        getClient(token).perform(get("/api/core/items")
                    .param("size", "2")
                    .param("page", "1"))
                    .andExpect(status().isOk())
@@ -200,7 +210,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
-
 
         getClient().perform(get("/api/core/items/" + publicItem1.getID()))
                    .andExpect(status().isOk())
@@ -296,7 +305,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
     }
 
-
     @Test
     public void findOneTestWrongUUID() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -312,7 +320,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
-        getClient().perform(get("/api/core/items/" + UUID.randomUUID()))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + UUID.randomUUID()))
                    .andExpect(status().isNotFound())
         ;
 
@@ -714,7 +724,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withIssueDate("2017-10-17")
                                .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                .withSubject("ExtraEntry")
-                               .makePrivate()
+                               .makeUnDiscoverable()
                                .build();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -767,7 +777,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withIssueDate("2017-10-17")
                                .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                .withSubject("ExtraEntry")
-                               .makePrivate()
+                               .makeUnDiscoverable()
                                .build();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -810,7 +820,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withIssueDate("2017-10-17")
                                .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                .withSubject("ExtraEntry")
-                               .makePrivate()
+                               .makeUnDiscoverable()
                                .build();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -835,7 +845,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void makePrivatePatchTest() throws Exception {
+    public void makeUnDiscoverablePatchTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -880,7 +890,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void makePrivatePatchUnauthorizedTest() throws Exception {
+    public void makeUnDiscoverablePatchUnauthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -922,7 +932,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     }
 
-    public void makePrivatePatchForbiddenTest() throws Exception {
+    @Test
+    public void makeUnDiscoverablePatchForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -994,7 +1005,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withIssueDate("2017-10-17")
                                .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                .withSubject("ExtraEntry")
-                               .makePrivate()
+                               .makeUnDiscoverable()
                                .build();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1031,6 +1042,307 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.uuid", Matchers.is(item2.getID().toString())))
                         .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
 
+    }
+
+    @Test
+    public void deleteOneArchivedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. One public item, one workspace item and one template item.
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        //Add a bitstream to an item
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                                             createBitstream(context, publicItem, is)
+                                         .withName("Bitstream1")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        // Check publicItem creation
+        getClient().perform(get("/api/core/items/" + publicItem.getID()))
+                   .andExpect(status().isOk());
+
+        // Check publicItem bitstream creatino
+        getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bitstreams"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._links.self.href", Matchers
+                   .containsString("/api/core/items/" + publicItem.getID() + "/bitstreams")));
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //Delete public item
+        getClient(token).perform(delete("/api/core/items/" + publicItem.getID()))
+                    .andExpect(status().is(204));
+
+        //Trying to get deleted item should fail with 404
+        getClient().perform(get("/api/core/items/" + publicItem.getID()))
+                   .andExpect(status().is(404));
+
+        //Trying to get deleted item bitstream should fail with 404
+        getClient().perform(get("/api/core/biststreams/" + bitstream.getID()))
+                   .andExpect(status().is(404));
+    }
+
+    @Test
+    public void deleteOneTemplateTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        //2. A collection with one template item.
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .withTemplateItem()
+                .build();
+
+
+        Item templateItem = col1.getTemplateItem();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //Trying to delete a templateItem should fail with 422
+        getClient(token).perform(delete("/api/core/items/" + templateItem.getID()))
+                    .andExpect(status().is(422));
+
+        //Check templateItem is available after failed deletion
+        getClient(token).perform(get("/api/core/items/" + templateItem.getID()))
+                   .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteOneWorkspaceTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. One workspace item.
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                            .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //Trying to delete a workspaceItem should fail with 422
+        getClient(token).perform(delete("/api/core/items/" + workspaceItem.getItem().getID()))
+                    .andExpect(status().is(422));
+
+        //Check workspaceItem is available after failed deletion
+        getClient(token).perform(get("/api/core/items/" + workspaceItem.getItem().getID()))
+                   .andExpect(status().isOk());
+    }
+
+    @Test
+    public void embargoAccessTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. An embargoed item
+        Item embargoedItem1 = ItemBuilder.createItem(context, col1)
+                                         .withTitle("embargoed item 1")
+                                         .withIssueDate("2017-12-18")
+                                         .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                         .withSubject("ExtraEntry")
+                                         .withEmbargoPeriod("6 months")
+                                         .build();
+
+        //3. a public item
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        //** THEN **
+        //An anonymous user can view public items
+        getClient().perform(get("/api/core/items/" + publicItem1.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        ItemMatcher.matchItemWithTitleAndDateIssued(
+                                publicItem1, "Public item 1", "2017-10-17")
+                )))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("/api/core/items")));
+
+        //An anonymous user is not allowed to view embargoed items
+        getClient().perform(get("/api/core/items/" + embargoedItem1.getID()))
+                   .andExpect(status().isUnauthorized());
+
+        //An admin user is allowed to access the embargoed item
+        String token1 = getAuthToken(admin.getEmail(), password);
+        getClient(token1).perform(get("/api/core/items/" + embargoedItem1.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        ItemMatcher.matchItemWithTitleAndDateIssued(
+                                embargoedItem1, "embargoed item 1", "2017-12-18")
+                )))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("/api/core/items")));
+
+    }
+
+    @Test
+    public void undiscoverableAccessTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. An undiscoverable item
+        Item unDiscoverableYetAccessibleItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Undiscoverable item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .makeUnDiscoverable()
+                .build();
+
+        context.restoreAuthSystemState();
+
+
+        //Anonymous users are allowed to access undiscoverable items
+        getClient().perform(get("/api/core/items/" + unDiscoverableYetAccessibleItem1.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        ItemMatcher.matchItemWithTitleAndDateIssued(unDiscoverableYetAccessibleItem1,
+                                "Undiscoverable item 1", "2017-10-17")
+                )));
+
+
+        //Admin users are allowed to acceess undiscoverable items
+        String token1 = getAuthToken(admin.getEmail(), password);
+        getClient(token1).perform(get("/api/core/items/" + unDiscoverableYetAccessibleItem1.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        ItemMatcher.matchItemWithTitleAndDateIssued(unDiscoverableYetAccessibleItem1,
+                                "Undiscoverable item 1", "2017-10-17")
+                )));
+
+    }
+
+    @Test
+    public void privateGroupAccessTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. An item restricted to a specific internal group
+        Group staffGroup = GroupBuilder.createGroup(context)
+                .withName("Staff")
+                .build();
+
+        Item restrictedItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Restricted item 1")
+                .withIssueDate("2017-12-18")
+                .withReaderGroup(staffGroup)
+                .build();
+
+        //3. A public item
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        //4. A member of the internal group
+        EPerson staffEPerson = EPersonBuilder.createEPerson(context)
+                .withEmail("professor@myuni.edu")
+                .withPassword("s3cr3t")
+                .withNameInMetadata("Doctor", "Professor")
+                .withGroupMembership(staffGroup)
+                .build();
+
+
+        context.restoreAuthSystemState();
+
+        //** THEN **
+        //An anonymous user can view the public item
+        getClient().perform(get("/api/core/items/" + publicItem1.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        ItemMatcher.matchItemWithTitleAndDateIssued(
+                                publicItem1, "Public item 1", "2017-10-17")
+                )))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("/api/core/items")));
+
+        //An anonymous user is not allowed to the restricted item
+        getClient().perform(get("/api/core/items/" + restrictedItem1.getID()))
+                .andExpect(status().isUnauthorized());
+
+        //An admin user is allowed to access the restricted item
+        String token1 = getAuthToken(admin.getEmail(), password);
+        getClient(token1).perform(get("/api/core/items/" + restrictedItem1.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        ItemMatcher.matchItemWithTitleAndDateIssued(
+                                restrictedItem1, "Restricted item 1", "2017-12-18")
+                )))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("/api/core/items")));
+
+        //A member of the internal group is also allowed to access the restricted item
+        String token2 = getAuthToken("professor@myuni.edu", "s3cr3t");
+        getClient(token2).perform(get("/api/core/items/" + restrictedItem1.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        ItemMatcher.matchItemWithTitleAndDateIssued(
+                                restrictedItem1, "Restricted item 1", "2017-12-18")
+                )))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("/api/core/items")));
     }
 
 }

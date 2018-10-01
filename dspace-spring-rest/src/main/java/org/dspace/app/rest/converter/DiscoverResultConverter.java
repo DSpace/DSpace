@@ -12,7 +12,9 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
@@ -21,7 +23,10 @@ import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +40,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscoverResultConverter {
 
+    private static final Logger log = Logger.getLogger(DiscoverResultConverter.class);
+
     @Autowired
     private List<DSpaceObjectConverter> converters;
+
+    @Autowired
+    private SearchService searchService;
 
     private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
 
@@ -51,14 +61,14 @@ public class DiscoverResultConverter {
 
         addSearchResults(searchResult, resultsRest);
 
-        addFacetValues(searchResult, resultsRest, configuration);
+        addFacetValues(context, searchResult, resultsRest, configuration);
 
         resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
 
         return resultsRest;
     }
 
-    private void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest resultsRest,
+    private void addFacetValues(Context context, final DiscoverResult searchResult, final SearchResultsRest resultsRest,
                                 final DiscoveryConfiguration configuration) {
 
         List<DiscoverySearchFilterFacet> facets = configuration.getSidebarFacets();
@@ -69,7 +79,10 @@ public class DiscoverResultConverter {
             int valueCount = 0;
             facetEntry.setHasMore(false);
             facetEntry.setFacetLimit(field.getFacetLimit());
-
+            if (field.exposeMinAndMaxValue()) {
+                handleExposeMinMaxValues(context,field,facetEntry);
+            }
+            facetEntry.setExposeMinMax(field.exposeMinAndMaxValue());
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
                 //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
                 //more results available.
@@ -92,6 +105,32 @@ public class DiscoverResultConverter {
         }
     }
 
+    /**
+     * This method will fill the facetEntry with the appropriate min and max values if they're not empty
+     * @param context       The relevant DSpace context
+     * @param field         The DiscoverySearchFilterFacet field to search for this value in solr
+     * @param facetEntry    The SearchFacetEntryRest facetEntry for which this needs to be filled in
+     */
+    private void handleExposeMinMaxValues(Context context,DiscoverySearchFilterFacet field,
+                                          SearchFacetEntryRest facetEntry) {
+        try {
+            String minValue = searchService.calculateExtremeValue(context,
+                                                                  field.getIndexFieldName() + "_min",
+                                                                  field.getIndexFieldName() + "_min_sort",
+                                                                  DiscoverQuery.SORT_ORDER.asc);
+            String maxValue = searchService.calculateExtremeValue(context,
+                                                                  field.getIndexFieldName() + "_max",
+                                                                  field.getIndexFieldName() + "_max_sort",
+                                                                  DiscoverQuery.SORT_ORDER.desc);
+
+            if (StringUtils.isNotBlank(minValue) && StringUtils.isNotBlank(maxValue)) {
+                facetEntry.setMinValue(minValue);
+                facetEntry.setMaxValue(maxValue);
+            }
+        } catch (SearchServiceException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
     private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
         for (DSpaceObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getDspaceObjects())) {
             SearchResultEntryRest resultEntry = new SearchResultEntryRest();
@@ -136,9 +175,12 @@ public class DiscoverResultConverter {
             Sort.Order order = page.getSort().iterator().next();
             resultsRest.setSort(order.getProperty(), order.getDirection().name());
         }
+        SearchQueryConverter searchQueryConverter = new SearchQueryConverter();
+        List<SearchFilter> transformedFilters = searchQueryConverter.convert(searchFilters);
+
         SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter =
             new SearchFilterToAppliedFilterConverter();
-        for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
+        for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(transformedFilters)) {
 
             resultsRest
                 .addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));

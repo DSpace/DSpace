@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -56,11 +58,13 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     @Autowired
     ItemPatch itemPatch;
 
+
     public ItemRestRepository() {
         System.out.println("Repository initialized by Spring");
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
     public ItemRest findOne(Context context, UUID id) {
         Item item = null;
         try {
@@ -75,6 +79,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<ItemRest> findAll(Context context, Pageable pageable) {
         Iterator<Item> it = null;
         List<Item> items = new ArrayList<Item>();
@@ -114,6 +119,29 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     @Override
     public ItemResource wrapResource(ItemRest item, String... rels) {
         return new ItemResource(item, utils, rels);
+    }
+
+    @Override
+    protected void delete(Context context, UUID id) throws AuthorizeException {
+        Item item = null;
+        try {
+            item = is.find(context, id);
+            if (is.isInProgressSubmission(context, item)) {
+                throw new UnprocessableEntityException("The item cannot be deleted. "
+                        + "It's part of a in-progress submission.");
+            }
+            if (item.getTemplateItemOf() != null) {
+                throw new UnprocessableEntityException("The item cannot be deleted. "
+                        + "It's a template for a collection");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        try {
+            is.delete(context, item);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
 }
