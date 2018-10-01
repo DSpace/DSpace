@@ -2,7 +2,7 @@
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
 
 # This version is JDK7 compatible
-# - tomcat:7.0.90-jre7
+# - tomcat:7-jre7
 # - ANT 1.9.13
 # - maven:latest
 # - note: 
@@ -22,7 +22,7 @@ COPY dspace/src/main/docker/test/solr_web.xml /app/dspace-solr/src/main/webapp/W
 RUN mvn package
 
 # Step 2 - Run Ant Deploy
-FROM tomcat:7.0.90-jre7 as ant_build
+FROM tomcat:7-jre7 as ant_build
 ARG TARGET_DIR=dspace-build
 COPY --from=build /app /dspace-src
 WORKDIR /dspace-src/dspace/target/${TARGET_DIR}
@@ -39,7 +39,7 @@ RUN ant update_configs update_code update_webapps
 
 # Step 3 - Run tomcat
 # Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:7.0.90-jre7
+FROM tomcat:7-jre7
 COPY --from=ant_build /dspace /dspace
 EXPOSE 8080 8009
 
