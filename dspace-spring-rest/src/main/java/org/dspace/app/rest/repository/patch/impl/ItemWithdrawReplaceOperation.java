@@ -56,7 +56,7 @@ public class ItemWithdrawReplaceOperation extends PatchOperation<Item, String> {
     public void perform(Context context, Item item, Operation operation)
             throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException {
 
-        replace(item, context, (String) operation.getValue());
+        replace(context, item, (String) operation.getValue());
 
     }
 
@@ -71,7 +71,7 @@ public class ItemWithdrawReplaceOperation extends PatchOperation<Item, String> {
      * @throws SQLException
      * @throws AuthorizeException
      */
-    private void replace(Item item, Context context, Object value)
+    private void replace(Context context, Item item,  Object value)
             throws PatchBadRequestException, SQLException, AuthorizeException {
 
         Boolean withdraw = BooleanUtils.toBooleanObject((String) value);

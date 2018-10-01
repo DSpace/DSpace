@@ -19,11 +19,16 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.EPersonConverter;
+import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.EPersonOperationFactory;
+import org.dspace.app.rest.repository.patch.impl.ResourcePatchOperation;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -34,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +59,9 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
 
     @Autowired
     EPersonConverter converter;
+
+    @Autowired
+    EPersonOperationFactory patchFactory;
 
     @Override
     protected EPersonRest createAndReturn(Context context)
@@ -177,6 +186,27 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
             return null;
         }
         return converter.fromModel(eperson);
+    }
+
+    @Override
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
+                      Patch patch)
+            throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException,
+            ResourceNotFoundException {
+
+        EPerson eperson = es.find(context, uuid);
+        if (eperson == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
+        }
+
+        List<Operation> operations = patch.getOperations();
+        for (Operation operation : operations) {
+
+            ResourcePatchOperation<EPerson> patchOperation = patchFactory.getPatchOperationForPath(operation.getPath());
+            patchOperation.perform(context, eperson, operation);
+
+        }
+
     }
 
     @Override
