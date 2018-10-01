@@ -13,15 +13,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ForbiddenException;
 
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +27,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -93,8 +92,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                                                                           HttpHeaders headers, HttpStatus status,
                                                                           WebRequest request) {
         // we want the 422 status for missing parameter as it seems to be the common behavior for REST application, see
-        // https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is
-        // -missing-a-required
+        // https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is-missing-a-required
         return super.handleMissingServletRequestParameter(ex, headers, HttpStatus.UNPROCESSABLE_ENTITY, request);
     }
 
@@ -103,56 +101,33 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                                                         HttpStatus status, WebRequest request) {
         // we want the 422 status for type mismatch on parameters as it seems to be the common behavior for REST
         // application, see
-        // https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is
-        // -missing-a-required
+        // https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is-missing-a-required
         return super.handleTypeMismatch(ex, headers, HttpStatus.UNPROCESSABLE_ENTITY, request);
     }
 
     @ExceptionHandler(Exception.class)
     protected void handleGenericException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
-        sendErrorResponse(request, response, ex, "An Exception has occured",
-                          HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
+        ResponseStatus responseStatusAnnotation = AnnotationUtils.findAnnotation(ex.getClass(), ResponseStatus.class);
 
-    @ExceptionHandler( {ResourceNotFoundException.class, RepositoryNotFoundException.class})
-    protected void handleResourceNotFoundException(HttpServletRequest request, HttpServletResponse response,
-                                                   Exception ex)
-        throws IOException {
-        sendErrorResponse(request, response, ex, "A ResourceNotFoundException has occured",
-                          HttpServletResponse.SC_NOT_FOUND);
+        int returnCode = 0;
+        if (responseStatusAnnotation != null) {
+            returnCode = responseStatusAnnotation.code().value();
+        } else {
+            returnCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        }
+        sendErrorResponse(request, response, ex, "An Exception has occured", returnCode);
+
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     protected void handleAccessDeniedException(HttpServletRequest request, HttpServletResponse response,
                                                Exception ex)
         throws IOException {
-        sendErrorResponse(request, response, ex, "A ResourceNotFoundException has occured",
+        sendErrorResponse(request, response, ex, "An AccessDenied Exception has occured",
                           HttpServletResponse.SC_UNAUTHORIZED);
     }
 
-    @ExceptionHandler(UnprocessableEntityException.class)
-    protected void handleUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
-                                                      Exception ex)
-        throws IOException {
-        sendErrorResponse(request, response, ex, "An UnprocessableEntityException has occured", 422);
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    protected void handleForbiddenException(HttpServletRequest request, HttpServletResponse response,
-                                            Exception ex)
-        throws IOException {
-        sendErrorResponse(request, response, ex, "A ForbiddenException has occured", HttpServletResponse.SC_FORBIDDEN);
-    }
-
-
-    @ExceptionHandler(BadRequestException.class)
-    protected void handleBadRequestExceptionn(HttpServletRequest request, HttpServletResponse response,
-                                              Exception ex)
-        throws IOException {
-        sendErrorResponse(request, response, ex, "A BadRequestException has occured",
-                          HttpServletResponse.SC_BAD_REQUEST);
-    }
 
     private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,
                                    final Exception ex, final String message, final int statusCode) throws IOException {
