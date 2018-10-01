@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,6 +24,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RequestItemBuilder;
 import org.dspace.app.rest.matcher.RequestCopyMatcher;
 import org.dspace.app.rest.model.RequestItemRest;
+import org.dspace.app.rest.repository.RequestItemRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -30,9 +32,6 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
  *
@@ -41,7 +40,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 public class RequestItemRepositoryIT
         extends AbstractControllerIntegrationTest {
     /** Where to find {@link RequestItem}s in the local URL namespace. */
-    public static final String URI_ROOT = "/api/"
+    public static final String URI_ROOT = REST_SERVER_URL
             + RequestItemRest.CATEGORY + '/'
             + RequestItemRest.NAME + 's';
 
@@ -99,24 +98,11 @@ public class RequestItemRepositoryIT
         // Test:  was it created correctly?
         final String uri = URI_ROOT + '/'
                 + request.getToken();
-/*
         getClient().perform(get(uri))
                    .andExpect(status().isOk()) // Can we find it?
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
                        RequestCopyMatcher.matchRequestCopy(request))));
-*/
-        //try {
-        MockMvc client = getClient();
-        MockHttpServletRequestBuilder get = get(uri);
-        ResultActions response = client.perform(get);
-        response.andExpect(status().isOk()); // Can we find it?
-        response.andExpect(content().contentType(contentType));
-        response.andExpect(jsonPath("$", Matchers.is(
-                       RequestCopyMatcher.matchRequestCopy(request))));
-        //} catch (Exception e) {
-        //    System.err.println(e.getMessage());
-        //}
 
         // Clean up.
         bitstream.setDeleted(true);
@@ -182,19 +168,13 @@ public class RequestItemRepositoryIT
     /**
      * Test of getDomainClass method, of class RequestItemRepository.
      */
-/*
     @Test
-    public void testGetDomainClass()
-    {
+    public void testGetDomainClass() {
         System.out.println("getDomainClass");
         RequestItemRepository instance = new RequestItemRepository();
-        Class<RequestItemRest> expResult = null;
-        Class<RequestItemRest> result = instance.getDomainClass();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Class instanceClass = instance.getDomainClass();
+        assertEquals("Wrong domain class", instanceClass, RequestItemRest.class);
     }
-*/
 
     /**
      * Test of wrapResource method, of class RequestItemRepository.

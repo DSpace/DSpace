@@ -9,6 +9,7 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +17,10 @@ import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.slf4j.Logger;
@@ -46,6 +51,12 @@ public class RequestItemConverter
     @Autowired(required = true)
     protected RequestService requestService;
 
+    @Autowired(required = true)
+    protected BitstreamService bitstreamService;
+
+    @Autowired(required = true)
+    protected ItemService itemService;
+
     @Override
     public RequestItemRest fromModel(RequestItem requestItem) {
         RequestItemRest requestItemRest = new RequestItemRest();
@@ -73,9 +84,13 @@ public class RequestItemConverter
         String token = obj.getToken();
         if (StringUtils.isBlank(token)) { // No token, so create a new request.
             try {
+                Bitstream bitstream = bitstreamService.find(context,
+                        UUID.fromString(obj.getBitstream().getUuid()));
+                Item item = itemService.find(context,
+                        UUID.fromString(obj.getItem().getUuid()));
                 token = requestItemService.createRequest(context,
-                        obj.getBitstream(),
-                        obj.getItem(),
+                        bitstream,
+                        item,
                         obj.isAllfiles(),
                         obj.getReqEmail(),
                         obj.getReqName(),
