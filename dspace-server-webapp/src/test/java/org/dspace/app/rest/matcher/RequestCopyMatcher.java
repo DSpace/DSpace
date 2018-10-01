@@ -27,16 +27,13 @@ public class RequestCopyMatcher {
 
     public static Matcher<? super Object> matchRequestCopy(RequestItem request) {
         return allOf(
-                hasJsonPath("$.bitstream", Matchers.not(Matchers.empty())),
-                hasJsonPath("$.item", Matchers.not(Matchers.empty())),
-                hasJsonPath("$.allFiles", is(String.valueOf(request.isAllfiles()))),
+                hasJsonPath("$._links.bitstream", Matchers.not(Matchers.empty())),
+                hasJsonPath("$._links.item", Matchers.not(Matchers.empty())),
+                hasJsonPath("$.allfiles", is(request.isAllfiles())),
                 hasJsonPath("$.reqEmail", is(request.getReqEmail())),
                 hasJsonPath("$.reqName", is(request.getReqName())),
                 hasJsonPath("$.reqMessage", is(request.getReqMessage())),
                 hasJsonPath("$.type", is(RequestItemRest.NAME)),
-                hasJsonPath("$._embedded.schema", Matchers.not(Matchers.empty())),
-                hasJsonPath("$._links.schema.href",
-                        Matchers.containsString(RequestItemRepositoryIT.URI_ROOT)),
                 hasJsonPath("$._links.self.href",
                         Matchers.containsString(RequestItemRepositoryIT.URI_ROOT))
         );
