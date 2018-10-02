@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Provides PATCH operation implementations for Items.
+ * Provides PATCH operation implementations for EPerson updates.
  */
 @Component
 public class EPersonPatch extends AbstractResourcePatch<EPerson> {
@@ -29,9 +29,20 @@ public class EPersonPatch extends AbstractResourcePatch<EPerson> {
     @Autowired
     EPersonOperationFactory patchFactory;
 
+    /**
+     * Performs the replace operation.
+     * @param eperson dspace object
+     * @param context dspace context
+     * @param operation the replace operation
+     * @throws UnprocessableEntityException
+     * @throws PatchBadRequestException
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     protected void replace(EPerson eperson, Context context, Operation operation)
             throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException {
 
+        // Get the patch operation via the EPerson replace operation factory.
         ResourcePatchOperation<EPerson> patchOperation = patchFactory.getReplaceOperationForPath(operation.getPath());
         patchOperation.perform(context, eperson, operation);
 

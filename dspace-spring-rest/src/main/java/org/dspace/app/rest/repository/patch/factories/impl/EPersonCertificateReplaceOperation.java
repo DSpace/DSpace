@@ -41,13 +41,14 @@ public class EPersonCertificateReplaceOperation  extends PatchOperation<EPerson,
     private void replace(Context context, EPerson eperson, Operation operation)
             throws PatchBadRequestException, SQLException, AuthorizeException {
 
+        checkOperationValue((String) operation.getValue());
         Boolean requireCert = BooleanUtils.toBooleanObject((String) operation.getValue());
 
         if (requireCert == null) {
-            // this check can be probably moved in the AbstractResourcePatch class as it is mandate by the json+patch
-            // specification
+            // make sure the string was converted to boolean.
             throw new PatchBadRequestException("Boolean value not provided for certificate operation.");
         }
+
         eperson.setRequireCertificate(requireCert);
 
     }
