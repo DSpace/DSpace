@@ -5,14 +5,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.repository.patch;
+package org.dspace.app.rest.repository.patch.factories;
 
 import org.dspace.app.rest.exception.PatchBadRequestException;
-import org.dspace.app.rest.repository.patch.impl.EPersonCertificateReplaceOperation;
-import org.dspace.app.rest.repository.patch.impl.EPersonLoginReplaceOperation;
-import org.dspace.app.rest.repository.patch.impl.EPersonNetidReplaceOperation;
-import org.dspace.app.rest.repository.patch.impl.EPersonPasswordReplaceOperation;
-import org.dspace.app.rest.repository.patch.impl.ResourcePatchOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.EPersonCertificateReplaceOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.EPersonLoginReplaceOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.EPersonNetidReplaceOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.EPersonPasswordReplaceOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.ResourcePatchOperation;
 import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,13 +43,13 @@ public class EPersonOperationFactory {
     private static final String OPERATION_SET_NETID = "/netid";
 
     /**
-     * Returns the PatchOperation instance for the operation based on
+     * Returns the PatchOperation instance for the replace operation, based on
      * the operation path.
      *
      * @param path the operation path
      * @return
      */
-    public ResourcePatchOperation<EPerson> getPatchOperationForPath(String path) {
+    public ResourcePatchOperation<EPerson> getReplaceOperationForPath(String path) {
 
         switch (path) {
             case OPERATION_PASSWORD_CHANGE:
@@ -61,7 +61,7 @@ public class EPersonOperationFactory {
             case OPERATION_SET_NETID:
                 return netidReplaceOperation;
             default:
-                throw new PatchBadRequestException("Missing or illegal patch operation for: " + path);
+                throw new PatchBadRequestException("Missing patch operation for: " + path);
         }
     }
 

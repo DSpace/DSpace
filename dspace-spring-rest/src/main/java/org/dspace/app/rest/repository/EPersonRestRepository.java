@@ -27,8 +27,7 @@ import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.EPersonOperationFactory;
-import org.dspace.app.rest.repository.patch.impl.ResourcePatchOperation;
+import org.dspace.app.rest.repository.patch.EPersonPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -61,7 +60,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     EPersonConverter converter;
 
     @Autowired
-    EPersonOperationFactory patchFactory;
+    EPersonPatch epersonPatch;
 
     @Override
     protected EPersonRest createAndReturn(Context context)
@@ -200,12 +199,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         }
 
         List<Operation> operations = patch.getOperations();
-        for (Operation operation : operations) {
-
-            ResourcePatchOperation<EPerson> patchOperation = patchFactory.getPatchOperationForPath(operation.getPath());
-            patchOperation.perform(context, eperson, operation);
-
-        }
+        epersonPatch.patch(eperson, context, operations);
 
     }
 

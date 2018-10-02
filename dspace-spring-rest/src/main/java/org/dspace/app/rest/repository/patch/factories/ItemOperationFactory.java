@@ -5,12 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.repository.patch;
+package org.dspace.app.rest.repository.patch.factories;
 
 import org.dspace.app.rest.exception.PatchBadRequestException;
-import org.dspace.app.rest.repository.patch.impl.ItemDiscoverableReplaceOperation;
-import org.dspace.app.rest.repository.patch.impl.ItemWithdrawReplaceOperation;
-import org.dspace.app.rest.repository.patch.impl.ResourcePatchOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.ItemDiscoverableReplaceOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.ItemWithdrawReplaceOperation;
+import org.dspace.app.rest.repository.patch.factories.impl.ResourcePatchOperation;
 import org.dspace.content.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,12 +33,12 @@ public class ItemOperationFactory {
     private static final String OPERATION_PATH_DISCOVERABLE = "/discoverable";
 
     /**
-     * Returns the PatchOperation instance for the operation based on the
+     * Returns the PatchOperation instance for the replace operation, based on the
      * operation path.
      * @param path
      * @return
      */
-    public ResourcePatchOperation<Item> getPatchOperationForPath(String path) {
+    public ResourcePatchOperation<Item> getReplaceOperationForPath(String path) {
 
         switch (path) {
             case OPERATION_PATH_DISCOVERABLE:
@@ -46,7 +46,7 @@ public class ItemOperationFactory {
             case OPERATION_PATH_WITHDRAW:
                 return itemWithdrawReplaceOperation;
             default:
-                throw new PatchBadRequestException("Missing or illegal patch operation for: " + path);
+                throw new PatchBadRequestException("Missing patch operation for: " + path);
         }
     }
 }
