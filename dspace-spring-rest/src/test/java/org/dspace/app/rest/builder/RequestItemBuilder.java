@@ -41,8 +41,13 @@ public class RequestItemBuilder
     @Override
     protected void cleanup()
             throws Exception {
-        LOG.info("cleanup()");
-        delete(requestItem);
+        LOG.debug("cleanup()");
+        if (null != requestItem) {
+            delete(requestItem);
+            requestItem = null;
+        } else {
+            LOG.debug("nothing to clean up.");
+        }
     }
 
     public static RequestItemBuilder createRequestItem(Context ctx, Item item,

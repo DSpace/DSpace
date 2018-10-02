@@ -19,6 +19,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 /**
+ * Compare {@link RequestItem}s.
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */

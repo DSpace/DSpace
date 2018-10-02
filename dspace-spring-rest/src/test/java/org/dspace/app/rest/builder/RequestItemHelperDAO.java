@@ -27,7 +27,7 @@ public class RequestItemHelperDAO extends AbstractHibernateDAO<RequestItem> {
 
     void delete(Context context, String token)
             throws SQLException {
-        LOG.info("delete request with token {}", token);
+        LOG.debug("delete request with token {}", token);
 
         Query delete = createQuery(context, "DELETE FROM "
                 + RequestItem.class.getSimpleName()
@@ -35,6 +35,6 @@ public class RequestItemHelperDAO extends AbstractHibernateDAO<RequestItem> {
         delete.setParameter("token", token);
         int howmany = delete.executeUpdate();
 
-        LOG.info("Deleted {} requests", howmany);
+        LOG.debug("Deleted {} requests", howmany);
     }
 }
