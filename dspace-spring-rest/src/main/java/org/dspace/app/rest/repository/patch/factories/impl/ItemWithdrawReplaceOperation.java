@@ -74,11 +74,13 @@ public class ItemWithdrawReplaceOperation extends PatchOperation<Item, String> {
     private void replace(Context context, Item item,  Object value)
             throws PatchBadRequestException, SQLException, AuthorizeException {
 
+        checkOperationValue((String) value);
         Boolean withdraw = BooleanUtils.toBooleanObject((String) value);
 
         if (withdraw == null) {
+            // make sure string was converted to boolean.
             throw new PatchBadRequestException(
-                    "Value is not a valid boolean expression");
+                    "Boolean value not provided for withdrawn operation..");
         }
 
         try {

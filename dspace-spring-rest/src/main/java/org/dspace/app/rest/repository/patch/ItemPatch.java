@@ -29,9 +29,20 @@ public class ItemPatch extends AbstractResourcePatch<Item> {
     @Autowired
     ItemOperationFactory patchFactory;
 
+    /**
+     * Peforms the replace operation.
+     * @param item dspace object
+     * @param context dspace context
+     * @param operation the replace operation
+     * @throws UnprocessableEntityException
+     * @throws PatchBadRequestException
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     protected void replace(Item item, Context context, Operation operation)
             throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException {
 
+        // Get the patch operation via the Item replace operation factory.
         ResourcePatchOperation<Item> patchOperation = patchFactory.getReplaceOperationForPath(operation.getPath());
         patchOperation.perform(context, item, operation);
 

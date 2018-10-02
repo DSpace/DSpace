@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Provides factory method for retrieving instances of eperson PatchOperations.
+ * Provides factory method for retrieving instances of EPerson PatchOperations.
  *
  * @author Michael Spalti
  */

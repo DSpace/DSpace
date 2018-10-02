@@ -47,9 +47,11 @@ public class EPersonLoginReplaceOperation extends PatchOperation<EPerson, String
     private void replace(Context context, EPerson eperson, Operation operation)
             throws PatchBadRequestException, SQLException, AuthorizeException {
 
+        checkOperationValue((String) operation.getValue());
         Boolean canLogin = BooleanUtils.toBooleanObject((String) operation.getValue());
 
         if (canLogin == null) {
+            // make sure string was converted to boolean.
             throw new PatchBadRequestException("Boolean value not provided for canLogin operation.");
         }
         eperson.setCanLogIn(canLogin);

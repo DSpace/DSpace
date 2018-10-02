@@ -59,11 +59,13 @@ public class ItemDiscoverableReplaceOperation extends PatchOperation<Item, Strin
     private void replace(Context context, Item item, Object value)
             throws SQLException, AuthorizeException {
 
+        checkOperationValue((String) value);
         Boolean discoverable = BooleanUtils.toBooleanObject((String) value);
 
         if (discoverable == null) {
+            // make sure string was converted to boolean.
             throw new PatchBadRequestException(
-                    "Value is not a valid boolean expression");
+                    "Boolean value not provided for discoverable operation.");
         }
 
         try {
