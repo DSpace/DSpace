@@ -23,8 +23,7 @@ import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.ItemOperationFactory;
-import org.dspace.app.rest.repository.patch.impl.ResourcePatchOperation;
+import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -55,7 +54,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     ItemConverter converter;
 
     @Autowired
-    ItemOperationFactory patchFactory;
+    ItemPatch itemPatch;
 
 
     public ItemRestRepository() {
@@ -109,12 +108,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         }
 
         List<Operation> operations = patch.getOperations();
-        for (Operation operation : operations) {
-
-            ResourcePatchOperation<Item> patchOperation = patchFactory.getPatchOperationForPath(operation.getPath());
-            patchOperation.perform(context, item, operation);
-
-        }
+        itemPatch.patch(item, context, operations);
 
     }
 
