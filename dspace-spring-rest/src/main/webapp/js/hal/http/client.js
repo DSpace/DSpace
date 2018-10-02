@@ -36,7 +36,7 @@ function downloadFile(url) {
             // Try to find out the filename from the content disposition `filename` value
             var disposition = request.getResponseHeader('content-disposition');
             var matches = /"([^"]*)"/.exec(disposition);
-            var filename = (matches != null && matches[1] ? matches[1] : 'file.pdf');
+            var filename = (matches != null && matches[1] ? matches[1] : 'content');
             // The actual download
             var contentTypeHeader = request.getResponseHeader("content-type");
             if (contentTypeHeader === undefined || contentTypeHeader === "") {
