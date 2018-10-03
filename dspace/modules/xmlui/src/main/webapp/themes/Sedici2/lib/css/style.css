@@ -95,7 +95,8 @@ margin:0 auto;
 #ds-header-wrapper {
 	background-image:url(../../images/background_header_large.png);
 	background-repeat: no-repeat;
-	background-color:#7fbce5;
+    background-position: right;
+    background-color: #5cb1e3;
 }
 
 #ds-header-wrapper #ds-header {
@@ -1916,7 +1917,6 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	text-decoration:none; 
 	font-family:Arial, Helvetica, sans-serif;
 	font-size:13px;
-	text-shadow:  white 1px 1px;
 }
 #topNav li a:focus { 
 	outline: none; 
@@ -3467,16 +3467,16 @@ color:#D8EBF8;
 }
 
 #slide_recursos {
-	background: url(../../images/icono_slide_recursos.png) no-repeat scroll center left;
+	background: url(../../images/icono_slide_recursos.png) no-repeat scroll top left;
 }
 #slide_visibilidad {
-	background: url(../../images/icono_slide_visibilidad.png) no-repeat scroll center left;
+	background: url(../../images/icono_slide_visibilidad.png) no-repeat scroll top left;
 }
 #slide_preservacion {
-	background: url(../../images/icono_slide_preservacion.png) no-repeat scroll center left;
+	background: url(../../images/icono_slide_preservacion.png) no-repeat scroll top left;
 }
 #slide_contacto {
-	background: url(../../images/icono_slide_contacto.png) no-repeat scroll center left;
+	background: url(../../images/icono_slide_contacto.png) no-repeat scroll top left;
 }
 
 #aspect_submission_StepTransformer_div_submit-upload table {
