@@ -22,6 +22,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
@@ -62,7 +66,7 @@ import org.datadryad.api.DryadJournalConcept;
  * Originally based on the DataPackageStats curation task.
  *
  * Input: a single data package OR a collection that contains data packages
- * Output: CSV file with appropriate stats
+ * Output: CSV file with some quick stats
  * Side Effects: Data package is transferred to DASH-based Dryad, Data Package is updated
  *               with metadata indicating date of successfull transfer.
  *
@@ -128,8 +132,7 @@ public class TransferToDash extends AbstractCurationTask {
 	
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output generic report header for the CSV file that will be created by processing all items in this collection
-	    report("handle, packageDOI, articleDOI, journal, numberOfFiles, packageSize, " +
-		   "embargoType, embargoDate, numberOfDownloads, manuscriptNum, numReadmes, dateAccessioned");
+	    report("handle, packageDOI, articleDOI, journal, numberOfFiles, packageSize");
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
 
@@ -314,11 +317,26 @@ public class TransferToDash extends AbstractCurationTask {
 	    return Curator.CURATE_SKIP;
         }
 
-	setResult("Last processed item = " + handle + " -- " + packageDOI);
+        // write this item to json
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode dataset = objectMapper.createObjectNode();
+        dataset.put("title", "This is a test title from the migration");
+        dataset.put("userID", 2);
+        
+        ArrayNode authors = objectMapper.createArrayNode();
+        authors.add("testy testerson");
+        authors.add("testy's son testerson");
+        dataset.set("authors", authors);
+
+        dataset.put("abstract", "This is a long abstract.");
+        
+        objectMapper.writeValue(new File("/tmp/transferToDash.json"), dataset);
+
+        // json complete
+        
+	setResult("Last processed item = " + handle + " -- " + packageDOI);        
 	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " +
-	       numberOfFiles + ", " + packageSize + ", " +
-	       embargoType + ", " + embargoDate + ", " + numberOfDownloads + ", " + manuscriptNum + ", " +
-	       numReadmes + ", " + dateAccessioned);
+	       numberOfFiles + ", " + packageSize);
 
 	// slow this down a bit so we don't overwhelm the production SOLR server with requests
 	try {
