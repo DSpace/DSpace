@@ -199,7 +199,10 @@ public class Context
     }
 
     public String getDbType(){
-        return dbConnection.getType();
+		String dbType = "postgres";
+		if(dbConnection.getType().equals("org.hibernate.dialect.Oracle10gDialect"))
+			dbType = "oracle";
+		return dbType;
     }
 
     /**
