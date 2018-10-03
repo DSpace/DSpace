@@ -54,6 +54,9 @@
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
         <jackson.version>2.8.5</jackson.version>
         <java.version>1.7</java.version>
+        <!-- Added maven compiler version for eclipse setting -->
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <lucene.version>4.10.2</lucene.version>
         <solr.version>4.10.2</solr.version>
         <jena.version>2.12.0</jena.version>
