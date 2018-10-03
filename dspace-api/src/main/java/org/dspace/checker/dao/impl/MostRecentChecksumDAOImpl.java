@@ -96,6 +96,13 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
     @Override
     public void deleteByBitstream(Context context, Bitstream bitstream) throws SQLException
     {
+	// DS-4001 - May me bundles still referenced
+        String hqlb = "update Bundle set primaryBitstream=:nullValue WHERE primaryBitstream=:bitstream";
+        Query queryb = createQuery(context, hqlb);
+        queryb.setParameter("bitstream", bitstream);
+        queryb.setParameter("nullValue", null);
+        queryb.executeUpdate();
+        
         String hql = "delete from MostRecentChecksum WHERE bitstream=:bitstream";
         Query query = createQuery(context, hql);
         query.setParameter("bitstream", bitstream);
