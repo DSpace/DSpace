@@ -17,6 +17,15 @@
 
 <%@ taglib uri="jdynatags" prefix="dyna"%>
 <%@ taglib uri="researchertags" prefix="researcher"%>
+
+<%@page import="org.dspace.app.webui.cris.dto.ComponentInfoDTO"%>
+<%@page import="java.util.Map" %>
+<%@page import="org.dspace.core.ConfigurationManager" %>
+
+<% 
+	Map<String, ComponentInfoDTO> mapInfo = ((Map<String, ComponentInfoDTO>)(request.getAttribute("componentinfomap"))); 
+	boolean showBadgeCount = ConfigurationManager.getBooleanProperty("cris", "webui.tab.show.count.for.firstcomponent", false);
+%>
 	
 	<div id="tabs">
 		<ul>
@@ -33,7 +42,38 @@
 								<img style="width: 16px;vertical-align: middle;" border="0" 
 									src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}" alt="icon" />
 								</c:if>	
-								<spring:message code="${entity.class.simpleName}.tab.${area.shortName}.label" text="${area.title}"></spring:message></a>
+								<spring:message code="${entity.class.simpleName}.tab.${area.shortName}.label" text="${area.title}"></spring:message>
+								<% if(showBadgeCount) { %>
+								<c:set var="firstComponentFound" value="false"/>
+								<c:forEach items="${area.mask}" var="box" varStatus="boxRowCounter">
+								<c:if test="${!empty box.externalJSP && !firstComponentFound}"> 
+								<%  
+								if(mapInfo!=null && !mapInfo.isEmpty()) {
+																		
+									for(String key : mapInfo.keySet()) {
+								%>
+								<c:set var="key"><%= key %></c:set>
+								<c:if test="${box.externalJSP eq key && !firstComponentFound}">
+								<%									    
+								        ComponentInfoDTO iii = (ComponentInfoDTO)(mapInfo.get(key));
+								%>
+								<%								        
+										if(iii.getTotal()>0) {
+								%>
+										<span class="badge badge-primary badge-pill"><%= iii.getTotal() %></span>
+										<c:set var="firstComponentFound" value="true"/>
+							    <% 		
+										} %>
+								</c:if>		
+							    <%
+									}
+								}
+								%>
+								</c:if>
+								</c:forEach>
+								<% } %>
+								</a>
+								
 							</c:when>
 							<c:otherwise>
 									<a href="${tablink}">
@@ -42,7 +82,37 @@
 										src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}"
 			    						alt="icon" />
 			    					</c:if>	
-			    					<spring:message code="${entity.class.simpleName}.tab.${area.shortName}.label" text="${area.title}"></spring:message></a>
+			    					<spring:message code="${entity.class.simpleName}.tab.${area.shortName}.label" text="${area.title}"></spring:message>
+								<% if(showBadgeCount) { %>
+								<c:set var="firstComponentFound" value="false"/>
+								<c:forEach items="${area.mask}" var="box" varStatus="boxRowCounter">
+								<c:if test="${!empty box.externalJSP && !firstComponentFound}"> 
+								<%  
+								if(mapInfo!=null && !mapInfo.isEmpty()) {
+																		
+									for(String key : mapInfo.keySet()) {
+								%>
+								<c:set var="key"><%= key %></c:set>
+								<c:if test="${box.externalJSP eq key && !firstComponentFound}">
+								<%									    
+								        ComponentInfoDTO iii = (ComponentInfoDTO)(mapInfo.get(key));
+								%>
+								<%								        
+										if(iii.getTotal()>0) {
+								%>
+										<span class="badge badge-primary badge-pill"><%= iii.getTotal() %></span>
+										<c:set var="firstComponentFound" value="true"/>
+							    <% 		
+										} %>
+								</c:if>		
+							    <%
+									}
+								}
+								%>
+								</c:if>
+								</c:forEach>
+								<% } %>
+			    					</a>
 							</c:otherwise>
 						</c:choose></li>
 
