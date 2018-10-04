@@ -1,5 +1,13 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -7,6 +15,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SWORDWebConfig {
+    @Value("${sword-server.path}")
+    private String path;
 
     @Bean
     public ServletContextInitializer swordv1ContextInitializer() {
@@ -19,7 +29,7 @@ public class SWORDWebConfig {
     @Bean
     public ServletRegistrationBean swordv1ServiceDocumentBean() {
         ServletRegistrationBean bean = new ServletRegistrationBean( new org.purl.sword.server.ServiceDocumentServlet(),
-                                                                    "/sword/servicedocument/*");
+                                                                    path + "/servicedocument/*");
         bean.setLoadOnStartup(1);
         return bean;
     }
@@ -27,7 +37,7 @@ public class SWORDWebConfig {
     @Bean
     public ServletRegistrationBean swordv1DepositBean() {
         ServletRegistrationBean bean = new ServletRegistrationBean( new org.purl.sword.server.DepositServlet(),
-                                                                    "/sword/deposit/*");
+                                                                    path + "/deposit/*");
         bean.setLoadOnStartup(1);
         return bean;
     }
@@ -35,7 +45,7 @@ public class SWORDWebConfig {
     @Bean
     public ServletRegistrationBean swordv1MediaLinkBean() {
         ServletRegistrationBean bean = new ServletRegistrationBean( new org.purl.sword.server.AtomDocumentServlet(),
-                                                                    "/sword/media-link/*");
+                                                                    path + "/media-link/*");
         bean.setLoadOnStartup(1);
         return bean;
     }
