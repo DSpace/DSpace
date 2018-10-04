@@ -307,12 +307,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
 
         * jsr311-api (javax.ws.rs:jsr311-api:1.1.1 - https://jsr311.dev.java.net)
 
-    CDDL+GPL License:
-
-        * jersey-repackaged-guava (org.glassfish.jersey.bundles.repackaged:jersey-guava:2.22.1 - https://jersey.java.net/project/project/jersey-guava/)
-        * jersey-core-client (org.glassfish.jersey.core:jersey-client:2.22.1 - https://jersey.java.net/jersey-client/)
-        * jersey-core-common (org.glassfish.jersey.core:jersey-common:2.22.1 - https://jersey.java.net/jersey-common/)
-
     Common Development and Distribution License (CDDL):
 
         * jersey-core (com.sun.jersey:jersey-core:1.19 - https://jersey.java.net/jersey-core/)
@@ -339,6 +333,9 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * OSGi resource locator bundle - used by various API providers that rely on META-INF/services mechanism to locate providers. (org.glassfish.hk2:osgi-resource-locator:1.0.1 - http://glassfish.org/osgi-resource-locator/)
         * aopalliance version 1.0 repackaged as a module (org.glassfish.hk2.external:aopalliance-repackaged:2.4.0-b31 - https://hk2.java.net/external/aopalliance-repackaged)
         * javax.inject:1 as OSGi bundle (org.glassfish.hk2.external:javax.inject:2.4.0-b31 - https://hk2.java.net/external/javax.inject)
+        * jersey-repackaged-guava (org.glassfish.jersey.bundles.repackaged:jersey-guava:2.22.1 - https://jersey.java.net/project/project/jersey-guava/)
+        * jersey-core-client (org.glassfish.jersey.core:jersey-client:2.22.1 - https://jersey.java.net/jersey-client/)
+        * jersey-core-common (org.glassfish.jersey.core:jersey-common:2.22.1 - https://jersey.java.net/jersey-common/)
         * Servlet Specification 2.5 API (org.mortbay.jetty:servlet-api-2.5:6.1.14 - http://jetty.mortbay.org/project/modules/servlet-api-2.5)
         * Restlet Core - API and Engine (org.restlet.jee:org.restlet:2.1.1 - http://www.restlet.org/org.restlet)
         * Restlet Extension - Servlet (org.restlet.jee:org.restlet.ext.servlet:2.1.1 - http://www.restlet.org/org.restlet.ext.servlet)
