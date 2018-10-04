@@ -25,6 +25,7 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.Link;
@@ -91,7 +92,7 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
                     Method readMethod = pd.getReadMethod();
                     String name = pd.getName();
                     if (readMethod != null && !"class".equals(name)) {
-                        LinkRest linkAnnotation = readMethod.getAnnotation(LinkRest.class);
+                        LinkRest linkAnnotation = AnnotationUtils.findAnnotation(readMethod, LinkRest.class);
 
                         if (linkAnnotation != null) {
                             if (StringUtils.isNotBlank(linkAnnotation.name())) {

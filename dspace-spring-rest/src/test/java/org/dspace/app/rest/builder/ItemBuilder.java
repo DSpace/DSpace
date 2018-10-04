@@ -67,7 +67,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchema.DC_SCHEMA, "subject", null, subject);
     }
 
-    public ItemBuilder makePrivate() {
+    public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
         return this;
     }

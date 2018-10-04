@@ -14,6 +14,7 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
 
@@ -69,6 +70,17 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
 
     public EPersonBuilder withEmail(String name) {
         ePerson.setEmail(name);
+        return this;
+    }
+
+    public EPersonBuilder withGroupMembership(Group group) {
+        groupService.addMember(context, group, ePerson);
+        return this;
+    }
+
+    public EPersonBuilder withPassword(final String password) {
+        ePerson.setCanLogIn(true);
+        ePersonService.setPassword(ePerson, password);
         return this;
     }
 }

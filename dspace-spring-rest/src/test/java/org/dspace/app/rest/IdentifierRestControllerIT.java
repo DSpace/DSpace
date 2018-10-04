@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -51,8 +52,20 @@ public class IdentifierRestControllerIT extends AbstractControllerIntegrationTes
 
     @Test
     public void testUnexistentIdentifier() throws Exception {
-        getClient().perform(get("/api/pid/find?{id}","fakeIdentifier"))
+        getClient().perform(get("/api/pid/find?id={id}","fakeIdentifier"))
                         .andExpect(status().isNotFound());
     }
 
+    @Test
+    @Ignore
+    /**
+     * This test will check the return status code when no id is supplied. It currently fails as our
+     * RestResourceController take the precedence over the pid controller returning a 404 Repository not found
+     *
+     * @throws Exception
+     */
+    public void testMissingIdentifierParameter() throws Exception {
+        getClient().perform(get("/api/pid/find"))
+                        .andExpect(status().isUnprocessableEntity());
+    }
 }
