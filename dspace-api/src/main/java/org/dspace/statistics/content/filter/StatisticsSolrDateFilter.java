@@ -115,11 +115,14 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
                 endDate = endCal.getTime();
             }
         }
-
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(endDate);
+        cal.add(Calendar.DATE, 1);
         //Parse the dates
         SimpleDateFormat formatter = new SimpleDateFormat(SolrLogger.DATE_FORMAT_8601);
         String startDateParsed = formatter.format(startDate);
-        String endDateParsed = formatter.format(endDate);
+        String endDateParsed = formatter.format(cal.getTime());
 
         //Create our string
         return "time:[" + startDateParsed + " TO " + endDateParsed + "]";
