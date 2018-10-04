@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.hateoas.core.EvoInflectorRelProvider;
 
 /**
@@ -20,7 +21,7 @@ public class DSpaceRelProvider extends EvoInflectorRelProvider {
 
     @Override
     public String getItemResourceRelFor(Class<?> type) {
-        RelNameDSpaceResource nameAnnotation = type.getAnnotation(RelNameDSpaceResource.class);
+        RelNameDSpaceResource nameAnnotation = AnnotationUtils.findAnnotation(type, RelNameDSpaceResource.class);
         if (nameAnnotation != null) {
             return nameAnnotation.value();
         }
