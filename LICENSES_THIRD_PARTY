@@ -290,6 +290,7 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Hamcrest All (org.hamcrest:hamcrest-all:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-all)
         * Hamcrest Core (org.hamcrest:hamcrest-core:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-core)
         * JBibTeX (org.jbibtex:jbibtex:1.0.10 - http://www.jbibtex.org)
+        * JAXB2 Basics - Runtime (org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.9.5 - https://github.com/highsource/jaxb2-basics/jaxb2-basics-runtime)
         * ASM Core (org.ow2.asm:asm:4.1 - http://asm.objectweb.org/asm/)
         * ASM Core (org.ow2.asm:asm:4.2 - http://asm.objectweb.org/asm/)
         * ASM Analysis (org.ow2.asm:asm-analysis:4.1 - http://asm.objectweb.org/asm-analysis/)
@@ -298,14 +299,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * ASM Util (org.ow2.asm:asm-util:4.1 - http://asm.objectweb.org/asm-util/)
         * XMLUnit for Java (xmlunit:xmlunit:1.1 - http://xmlunit.sourceforge.net/)
         * XMLUnit for Java (xmlunit:xmlunit:1.3 - http://xmlunit.sourceforge.net/)
-
-    BSD-Style License:
-
-        * JAXB2 Basics - Runtime (org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.9.5 - https://github.com/highsource/jaxb2-basics/jaxb2-basics-runtime)
-
-    CDDL License:
-
-        * jsr311-api (javax.ws.rs:jsr311-api:1.1.1 - https://jsr311.dev.java.net)
 
     Common Development and Distribution License (CDDL):
 
@@ -325,6 +318,7 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * jstl (javax.servlet:jstl:1.1.2 - no url defined)
         * servlet-api (javax.servlet:servlet-api:2.5 - no url defined)
         * javax.ws.rs-api (javax.ws.rs:javax.ws.rs-api:2.0.1 - http://jax-rs-spec.java.net)
+        * jsr311-api (javax.ws.rs:jsr311-api:1.1.1 - https://jsr311.dev.java.net)
         * JAXB API bundle for GlassFish V3 (javax.xml.bind:jaxb-api:2.2.2 - https://jaxb.dev.java.net/)
         * Streaming API for XML (javax.xml.stream:stax-api:1.0-2 - no url defined)
         * HK2 API module (org.glassfish.hk2:hk2-api:2.4.0-b31 - https://hk2.java.net/hk2-api)
