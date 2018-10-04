@@ -119,9 +119,7 @@ public class TransferToDash extends AbstractCurationTask {
 	int maxDownloads = 0;
 	String numberOfDownloads = "\"[unknown]\"";
 	String manuscriptNum = null;
-	int numReadmes = 0;
 	String dateAccessioned = "\"[unknown]\"";
-
 	
 	try {
 	    context = new Context();
@@ -129,12 +127,17 @@ public class TransferToDash extends AbstractCurationTask {
 	    log.fatal("Unable to open database connection", e);
 	    return Curator.CURATE_FAIL;
 	}
-	
+        
 	if (dso.getType() == Constants.COLLECTION) {
 	    // output generic report header for the CSV file that will be created by processing all items in this collection
 	    report("handle, packageDOI, articleDOI, journal, numberOfFiles, packageSize");
 	} else if (dso.getType() == Constants.ITEM) {
+
             Item item = (Item)dso;
+
+            // dataset is the JSON dataset object that will be deposited into New Dryad
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode dataset = objectMapper.createObjectNode();
 
 	    try {
 		handle = item.getHandle();
@@ -160,6 +163,25 @@ public class TransferToDash extends AbstractCurationTask {
 		    }
 		}
 		log.debug("packageDOI = " + packageDOI);
+                dataset.put("identifier", packageDOI);
+
+                // title
+                DCValue[] vals = item.getMetadata("dc.title");
+                if (vals.length > 0) {
+                    String title = vals[0].value;
+                    log.debug("title = " + title);
+                    dataset.put("title", title);
+                }
+
+                // abstract
+                vals = item.getMetadata("dc.description");
+                if (vals.length > 0) {
+                    String abstract = vals[0].value;
+                    dataset.put("abstract", abstract);
+                }
+                       
+                // TODO -- fix this field! Need a real lookup!
+                dataset.put("userID", 1);
 
 		// article DOI
 		vals = item.getMetadata("dc.relation.isreferencedby");
@@ -169,8 +191,39 @@ public class TransferToDash extends AbstractCurationTask {
 		    articleDOI = vals[0].value;
 		}
 		log.debug("articleDOI = " + articleDOI);
+                ObjectNode article = objectMapper.createObjectNode();
+                article.put("relationship", "IsReferencedBy");
+                article.put("identifierType", "DOI");
+                article.put("identifier", articleDOI);
+                ArrayNode relatedWorks = objectMapper.createArrayNode();
+                relatedWorks.add(article);
+                dataset.put("relatedWorks", relatedWorks);
 
-		
+                ArrayNode allAuthors = objectMapper.createArrayNode();
+		vals = item.getMetadata("dc.contributor");
+                for(int i = 0; i < vals.length; i++) {
+                    String authorName = vals[i].value;
+                    ObjectNode authorObj = objectMapper.createObjectNode();
+                    int comma = authorName.indexOf(",");
+                    authorObj.put("firstName", authorName.substring(comma));
+                    authorObj.put("lastName", authorName.substring(0, comma));
+                    // TODO add affiliation
+                    allAuthors.add(authorObj);
+                }
+                vals = item.getMetadata("dc.contributor.author");
+                for(int i = 0; i < vals.length; i++) {
+                    String authorName = vals[i].value;
+                    ObjectNode authorObj = objectMapper.createObjectNode();
+                    int comma = authorName.indexOf(",");
+                    authorObj.put("firstName", authorName.substring(comma));
+                    authorObj.put("lastName", authorName.substring(0, comma));
+                    // TODO add affiliation
+                    allAuthors.add(authorObj);
+                }
+                dataset.put("authors", allAuthors);
+
+                // ///////// Items below this are not yet added to json
+                
 		// journal
 	 	vals = item.getMetadata("prism.publicationName");
 		if (vals.length == 0) {
@@ -318,22 +371,9 @@ public class TransferToDash extends AbstractCurationTask {
         }
 
         // write this item to json
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode dataset = objectMapper.createObjectNode();
-        dataset.put("title", "This is a test title from the migration");
-        dataset.put("userID", 2);
-        
-        ArrayNode authors = objectMapper.createArrayNode();
-        authors.add("testy testerson");
-        authors.add("testy's son testerson");
-        dataset.set("authors", authors);
-
-        dataset.put("abstract", "This is a long abstract.");
-        
         objectMapper.writeValue(new File("/tmp/transferToDash.json"), dataset);
 
-        // json complete
-        
+        // provide output for the console
 	setResult("Last processed item = " + handle + " -- " + packageDOI);        
 	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " +
 	       numberOfFiles + ", " + packageSize);
