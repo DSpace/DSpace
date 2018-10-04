@@ -15,8 +15,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SWORDWebConfig {
-    @Value("${sword-server.path}")
-    private String path;
 
     @Bean
     public ServletContextInitializer swordv1ContextInitializer() {
@@ -29,7 +27,7 @@ public class SWORDWebConfig {
     @Bean
     public ServletRegistrationBean swordv1ServiceDocumentBean() {
         ServletRegistrationBean bean = new ServletRegistrationBean( new org.purl.sword.server.ServiceDocumentServlet(),
-                                                                    path + "/servicedocument/*");
+                                                                    "/sword/servicedocument/*");
         bean.setLoadOnStartup(1);
         return bean;
     }
@@ -37,7 +35,7 @@ public class SWORDWebConfig {
     @Bean
     public ServletRegistrationBean swordv1DepositBean() {
         ServletRegistrationBean bean = new ServletRegistrationBean( new org.purl.sword.server.DepositServlet(),
-                                                                    path + "/deposit/*");
+                                                                    "/sword/deposit/*");
         bean.setLoadOnStartup(1);
         return bean;
     }
@@ -45,7 +43,7 @@ public class SWORDWebConfig {
     @Bean
     public ServletRegistrationBean swordv1MediaLinkBean() {
         ServletRegistrationBean bean = new ServletRegistrationBean( new org.purl.sword.server.AtomDocumentServlet(),
-                                                                    path + "/media-link/*");
+                                                                    "/sword/media-link/*");
         bean.setLoadOnStartup(1);
         return bean;
     }
