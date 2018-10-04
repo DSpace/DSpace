@@ -774,11 +774,20 @@ public class ImportExportUtils {
                     {
                         if (update)
                         {
-                            nested = applicationService
-                                    .getNestedObjectsByParentIdAndTypoIDAndNestedSourceReference(
-                                            object.getId(), typo.getId(),
-                                            sourceRef, sourceID,
-                                            crisNestedObjectClazz);
+                            if (StringUtils.isNotBlank(uuid))
+                            {
+                                nested = applicationService
+                                        .findNestedObjectByUUID(
+                                                crisNestedObjectClazz, uuid);
+                            }
+                            else 
+                            {
+                                nested = applicationService
+                                        .getNestedObjectsByParentIdAndTypoIDAndNestedSourceReference(
+                                                object.getId(), typo.getId(),
+                                                sourceRef, sourceID,
+                                                crisNestedObjectClazz);
+                            }
                         }
                         if (nested == null)
                         {
