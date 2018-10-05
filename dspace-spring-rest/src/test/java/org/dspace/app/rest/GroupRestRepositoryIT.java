@@ -10,16 +10,23 @@ package org.dspace.app.rest;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.awt.*;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
+import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -28,6 +35,23 @@ import org.junit.Test;
  */
 
 public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Test
+    public void createTest()
+        throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String groupName = "testGroup1";
+
+        groupRest.setName(groupName);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/eperson/groups")
+                .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("name", Matchers.containsString(groupName)));
+    }
 
     @Test
     public void findAllTest() throws Exception {
