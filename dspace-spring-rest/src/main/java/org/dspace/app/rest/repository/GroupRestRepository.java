@@ -46,6 +46,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
     @Autowired
     GroupConverter converter;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     protected GroupRest createAndReturn(Context context)
             throws AuthorizeException, RepositoryMethodNotImplementedException {
