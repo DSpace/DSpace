@@ -2051,6 +2051,7 @@
 	<message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
 	<message key="xmlui.dri2xhtml.structural.link_original_license">Licença original</message>
 	<message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Mostrando itens {0}-{1}</message>
+	<message key="xmlui.dri2xhtml.structural.footer.developers.contact-phone">Tel: +54 0221 6447282 <br></br>Tel: +54 0221 423 6696/6677 (int. 141) </message>
 
 	<!-- DS-METS-1.0-MODS.xsl -->
 	<!-- DS-METS-1.0-DIM.xsl -->
