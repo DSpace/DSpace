@@ -571,7 +571,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //An anonymous user browses the items in the Browse by date issued endpoint
         //with startsWith set to 1990
         getClient().perform(get("/api/discover/browses/dateissued/items")
-                                .param("startsWith", "1990"))
+                                .param("startsWith", "1990")
+                                .param("size", "2"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -580,22 +581,17 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(content().contentType(contentType))
 
                    //We expect only the "remaining" five items to be present
-                   .andExpect(jsonPath("$.page.totalElements", is(5)))
-                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   .andExpect(jsonPath("$.page.number", is(1)))
+                   .andExpect(jsonPath("$.page.size", is(2)))
+                   .andExpect(jsonPath("$._links.first.href", contains("startsWith=1990")))
 
                    //Verify that the index jumps to the "Python" item.
                    .andExpect(jsonPath("$._embedded.items",
                                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item3,
                                                                                             "Python", "1990"),
                                                 ItemMatcher.matchItemWithTitleAndDateIssued(item4,
-                                                                                            "Java", "1995-05-23"),
-                                                ItemMatcher.matchItemWithTitleAndDateIssued(item5,
-                                                                                            "Zeta Reticuli",
-                                                                                            "2018-01-01"),
-                                                ItemMatcher.matchItemWithTitleAndDateIssued(item6,
-                                                                                            "Moon", "2018-01-02"),
-                                                ItemMatcher.matchItemWithTitleAndDateIssued(item7,
-                                                                                            "T-800", "2029")
+                                                                                            "Java", "1995-05-23")
                                        )));
         //** WHEN **
         //An anonymous user browses the items in the Browse by Title endpoint
