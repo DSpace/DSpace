@@ -24,7 +24,6 @@ import org.dspace.app.rest.model.hateoas.GroupResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,7 +41,7 @@ import org.springframework.stereotype.Component;
 @Component(GroupRest.CATEGORY + "." + GroupRest.NAME)
 public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
     @Autowired
-    GroupService gs;//= EPersonServiceFactory.getInstance().getGroupService();
+    GroupService gs;
 
     @Autowired
     GroupConverter converter;
