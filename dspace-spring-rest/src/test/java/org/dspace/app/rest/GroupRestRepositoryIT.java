@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.awt.*;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,10 +22,7 @@ import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.GroupService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -49,8 +45,25 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/eperson/groups")
                 .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("name", Matchers.containsString(groupName)));
+                .andExpect(status().isCreated());
+
+        getClient(authToken).perform(get("/api/eperson/groups"))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.groups", Matchers.containsInAnyOrder(
+                           GroupMatcher.matchGroupWithName(groupName),
+                           GroupMatcher.matchGroupWithName("Administrator"),
+                           GroupMatcher.matchGroupWithName("Anonymous"))));
+
+        authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(post("/api/eperson/groups")
+                .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                .andExpect(status().isForbidden());
+
+        getClient().perform(post("/api/eperson/groups")
+                .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
