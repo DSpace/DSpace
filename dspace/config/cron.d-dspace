@@ -32,9 +32,9 @@ DSPACE=/var/dspace/install
 0 1 * * *	dspace	$DSPACE/bin/dspace sub-daily
 
 # Run the media filter at 01:01 and 17:01 every day
-1 1,17 * * *    dspace  $DSPACE/bin/dspace filter-media -m 50 -s 10915/5621,10915/2618,10915/2762,10915/15912,10915/2272,10915/15920,10915/5226 -q > /dev/null 
+1 1,17 * * *	dspace	$DSPACE/bin/dspace filter-media -m 50 -s 10915/5621,10915/2618,10915/2762,10915/15912,10915/2272,10915/15920,10915/5226 -q > /dev/null
 
-# Run the checksum checker at 03:00 every Saturday
+# Run the checksum checker at 04:00 every Saturday
 0 4 * * sat	dspace	$DSPACE/bin/dspace checker -lp | grep -v " old results from the database"
 # Mail the results to the sysadmin at 04:00
 2 4 * * 1	dspace	$DSPACE/bin/dspace checker-emailer -c
@@ -64,16 +64,12 @@ DSPACE=/var/dspace/install
 #Generate Sitemaps
 0 1,9,17 * * *	dspace	$DSPACE/bin/dspace generate-sitemaps > /dev/null
 
-#Check for pendign embargoes
-#1 6 * * *	dspace	$DSPACE/bin/dspace embargo-lifter 
-
 #Actualizacion de la bbdd geolite. ver mas en http://trac.prebi.unlp.edu.ar/issues/1702
 #0 5 2 * *	dspace	ant -f $DSPACE-src/distribution/target/dspace-sedici-distribution-bin/build.xml update_geolite
 0 6 2 * *	dspace	wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -q -O - | gunzip > $DSPACE/config/GeoLiteCity.dat
 
-#Backup en AIP una vez por semana
-#5 22 * *	dspace	sun date && $DSPACE/bin/dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 $DSPACE/backups/aip/aip-site.zip && date
-
 # ########## POSTGRES ######################
 # Clean up the database nightly at 4.20am 
 # 20 4 * * *	dspace	vacuumdb --analyze dspace > /dev/null 2>&1
+
+

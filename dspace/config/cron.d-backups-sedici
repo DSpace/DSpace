@@ -14,8 +14,6 @@ DATEMTH=date +%m
 ##  SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS ##
 ##################################################################################
 1 12 2,25 * *	root	tar --directory / -czf $DSPACE_BACKUP_DIR/etc/etc.backup.$($DATESTR).tgz etc/
-#Envio los backups al storage de jursoc
-#0 6,17 * * *       root    rsync -arvz --delete $DSPACE_INSTALL_DIR/* dspace@A.B.C.D:dspace/ > /var/log/rsync-a-jursoc.log
 
 ##################################################################################
 ## DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE ##
@@ -28,21 +26,10 @@ DATEMTH=date +%m
 0 5 * * 1       dspace find $DSPACE_BACKUP_DIR/postgres -maxdepth 1 -name "dspace_sedici*-20??-??-??*.tgz" -mtime +30 -not -name "dspace_sedici*-20??-??-01*.tgz" -exec rm {} \; > /dev/null
 
 #backups de configuraciones (todos los 1ro de mes a las 4:38hs)
-38 4 1 * * 	root	tar --directory $DSPACE_INSTALL_DIR -czf $DSPACE_BACKUP_DIR/config/config.backup.$($DATESTR).tgz config/ 
+38 4 1 * *	root	tar --directory $DSPACE_INSTALL_DIR -czf $DSPACE_BACKUP_DIR/config/config.backup.$($DATESTR).tgz config/ 
 
 #Backup en AIP una vez por semana
 #5 22 * *       dspace  sun date && $DSPACE/bin/dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 $DSPACE/backups/aip/aip-site.zip && date
-
-##################################################################################
-##  BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG  ##
-##################################################################################
-
-#backups del htdocs del BLOG (domingos a las 4:55AM)
-#55 4 * * sun	root	tar --directory /var/www -czf $DSPACE_BACKUP_DIR/blog/sedici_blog.htdocs.mes-$($DATEMTH).tgz sedici_blog/
-
-#backups del mysql del blog todos los días a las 16:30
-#MYSQL_sedici_blog_PWD='YYY'
-#30 16 * * 1,2,3,4,5	root	mysqldump -usedici_blog -p$MYSQL_sedici_blog_PWD -hdata.server.sedici.unlp.edu.ar sedici_blog2 | gzip -c > $DSPACE_BACKUP_DIR/mysql/sedici_blog2.sql.gz
 
 ##################################################################################
 ##  AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH AUTH ##
@@ -52,5 +39,6 @@ DATEMTH=date +%m
 50 4 * * 1,2,3,4,5	root	/usr/local/bin/drush -r /var/www/auth archive-dump --destination=$DSPACE_BACKUP_DIR/auth/auth.$($DATESTR).tar.gz -q > /dev/null
 
 #rotación de backups de drupal (todos los dias a las 05:00hs). Se eliminan aquellos mas antiguos a 30 dias de creación pero se conservan los de primero de cada mes
-0 5 * * 1,2,3,4,5       root  find $DSPACE_BACKUP_DIR/auth -maxdepth 1 -name "auth.*.tar.gz" -mtime +30 -not -name "auth.20??-??-01*.tar.gz" -exec rm {} \; > /dev/null
+0 5 * * 1,2,3,4,5       root  find $DSPACE_BACKUP_DIR/auth -maxdepth 1 -name "auth.20??-??-??*.tar.gz" -mtime +30 -not -name "auth.20??-??-01*.tar.gz" -exec rm {} \; > /dev/null
+
 
