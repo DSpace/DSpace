@@ -299,7 +299,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param id
      *            the ID of the target REST object
      * @param extraField
-     *            an optional implementation specific parameter used to influence how the file is processed
+     *            the original name of the uploaded file
      * @param file
      *            the uploaded file
      * @return the new state of the REST object
