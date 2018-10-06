@@ -8,15 +8,15 @@
 package org.dspace.app.rest.repository.patch.factories;
 
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.repository.patch.factories.impl.ItemDiscoverableReplaceOperation;
 import org.dspace.app.rest.repository.patch.factories.impl.ItemWithdrawReplaceOperation;
 import org.dspace.app.rest.repository.patch.factories.impl.ResourcePatchOperation;
-import org.dspace.content.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Provides factory method for instances of item PatchOperations.
+ * Provides factory methods for obtaining instances of item patch operations.
  *
  * @author Michael Spalti
  */
@@ -33,12 +33,13 @@ public class ItemOperationFactory {
     private static final String OPERATION_PATH_DISCOVERABLE = "/discoverable";
 
     /**
-     * Returns the PatchOperation instance for the replace operation, based on the
-     * operation path.
-     * @param path
-     * @return
+     * Returns the patch instance for the replace operation (based on the operation path).
+     *
+     * @param path the operation path
+     * @return the patch operation implementation
      */
-    public ResourcePatchOperation<Item> getReplaceOperationForPath(String path) {
+    public ResourcePatchOperation<ItemRest> getReplaceOperationForPath(String path)
+            throws PatchBadRequestException {
 
         switch (path) {
             case OPERATION_PATH_DISCOVERABLE:

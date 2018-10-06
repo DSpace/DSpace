@@ -7,23 +7,63 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
 import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
-public abstract class PatchOperation<DSO extends DSpaceObject, T extends Object>
-        implements ResourcePatchOperation<DSO> {
+/**
+ * This patch class includes abstract and implemented methods that
+ * can be used to type check objects derived from operation values.
+ *
+ * @author Michael Spalti
+ */
+public abstract class PatchOperation<R extends RestModel, T extends Object>
+        implements ResourcePatchOperation<R> {
 
-    public abstract void perform(Context context, DSO resource, Operation operation)
-            throws SQLException, AuthorizeException, PatchBadRequestException;
+    public abstract RestModel perform(R resource, Operation operation)
+            throws PatchBadRequestException;
 
+    /**
+     * Throws PatchBadRequestException for missing operation value.
+     * @param value the value to test
+     */
+    public void checkOperationValue(Object value) {
+        if (value == null) {
+            throw new PatchBadRequestException("No value provided for the operation.");
+        }
+    }
+
+    /**
+     * Allows clients to use either a boolean or a string representation of boolean value.
+     * @param value the operation value
+     * @return the original or derived boolean value
+     */
+    public Boolean getBooleanOperationValue(Object value) throws PatchBadRequestException {
+        Boolean bool;
+
+        if (value instanceof String) {
+            bool = BooleanUtils.toBooleanObject((String) value);
+            if (bool == null) {
+                // make sure the string was converted to boolean.
+                throw new PatchBadRequestException("Boolean value not provided.");
+            }
+        } else {
+            bool = (Boolean) value;
+        }
+        return bool;
+    }
+
+    // This is duplicated code (see org.dspace.app.rest.submit.factory.impl.PatchOperation)
+    // If it stays here, it should be DRY. Current patch resource patch operations do not
+    // use these methods since operation values are either strings or booleans.
+    // These methods handle JsonValueEvaluator instances for json objects and arrays,
+    // as returned by the JsonPatchConverter. A complete implementation of the PatchOperation
+    // class will need these methods.
     public List<T> evaluateArrayObject(LateObjectEvaluator value) {
         List<T> results = new ArrayList<T>();
         T[] list = null;
@@ -48,17 +88,17 @@ public abstract class PatchOperation<DSO extends DSpaceObject, T extends Object>
     }
 
     /**
-     * Throws PatchBadRequestException for missing operation value.
-     * @param value the value to check
+     * This method should return the typed array to be used in the
+     * LateObjectEvaluator evaluation of json arrays.
+     * @return
      */
-    public void checkOperationValue(T value) {
-        if (value == null) {
-            throw new PatchBadRequestException("No value provided for the operation.");
-        }
-    }
-
     protected abstract Class<T[]> getArrayClassForEvaluation();
 
+    /**
+     * This method should return the object type to be used in the
+     * LateObjectEvaluator evaluation of json objects.
+     * @return
+     */
     protected abstract Class<T> getClassForEvaluation();
 
 }

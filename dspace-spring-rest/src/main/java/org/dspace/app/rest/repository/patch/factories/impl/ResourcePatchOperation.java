@@ -7,17 +7,25 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import java.sql.SQLException;
-
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
 
-public interface ResourcePatchOperation<DSO extends DSpaceObject> {
+/**
+ * The interface for repository patch operations.
+ *
+ * @author Michael Spalti
+ */
+public interface ResourcePatchOperation<R extends RestModel> {
 
-    void perform(Context context, DSO resource, Operation operation)
-            throws SQLException, AuthorizeException, PatchBadRequestException;
+    /**
+     * Updates the rest model by applying the patch operation.
+     * @param resource the rest model
+     * @param operation
+     * @return the updated rest model
+     * @throws PatchBadRequestException
+     */
+    RestModel perform(R resource, Operation operation)
+            throws PatchBadRequestException;
 
 }
