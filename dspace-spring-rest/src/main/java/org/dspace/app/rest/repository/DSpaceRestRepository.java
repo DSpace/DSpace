@@ -68,48 +68,94 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         }
     }
 
+    /**
+     * Method to implement to support full update of a REST object. This is usually required by a PUT request.
+     * 
+     * @param context
+     *            the dspace context
+     * @param entity
+     *            the REST object to update
+     * @return the new state of the REST object after persistence
+     * @throws AuthorizeException
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
+     */
     protected <S extends T> S save(Context context, S entity) throws AuthorizeException,
         RepositoryMethodNotImplementedException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
     @Override
+    /**
+     * Method to implement to support bulk update of a REST objects via a PUT request
+     */
     public <S extends T> Iterable<S> save(Iterable<S> entities) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
+    /**
+     * Return a specific REST object
+     * 
+     * @return the REST object identified by its ID
+     */
     public T findOne(ID id) {
         Context context = obtainContext();
         return thisRepository.findOne(context, id);
     }
 
+    /**
+     * Method to implement to support retrieval of a specific REST object instance
+     * 
+     * @param context
+     *            the dspace context
+     * @param id
+     *            the rest object id
+     * @return the REST object identified by its ID
+     */
     public abstract T findOne(Context context, ID id);
 
     @Override
+    /**
+     * Return true if an object exist for the specified ID. The default implementation is inefficient as it retrieves
+     * the actual object to state that it exists. This could lead to retrieve and inizialize lot of linked objects
+     */
     public boolean exists(ID id) {
-        // TODO Auto-generated method stub
-        return false;
+        return findOne(id) != null;
     }
 
     @Override
-    public Iterable<T> findAll() {
+    /**
+     * This method cannot be implemented we required all the find method to be paginated
+     */
+    public final Iterable<T> findAll() {
         throw new RuntimeException("findAll MUST be paginated");
     }
 
     @Override
+    /**
+     * This method could be implemented to support bulk retrieval of specific object by their IDs. Unfortunately, this
+     * method doesn't allow pagination and it could be misused to retrieve thousand objects at once
+     */
     public Iterable<T> findAll(Iterable<ID> ids) {
         throw new RuntimeException("findAll MUST be paginated");
     }
 
     @Override
+    /**
+     * This method return the number of object instances of the type managed by the repository class available in the
+     * system
+     */
     public long count() {
-        // TODO Auto-generated method stub
+        // FIXME DS-4038
         return 0;
     }
 
     @Override
+    /**
+     * Delete the object identified by its ID
+     */
     public void delete(ID id) {
         Context context = obtainContext();
         try {
@@ -122,44 +168,96 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         }
     }
 
+    /**
+     * Method to implement to support delete of a single object instance
+     * 
+     * @param context
+     *            the dspace context
+     * @param id
+     *            the id of the rest object to delete
+     * @throws AuthorizeException
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
+     */
     protected void delete(Context context, ID id) throws AuthorizeException, RepositoryMethodNotImplementedException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
     @Override
+    /**
+     * Method to implement to allow delete of a specific entity instance
+     */
     public void delete(T entity) {
         // TODO Auto-generated method stub
     }
 
     @Override
+    /**
+     * Method to implement to support bulk delete of multiple entity instances
+     */
     public void delete(Iterable<? extends T> entities) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
+    /**
+     * Method to implement to support bulk delete of ALL entity instances
+     */
     public void deleteAll() {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public Iterable<T> findAll(Sort sort) {
+    /**
+     * This method cannot be implemented we required all the find method to be paginated
+     */
+    public final Iterable<T> findAll(Sort sort) {
         throw new RuntimeException("findAll MUST be paginated");
     }
 
     @Override
+    /**
+     * Provide access to the manage entity instances in a paginated way
+     */
     public Page<T> findAll(Pageable pageable) {
         Context context = obtainContext();
         return thisRepository.findAll(context, pageable);
     }
 
+    /**
+     * Method to implement to support scroll of entity instances from the collection resource endpoin
+     * 
+     * @param context
+     *            the dspace context
+     * @param pageable
+     *            object embedding the requested pagination info
+     * @return
+     */
     public abstract Page<T> findAll(Context context, Pageable pageable);
 
+    /**
+     * The REST model supported by the repository
+     */
     public abstract Class<T> getDomainClass();
 
+    /**
+     * Wrap the REST model in a REST HAL Resource
+     * 
+     * @param model
+     *            the rest model instance
+     * @param rels
+     *            the HAL links
+     * @return the REST Resource
+     */
     public abstract DSpaceResource<T> wrapResource(T model, String... rels);
 
+    /**
+     * Create and return a new instance. Data are usually retrieved from the thread bound http request
+     * 
+     * @return the created REST object
+     */
     public T createAndReturn() {
         Context context = null;
         try {
@@ -174,16 +272,60 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         }
     }
 
+    /**
+     * Method to implement to support the creation of a new instance. Usually require to retrieve the http request from
+     * the thread bound attribute
+     * 
+     * @param context
+     *            the dspace context
+     * @return the created REST object
+     * @throws AuthorizeException
+     * @throws SQLException
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
+     */
     protected T createAndReturn(Context context)
             throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
+    /**
+     * Method to implement to attach/upload a file to a specific REST object
+     * 
+     * @param request
+     *            the http request
+     * @param apiCategory
+     * @param model
+     * @param id
+     *            the ID of the target REST object
+     * @param extraField
+     *            an optional implementation specific parameter used to influence how the file is processed
+     * @param file
+     *            the uploaded file
+     * @return the new state of the REST object
+     * @throws Exception
+     */
     public T upload(HttpServletRequest request, String apiCategory, String model,
                                                      ID id, String extraField, MultipartFile file) throws Exception {
         throw new RuntimeException("No implementation found; Method not allowed!");
     }
 
+    /**
+     * Apply a partial update to the REST object via JSON Patch
+     * 
+     * @param request
+     *            the http request
+     * @param apiCategory
+     * @param model
+     * @param id
+     *            the ID of the target REST object
+     * @param patch
+     * the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
+     * @return
+     * @throws HttpRequestMethodNotSupportedException
+     * @throws UnprocessableEntityException
+     * @throws PatchBadRequestException
+     */
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
         throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, PatchBadRequestException {
         Context context = obtainContext();
@@ -198,12 +340,47 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         return findOne(id);
     }
 
+    /**
+     * Method to implement to allow partial update of the REST object via JSON Patch
+     * 
+     * @param request
+     *            the http request
+     * @param apiCategory
+     * @param model
+     * @param id
+     *            the ID of the target REST object
+     * @param patch
+     *            the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
+     * @return the full new state of the REST object after patching
+     * @throws HttpRequestMethodNotSupportedException
+     * @throws UnprocessableEntityException
+     * @throws PatchBadRequestException
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
+     * 
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws DCInputsReaderException
+     */
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
                          Patch patch)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 
+    /**
+     * Bulk create object instances from an uploaded file
+     * 
+     * @param request
+     *            the http request
+     * @param uploadfile
+     *            the file to process
+     * @return the created objects
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
     public Iterable<T> upload(HttpServletRequest request, MultipartFile uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         Context context = obtainContext();
@@ -212,9 +389,22 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         return entity;
     }
 
+    /**
+     * Method to implement to support bulk creation of objects from a file
+     * @param request
+     *            the http request
+     * @param uploadfile
+     *            the file to process
+     * @return the created objects
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws AuthorizeException
+     * @throws RepositoryMethodNotImplementedException
+     */
     protected Iterable<T> upload(Context context, HttpServletRequest request, MultipartFile uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
-        throw new RuntimeException("No implementation found; Method not allowed!");
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
 }
