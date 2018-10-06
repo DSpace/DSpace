@@ -103,13 +103,45 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
             ResourceNotFoundException {
 
         Item item = is.find(context, uuid);
+
         if (item == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
         }
 
         List<Operation> operations = patch.getOperations();
-        itemPatch.patch(item, context, operations);
+        ItemRest itemRest = findOne(uuid);
 
+        ItemRest patchedModel = (ItemRest) itemPatch.patch(itemRest, operations);
+        updatePatchedValues(context, patchedModel, item);
+    }
+
+    /**
+     * Persists changes to the rest model.
+     * @param context
+     * @param itemRest the updated item rest resource
+     * @param item the item content object
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    private void updatePatchedValues(Context context, ItemRest itemRest, Item item)
+            throws SQLException, AuthorizeException {
+
+        try {
+            if (itemRest.getWithdrawn() != item.isWithdrawn()) {
+                if (itemRest.getWithdrawn()) {
+                    is.withdraw(context, item);
+                } else {
+                    is.reinstate(context, item);
+                }
+            }
+            if (itemRest.getDiscoverable() != item.isDiscoverable()) {
+                item.setDiscoverable(itemRest.getDiscoverable());
+                is.update(context, item);
+            }
+        } catch (SQLException | AuthorizeException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override

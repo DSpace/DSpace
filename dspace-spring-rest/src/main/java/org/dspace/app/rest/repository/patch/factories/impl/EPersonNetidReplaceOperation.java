@@ -7,13 +7,9 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import java.sql.SQLException;
-
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,21 +24,24 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonNetidReplaceOperation extends PatchOperation<EPerson, String>
-        implements ResourcePatchOperation<EPerson> {
+public class EPersonNetidReplaceOperation extends PatchOperation<EPersonRest, String>
+        implements ResourcePatchOperation<EPersonRest> {
 
+    /**
+     * Updates the netid in the eperson rest model.
+     * @param resource the rest model
+     * @param operation
+     * @return the updated rest model
+     * @throws PatchBadRequestException
+     */
     @Override
-    public void perform(Context context, EPerson resource, Operation operation)
-            throws SQLException, AuthorizeException, PatchBadRequestException {
-
-        replace(context, resource, operation);
-    }
-
-    private void replace(Context context, EPerson eperson, Operation operation)
-            throws PatchBadRequestException, SQLException, AuthorizeException {
+    public EPersonRest perform(EPersonRest resource, Operation operation)
+            throws PatchBadRequestException {
 
         checkOperationValue((String) operation.getValue());
-        eperson.setNetid((String) operation.getValue());
+        resource.setNetid((String) operation.getValue());
+        return resource;
+
     }
 
     @Override

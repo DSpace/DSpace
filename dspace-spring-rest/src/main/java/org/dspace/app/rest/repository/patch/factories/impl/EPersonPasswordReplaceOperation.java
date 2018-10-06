@@ -8,11 +8,8 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,24 +24,24 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonPasswordReplaceOperation extends PatchOperation<EPerson, String>
-        implements ResourcePatchOperation<EPerson> {
+public class EPersonPasswordReplaceOperation extends PatchOperation<EPersonRest, String>
+        implements ResourcePatchOperation<EPersonRest> {
 
-    @Autowired
-    EPersonService epersonService;
 
+    /**
+     * Updates the password in the eperson rest model.
+     * @param resource the rest model
+     * @param operation
+     * @return updated rest model
+     * @throws PatchBadRequestException
+     */
     @Override
-    public void perform(Context context, EPerson resource, Operation operation)
+    public EPersonRest perform( EPersonRest resource, Operation operation)
             throws PatchBadRequestException {
 
-        replace(context, resource, operation);
-    }
-
-    private void replace(Context context, EPerson ePerson, Operation operation) throws PatchBadRequestException {
-
-        checkOperationValue((String) operation.getValue());
-
-        epersonService.setPassword(ePerson, (String) operation.getValue());
+        checkOperationValue(operation.getValue());
+        resource.setPassword((String) operation.getValue());
+        return resource;
 
     }
 

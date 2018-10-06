@@ -7,17 +7,10 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import java.sql.SQLException;
-
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.content.service.ItemService;
-import org.dspace.core.Context;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,49 +25,31 @@ import org.springframework.stereotype.Component;
  *  @author Michael Spalti
  */
 @Component
-public class ItemDiscoverableReplaceOperation extends PatchOperation<Item, String>
-        implements ResourcePatchOperation<Item> {
-
-    @Autowired
-    ItemService is;
+public class ItemDiscoverableReplaceOperation extends PatchOperation<ItemRest, String>
+        implements ResourcePatchOperation<ItemRest> {
 
     private static final Logger log = Logger.getLogger(ItemDiscoverableReplaceOperation.class);
 
     /**
-     * Sets discoverable field on the item.
-     *
-     * @param item
-     * @param context
-
-     * @throws SQLException
-     * @throws AuthorizeException
+     * Updates the discoverable in the item rest model.
+     * @param item the rest model
+     * @param operation
+     * @return updated rest model
+     * @throws PatchBadRequestException
      */
-    public void perform(Context context, Item item, Operation operation)
-            throws SQLException, AuthorizeException, PatchBadRequestException {
+    public ItemRest perform(ItemRest item, Operation operation)
+            throws PatchBadRequestException {
 
-        replace(context, item, operation.getValue());
+        return replace(item, operation);
 
     }
 
-    private void replace(Context context, Item item, Object value)
-            throws SQLException, AuthorizeException {
+    private ItemRest replace(ItemRest item, Operation operation) {
 
-        checkOperationValue((String) value);
-        Boolean discoverable = BooleanUtils.toBooleanObject((String) value);
-
-        if (discoverable == null) {
-            // make sure string was converted to boolean.
-            throw new PatchBadRequestException(
-                    "Boolean value not provided for discoverable operation.");
-        }
-
-        try {
-            item.setDiscoverable(discoverable);
-            is.update(context, item);
-        } catch (SQLException | AuthorizeException e) {
-            log.error(e.getMessage(), e);
-            throw e;
-        }
+        checkOperationValue(operation.getValue());
+        Boolean discoverable = getBooleanOperationValue(operation.getValue());
+        item.setDiscoverable(discoverable);
+        return item;
 
     }
 

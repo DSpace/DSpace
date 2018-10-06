@@ -7,18 +7,13 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import java.sql.SQLException;
-
-import org.apache.commons.lang.BooleanUtils;
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation for EPerson requres certificate patches.
+ * Implementation for EPerson requires certificate patches.
  *
  * Example: <code>
  * curl -X PATCH http://${dspace.url}/api/epersons/eperson/<:id-eperson> -H "
@@ -29,27 +24,30 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonCertificateReplaceOperation  extends PatchOperation<EPerson, String>
-        implements ResourcePatchOperation<EPerson> {
-    @Override
-    public void perform(Context context, EPerson resource, Operation operation)
-            throws SQLException, AuthorizeException, PatchBadRequestException {
+public class EPersonCertificateReplaceOperation extends PatchOperation<EPersonRest, String>
+        implements ResourcePatchOperation<EPersonRest> {
 
-        replace(context, resource, operation);
+    /**
+     * Updates the certificate required status in the eperson rest model.
+     * @param resource the rest model
+     * @param operation
+     * @return the updated rest model
+     * @throws PatchBadRequestException
+     */
+    @Override
+    public EPersonRest perform(EPersonRest resource, Operation operation)
+            throws PatchBadRequestException {
+
+        return replace(resource, operation);
     }
 
-    private void replace(Context context, EPerson eperson, Operation operation)
-            throws PatchBadRequestException, SQLException, AuthorizeException {
+    private EPersonRest replace(EPersonRest eperson, Operation operation)
+            throws PatchBadRequestException {
 
-        checkOperationValue((String) operation.getValue());
-        Boolean requireCert = BooleanUtils.toBooleanObject((String) operation.getValue());
-
-        if (requireCert == null) {
-            // make sure the string was converted to boolean.
-            throw new PatchBadRequestException("Boolean value not provided for certificate operation.");
-        }
-
+        checkOperationValue(operation.getValue());
+        Boolean requireCert = getBooleanOperationValue(operation.getValue());
         eperson.setRequireCertificate(requireCert);
+        return eperson;
 
     }
 

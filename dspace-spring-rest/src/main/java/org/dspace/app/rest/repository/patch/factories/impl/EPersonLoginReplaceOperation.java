@@ -7,16 +7,9 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import java.sql.SQLException;
-
-import org.apache.commons.lang.BooleanUtils;
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,30 +24,31 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonLoginReplaceOperation extends PatchOperation<EPerson, String>
-        implements ResourcePatchOperation<EPerson> {
+public class EPersonLoginReplaceOperation extends PatchOperation<EPersonRest, String>
+        implements ResourcePatchOperation<EPersonRest> {
 
-    @Autowired
-    EPersonService epersonService;
 
+    /**
+     * Updates the canLogIn status in the eperson rest model.
+     * @param resource the rest model
+     * @param operation
+     * @return the updated rest model
+     * @throws PatchBadRequestException
+     */
     @Override
-    public void perform(Context context, EPerson resource, Operation operation)
-            throws PatchBadRequestException, SQLException, AuthorizeException {
+    public EPersonRest perform(EPersonRest resource, Operation operation)
+            throws PatchBadRequestException {
 
-        replace(context, resource, operation);
+        return replace(resource, operation);
     }
 
-    private void replace(Context context, EPerson eperson, Operation operation)
-            throws PatchBadRequestException, SQLException, AuthorizeException {
+    private EPersonRest replace(EPersonRest eperson, Operation operation)
+            throws PatchBadRequestException {
 
-        checkOperationValue((String) operation.getValue());
-        Boolean canLogin = BooleanUtils.toBooleanObject((String) operation.getValue());
-
-        if (canLogin == null) {
-            // make sure string was converted to boolean.
-            throw new PatchBadRequestException("Boolean value not provided for canLogin operation.");
-        }
+        checkOperationValue(operation.getValue());
+        Boolean canLogin = getBooleanOperationValue(operation.getValue());
         eperson.setCanLogIn(canLogin);
+        return eperson;
 
     }
 

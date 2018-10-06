@@ -10,6 +10,7 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -188,18 +189,52 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                       Patch patch)
-            throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException,
+            throws UnprocessableEntityException, PatchBadRequestException, AuthorizeException,
             ResourceNotFoundException {
 
-        EPerson eperson = es.find(context, uuid);
-        if (eperson == null) {
-            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
+        try {
+            EPerson eperson = es.find(context, uuid);
+            if (eperson == null) {
+                throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
+            }
+            List<Operation> operations = patch.getOperations();
+            EPersonRest ePersonRest = findOne(context, uuid);
+            EPersonRest patchedModel = (EPersonRest) epersonPatch.patch(ePersonRest, operations);
+            updatePatchedValues(context, patchedModel, eperson);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Applies changes in the rest model.
+     * @param context
+     * @param ePersonRest the updated eperson rest
+     * @param ePerson the eperson content object
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    private void updatePatchedValues(Context context, EPersonRest ePersonRest, EPerson ePerson)
+            throws SQLException, AuthorizeException {
+
+        if (ePersonRest.getPassword() != null) {
+            es.setPassword(ePerson, ePersonRest.getPassword());
+        }
+        if (ePersonRest.isRequireCertificate() != ePerson.getRequireCertificate()) {
+            ePerson.setRequireCertificate(ePersonRest.isRequireCertificate());
+        }
+        if (ePersonRest.isCanLogIn() != ePerson.canLogIn()) {
+            ePerson.setCanLogIn(ePersonRest.isCanLogIn());
+        }
+        if (!Objects.equals(ePersonRest.getNetid(), ePerson.getNetid())) {
+            ePerson.setNetid(ePersonRest.getNetid());
         }
 
-        List<Operation> operations = patch.getOperations();
-        epersonPatch.patch(eperson, context, operations);
+        es.update(context, ePerson);
 
     }
 
