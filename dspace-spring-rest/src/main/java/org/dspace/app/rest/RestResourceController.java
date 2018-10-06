@@ -444,8 +444,7 @@ public class RestResourceController implements InitializingBean {
      * @param id
      *            the id of the specific rest resource
      * @param extraField
-     *            an option implementation specific parameter (could be used to force a specific processing strategy
-     *            other than what can be guess by the filename or mimetype of the uploaded file)
+     *            the original name of the uploaded file
      * @param uploadfile
      *            the file to upload
      * @return the created resource
@@ -479,8 +478,7 @@ public class RestResourceController implements InitializingBean {
      * @param id
      *            the id of the specific rest resource
      * @param extraField
-     *            an option implementation specific parameter (could be used to force a specific processing strategy
-     *            other than what can be guess by the filename or mimetype of the uploaded file)
+     *            the original name of the uploaded file
      * @param uploadfile
      *            the file to upload
      * @return the created resource
