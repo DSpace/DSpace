@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -426,17 +427,24 @@ public class RestResourceController implements InitializingBean {
     }
 
     /**
-     * Called in POST, multipart, upload a resource passed into "file" request parameter
+     *  Called in POST, multipart, upload to a specific rest resource the file passed as "file" request parameter
      *
      * Note that the regular expression in the request mapping accept a number as identifier;
      *
      * @param request
+     *            the http request
      * @param apiCategory
+     *            the api category
      * @param model
+     *            the rest model that identify the REST resource collection
      * @param id
+     *            the id of the specific rest resource
      * @param extraField
+     *            an option implementation specific parameter (could be used to force a specific processing strategy
+     *            other than what can be guess by the filename or mimetype of the uploaded file)
      * @param uploadfile
-     * @return
+     *            the file to upload
+     * @return the created resource
      * @throws HttpRequestMethodNotSupportedException
      */
     @RequestMapping(method = RequestMethod.POST, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT, headers =
@@ -454,17 +462,24 @@ public class RestResourceController implements InitializingBean {
     }
 
     /**
-     * Called in POST, multipart, upload a resource passed into "file" request parameter
+     * Called in POST, multipart, upload to a specific rest resource the file passed as "file" request parameter
      *
      * Note that the regular expression in the request mapping accept a UUID as identifier;
      *
      * @param request
+     *            the http request
      * @param apiCategory
+     *            the api category
      * @param model
+     *            the rest model that identify the REST resource collection
      * @param id
+     *            the id of the specific rest resource
      * @param extraField
+     *            an option implementation specific parameter (could be used to force a specific processing strategy
+     *            other than what can be guess by the filename or mimetype of the uploaded file)
      * @param uploadfile
-     * @return
+     *            the file to upload
+     * @return the created resource
      * @throws HttpRequestMethodNotSupportedException
      */
     @RequestMapping(method = RequestMethod.POST, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID, headers =

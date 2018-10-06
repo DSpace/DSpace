@@ -35,6 +35,10 @@ import org.dspace.submit.step.ExtractionStep;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * This submission step allows to extract metadata from an uploaded file to enrich or initialize a submission. The
+ * processing is delegated to a list of extractor specialized by format (i.e. a Grobid extractor to get data from a PDF
+ * file, an extractor to get data from bibliographic file such as BibTeX, etc)
+ * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class ExtractMetadataStep extends ExtractionStep implements UploadableStep {
@@ -81,7 +85,7 @@ public class ExtractMetadataStep extends ExtractionStep implements UploadableSte
         return null;
     }
 
-    public RecordSet convertFields(RecordSet recordSet, Map<String, String> fieldMap) {
+    private RecordSet convertFields(RecordSet recordSet, Map<String, String> fieldMap) {
         RecordSet result = new RecordSet();
         for (Record publication : recordSet.getRecords()) {
             for (String fieldName : fieldMap.keySet()) {
