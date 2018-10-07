@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -551,6 +552,8 @@ public class RestResourceController implements InitializingBean {
     public <T extends RestAddressableModel> ResponseEntity<ResourceSupport> upload(HttpServletRequest request,
                                                                                    @PathVariable String apiCategory,
                                                                                    @PathVariable String model,
+                                                                                   @RequestParam(required = false)
+                                                                                       String extraField,
                                                                                    @RequestParam("file") MultipartFile
                                                                                        uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
@@ -558,7 +561,7 @@ public class RestResourceController implements InitializingBean {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
 
-        Iterable<T> content = repository.upload(request, uploadfile);
+        Iterable<T> content = repository.upload(request, extraField, uploadfile);
 
         List<DSpaceResource> resources = new ArrayList<>();
         for (T modelObject : content) {
@@ -630,7 +633,6 @@ public class RestResourceController implements InitializingBean {
                                                                                    String model, ID id,
                                                                                    JsonNode jsonNode)
         throws HttpRequestMethodNotSupportedException {
-
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
