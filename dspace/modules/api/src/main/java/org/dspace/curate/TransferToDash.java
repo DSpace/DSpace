@@ -166,7 +166,7 @@ public class TransferToDash extends AbstractCurationTask {
                 dataset.put("identifier", packageDOI);
 
                 // title
-                DCValue[] vals = item.getMetadata("dc.title");
+                vals = item.getMetadata("dc.title");
                 if (vals.length > 0) {
                     String title = vals[0].value;
                     log.debug("title = " + title);
@@ -176,8 +176,8 @@ public class TransferToDash extends AbstractCurationTask {
                 // abstract
                 vals = item.getMetadata("dc.description");
                 if (vals.length > 0) {
-                    String abstract = vals[0].value;
-                    dataset.put("abstract", abstract);
+                    String packageAbstract = vals[0].value;
+                    dataset.put("abstract", packageAbstract);
                 }
                        
                 // TODO -- fix this field! Need a real lookup!
@@ -309,11 +309,6 @@ public class TransferToDash extends AbstractCurationTask {
 				}
 			    }
 			}
-			if(readmeFound) {
-			    numReadmes++;
-			}
-			log.debug("total readmes (as of file " + fileID + ") = " + numReadmes);
-
 			
 			// embargo setting (of last file processed)
 			vals = fileItem.getMetadata("dc.type.embargo");
@@ -363,20 +358,21 @@ public class TransferToDash extends AbstractCurationTask {
 		context.abort();
 		return Curator.CURATE_SKIP;
 	    }
+
+            // write this item to json
+            objectMapper.writeValue(new File("/tmp/transferToDash.json"), dataset);
+
+            // provide output for the console
+            setResult("Last processed item = " + handle + " -- " + packageDOI);        
+            report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " +
+                   numberOfFiles + ", " + packageSize);
+
 	} else {
 	    log.info("Skipping -- non-item DSpace object");
 	    setResult("Object skipped (not an item)");
 	    context.abort();
 	    return Curator.CURATE_SKIP;
         }
-
-        // write this item to json
-        objectMapper.writeValue(new File("/tmp/transferToDash.json"), dataset);
-
-        // provide output for the console
-	setResult("Last processed item = " + handle + " -- " + packageDOI);        
-	report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " +
-	       numberOfFiles + ", " + packageSize);
 
 	// slow this down a bit so we don't overwhelm the production SOLR server with requests
 	try {
