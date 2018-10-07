@@ -8,6 +8,7 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
@@ -70,7 +71,9 @@ public class WorkspaceItemMatcher {
                 // Check workspaceitem properties
                 matchProperties(witem),
                 // Check core metadata all appear in the first describe panel "traditionalpageone"
-                hasJsonPath("$.sections.traditionalpageone['dc.title'][0].value", is(title)),
+                title != null ?
+                        hasJsonPath("$.sections.traditionalpageone['dc.title'][0].value", is(title)) :
+                        hasNoJsonPath("$.sections.traditionalpageone['dc.title']"),
                 hasJsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value", is(dateIssued)),
                 // Check keywords they appear in the second describe panel "traditionalpagetwo"
                 hasJsonPath("$.sections.traditionalpagetwo['dc.subject'][0].value", is(subject)),
