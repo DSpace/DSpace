@@ -373,6 +373,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * 
      * @param request
      *            the http request
+     * @param extraField
+     *            the original name of the uploaded file
      * @param uploadfile
      *            the file to process
      * @return the created objects
@@ -381,18 +383,21 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @throws IOException
      * @throws AuthorizeException
      */
-    public Iterable<T> upload(HttpServletRequest request, MultipartFile uploadfile)
+    public Iterable<T> upload(HttpServletRequest request, String extraField, MultipartFile uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         Context context = obtainContext();
-        Iterable<T> entity = upload(context, request, uploadfile);
+        Iterable<T> entity = upload(context, request, extraField, uploadfile);
         context.commit();
         return entity;
     }
 
     /**
      * Method to implement to support bulk creation of objects from a file
+     * 
      * @param request
      *            the http request
+     * @param extraField
+     *            the original name of the uploaded file
      * @param uploadfile
      *            the file to process
      * @return the created objects
@@ -402,7 +407,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @throws AuthorizeException
      * @throws RepositoryMethodNotImplementedException
      */
-    protected Iterable<T> upload(Context context, HttpServletRequest request, MultipartFile uploadfile)
+    protected Iterable<T> upload(Context context, HttpServletRequest request, String extraField,
+            MultipartFile uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }

@@ -65,6 +65,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.json.patch.PatchException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -325,6 +326,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
+                    throw new PatchException("Error processing the patch request", e);
                 }
             }
         }
@@ -345,7 +347,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     }
 
     @Override
-    public Iterable<WorkspaceItemRest> upload(Context context, HttpServletRequest request, MultipartFile uploadfile)
+    public Iterable<WorkspaceItemRest> upload(Context context, HttpServletRequest request, String extraField,
+            MultipartFile uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         File file = Utils.getFile(uploadfile, "upload-loader", "filedataloader");
         List<WorkspaceItemRest> results = new ArrayList<>();
@@ -360,7 +363,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             if (StringUtils.isNotBlank(uuid)) {
                 collection = collectionService.find(context, UUID.fromString(uuid));
             } else {
-                collection = collectionService.findAll(context, 1, 0).get(0);
+                collection = collectionService.findAuthorizedOptimized(context, Constants.ADD).get(0);
             }
 
             SubmissionConfig submissionConfig =
@@ -370,6 +373,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             List<ItemSubmissionLookupDTO> tmpResult = new ArrayList<ItemSubmissionLookupDTO>();
 
             TransformationEngine transformationEngine1 = submissionLookupService.getPhase1TransformationEngine();
+            TransformationSpec spec = new TransformationSpec();
+            // FIXME this is mostly due to the need to test. The BTE framework has an assert statement that check if the
+            // number of found record is less than the requested and treat 0 as is, instead, the implementation assume
+            // 0=unlimited this lead to test failure.
+            // It is unclear if BTE really respect values other than 0/MAX allowing us to put a protection against heavy
+            // load
+            spec.setNumberOfRecords(Integer.MAX_VALUE);
             if (transformationEngine1 != null) {
                 MultipleSubmissionLookupDataLoader dataLoader =
                     (MultipleSubmissionLookupDataLoader) transformationEngine1.getDataLoader();
@@ -383,7 +393,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                             (SubmissionLookupOutputGenerator) transformationEngine1.getOutputGenerator();
                         outputGenerator.setDtoList(new ArrayList<ItemSubmissionLookupDTO>());
                         log.debug("BTE transformation is about to start!");
-                        transformationEngine1.transform(new TransformationSpec());
+                        transformationEngine1.transform(spec);
                         log.debug("BTE transformation finished!");
                         tmpResult.addAll(outputGenerator.getDtoList());
                         if (!tmpResult.isEmpty()) {
@@ -417,7 +427,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                     outputGenerator.setDto(tmpResult.get(0));
 
                     try {
-                        transformationEngine2.transform(new TransformationSpec());
+                        transformationEngine2.transform(spec);
                         result = outputGenerator.getWitems();
                     } catch (BadTransformationSpec e1) {
                         e1.printStackTrace();
@@ -456,9 +466,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                                 Object stepInstance = stepClass.newInstance();
                                 if (UploadableStep.class.isAssignableFrom(stepClass)) {
                                     UploadableStep uploadableStep = (UploadableStep) stepInstance;
-                                    ErrorRest err = uploadableStep
-                                        .upload(context, submissionService, stepConfig, wi, uploadfile,
-                                            file.getAbsolutePath());
+                                    ErrorRest err = uploadableStep.upload(context, submissionService, stepConfig, wi,
+                                            uploadfile, extraField);
                                     if (err != null) {
                                         errors.add(err);
                                     }
