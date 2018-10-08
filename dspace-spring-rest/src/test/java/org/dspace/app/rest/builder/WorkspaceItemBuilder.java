@@ -7,13 +7,18 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.InputStream;
+
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
+import org.dspace.content.LicenseUtils;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 
 /**
  * Builder to construct WorkspaceItem objects
@@ -111,4 +116,30 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchema.DC_SCHEMA, "subject", null, subject);
     }
 
+    public WorkspaceItemBuilder grantLicense() {
+        Item item = workspaceItem.getItem();
+        String license;
+        try {
+            EPerson submitter = workspaceItem.getSubmitter();
+            submitter = context.reloadEntity(submitter);
+            license = LicenseUtils.getLicenseText(context.getCurrentLocale(), workspaceItem.getCollection(), item,
+                    submitter);
+            LicenseUtils.grantLicense(context, item, license, null);
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return this;
+    }
+
+    public WorkspaceItemBuilder withFulltext(String name, String source, InputStream is) {
+        try {
+            Item item = workspaceItem.getItem();
+            Bitstream b = itemService.createSingleBitstream(context, is, item);
+            b.setName(context, name);
+            b.setSource(context, source);
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return this;
+    }
 }
