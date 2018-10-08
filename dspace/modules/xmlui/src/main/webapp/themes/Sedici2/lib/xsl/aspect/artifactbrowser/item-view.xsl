@@ -333,15 +333,17 @@
 		<xsl:if test="dim:field[@element='type'] = $tesis">
 			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.tesis-info</i18n:text></h2>
 			<!-- contributor.director row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'contributor-director'"/>
-				<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='director'] "/>
+			<xsl:call-template name="render-author-metadata-field">
+				<xsl:with-param name="general-element" select="'contributor'"/>
+				<xsl:with-param name="general-qualifier" select="'director'"/>
+				<xsl:with-param name="metadata-fields" select="dim:field[@element='contributor' and @qualifier='director']"/>
 			</xsl:call-template>
 
 			<!-- contributor.codirector row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'contributor-codirector'"/>
-				<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='codirector'] "/>
+			<xsl:call-template name="render-author-metadata-field">
+				<xsl:with-param name="general-element" select="'contributor'"/>
+				<xsl:with-param name="general-qualifier" select="'codirector'"/>
+				<xsl:with-param name="metadata-fields" select="dim:field[@element='contributor' and @qualifier='codirector'] "/>
 			</xsl:call-template>
 
 			<!-- date.exposure row -->
@@ -449,10 +451,10 @@
 				</xsl:if>
 
 			<!-- contributor.juror row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'contributor-juror'"/>
-				<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='juror'] "/>
-				<xsl:with-param name="separator" select="' | '"/>
+			<xsl:call-template name="render-author-metadata-field">
+				<xsl:with-param name="general-element" select="'contributor'"/>
+				<xsl:with-param name="general-qualifier" select="'juror'"/>
+				<xsl:with-param name="metadata-fields" select="dim:field[@element='contributor' and @qualifier='juror'] "/>
 			</xsl:call-template>
 
 			<!-- contributor.colaborator row -->
@@ -745,10 +747,12 @@
 						</xsl:variable>
 						<xsl:call-template name="render-author-metadata-field">
 							<xsl:with-param name="metadata-fields" select="dim:field[@element='creator'][@qualifier='person' or @qualifier='corporate']"/>
+							<xsl:with-param name="general-element" select="'creator'"/>
 							<xsl:with-param name="general-qualifier" select="$general-qualifier"/>
 						</xsl:call-template>
 						<xsl:call-template name="render-author-metadata-field">
 							<xsl:with-param name="metadata-fields" select="dim:field[@element='creator'][@qualifier='interprete']"/>
+							<xsl:with-param name="general-element" select="'creator'"/>
 							<xsl:with-param name="general-qualifier" select="'interprete'"/>
 						</xsl:call-template>
 					</xsl:when>
@@ -831,16 +835,18 @@
 	<!-- This template receives an authors collection ('metadata-fields'), with same or different qualifiers (person,corporate,etc), and associates them with a 'general-qualifier' received as parameter. -->
 	<xsl:template name="render-author-metadata-field">
 		<xsl:param name="metadata-fields"/>
+		<xsl:param name="general-element"/>
 		<xsl:param name="general-qualifier"/>
+		<xsl:param name="separator" select="'; '"/>
 			<xsl:if test="count($metadata-fields) &gt; 0">
 				<div>
 					<span class="metadata-label">
 						<xsl:choose>
 							<xsl:when test="count($metadata-fields) &gt; 1">
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-creators-<xsl:value-of select="$general-qualifier"/></i18n:text>: 
+								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="$general-element"/>s-<xsl:value-of select="$general-qualifier"/></i18n:text>: 
 							</xsl:when>
 							<xsl:otherwise>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-creator-<xsl:value-of select="$general-qualifier"/></i18n:text>: 
+								<i18n:text>xmlui.dri2xhtml.METS-1.0.item-<xsl:value-of select="$general-element"/>-<xsl:value-of select="$general-qualifier"/></i18n:text>: 
 							</xsl:otherwise>
 						</xsl:choose>
 					</span>

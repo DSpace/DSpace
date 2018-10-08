@@ -2295,7 +2295,9 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-title-alternative">Título alternativo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-date-issued">Fecha de publicación</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-director">Director</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributors-director">Directores</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-codirector">Co-director</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributors-codirector">Co-directores</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-editor">Editor</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-editors">Editores</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-translator">Traductor</message>
@@ -2303,6 +2305,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-compiler">Compilador</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-compilers">Compiladores</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-juror">Jurado</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributors-juror">Jurado</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-colaborator">Colaborador</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-language">Idioma del documento</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Editorial</message>
