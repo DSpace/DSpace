@@ -813,6 +813,7 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
 					<dc-qualifier>director</dc-qualifier>
+					<repeatable>true</repeatable>
 					<label>Director de la Tesis</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre del director de la Tesis</hint>
@@ -1107,6 +1108,7 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
 					<dc-qualifier>director</dc-qualifier>
+					<repeatable>true</repeatable>
 					<label>Director de la Tesis</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre del director de la Tesis</hint>
