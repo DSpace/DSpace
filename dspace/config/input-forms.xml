@@ -499,17 +499,6 @@
 					<type-bind>Tesis</type-bind>
 				</field>
 
-				<!-- Keywords -->
-				<field>
-					<dc-schema>sedici</dc-schema>
-					<dc-element>subject</dc-element>
-					<dc-qualifier>keyword</dc-qualifier>
-					<repeatable>true</repeatable>
-					<label>Palabras clave</label>
-					<input-type>onebox</input-type>
-					<hint>Palabras o terminos extraídos del documento</hint>
-					<i18n>true</i18n>
-				</field>
 				<!-- Período de embargo -->
 				<field>
 					<dc-schema>sedici</dc-schema>
@@ -605,6 +594,18 @@
 					<hint>Descriptores del recurso a partir del Sist de clasificacion ACM98</hint>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
 					<type-bind>!Objeto Fisico</type-bind>
+				</field>
+
+				<!-- Keywords -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>keyword</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Palabras clave</label>
+					<input-type>onebox</input-type>
+					<hint>Palabras o terminos extraídos del documento</hint>
+					<i18n>true</i18n>
 				</field>
 
 				<!-- Descriptores libres -->
