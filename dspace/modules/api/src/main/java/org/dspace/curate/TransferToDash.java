@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.net.URL;
@@ -91,6 +92,7 @@ public class TransferToDash extends AbstractCurationTask {
     DocumentBuilder docb = null;
     static long total = 0;
     private Context context;
+    private String dashServer;
     private String token;
     
     @Override 
@@ -108,7 +110,7 @@ public class TransferToDash extends AbstractCurationTask {
 	}
 
         // init oauth connection with DASH
-        String dashServer = ConfigurationManager.getProperty("dash.server");
+        dashServer = ConfigurationManager.getProperty("dash.server");
         String dashUser = ConfigurationManager.getProperty("dash.username");
         String dashPass = ConfigurationManager.getProperty("dash.password");
 
@@ -117,8 +119,6 @@ public class TransferToDash extends AbstractCurationTask {
 
     private String getOAUTHtoken(String dashServer, String dashUser, String dashPass) {
 
-        // e.g., curl -X POST https://dryad-dev.cdlib.org/oauth/token -d "client_id=837e7feebcc7c03b33f3f7c03db1ddd7a1795aeb70e&client_secret=3b0677d807709d6d8511b68b020eb895cb5752d48b4e&grant_type=client_credentials" -H "Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
-        
         String url = dashServer + "/oauth/token";
         String auth = dashUser + ":" + dashPass;
         String authentication = Base64.getEncoder().encodeToString(auth.getBytes());
@@ -149,7 +149,7 @@ public class TransferToDash extends AbstractCurationTask {
                 token = matcher.group(1);
             }
 
-            log.info("got token " + token);
+            log.info("got OAuth token " + token);
 
         } catch (Exception e) {
             log.fatal("Unable to obtain OAuth token", e);
@@ -252,7 +252,7 @@ public class TransferToDash extends AbstractCurationTask {
 		}
 		log.debug("articleDOI = " + articleDOI);
                 ObjectNode article = objectMapper.createObjectNode();
-                article.put("relationship", "is cited by");
+                article.put("relationship", "IsCitedBy");
                 article.put("identifierType", "DOI");
                 article.put("identifier", articleDOI.substring("doi:".length()));
                 ArrayNode relatedWorks = objectMapper.createArrayNode();
@@ -422,6 +422,9 @@ public class TransferToDash extends AbstractCurationTask {
             // write this item to json
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("/tmp/transferToDash.json"), dataset);
 
+            // send this item to the server
+            sendToDash(objectMapper.writeValueAsString(dataset));
+            
             // provide output for the console
             setResult("Last processed item = " + handle + " -- " + packageDOI);        
             report(handle + ", " + packageDOI + ", " + articleDOI + ", \"" + journal + "\", " +
@@ -451,6 +454,34 @@ public class TransferToDash extends AbstractCurationTask {
 	return Curator.CURATE_SUCCESS;
     }
 
+    private void sendToDash(String jsonString) {
+        BufferedReader reader = null;
+        try {
+            URL url = new URL(dashServer + "/api/datasets");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+
+            OutputStreamWriter wr= new OutputStreamWriter(connection.getOutputStream());
+            wr.write(jsonString);
+            wr.close();
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = null;
+            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+            String response = out.toString();
+            System.out.println("##### " + response);
+        } catch (Exception e) {
+            log.fatal("Unable to send item to DASH", e);
+        }
+    }
+        
     /**
        An XML utility method that returns the text content of a node.
     **/
