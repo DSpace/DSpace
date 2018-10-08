@@ -27,6 +27,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.disseminate.service.CitationDocumentService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,9 @@ public class BitstreamContentRestController {
     @Autowired
     private CitationDocumentService citationDocumentService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
     public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
@@ -103,6 +107,12 @@ public class BitstreamContentRestController {
                     .withLastModified(lastModified)
                     .with(request)
                     .with(response);
+
+            //Determine if we need to send the file as a download or if the browser can open it inline
+            long dispositionThreshold = configurationService.getLongProperty("webui.content_disposition_threshold");
+            if (dispositionThreshold >= 0 && bitstreamTuple.getRight() > dispositionThreshold) {
+                sender.withDisposition(MultipartFileSender.CONTENT_DISPOSITION_ATTACHMENT);
+            }
 
             if (sender.isNoRangeRequest() && isNotAnErrorResponse(response)) {
                 //We only log a download request when serving a request without Range header. This is because
