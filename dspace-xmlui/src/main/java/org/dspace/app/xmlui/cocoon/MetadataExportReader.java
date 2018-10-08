@@ -113,9 +113,6 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
             this.response = ObjectModelHelper.getResponse(objectModel);
             Context context = ContextUtil.obtainContext(objectModel);
 
-            if(authorizeService.isAdmin(context))
-            {
-
             /* Get our parameters that identify the item, collection
              * or community to be exported
              *
@@ -123,6 +120,9 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
 
             String handle = par.getParameter("handle");
             DSpaceObject dso = handleService.resolveToObject(context, handle);
+
+            if(authorizeService.isAdmin(context,dso))
+            {
             
             java.util.List<Item> itemmd = new ArrayList<>();
             if(dso.getType() == Constants.ITEM)
