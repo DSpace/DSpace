@@ -7,20 +7,29 @@
  */
 package org.dspace.curate;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.StringWriter;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import sun.net.www.protocol.http.HttpURLConnection;
+import javax.net.ssl.HttpsURLConnection;
+    
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -82,6 +91,7 @@ public class TransferToDash extends AbstractCurationTask {
     DocumentBuilder docb = null;
     static long total = 0;
     private Context context;
+    private String token;
     
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
@@ -96,6 +106,56 @@ public class TransferToDash extends AbstractCurationTask {
 	} catch (ParserConfigurationException e) {
 	    throw new IOException("unable to initiate xml processor", e);
 	}
+
+        // init oauth connection with DASH
+        String dashServer = ConfigurationManager.getProperty("dash.server");
+        String dashUser = ConfigurationManager.getProperty("dash.username");
+        String dashPass = ConfigurationManager.getProperty("dash.password");
+
+        token = getOAUTHtoken(dashServer, dashUser, dashPass);
+    }
+
+    private String getOAUTHtoken(String dashServer, String dashUser, String dashPass) {
+
+        // e.g., curl -X POST https://dryad-dev.cdlib.org/oauth/token -d "client_id=837e7feebcc7c03b33f3f7c03db1ddd7a1795aeb70e&client_secret=3b0677d807709d6d8511b68b020eb895cb5752d48b4e&grant_type=client_credentials" -H "Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
+        
+        String url = dashServer + "/oauth/token";
+        String auth = dashUser + ":" + dashPass;
+        String authentication = Base64.getEncoder().encodeToString(auth.getBytes());
+        String token = "";
+        Pattern pat = Pattern.compile(".*\"access_token\"\\s*:\\s*\"([^\"]+)\".*");
+        
+        try {
+            URL urlObj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) urlObj.openConnection();
+            con.setRequestMethod("POST");
+            con.setDoOutput(true);
+            con.setRequestProperty("Authorization", "Basic " + authentication);
+            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+            con.setRequestProperty("Accept", "application/json");
+            
+            PrintStream os = new PrintStream(con.getOutputStream());
+            os.print("grant_type=client_credentials");
+            os.close();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String line = null;
+            StringWriter out = new StringWriter(con.getContentLength() > 0 ? con.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+            String response = out.toString();
+            Matcher matcher = pat.matcher(response);
+            if (matcher.matches() && matcher.groupCount() > 0) {
+                token = matcher.group(1);
+            }
+
+            log.info("got token " + token);
+
+        } catch (Exception e) {
+            log.fatal("Unable to obtain OAuth token", e);
+        }
+
+        return token;
     }
     
     /**
@@ -192,9 +252,9 @@ public class TransferToDash extends AbstractCurationTask {
 		}
 		log.debug("articleDOI = " + articleDOI);
                 ObjectNode article = objectMapper.createObjectNode();
-                article.put("relationship", "IsReferencedBy");
+                article.put("relationship", "is cited by");
                 article.put("identifierType", "DOI");
-                article.put("identifier", articleDOI);
+                article.put("identifier", articleDOI.substring("doi:".length()));
                 ArrayNode relatedWorks = objectMapper.createArrayNode();
                 relatedWorks.add(article);
                 dataset.put("relatedWorks", relatedWorks);
@@ -205,7 +265,7 @@ public class TransferToDash extends AbstractCurationTask {
                     String authorName = vals[i].value;
                     ObjectNode authorObj = objectMapper.createObjectNode();
                     int comma = authorName.indexOf(",");
-                    authorObj.put("firstName", authorName.substring(comma));
+                    authorObj.put("firstName", authorName.substring(comma+2));
                     authorObj.put("lastName", authorName.substring(0, comma));
                     // TODO add affiliation
                     allAuthors.add(authorObj);
@@ -215,7 +275,7 @@ public class TransferToDash extends AbstractCurationTask {
                     String authorName = vals[i].value;
                     ObjectNode authorObj = objectMapper.createObjectNode();
                     int comma = authorName.indexOf(",");
-                    authorObj.put("firstName", authorName.substring(comma));
+                    authorObj.put("firstName", authorName.substring(comma+2));
                     authorObj.put("lastName", authorName.substring(0, comma));
                     // TODO add affiliation
                     allAuthors.add(authorObj);
@@ -360,7 +420,7 @@ public class TransferToDash extends AbstractCurationTask {
 	    }
 
             // write this item to json
-            objectMapper.writeValue(new File("/tmp/transferToDash.json"), dataset);
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("/tmp/transferToDash.json"), dataset);
 
             // provide output for the console
             setResult("Last processed item = " + handle + " -- " + packageDOI);        
