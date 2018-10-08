@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -58,7 +58,7 @@ public class DOIIdentifierProviderTest
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(DOIIdentifierProviderTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DOIIdentifierProviderTest.class);
 
     private static final String PREFIX = "10.5072";
     private static final String NAMESPACE_SEPARATOR = "dspaceUnitTests-";

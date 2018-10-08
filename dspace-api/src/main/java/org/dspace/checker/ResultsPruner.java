@@ -19,7 +19,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.core.ConfigurationManager;
@@ -40,7 +40,7 @@ public final class ResultsPruner {
     /**
      * Default logger.
      */
-    private static final Logger LOG = Logger.getLogger(ResultsPruner.class);
+    private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(ResultsPruner.class);
 
     /**
      * Factory method for the default results pruner configuration using

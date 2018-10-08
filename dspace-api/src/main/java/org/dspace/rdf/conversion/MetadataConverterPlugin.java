@@ -26,7 +26,7 @@ import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.util.FileUtils;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -50,7 +50,7 @@ public class MetadataConverterPlugin implements ConverterPlugin {
     public final static String METADATA_SCHEMA_URL_KEY = "rdf.metadata.schema";
     public final static String METADATA_PREFIXES_KEY = "rdf.metadata.prefixes";
 
-    private final static Logger log = Logger.getLogger(MetadataConverterPlugin.class);
+    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataConverterPlugin.class);
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 

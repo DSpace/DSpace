@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScopeResolver {
 
-    private static final Logger log = Logger.getLogger(ScopeResolver.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopeResolver.class);
 
     @Autowired
     CollectionService collectionService;

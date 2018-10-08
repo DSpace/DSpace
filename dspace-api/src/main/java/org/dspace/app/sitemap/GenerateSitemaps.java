@@ -29,7 +29,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -52,7 +52,7 @@ public class GenerateSitemaps {
     /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(GenerateSitemaps.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(GenerateSitemaps.class);
 
     private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     private static final CollectionService collectionService =

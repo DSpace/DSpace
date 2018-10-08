@@ -27,7 +27,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Utils;
@@ -45,7 +45,7 @@ public class S3BitStoreService implements BitStoreService {
     /**
      * log4j log
      */
-    private static Logger log = Logger.getLogger(S3BitStoreService.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(S3BitStoreService.class);
 
     /**
      * Checksum algorithm

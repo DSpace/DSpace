@@ -7,7 +7,7 @@
  */
 package org.dspace.sword;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.purl.sword.base.AtomDocumentRequest;
@@ -33,7 +33,7 @@ public class DSpaceSWORDServer implements SWORDServer {
     /**
      * Log4j logger
      */
-    public static final Logger log = Logger.getLogger(DSpaceSWORDServer.class);
+    public static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceSWORDServer.class);
 
     // methods required by SWORDServer interface
     ////////////////////////////////////////////

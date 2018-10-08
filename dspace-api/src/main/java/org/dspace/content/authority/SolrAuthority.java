@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -36,10 +36,12 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class SolrAuthority implements ChoiceAuthority {
 
-    private static final Logger log = Logger.getLogger(SolrAuthority.class);
     protected SolrAuthorityInterface source =
         DSpaceServicesFactory.getInstance().getServiceManager()
                              .getServiceByName("AuthoritySource", SolrAuthorityInterface.class);
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrAuthority.class);
+
     protected boolean externalResults = false;
     protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
                                                                                          .getAuthorityValueService();

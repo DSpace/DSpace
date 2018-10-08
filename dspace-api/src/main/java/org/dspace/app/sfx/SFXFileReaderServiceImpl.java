@@ -16,7 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.sfx.service.SFXFileReaderService;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.Item;
@@ -58,7 +58,7 @@ public class SFXFileReaderServiceImpl implements SFXFileReaderService {
     /**
      * log4j logger
      */
-    private final Logger log = Logger.getLogger(SFXFileReaderServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(SFXFileReaderServiceImpl.class);
 
     protected SFXFileReaderServiceImpl() {
     }

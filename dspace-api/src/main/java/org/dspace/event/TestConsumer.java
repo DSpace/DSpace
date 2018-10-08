@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -27,7 +27,7 @@ import org.dspace.eperson.EPerson;
  */
 public class TestConsumer implements Consumer {
     // Log4j logger
-    private static Logger log = Logger.getLogger(TestConsumer.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(TestConsumer.class);
 
     // Send diagnostic output here - set to null to turn it off.
     private static PrintStream out = ConfigurationManager

@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
@@ -61,7 +61,7 @@ public class LDAPAuthentication
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(LDAPAuthentication.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(LDAPAuthentication.class);
 
     protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance()
                                                                                       .getAuthenticationService();

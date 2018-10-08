@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCDate;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Required;
  * @author Philip Vissenaekens (philip at atmire dot com)
  */
 public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T> {
-    Logger log = Logger.getLogger(PubmedDateMetadatumContributor.class);
+    Logger log = org.apache.logging.log4j.LogManager.getLogger(PubmedDateMetadatumContributor.class);
 
     private MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping;
 

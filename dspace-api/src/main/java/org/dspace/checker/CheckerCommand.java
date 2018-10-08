@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.checker.service.ChecksumResultService;
@@ -42,7 +42,7 @@ public final class CheckerCommand {
     /**
      * Usual Log4J logger.
      */
-    private static final Logger LOG = Logger.getLogger(CheckerCommand.class);
+    private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(CheckerCommand.class);
 
     private Context context;
 

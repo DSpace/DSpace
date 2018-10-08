@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -26,7 +26,7 @@ import org.dspace.core.ConfigurationManager;
  * @author Richard Jones
  */
 public class SortOption {
-    private static final Logger log = Logger.getLogger(SortOption.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SortOption.class);
 
     public static final String ASCENDING = "ASC";
     public static final String DESCENDING = "DESC";

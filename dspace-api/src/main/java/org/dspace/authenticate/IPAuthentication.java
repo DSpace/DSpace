@@ -17,7 +17,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -49,7 +49,7 @@ public class IPAuthentication implements AuthenticationMethod {
     /**
      * Our logger
      */
-    private static Logger log = Logger.getLogger(IPAuthentication.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IPAuthentication.class);
 
     /**
      * Whether to look for x-forwarded headers for logging IP addresses

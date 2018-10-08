@@ -15,7 +15,8 @@ import gr.ekt.bte.core.DataLoadingSpec;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.exceptions.MalformedSourceException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 
 /**
@@ -29,8 +30,7 @@ public class SubmissionItemDataLoader implements DataLoader {
 
     List<DataLoader> providers;
 
-    private static Logger log = Logger
-        .getLogger(SubmissionItemDataLoader.class);
+    private static Logger log = LogManager.getLogger(SubmissionItemDataLoader.class);
 
     public SubmissionItemDataLoader() {
         dtoList = null;

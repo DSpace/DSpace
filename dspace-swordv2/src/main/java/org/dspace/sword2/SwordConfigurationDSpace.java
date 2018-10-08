@@ -13,7 +13,8 @@ import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -30,7 +31,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
     /**
      * logger
      */
-    public static final Logger log = Logger
+    public static final Logger log = LogManager
         .getLogger(SwordConfigurationDSpace.class);
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory

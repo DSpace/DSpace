@@ -21,7 +21,7 @@ import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -61,7 +61,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(CollectionServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionServiceImpl.class);
 
     @Autowired(required = true)
     protected CollectionDAO collectionDAO;

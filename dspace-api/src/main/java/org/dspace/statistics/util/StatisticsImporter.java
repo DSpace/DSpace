@@ -34,7 +34,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
@@ -64,7 +64,7 @@ import org.dspace.statistics.service.SolrLoggerService;
  * @see ClassicDSpaceLogConverter
  */
 public class StatisticsImporter {
-    private static final Logger log = Logger.getLogger(StatisticsImporter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StatisticsImporter.class);
 
     /**
      * Date format (for solr)

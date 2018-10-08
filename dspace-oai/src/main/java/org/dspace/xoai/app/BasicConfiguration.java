@@ -8,7 +8,7 @@
 package org.dspace.xoai.app;
 
 import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.FieldResolver;
@@ -49,7 +49,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class BasicConfiguration {
-    private static final Logger log = Logger.getLogger(BasicConfiguration.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicConfiguration.class);
 
     @Bean
     public ConfigurationService configurationService() {

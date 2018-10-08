@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
@@ -42,7 +42,7 @@ import org.dspace.core.SelfNamedPlugin;
  * fields.
  */
 public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority {
-    private static Logger log = Logger.getLogger(DCInputAuthority.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DCInputAuthority.class);
 
     private String values[] = null;
     private String labels[] = null;

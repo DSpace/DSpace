@@ -10,7 +10,7 @@ package org.dspace.app.rest.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.content.Bitstream;
@@ -33,7 +33,7 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
     @Autowired(required = true)
     private BitstreamConverter bitstreamConverter;
 
-    private static final Logger log = Logger.getLogger(ItemConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
     @Override
     public ItemRest fromModel(org.dspace.content.Item obj) {

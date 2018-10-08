@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -48,7 +48,7 @@ public class PREMISCrosswalk
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(PREMISCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(PREMISCrosswalk.class);
 
     private static final Namespace PREMIS_NS =
         Namespace.getNamespace("premis", "http://www.loc.gov/standards/premis");

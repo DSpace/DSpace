@@ -14,7 +14,7 @@ import java.util.Properties;
 
 import nu.xom.Element;
 import nu.xom.Elements;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.purl.sword.atom.Generator;
 
 
@@ -47,7 +47,7 @@ public class Service extends XmlElement implements SwordElementInterface {
     /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(Service.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Service.class);
 
     /**
      * MaxUploadSize

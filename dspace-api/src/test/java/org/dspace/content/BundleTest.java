@@ -29,7 +29,7 @@ import java.util.UUID;
 
 import mockit.NonStrictExpectations;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.Constants;
@@ -47,7 +47,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(BundleTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BundleTest.class);
 
     /**
      * Bundle instance for the tests

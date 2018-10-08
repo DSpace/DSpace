@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -30,7 +30,7 @@ import org.dspace.core.ConfigurationManager;
  */
 public class AuthoritySolrServiceImpl implements AuthorityIndexingService, AuthoritySearchService {
 
-    private static final Logger log = Logger.getLogger(AuthoritySolrServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthoritySolrServiceImpl.class);
 
     protected AuthoritySolrServiceImpl() {
 

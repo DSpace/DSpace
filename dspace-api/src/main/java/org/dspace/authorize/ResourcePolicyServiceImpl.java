@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
@@ -38,7 +38,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(ResourcePolicyServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ResourcePolicyServiceImpl.class);
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;

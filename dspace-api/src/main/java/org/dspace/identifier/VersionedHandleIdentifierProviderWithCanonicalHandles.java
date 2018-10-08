@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -43,7 +43,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
+    private static Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
 
     /**
      * Prefix registered to no one

@@ -11,14 +11,14 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Neil Taylor (nst@aber.ac.uk)
  */
 public class SwordContentPackageTypes {
 
-    private static Logger log = Logger.getLogger(SwordContentPackageTypes.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SwordContentPackageTypes.class);
 
     private static Properties types;
 

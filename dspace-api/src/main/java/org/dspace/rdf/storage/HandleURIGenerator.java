@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
  */
 public class HandleURIGenerator implements URIGenerator {
-    private static final Logger log = Logger.getLogger(HandleURIGenerator.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleURIGenerator.class);
 
     @Autowired(required = true)
     protected SiteService siteService;

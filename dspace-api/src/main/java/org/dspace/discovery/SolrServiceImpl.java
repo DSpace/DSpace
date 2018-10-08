@@ -47,7 +47,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServer;
@@ -134,7 +134,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SolrServiceImpl implements SearchService, IndexingService {
 
-    private static final Logger log = Logger.getLogger(SolrServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrServiceImpl.class);
 
     protected static final String LAST_INDEXED_FIELD = "SolrIndexer.lastIndexed";
     protected static final String HANDLE_FIELD = "handle";

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -48,7 +48,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(WorkspaceItemTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemTest.class);
 
     /**
      * WorkspaceItem instance for the tests

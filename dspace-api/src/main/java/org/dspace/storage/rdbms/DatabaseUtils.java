@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
@@ -54,7 +54,7 @@ public class DatabaseUtils {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(DatabaseUtils.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DatabaseUtils.class);
 
     // Our Flyway DB object (initialized by setupFlyway())
     private static Flyway flywaydb;

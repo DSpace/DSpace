@@ -26,7 +26,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -92,7 +92,7 @@ public class MetadataImport {
     /**
      * Logger
      */
-    protected static final Logger log = Logger.getLogger(MetadataImport.class);
+    protected static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataImport.class);
 
     protected final AuthorityValueService authorityValueService;
 

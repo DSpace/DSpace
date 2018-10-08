@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -31,7 +31,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
  */
 public class RDFUtil {
-    private static final Logger log = Logger.getLogger(RDFUtil.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RDFUtil.class);
     private static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance()
                                                                                     .getAuthorizeService();
 

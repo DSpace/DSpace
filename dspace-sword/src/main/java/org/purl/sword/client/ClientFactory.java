@@ -7,7 +7,7 @@
  */
 package org.purl.sword.client;
 
-import org.apache.log4j.PropertyConfigurator;
+// Replace with log4j 2: import org.apache.logging.log4j.PropertyConfigurator;
 
 /**
  * Entry point for the SWORD Demonstration Client. This will parse the list of
@@ -24,8 +24,8 @@ public class ClientFactory {
         // configure the logger from the property file. The GUI client will
         // reload these properties if it is set to capture the output and
         // display it in a panel.
-        PropertyConfigurator.configure(this.getClass().getClassLoader()
-                                           .getResource(ClientConstants.LOGGING_PROPERTY_FILE));
+        // Replace with log4j 2: PropertyConfigurator.configure(this.getClass()
+        // .getClassLoader().getResource(ClientConstants.LOGGING_PROPERTY_FILE));
     }
 
     /**

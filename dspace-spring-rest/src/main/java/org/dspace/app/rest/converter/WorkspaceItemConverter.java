@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 public class WorkspaceItemConverter
     extends DSpaceConverter<org.dspace.content.WorkspaceItem, org.dspace.app.rest.model.WorkspaceItemRest> {
 
-    private static final Logger log = Logger.getLogger(WorkspaceItemConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemConverter.class);
 
     @Autowired
     private EPersonConverter epersonConverter;

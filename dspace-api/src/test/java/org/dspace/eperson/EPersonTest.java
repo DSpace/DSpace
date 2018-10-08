@@ -14,7 +14,7 @@ import static org.junit.Assert.fail;
 import java.sql.SQLException;
 
 import org.apache.commons.codec.DecoderException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
@@ -28,7 +28,7 @@ import org.junit.Test;
  */
 public class EPersonTest extends AbstractUnitTest {
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private static final Logger log = Logger.getLogger(EPersonTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EPersonTest.class);
 
 
     public EPersonTest() {

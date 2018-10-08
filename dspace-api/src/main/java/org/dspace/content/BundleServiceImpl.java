@@ -17,7 +17,7 @@ import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -45,7 +45,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(Bundle.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Bundle.class);
 
     @Autowired(required = true)
     protected BundleDAO bundleDAO;

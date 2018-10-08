@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -36,7 +36,7 @@ public class IdentifierServiceImpl implements IdentifierService {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(IdentifierServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IdentifierServiceImpl.class);
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
