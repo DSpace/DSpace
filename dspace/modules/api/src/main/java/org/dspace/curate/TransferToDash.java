@@ -282,133 +282,6 @@ public class TransferToDash extends AbstractCurationTask {
                 }
                 dataset.put("authors", allAuthors);
 
-                // ///////// Items below this are not yet added to json
-                
-		// journal
-	 	vals = item.getMetadata("prism.publicationName");
-		if (vals.length == 0) {
-		    setResult("Object has no prism.publicationName available " + handle);
-		    log.error("Skipping -- Object has no prism.publicationName available " + handle);
-		    context.abort();
-		    return Curator.CURATE_SKIP;
-		} else {
-		    journal = vals[0].value;
-		}
-		log.debug("journal = " + journal);
-
-		// accession date
-		vals = item.getMetadata("dc.date.accessioned");
-		if (vals.length == 0) {
-		    setResult("Object has no dc.date.accessioned available " + handle);
-		    log.error("Skipping -- Object has no dc.date.accessioned available " + handle);
-		    context.abort();
-		    return Curator.CURATE_SKIP;
-		} else {
-		    dateAccessioned = vals[0].value;
-		}
-		log.debug("dateAccessioned = " + dateAccessioned);
-
-		// manuscript number
-		DCValue[] manuvals = item.getMetadata("dc.identifier.manuscriptNumber");
-		manuscriptNum = null;
-		if(manuvals.length > 0) {
-		    manuscriptNum = manuvals[0].value;
-		}
-		if(manuscriptNum != null && manuscriptNum.trim().length() > 0) {
-		    log.debug("has a real manuscriptNum = " + manuscriptNum);
-
-		}
-		
-		// count the files, and compute statistics that depend on the files
-		log.debug("getting data file info");
-		DCValue[] dataFiles = item.getMetadata("dc.relation.haspart");
-		if (dataFiles.length == 0) {
-		    setResult("Object has no dc.relation.haspart available " + handle);
-		    log.error("Skipping -- Object has no dc.relation.haspart available " + handle);
-		    context.abort();
-		    return Curator.CURATE_SKIP;
-		} else {
-		    numberOfFiles = "" + dataFiles.length;
-		    packageSize = 0;
-		    
-		    // for each data file in the package
-
-		    for(int i = 0; i < dataFiles.length; i++) {
-			String fileID = dataFiles[i].value;
-			log.debug(" ======= processing fileID = " + fileID);
-
-			// get the DSpace Item for this fileID
-			Item fileItem = getDSpaceItem(fileID);
-
-			if(fileItem == null) {
-			    log.error("Skipping data file -- it's null");
-			    break;
-			}
-			log.debug("file internalID = " + fileItem.getID());
-			
-			// total package size
-			// add total size of the bitstreams in this data file 
-			// to the cumulative total for the package
-			// (includes metadata, readme, and textual conversions for indexing)
-			for (Bundle bn : fileItem.getBundles()) {
-			    for (Bitstream bs : bn.getBitstreams()) {
-				packageSize = packageSize + bs.getSize();
-			    }
-			}
-			log.debug("total package size (as of file " + fileID + ") = " + packageSize);
-
-			// Readmes
-			// Check for at least one readme bitstream. There may be more, due to indexing and cases
-			// where the file itself is named readme. We only count one readme per datafile.
-			boolean readmeFound = false;
-			for (Bundle bn : fileItem.getBundles()) {
-			    for (Bitstream bs : bn.getBitstreams()) {
-				String name = bs.getName().trim().toLowerCase();
-				if(name.startsWith("readme")) {
-				    readmeFound = true;
-				}
-			    }
-			}
-			
-			// embargo setting (of last file processed)
-			vals = fileItem.getMetadata("dc.type.embargo");
-			if (vals.length > 0) {
-			    embargoType = vals[0].value;
-			    log.debug("EMBARGO vals " + vals.length + " type " + embargoType);
-			}
-			vals = fileItem.getMetadata("dc.date.embargoedUntil");
-			if (vals.length > 0) {
-			    embargoDate = vals[0].value;
-			}
-			if((embargoType == null || embargoType.equals("") || embargoType.equals("none")) &&
-			   (embargoDate != null && !embargoDate.equals(""))) {
-			    // correctly encode embago type to "oneyear" if there is a date set, but the type is blank or none
-			    embargoType = "oneyear";
-			}
-			log.debug("embargoType = " + embargoType);
-			log.debug("embargoDate = " + embargoDate);
-			
-		       			    			
-			// number of downlaods for most downloaded file
-			// must use the DSpace item ID, since the solr stats system is based on this ID
-			// The SOLR address is hardcoded to the production system here, because even when we run on test servers,
-			// it's easiest to use the real stats --the test servers typically don't have useful stats available
-			URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?indent=on&q=owningItem:" + fileItem.getID());
-			log.debug("fetching " + downloadStatURL);
-			Document statsdoc = docb.parse(downloadStatURL.openStream());
-			NodeList nl = statsdoc.getElementsByTagName("result");
-			String downloadsAtt = nl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
-			int currDownloads = Integer.parseInt(downloadsAtt);
-			if(currDownloads > maxDownloads) {
-			    maxDownloads = currDownloads;
-			    // rather than converting maxDownloads back to a string, just use the string we parsed above
-			    numberOfDownloads = downloadsAtt;
-			}
-			log.debug("max downloads (as of file " + fileID + ") = " + numberOfDownloads);
-			
-		    }
-
-		}
 		log.info(handle + " done.");
 	    } catch (Exception e) {
 		log.fatal("Skipping -- Exception in processing " + handle, e);
@@ -419,10 +292,10 @@ public class TransferToDash extends AbstractCurationTask {
 		return Curator.CURATE_SKIP;
 	    }
 
-            // write this item to json
+            // write this item to a file for easy debugging
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("/tmp/transferToDash.json"), dataset);
 
-            // send this item to the server
+            // send this item to the DASH server
             sendToDash(objectMapper.writeValueAsString(dataset));
             
             // provide output for the console
@@ -476,7 +349,7 @@ public class TransferToDash extends AbstractCurationTask {
                 out.append(line);
             }
             String response = out.toString();
-            System.out.println("##### " + response);
+            log.debug("transfer response " + response);
         } catch (Exception e) {
             log.fatal("Unable to send item to DASH", e);
         }
