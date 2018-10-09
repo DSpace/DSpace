@@ -141,7 +141,12 @@ public class DataOneMN extends HttpServlet implements Constants {
      **/
     private String buildReqPath(String aPath) {
 	String reqPath = aPath;
-	
+
+        // if the path is empty, return an empty string
+        if(reqPath == null || reqPath.length() == 0) {
+            return "";
+        }
+        
 	// handle (and remove) the version indicator
 	// TODO: throw an error for requests that do not have a version indicator -- need to notify potential users first
 	if(reqPath.startsWith("/v1")) {
