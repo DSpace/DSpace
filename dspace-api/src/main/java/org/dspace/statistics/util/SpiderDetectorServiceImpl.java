@@ -186,26 +186,25 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
         if (patternsDir.exists() && patternsDir.isDirectory()) {
             for (File file : patternsDir.listFiles()) {
                 if (file.isFile()
-                    	&& !file.getName().matches(".+old$")) // UH omit .old files from previous update runs
-                {
-                Set<String> patterns;
-                try {
-                    patterns = readPatterns(file);
-                } catch (IOException ex) {
-                    log.error("Patterns not read from {}:  {}",
-                              file.getPath(), ex.getMessage());
-                    continue;
-                }
-                //If case insensitive matching is enabled, lowercase the patterns so they can be lowercase matched
-                for (String pattern : patterns) {
-                    if (isUseCaseInsensitiveMatching()) {
-                        pattern = StringUtils.lowerCase(pattern);
+                    && !file.getName().matches(".+old$")) { // UH omit .old files from previous update runs
+                    Set<String> patterns;
+                    try {
+                        patterns = readPatterns(file);
+                    } catch (IOException ex) {
+                        log.error("Patterns not read from {}:  {}",
+                                  file.getPath(), ex.getMessage());
+                        continue;
                     }
-                    patternList.add(Pattern.compile(pattern));
-                }
+                    //If case insensitive matching is enabled, lowercase the patterns so they can be lowercase matched
+                    for (String pattern : patterns) {
+                        if (isUseCaseInsensitiveMatching()) {
+                            pattern = StringUtils.lowerCase(pattern);
+                        }
+                        patternList.add(Pattern.compile(pattern));
+                    }
 
 
-                log.info("Loaded pattern file:  {}", file.getPath());
+                    log.info("Loaded pattern file:  {}", file.getPath());
                 }
             }
         } else {
@@ -264,8 +263,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
                 if (spidersDir.exists() && spidersDir.isDirectory()) {
                     for (File file : spidersDir.listFiles()) {
                         if (file.isFile()
-                           	&& !file.getName().matches(".+old$")) // UH omit .old files from previous update runs
-                        {
+                           	&& !file.getName().matches(".+old$")) { // UH omit .old files from previous update runs
                             for (String ip : readPatterns(file)) {
                                 log.debug("Loading {}", ip);
                                 if (!Character.isDigit(ip.charAt(0))) {
