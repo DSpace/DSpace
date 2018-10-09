@@ -46,8 +46,8 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
     @Autowired
     GroupConverter converter;
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     protected GroupRest createAndReturn(Context context)
             throws AuthorizeException, RepositoryMethodNotImplementedException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
@@ -57,7 +57,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
         try {
             groupRest = mapper.readValue(req.getInputStream(), GroupRest.class);
         } catch (IOException excIO) {
-            throw new UnprocessableEntityException("error parsing the body... maybe this is not the right error code");
+            throw new UnprocessableEntityException("error parsing the body ..." + excIO.getMessage());
         }
 
         Group group = null;
