@@ -185,6 +185,9 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
         File patternsDir = new File(spidersDir, directory);
         if (patternsDir.exists() && patternsDir.isDirectory()) {
             for (File file : patternsDir.listFiles()) {
+                if (file.isFile()
+                    	&& !file.getName().matches(".+old$")) // UH omit .old files from previous update runs
+                {
                 Set<String> patterns;
                 try {
                     patterns = readPatterns(file);
@@ -203,6 +206,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
 
 
                 log.info("Loaded pattern file:  {}", file.getPath());
+                }
             }
         } else {
             log.info("No patterns loaded from {}", patternsDir.getPath());
@@ -259,7 +263,9 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
 
                 if (spidersDir.exists() && spidersDir.isDirectory()) {
                     for (File file : spidersDir.listFiles()) {
-                        if (file.isFile()) {
+                        if (file.isFile()
+                           	&& !file.getName().matches(".+old$")) // UH omit .old files from previous update runs
+                        {
                             for (String ip : readPatterns(file)) {
                                 log.debug("Loading {}", ip);
                                 if (!Character.isDigit(ip.charAt(0))) {
