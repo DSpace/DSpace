@@ -38,7 +38,7 @@ public class EPersonPatch extends AbstractResourcePatch<EPersonRest> {
         ResourcePatchOperation<EPersonRest> patchOperation =
                 patchFactory.getReplaceOperationForPath(operation.getPath());
 
-        return (EPersonRest) patchOperation.perform(eperson, operation);
+        return patchOperation.perform(eperson, operation);
 
     }
 }

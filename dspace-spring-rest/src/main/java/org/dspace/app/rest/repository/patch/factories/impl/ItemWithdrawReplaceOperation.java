@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
 
@@ -27,30 +26,25 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class ItemWithdrawReplaceOperation extends PatchOperation<ItemRest, String> {
+public class ItemWithdrawReplaceOperation extends ReplacePatchOperation<ItemRest, String> {
 
     private static final Logger log = Logger.getLogger(ItemWithdrawReplaceOperation.class);
 
-    /**
-     * Updates the withdrawn in the item rest model.
-     * @param item the rest model
-     * @param operation
-     * @return the updated rest model
-     * @throws UnprocessableEntityException
-     * @throws PatchBadRequestException
-     */
     @Override
-    public RestModel perform(ItemRest item, Operation operation)
+    public ItemRest perform(ItemRest item, Operation operation)
             throws UnprocessableEntityException, PatchBadRequestException {
 
         return replace(item, operation);
 
     }
 
-    private RestModel replace(ItemRest item, Operation operation)
+    @Override
+    public ItemRest replace(ItemRest item, Operation operation)
             throws PatchBadRequestException, UnprocessableEntityException {
 
         checkOperationValue(operation.getValue());
+        checkModelForExistingValue(item.getWithdrawn());
+
         Boolean withdraw = getBooleanOperationValue(operation.getValue());
 
         // This is a request to withdraw the item.
