@@ -25,18 +25,11 @@ import org.springframework.stereotype.Component;
  *  @author Michael Spalti
  */
 @Component
-public class ItemDiscoverableReplaceOperation extends PatchOperation<ItemRest, String>
-        implements ResourcePatchOperation<ItemRest> {
+public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<ItemRest, String> {
 
     private static final Logger log = Logger.getLogger(ItemDiscoverableReplaceOperation.class);
 
-    /**
-     * Updates the discoverable in the item rest model.
-     * @param item the rest model
-     * @param operation
-     * @return updated rest model
-     * @throws PatchBadRequestException
-     */
+    @Override
     public ItemRest perform(ItemRest item, Operation operation)
             throws PatchBadRequestException {
 
@@ -44,9 +37,11 @@ public class ItemDiscoverableReplaceOperation extends PatchOperation<ItemRest, S
 
     }
 
-    private ItemRest replace(ItemRest item, Operation operation) {
+    @Override
+    public ItemRest replace(ItemRest item, Operation operation) {
 
         checkOperationValue(operation.getValue());
+        checkModelForExistingValue(item.getDiscoverable());
         Boolean discoverable = getBooleanOperationValue(operation.getValue());
         item.setDiscoverable(discoverable);
         return item;
