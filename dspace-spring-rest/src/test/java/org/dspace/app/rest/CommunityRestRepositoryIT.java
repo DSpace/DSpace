@@ -36,6 +36,7 @@ import org.junit.Test;
 
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    @Test
     public void createTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -101,6 +102,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
     }
 
+    @Test
     public void createUnauthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -119,7 +121,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(post("/api/core/communities")
                                         .content(mapper.writeValueAsBytes(comm))
                                         .contentType(contentType))
-                   .andExpect(status().isForbidden());
+                   .andExpect(status().isUnauthorized());
 
         // Non-admin Eperson tries to create a community.
         // Should fail because user doesn't have permissions. Error 403.
