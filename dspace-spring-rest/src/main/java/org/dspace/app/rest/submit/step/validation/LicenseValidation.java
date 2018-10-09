@@ -23,7 +23,8 @@ import org.dspace.core.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Execute check on license bundle
+ * This submission validation check that the license has been grant for the inprogress submission looking for the
+ * presence of a license bitstream in the license bundle,
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */

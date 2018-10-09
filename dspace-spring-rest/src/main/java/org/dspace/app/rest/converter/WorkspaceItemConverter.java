@@ -85,6 +85,10 @@ public class WorkspaceItemConverter
         // info
 
         if (collection != null) {
+            // we set the status to true as we will discover validation error later in this block
+            // we could eventually leave the status to empty if we don't have collection information, this could be
+            // eventually the case when projection support will be included
+            witem.setStatus(true);
             SubmissionDefinitionRest def = submissionDefinitionConverter
                 .convert(submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle()));
             witem.setSubmissionDefinition(def);
@@ -108,6 +112,7 @@ public class WorkspaceItemConverter
                             (AbstractRestProcessingStep) stepClass.newInstance();
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
                             addError(witem.getErrors(), error);
+                            witem.setStatus(false);
                         }
                         witem.getSections()
                             .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));

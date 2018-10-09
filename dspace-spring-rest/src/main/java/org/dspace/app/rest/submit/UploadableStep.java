@@ -16,7 +16,10 @@ import org.dspace.core.Context;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * The interface for submission Steps that need to deal with file upload
+ * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public interface UploadableStep extends ListenerProcessingStep {
 
