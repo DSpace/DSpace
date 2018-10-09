@@ -52,7 +52,13 @@ public class LicenseAddPatchOperation extends AddPatchOperation<String> {
     void add(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
         throws Exception {
 
-        Boolean grant = BooleanUtils.toBooleanObject((String) value);
+        Boolean grant = null;
+        // we are friendly with the client and accept also a string representation for the boolean
+        if (value instanceof String) {
+            grant = BooleanUtils.toBooleanObject((String) value);
+        } else {
+            grant = (Boolean) value;
+        }
 
         if (grant == null) {
             throw new IllegalArgumentException(

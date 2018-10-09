@@ -14,7 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.ErrorRest;
 
 /**
- * Abstract class to manage errors on validation during submission process
+ * Abstract class to provide basic management of errors resulting from a validation on a submission
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
@@ -24,6 +24,9 @@ public abstract class AbstractValidation implements Validation {
 
     private List<ErrorRest> errors = new ArrayList<ErrorRest>();
 
+    /**
+     * An unique name to identify the validation implementation
+     */
     public String getName() {
         return name;
     }
@@ -32,6 +35,15 @@ public abstract class AbstractValidation implements Validation {
         this.name = name;
     }
 
+    /**
+     * Add an error message (i18nKey) for a specific json path
+     * 
+     * @param i18nKey
+     *            the validation error message as a key to internationalize
+     * @param path
+     *            the json path that identify the wrong data in the submission. It could be as specific as a single
+     *            value in a multivalued attribute or general of a "whole" section
+     */
     public void addError(String i18nKey, String path) {
         boolean found = false;
         if (StringUtils.isNotBlank(i18nKey)) {
@@ -51,6 +63,11 @@ public abstract class AbstractValidation implements Validation {
         }
     }
 
+    /**
+     * Expose the identified errors
+     * 
+     * @return the list of identified {@link ErrorRest}
+     */
     public List<ErrorRest> getErrors() {
         return errors;
     }

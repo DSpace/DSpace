@@ -33,6 +33,7 @@ import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.listener.MetadataListener;
 import org.dspace.submit.lookup.SubmissionLookupDataLoader;
 
+//FIXME move to the ExtractionStep
 /**
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */

@@ -31,9 +31,11 @@ import org.dspace.core.Utils;
 import org.dspace.services.model.Request;
 
 /**
- * Describe step for DSpace Spring Rest. Handle the exposition of metadata own by the in progress submission.
+ * Describe step for DSpace Spring Rest. Expose and allow patching of the in progress submission metadata. It is
+ * configured via the config/submission-forms.xml file
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class DescribeStep extends org.dspace.submit.step.DescribeStep implements AbstractRestProcessingStep {
 

@@ -13,7 +13,11 @@ import gr.ekt.bte.dataloader.FileDataLoader;
 import org.dspace.services.ConfigurationService;
 
 /**
+ * Configuration bean to associate a BTE FileDataLoader with a specific list of format identified by the file
+ * extensions. See config/spring/api/metadata-extractor.xml
+ * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class MetadataExtractor {
 
