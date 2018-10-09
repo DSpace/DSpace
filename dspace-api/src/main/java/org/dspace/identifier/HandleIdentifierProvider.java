@@ -238,4 +238,9 @@ public class HandleIdentifierProvider extends IdentifierProvider {
             itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
         }
     }
+
+    @Override
+    public String getIdentifierTypeName() {
+        return Handle.getTypeName();
+    }
 }

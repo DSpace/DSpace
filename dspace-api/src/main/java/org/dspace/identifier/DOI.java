@@ -62,6 +62,14 @@ public class DOI
     protected DOI() {
     }
 
+    /**
+     * What type of identifier is this?
+     * @return "DOI"
+     */
+    public static String getIdentifierTypeName() {
+        return "DOI";
+    }
+
     public Integer getID() {
         return id;
     }

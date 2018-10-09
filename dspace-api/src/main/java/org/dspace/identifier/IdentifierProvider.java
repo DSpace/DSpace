@@ -34,6 +34,15 @@ public abstract class IdentifierProvider {
     public void setParentService(IdentifierService parentService) {
         this.parentService = parentService;
     }
+     /**
+     * Get a "type name" for the sort of identifier that this provider handles.
+     * All providers which generate, resolve, etc. DOIs, for example, should return
+     * the same string, e.g. "DOI".
+     *
+     * @return a name for the type of identifier provided.
+     */
+    public abstract String getIdentifierTypeName();
+
 
     /**
      * Can this provider provide identifiers of a given type?

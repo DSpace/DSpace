@@ -8,9 +8,20 @@
 package org.dspace.identifier;
 
 /**
+ * Identifiers used by the <a href="https://handle.net">Handle System</a>.
+ *
  * @author Fabio Bolognesi (fabio at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
 public class Handle implements Identifier {
+    private Handle() { }
+
+    /**
+     * What type of identifier is this?
+     * @return "Handle"
+     */
+    public static String getTypeName() {
+        return "Handle";
+    }
 }

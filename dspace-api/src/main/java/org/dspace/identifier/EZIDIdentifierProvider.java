@@ -642,4 +642,9 @@ public class EZIDIdentifierProvider
     protected void setItemService(ItemService itemService) {
         this.itemService = itemService;
     }
+
+    @Override
+    public String getIdentifierTypeName() {
+        return DOI.getIdentifierTypeName();
+    }
 }

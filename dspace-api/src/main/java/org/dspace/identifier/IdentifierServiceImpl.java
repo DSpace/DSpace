@@ -12,13 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -34,9 +39,10 @@ public class IdentifierServiceImpl implements IdentifierService {
     private List<IdentifierProvider> providers;
 
     /**
-     * log4j category
+     * logging category
      */
-    private static Logger log = Logger.getLogger(IdentifierServiceImpl.class);
+    private static final Logger log
+            = LoggerFactory.getLogger(IdentifierServiceImpl.class);
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
@@ -47,6 +53,10 @@ public class IdentifierServiceImpl implements IdentifierService {
 
     }
 
+    /**
+     * Collects all configured IdentifierProvider implementations.
+     * @param providers the configured identifier providers.
+     */
     @Autowired
     @Required
     public void setProviders(List<IdentifierProvider> providers) {
@@ -62,14 +72,19 @@ public class IdentifierServiceImpl implements IdentifierService {
      *
      * @param context dspace context
      * @param dso     dspace object
+     * @throws org.dspace.authorize.AuthorizeException
+     * @throws java.sql.SQLException
+     * @throws org.dspace.identifier.IdentifierException
      */
     @Override
     public void reserve(Context context, DSpaceObject dso)
         throws AuthorizeException, SQLException, IdentifierException {
         for (IdentifierProvider service : providers) {
-            String identifier = service.mint(context, dso);
-            if (!StringUtils.isEmpty(identifier)) {
-                service.reserve(context, dso, identifier);
+            if (isProviderEnabled(dso, service)) {
+                String identifier = service.mint(context, dso);
+                if (!StringUtils.isEmpty(identifier)) {
+                    service.reserve(context, dso, identifier);
+                }
             }
         }
         //Update our item
@@ -81,7 +96,7 @@ public class IdentifierServiceImpl implements IdentifierService {
         throws AuthorizeException, SQLException, IdentifierException {
         // Next resolve all other services
         for (IdentifierProvider service : providers) {
-            if (service.supports(identifier)) {
+            if (service.supports(identifier) && isProviderEnabled(dso, service)) {
                 service.reserve(context, dso, identifier);
             }
         }
@@ -95,7 +110,9 @@ public class IdentifierServiceImpl implements IdentifierService {
         //We need to commit our context because one of the providers might require the handle created above
         // Next resolve all other services
         for (IdentifierProvider service : providers) {
-            service.register(context, dso);
+            if (isProviderEnabled(dso, service)) {
+                service.register(context, dso);
+            }
         }
         //Update our item
         contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
@@ -108,7 +125,7 @@ public class IdentifierServiceImpl implements IdentifierService {
         // Next resolve all other services
         boolean registered = false;
         for (IdentifierProvider service : providers) {
-            if (service.supports(identifier)) {
+            if (service.supports(identifier) && isProviderEnabled(object, service)) {
                 service.register(context, object, identifier);
                 registered = true;
             }
@@ -248,5 +265,58 @@ public class IdentifierServiceImpl implements IdentifierService {
                 log.error(e.getMessage(), e);
             }
         }
+    }
+
+    /**
+     * Test whether an identifier provider been disabled in the container of
+     * this object.  If the object is not an Item, providers cannot be disabled.
+     * Otherwise, if *all* containers are marked as disabling generation of this
+     * provider's type of identifier, then generation is disabled.  A container
+     * is marked to disable a provider's identifier type if it has a metadata
+     * field 'local.identifier_generation_disabled.TYPE' where TYPE is the
+     * {@link IdentifierProvider#getIdentifierTypeName() "type name"} of the
+     * provider and the field's first value is "true".
+     *
+     * @return false if this provider is disabled.
+     */
+    private boolean isProviderEnabled(DSpaceObject dso, IdentifierProvider provider)
+            throws SQLException {
+        if (!(dso instanceof Item)) {
+            return true;
+        }
+
+        Item item = (Item)dso;
+        String providerTypeName = provider.getIdentifierTypeName();
+        log.debug("Is provider {} enabled for Item {}?",
+                providerTypeName, dso.getID());
+
+        List<Collection> collections = item.getCollections();
+        log.debug("Item is in {} collections", collections.size());
+        // Provider is enabled if there are no collections to disable it
+        if (collections.isEmpty()) {
+            log.debug("Returning true");
+            return true;
+        }
+
+        boolean disabled = true;
+        for (Collection collection : collections) {
+            log.debug("Checking Collection {} {}",
+                    collection.getID(), collection.getName());
+            CollectionService collectionService = contentServiceFactory.getCollectionService();
+            List<MetadataValue> flagValues = collectionService.getMetadata(collection, "local",
+                    "identifier_generation_disabled", providerTypeName, Item.ANY);
+            if (!flagValues.isEmpty()) {
+                MetadataValue flag = flagValues.get(0);
+                log.debug("local.identifier_generation_disabled[0] = {}", flag);
+                disabled &= Boolean.parseBoolean(flag.getValue());
+            } else {
+                log.debug("local.identifier_generation_disabled is not set");
+                disabled = false;
+            }
+            log.debug("disabled = {}", disabled);
+        }
+
+        log.debug("Returning {}", !disabled);
+        return !disabled;
     }
 }

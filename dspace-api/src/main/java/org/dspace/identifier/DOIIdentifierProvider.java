@@ -835,4 +835,9 @@ public class DOIIdentifierProvider
                                 remainder);
         itemService.update(context, item);
     }
+
+    @Override
+    public String getIdentifierTypeName() {
+        return DOI.getIdentifierTypeName();
+    }
 }
