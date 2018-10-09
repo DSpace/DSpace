@@ -17,10 +17,10 @@ public class CommunityMetadataMatcher {
 
     private CommunityMetadataMatcher() { }
 
-    public static Matcher<? super Object> matchTitle(String title) {
+    public static Matcher<? super Object> matchMetadata(String key, String value) {
         return allOf(
-            hasJsonPath("$.key", is("dc.title")),
-            hasJsonPath("$.value", is(title))
+            hasJsonPath("$.key", is(key)),
+            hasJsonPath("$.value", is(value))
         );
     }
 }

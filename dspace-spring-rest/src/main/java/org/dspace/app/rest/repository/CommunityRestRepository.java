@@ -7,16 +7,24 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
@@ -29,7 +37,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the repository responsible to manage Item Rest object
+ * This is the repository responsible to manage Community Rest object
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -45,6 +53,38 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 
     public CommunityRestRepository() {
         System.out.println("Repository initialized by Spring");
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected CommunityRest createAndReturn(Context context) throws AuthorizeException {
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ObjectMapper mapper = new ObjectMapper();
+        CommunityRest communityRest = null;
+        try {
+            ServletInputStream input = req.getInputStream();
+            communityRest = mapper.readValue(input, CommunityRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
+        }
+
+        Community community = null;
+
+        try {
+            community = cs.create(null, context);
+            cs.update(context, community);
+            if (communityRest.getMetadata() != null) {
+                for (MetadataEntryRest mer : communityRest.getMetadata()) {
+                    String[] metadatakey = mer.getKey().split("\\.");
+                    cs.addMetadata(context, community, metadatakey[0], metadatakey[1],
+                            metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        return converter.convert(community);
     }
 
     @Override
