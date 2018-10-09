@@ -38,7 +38,7 @@ public class ItemPatch extends AbstractResourcePatch<ItemRest> {
         ResourcePatchOperation<ItemRest> patchOperation =
                 patchFactory.getReplaceOperationForPath(operation.getPath());
 
-        return (ItemRest) patchOperation.perform(item, operation);
+        return patchOperation.perform(item, operation);
 
     }
 }

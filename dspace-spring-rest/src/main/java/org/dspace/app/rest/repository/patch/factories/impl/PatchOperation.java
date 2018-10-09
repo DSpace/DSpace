@@ -17,22 +17,31 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
- * This patch class includes abstract and implemented methods that
- * can be used to type check objects derived from operation values.
+ * Base class for all patch operations. This class includes methods that
+ * can be used to type check objects that are converted from json.
  *
  * @author Michael Spalti
  */
-public abstract class PatchOperation<R extends RestModel, T extends Object>
+public abstract class PatchOperation<R extends RestModel, T>
         implements ResourcePatchOperation<R> {
 
-    public abstract RestModel perform(R resource, Operation operation)
+    /**
+     * Updates the rest model by applying the patch operation.
+     *
+     * @param resource  the rest model
+     * @param operation
+     * @return the updated rest model
+     * @throws PatchBadRequestException
+     */
+    public abstract R perform(R resource, Operation operation)
             throws PatchBadRequestException;
 
     /**
      * Throws PatchBadRequestException for missing operation value.
+     *
      * @param value the value to test
      */
-    public void checkOperationValue(Object value) {
+    void checkOperationValue(Object value) {
         if (value == null) {
             throw new PatchBadRequestException("No value provided for the operation.");
         }
@@ -40,10 +49,11 @@ public abstract class PatchOperation<R extends RestModel, T extends Object>
 
     /**
      * Allows clients to use either a boolean or a string representation of boolean value.
+     *
      * @param value the operation value
      * @return the original or derived boolean value
      */
-    public Boolean getBooleanOperationValue(Object value) throws PatchBadRequestException {
+    Boolean getBooleanOperationValue(Object value) throws PatchBadRequestException {
         Boolean bool;
 
         if (value instanceof String) {
@@ -90,6 +100,7 @@ public abstract class PatchOperation<R extends RestModel, T extends Object>
     /**
      * This method should return the typed array to be used in the
      * LateObjectEvaluator evaluation of json arrays.
+     *
      * @return
      */
     protected abstract Class<T[]> getArrayClassForEvaluation();
@@ -97,6 +108,7 @@ public abstract class PatchOperation<R extends RestModel, T extends Object>
     /**
      * This method should return the object type to be used in the
      * LateObjectEvaluator evaluation of json objects.
+     *
      * @return
      */
     protected abstract Class<T> getClassForEvaluation();

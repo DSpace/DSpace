@@ -78,6 +78,11 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return this;
     }
 
+    public EPersonBuilder withNetId(final String netId) {
+        ePerson.setNetid(netId);
+        return this;
+    }
+
     public EPersonBuilder withPassword(final String password) {
         ePerson.setCanLogIn(true);
         ePersonService.setPassword(ePerson, password);

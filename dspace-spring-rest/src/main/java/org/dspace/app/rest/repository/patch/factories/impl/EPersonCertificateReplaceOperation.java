@@ -24,16 +24,9 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonCertificateReplaceOperation extends PatchOperation<EPersonRest, String>
+public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EPersonRest, String>
         implements ResourcePatchOperation<EPersonRest> {
 
-    /**
-     * Updates the certificate required status in the eperson rest model.
-     * @param resource the rest model
-     * @param operation
-     * @return the updated rest model
-     * @throws PatchBadRequestException
-     */
     @Override
     public EPersonRest perform(EPersonRest resource, Operation operation)
             throws PatchBadRequestException {
@@ -41,10 +34,13 @@ public class EPersonCertificateReplaceOperation extends PatchOperation<EPersonRe
         return replace(resource, operation);
     }
 
-    private EPersonRest replace(EPersonRest eperson, Operation operation)
+    @Override
+    public EPersonRest replace(EPersonRest eperson, Operation operation)
             throws PatchBadRequestException {
 
         checkOperationValue(operation.getValue());
+        checkModelForExistingValue(eperson.isRequireCertificate());
+
         Boolean requireCert = getBooleanOperationValue(operation.getValue());
         eperson.setRequireCertificate(requireCert);
         return eperson;
@@ -53,11 +49,11 @@ public class EPersonCertificateReplaceOperation extends PatchOperation<EPersonRe
 
     @Override
     protected Class<String[]> getArrayClassForEvaluation() {
-        return null;
+        return String[].class;
     }
 
     @Override
     protected Class<String> getClassForEvaluation() {
-        return null;
+        return String.class;
     }
 }

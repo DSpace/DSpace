@@ -12,20 +12,12 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 
 /**
- * The interface for repository patch operations.
- *
- * @author Michael Spalti
+ * The patch interface used by repository classes.
+ * @param <R>
  */
 public interface ResourcePatchOperation<R extends RestModel> {
 
-    /**
-     * Updates the rest model by applying the patch operation.
-     * @param resource the rest model
-     * @param operation
-     * @return the updated rest model
-     * @throws PatchBadRequestException
-     */
-    RestModel perform(R resource, Operation operation)
+    R perform(R resource, Operation operation)
             throws PatchBadRequestException;
 
 }

@@ -24,17 +24,9 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonLoginReplaceOperation extends PatchOperation<EPersonRest, String>
+public class EPersonLoginReplaceOperation extends ReplacePatchOperation<EPersonRest, String>
         implements ResourcePatchOperation<EPersonRest> {
 
-
-    /**
-     * Updates the canLogIn status in the eperson rest model.
-     * @param resource the rest model
-     * @param operation
-     * @return the updated rest model
-     * @throws PatchBadRequestException
-     */
     @Override
     public EPersonRest perform(EPersonRest resource, Operation operation)
             throws PatchBadRequestException {
@@ -42,10 +34,13 @@ public class EPersonLoginReplaceOperation extends PatchOperation<EPersonRest, St
         return replace(resource, operation);
     }
 
-    private EPersonRest replace(EPersonRest eperson, Operation operation)
+    @Override
+    public EPersonRest replace(EPersonRest eperson, Operation operation)
             throws PatchBadRequestException {
 
         checkOperationValue(operation.getValue());
+        checkModelForExistingValue(eperson.isCanLogIn());
+
         Boolean canLogin = getBooleanOperationValue(operation.getValue());
         eperson.setCanLogIn(canLogin);
         return eperson;

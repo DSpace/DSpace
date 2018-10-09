@@ -588,6 +588,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
+                                        .withNetId("testId")
                                         .build();
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -608,6 +609,35 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     }
 
+    @Test
+    public void replaceOnNonExistentValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // update of netId should fail.
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.email", Matchers.is("johndoe@fake-email.com")))
+                        .andExpect(jsonPath("$.netid", Matchers.nullValue()));
+
+    }
 
     @Test
     public void patchNetIdMissingValue() throws Exception {
@@ -617,6 +647,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
+                                        .withNetId("testId")
                                         .build();
 
         String newId = "newId";
@@ -813,6 +844,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
+                                        .withPassword("7Testpass")
                                         .build();
 
         String newPassword = "newpassword";
@@ -845,6 +877,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
+                                        .withPassword("testpass79bC")
                                         .build();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -889,6 +922,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
+                                        .withNetId("testId")
                                         .build();
 
         String token = getAuthToken(admin.getEmail(), password);

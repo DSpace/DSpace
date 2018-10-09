@@ -24,24 +24,26 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonNetidReplaceOperation extends PatchOperation<EPersonRest, String>
+public class EPersonNetidReplaceOperation extends ReplacePatchOperation<EPersonRest, String>
         implements ResourcePatchOperation<EPersonRest> {
 
-    /**
-     * Updates the netid in the eperson rest model.
-     * @param resource the rest model
-     * @param operation
-     * @return the updated rest model
-     * @throws PatchBadRequestException
-     */
     @Override
     public EPersonRest perform(EPersonRest resource, Operation operation)
             throws PatchBadRequestException {
 
-        checkOperationValue((String) operation.getValue());
-        resource.setNetid((String) operation.getValue());
-        return resource;
+        return replace(resource, operation);
 
+    }
+
+    @Override
+    EPersonRest replace(EPersonRest eperson, Operation operation) throws PatchBadRequestException {
+
+        checkOperationValue(operation.getValue());
+        checkModelForExistingValue(eperson.getNetid());
+
+        eperson.setNetid((String) operation.getValue());
+
+        return eperson;
     }
 
     @Override
