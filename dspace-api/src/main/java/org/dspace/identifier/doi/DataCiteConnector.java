@@ -1036,7 +1036,7 @@ implements DOIConnector
         {
             return root;
         }
-        Element identifier = new Element("identifier", "http://datacite.org/schema/kernel-2.2");
+        Element identifier = new Element("identifier", root.getNamespaceURI());
         identifier.setAttribute("identifierType", "DOI");
         identifier.addContent(doi.substring(DOI.SCHEME.length()));
         return root.addContent(0, identifier);
