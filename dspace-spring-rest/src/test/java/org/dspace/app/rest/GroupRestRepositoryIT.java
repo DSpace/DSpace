@@ -56,14 +56,40 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                            GroupMatcher.matchGroupWithName("Administrator"),
                            GroupMatcher.matchGroupWithName("Anonymous"))));
 
-        authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(post("/api/eperson/groups")
-                .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
-                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void createUnauthauthorizedTest()
+            throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String groupName = "testGroupUnauth1";
+
+        groupRest.setName(groupName);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
 
         getClient().perform(post("/api/eperson/groups")
                 .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
                 .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    public void createForbiddenTest()
+            throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String groupName = "testGroupForbidden1";
+
+        groupRest.setName(groupName);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(post("/api/eperson/groups")
+                .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                .andExpect(status().isForbidden());
     }
 
     @Test
