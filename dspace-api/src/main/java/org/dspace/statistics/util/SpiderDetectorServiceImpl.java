@@ -263,7 +263,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
                 if (spidersDir.exists() && spidersDir.isDirectory()) {
                     for (File file : spidersDir.listFiles()) {
                         if (file.isFile()
-                           	&& !file.getName().matches(".+old$")) { // UH omit .old files from previous update runs
+                            && !file.getName().matches(".+old$")) { // UH omit .old files from previous update runs
                             for (String ip : readPatterns(file)) {
                                 log.debug("Loading {}", ip);
                                 if (!Character.isDigit(ip.charAt(0))) {
