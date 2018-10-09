@@ -24,25 +24,28 @@ import org.springframework.stereotype.Component;
  * @author Michael Spalti
  */
 @Component
-public class EPersonPasswordReplaceOperation extends PatchOperation<EPersonRest, String>
-        implements ResourcePatchOperation<EPersonRest> {
+public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPersonRest, String> {
 
-
-    /**
-     * Updates the password in the eperson rest model.
-     * @param resource the rest model
-     * @param operation
-     * @return updated rest model
-     * @throws PatchBadRequestException
-     */
     @Override
     public EPersonRest perform( EPersonRest resource, Operation operation)
             throws PatchBadRequestException {
 
-        checkOperationValue(operation.getValue());
-        resource.setPassword((String) operation.getValue());
-        return resource;
+        return replace(resource, operation);
+    }
 
+    @Override
+    EPersonRest replace(EPersonRest eperson, Operation operation) throws PatchBadRequestException {
+
+        // The value must not be null.
+        checkOperationValue(operation.getValue());
+        /*
+         * TODO: the password field in eperson rest model is always null (initially) since
+         * the password value is not set by eperson converter.fromModel() method. So for now,
+         * not calling checkModelForExistingValue() or throwing error when replacing what
+         * appears to be a non-existent value.
+         */
+        eperson.setPassword((String) operation.getValue());
+        return eperson;
     }
 
     @Override
