@@ -47,7 +47,7 @@ public class ExtractMetadataStep extends ExtractionStep implements UploadableSte
 
     @Override
     public ErrorRest upload(Context context, SubmissionService submissionService, SubmissionStepConfig stepConfig,
-            InProgressSubmission wsi, MultipartFile multipartFile, String extraField)
+            InProgressSubmission wsi, MultipartFile multipartFile)
         throws IOException {
 
         Item item = wsi.getItem();
@@ -66,7 +66,7 @@ public class ExtractMetadataStep extends ExtractionStep implements UploadableSte
                     }
 
                     FileDataLoader fdl = (FileDataLoader) dataLoader;
-                    fdl.setFilename(file.getAbsolutePath());
+                    fdl.setFilename(Utils.getFileName(multipartFile));
 
 
                     recordSet = convertFields(dataLoader.getRecords(), bteBatchImportService.getOutputMap());
