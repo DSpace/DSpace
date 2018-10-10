@@ -27,7 +27,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import java.net.HttpURLConnection;
-import javax.net.ssl.HttpsURLConnection;
     
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -332,10 +331,11 @@ public class TransferToDash extends AbstractCurationTask {
         try {
             URL url = new URL(dashServer + "/api/datasets");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Authorization", "Bearer " + token);
-            connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
 
             OutputStreamWriter wr= new OutputStreamWriter(connection.getOutputStream());
             wr.write(jsonString);
