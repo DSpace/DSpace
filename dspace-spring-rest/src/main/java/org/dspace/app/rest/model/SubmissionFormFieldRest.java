@@ -34,6 +34,7 @@ public class SubmissionFormFieldRest {
     private boolean repeatable;
     private String mandatoryMessage;
     private String hints;
+    private String style;
 
     private List<SelectableMetadata> selectableMetadata;
     private List<LanguageFormField> languageCodes;
@@ -84,6 +85,14 @@ public class SubmissionFormFieldRest {
 
     public void setHints(String hints) {
         this.hints = hints;
+    }
+
+    public String getStyle() {
+        return style;
+    }
+
+    public void setStyle(String style) {
+        this.style = style;
     }
 
     public List<LanguageFormField> getLanguageCodes() {
