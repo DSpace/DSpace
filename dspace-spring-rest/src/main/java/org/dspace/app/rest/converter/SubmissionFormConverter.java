@@ -80,6 +80,7 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 
         inputField.setLabel(dcinput.getLabel());
         inputField.setHints(dcinput.getHints());
+        inputField.setStyle(dcinput.getStyle());
         inputField.setMandatoryMessage(dcinput.getWarning());
         inputField.setMandatory(dcinput.isRequired());
         inputField.setScope(ScopeEnum.fromString(dcinput.getScope()));

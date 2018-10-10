@@ -87,8 +87,6 @@ public class DCInputsReader {
      */
     private DCInputSet lastInputSet = null;
 
-    private Map<String, List<String>> mappedValuePairs = new HashMap<String, List<String>>();
-
     /**
      * Parse an XML encoded submission forms template file, and create a hashmap
      * containing all the form information. This hashmap will contain three top
@@ -366,22 +364,6 @@ public class DCInputsReader {
                         + element;
                     if (StringUtils.isNotBlank(qualifier)) {
                         metadataField += "." + qualifier;
-                    }
-
-                    if (mappedValuePairs.containsKey(
-                        key)) {
-                        if (!mappedValuePairs
-                            .get(key).contains(metadataField)) {
-                            mappedValuePairs
-                                .get(key).add(metadataField);
-                        }
-
-                    } else {
-                        List<String> newval = new ArrayList<String>();
-                        newval.add(metadataField);
-                        mappedValuePairs.put(
-                            key,
-                            newval);
                     }
                 }
 
@@ -701,7 +683,4 @@ public class DCInputsReader {
         throw new DCInputsReaderException("No field configuration found!");
     }
 
-    public Map<String, List<String>> getMappedValuePairs() {
-        return mappedValuePairs;
-    }
 }
