@@ -2,7 +2,7 @@
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
 # 
 # This version is JDK8 compatible
-# - tomcat:8
+# - tomcat:8-jre8
 # - ANT 1.10.5
 # - maven:latest
 # - note: 
@@ -19,7 +19,7 @@ COPY dspace/src/main/docker/local.cfg /app/local.cfg
 RUN mvn package
 
 # Step 2 - Run Ant Deploy
-FROM tomcat:8 as ant_build
+FROM tomcat:8-jre8 as ant_build
 ARG TARGET_DIR=dspace-installer
 COPY --from=build /app /dspace-src
 WORKDIR /dspace-src/dspace/target/${TARGET_DIR}
@@ -36,7 +36,7 @@ RUN ant update_configs update_code update_webapps update_solr_indexes
 
 # Step 3 - Run tomcat
 # Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:8
+FROM tomcat:8-jre8
 COPY --from=ant_build /dspace /dspace
 EXPOSE 8080 8009
 
