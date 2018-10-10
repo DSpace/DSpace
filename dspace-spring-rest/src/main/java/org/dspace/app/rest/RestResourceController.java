@@ -757,12 +757,11 @@ public class RestResourceController implements InitializingBean {
 
         } else {
             if (resource.getEmbeddedResources().get(rel) == null) {
-	    PageImpl<Resource>emptyPage = new PageImpl(new ArrayList<Resource>(), page, 0);
-	    return assembler.toResource ( emptyPage );
+                PageImpl<Resource> emptyPage = new PageImpl(new ArrayList<Resource>(), page, 0);
+                return assembler.toResource(emptyPage);
+            } else {
+                return (ResourceSupport) resource.getEmbeddedResources().get(rel);
             }
-	    else {
-		return (ResourceSupport) resource.getEmbeddedResources().get(rel);
-	    }
         }
 
     }
