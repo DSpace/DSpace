@@ -9,6 +9,10 @@
     http://www.dspace.org/license/
 
 -->
+<!-- 
+    THIS FILE EXISTS TO SIMPLIFY TESTING IN DOCKER.
+    This file overrides the solr localhost restriction.
+ -->
 
 <web-app>
 
