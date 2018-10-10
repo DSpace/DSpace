@@ -26,7 +26,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import java.net.HttpURLConnection;
+import sun.net.www.protocol.http.HttpURLConnection;
+import javax.net.ssl.HttpsURLConnection;
     
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
