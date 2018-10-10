@@ -22,6 +22,7 @@ import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -93,7 +94,7 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
 
     @Override
     public ErrorRest upload(Context context, SubmissionService submissionService, SubmissionStepConfig stepConfig,
-                            InProgressSubmission wsi, MultipartFile file, String extraField) {
+                            InProgressSubmission wsi, MultipartFile file) {
 
         Bitstream source = null;
         BitstreamFormat bf = null;
@@ -113,7 +114,7 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
                 source = bitstreamService.create(context, bundles.get(0), inputStream);
             }
 
-            source.setName(context, extraField);
+            source.setName(context, Utils.getFileName(file));
             source.setSource(context, file.getOriginalFilename());
 
             // Identify the format

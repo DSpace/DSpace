@@ -23,7 +23,24 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface UploadableStep extends ListenerProcessingStep {
 
+    /**
+     * The method to implement to support upload of a file in the submission section (aka panel / step)
+     * 
+     * @param context
+     *            the dspace context
+     * @param submissionService
+     *            the submission service
+     * @param stepConfig
+     *            the configuration of the submission section
+     * @param wsi
+     *            the inprogress submission
+     * @param file
+     *            the multipart file, please note that it is a complex object containing additional information other
+     *            than just the binary such as the filename and the mimetype
+     * @return the encountered error if any
+     * @throws IOException
+     */
     public ErrorRest upload(Context context, SubmissionService submissionService, SubmissionStepConfig stepConfig,
-                            InProgressSubmission wsi, MultipartFile file, String extraField) throws IOException;
+                            InProgressSubmission wsi, MultipartFile file) throws IOException;
 
 }

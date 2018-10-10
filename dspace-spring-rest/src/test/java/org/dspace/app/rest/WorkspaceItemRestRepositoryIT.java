@@ -486,12 +486,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(admin.getEmail(), password);
 
         InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
-        final MockMultipartFile bibtexFile = new MockMultipartFile("file", bibtex);
+        final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
+                bibtex);
 
         // bulk create workspaceitems in the default collection (col1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
-                    .file(bibtexFile)
-                    .param("extraField", "bibtex-test.bib"))
+                    .file(bibtexFile))
                 // bulk create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
@@ -506,6 +506,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         is("My Article 3")))
                 .andExpect(
                         jsonPath("$._embedded.workspaceitems[2]._embedded.collection.id", is(col1.getID().toString())))
+                .andExpect(
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
         ;
 
         // bulk create workspaceitems explicitly in the col2
@@ -525,6 +527,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         is("My Article 3")))
                 .andExpect(
                         jsonPath("$._embedded.workspaceitems[2]._embedded.collection.id", is(col2.getID().toString())))
+                .andExpect(
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
         ;
 
         bibtex.close();
@@ -558,8 +562,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // bulk create a workspaceitem
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
-                    .file(pdfFile)
-                    .param("extraField", "sample-article.pdf"))
+                    .file(pdfFile))
                 // bulk create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 //FIXME it will be nice to setup a mock grobid server for end to end testing
@@ -569,7 +572,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 // we can just check that the pdf is stored in the item
                 .andExpect(
                         jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.title'][0].value",
-                                is("sample-article.pdf")))
+                                is("myfile.pdf")))
                 .andExpect(jsonPath(
                         "$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.source'][0].value",
                         is("/local/path/myfile.pdf")))
@@ -1639,22 +1642,26 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .build();
 
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
-        final MockMultipartFile pdfFile = new MockMultipartFile("file", pdf);
+        final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+                "application/pdf", pdf);
 
         // upload the file in our workspaceitem
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
-                .file(pdfFile)
-                .param("extraField", "sample-article.pdf"))
+                .file(pdfFile))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
-                            is("sample-article.pdf")))
+                            is("simple-article.pdf")))
+                    .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                            is("/local/path/simple-article.pdf")))
         ;
 
         // check the file metadata
         getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
-                    is("sample-article.pdf")))
+                    is("simple-article.pdf")))
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                    is("/local/path/simple-article.pdf")))
         ;
     }
 
