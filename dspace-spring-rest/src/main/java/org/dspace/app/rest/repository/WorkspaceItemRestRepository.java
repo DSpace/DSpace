@@ -219,7 +219,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public WorkspaceItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                    String extraField, MultipartFile file) throws Exception {
+                                    MultipartFile file) throws Exception {
 
         Context context = obtainContext();
         WorkspaceItemRest wsi = findOne(id);
@@ -244,7 +244,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                     UploadableStep uploadableStep = (UploadableStep) stepInstance;
                     uploadableStep.doPreProcessing(context, source);
                     ErrorRest err =
-                        uploadableStep.upload(context, submissionService, stepConfig, source, file, extraField);
+                        uploadableStep.upload(context, submissionService, stepConfig, source, file);
                     uploadableStep.doPostProcessing(context, source);
                     if (err != null) {
                         errors.add(err);
@@ -347,7 +347,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     }
 
     @Override
-    public Iterable<WorkspaceItemRest> upload(Context context, HttpServletRequest request, String extraField,
+    public Iterable<WorkspaceItemRest> upload(Context context, HttpServletRequest request,
             MultipartFile uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         File file = Utils.getFile(uploadfile, "upload-loader", "filedataloader");
@@ -467,7 +467,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                                 if (UploadableStep.class.isAssignableFrom(stepClass)) {
                                     UploadableStep uploadableStep = (UploadableStep) stepInstance;
                                     ErrorRest err = uploadableStep.upload(context, submissionService, stepConfig, wi,
-                                            uploadfile, extraField);
+                                            uploadfile);
                                     if (err != null) {
                                         errors.add(err);
                                     }
