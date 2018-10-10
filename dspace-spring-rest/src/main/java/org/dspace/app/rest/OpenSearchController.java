@@ -18,39 +18,39 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.dom.DOMSource;
-import org.w3c.dom.Document;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.boot.autoconfigure.web.ErrorController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.ScopeResolver;
+import org.dspace.app.util.SyndicationFeed;
+import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
-import org.dspace.core.LogManager;
-import org.dspace.core.Context;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.content.DSpaceObject;
-import org.dspace.app.util.SyndicationFeed;
-import org.dspace.app.util.factory.UtilServiceFactory;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
+
+import org.springframework.boot.autoconfigure.web.ErrorController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import org.w3c.dom.Document;
 
 /**
  * This class provides a controller for OpenSearch support.
@@ -80,10 +80,10 @@ public class OpenSearchController implements ErrorController {
     @GetMapping("/search")
     public void search(HttpServletRequest request,
                          HttpServletResponse response,
-                         @RequestParam(name="query", required=false) String query,
-                         @RequestParam(name="start", required=false) Integer start,
-                         @RequestParam(name="rpp", required=false) Integer count,
-                         @RequestParam(name="format", required=false) String format,
+                         @RequestParam(name = "query", required = false) String query,
+                         @RequestParam(name = "start", required = false) Integer start,
+                         @RequestParam(name = "rpp", required = false) Integer count,
+                         @RequestParam(name = "format", required = false) String format,
                          Model model) throws IOException, ServletException {
         context = ContextUtil.obtainContext(request);
         if (start == null) {
@@ -92,22 +92,23 @@ public class OpenSearchController implements ErrorController {
         if (count == null) {
             count = -1;
         }
-        openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
+        if (openSearchService == null) {
+            openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
+        }
         if (openSearchService.isEnabled()) {
+            init();
             // get enough request parameters to decide on action to take
-            if (format == null || "".equals(format))
-            {
+            if (format == null || "".equals(format)) {
                 // default to atom
                 format = "atom";
             }
 
-            log.debug("Searching for "+query+" in format "+format);
+            log.debug("Searching for " + query + " in format " + format);
 
             // do some sanity checking
             // TODO: make that work correctly
-            if (!openSearchService.getFormats().contains(format))
-            {
-                String err = "Format "+format+" is not supported.";
+            if (!openSearchService.getFormats().contains(format)) {
+                String err = "Format " + format + " is not supported.";
                 response.setContentType("text/html");
                 response.setContentLength(err.length());
                 response.getWriter().write(err);
@@ -126,13 +127,10 @@ public class OpenSearchController implements ErrorController {
 
             // Perform the search
             DiscoverResult qResults = null;
-            try
-            {
+            try {
                 qResults = SearchUtils.getSearchService().search(context,
                     container, queryArgs);
-            }
-            catch (SearchServiceException e)
-            {
+            } catch (SearchServiceException e) {
                 log.error(
                     LogManager.getHeader(context, "opensearch", "query="
                             + queryArgs.getQuery()
@@ -150,20 +148,16 @@ public class OpenSearchController implements ErrorController {
             Document resultsDoc = openSearchService.getResultsDoc(context, format, query,
                 (int) qResults.getTotalSearchResults(), qResults.getStart(),
                 qResults.getMaxResults(), container, dsoResults, labelMap);
-            try
-            {
+            try {
                 Transformer xf = TransformerFactory.newInstance().newTransformer();
                 response.setContentType(openSearchService.getContentType(format));
                 xf.transform(new DOMSource(resultsDoc),
                     new StreamResult(response.getWriter()));
-            }
-            catch (TransformerException e)
-            {
+            } catch (TransformerException e) {
                 log.error(e);
                 throw new ServletException(e.toString());
             }
-        }
-        else {
+        } else {
             log.debug("OpenSearch Service is disabled");
             String err = "OpenSearch Service is disabled";
             response.setContentType("text/html");
@@ -180,16 +174,17 @@ public class OpenSearchController implements ErrorController {
     public void service(HttpServletRequest request,
                          HttpServletResponse response) throws IOException {
         log.debug("Show OpenSearch Service document");
-        openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
+        if (openSearchService == null) {
+            openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
+        }
         if (openSearchService.isEnabled()) {
             String svcDescrip = openSearchService.getDescription(null);
-            log.debug("opensearchdescription is "+svcDescrip);
+            log.debug("opensearchdescription is " + svcDescrip);
             response.setContentType(openSearchService
                 .getContentType("opensearchdescription"));
             response.setContentLength(svcDescrip.length());
             response.getWriter().write(svcDescrip);
-        }
-        else {
+        } else {
             log.debug("OpenSearch Service is disabled");
             String err = "OpenSearch Service is disabled";
             response.setContentType("text/html");
@@ -212,16 +207,13 @@ public class OpenSearchController implements ErrorController {
      * Internal method for controller initialization
      * Not used currently
      */
-    private void init()
-    {
-        if (searchIndices == null)
-        {
+    private void init() {
+        if (searchIndices == null) {
             searchIndices = new ArrayList<String>();
             DiscoveryConfiguration discoveryConfiguration = SearchUtils
                     .getDiscoveryConfiguration();
             searchIndices.add("any");
-            for (DiscoverySearchFilter sFilter : discoveryConfiguration.getSearchFilters())
-            {
+            for (DiscoverySearchFilter sFilter : discoveryConfiguration.getSearchFilters()) {
                 searchIndices.add(sFilter.getIndexFieldName());
             }
         }
@@ -230,19 +222,22 @@ public class OpenSearchController implements ErrorController {
         authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     }
 
+    public void setOpenSearchService(OpenSearchService oSS) {
+        openSearchService = oSS;
+    }
+
+
     /**
      * Internal method to get labels for the returned document
      */
-    private Map<String, String> getLabels(HttpServletRequest request)
-    {
+    private Map<String, String> getLabels(HttpServletRequest request) {
         // TODO: get strings from translation file or configuration
         Map<String, String> labelMap = new HashMap<String, String>();
         labelMap.put(SyndicationFeed.MSG_UNTITLED, "notitle");
         labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, "logo.title");
         labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, "general-feed.description");
         labelMap.put(SyndicationFeed.MSG_UITYPE, SyndicationFeed.UITYPE_JSPUI);
-        for (String selector : SyndicationFeed.getDescriptionSelectors())
-        {
+        for (String selector : SyndicationFeed.getDescriptionSelectors()) {
             labelMap.put("metadata." + selector, selector);
         }
         return labelMap;
