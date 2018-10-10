@@ -8,7 +8,11 @@
     http://www.dspace.org/license/
 
 -->
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<!-- 
+    THIS FILE EXISTS TO SIMPLIFY TESTING IN DOCKER.
+    This file overrides the requirement to connect to the legacy rest service over https.
+ -->
+ <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
