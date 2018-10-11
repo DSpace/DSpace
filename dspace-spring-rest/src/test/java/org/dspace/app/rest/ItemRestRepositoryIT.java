@@ -301,8 +301,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
 
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/templateItemOf"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.page.totalElements", is(0)));
+                   .andExpect(status().isNoContent());
         ;
     }
 
