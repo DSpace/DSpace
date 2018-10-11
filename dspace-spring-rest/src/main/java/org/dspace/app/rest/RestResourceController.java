@@ -736,8 +736,9 @@ public class RestResourceController implements InitializingBean {
             EmbeddedPage ep = (EmbeddedPage) resource.getEmbeddedResources().get(rel);
             List<? extends RestAddressableModel> fullList = ep.getFullList();
             if (fullList == null || fullList.size() == 0) {
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                return null;
+                PageImpl<RestAddressableModel> pageResult = new PageImpl(fullList, page, 0);
+                result = assembler.toResource(pageResult);
+                return result;
             }
             int start = page.getOffset();
             int end = (start + page.getPageSize()) > fullList.size() ? fullList.size() : (start + page.getPageSize());
@@ -757,11 +758,9 @@ public class RestResourceController implements InitializingBean {
 
         } else {
             if (resource.getEmbeddedResources().get(rel) == null) {
-                PageImpl<Resource> emptyPage = new PageImpl(new ArrayList<Resource>(), page, 0);
-                return assembler.toResource(emptyPage);
-            } else {
-                return (ResourceSupport) resource.getEmbeddedResources().get(rel);
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
+            return (ResourceSupport) resource.getEmbeddedResources().get(rel);
         }
 
     }
