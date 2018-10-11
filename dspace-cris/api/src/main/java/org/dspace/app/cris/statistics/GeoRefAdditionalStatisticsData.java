@@ -38,47 +38,6 @@ public class GeoRefAdditionalStatisticsData implements
     private static Logger log = Logger
             .getLogger(GeoRefAdditionalStatisticsData.class);
 
-    private Properties countries2Continent = null;
-
-    public Properties getCountries2Continent()
-    {
-
-        if (countries2Continent == null)
-        {
-            countries2Continent = new Properties();
-            FileInputStream fcc = null;
-            // FileInputStream fcn = null;
-            try
-            {
-                fcc = new FileInputStream(ConfigurationManager
-                        .getProperty("dspace.dir")
-                        + "/config/countries2continent.properties");
-                countries2Continent.load(fcc);
-            }
-            catch (Exception notfound)
-            {
-                throw new IllegalArgumentException(
-                        "Failed to load configuration file for GeoRefAdditionalStatisticsData",
-                        notfound);
-            }
-            finally
-            {
-                if (fcc != null)
-                {
-                    try
-                    {
-                        fcc.close();
-                    }
-                    catch (IOException ioe)
-                    {
-                        log.error(ioe.getMessage(), ioe);
-                    }
-                }
-            }
-        }
-        return countries2Continent;
-    }
-
     @Override
     public void addMetadata(SolrInputDocument doc1, HttpServletRequest request,
             DSpaceObject dspaceObject)
@@ -135,13 +94,7 @@ public class GeoRefAdditionalStatisticsData implements
                     && latitude == -180
                     && longitude == -180)
             ) {
-                try {
-                    doc1.addField("continent", LocationUtils
-                        .getContinentCode(countryCode));
-                } catch (Exception e) {
-                    System.out
-                        .println("COUNTRY ERROR: " + countryCode);
-                }
+
                 doc1.addField("countryCode", countryCode);
                 doc1.addField("city", location.getCity().getName());
                 doc1.addField("latitude", latitude);
@@ -150,15 +103,12 @@ public class GeoRefAdditionalStatisticsData implements
                         + longitude);
                 if (countryCode != null)
                 {
-                    String continentCode = getCountries2Continent()
-                            .getProperty(countryCode);
-                    if (continentCode == null)
-                    {
-                        continentCode = getCountries2Continent().getProperty("default");
-                    }
-                    if (continentCode != null)
-                    {
-                        doc1.addField("continent", continentCode);
+                    try {
+                        doc1.addField("continent", LocationUtils
+                            .getContinentCode(countryCode));
+                    } catch (Exception e) {
+                        System.out
+                            .println("COUNTRY ERROR: " + countryCode);
                     }
                 }
             }
