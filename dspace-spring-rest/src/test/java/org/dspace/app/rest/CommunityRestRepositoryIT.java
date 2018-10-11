@@ -7,17 +7,27 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Arrays;
 import java.util.UUID;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.matcher.CommunityMatcher;
+import org.dspace.app.rest.matcher.CommunityMetadataMatcher;
+import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -25,6 +35,102 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Test
+    public void createTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        ObjectMapper mapper = new ObjectMapper();
+        CommunityRest comm = new CommunityRest();
+        // We send a name but the created community should set this to the title
+        comm.setName("Test Top-Level Community");
+
+        MetadataEntryRest description = new MetadataEntryRest();
+        description.setKey("dc.description");
+        description.setValue("<p>Some cool HTML code here</p>");
+
+        MetadataEntryRest abs = new MetadataEntryRest();
+        abs.setKey("dc.description.abstract");
+        abs.setValue("Sample top-level community created via the REST API");
+
+        MetadataEntryRest contents = new MetadataEntryRest();
+        contents.setKey("dc.description.tableofcontents");
+        contents.setValue("<p>HTML News</p>");
+
+        MetadataEntryRest copyright = new MetadataEntryRest();
+        copyright.setKey("dc.rights");
+        copyright.setValue("Custom Copyright Text");
+
+        MetadataEntryRest title = new MetadataEntryRest();
+        title.setKey("dc.title");
+        title.setValue("Title Text");
+
+        comm.setMetadata(Arrays.asList(description,
+                                       abs,
+                                       contents,
+                                       copyright,
+                                       title));
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/core/communities")
+                                        .content(mapper.writeValueAsBytes(comm))
+                                        .contentType(contentType))
+                   .andExpect(status().isCreated())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                               hasJsonPath("$.id", not(empty())),
+                               hasJsonPath("$.uuid", not(empty())),
+                               hasJsonPath("$.name", is("Title Text")),
+                               hasJsonPath("$.handle", not(empty())),
+                               hasJsonPath("$.type", is("community")),
+                               hasJsonPath("$._links.collections.href", not(empty())),
+                               hasJsonPath("$._links.logo.href", not(empty())),
+                               hasJsonPath("$._links.subcommunities.href", not(empty())),
+                               hasJsonPath("$._links.self.href", not(empty())),
+                               hasJsonPath("$.metadata", Matchers.containsInAnyOrder(
+                                   CommunityMetadataMatcher.matchMetadata("dc.description",
+                                           "<p>Some cool HTML code here</p>"),
+                                   CommunityMetadataMatcher.matchMetadata("dc.description.abstract",
+                                           "Sample top-level community created via the REST API"),
+                                   CommunityMetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                           "<p>HTML News</p>"),
+                                   CommunityMetadataMatcher.matchMetadata("dc.rights",
+                                           "Custom Copyright Text"),
+                                   CommunityMetadataMatcher.matchMetadata("dc.title",
+                                           "Title Text")
+                               )))));
+
+    }
+
+    @Test
+    public void createUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        ObjectMapper mapper = new ObjectMapper();
+        CommunityRest comm = new CommunityRest();
+        comm.setName("Test Top-Level Community");
+
+        MetadataEntryRest title = new MetadataEntryRest();
+        title.setKey("dc.title");
+        title.setValue("Title Text");
+
+        comm.setMetadata(Arrays.asList(title));
+
+        // Anonymous user tries to create a community.
+        // Should fail because user is not authenticated. Error 401.
+        getClient().perform(post("/api/core/communities")
+                                        .content(mapper.writeValueAsBytes(comm))
+                                        .contentType(contentType))
+                   .andExpect(status().isUnauthorized());
+
+        // Non-admin Eperson tries to create a community.
+        // Should fail because user doesn't have permissions. Error 403.
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(post("/api/core/communities")
+                                        .content(mapper.writeValueAsBytes(comm))
+                                        .contentType(contentType))
+                   .andExpect(status().isForbidden());
+    }
 
     @Test
     public void findAllTest() throws Exception {
