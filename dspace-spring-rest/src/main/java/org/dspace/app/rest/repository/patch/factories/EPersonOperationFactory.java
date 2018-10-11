@@ -47,9 +47,9 @@ public class EPersonOperationFactory {
      *
      * @param path the operation path
      * @return the patch operation implementation
+     * @throws PatchBadRequestException
      */
-    public ResourcePatchOperation<EPersonRest> getReplaceOperationForPath(String path)
-        throws PatchBadRequestException {
+    public ResourcePatchOperation<EPersonRest> getReplaceOperationForPath(String path) {
 
         switch (path) {
             case OPERATION_PASSWORD_CHANGE:

@@ -14,10 +14,10 @@ import org.dspace.app.rest.model.patch.Operation;
 /**
  * The patch interface used by repository classes.
  * @param <R>
+ * @throws PatchBadRequestException
  */
 public interface ResourcePatchOperation<R extends RestModel> {
 
-    R perform(R resource, Operation operation)
-            throws PatchBadRequestException;
+    R perform(R resource, Operation operation);
 
 }

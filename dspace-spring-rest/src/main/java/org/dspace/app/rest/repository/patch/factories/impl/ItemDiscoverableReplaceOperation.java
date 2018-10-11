@@ -19,29 +19,19 @@ import org.springframework.stereotype.Component;
  * Example: <code>
  * curl -X PATCH http://${dspace.url}/api/item/<:id-item> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
- * /discoverable", "value": "true|false"]'
+ * /discoverable", "value": true|false]'
  * </code>
  *
  *  @author Michael Spalti
  */
 @Component
-public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<ItemRest, String> {
+public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<ItemRest, Boolean> {
 
     private static final Logger log = Logger.getLogger(ItemDiscoverableReplaceOperation.class);
 
-    @Override
-    public ItemRest perform(ItemRest item, Operation operation)
-            throws PatchBadRequestException {
-
-        return replace(item, operation);
-
-    }
 
     @Override
     public ItemRest replace(ItemRest item, Operation operation) {
-
-        checkOperationValue(operation.getValue());
-        checkModelForExistingValue(item.getDiscoverable());
 
         Boolean discoverable = getBooleanOperationValue(operation.getValue());
         item.setDiscoverable(discoverable);
@@ -49,12 +39,19 @@ public class ItemDiscoverableReplaceOperation extends ReplacePatchOperation<Item
 
     }
 
-    protected Class<String[]> getArrayClassForEvaluation() {
-        return String[].class;
+    @Override
+    void checkModelForExistingValue(ItemRest resource) {
+        if ((Object) resource.getDiscoverable() == null) {
+            throw new PatchBadRequestException("Attempting to replace a non-existent value.");
+        }
     }
 
-    protected Class<String> getClassForEvaluation() {
-        return String.class;
+    protected Class<Boolean[]> getArrayClassForEvaluation() {
+        return Boolean[].class;
+    }
+
+    protected Class<Boolean> getClassForEvaluation() {
+        return Boolean.class;
     }
 
 }
