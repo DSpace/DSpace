@@ -12,10 +12,11 @@ import org.apache.log4j.Logger;
 /**
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class DescribeStep extends MetadataStep {
+public class ExtractionStep extends MetadataStep {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(DescribeStep.class);
+    private static Logger log = Logger
+        .getLogger(ExtractionStep.class);
 
 }
