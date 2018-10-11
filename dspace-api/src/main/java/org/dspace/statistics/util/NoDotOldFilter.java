@@ -5,9 +5,6 @@
  *
  * http://www.dspace.org/license/
  */
-/**
- * 
- */
 package org.dspace.statistics.util;
 
 import java.io.File;
