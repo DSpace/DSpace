@@ -9,51 +9,34 @@ package org.dspace.curate;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import java.net.HttpURLConnection;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.apache.log4j.Logger;
+
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.dspace.handle.HandleManager;
-import org.dspace.app.util.DCInput;
-import org.dspace.app.util.DCInputSet;
-import org.dspace.app.util.DCInputsReader;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.Bundle;
-import org.dspace.content.Bitstream;
-import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
@@ -62,8 +45,11 @@ import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.utils.DSpace;
 
-import org.apache.log4j.Logger;
-import org.datadryad.api.DryadJournalConcept;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 
 /**
  * TransferToDash processes a data package and sends it to a DASH-based Dryad system.
@@ -92,7 +78,7 @@ public class TransferToDash extends AbstractCurationTask {
     private static long total = 0;
     private Context context;
     private String dashServer;
-    private String token;
+    private String oauthToken;
 
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
@@ -110,10 +96,10 @@ public class TransferToDash extends AbstractCurationTask {
         
         // init oauth connection with DASH
         dashServer = ConfigurationManager.getProperty("dash.server");
-        String dashUser = ConfigurationManager.getProperty("dash.username");
-        String dashPass = ConfigurationManager.getProperty("dash.password");
+        String dashUser = ConfigurationManager.getProperty("dash.application_id");
+        String dashPass = ConfigurationManager.getProperty("dash.application_secret");
         
-        token = getOAUTHtoken(dashServer, dashUser, dashPass);
+        oauthToken = getOAUTHtoken(dashServer, dashUser, dashPass);
     }
     
     private String getOAUTHtoken(String dashServer, String dashUser, String dashPass) {
@@ -121,9 +107,9 @@ public class TransferToDash extends AbstractCurationTask {
         String url = dashServer + "/oauth/token";
         String auth = dashUser + ":" + dashPass;
         String authentication = Base64.getEncoder().encodeToString(auth.getBytes());
-        String token = "";
         Pattern pat = Pattern.compile(".*\"access_token\"\\s*:\\s*\"([^\"]+)\".*");
-        
+        String token = "";
+
         try {
             URL urlObj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) urlObj.openConnection();
@@ -334,7 +320,7 @@ public class TransferToDash extends AbstractCurationTask {
             //connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
-            connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
 
