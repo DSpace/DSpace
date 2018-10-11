@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.GroupConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.GroupResource;
@@ -26,6 +27,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -87,7 +89,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
         try {
             group = gs.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (group == null) {
             return null;
@@ -104,7 +106,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
             total = gs.countTotal(context);
             groups = gs.findAll(context, null, pageable.getPageSize(), pageable.getOffset());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total).map(converter);
         return page;

@@ -31,8 +31,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.JsonPatchConverter;
+import org.dspace.app.rest.exception.LinkMethodException;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.RESTIOException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
@@ -680,8 +682,8 @@ public class RestResourceController implements InitializingBean {
                 Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
                 halResources.forEach(linkService::addLinks);
                 return assembler.toResource(halResources, link);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                throw new RuntimeException(e.getMessage(), e);
+            } catch (IllegalAccessException  | InvocationTargetException e) {
+                throw new IllegalStateException(e.getMessage(), e);
             }
         }
         return null;
@@ -717,8 +719,8 @@ public class RestResourceController implements InitializingBean {
             Method linkMethod = repositoryUtils.getLinkMethod(linkRest.method(), linkRepository);
 
             if (linkMethod == null) {
-                // TODO custom exception
-                throw new RuntimeException(
+                // custom exception
+                throw new LinkMethodException(
                         "Method for relation " + subpath + " not found: " + linkRest.name() + ":" + linkRest.method());
             } else {
                 try {
@@ -927,7 +929,7 @@ public class RestResourceController implements InitializingBean {
                 try {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 } catch (IOException e) {
-                    throw new RuntimeException(e.getMessage(), e);
+                    throw new RESTIOException(e.getMessage(), e);
                 }
                 return null;
             }

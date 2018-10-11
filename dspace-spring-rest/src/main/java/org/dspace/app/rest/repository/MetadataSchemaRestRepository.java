@@ -11,12 +11,14 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.rest.converter.MetadataSchemaConverter;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.model.hateoas.MetadataSchemaResource;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -44,7 +46,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         try {
             metadataSchema = metaScemaService.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (metadataSchema == null) {
             return null;
@@ -58,7 +60,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         try {
             metadataSchema = metaScemaService.findAll(context);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable).map(converter);
         return page;

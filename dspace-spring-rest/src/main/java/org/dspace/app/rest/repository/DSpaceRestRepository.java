@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
+import org.dspace.app.rest.exception.RESTDCInputsReaderException;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestAddressableModel;
@@ -164,7 +166,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (SQLException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
+            throw new RESTSQLException(ex.getMessage(), ex);
         }
     }
 
@@ -268,7 +270,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (SQLException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
+            throw new RESTSQLException(ex.getMessage(), ex);
         }
     }
 
@@ -332,8 +334,10 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
             context.commit();
         } catch (AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);
-        } catch (SQLException | DCInputsReaderException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new RESTSQLException(e.getMessage(), e);
+        } catch (DCInputsReaderException e) {
+            throw new RESTDCInputsReaderException(e.getMessage(), e);
         }
         return findOne(id);
     }

@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
@@ -25,6 +26,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -72,7 +74,7 @@ public class WorkspaceItemConverter
         try {
             submitter = obj.getSubmitter();
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
 
         witem.setId(obj.getID());

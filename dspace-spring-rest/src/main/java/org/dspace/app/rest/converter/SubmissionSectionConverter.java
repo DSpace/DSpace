@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.exception.RESTSubmissionConfigReaderException;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
@@ -48,7 +49,7 @@ public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepCo
         try {
             step = getSubmissionConfigReader().getStepConfig(obj.getId());
         } catch (SubmissionConfigReaderException e) {
-            throw new RuntimeException(e);
+            throw new RESTSubmissionConfigReaderException(e);
         }
         return step;
     }

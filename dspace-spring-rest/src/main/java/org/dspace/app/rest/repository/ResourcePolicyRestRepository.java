@@ -10,6 +10,7 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 
 import org.dspace.app.rest.converter.ResourcePolicyConverter;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.hateoas.ResourcePolicyResource;
@@ -18,6 +19,7 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,7 +49,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         try {
             source = resourcePolicyService.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (source == null) {
             return null;

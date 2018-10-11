@@ -15,6 +15,7 @@ import java.util.UUID;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CollectionResource;
@@ -25,6 +26,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -62,7 +64,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
         try {
             collection = cs.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (collection == null) {
             return null;
@@ -82,7 +84,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
                 collections.add(c);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<CollectionRest> page = new PageImpl<Collection>(collections, pageable, total).map(converter);
         return page;
@@ -106,7 +108,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
                 collections.add(c);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         Page<CollectionRest> page = utils.getPage(collections, pageable).map(converter);
         return page;
@@ -123,7 +125,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
                 collections.add(c);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         Page<CollectionRest> page = utils.getPage(collections, pageable).map(converter);
         return page;

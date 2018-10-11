@@ -25,16 +25,18 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
      * Handles the patch operations. Patch implementations are provided by subclasses.
      * The default methods throw an UnprocessableEntityException.
      *
-     * @param restModel the rest resource to patch
+     * @param restModel  the rest resource to patch
      * @param operations list of patch operations
      * @throws UnprocessableEntityException
      * @throws PatchBadRequestException
      */
+
     public RestModel patch(R restModel, List<Operation> operations) {
 
         // Note: the list of possible operations is taken from JsonPatchConverter class. Does not implement
         // test https://tools.ietf.org/html/rfc6902#section-4.6
-        ops: for (Operation op : operations) {
+        ops:
+        for (Operation op : operations) {
             switch (op.getOp()) {
                 case "add":
                     restModel = add(restModel, op);
@@ -64,35 +66,43 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
 
     protected R add(R restModel, Operation operation)
             throws UnprocessableEntityException, PatchBadRequestException {
+
         throw new UnprocessableEntityException(
                 "The add operation is not supported."
         );
     }
+
 
     protected R replace(R restModel, Operation operation)
             throws UnprocessableEntityException, PatchBadRequestException {
         throw new UnprocessableEntityException(
                 "The replace operation is not supported."
         );
+
     }
 
     protected R remove(R restModel, Operation operation)
 
             throws UnprocessableEntityException, PatchBadRequestException {
+
         throw new UnprocessableEntityException(
                 "The remove operation is not supported."
         );
     }
 
+
     protected R copy(R restModel, Operation operation)
             throws UnprocessableEntityException, PatchBadRequestException {
+
         throw new UnprocessableEntityException(
                 "The copy operation is not supported."
         );
     }
 
+
     protected R move(R restModel, Operation operation)
             throws UnprocessableEntityException, PatchBadRequestException {
+
         throw new UnprocessableEntityException(
                 "The move operation is not supported."
         );

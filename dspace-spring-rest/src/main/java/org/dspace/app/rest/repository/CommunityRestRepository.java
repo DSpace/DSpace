@@ -21,6 +21,7 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
@@ -29,6 +30,7 @@ import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -94,7 +96,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
         try {
             community = cs.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (community == null) {
             return null;
@@ -114,7 +116,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
                 communities.add(c);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<CommunityRest> page = new PageImpl<Community>(communities, pageable, total).map(converter);
         return page;
@@ -128,7 +130,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
         try {
             topCommunities = cs.findAllTop(obtainContext());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         Page<CommunityRest> page = utils.getPage(topCommunities, pageable).map(converter);
         return page;
@@ -149,7 +151,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
             }
             subCommunities = community.getSubcommunities();
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         Page<CommunityRest> page = utils.getPage(subCommunities, pageable).map(converter);
         return page;

@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.RESTIOException;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
@@ -29,6 +31,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -68,7 +71,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         try {
             item = is.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (item == null) {
             return null;
@@ -90,7 +93,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
                 items.add(i);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(converter);
         return page;
@@ -168,12 +171,14 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
                         + "It's a template for a collection");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         try {
             is.delete(context, item);
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new RESTSQLException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new RESTIOException(e.getMessage(), e);
         }
     }
 

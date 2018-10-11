@@ -11,12 +11,14 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -46,7 +48,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         try {
             bit = bfs.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (bit == null) {
             return null;
@@ -60,7 +62,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         try {
             bit = bfs.findAll(context);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<BitstreamFormatRest> page = utils.getPage(bit, pageable).map(converter);
         return page;

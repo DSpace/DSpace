@@ -14,6 +14,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.hateoas.AuthorityEntryResource;
@@ -67,7 +68,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
             try {
                 collection = cs.find(context, UUID.fromString(uuidCollectìon));
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new RESTSQLException(e.getMessage(), e);
             }
         }
         List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();

@@ -51,14 +51,14 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         }
     }
 
-    @ExceptionHandler(SQLException.class)
+    @ExceptionHandler({SQLException.class, RESTSQLException.class})
     protected void handleSQLException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
         sendErrorResponse(request, response, ex,
                           "An internal database error occurred", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(IOException.class)
+    @ExceptionHandler({IOException.class, RESTIOException.class})
     protected void handleIOException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
         sendErrorResponse(request, response, ex,

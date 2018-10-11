@@ -13,12 +13,14 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.rest.converter.SiteConverter;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.hateoas.SiteResource;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +51,7 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
         try {
             site = sitesv.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (site == null) {
             return null;
@@ -64,7 +66,7 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
         try {
             sites.add(sitesv.findSite(context));
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(converter);
         return page;

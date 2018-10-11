@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.rest.converter.BitstreamConverter;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
+import org.dspace.app.rest.exception.RESTIOException;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
@@ -24,6 +27,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -58,7 +62,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         try {
             bit = bs.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         if (bit == null) {
             return null;
@@ -68,7 +72,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
                 throw new ResourceNotFoundException();
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         return converter.fromModel(bit);
     }
@@ -86,7 +90,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
                 bit.add(it.next());
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<BitstreamRest> page = new PageImpl<Bitstream>(bit, pageable, total).map(converter);
         return page;
@@ -111,12 +115,14 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
                 throw new UnprocessableEntityException("The bitstream cannot be deleted it is a logo");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         try {
             bs.delete(context, bit);
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new RESTSQLException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new RESTIOException(e.getMessage(), e);
         }
     }
 
@@ -126,7 +132,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         try {
             bit = bs.find(context, uuid);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         if (bit == null) {
             return null;
@@ -134,8 +140,12 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         InputStream is;
         try {
             is = bs.retrieve(context, bit);
-        } catch (IOException | SQLException | AuthorizeException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new RESTSQLException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new RESTIOException(e.getMessage(), e);
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
         }
         context.abort();
         return is;

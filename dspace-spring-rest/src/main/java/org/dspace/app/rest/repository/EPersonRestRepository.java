@@ -36,6 +36,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -110,7 +111,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         try {
             eperson = es.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (eperson == null) {
             return null;
@@ -131,7 +132,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
             total = es.countTotal(context);
             epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(), pageable.getOffset());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(converter);
         return page;

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.app.rest.converter.BrowseIndexConverter;
+import org.dspace.app.rest.exception.RESTBrowseException;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.hateoas.BrowseIndexResource;
 import org.dspace.browse.BrowseException;
@@ -39,7 +40,7 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
         try {
             bix = BrowseIndex.getBrowseIndex(name);
         } catch (BrowseException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTBrowseException(e.getMessage(), e);
         }
         if (bix != null) {
             bi = converter.convert(bix);
@@ -59,7 +60,7 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
                 indexesList.add(bix);
             }
         } catch (BrowseException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTBrowseException(e.getMessage(), e);
         }
         Page<BrowseIndexRest> page = new PageImpl<BrowseIndex>(indexesList, pageable, total).map(converter);
         return page;

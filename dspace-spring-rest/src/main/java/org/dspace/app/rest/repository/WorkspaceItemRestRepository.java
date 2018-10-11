@@ -28,6 +28,7 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.model.ErrorRest;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.app.rest.model.patch.Operation;
@@ -62,6 +63,7 @@ import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -119,7 +121,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         try {
             witem = wis.find(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (witem == null) {
             return null;
@@ -136,7 +138,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             total = wis.countTotal(context);
             witems = wis.findAll(context, pageable.getPageSize(), pageable.getOffset());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter);
         return page;
@@ -154,7 +156,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             witems = wis.findByEPerson(context, ep, pageable.getPageSize(), pageable.getOffset());
             total = wis.countByEPerson(context, ep);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter);
         return page;
