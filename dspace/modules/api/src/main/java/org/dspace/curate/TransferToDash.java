@@ -96,8 +96,8 @@ public class TransferToDash extends AbstractCurationTask {
         
         // init oauth connection with DASH
         dashServer = ConfigurationManager.getProperty("dash.server");
-        String dashAppID = ConfigurationManager.getProperty("dash.application_id");
-        String dashAppSecret = ConfigurationManager.getProperty("dash.application_secret");
+        String dashAppID = ConfigurationManager.getProperty("dash.application.id");
+        String dashAppSecret = ConfigurationManager.getProperty("dash.application.secret");
         
         oauthToken = getOAUTHtoken(dashServer, dashAppID, dashAppSecret);
     }
@@ -274,7 +274,7 @@ public class TransferToDash extends AbstractCurationTask {
 		report("Object has a fatal error: " + handle + "\n" + e.getMessage());
 		
 		context.abort();
-		return Curator.CURATE_SKIP;
+                return Curator.CURATE_SKIP;
 	    }
 
             // write this item to json
@@ -313,14 +313,15 @@ public class TransferToDash extends AbstractCurationTask {
     }
 
     private void sendToDash(String jsonString) {
-        BufferedReader reader = null;                 
+        BufferedReader reader = null;
+
+        //TODO: replace this pattern matching with real JSON parsing
         Pattern datasetIDPattern = Pattern.compile("(/api/datasets/.+?)\"},"); 
         
         try {
             URL url = new URL(dashServer + "/api/datasets");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            //connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setDoOutput(true);
