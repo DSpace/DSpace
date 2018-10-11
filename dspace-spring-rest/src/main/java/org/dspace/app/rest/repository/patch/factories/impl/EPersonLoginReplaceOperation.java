@@ -18,42 +18,38 @@ import org.springframework.stereotype.Component;
  * Example: <code>
  * curl -X PATCH http://${dspace.url}/api/epersons/eperson/<:id-eperson> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
- * /canLogin", "value": "true|false"]'
+ * /canLogin", "value": true|false]'
  * </code>
  *
  * @author Michael Spalti
  */
 @Component
-public class EPersonLoginReplaceOperation extends ReplacePatchOperation<EPersonRest, String>
+public class EPersonLoginReplaceOperation extends ReplacePatchOperation<EPersonRest, Boolean>
         implements ResourcePatchOperation<EPersonRest> {
 
-    @Override
-    public EPersonRest perform(EPersonRest resource, Operation operation)
-            throws PatchBadRequestException {
-
-        return replace(resource, operation);
-    }
 
     @Override
-    public EPersonRest replace(EPersonRest eperson, Operation operation)
-            throws PatchBadRequestException {
-
-        checkOperationValue(operation.getValue());
-        checkModelForExistingValue(eperson.isCanLogIn());
+    public EPersonRest replace(EPersonRest eperson, Operation operation) {
 
         Boolean canLogin = getBooleanOperationValue(operation.getValue());
         eperson.setCanLogIn(canLogin);
         return eperson;
-
     }
 
     @Override
-    protected Class<String[]> getArrayClassForEvaluation() {
-        return String[].class;
+    void checkModelForExistingValue(EPersonRest resource) {
+        if ((Object) resource.isCanLogIn() == null) {
+            throw new PatchBadRequestException("Attempting to replace a non-existent value.");
+        }
     }
 
     @Override
-    protected Class<String> getClassForEvaluation() {
-        return String.class;
+    protected Class<Boolean[]> getArrayClassForEvaluation() {
+        return Boolean[].class;
+    }
+
+    @Override
+    protected Class<Boolean> getClassForEvaluation() {
+        return Boolean.class;
     }
 }

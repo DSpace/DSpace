@@ -18,28 +18,17 @@ import org.springframework.stereotype.Component;
  * Example: <code>
  * curl -X PATCH http://${dspace.url}/api/epersons/eperson/<:id-eperson> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
- * /certificate", "value": "true|false"]'
+ * /certificate", "value": true|false]'
  * </code>
  *
  * @author Michael Spalti
  */
 @Component
-public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EPersonRest, String>
+public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EPersonRest, Boolean>
         implements ResourcePatchOperation<EPersonRest> {
 
     @Override
-    public EPersonRest perform(EPersonRest resource, Operation operation)
-            throws PatchBadRequestException {
-
-        return replace(resource, operation);
-    }
-
-    @Override
-    public EPersonRest replace(EPersonRest eperson, Operation operation)
-            throws PatchBadRequestException {
-
-        checkOperationValue(operation.getValue());
-        checkModelForExistingValue(eperson.isRequireCertificate());
+    public EPersonRest replace(EPersonRest eperson, Operation operation) {
 
         Boolean requireCert = getBooleanOperationValue(operation.getValue());
         eperson.setRequireCertificate(requireCert);
@@ -48,12 +37,22 @@ public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EP
     }
 
     @Override
-    protected Class<String[]> getArrayClassForEvaluation() {
-        return String[].class;
+    void checkModelForExistingValue(EPersonRest resource) {
+        // TODO: many (all?) boolean values on the rest model should never be null.
+        // So perhaps the error to throw in this case is different...IllegalStateException?
+        // Or perhaps do nothing (no check is required).
+        if ((Object) resource.isRequireCertificate() == null) {
+            throw new PatchBadRequestException("Attempting to replace a non-existent value.");
+        }
     }
 
     @Override
-    protected Class<String> getClassForEvaluation() {
-        return String.class;
+    protected Class<Boolean[]> getArrayClassForEvaluation() {
+        return Boolean[].class;
+    }
+
+    @Override
+    protected Class<Boolean> getClassForEvaluation() {
+        return Boolean.class;
     }
 }

@@ -28,22 +28,17 @@ public class EPersonNetidReplaceOperation extends ReplacePatchOperation<EPersonR
         implements ResourcePatchOperation<EPersonRest> {
 
     @Override
-    public EPersonRest perform(EPersonRest resource, Operation operation)
-            throws PatchBadRequestException {
+    EPersonRest replace(EPersonRest eperson, Operation operation) {
 
-        return replace(resource, operation);
-
+        eperson.setNetid((String) operation.getValue());
+        return eperson;
     }
 
     @Override
-    EPersonRest replace(EPersonRest eperson, Operation operation) throws PatchBadRequestException {
-
-        checkOperationValue(operation.getValue());
-        checkModelForExistingValue(eperson.getNetid());
-
-        eperson.setNetid((String) operation.getValue());
-
-        return eperson;
+    void checkModelForExistingValue(EPersonRest resource) {
+        if (resource.getNetid() == null) {
+            throw new PatchBadRequestException("Attempting to replace a non-existent value.");
+        }
     }
 
     @Override
