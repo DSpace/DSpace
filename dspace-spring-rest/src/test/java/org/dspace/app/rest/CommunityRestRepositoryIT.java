@@ -187,11 +187,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(content().contentType(contentType));
 
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/logo"))
-                   .andExpect(status().isNoContent());
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         //Main community has no collections, therefore contentType is not set
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/collections"))
-                   .andExpect(status().isNoContent());
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/collections"))
                    .andExpect(status().isOk())
@@ -203,7 +205,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //child1 subcommunity has no subcommunities, therefore contentType is not set
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/subcommunities"))
-                   .andExpect(status().isNoContent());
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
 
