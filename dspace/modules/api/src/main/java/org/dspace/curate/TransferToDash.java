@@ -96,16 +96,16 @@ public class TransferToDash extends AbstractCurationTask {
         
         // init oauth connection with DASH
         dashServer = ConfigurationManager.getProperty("dash.server");
-        String dashUser = ConfigurationManager.getProperty("dash.application_id");
-        String dashPass = ConfigurationManager.getProperty("dash.application_secret");
+        String dashAppID = ConfigurationManager.getProperty("dash.application_id");
+        String dashAppSecret = ConfigurationManager.getProperty("dash.application_secret");
         
-        oauthToken = getOAUTHtoken(dashServer, dashUser, dashPass);
+        oauthToken = getOAUTHtoken(dashServer, dashAppID, dashAppSecret);
     }
     
-    private String getOAUTHtoken(String dashServer, String dashUser, String dashPass) {
+    private String getOAUTHtoken(String dashServer, String dashAppID, String dashAppSecret) {
         
         String url = dashServer + "/oauth/token";
-        String auth = dashUser + ":" + dashPass;
+        String auth = dashAppID + ":" + dashAppSecret;
         String authentication = Base64.getEncoder().encodeToString(auth.getBytes());
         Pattern pat = Pattern.compile(".*\"access_token\"\\s*:\\s*\"([^\"]+)\".*");
         String token = "";
