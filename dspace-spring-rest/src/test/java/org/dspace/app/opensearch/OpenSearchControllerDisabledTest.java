@@ -7,18 +7,17 @@
  */
 package org.dspace.app.opensearch;
 
+/*
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+*/
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.springframework.mock.web.MockHttpServletResponse;
 
 /*
 import org.dspace.app.rest.OpenSearchController;
@@ -36,13 +35,14 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.Group;
 */
+
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.junit.Test;
-import org.junit.Before;
-import org.springframework.test.web.servlet.MockMvc;
+
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Integration test to test the /opensearch endpoint
