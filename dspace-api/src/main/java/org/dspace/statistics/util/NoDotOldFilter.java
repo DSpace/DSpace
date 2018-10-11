@@ -1,4 +1,11 @@
 /**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+/**
  * 
  */
 package org.dspace.statistics.util;
@@ -7,15 +14,15 @@ import java.io.File;
 import java.io.FileFilter;
 
 /**
- * @author uhahn
+ * @author Ulrich Hahn
  *
  */
 public class NoDotOldFilter implements FileFilter {
 
 	/**
-	 * all files with ending .old are fitered out
-	 * motivation: each "ant update" run backs up changed config files with .old extensions
-	 * these files were read unexpectedly in addition to the current config files 
+	 * All files with ending .old are fitered out.
+	 * Motivation: each "ant update" run backs up changed config files with .old extensions.
+	 * These files were read unexpectedly in addition to the current config files.
 	 */
 
 	/* (non-Javadoc)
@@ -23,7 +30,7 @@ public class NoDotOldFilter implements FileFilter {
 	 */
 	@Override
 	public boolean accept(File inFile) {
-		if(inFile.getName().matches(".*\\.old$"))
+		if(inFile.getName().matches(".+\\.old$"))
 			return false;
 		return true;
 	}
