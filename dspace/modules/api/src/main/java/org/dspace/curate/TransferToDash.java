@@ -107,7 +107,7 @@ public class TransferToDash extends AbstractCurationTask {
         String url = dashServer + "/oauth/token";
         String auth = dashAppID + ":" + dashAppSecret;
         String authentication = Base64.getEncoder().encodeToString(auth.getBytes());
-        Pattern pat = Pattern.compile(".*\"access_token\"\\s*:\\s*\"([^\"]+)\".*");
+        Pattern tokenPattern = Pattern.compile(".*\"access_token\"\\s*:\\s*\"([^\"]+)\".*");
         String token = "";
 
         try {
@@ -129,7 +129,7 @@ public class TransferToDash extends AbstractCurationTask {
                 out.append(line);
             }
             String response = out.toString();
-            Matcher matcher = pat.matcher(response);
+            Matcher matcher = tokenPattern.matcher(response);
             if (matcher.matches() && matcher.groupCount() > 0) {
                 token = matcher.group(1);
             }
@@ -313,7 +313,9 @@ public class TransferToDash extends AbstractCurationTask {
     }
 
     private void sendToDash(String jsonString) {
-        BufferedReader reader = null;
+        BufferedReader reader = null;                 
+        Pattern datasetIDPattern = Pattern.compile("(/api/datasets/.+?)\"},"); 
+        
         try {
             URL url = new URL(dashServer + "/api/datasets");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -334,7 +336,15 @@ public class TransferToDash extends AbstractCurationTask {
             while ((line = reader.readLine()) != null) {
                 out.append(line);
             }
+
             String response = out.toString();
+            String datasetID = "";
+            Matcher matcher = datasetIDPattern.matcher(response);
+            if (matcher.matches() && matcher.groupCount() > 0) {
+                datasetID = matcher.group(1);
+            }
+
+            log.info("got dataset ID " + datasetID);
             System.out.println("##### " + response);
         } catch (Exception e) {
             log.fatal("Unable to send item to DASH", e);
