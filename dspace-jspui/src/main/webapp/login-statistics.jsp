@@ -12,7 +12,7 @@
 
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="org.dspace.app.webui.components.StatisticsBean"  %>
@@ -20,7 +20,7 @@
 <dspace:layout titlekey="jsp.loginStatistics.title" navbar="admin">
 <h1><fmt:message key="jsp.loginStatistics.title"/></h1>
 <div>
-        <span class="label label-info">from:</span>&nbsp; ${stats_from_date} &nbsp;&nbsp;&nbsp; <span class="label label-info">to:</span> &nbsp; ${stats_to_date}
+        <span class="label label-info">from:</span>&nbsp; ${fn:escapeXML(stats_from_date)} &nbsp;&nbsp;&nbsp; <span class="label label-info">to:</span> &nbsp; ${fn:escapeXML(stats_to_date)}
         &nbsp;&nbsp;&nbsp;<span class="label label-info">max:</span>&nbsp;${viewFilter == '-1'? 'all' : viewFilter}
         &nbsp;&nbsp;<a class="btn btn-default" data-toggle="modal" data-target="#stats-date-change-dialog"><fmt:message key="view.statistics.change-range" /></a>
         </div>
