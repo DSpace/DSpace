@@ -88,7 +88,9 @@ public class OpenSearchControllerTest extends AbstractControllerIntegrationTest 
                    // and there need to be some values taken from the test configuration
                    .andExpect(xpath("OpenSearchDescription/ShortName").string("DSpace"))
                    .andExpect(xpath("OpenSearchDescription/LongName").string("DSpace at My University"))
-                   .andExpect(xpath("OpenSearchDescription/Description").string("DSpace at My University DSpace repository"))
+                   .andExpect(xpath("OpenSearchDescription/Description")
+                       .string("DSpace at My University DSpace repository")
+                   )
         ;
         /* Expected response for the service document is:
             <?xml version="1.0" encoding="UTF-8"?>
