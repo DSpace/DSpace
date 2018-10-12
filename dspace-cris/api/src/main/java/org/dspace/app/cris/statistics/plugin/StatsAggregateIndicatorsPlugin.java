@@ -33,8 +33,6 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.utils.DSpace;
 
-import com.sun.tools.javac.code.Attribute.Array;
-
 public class StatsAggregateIndicatorsPlugin<ACO extends ACrisObject>
         extends AStatsIndicatorsPlugin
 {
