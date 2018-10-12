@@ -24,7 +24,7 @@ public class NoDotOldFilter implements FileFilter {
      */
     @Override
     public boolean accept(File inFile) {
-        if(inFile.getName().matches(".+\\.old$")) {    
+        if (inFile.getName().matches(".+\\.old$")) {
             return false;
         }
         return true;
