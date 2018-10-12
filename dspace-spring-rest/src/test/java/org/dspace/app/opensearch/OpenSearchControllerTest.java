@@ -14,8 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 
-import org.dspace.services.ConfigurationService;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,16 +24,6 @@ import org.junit.Test;
  * @author Oliver Goldschmidt (o dot goldschmidt at tuhh dot de)
  */
 public class OpenSearchControllerTest extends AbstractControllerIntegrationTest {
-
-    // configuration is taken from dspace-api/src/test/data/dspaceFolder/config/local.cfg
-    private ConfigurationService configurationService;
-
-    @Before
-    public void init() throws Exception {
-        // override the configuration settings here if other settings are required for test
-        // configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        // configurationService.setProperty("websvc.opensearch.enable", true);
-    }
 
     @Test
     public void searchAtomTest() throws Exception {
