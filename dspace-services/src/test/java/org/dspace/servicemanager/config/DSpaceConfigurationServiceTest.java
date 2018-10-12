@@ -13,11 +13,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import mockit.Expectations;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,9 +38,16 @@ public class DSpaceConfigurationServiceTest {
     DSpaceConfigurationService configurationService;
     int numPropsLoaded;
 
+    // Path to our main test config file (local.properties)
+    private String propertyFilePath;
+
     @Before
     public void init() {
         configurationService = new DSpaceConfigurationService();
+
+        // Save the path to our main test configuration file
+        propertyFilePath = configurationService.getDSpaceHome(null) + File.separatorChar
+            + DSpaceConfigurationService.DEFAULT_CONFIG_DIR + File.separatorChar + "local.properties";
 
         // clear out default configs (leaves us with an empty Configuration)
         configurationService.clear();
@@ -174,6 +186,17 @@ public class DSpaceConfigurationServiceTest {
         assertEquals(1, array.length);
         assertEquals("A,B,C", array[0]);
         configurationService.clearConfig("new.array");
+
+        // Test multiline arrays (requires loading configs from local.properties test config file)
+        // Specifying the same property multiple times should create an array of values.
+        DSpaceConfigurationService dscs = new DSpaceConfigurationService();
+        array = dscs.getArrayProperty("prop.multiline.array");
+        assertNotNull(array);
+        assertEquals(3, array.length);
+        assertEquals("line1", array[0]);
+        assertEquals("line2", array[1]);
+        assertEquals("line3", array[2]);
+        dscs.clear();
     }
 
     /**
@@ -242,7 +265,7 @@ public class DSpaceConfigurationServiceTest {
 
     /**
      * Test method for
-     * {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getHasProperty(java.lang.String)}.
+     * {@link org.dspace.servicemanager.config.DSpaceConfigurationService#hasProperty(java.lang.String)}.
      */
     @Test
     public void testHasProperty() {
@@ -416,7 +439,7 @@ public class DSpaceConfigurationServiceTest {
 
     /**
      * Test method for
-     * {@link org.dspace.servicemanager.config.DSpaceConfigurationService#loadConfig(java.lang.String, java.lang.String)}.
+     * {@link org.dspace.servicemanager.config.DSpaceConfigurationService#loadConfig(java.lang.String, java.lang.Object)}.
      */
     @Test
     public void testLoadConfig() {
@@ -496,6 +519,41 @@ public class DSpaceConfigurationServiceTest {
     }
 
     /**
+     * Tests the ability of our ConfigurationService to automatically reload properties after a set period
+     * of time.
+     */
+    @Test
+    public void testAutomaticReload() throws ConfigurationException, InterruptedException {
+        // Initialize new config service
+        DSpaceConfigurationService dscs = new DSpaceConfigurationService();
+
+        // Assert a property exists with a specific initial value
+        assertNotNull(dscs.getProperty("prop.to.auto.reload"));
+        assertEquals("D-space", dscs.getProperty("prop.to.auto.reload"));
+
+        // Now, change the value of that Property in the file itself (using a separate builder instance)
+        FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new Configurations()
+            .propertiesBuilder(propertyFilePath);
+        PropertiesConfiguration config = builder.getConfiguration();
+        // Clear out current value. Add in a new value
+        config.clearProperty("prop.to.auto.reload");
+        config.addProperty("prop.to.auto.reload", "DSpace");
+        // Save updates to file
+        builder.save();
+
+        // Check immediately. Property should be unchanged
+        // NOTE: If this fails, then somehow the configuration reloaded *immediately*
+        assertEquals("D-space", dscs.getProperty("prop.to.auto.reload"));
+
+        // Wait now for 3 seconds
+        Thread.sleep(3_000);
+
+        // Check again. Property should have reloaded
+        // NOTE: reload time is set in config-definition.xml to reload every 2 seconds
+        assertEquals("DSpace", dscs.getProperty("prop.to.auto.reload"));
+    }
+
+    /**
      * Tests the ability of the system to properly extract system properties into the configuration.
      * (NOTE: This ability to load system properties is specified in the test "config-definition.xml")
      */
@@ -531,6 +589,11 @@ public class DSpaceConfigurationServiceTest {
         // Test that property values are automatically trimmed of leading/trailing spaces
         // In local.properties, this value is something like "   test    "
         assertEquals("test", dscs.getProperty("prop.needing.trimmed"));
+
+        // Also test that properties in included files are loaded
+        // This property is specified in "included.properties", which is loaded via an "include =" statement in
+        // local.properties
+        assertEquals("works", dscs.getProperty("prop.from.included.file"));
 
         dscs.clear();
         dscs = null;

@@ -468,7 +468,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         this.homePath = getDSpaceHome(providedHome);
 
         // Based on homePath get full path to the configuration definition
-        String configDefinition = this.homePath + File.separatorChar + DSPACE_CONFIG_DEFINITION_PATH;
+        this.configDefinition = this.homePath + File.separatorChar + DSPACE_CONFIG_DEFINITION_PATH;
 
         // Check if our configuration definition exists in the homePath
         File configDefFile = new File(this.configDefinition);
@@ -491,7 +491,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             // See: http://commons.apache.org/proper/commons-configuration/userguide/howto_combinedbuilder.html
             this.configurationBuilder = new ReloadingCombinedConfigurationBuilder()
                 .configure(params.fileBased()
-                                 .setFile(new File(configDefinition))
+                                 .setFile(new File(this.configDefinition))
                                  .setListDelimiterHandler(listDelimiterHandler));
 
             // Parse our configuration definition and initialize resulting Configuration
