@@ -201,7 +201,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
                     patternList.add(Pattern.compile(pattern));
                 }
 
-                    log.info("Loaded pattern file:  {}", file.getPath());
+                log.info("Loaded pattern file:  {}", file.getPath());
             }
         } else {
             log.info("No patterns loaded from {}", patternsDir.getPath());
