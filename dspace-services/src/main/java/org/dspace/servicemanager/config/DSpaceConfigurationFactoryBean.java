@@ -28,10 +28,12 @@ package org.dspace.servicemanager.config;
 
 import java.net.URL;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationConverter;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ConfigurationConverter;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -129,8 +131,11 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
         if (locations != null) {
             for (int i = 0; i < locations.length; i++) {
                 URL url = locations[i].getURL();
-                Configuration props = new PropertiesConfiguration(url);
-                configuration.addConfiguration(props);
+                Parameters params = new Parameters();
+                FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                    new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
+                        .configure(params.fileBased().setURL(url));
+                configuration.addConfiguration(builder.getConfiguration());
             }
         }
     }
@@ -177,7 +182,7 @@ public class DSpaceConfigurationFactoryBean implements InitializingBean, Factory
     /**
      * Set the underlying Commons CompositeConfiguration throwExceptionOnMissing
      * flag.
-     * @see org.apache.commons.configuration.AbstractConfiguration
+     * @see org.apache.commons.configuration2.AbstractConfiguration
      * @param throwExceptionOnMissing whether to throw an exception if a config is missing
      */
     public void setThrowExceptionOnMissing(boolean throwExceptionOnMissing) {

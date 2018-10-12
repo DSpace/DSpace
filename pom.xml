@@ -150,6 +150,8 @@
                         </excludes>
                         <!-- Detailed logs in reportsDirectory/testName-output.txt instead of stdout -->
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <!-- Ensure full stacktrace is logged (when errors occur) -->
+                        <trimStackTrace>false</trimStackTrace>
                         <!--
                         Enable to debug Maven Surefire tests in remote proces
                         <debugForkedProcess>true</debugForkedProcess>
@@ -1153,7 +1155,7 @@
             <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
-                <version>1.9.2</version>
+                <version>1.9.3</version>
             </dependency>
             <dependency>
                 <groupId>commons-cli</groupId>
@@ -1179,9 +1181,9 @@
                 <version>3.2.2</version>
             </dependency>
             <dependency>
-                <groupId>commons-configuration</groupId>
-                <artifactId>commons-configuration</artifactId>
-                <version>1.10</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-configuration2</artifactId>
+                <version>2.3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
