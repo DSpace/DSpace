@@ -106,20 +106,17 @@ public class OpenSearchController implements ErrorController {
             log.debug("Searching for " + query + " in format " + format);
 
             // do some sanity checking
-            // TODO: make that work correctly
             if (!openSearchService.getFormats().contains(format)) {
                 String err = "Format " + format + " is not supported.";
                 response.setContentType("text/html");
                 response.setContentLength(err.length());
                 response.getWriter().write(err);
-                //response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                //return "error";
             }
 
             // then the rest - we are processing the query
             DSpaceObject container = null;
 
-            // TODO: support pagination parameters
+            // support pagination parameters
             DiscoverQuery queryArgs = new DiscoverQuery();
             queryArgs.setQuery(query);
             queryArgs.setStart(start);
@@ -160,6 +157,7 @@ public class OpenSearchController implements ErrorController {
         } else {
             log.debug("OpenSearch Service is disabled");
             String err = "OpenSearch Service is disabled";
+            response.setStatus(404);
             response.setContentType("text/html");
             response.setContentLength(err.length());
             response.getWriter().write(err);
@@ -187,6 +185,7 @@ public class OpenSearchController implements ErrorController {
         } else {
             log.debug("OpenSearch Service is disabled");
             String err = "OpenSearch Service is disabled";
+            response.setStatus(404);
             response.setContentType("text/html");
             response.setContentLength(err.length());
             response.getWriter().write(err);

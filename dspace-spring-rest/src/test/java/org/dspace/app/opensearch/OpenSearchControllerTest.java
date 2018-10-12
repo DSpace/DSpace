@@ -7,35 +7,10 @@
  */
 package org.dspace.app.opensearch;
 
-/*
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-*/
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
-
-/*
-import org.dspace.app.rest.OpenSearchController;
-import org.dspace.services.ConfigurationService;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.matcher.BrowseEntryResourceMatcher;
-import org.dspace.app.rest.matcher.BrowseIndexMatcher;
-import org.dspace.app.rest.matcher.ItemMatcher;
-import org.dspace.app.util.service.OpenSearchService;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.eperson.Group;
-*/
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 
@@ -60,13 +35,6 @@ public class OpenSearchControllerTest extends AbstractControllerIntegrationTest 
         // override the configuration settings here if other settings are required for test
         // configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         // configurationService.setProperty("websvc.opensearch.enable", true);
-        /*
-        System.out.println("Testing OpenSearch");
-        MockHttpServletResponse resp2 = getClient().perform(get("/opensearch/search")
-            .param("query", "cats"))
-            .andReturn().getResponse();
-        System.out.println("Response from Test 2: "+resp2.getContentAsString());
-        */
     }
 
     @Test
@@ -118,20 +86,19 @@ public class OpenSearchControllerTest extends AbstractControllerIntegrationTest 
                    // and the contentType has to be an opensearchdescription
                    .andExpect(content().contentType("application/opensearchdescription+xml;charset=UTF-8"))
                    // and there need to be some values taken from the test configuration
-                   .andExpect(xpath("OpenSearchDescription/ShortName").string("DS7 OpenSearch"))
-                   .andExpect(xpath("OpenSearchDescription/LongName").string("DSpace 7 OpenSearch Service"))
-                   .andExpect(xpath("OpenSearchDescription/Description").string("OpenSearch Service for DSpace 7"))
-                   .andExpect(xpath("OpenSearchDescription/ShortName").string("DS7 OpenSearch"))
+                   .andExpect(xpath("OpenSearchDescription/ShortName").string("DSpace"))
+                   .andExpect(xpath("OpenSearchDescription/LongName").string("DSpace at My University"))
+                   .andExpect(xpath("OpenSearchDescription/Description").string("DSpace at My University DSpace repository"))
         ;
         /* Expected response for the service document is:
             <?xml version="1.0" encoding="UTF-8"?>
             <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
-                <ShortName>DS7 OpenSearch</ShortName>
-                <LongName>DSpace 7 OpenSearch Service</LongName>
-                <Description>OpenSearch Service for DSpace 7</Description>
+                <ShortName>DSpace</ShortName>
+                <LongName>DSpace at My University</LongName>
+                <Description>DSpace at My University DSpace repository</Description>
                 <InputEncoding>UTF-8</InputEncoding>
                 <OutputEncoding>UTF-8</OutputEncoding>
-                <Query role="example" searchTerms="cats" />
+                <Query role="example" searchTerms="photosyntesis" />
                 <Tags>IR DSpace</Tags>
                 <Contact>dspace-help@myu.edu</Contact>
                 <Image height="16" width="16" type="image/vnd.microsoft.icon">http://www.dspace.org/images/favicon.ico</Image>
