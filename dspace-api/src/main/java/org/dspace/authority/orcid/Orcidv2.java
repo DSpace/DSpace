@@ -20,7 +20,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.authority.orcid.xml.XMLtoBio;
@@ -35,7 +36,7 @@ import org.orcid.jaxb.model.record_v2.Person;
  */
 public class Orcidv2 implements SolrAuthorityInterface {
 
-    private static Logger log = Logger.getLogger(Orcidv2.class);
+    private static Logger log = LogManager.getLogger(Orcidv2.class);
 
     public RESTConnector restConnector;
     private String OAUTHUrl;
@@ -46,7 +47,9 @@ public class Orcidv2 implements SolrAuthorityInterface {
     private String accessToken;
 
     /**
-     *  Initialize the accessToken that is required for all subsequent calls to ORCID
+     * Initialize the accessToken that is required for all subsequent calls to ORCID.
+     *
+     * @throws java.io.IOException passed through from HTTPclient.
      */
     public void init() throws IOException {
         if (StringUtils.isNotBlank(accessToken) && StringUtils.isNotBlank(clientSecret)) {
