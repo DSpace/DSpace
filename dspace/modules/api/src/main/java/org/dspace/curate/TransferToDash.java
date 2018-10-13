@@ -31,6 +31,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.log4j.Logger;
 
+import org.datadryad.api.DryadDataPackage;
+
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
@@ -178,110 +180,12 @@ public class TransferToDash extends AbstractCurationTask {
 	    report("handle, packageDOI, articleDOI, journal, numberOfFiles, packageSize");
 	} else if (dso.getType() == Constants.ITEM) {
 
-            Item item = (Item)dso;
-
-            // dataset is the JSON dataset object that will be deposited into New Dryad
-            ObjectMapper objectMapper = new ObjectMapper();
-            ObjectNode dataset = objectMapper.createObjectNode();
-
-	    try {
-		handle = item.getHandle();
-		log.info("handle = " + handle);
-		
-		if (handle == null) {
-		    // this item is still in workflow - no handle assigned
-		    handle = "in workflow";
-		}
-		
-		// package DOI
-		DCValue[] vals = item.getMetadata("dc.identifier");
-		if (vals.length == 0) {
-		    setResult("Object has no dc.identifier available " + handle);
-		    log.error("Skipping -- no dc.identifier available for " + handle);
-		    context.abort(); 
-		    return Curator.CURATE_SKIP;
-		} else {
-		    for(int i = 0; i < vals.length; i++) {
-			if (vals[i].value.startsWith("doi:")) {
-			    packageDOI = vals[i].value;
-			}
-		    }
-		}
-		log.debug("packageDOI = " + packageDOI);
-                dataset.put("identifier", packageDOI);
-
-                // title
-                vals = item.getMetadata("dc.title");
-                if (vals.length > 0) {
-                    String title = vals[0].value;
-                    log.debug("title = " + title);
-                    dataset.put("title", title);
-                }
-
-                // abstract
-                vals = item.getMetadata("dc.description");
-                if (vals.length > 0) {
-                    String packageAbstract = vals[0].value;
-                    dataset.put("abstract", packageAbstract);
-                }
-                       
-                // TODO -- fix this field! Need a real lookup!
-                dataset.put("userID", 1);
-
-		// article DOI
-		vals = item.getMetadata("dc.relation.isreferencedby");
-		if (vals.length == 0) {
-		    log.debug("Object has no articleDOI (dc.relation.isreferencedby) " + handle);
-		} else {
-		    articleDOI = vals[0].value;
-		}
-		log.debug("articleDOI = " + articleDOI);
-                ObjectNode article = objectMapper.createObjectNode();
-                article.put("relationship", "IsCitedBy");
-                article.put("identifierType", "DOI");
-                article.put("identifier", articleDOI.substring("doi:".length()));
-                ArrayNode relatedWorks = objectMapper.createArrayNode();
-                relatedWorks.add(article);
-                dataset.put("relatedWorks", relatedWorks);
-
-                ArrayNode allAuthors = objectMapper.createArrayNode();
-		vals = item.getMetadata("dc.contributor");
-                for(int i = 0; i < vals.length; i++) {
-                    String authorName = vals[i].value;
-                    ObjectNode authorObj = objectMapper.createObjectNode();
-                    int comma = authorName.indexOf(",");
-                    authorObj.put("firstName", authorName.substring(comma+2));
-                    authorObj.put("lastName", authorName.substring(0, comma));
-                    // TODO add affiliation
-                    allAuthors.add(authorObj);
-                }
-                vals = item.getMetadata("dc.contributor.author");
-                for(int i = 0; i < vals.length; i++) {
-                    String authorName = vals[i].value;
-                    ObjectNode authorObj = objectMapper.createObjectNode();
-                    int comma = authorName.indexOf(",");
-                    authorObj.put("firstName", authorName.substring(comma+2));
-                    authorObj.put("lastName", authorName.substring(0, comma));
-                    // TODO add affiliation
-                    allAuthors.add(authorObj);
-                }
-                dataset.put("authors", allAuthors);
-
-		log.info(handle + " done.");
-	    } catch (Exception e) {
-		log.fatal("Skipping -- Exception in processing " + handle, e);
-		setResult("Object has a fatal error: " + handle + "\n" + e.getMessage());
-		report("Object has a fatal error: " + handle + "\n" + e.getMessage());
-		
-		context.abort();
-                return Curator.CURATE_SKIP;
-	    }
-
-            // write this item to json
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("/tmp/transferToDash.json"), dataset);
-
+            DryadDataPackage dataPackage = new DryadDataPackage((Item)dso);
+            String dashJSON = dataPackage.getDashJSON();
+            log.debug("Got JSON object: " + dashJSON);
+            
             // send this item to the server
-            sendToDash(objectMapper.writeValueAsString(dataset));
+            sendToDash(dashJSON);
             
             // provide output for the console
             setResult("Last processed item = " + handle + " -- " + packageDOI);        

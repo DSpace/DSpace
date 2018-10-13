@@ -581,6 +581,20 @@ public class DryadDataPackage extends DryadObject {
             mapper.registerModule(new SimpleModule().addSerializer(Package.class, new Package.SchemaDotOrgSerializer()));
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(new Package(this));
         } catch (Exception e) {
+            log.error("Unable to serialize Schema.org JSON", e);
+            return "";
+        }
+    }
+
+    // Convenience method to access a properly serialized JSON string, formatted for use with DASH.
+    public String getDashJSON() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.registerModule(new SimpleModule().addSerializer(Author.class, new Author.DashSerializer()));
+            mapper.registerModule(new SimpleModule().addSerializer(Package.class, new Package.DashSerializer()));
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(new Package(this));
+        } catch (Exception e) {
+            log.error("Unable to serialize Dash-style JSON", e);
             return "";
         }
     }
