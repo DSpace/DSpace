@@ -39,7 +39,7 @@ REM Otherwise, default Java to using 256MB of memory
 if "%JAVA_OPTS%"=="" set "JAVA_OPTS=-Xmx256m -Dfile.encoding=UTF-8"
 
 REM Execute Java
-java %JAVA_OPTS% -classpath "%DSPACE_CLASSPATH%" org.dspace.app.launcher.ScriptLauncher %*
+java %JAVA_OPTS% -classpath "%DSPACE_CLASSPATH%" -Dlog4j.configurationFile=%DSPACEDIR%/config/log4j2.xml org.dspace.app.launcher.ScriptLauncher %*
 
 REM Clean up DSPACE_CLASSPATH variable
 set DSPACE_CLASSPATH=

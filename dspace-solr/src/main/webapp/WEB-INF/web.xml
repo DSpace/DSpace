@@ -45,9 +45,11 @@
          initialized until the DSpace Kernel starts up, and we don't want Solr to
          depend on the DSpace Kernel/API -->
     <context-param>
-        <param-name>log4j.configuration</param-name>
+        <param-name>log4jConfiguration</param-name>
         <param-value>${dspace.dir}/config/log4j-solr.properties</param-value>
-        <description>URL locating a Log4J configuration file (properties or XML).</description>
+        <description>
+	    URL locating a Log4J configuration file (properties or XML).
+	</description>
     </context-param>
 
     <!-- Any path (name) registered in solrconfig.xml will be sent to that filter -->
