@@ -183,9 +183,10 @@
             <version>${spring-boot.version}</version>
             <exclusions>
                 <!-- Temporary exclusions until DS-3135 is fixed.
-                Once we are using log4j v2, we should update Spring Boot to utilize
-                it per these instructions:
-                https://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html#howto-configure-log4j-for-logging
+                Once we are using log4j v2, we should update Spring
+		Boot to utilize it per these instructions:
+                https://docs.spring.io/spring-boot/docs/current/reference
+		/html/howto-logging.html#howto-configure-log4j-for-logging
                 -->
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -263,11 +264,14 @@
             <version>${spring-boot.version}</version>
         </dependency>
 
-        <!-- Add in log4j support by excluding default logging, and using starter-log4j -->
-        <!-- See: http://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html#howto-configure-log4j-for-logging -->
-        <!--<dependency>
+        <!-- Add in log4j support by excluding default logging, and
+	     using starter-log4j -->
+        <!-- See:  http://docs.spring.io/spring-boot/docs/current/reference
+	     /html/howto-logging.html#howto-configure-log4j-for-logging -->
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+	    <version>${spring-boot.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -277,8 +281,9 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j</artifactId>
-        </dependency>-->
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+	    <version>${spring-boot.version}</version>
+        </dependency>
 
         <!-- DSpace dependencies -->
         <dependency>
