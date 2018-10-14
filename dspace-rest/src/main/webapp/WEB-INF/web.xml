@@ -77,6 +77,14 @@
     </context-param>
 
     <context-param>
+        <param-name>log4jConfiguration</param-name>
+        <param-value>${dspace.dir}/config/log4j2.xml</param-value>
+        <description>
+	    The location of the Log4J configuration
+        </description>
+    </context-param>
+
+    <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
             /WEB-INF/applicationContext.xml,
