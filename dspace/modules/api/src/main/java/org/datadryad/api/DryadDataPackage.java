@@ -8,6 +8,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -90,6 +92,9 @@ public class DryadDataPackage extends DryadObject {
     private final static String PUBLICATION_DATE_ELEMENT = "date";
     private final static String PUBLICATION_DATE_QUALIFIER = "issued";
 
+    private static final String DASH_TRANSFER_SCHEMA = "dryad";
+    private static final String DASH_TRANSFER_ELEMENT = "dashTransferDate";
+    
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
@@ -388,6 +393,7 @@ public class DryadDataPackage extends DryadObject {
         addSingleMetadataValue(Boolean.FALSE,PROVENANCE_SCHEMA, PROVENANCE_ELEMENT, PROVENANCE_QUALIFIER, PROVENANCE_LANGUAGE, metadataValue);
     }
 
+    
     @Override
     Set<DryadObject> getRelatedObjects(final Context context) throws SQLException {
         return new HashSet<DryadObject>(getDataFiles(context));
@@ -556,6 +562,13 @@ public class DryadDataPackage extends DryadObject {
 
     public void addKeywords(List<String> keywords) throws SQLException {
         addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+    }
+
+    public void addDashTransferDate() throws SQLException {
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
+        String transferDate = sdf.format(now);
+        addSingleMetadataValue(Boolean.FALSE, DASH_TRANSFER_SCHEMA, DASH_TRANSFER_ELEMENT, null, transferDate);
     }
 
     public List<Author> getAuthors() throws SQLException {

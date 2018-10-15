@@ -156,6 +156,7 @@ public class DashService {
                 datasetID = matcher.group(1);
             }
 
+            dataPackage.addDashTransferDate();
             log.info("got dataset ID " + datasetID);
             log.info("result object " + response);
         } catch (Exception e) {
