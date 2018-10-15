@@ -20,14 +20,35 @@
          like ${dspace.dir} within our Spring bean XML configuration files. These
          property values are then dynamically loaded via our DSpaceConfigurationService. -->
     <!-- First, configure a property placeholder. This lets us use properties like ${..} within Spring bean configs -->
-    <bean id="propertyPlaceholderConfigurer"
+    <!--<bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="properties" ref="dspaceConfigurationFactoryBean"/>
-    </bean>
+    </bean>-->
     <!-- Next, wire it up to use our DSpaceConfigurationFactoryBean. This bean will use our configured
          DSpace ConfigurationService for all property substitution in Spring XML files -->
-    <bean id="dspaceConfigurationFactoryBean" class="org.dspace.servicemanager.config.DSpaceConfigurationFactoryBean">
+    <!--<bean id="dspaceConfigurationFactoryBean" class="org.dspace.servicemanager.config.DSpaceConfigurationFactoryBean">
         <constructor-arg ref="org.dspace.services.ConfigurationService"/>
+    </bean>-->
+
+    <!-- Configure the Commmons Configuration "ConfigurationPropertiesFactoryBean" to use our DSpace Configuration
+         service to perform Property Placeholder substitution in Spring configuration.  For example, this lets us
+         use dynamic properties like ${dspace.dir} within our Spring bean XML configuration files. These property
+         values are then dynamically loaded via our DSpaceConfigurationService at runtime. -->
+    <!-- See: https://commons.apache.org/proper/commons-configuration/userguide/howto_utilities.html#Use_Configuration_in_Spring -->
+    <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="properties">
+            <bean class="org.apache.commons.configuration2.spring.ConfigurationPropertiesFactoryBean">
+                <constructor-arg>
+                    <ref bean="dspaceConfiguration" />
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+    <!-- This wires up our ConfigurationService.getConfiguration() method to be called to provide its properties
+         to the above PropertyPlaceholderConfigurer -->
+    <bean id="dspaceConfiguration" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="org.dspace.services.ConfigurationService" />
+        <property name="targetMethod" value="getConfiguration" />
     </bean>
     <!-- end PROPERTY PLACEHOLDER SETUP-->
 
