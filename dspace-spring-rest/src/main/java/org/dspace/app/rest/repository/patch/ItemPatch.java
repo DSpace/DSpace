@@ -32,8 +32,7 @@ public class ItemPatch extends AbstractResourcePatch<ItemRest> {
      * @throws UnprocessableEntityException
      * @throws PatchBadRequestException
      */
-    protected ItemRest replace(ItemRest item, Operation operation)
-            throws UnprocessableEntityException, PatchBadRequestException {
+    protected ItemRest replace(ItemRest item, Operation operation) {
 
         ResourcePatchOperation<ItemRest> patchOperation =
                 patchFactory.getReplaceOperationForPath(operation.getPath());

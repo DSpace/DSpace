@@ -17,24 +17,22 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
- * Base class for all patch operations. This class includes methods that
- * can be used to type check objects that are converted from json.
+ * Base class for all resource patch operations.
  *
  * @author Michael Spalti
  */
-public abstract class PatchOperation<R extends RestModel, T extends Object>
+public abstract class PatchOperation<R extends RestModel, T>
         implements ResourcePatchOperation<R> {
 
     /**
      * Updates the rest model by applying the patch operation.
      *
-     * @param resource  the rest model
-     * @param operation
-     * @return the updated rest model
+     * @param resource  the rest model.
+     * @param operation the patch operation.
+     * @return the updated rest model.
      * @throws PatchBadRequestException
      */
-    public abstract R perform(R resource, Operation operation)
-            throws PatchBadRequestException;
+    public abstract R perform(R resource, Operation operation);
 
     /**
      * Throws PatchBadRequestException for missing operation value.
@@ -52,8 +50,9 @@ public abstract class PatchOperation<R extends RestModel, T extends Object>
      *
      * @param value the operation value
      * @return the original or derived boolean value
+     * @throws PatchBadRequestException
      */
-    Boolean getBooleanOperationValue(Object value) throws PatchBadRequestException {
+    Boolean getBooleanOperationValue(Object value) {
         Boolean bool;
 
         if (value instanceof String) {

@@ -32,8 +32,7 @@ public class EPersonPatch extends AbstractResourcePatch<EPersonRest> {
      * @throws UnprocessableEntityException
      * @throws PatchBadRequestException
      */
-    protected EPersonRest replace(EPersonRest eperson, Operation operation)
-            throws UnprocessableEntityException, PatchBadRequestException {
+    protected EPersonRest replace(EPersonRest eperson, Operation operation) {
 
         ResourcePatchOperation<EPersonRest> patchOperation =
                 patchFactory.getReplaceOperationForPath(operation.getPath());
