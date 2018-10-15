@@ -2,6 +2,10 @@ package org.datadryad.api;
 
 /** 
     Utilities to facilitate communication with the DASH-based version of Dryad.
+
+    To use from the command line:
+    - retrieve an item from Dash:
+      /opt/dryad/bin/dspace dash-service <doi>
  **/
 
 import java.io.BufferedReader;
@@ -165,7 +169,7 @@ public class DashService {
     public static void main(String[] args) throws IOException {
         
         String usage = "\n\nUsage: \n" +
-            "\tlookup a specific item: class doi\n";
+            "\tlookup a specific item: dash-service doi\n";
         DashService service = new DashService();
 
         // LOOKUP: args[0]=DOI

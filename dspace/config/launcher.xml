@@ -374,6 +374,14 @@
 		</step>
 	</command>
 
+	<command>
+	  <name>dash-service</name>
+	  <description>DASH utility</description>
+	  <step>
+	    <class>org.datadryad.api.DashService</class>
+	  </step>
+	</command>
+
     <command>
         <name>review-item</name>
         <description>Approve or reject a workflow item in the review stage</description>

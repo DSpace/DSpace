@@ -28,6 +28,9 @@ import org.dspace.core.Constants;
  * Side Effects: Data package is transferred to DASH-based Dryad, Data Package is updated
  *               with metadata indicating date of successfull transfer.
  *
+ * To use from the command line:
+ * /opt/dryad/bin/dspace curate -v -t transfertodash -i <handle-without-hdl-prefix> -r -
+ *
  * @author Ryan Scherle
  */
 
