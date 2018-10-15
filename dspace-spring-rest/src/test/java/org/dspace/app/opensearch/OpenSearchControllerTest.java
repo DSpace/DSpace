@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 
-import org.junit.Before;
 import org.junit.Test;
 
 /**
