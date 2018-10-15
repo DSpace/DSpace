@@ -12,6 +12,7 @@ import java.io.PrintStream;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -78,10 +79,41 @@ public class DashService {
         return token;
     }
 
+    /**
+       Read the JSON format of a dataset from Dash.
+    **/
     public String getDashJSON(String doi) {
-        return "getDashJSON NOT IMPLEMENTED YET";
+        String response = "";
+        log.debug("getting Dash JSON for " + doi);
+        
+        try {
+            doi = URLEncoder.encode(doi, "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + doi);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = null;
+            StringWriter responseContent = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                responseContent.append(line);
+            }
+            response = responseContent.toString();
+            log.debug("got response content: " + responseContent);
+        } catch (Exception e) {
+            log.error("Unable to get Dash JSON", e);
+        }
+        
+        return response;
     }
-    
+
+    /**
+       POSTs a DryadDataPackage to Dash, creating a new submission. This will eventually be
+       deprecated in favor of PUT, to ensure that only one submission is created for each identifier.
+    **/
     public String postDataPackage(DryadDataPackage dataPackage) {
         String dashJSON = dataPackage.getDashJSON();
         String responseCode = "POST not completed";
