@@ -129,18 +129,12 @@ public class DashService {
         return responseCode;
     }
     
-    /**
-     * Have to test this on dev since it's also IP restricted.
-     *
-     * @param args
-     */
+
     public static void main(String[] args) throws IOException {
         
         String usage = "\n\nUsage: \n" +
             "\tlookup a specific item: class doi\n";
         DashService service = new DashService();
-
-        log.debug("========== Starting DOI command-line service ===========");
 
         // LOOKUP: args[0]=DOI
         if (args.length == 1) {

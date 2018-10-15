@@ -23,10 +23,8 @@ import org.dspace.core.Constants;
  * otherwise it fails. If the transfer was successful, results are recorded in the
  * metadata field dryad.dashTransferDate
  *
- * Originally based on the DataPackageStats curation task.
- *
  * Input: a single data package OR a collection that contains data packages
- * Output: CSV file with some quick stats
+ * Output: list of DOIs of the processed items
  * Side Effects: Data package is transferred to DASH-based Dryad, Data Package is updated
  *               with metadata indicating date of successfull transfer.
  *
@@ -76,13 +74,6 @@ public class TransferToDash extends AbstractCurationTask {
             return Curator.CURATE_SKIP;
         }
 
-        // slow this down a bit so we don't overwhelm the production SOLR server with requests
-        try {
-            Thread.sleep(20);
-        } catch(InterruptedException e) {
-            // ignore it
-        }
-        
         log.info("TransferToDash complete");
         return Curator.CURATE_SUCCESS;
     }
