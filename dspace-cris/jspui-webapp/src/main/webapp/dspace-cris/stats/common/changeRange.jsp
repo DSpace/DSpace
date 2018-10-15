@@ -26,7 +26,7 @@
 								<fmt:message key="view.statistics.range.to" /> <input class="form-control" type="text" id="stats_to_date" name="stats_to_date" value="${fn:escapeXml(data.stats_to_date)}" /> 
 						</div>
 					</div>
-			<input type="hidden" name="type" value="${data.type}"/>
+			<input type="hidden" name="type" value="${fn:escapeXml(data.type)}"/>
 			<c:choose>
 			<c:when test="${data.object.type < 9}">
 				<input type="hidden" name="handle" value="${data.object.handle}" />

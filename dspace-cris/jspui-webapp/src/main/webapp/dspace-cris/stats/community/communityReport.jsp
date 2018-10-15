@@ -83,18 +83,18 @@
 			<%@ include file="/dspace-cris/stats/community/_communityReport.jsp" %>
 		<div class="bottom">
 			<c:if test="${data.seeParentObject}">			
-				<c:set var="parentLink">${contextPath}/cris/stats/community.html?handle=${data.parentObject.handle}&type=${type}</c:set>
+				<c:set var="parentLink">${contextPath}/cris/stats/community.html?handle=${data.parentObject.handle}&type=${fn:escapeXml(type)}</c:set>
 				<div class="list-group">
-					<a class="list-group-item" href="${parentLink}"><fmt:message key="view.${data.jspKey}.${type}.parentStats"><fmt:param>${data.parentObject.name}</fmt:param></fmt:message></a>
+					<a class="list-group-item" href="${parentLink}"><fmt:message key="view.${data.jspKey}.${fn:escapeXml(type)}.parentStats"><fmt:param>${data.parentObject.name}</fmt:param></fmt:message></a>
 				</div>
 			</c:if>
 			<div class="list-group">
 				<c:forEach var="child" items="${data.childrenObjects}">
 				<c:if test="${child.type eq 3}">
-					<a class="list-group-item" href="${contextPath}/cris/stats/collection.html?handle=${child.handle}&type=${type}&stats_from_date=${fn:escapeXml(data.stats_from_date)}&stats_to_date=${fn:escapeXml(data.stats_to_date)}"><fmt:message key="view.${data.jspKey}.${type}.childrenStats"><fmt:param>${child.name}</fmt:param></fmt:message></a>
+					<a class="list-group-item" href="${contextPath}/cris/stats/collection.html?handle=${child.handle}&type=${fn:escapeXml(type)}&stats_from_date=${fn:escapeXml(data.stats_from_date)}&stats_to_date=${fn:escapeXml(data.stats_to_date)}"><fmt:message key="view.${data.jspKey}.${type}.childrenStats"><fmt:param>${child.name}</fmt:param></fmt:message></a>
 				</c:if>
 				<c:if test="${child.type eq 4}">
-					<a class="list-group-item" href="${contextPath}/cris/stats/community.html?handle=${child.handle}&type=${type}&stats_from_date=${fn:escapeXml(data.stats_from_date)}&stats_to_date=${fn:escapeXml(data.stats_to_date)}"><fmt:message key="view.${data.jspKey}.${type}.childrenStats"><fmt:param>${child.name}</fmt:param></fmt:message></a>
+					<a class="list-group-item" href="${contextPath}/cris/stats/community.html?handle=${child.handle}&type=${fn:escapeXml(type)}&stats_from_date=${fn:escapeXml(data.stats_from_date)}&stats_to_date=${fn:escapeXml(data.stats_to_date)}"><fmt:message key="view.${data.jspKey}.${type}.childrenStats"><fmt:param>${child.name}</fmt:param></fmt:message></a>
 				</c:if>	
 				</c:forEach>
 			</div>

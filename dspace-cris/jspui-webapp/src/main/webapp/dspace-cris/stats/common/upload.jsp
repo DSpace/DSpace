@@ -27,7 +27,7 @@
 	<c:when test="${mode == 'download' && objectName!='bitstream'}">
 		<div id="statstab-content-id" class="statstab-content-item">		 
 		<c:set var="pieType">sectionid</c:set>
-		<stats:piewithtable data="${data}" statType="${statType}" objectName="${objectName}" pieType="${pieType}" useLocalMap="true"/>
+		<stats:piewithtable data="${data}" statType="${fn:escapeXml(statType)}" objectName="${objectName}" pieType="${pieType}" useLocalMap="true"/>
 		</div>	
 	</c:when>
 <%-- 	<c:otherwise>
@@ -42,7 +42,7 @@
 </div>
 	</c:when>
 	<c:otherwise> 
-		<fmt:message key="view.${data.jspKey}.${statType}.${objectName}.data.empty" />
+		<fmt:message key="view.${data.jspKey}.${fn:escapeXml(statType)}.${objectName}.data.empty" />
 				
 	</c:otherwise>
 </c:choose>

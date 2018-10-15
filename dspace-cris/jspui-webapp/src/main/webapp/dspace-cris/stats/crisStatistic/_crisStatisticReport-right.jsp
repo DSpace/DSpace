@@ -8,7 +8,7 @@
 
 --%>
 <c:set var="link"><%=request.getContextPath() %>/cris/stats/${data.object.publicPath}.html?id=${data.object.uuid}</c:set>
-<c:set var="subscribeLink"><%=request.getContextPath() %>/cris/tools/stats/subscription/subscribe?uid=${data.object.uuid}&amp;type=${data.object.type}</c:set>
+<c:set var="subscribeLink"><%=request.getContextPath() %>/cris/tools/stats/subscription/subscribe?uid=${data.object.uuid}&amp;type=${fn:escapeXml(data.object.type)}</c:set>
 <c:set var="rssLink"><%=request.getContextPath() %>/cris/stats/rss/</c:set>
 
 <c:set var="oldsubscription">
