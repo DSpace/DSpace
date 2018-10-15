@@ -1022,7 +1022,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ReplaceOperation replaceOperation2 = new ReplaceOperation("/certificate", true);
         ops.add(replaceOperation2);
         // This will fail. The path does not exist.
-        ReplaceOperation replaceOperation3 = new ReplaceOperation("/nonexistentPath\"", "somevalue");
+        ReplaceOperation replaceOperation3 = new ReplaceOperation("/nonexistentPath", "somevalue");
         ops.add(replaceOperation3);
         ReplaceOperation replaceOperation4 = new ReplaceOperation("/certificate", false);
         ops.add(replaceOperation4);
