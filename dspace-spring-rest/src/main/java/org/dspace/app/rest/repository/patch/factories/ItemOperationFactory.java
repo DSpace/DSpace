@@ -37,9 +37,9 @@ public class ItemOperationFactory {
      *
      * @param path the operation path
      * @return the patch operation implementation
+     * @throws PatchBadRequestException
      */
-    public ResourcePatchOperation<ItemRest> getReplaceOperationForPath(String path)
-            throws PatchBadRequestException {
+    public ResourcePatchOperation<ItemRest> getReplaceOperationForPath(String path) {
 
         switch (path) {
             case OPERATION_PATH_DISCOVERABLE:

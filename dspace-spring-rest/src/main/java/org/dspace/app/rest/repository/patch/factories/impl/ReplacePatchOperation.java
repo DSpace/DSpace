@@ -8,44 +8,58 @@
 package org.dspace.app.rest.repository.patch.factories.impl;
 
 import org.dspace.app.rest.exception.PatchBadRequestException;
+
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.patch.Operation;
 
 /**
- * The base class for replace operations.
+ * Base class for replace patch operations.
  *
- * @param <R>
- * @param <T>
+ * @author Michael Spalti
  */
-public abstract class ReplacePatchOperation<R extends RestModel, T extends Object>
+public abstract class ReplacePatchOperation<R extends RestModel, T>
         extends PatchOperation<R, T> {
 
+    /**
+     * Implements the patch operation for replace operations.
+     * Before performing the replace operation this method checks
+     * for a non-null operation value and a non-null value on the rest model
+     * (replace operations should only be applied to an existing value).
+     * @param resource  the rest model.
+     * @param operation the replace patch operation.
+     * @return the updated rest model.
+     * @throws PatchBadRequestException
+     * @throws UnprocessableEntityException
+     */
     @Override
-    public abstract R perform(R resource, Operation operation)
-            throws PatchBadRequestException;
+    public R perform(R resource, Operation operation) {
+
+        checkOperationValue(operation.getValue());
+        checkModelForExistingValue(resource);
+        return replace(resource, operation);
+
+    }
 
     /**
      * Executes the replace patch operation.
      *
-     * @param resource
-     * @param operation
-     * @return
+     * @param resource the rest model.
+     * @param operation the replace patch operation.
+     * @return the updated rest model.
      * @throws PatchBadRequestException
+     * @throws UnprocessableEntityException
      */
-    abstract R replace(R resource, Operation operation)
-            throws PatchBadRequestException;
+    abstract R replace(R resource, Operation operation);
 
     /**
      * Replace operations are not allowed on non-existent values.
      * Null values may exist in the RestModel for certain fields
-     * (usually non-boolean).
-     *
-     * @param value the rest model value to be replaced.
+     * (usually non-boolean). This method should be implemented
+     * to assure that the replace operation acts only on an existing value.
+     * @param resource the rest model.
      * @throws PatchBadRequestException
      */
-    void checkModelForExistingValue(Object value) throws PatchBadRequestException {
-        if (value == null) {
-            throw new PatchBadRequestException("Attempting to replace a non-existent value.");
-        }
-    }
+    abstract void checkModelForExistingValue(R resource);
+
 }

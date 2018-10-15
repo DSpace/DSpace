@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.repository.patch.factories.impl;
 
-import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
@@ -27,25 +26,21 @@ import org.springframework.stereotype.Component;
 public class EPersonPasswordReplaceOperation extends ReplacePatchOperation<EPersonRest, String> {
 
     @Override
-    public EPersonRest perform( EPersonRest resource, Operation operation)
-            throws PatchBadRequestException {
+    EPersonRest replace(EPersonRest eperson, Operation operation) {
 
-        return replace(resource, operation);
+        eperson.setPassword((String) operation.getValue());
+        return eperson;
     }
 
     @Override
-    EPersonRest replace(EPersonRest eperson, Operation operation) throws PatchBadRequestException {
-
-        // The value must not be null.
-        checkOperationValue(operation.getValue());
+    void checkModelForExistingValue(EPersonRest resource) {
         /*
-         * TODO: the password field in eperson rest model is always null (initially) since
-         * the password value is not set by eperson converter.fromModel() method. So for now,
-         * not calling checkModelForExistingValue() or throwing error when replacing what
-         * appears to be a non-existent value.
+         * FIXME: the password field in eperson rest model is always null because
+         * the value is not set in the rest converter.
+         * We would normally throw an exception here since replace
+         * operations are not allowed on non-existent values, but that
+         * would prevent the password update from ever taking place.
          */
-        eperson.setPassword((String) operation.getValue());
-        return eperson;
     }
 
     @Override
