@@ -155,7 +155,6 @@
 				otros
 			</xsl:when> -->
 			<xsl:otherwise>
-				otros
 			</xsl:otherwise>
 		</xsl:choose>
 		</xsl:variable>
