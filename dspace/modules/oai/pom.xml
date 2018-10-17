@@ -146,6 +146,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- Note: XOAI requires hamcrest both for testing and runtime -->
+        <!-- As our Parent POM sets this to 'test' scope, we must override it -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <developers>
