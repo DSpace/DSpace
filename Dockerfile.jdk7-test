@@ -1,6 +1,13 @@
 # This image will be published as dspace/dspace
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
 
+# This version is JDK7 compatible
+# - tomcat:7-jre7
+# - ANT 1.9.13
+# - maven:latest
+# - note: 
+# - default tag for branch: dspace/dspace: dspace/dspace:dspace-4_x-jdk7
+
 # Step 1 - Run Maven Build
 FROM maven as build
 WORKDIR /app
@@ -9,16 +16,19 @@ WORKDIR /app
 ADD . /app/
 COPY dspace/src/main/docker/build.properties /app/build.properties
 
+# Provide web.xml overrides to make webapps easier to test
+COPY dspace/src/main/docker/test/solr_web.xml /app/dspace-solr/src/main/webapp/WEB-INF/web.xml
+
 RUN mvn package
 
 # Step 2 - Run Ant Deploy
-FROM tomcat:8 as ant_build
+FROM tomcat:7-jre7 as ant_build
 ARG TARGET_DIR=dspace-build
 COPY --from=build /app /dspace-src
 WORKDIR /dspace-src/dspace/target/${TARGET_DIR}
 
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.5
+ENV ANT_VERSION 1.9.13
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
 
@@ -29,12 +39,12 @@ RUN ant update_configs update_code update_webapps
 
 # Step 3 - Run tomcat
 # Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:8
+FROM tomcat:7-jre7
 COPY --from=ant_build /dspace /dspace
 EXPOSE 8080 8009
 
 # Ant will be embedded in the final container to allow additional deployments
-ENV ANT_VERSION 1.10.5
+ENV ANT_VERSION 1.9.13
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
 
