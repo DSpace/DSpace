@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
- * The InputFormField REST Resource. It is not addressable directly, only used
+ * The SubmissionFormInputType REST Resource. It is not addressable directly, only used
  * as inline object in the InputForm resource
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)

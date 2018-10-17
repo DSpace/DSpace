@@ -17,12 +17,24 @@ import java.util.List;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class SubmissionFormRowRest {
+    /**
+     * The list of fields in the row
+     */
     private List<SubmissionFormFieldRest> fields;
 
+    /**
+     * Getter for {@link #fields}
+     * 
+     * @return {@link #fields}
+     */
     public List<SubmissionFormFieldRest> getFields() {
         return fields;
     }
 
+    /**
+     * Setter for {@link #fields}
+     * 
+     */
     public void setFields(List<SubmissionFormFieldRest> fields) {
         this.fields = fields;
     }
