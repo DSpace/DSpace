@@ -78,15 +78,8 @@ public class DryadDataPackage extends DryadObject {
     private static final String TITLE_SCHEMA = "dc";
     private static final String TITLE_ELEMENT = "title";
 
-    private static final String ABSTRACT_SCHEMA = "dc";
-    private static final String ABSTRACT_ELEMENT = "description";
-
     private static final String KEYWORD_SCHEMA = "dc";
     private static final String KEYWORD_ELEMENT = "subject";
-
-    private static final String AUTHOR_SCHEMA = "dc";
-    private static final String AUTHOR_ELEMENT = "contributor";
-    private static final String AUTHOR_QUALIFIER = "author";
 
     private final static String PUBLICATION_DATE_SCHEMA = "dc";
     private final static String PUBLICATION_DATE_ELEMENT = "date";
@@ -545,11 +538,18 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public void setAbstract(String theAbstract) throws SQLException {
-        addSingleMetadataValue(Boolean.TRUE, ABSTRACT_SCHEMA, ABSTRACT_ELEMENT, null, theAbstract);
+        addSingleMetadataValue(Boolean.TRUE, "dc", "description", null, theAbstract);
     }
 
     public String getAbstract() throws SQLException {
-        return getSingleMetadataValue(ABSTRACT_SCHEMA, ABSTRACT_ELEMENT, null);
+        String theAbstract = getSingleMetadataValue("dc", "description", null);
+        String extraAbstract = getSingleMetadataValue("dc", "description", "abstract");
+
+        if (extraAbstract != null && extraAbstract.length() > 0) {
+            theAbstract = theAbstract + "\n" + extraAbstract;
+        }
+
+        return theAbstract;
     }
 
     public List<String> getKeywords() throws SQLException {
@@ -573,7 +573,15 @@ public class DryadDataPackage extends DryadObject {
 
     public List<Author> getAuthors() throws SQLException {
         ArrayList<Author> authors = new ArrayList<Author>();
-        DCValue[] metadata = item.getMetadata(AUTHOR_SCHEMA, AUTHOR_ELEMENT, AUTHOR_QUALIFIER, Item.ANY);
+        DCValue[] metadata = item.getMetadata("dc", "contributor", "author", Item.ANY);
+        for(DCValue dcValue : metadata) {
+            authors.add(new Author(dcValue));
+        }
+        metadata = item.getMetadata("dc", "contributor", null, Item.ANY);
+        for(DCValue dcValue : metadata) {
+            authors.add(new Author(dcValue));
+        }
+        metadata = item.getMetadata("dc", "creator", null, Item.ANY);
         for(DCValue dcValue : metadata) {
             authors.add(new Author(dcValue));
         }
