@@ -35,8 +35,6 @@ public class CDLDataCiteService {
 
     private static final Logger log = Logger.getLogger(CDLDataCiteService.class);
 
-    private static final String DEFAULT_BASEURL = ConfigurationManager.getProperty("doi.server");
-
     private String myUsername;
     private String myPassword;
 
@@ -105,7 +103,7 @@ public class CDLDataCiteService {
             aDOI = aDOI.substring(4);
         }
 
-        String baseUrl = DEFAULT_BASEURL;
+        String baseUrl = ConfigurationManager.getProperty("doi.server");
         String doiEnv = System.getenv("DOI_SERVER");
         if(doiEnv != null) {
             baseUrl = doiEnv;
