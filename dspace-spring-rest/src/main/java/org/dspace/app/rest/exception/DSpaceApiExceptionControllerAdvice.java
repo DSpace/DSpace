@@ -16,9 +16,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.security.RestAuthenticationService;
+import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowseException;
+import org.dspace.sort.SortException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -53,9 +58,42 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     @ExceptionHandler({SQLException.class, RESTSQLException.class})
     protected void handleSQLException(HttpServletRequest request, HttpServletResponse response, Exception ex)
-        throws IOException {
+            throws IOException {
         sendErrorResponse(request, response, ex,
-                          "An internal database error occurred", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                "An internal database error occurred", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler({DataRetrievalFailureException.class})
+    protected void handleSQLRetrieveException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+            throws IOException {
+        sendErrorResponse(request, response, ex,
+                "An internal database error occurred while attempting to retrieve data",
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler({DCInputsReaderException.class, SubmissionConfigReaderException.class,
+            RESTInputReaderException.class})
+    protected void handleInputReaderException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+            throws IOException {
+        sendErrorResponse(request, response, ex,
+                "An internal server error occurred while attempting to read configuration data",
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler({BrowseException.class, SortException.class, RESTBrowseException.class})
+    protected void handleBrowseException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+            throws IOException {
+        sendErrorResponse(request, response, ex,
+                "An internal server error occurred while attempting to browse data",
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler({LinkMethodException.class})
+    protected void handleLinkedMethodException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+            throws IOException {
+        sendErrorResponse(request, response, ex,
+                "An internal server error occurred attempting to find method in linked resource",
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({IOException.class, RESTIOException.class})

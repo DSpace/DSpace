@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
-import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.exception.RESTSQLException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
@@ -83,7 +83,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
 
         return converter.convert(community);
@@ -130,7 +130,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
         try {
             topCommunities = cs.findAllTop(obtainContext());
         } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         Page<CommunityRest> page = utils.getPage(topCommunities, pageable).map(converter);
         return page;

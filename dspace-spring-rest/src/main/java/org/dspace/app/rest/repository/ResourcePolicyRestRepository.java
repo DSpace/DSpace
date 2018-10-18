@@ -10,7 +10,6 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 
 import org.dspace.app.rest.converter.ResourcePolicyConverter;
-import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.hateoas.ResourcePolicyResource;

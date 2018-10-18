@@ -27,8 +27,9 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
-import org.dspace.app.rest.model.ErrorRest;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RESTSQLException;
+import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.app.rest.model.patch.Operation;
@@ -274,10 +275,15 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
-                      Patch patch) throws SQLException, AuthorizeException {
+                      Patch patch)  {
         List<Operation> operations = patch.getOperations();
         WorkspaceItemRest wsi = findOne(id);
-        WorkspaceItem source = wis.find(context, id);
+        WorkspaceItem source = null;
+        try {
+            source = wis.find(context, id);
+        } catch (SQLException e) {
+            throw new RESTSQLException(e.getMessage(), e);
+        }
         for (Operation op : operations) {
             //the value in the position 0 is a null value
             String[] path = op.getPath().substring(1).split("/", 3);
@@ -289,7 +295,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                     "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
             }
         }
-        wis.update(context, source);
+        try {
+            wis.update(context, source);
+        } catch (SQLException e) {
+            throw new RESTSQLException(e.getMessage(), e);
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e.getMessage());
+        }
     }
 
     private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi,

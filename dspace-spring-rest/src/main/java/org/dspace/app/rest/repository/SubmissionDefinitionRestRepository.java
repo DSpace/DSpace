@@ -25,6 +25,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -71,14 +72,18 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findByCollection")
-    public SubmissionDefinitionRest findByCollection(@Parameter(value = "uuid", required = true) UUID collectionUuid)
-            throws SQLException {
-        Collection col = collectionService.find(obtainContext(), collectionUuid);
+    public SubmissionDefinitionRest findByCollection(@Parameter(value = "uuid", required = true) UUID collectionUuid) {
+        Collection col = null;
+        try {
+            col = collectionService.find(obtainContext(), collectionUuid);
+        } catch (SQLException e) {
+            throw new DataRetrievalFailureException(e.getMessage(), e);
+        }
         if (col == null) {
             return null;
         }
         SubmissionDefinitionRest def = converter
-            .convert(submissionConfigReader.getSubmissionConfigByCollection(col.getHandle()));
+                .convert(submissionConfigReader.getSubmissionConfigByCollection(col.getHandle()));
         return def;
     }
 

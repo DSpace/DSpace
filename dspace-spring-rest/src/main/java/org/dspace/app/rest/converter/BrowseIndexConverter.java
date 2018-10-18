@@ -10,7 +10,7 @@ package org.dspace.app.rest.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.exception.RESTSortException;
+import org.dspace.app.rest.exception.RESTBrowseException;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.sort.SortException;
@@ -47,7 +47,7 @@ public class BrowseIndexConverter extends DSpaceConverter<BrowseIndex, BrowseInd
                 sortOptionsList.add(new BrowseIndexRest.SortOption(so.getName(), so.getMetadata()));
             }
         } catch (SortException e) {
-            throw new RESTSortException(e.getMessage(), e);
+            throw new RESTBrowseException(e.getMessage(), e);
         }
         bir.setSortOptions(sortOptionsList);
         return bir;

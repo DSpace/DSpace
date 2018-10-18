@@ -17,14 +17,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
-import org.dspace.app.rest.exception.RESTDCInputsReaderException;
+import org.dspace.app.rest.exception.RESTInputReaderException;
 import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +65,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         } catch (AuthorizeException ex) {
             throw new RESTAuthorizationException(ex);
         } catch (SQLException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
+            throw new RESTSQLException(ex.getMessage(), ex);
         }
     }
 
@@ -322,22 +321,17 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param patch
      * the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return
-     * @throws HttpRequestMethodNotSupportedException
      * @throws UnprocessableEntityException
      * @throws PatchBadRequestException
      */
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
-        throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, PatchBadRequestException {
+        throws UnprocessableEntityException, PatchBadRequestException {
         Context context = obtainContext();
         try {
             thisRepository.patch(context, request, apiCategory, model, id, patch);
             context.commit();
-        } catch (AuthorizeException ae) {
-            throw new RESTAuthorizationException(ae);
         } catch (SQLException e) {
             throw new RESTSQLException(e.getMessage(), e);
-        } catch (DCInputsReaderException e) {
-            throw new RESTDCInputsReaderException(e.getMessage(), e);
         }
         return findOne(id);
     }
@@ -360,13 +354,14 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @throws RepositoryMethodNotImplementedException
      *             returned by the default implementation when the operation is not supported for the entity
      * 
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws DCInputsReaderException
+     * @throws RESTSQLException
+     * @throws RESTAuthorizationException
+     * @throws RESTInputReaderException
      */
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
                          Patch patch)
-        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
+        throws RepositoryMethodNotImplementedException, RESTSQLException, RESTAuthorizationException,
+            RESTInputReaderException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 

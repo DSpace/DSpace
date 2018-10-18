@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.rest.converter.SiteConverter;
-import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.hateoas.SiteResource;
 import org.dspace.content.Site;

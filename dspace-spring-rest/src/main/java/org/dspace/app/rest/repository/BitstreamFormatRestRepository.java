@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
-import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
 import org.dspace.content.BitstreamFormat;

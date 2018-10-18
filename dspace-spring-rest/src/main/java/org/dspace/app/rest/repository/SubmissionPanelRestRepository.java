@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.app.rest.converter.SubmissionSectionConverter;
-import org.dspace.app.rest.exception.RESTSubmissionConfigReaderException;
+import org.dspace.app.rest.exception.RESTInputReaderException;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.hateoas.SubmissionSectionResource;
@@ -52,7 +52,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
             return converter.convert(step);
         } catch (SubmissionConfigReaderException e) {
             //TODO wrap with a specific exception
-            throw new RESTSubmissionConfigReaderException(e.getMessage(), e);
+            throw new RESTInputReaderException(e.getMessage(), e);
         }
     }
 

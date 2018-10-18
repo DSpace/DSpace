@@ -20,9 +20,12 @@ public class RESTIOException extends RuntimeException {
         super(message);
     }
 
-    public RESTIOException(IOException ex) {super(ex); }
+    public RESTIOException(IOException ex) {
+        super(ex);
+    }
 
     public RESTIOException(String message, Throwable ex) {
+
         super(message, ex);
     }
 

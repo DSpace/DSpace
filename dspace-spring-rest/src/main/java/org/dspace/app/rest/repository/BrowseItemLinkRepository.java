@@ -13,8 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ItemConverter;
-import org.dspace.app.rest.exception.RESTSQLException;
-import org.dspace.app.rest.exception.RESTSortException;
+import org.dspace.app.rest.exception.RESTBrowseException;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
@@ -116,7 +115,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
                         bs.setSortBy(so.getNumber());
                     }
                 } catch (SortException e) {
-                    throw new RESTSortException(e.getMessage(), e);
+                    throw new RESTBrowseException(e.getMessage(), e);
                 }
             }
         }

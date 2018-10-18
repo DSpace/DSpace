@@ -13,7 +13,6 @@ import java.util.List;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataFieldConverter;
-import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.hateoas.MetadataFieldResource;
 import org.dspace.content.MetadataField;

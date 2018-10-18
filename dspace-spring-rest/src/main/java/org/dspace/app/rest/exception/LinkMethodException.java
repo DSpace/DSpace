@@ -7,11 +7,20 @@
  */
 package org.dspace.app.rest.exception;
 
+/**
+ * This exception captures information when a method cannot be found
+ * in the repository for a resource.
+ *
+ * @author Michael Spalti
+ */
 public class LinkMethodException extends RuntimeException {
 
-    public LinkMethodException(String message) { super(message); }
+    public LinkMethodException(String message) {
+        super(message);
+    }
 
     public LinkMethodException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

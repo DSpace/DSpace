@@ -10,21 +10,22 @@ package org.dspace.app.rest.exception;
 import org.dspace.app.util.SubmissionConfigReaderException;
 
 /**
- * Wrapper of the dspace SubmissionConfigReaderException that makes it unchecked.
+ * Wrapper for dspace input reader exceptions that makes them unchecked
+ * (e.g. DCInputsReaderException or SubmissionConfigReaderException).
  *
  * @author Michael Spalti
  */
-public class RESTSubmissionConfigReaderException extends RuntimeException {
+public class RESTInputReaderException extends RuntimeException {
 
-    public RESTSubmissionConfigReaderException(String message) {
+    public RESTInputReaderException(String message) {
         super(message);
     }
 
-    public RESTSubmissionConfigReaderException(SubmissionConfigReaderException ex) {
+    public RESTInputReaderException(SubmissionConfigReaderException ex) {
         super(ex);
     }
 
-    public RESTSubmissionConfigReaderException(String message, Throwable io) {
+    public RESTInputReaderException(String message, Throwable io) {
         super(message, io);
     }
 }

@@ -62,7 +62,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         try {
             bit = bs.find(context, id);
         } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (bit == null) {
             return null;
@@ -115,7 +115,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
                 throw new UnprocessableEntityException("The bitstream cannot be deleted it is a logo");
             }
         } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         try {
             bs.delete(context, bit);
@@ -132,7 +132,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         try {
             bit = bs.find(context, uuid);
         } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (bit == null) {
             return null;

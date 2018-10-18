@@ -22,6 +22,8 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
+import org.dspace.app.rest.exception.RESTIOException;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
@@ -98,7 +100,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
 
         return converter.convert(eperson);
@@ -158,7 +160,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
             epersons = es.search(context, q, pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
             total = es.searchResultCount(context, q);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(converter);
         return page;
@@ -181,7 +183,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
             Context context = obtainContext();
             eperson = es.findByEmail(context, email);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataRetrievalFailureException(e.getMessage(), e);
         }
         if (eperson == null) {
             return null;
@@ -193,8 +195,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     @PreAuthorize("hasAuthority('ADMIN')")
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                       Patch patch)
-            throws UnprocessableEntityException, PatchBadRequestException, AuthorizeException,
-            ResourceNotFoundException {
+            throws UnprocessableEntityException, PatchBadRequestException, ResourceNotFoundException {
 
         try {
             EPerson eperson = es.find(context, uuid);
@@ -207,7 +208,9 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
             updatePatchedValues(context, patchedModel, eperson);
 
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e.getMessage());
         }
     }
 
@@ -251,12 +254,14 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
                                 + StringUtils.join(constraints, ", "));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         try {
             es.delete(context, eperson);
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new RESTSQLException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new RESTIOException(e.getMessage(), e);
         }
     }
 

@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RESTIOException;
 import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -102,10 +103,14 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     @Override
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                       Patch patch)
-            throws UnprocessableEntityException, PatchBadRequestException, SQLException, AuthorizeException,
-            ResourceNotFoundException {
+            throws UnprocessableEntityException, PatchBadRequestException, ResourceNotFoundException {
 
-        Item item = is.find(context, uuid);
+        Item item = null;
+        try {
+            item = is.find(context, uuid);
+        } catch (SQLException e) {
+            throw new DataRetrievalFailureException(e.getMessage(), e);
+        }
 
         if (item == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
@@ -123,11 +128,10 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
      * @param context
      * @param itemRest the updated item rest resource
      * @param item the item content object
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws RESTSQLException
+     * @throws RESTAuthorizationException
      */
-    private void updatePatchedValues(Context context, ItemRest itemRest, Item item)
-            throws SQLException, AuthorizeException {
+    private void updatePatchedValues(Context context, ItemRest itemRest, Item item) {
 
         try {
             if (itemRest.getWithdrawn() != item.isWithdrawn()) {
@@ -141,9 +145,11 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
                 item.setDiscoverable(itemRest.getDiscoverable());
                 is.update(context, item);
             }
-        } catch (SQLException | AuthorizeException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            throw e;
+            throw new RESTSQLException(e.getMessage(), e);
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e.getMessage());
         }
     }
 

@@ -16,9 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.GroupConverter;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.GroupResource;
@@ -76,7 +76,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
                 }
             }
         } catch (SQLException excSQL) {
-            throw new RuntimeException(excSQL.getMessage(), excSQL);
+            throw new RESTSQLException(excSQL.getMessage(), excSQL);
         }
 
         return converter.convert(group);
