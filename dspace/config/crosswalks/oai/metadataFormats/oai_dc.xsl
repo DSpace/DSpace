@@ -214,14 +214,32 @@
 				<dc:type><xsl:value-of select="." /></dc:type>
 			</xsl:for-each>
 
-			<!-- AccessType de OpenAire opcional -->
-			<!-- driver.rights.accessRights = rights - for SNRD and DRIVER-->	
-			<xsl:for-each select="doc:metadata/doc:element[@name='driver']/doc:element[@name='rights']/doc:element[@name='accessRights']/doc:element/doc:field[@name='value']">
-				<dc:rights><xsl:value-of select="." /></dc:rights>
-			</xsl:for-each>
-			
-			
 			<!--sedici.rights.* = rights -->
+			<xsl:variable name="bitstreams" select="doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle'][./doc:field/text()='ORIGINAL']/doc:element[@name='bitstreams']/doc:element[@name='bitstream']"/>
+			<xsl:variable name="embargoed" select="$bitstreams/doc:field[@name='embargo']"/>
+
+			<xsl:choose>
+				<xsl:when test="count($bitstreams) = 0 or count($embargoed[text() = 'forever']) = count($bitstreams) ">
+					<dc:rights>info:eu-repo/semantics/closedAccess</dc:rights>
+				</xsl:when>
+				<xsl:when test="count($embargoed) = 0">
+					<dc:rights>info:eu-repo/semantics/openAccess</dc:rights>
+				</xsl:when>
+				<xsl:when test="count($embargoed[text() = 'forever']) &gt; 0">
+					<dc:rights>info:eu-repo/semantics/restrictedAccess</dc:rights>
+				</xsl:when>
+				<xsl:otherwise>
+<!-- 			es un embargoedAccess si o si -->
+					<xsl:for-each select="$embargoed">
+						<xsl:sort select="text()" />
+						<xsl:if test="position() = 1">
+							<dc:date><xsl:value-of select="concat('info:eu-repo/date/embargoEnd/',text())"/></dc:date>
+							<dc:rigths>info:eu-repo/semantics/embargoedAccess</dc:rigths>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:otherwise>
+			</xsl:choose>
+
 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='rights']/doc:element[@name='uri']/doc:element/doc:field[@name='value']">
 				<dc:rights><xsl:value-of select="." /></dc:rights>
 			</xsl:for-each>
