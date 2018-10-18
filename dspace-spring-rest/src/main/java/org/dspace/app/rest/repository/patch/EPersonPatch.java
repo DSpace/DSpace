@@ -9,35 +9,35 @@ package org.dspace.app.rest.repository.patch;
 
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.app.rest.repository.patch.factories.ItemOperationFactory;
+import org.dspace.app.rest.repository.patch.factories.EPersonOperationFactory;
 import org.dspace.app.rest.repository.patch.factories.impl.ResourcePatchOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Provides PATCH operations for item updates.
+ * Provides patch operations for eperson updates.
  */
 @Component
-public class ItemPatch extends AbstractResourcePatch<ItemRest> {
+public class EPersonPatch extends AbstractResourcePatch<EPersonRest> {
 
     @Autowired
-    ItemOperationFactory patchFactory;
+    EPersonOperationFactory patchFactory;
 
     /**
-     * Peforms the replace operation.
-     * @param item the rest representation of the item
+     * Performs the replace operation.
+     * @param eperson the eperson rest representation
      * @param operation the replace operation
      * @throws UnprocessableEntityException
      * @throws PatchBadRequestException
      */
-    protected ItemRest replace(ItemRest item, Operation operation) {
+    protected EPersonRest replace(EPersonRest eperson, Operation operation) {
 
-        ResourcePatchOperation<ItemRest> patchOperation =
+        ResourcePatchOperation<EPersonRest> patchOperation =
                 patchFactory.getReplaceOperationForPath(operation.getPath());
 
-        return patchOperation.perform(item, operation);
+        return patchOperation.perform(eperson, operation);
 
     }
 }

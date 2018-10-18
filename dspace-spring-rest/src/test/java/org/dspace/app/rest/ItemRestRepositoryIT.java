@@ -89,11 +89,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/core/items"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "Public item 1", "2017-10-17"),
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13"),
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3, "Public item 3", "2016-02-13")
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
+                                        "Public item 1", "2017-10-17"),
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
+                                        "Public item 2", "2016-02-13"),
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
+                                        "Public item 3", "2016-02-13")
                    )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
+                   .andExpect(jsonPath("$._links.self.href",
+                           Matchers.containsString("/api/core/items")))
                    .andExpect(jsonPath("$.page.size", is(20)))
                    .andExpect(jsonPath("$.page.totalElements", is(3)))
         ;
@@ -143,15 +147,19 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .param("size", "2"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "Public item 1", "2017-10-17"),
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13")
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
+                               "Public item 1", "2017-10-17"),
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
+                               "Public item 2", "2016-02-13")
                    )))
                    .andExpect(jsonPath("$._embedded.items", Matchers.not(
-                       Matchers.contains(
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3, "Public item 3", "2016-02-13")
-                       )
+                           Matchers.contains(
+                               ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
+                                       "Public item 3", "2016-02-13")
+                           )
                    )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
+                   .andExpect(jsonPath("$._links.self.href",
+                           Matchers.containsString("/api/core/items")))
         ;
 
         getClient(token).perform(get("/api/core/items")
@@ -159,15 +167,19 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .param("page", "1"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.items", Matchers.contains(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3, "Public item 3", "2016-02-13")
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
+                               "Public item 3", "2016-02-13")
                    )))
                    .andExpect(jsonPath("$._embedded.items", Matchers.not(
                        Matchers.contains(
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "Public item 1", "2017-10-17"),
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13")
+                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
+                                   "Public item 1", "2017-10-17"),
+                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
+                                   "Public item 2", "2016-02-13")
                        )
                    )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
+                   .andExpect(jsonPath("$._links.self.href",
+                           Matchers.containsString("/api/core/items")))
                    .andExpect(jsonPath("$.page.size", is(2)))
                    .andExpect(jsonPath("$.page.totalElements", is(3)))
         ;
@@ -214,14 +226,17 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem1.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", Matchers.is(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "Public item 1", "2017-10-17")
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
+                               "Public item 1", "2017-10-17")
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13")
+                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
+                                   "Public item 2", "2016-02-13")
                        )
                    )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
+                   .andExpect(jsonPath("$._links.self.href",
+                           Matchers.containsString("/api/core/items")))
         ;
     }
 
@@ -277,14 +292,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem1.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", Matchers.is(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "Public item 1", "2017-10-17")
+                       ItemMatcher
+                               .matchItemWithTitleAndDateIssued(publicItem1,
+                                       "Public item 1", "2017-10-17")
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13")
+                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
+                                   "Public item 2", "2016-02-13")
                        )
                    )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
+                   .andExpect(jsonPath("$._links.self.href",
+                           Matchers.containsString("/api/core/items")))
         ;
 
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/bitstreams"))
@@ -297,7 +316,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/owningCollection"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/collections")))
+                   .andExpect(jsonPath("$._links.self.href",
+                           Matchers.containsString("/api/core/collections")))
         ;
 
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/templateItemOf"))
@@ -536,7 +556,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(patch("/api/core/items/" + item.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                            .andExpect(status().isBadRequest());
+                        .andExpect(status().isBadRequest());
 
         // check item status after the failed patch (it must be unchanged)
         getClient(token).perform(get("/api/core/items/" + item2.getID()))
@@ -694,7 +714,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(patch("/api/core/items/" + item.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                   .andExpect(status().isForbidden());
+                        .andExpect(status().isForbidden());
 
         // check item status after the failed patch
         getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
@@ -750,8 +770,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // make discoverable an already discoverable item is a no-op
         getClient(token).perform(patch("/api/core/items/" + item.getID())
-            .content(patchBody)
-            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
                         .andExpect(jsonPath("$.discoverable", Matchers.is(true)));
@@ -877,9 +897,56 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(patch("/api/core/items/" + item.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
-                   .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
+
+        // check item status after the patch
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
+
+    }
+
+
+    @Test
+    public void useStringForBooleanTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public item
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                               .withSubject("ExtraEntry")
+                               .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        // String value should work.
+        ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", "false");
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // make private
+        getClient(token).perform(patch("/api/core/items/" + item.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.uuid", Matchers.is(item.getID().toString())))
+                        .andExpect(jsonPath("$.discoverable", Matchers.is(false)));
 
         // check item status after the patch
         getClient(token).perform(get("/api/core/items/" + item.getID()))
@@ -922,7 +989,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(patch("/api/core/items/" + item.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                   .andExpect(status().isUnauthorized());
+                        .andExpect(status().isUnauthorized());
 
         // check item status after the failed patch
         getClient(token).perform(get("/api/core/items/" + item.getID()))
@@ -966,7 +1033,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(patch("/api/core/items/" + item.getID())
             .content(patchBody)
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                   .andExpect(status().isForbidden());
+                        .andExpect(status().isForbidden());
 
         // check item status after the failed patch
         getClient(tokenAdmin).perform(get("/api/core/items/" + item.getID()))
@@ -1053,15 +1120,16 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder
+                .createCollection(context, parentCommunity).withName("Collection 1").build();
 
         //2. One public item, one workspace item and one template item.
         Item publicItem = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
+                                     .withTitle("Public item 1")
+                                     .withIssueDate("2017-10-17")
+                                     .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                     .withSubject("ExtraEntry")
+                                     .build();
 
         //Add a bitstream to an item
         String bitstreamContent = "ThisIsSomeDummyText";
@@ -1083,13 +1151,13 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._links.self.href", Matchers
-                   .containsString("/api/core/items/" + publicItem.getID() + "/bitstreams")));
+                           .containsString("/api/core/items/" + publicItem.getID() + "/bitstreams")));
 
         String token = getAuthToken(admin.getEmail(), password);
 
         //Delete public item
         getClient(token).perform(delete("/api/core/items/" + publicItem.getID()))
-                    .andExpect(status().is(204));
+                   .andExpect(status().is(204));
 
         //Trying to get deleted item should fail with 404
         getClient().perform(get("/api/core/items/" + publicItem.getID()))
@@ -1139,7 +1207,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                           .withName("Parent Community")
                                           .build();
 
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder
+                .createCollection(context, parentCommunity).withName("Collection 1").build();
 
         //2. One workspace item.
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
@@ -1153,7 +1222,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         //Check workspaceItem is available after failed deletion
         getClient(token).perform(get("/api/core/items/" + workspaceItem.getItem().getID()))
-                   .andExpect(status().isOk());
+                    .andExpect(status().isOk());
     }
 
     @Test
