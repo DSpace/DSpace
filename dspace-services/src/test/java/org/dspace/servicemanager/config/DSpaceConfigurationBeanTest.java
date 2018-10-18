@@ -42,7 +42,7 @@ public class DSpaceConfigurationBeanTest
 
     /**
      * Test that property substitution is working properly in Spring XML configs.
-     * Properties in those configs (e.g. ${key}) should be dynamically replaced
+     * Properties in those XML configs (e.g. ${key}) should be dynamically replaced
      * with the corresponding value from our ConfigurationService
      */
     @Test
@@ -61,10 +61,37 @@ public class DSpaceConfigurationBeanTest
         assertNotNull("Bean returned null", bean);
         assertNotNull("Bean.name() returned null", bean.getProperty());
 
-        // The name of the ServiceExample bean should be the SAME as the value of "serviceExample.bean.name" in
-        // configuration, as the spring-test-beans.xml uses ${serviceExample.bean.name} to set the name
-        assertEquals("Bean.name() does not match configuration", cfg.getProperty("testDynamicBean.property"),
+        // The bean's getProperty() method should return the same value as "testDynamicBean.property" in DSpace's
+        // configuration. This is cause bean's property is set to ${testDynamicBean.property} in spring-test-beans.xml
+        assertEquals("Bean.getProperty() does not match configuration", cfg.getProperty("testDynamicBean.property"),
                      bean.getProperty());
+    }
+
+    /**
+     * Test that property substitution is working properly in Spring PropertySource (e.g. @Value annotations)
+     * Properties in those annotations, e.g. @Value("${key}"), should be dynamically replaced with the corresponding
+     * value from our ConfigurationService
+     */
+    @Test
+    public void testGetPropertySourceFromConfigurationService() {
+        // Load configs from files
+        ConfigurationService cfg = getKernel().getConfigurationService();
+        assertNotNull("ConfigurationService returned null", cfg);
+        assertNotNull("test config returned null", cfg.getProperty("testDynamicBean.property"));
+
+        // Load test bean which is defined by TestDynamicAnnotationConfiguration
+        TestDynamicPropertyBean bean = getKernel().getServiceManager().getServiceByName("propertyBeanUsingAnnotation",
+                                                                                        TestDynamicPropertyBean.class);
+
+        // The Test bean's property should be automatically set (see TestDynamicAnnotationConfiguration)
+        String configValue = bean.getProperty();
+
+        assertNotNull("PropertySource config returned null", configValue);
+
+        // The value of "configValue" should be equal to "testDynamicBean.property" in our configuration.
+        // This is because configValue is set via an @Value annotation in TestDynamicAnnotationConfiguration
+        assertEquals("PropertySource config does not match configuration", cfg.getProperty("testDynamicBean.property"),
+                     configValue);
     }
 
     /**
@@ -72,6 +99,8 @@ public class DSpaceConfigurationBeanTest
      *
      * @TODO: This test does not actually work yet, because Commons Configuration v2 doesn't yet have a
      * org.apache.commons.configuration2.spring.ConfigurationPropertiesFactoryBean that supports reloading properties.
+     * NOTE: This test also fails in Commons Configuration v1 (e.g. in DSpace 6.x). So, it's possible we may not be
+     * able to support reloadable properties via Spring beans (until Commons Configuration does)
      */
     /*@Test
     public void testReloadBeanSettingFromConfigurationService() throws ConfigurationException, InterruptedException {
