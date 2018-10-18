@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -499,7 +500,6 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                        )));
     }
 
-
     @Test
     public void testBrowseByStartsWith() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -565,13 +565,12 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withSubject("Science Fiction")
                                 .build();
 
-        // ---- BROWSES BY ITEM ----
+         // ---- BROWSES BY ENTRIES ----
 
         //** WHEN **
-        //An anonymous user browses the items in the Browse by date issued endpoint
-        //with startsWith set to 1990
-        getClient().perform(get("/api/discover/browses/dateissued/items")
-                                .param("startsWith", "1990")
+        //An anonymous user browses the entries in the Browse by Author endpoint
+        //with startsWith set to U
+        getClient().perform(get("/api/discover/browses/author/entries?startsWith=U")
                                 .param("size", "2"))
 
                    //** THEN **
@@ -580,11 +579,85 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect only the "remaining" five items to be present
+                   //We expect only the "Universe" entry to be present
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   //As entry browsing works as a filter, we expect to be on page 0
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index filters to the "Universe" entries and Counts 2 Items.
+                   .andExpect(jsonPath("$._embedded.browseEntries",
+                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Universe", 2)
+                                       )))
+                   //Verify startsWith parameter is included in the links
+                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=U")));
+
+        //** WHEN **
+        //An anonymous user browses the entries in the Browse by Author endpoint
+        //with startsWith set to T and scope set to Col 1
+        getClient().perform(get("/api/discover/browses/author/entries?startsWith=T")
+                                .param("scope", col1.getID().toString()))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the entry "Turing, Alan Mathison" to be present
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   //As entry browsing works as a filter, we expect to be on page 0
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index filters to the "Turing, Alan'" items.
+                   .andExpect(jsonPath("$._embedded.browseEntries",
+                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Turing, Alan Mathison", 1)
+                                       )))
+                   //Verify that the startsWith paramater is included in the links
+                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=T")));
+
+        //** WHEN **
+        //An anonymous user browses the entries in the Browse by Subject endpoint
+        //with startsWith set to C
+        getClient().perform(get("/api/discover/browses/subject/entries?startsWith=C"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the entry "Computing" to be present
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   //As entry browsing works as a filter, we expect to be on page 0
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index filters to the "Computing'" items.
+                   .andExpect(jsonPath("$._embedded.browseEntries",
+                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Computing", 3)
+                                       )))
+                   //Verify that the startsWith paramater is included in the links
+                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=C")));
+
+        // ---- BROWSES BY ITEM ----
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by date issued endpoint
+        //with startsWith set to 1990
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
+                                .param("size", "2"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect the totalElements to be the 7 items present in the repository
                    .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   //We expect to jump to page 1 of the index
                    .andExpect(jsonPath("$.page.number", is(1)))
                    .andExpect(jsonPath("$.page.size", is(2)))
-                   .andExpect(jsonPath("$._links.first.href", contains("startsWith=1990")))
+                   .andExpect(jsonPath("$._links.first.href", containsString("startsWith=1990")))
 
                    //Verify that the index jumps to the "Python" item.
                    .andExpect(jsonPath("$._embedded.items",
@@ -596,8 +669,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //** WHEN **
         //An anonymous user browses the items in the Browse by Title endpoint
         //with startsWith set to T
-        getClient().perform(get("/api/discover/browses/title/items")
-                                .param("startsWith", "T"))
+        getClient().perform(get("/api/discover/browses/title/items?startsWith=T")
+                            .param("size", "2"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -605,9 +678,11 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect only the "T-800" and "Zeta Reticuli" items to be present
-                   .andExpect(jsonPath("$.page.totalElements", is(2)))
-                   .andExpect(jsonPath("$.page.number", is(0)))
+                   //We expect the totalElements to be the 7 items present in the repository
+                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   //We expect to jump to page 2 in the index
+                   .andExpect(jsonPath("$.page.number", is(2)))
+                   .andExpect(jsonPath("$._links.first.href", containsString("startsWith=T")))
 
                    //Verify that the index jumps to the "T-800" item.
                    .andExpect(jsonPath("$._embedded.items",
@@ -617,12 +692,13 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                                                             "Zeta Reticuli",
                                                                                             "2018-01-01")
                                        )));
+
         //** WHEN **
         //An anonymous user browses the items in the Browse by Title endpoint
         //with startsWith set to Blade and scope set to Col 1
-        getClient().perform(get("/api/discover/browses/title/items")
-                                .param("startsWith", "Blade")
-                                .param("scope", col1.getID().toString()))
+        getClient().perform(get("/api/discover/browses/title/items?startsWith=Blade")
+                                .param("scope", col1.getID().toString())
+                                .param("size", "2"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -630,82 +706,19 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect only the "Blade Runner" and "Python" items to be present
-                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   //We expect the totalElements to be the 3 items present in the collection
+                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+                   //As this is is a small collection, we expect to go-to page 0
                    .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(jsonPath("$._links.first.href", containsString("startsWith=Blade")))
 
                    //Verify that the index jumps to the "Blade Runner" item.
                    .andExpect(jsonPath("$._embedded.items",
-                                       contains(ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                           contains(ItemMatcher.matchItemWithTitleAndDateIssued(item2,
                                                                                             "Blade Runner",
                                                                                             "1982-06-25"),
                                                ItemMatcher.matchItemWithTitleAndDateIssued(item3,
                                                                                             "Python", "1990")
-                                       )));
-
-        // ---- BROWSES BY ENTRIES ----
-
-        //** WHEN **
-        //An anonymous user browses the entries in the Browse by Author endpoint
-        //with startsWith set to U
-        getClient().perform(get("/api/discover/browses/author/entries")
-                                .param("startsWith", "U"))
-
-                   //** THEN **
-                   //The status has to be 200 OK
-                   .andExpect(status().isOk())
-                   //We expect the content type to be "application/hal+json;charset=UTF-8"
-                   .andExpect(content().contentType(contentType))
-
-                   //We expect only the "Universe" entry to be present
-                   .andExpect(jsonPath("$.page.totalElements", is(1)))
-                   .andExpect(jsonPath("$.page.number", is(0)))
-
-                   //Verify that the index filters to the "Universe" entries and Counts 2 Items.
-                   .andExpect(jsonPath("$._embedded.browseEntries",
-                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Universe", 2)
-                                       )));
-        //** WHEN **
-        //An anonymous user browses the entries in the Browse by Author endpoint
-        //with startsWith set to T and scope set to Col 1
-        getClient().perform(get("/api/discover/browses/author/entries")
-                                .param("startsWith", "T")
-                                .param("scope", col1.getID().toString()))
-
-                   //** THEN **
-                   //The status has to be 200 OK
-                   .andExpect(status().isOk())
-                   //We expect the content type to be "application/hal+json;charset=UTF-8"
-                   .andExpect(content().contentType(contentType))
-
-                   //We expect only the entry "Turing, Alan Mathison" to be present
-                   .andExpect(jsonPath("$.page.totalElements", is(1)))
-                   .andExpect(jsonPath("$.page.number", is(0)))
-
-                   //Verify that the index filters to the "James'" items.
-                   .andExpect(jsonPath("$._embedded.browseEntries",
-                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Turing, Alan Mathison", 1)
-                                       )));
-
-        //** WHEN **
-        //An anonymous user browses the entries in the Browse by Subject endpoint
-        //with startsWith set to C
-        getClient().perform(get("/api/discover/browses/subject/entries")
-                                .param("startsWith", "C"))
-
-                   //** THEN **
-                   //The status has to be 200 OK
-                   .andExpect(status().isOk())
-                   //We expect the content type to be "application/hal+json;charset=UTF-8"
-                   .andExpect(content().contentType(contentType))
-
-                   //We expect only the entry "Computing" to be present
-                   .andExpect(jsonPath("$.page.totalElements", is(1)))
-                   .andExpect(jsonPath("$.page.number", is(0)))
-
-                   //Verify that the index filters to the "Computing'" items.
-                   .andExpect(jsonPath("$._embedded.browseEntries",
-                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Computing", 3)
                                        )));
     }
 }
