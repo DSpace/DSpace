@@ -1130,6 +1130,12 @@
                 <artifactId>apache-jena-libs</artifactId>
                 <type>pom</type>
                 <version>${jena.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>org.apache.commons</artifactId>
+                        <groupId>commons-lang3</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1206,10 +1212,9 @@
                 <version>2.4</version>
             </dependency>
             <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.6</version>
-                <!-- <version>2.1</version> in xmlui - wing -->
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.7</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>

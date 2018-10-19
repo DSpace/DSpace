@@ -9,8 +9,8 @@ package org.purl.sword.base;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * @author Neil Taylor (nst@aber.ac.uk)

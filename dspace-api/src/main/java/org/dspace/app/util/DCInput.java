@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.Utils;
 import org.slf4j.Logger;

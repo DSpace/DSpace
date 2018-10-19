@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.parameter;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Custom request parameter used in the Discovery search REST endpoint.

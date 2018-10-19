@@ -17,7 +17,7 @@ import java.util.Set;
 import gr.ekt.bte.core.MutableRecord;
 import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.core.Value;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.submit.lookup.SubmissionLookupDataLoader;
 
 /**

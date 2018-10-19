@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.service.AuthorityValueService;
@@ -124,7 +124,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
      * This method looks at the authority of a metadata value.
      * If the authority can be found in solr, that value is reused.
      * Otherwise a new authority value will be generated that will be indexed in solr.
-     * 
+     *
      * If the authority starts with AuthorityValueGenerator.GENERATE, a specific type of AuthorityValue will be
      * generated.
      * Depending on the type this may involve querying an external REST service
