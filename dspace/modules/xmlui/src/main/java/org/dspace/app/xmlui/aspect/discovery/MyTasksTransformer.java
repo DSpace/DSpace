@@ -206,7 +206,7 @@ public class MyTasksTransformer extends DiscoverySubmissions{
 
 
                 // Registration Status Row
-                Row registrationRow = t.addRow();
+                /*                Row registrationRow = t.addRow();
                 registrationRow.addCell(Cell.ROLE_HEADER).addContent(T_doi_registration_status);
                 c = registrationRow.addCell(Cell.ROLE_DATA);
 
@@ -219,6 +219,7 @@ public class MyTasksTransformer extends DiscoverySubmissions{
                     // no DOI registration info
                     c.addContent(T_doi_not_registered);
                 }
+                */
 
                 Row titleRow = t.addRow();
                 titleRow.addCell(Cell.ROLE_HEADER).addContent(T_item_title);
