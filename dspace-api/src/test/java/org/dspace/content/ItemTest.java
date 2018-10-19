@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 import mockit.NonStrictExpectations;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;

@@ -15,7 +15,7 @@ import java.util.List;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;

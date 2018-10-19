@@ -31,7 +31,7 @@ import ORG.oclc.oai.harvester2.verb.Identify;
 import ORG.oclc.oai.harvester2.verb.ListIdentifiers;
 import ORG.oclc.oai.harvester2.verb.ListMetadataFormats;
 import ORG.oclc.oai.harvester2.verb.ListRecords;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;

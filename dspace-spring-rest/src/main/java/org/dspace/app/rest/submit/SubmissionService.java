@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.BitstreamFormatConverter;

@@ -22,7 +22,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.app.mediafilter.factory.MediaFilterServiceFactory;
 import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.content.Collection;

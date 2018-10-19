@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;

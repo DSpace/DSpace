@@ -95,8 +95,8 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <!-- this needs to eventually go into common/lib for tomcat 5 -->
         <dependency>
