@@ -9,6 +9,7 @@
 --%>
 <%@ page language="java" pageEncoding="UTF-8" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.content.DSpaceObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
@@ -19,9 +20,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
 	
-    Map<String, List<String[]>> result = (Map<String, List<String[]>>) request.getAttribute("result");
-	String handle = (String)request.getAttribute("handle");
-	Map<String, Boolean> haveSimilar = (Map<String, Boolean>)request.getAttribute("haveSimilar");
+	Map<String, Map<String, List<String[]>>> result = (Map<String, Map<String, List<String[]>>>) request.getAttribute("result");
+	Map<String, Map<String, Boolean>> haveSimilar = (Map<String, Map<String, Boolean>>)request.getAttribute("haveSimilar");
+	Map<String, DSpaceObject> mapItem = (Map<String, DSpaceObject>)request.getAttribute("items");
 	
 %>
 
@@ -32,13 +33,22 @@
 
 <fmt:message key="jsp.dspace.authority-claim.info" />
 <ul>
-	<fmt:message key="jsp.dspace.authority-claim.info.case1" />
-	<fmt:message key="jsp.dspace.authority-claim.info.case2" />
-	<fmt:message key="jsp.dspace.authority-claim.info.case3" />
+<fmt:message key="jsp.dspace.authority-claim.info.case1" />
+<fmt:message key="jsp.dspace.authority-claim.info.case2" />
+<fmt:message key="jsp.dspace.authority-claim.info.case3" />
 </ul>
 
-<form method="post">
+<% for(String handlekey : result.keySet()) { 
+    
+    Map<String, List<String[]>> subresult = (Map<String, List<String[]>>) result.get(handlekey);
+    Map<String, Boolean> subHaveSimilar = (Map<String, Boolean>)haveSimilar.get(handlekey);
 
+	DSpaceObject item = mapItem.get(handlekey); 
+	%>  
+	<%= item.getName() %>
+
+<form method="post">
+	
 <ul class="nav nav-tabs" id="myTab" role="tablist">
 <%
     // Keep a count of the number of values of each element+qualifier
@@ -47,9 +57,8 @@
     Map<String, Integer> dcCounter = new HashMap<String, Integer>();
     
     int i = 0;
-    for (String key : result.keySet())
+    for (String key : subresult.keySet())
     {
-
 %>
         
 
@@ -61,15 +70,14 @@
 	i++;
     } %>
 </ul>
-
-
+	
 <div class="tab-content" id="myTabContent">
-<% 
-
+  
+<%    
 i = 0;
-for (String key : result.keySet())
-{
 
+for (String key : subresult.keySet())
+{
 %>
 
   <div class="tab-pane <%= i==0?"active":""%>" id="<%= key %>" role="tabpanel" aria-labelledby="<%= key %>-tab">
@@ -78,7 +86,7 @@ for (String key : result.keySet())
       
       	<div class="col-sm-5">
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="userchoice_<%= key %>" id="dolater_<%= key %>" value="dolater_<%= key %>" <%= haveSimilar.get(key)?"":"checked" %>/>
+          <input class="form-check-input" type="radio" name="userchoice_<%= key %>" id="dolater_<%= key %>" value="dolater_<%= key %>" <%= subHaveSimilar.get(key)?"":"checked" %>/>
           
           <label class="form-check-label" for="none_<%= key %>">
             <fmt:message key="jsp.authority-claim.choice.dolater"/>
@@ -94,7 +102,7 @@ for (String key : result.keySet())
         </div> 
 <%        
 
-		for(String[] record : result.get(key)) { 
+		for(String[] record : subresult.get(key)) { 
 	        Integer count = dcCounter.get(key);
 	        if (count == null)
 	        {
@@ -155,15 +163,20 @@ for (String key : result.keySet())
 
 <% 
 	i++;
-} %>
+} 
+%>
+
 </div>
-        <input type="hidden" name="handle" value="<%= handle %>"/>
+
+        <input type="hidden" name="handle" value="<%= handlekey %>"/>
 					
         <%-- <input type="submit" name="submit" value="Update" /> --%>
         <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit" value="<fmt:message key="jsp.tools.general.update"/>" />
         <%-- <input type="submit" name="submit_cancel" value="Cancel" /> --%>
 		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
-	
-</form>
 
+</form>		
+<%
+}
+%>
 </dspace:layout>

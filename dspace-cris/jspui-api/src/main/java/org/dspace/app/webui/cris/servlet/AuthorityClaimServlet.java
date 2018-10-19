@@ -23,12 +23,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.integration.BindItemToRP;
+import org.dspace.app.cris.integration.NameResearcherPage;
 import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -67,11 +69,71 @@ public class AuthorityClaimServlet extends DSpaceServlet
     {
 
         String handle = request.getParameter("handle");
-        String crisID = context.getCrisID();
+        String crisID = (String)request.getAttribute("requesterMapPublication");
+        if(StringUtils.isBlank(crisID)) {
+            crisID = context.getCrisID();
+        }
+        Map<NameResearcherPage, Item[]> mapPublications = (Map<NameResearcherPage, Item[]>)request.getAttribute("mapPublicationList");
+        if(mapPublications!=null) {
+            showListClaim(context, request, response, crisID, mapPublications);
+        }
+        else {
+            Map<String, List<String[]>> result = new HashMap<String, List<String[]>>();
+            Map<String, Boolean> haveSimilar = new HashMap<String, Boolean>();
+            showAuthorityClaim(context, request, response, handle, crisID, result, haveSimilar);
+        }
+    }
 
-        Map<String, List<String[]>> result = new HashMap<String, List<String[]>>();
-        Map<String, Boolean> haveSimilar = new HashMap<String, Boolean>();
+    private void showListClaim(Context context, HttpServletRequest request,
+            HttpServletResponse response, String crisID,
+            Map<NameResearcherPage, Item[]> mapPublications) throws SQLException, ServletException, IOException
+    {
+        Map<String, Map<String, List<String[]>>> mapResult = new HashMap<String, Map<String, List<String[]>>>();
+        Map<String, Map<String, Boolean>> haveSimilarResult = new HashMap<String, Map<String, Boolean>>();
+        Map<String, DSpaceObject> mapItem = new HashMap<String, DSpaceObject>();
+        for(Item[] ii : mapPublications.values()) {
+            for(Item i : ii) {
+                Map<String, List<String[]>> result = new HashMap<String, List<String[]>>();
+                Map<String, Boolean> haveSimilar = new HashMap<String, Boolean>();
+                String handle = i.getHandle();
+                internalDoResult(context, handle, crisID, result, haveSimilar);
+                mapResult.put(handle, result);
+                mapItem.put(handle, HandleManager.resolveToObject(context, handle));
+                haveSimilarResult.put(handle, haveSimilar);
+            }            
+        }
+        
+        log.info(LogManager.getHeader(context, "show_authority_claim_list", null));
+        request.setAttribute("items", mapItem);
+        request.setAttribute("result", mapResult);        
+        request.setAttribute("haveSimilar", haveSimilarResult);
+        
+        JSPManager.showJSP(request, response, "/tools/authority-claim-list.jsp");
+        
+    }
 
+    private void showAuthorityClaim(Context context, HttpServletRequest request,
+            HttpServletResponse response, String handle, String crisID, Map<String, List<String[]>> result, Map<String, Boolean> haveSimilar)
+            throws SQLException, ServletException, IOException
+    {
+
+
+        internalDoResult(context, handle, crisID, result, haveSimilar);
+
+        request.setAttribute("result", result);
+        request.setAttribute("handle", handle);
+        request.setAttribute("haveSimilar", haveSimilar);
+
+        log.info(LogManager.getHeader(context, "show_authority_claim",
+                "#keys: " + result.size()));
+
+        JSPManager.showJSP(request, response, "/tools/authority-claim.jsp");
+    }
+
+    private void internalDoResult(Context context, String handle, String crisID,
+            Map<String, List<String[]>> result,
+            Map<String, Boolean> haveSimilar) throws SQLException
+    {
         if (StringUtils.isNotBlank(handle))
         {
 
@@ -144,15 +206,6 @@ public class AuthorityClaimServlet extends DSpaceServlet
             }
 
         }
-
-        request.setAttribute("result", result);
-        request.setAttribute("handle", handle);
-        request.setAttribute("haveSimilar", haveSimilar);
-
-        log.info(LogManager.getHeader(context, "show_authority_claim",
-                "#keys: " + result.size()));
-
-        JSPManager.showJSP(request, response, "/tools/authority-claim.jsp");
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,

@@ -10,15 +10,19 @@ package org.dspace.app.webui.cris.controller;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.cris.integration.BindItemToRP;
+import org.dspace.app.cris.integration.NameResearcherPage;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.content.Item;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
@@ -33,6 +37,8 @@ import org.springframework.web.servlet.mvc.ParameterizableViewController;
  */
 public class ReBindItemToRPController extends ParameterizableViewController
 {
+
+    private static final String OPERATION_LIST = "list";
 
     /**
      * the applicationService for query the RP db, injected by Spring IoC
@@ -54,7 +60,17 @@ public class ReBindItemToRPController extends ParameterizableViewController
         }
         List<ResearcherPage> r = new LinkedList<ResearcherPage>();
         r.add(researcher);
-        BindItemToRP.work(r, relationPreferenceService);
+        
+        String operation = arg0.getParameter("operation");
+        if(StringUtils.isNotBlank(operation) && OPERATION_LIST.equals(operation)) {
+            Map<NameResearcherPage, Item[]> result = BindItemToRP.list(r, relationPreferenceService);
+            arg0.setAttribute("requesterMapPublication", researcher.getCrisID());
+            arg0.setAttribute("mapPublicationList", result);
+            return new ModelAndView("forward:/tools/claim");
+        }
+        else {
+            BindItemToRP.work(r, relationPreferenceService);
+        }
         return new ModelAndView(getViewName()+ ResearcherPageUtils.getPersistentIdentifier(researcher));
     }
 
