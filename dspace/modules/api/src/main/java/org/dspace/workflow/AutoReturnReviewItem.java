@@ -2,7 +2,9 @@ package org.dspace.workflow;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.rest.models.Manuscript;
+import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -117,13 +119,14 @@ public class AutoReturnReviewItem {
             if (wfi != null) {
                 //Check for a valid task
                 Item item = wfi.getItem();
+                DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(context, wfi.getID());
                 if (!DryadWorkflowUtils.isItemInReview(context, wfi)) {
                     log.debug("Item " + item.getID() + " not found or not in review");
                 } else {
                     // make sure that this item is updated according to the ApproveReject mechanism:
                     if (!testMode) {
                         log.info("check to see if item " + item.getID() + " is approved or rejected");
-                        Manuscript databaseManuscript = ApproveRejectReviewItem.getStoredManuscriptForWorkflowItem(context, wfi);
+                        Manuscript databaseManuscript = JournalUtils.getStoredManuscriptForWorkflowItem(context, dryadDataPackage);
                         if (databaseManuscript != null && databaseManuscript.isAccepted()) {
                             ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfi, databaseManuscript);
                         }
@@ -137,7 +140,7 @@ public class AutoReturnReviewItem {
                             String reason = "Since this submission has been in review for more than " + olderThan + " years, we assume it is no longer needed. Feel free to delete it from your workspace.";
                             EPerson ePerson = EPerson.findByEmail(context, ConfigurationManager.getProperty("system.curator.account"));
                             //Also return all the data files
-                            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, wfi.getItem());
+                            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
                             for (Item dataFile : dataFiles) {
                                 try {
                                     WorkflowManager.rejectWorkflowItem(context, WorkflowItem.findByItemId(context, dataFile.getID()), ePerson, null, reason, false);

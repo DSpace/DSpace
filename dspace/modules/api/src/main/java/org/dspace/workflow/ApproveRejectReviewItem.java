@@ -122,28 +122,6 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    public static Manuscript getStoredManuscriptForWorkflowItem(Context c, WorkflowItem workflowItem) throws ApproveRejectReviewItemException {
-        Item item = workflowItem.getItem();
-        Manuscript manuscript = new Manuscript(item);
-        try {
-            c.turnOffAuthorisationSystem();
-            List<Manuscript> storedManuscripts = JournalUtils.getStoredManuscriptsMatchingManuscript(manuscript);
-            if (storedManuscripts != null && storedManuscripts.size() > 0) {
-                Manuscript storedManuscript = storedManuscripts.get(0);
-                log.info("found stored manuscript " + storedManuscript.getManuscriptId() + " with status " + storedManuscript.getLiteralStatus());
-                if (!JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item, storedManuscript)) {
-                    return storedManuscript;
-                } else {
-                    log.info("stored manuscript match was a known former manuscript number");
-                }
-            }
-            c.restoreAuthSystemState();
-        } catch (Exception e) {
-            throw new ApproveRejectReviewItemException("couldn't process workflowitem " + workflowItem.getID() + ": " + e.getMessage());
-        }
-        return null;
-    }
-
     public static void processWorkflowItemsUsingManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
         Context c = null;
         try {

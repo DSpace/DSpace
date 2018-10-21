@@ -2,6 +2,7 @@ package org.datadryad.publication;
 
 import org.apache.http.NameValuePair;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.rest.models.*;
 import org.dspace.content.*;
 import org.dspace.core.Context;
@@ -253,7 +254,8 @@ public class PublicationUpdater extends HttpServlet {
                     // who didn't use a journal link.
                     Manuscript databaseManuscript = null;
                     try {
-                        databaseManuscript = ApproveRejectReviewItem.getStoredManuscriptForWorkflowItem(context, wfi);
+                        DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
+                        databaseManuscript = JournalUtils.getStoredManuscriptForWorkflowItem(context, dryadDataPackage);
                         if (isInReview && databaseManuscript != null) {
                             StringBuilder provenance = new StringBuilder("Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ");
                             if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.*;
@@ -24,6 +25,7 @@ import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.workflow.ApproveRejectReviewItemException;
 import org.dspace.workflow.DryadWorkflowUtils;
 
 import java.io.BufferedWriter;
@@ -34,11 +36,9 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static java.time.temporal.TemporalAdjusters.*;
 
 /**
  * User: lantian @ atmire . com
@@ -841,6 +841,27 @@ public class JournalUtils {
         }
     }
 
+    public static Manuscript getStoredManuscriptForWorkflowItem(Context c, DryadDataPackage dryadDataPackage) throws ApproveRejectReviewItemException {
+        Item item = dryadDataPackage.getItem();
+        Manuscript manuscript = new Manuscript(item);
+        try {
+            c.turnOffAuthorisationSystem();
+            List<Manuscript> storedManuscripts = getStoredManuscriptsMatchingManuscript(manuscript);
+            if (storedManuscripts != null && storedManuscripts.size() > 0) {
+                Manuscript storedManuscript = storedManuscripts.get(0);
+                log.info("found stored manuscript " + storedManuscript.getManuscriptId() + " with status " + storedManuscript.getLiteralStatus());
+                if (!manuscriptIsKnownFormerManuscriptNumber(item, storedManuscript)) {
+                    return storedManuscript;
+                } else {
+                    log.info("stored manuscript match was a known former manuscript number");
+                }
+            }
+            c.restoreAuthSystemState();
+        } catch (Exception e) {
+            throw new ApproveRejectReviewItemException("couldn't process workflowitem " + dryadDataPackage.getIdentifier() + ": " + e.getMessage());
+        }
+        return null;
+    }
 
 
     public static String cleanJournalCode(String journalCode) {
