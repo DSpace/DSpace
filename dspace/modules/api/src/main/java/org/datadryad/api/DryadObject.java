@@ -249,7 +249,7 @@ public abstract class DryadObject {
         return value;
     }
 
-    protected List<String> getMultipleMetadataValues(String schema, String element, String qualifier) throws SQLException {
+    protected List<String> getMultipleMetadataValues(String schema, String element, String qualifier) {
         List<String> values = new ArrayList<String>();
         DCValue[] metadata = item.getMetadata(schema, element, qualifier, Item.ANY);
         for(DCValue dcValue : metadata) {
