@@ -23,7 +23,6 @@ import org.dspace.browse.BrowseException;
 import org.dspace.sort.SortException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -63,14 +62,6 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                 "An internal database error occurred", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler({DataRetrievalFailureException.class})
-    protected void handleSQLRetrieveException(HttpServletRequest request, HttpServletResponse response, Exception ex)
-            throws IOException {
-        sendErrorResponse(request, response, ex,
-                "An internal database error occurred while attempting to retrieve data",
-                HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
-
     @ExceptionHandler({DCInputsReaderException.class, SubmissionConfigReaderException.class,
             RESTInputReaderException.class})
     protected void handleInputReaderException(HttpServletRequest request, HttpServletResponse response, Exception ex)
@@ -93,6 +84,15 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
             throws IOException {
         sendErrorResponse(request, response, ex,
                 "An internal server error occurred attempting to find method in linked resource",
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler({MissingPaginationException.class})
+    protected void handleMissingPaginationException(HttpServletRequest request, HttpServletResponse response,
+                                                    Exception ex)
+            throws IOException {
+        sendErrorResponse(request, response, ex,
+                "An internal server error occurred while attempting to retrieve data without pagination",
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 

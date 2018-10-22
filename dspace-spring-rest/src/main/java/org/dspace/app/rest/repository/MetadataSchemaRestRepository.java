@@ -17,7 +17,6 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -40,13 +39,8 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     }
 
     @Override
-    public MetadataSchemaRest findOne(Context context, Integer id) {
-        MetadataSchema metadataSchema = null;
-        try {
-            metadataSchema = metaScemaService.find(context, id);
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+    public MetadataSchemaRest findOne(Context context, Integer id) throws SQLException {
+        MetadataSchema metadataSchema = metaScemaService.find(context, id);
         if (metadataSchema == null) {
             return null;
         }
@@ -54,13 +48,8 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     }
 
     @Override
-    public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
-        List<MetadataSchema> metadataSchema = null;
-        try {
-            metadataSchema = metaScemaService.findAll(context);
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+    public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) throws SQLException {
+        List<MetadataSchema> metadataSchema = metaScemaService.findAll(context);
         Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable).map(converter);
         return page;
     }

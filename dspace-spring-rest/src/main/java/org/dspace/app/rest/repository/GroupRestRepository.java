@@ -16,8 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.GroupConverter;
-import org.dspace.app.rest.exception.RESTSQLException;
-import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
@@ -27,7 +25,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +48,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected GroupRest createAndReturn(Context context)
-            throws AuthorizeException, RepositoryMethodNotImplementedException {
+            throws SQLException, AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = null;
@@ -63,34 +60,26 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
         }
 
         Group group = null;
-        try {
-            group = gs.create(context);
-            gs.setName(group, groupRest.getName());
-            gs.update(context, group);
+        group = gs.create(context);
+        gs.setName(group, groupRest.getName());
+        gs.update(context, group);
 
-            if (groupRest.getMetadata() != null) {
-                for (MetadataEntryRest mer: groupRest.getMetadata()) {
-                    String[] metadatakey = mer.getKey().split("\\.");
-                    gs.addMetadata(context, group, metadatakey[0], metadatakey[1],
-                            metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
-                }
+        if (groupRest.getMetadata() != null) {
+            for (MetadataEntryRest mer : groupRest.getMetadata()) {
+                String[] metadatakey = mer.getKey().split("\\.");
+                gs.addMetadata(context, group, metadatakey[0], metadatakey[1],
+                        metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
             }
-        } catch (SQLException excSQL) {
-            throw new RESTSQLException(excSQL.getMessage(), excSQL);
         }
 
         return converter.convert(group);
+
     }
 
     @Override
     @PreAuthorize("hasPermission(#id, 'GROUP', 'READ')")
-    public GroupRest findOne(Context context, UUID id) {
-        Group group = null;
-        try {
-            group = gs.find(context, id);
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+    public GroupRest findOne(Context context, UUID id) throws SQLException {
+        Group group = gs.find(context, id);
         if (group == null) {
             return null;
         }
@@ -99,15 +88,9 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @Override
-    public Page<GroupRest> findAll(Context context, Pageable pageable) {
-        List<Group> groups = null;
-        int total = 0;
-        try {
-            total = gs.countTotal(context);
-            groups = gs.findAll(context, null, pageable.getPageSize(), pageable.getOffset());
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+    public Page<GroupRest> findAll(Context context, Pageable pageable) throws SQLException {
+        int total = gs.countTotal(context);
+        List<Group> groups = gs.findAll(context, null, pageable.getPageSize(), pageable.getOffset());
         Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total).map(converter);
         return page;
     }

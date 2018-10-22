@@ -73,18 +73,12 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
     }
 
     @Override
-    public Page<CollectionRest> findAll(Context context, Pageable pageable) {
-        List<Collection> it = null;
+    public Page<CollectionRest> findAll(Context context, Pageable pageable) throws SQLException {
         List<Collection> collections = new ArrayList<Collection>();
-        int total = 0;
-        try {
-            total = cs.countTotal(context);
-            it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
-            for (Collection c : it) {
-                collections.add(c);
-            }
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+        int total = cs.countTotal(context);
+        List<Collection> it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+        for (Collection c : it) {
+            collections.add(c);
         }
         Page<CollectionRest> page = new PageImpl<Collection>(collections, pageable, total).map(converter);
         return page;

@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataFieldConverter;
+import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.hateoas.MetadataFieldResource;
 import org.dspace.content.MetadataField;
@@ -21,7 +22,6 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -47,13 +47,9 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     }
 
     @Override
-    public MetadataFieldRest findOne(Context context, Integer id) {
-        MetadataField metadataField = null;
-        try {
-            metadataField = metaFieldService.find(context, id);
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+    public MetadataFieldRest findOne(Context context, Integer id) throws SQLException {
+        MetadataField metadataField = metaFieldService.find(context, id);
+
         if (metadataField == null) {
             return null;
         }
@@ -61,13 +57,8 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     }
 
     @Override
-    public Page<MetadataFieldRest> findAll(Context context, Pageable pageable) {
-        List<MetadataField> metadataField = null;
-        try {
-            metadataField = metaFieldService.findAll(context);
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+    public Page<MetadataFieldRest> findAll(Context context, Pageable pageable) throws SQLException {
+        List<MetadataField> metadataField = metaFieldService.findAll(context);
         Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable).map(converter);
         return page;
     }
@@ -84,7 +75,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             }
             metadataFields = metaFieldService.findAllInSchema(context, schema);
         } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         Page<MetadataFieldRest> page = utils.getPage(metadataFields, pageable).map(converter);
         return page;

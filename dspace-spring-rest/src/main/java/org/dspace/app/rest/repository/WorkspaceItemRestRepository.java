@@ -27,7 +27,6 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
-import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
@@ -64,7 +63,6 @@ import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -122,7 +120,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         try {
             witem = wis.find(context, id);
         } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         if (witem == null) {
             return null;
@@ -132,15 +130,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     //TODO @PreAuthorize("hasAuthority('ADMIN')")
     @Override
-    public Page<WorkspaceItemRest> findAll(Context context, Pageable pageable) {
-        List<WorkspaceItem> witems = null;
-        int total = 0;
-        try {
-            total = wis.countTotal(context);
-            witems = wis.findAll(context, pageable.getPageSize(), pageable.getOffset());
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+    public Page<WorkspaceItemRest> findAll(Context context, Pageable pageable) throws SQLException {
+        int total = wis.countTotal(context);
+        List<WorkspaceItem> witems = wis.findAll(context, pageable.getPageSize(), pageable.getOffset());
         Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter);
         return page;
     }
@@ -157,7 +149,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             witems = wis.findByEPerson(context, ep, pageable.getPageSize(), pageable.getOffset());
             total = wis.countByEPerson(context, ep);
         } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter);
         return page;
@@ -202,6 +194,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                 }
 
             } catch (Exception e) {
+                // TODO should we throw an exception here?
                 log.error(e.getMessage(), e);
             }
         }
@@ -275,15 +268,11 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
-                      Patch patch)  {
+                      Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
         WorkspaceItemRest wsi = findOne(id);
         WorkspaceItem source = null;
-        try {
-            source = wis.find(context, id);
-        } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
-        }
+        source = wis.find(context, id);
         for (Operation op : operations) {
             //the value in the position 0 is a null value
             String[] path = op.getPath().substring(1).split("/", 3);
@@ -295,13 +284,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                     "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
             }
         }
-        try {
-            wis.update(context, source);
-        } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
-        } catch (AuthorizeException e) {
-            throw new RESTAuthorizationException(e.getMessage());
-        }
+
+        wis.update(context, source);
+
     }
 
     private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi,
@@ -348,16 +333,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")
     @Override
-    protected void delete(Context context, Integer id) throws AuthorizeException {
+    protected void delete(Context context, Integer id) throws AuthorizeException, SQLException, IOException {
         WorkspaceItem witem = null;
-        try {
-            witem = wis.find(context, id);
-            wis.deleteAll(context, witem);
-            context.addEvent(new Event(Event.DELETE, Constants.ITEM, witem.getItem().getID(), null,
+        witem = wis.find(context, id);
+        wis.deleteAll(context, witem);
+        context.addEvent(new Event(Event.DELETE, Constants.ITEM, witem.getItem().getID(), null,
                 itemService.getIdentifiers(context, witem.getItem())));
-        } catch (SQLException | IOException e) {
-            log.error(e.getMessage(), e);
-        }
+
     }
 
     @Override

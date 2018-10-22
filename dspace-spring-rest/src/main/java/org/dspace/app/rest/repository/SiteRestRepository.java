@@ -59,14 +59,10 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
     }
 
     @Override
-    public Page<SiteRest> findAll(Context context, Pageable pageable) {
+    public Page<SiteRest> findAll(Context context, Pageable pageable) throws SQLException {
         List<Site> sites = new ArrayList<Site>();
         int total = 1;
-        try {
-            sites.add(sitesv.findSite(context));
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+        sites.add(sitesv.findSite(context));
         Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(converter);
         return page;
     }

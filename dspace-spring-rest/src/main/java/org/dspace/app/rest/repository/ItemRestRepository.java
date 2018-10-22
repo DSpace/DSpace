@@ -17,9 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ItemConverter;
-import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
-import org.dspace.app.rest.exception.RESTIOException;
 import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
@@ -67,13 +65,8 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
     @Override
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
-    public ItemRest findOne(Context context, UUID id) {
-        Item item = null;
-        try {
-            item = is.find(context, id);
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+    public ItemRest findOne(Context context, UUID id) throws SQLException {
+        Item item = is.find(context, id);
         if (item == null) {
             return null;
         }
@@ -82,19 +75,13 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<ItemRest> findAll(Context context, Pageable pageable) {
-        Iterator<Item> it = null;
+    public Page<ItemRest> findAll(Context context, Pageable pageable) throws SQLException {
         List<Item> items = new ArrayList<Item>();
-        int total = 0;
-        try {
-            total = is.countTotal(context);
-            it = is.findAll(context, pageable.getPageSize(), pageable.getOffset());
-            while (it.hasNext()) {
-                Item i = it.next();
-                items.add(i);
-            }
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+        int total = is.countTotal(context);
+        Iterator<Item> it = is.findAll(context, pageable.getPageSize(), pageable.getOffset());
+        while (it.hasNext()) {
+            Item i = it.next();
+            items.add(i);
         }
         Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(converter);
         return page;
@@ -103,7 +90,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     @Override
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                       Patch patch)
-            throws UnprocessableEntityException, PatchBadRequestException, ResourceNotFoundException {
+            throws SQLException, AuthorizeException {
 
         Item item = null;
         try {
@@ -131,26 +118,21 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
      * @throws RESTSQLException
      * @throws RESTAuthorizationException
      */
-    private void updatePatchedValues(Context context, ItemRest itemRest, Item item) {
+    private void updatePatchedValues(Context context, ItemRest itemRest, Item item)
+            throws SQLException, AuthorizeException {
 
-        try {
-            if (itemRest.getWithdrawn() != item.isWithdrawn()) {
-                if (itemRest.getWithdrawn()) {
-                    is.withdraw(context, item);
-                } else {
-                    is.reinstate(context, item);
-                }
+        if (itemRest.getWithdrawn() != item.isWithdrawn()) {
+            if (itemRest.getWithdrawn()) {
+                is.withdraw(context, item);
+            } else {
+                is.reinstate(context, item);
             }
-            if (itemRest.getDiscoverable() != item.isDiscoverable()) {
-                item.setDiscoverable(itemRest.getDiscoverable());
-                is.update(context, item);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RESTSQLException(e.getMessage(), e);
-        } catch (AuthorizeException e) {
-            throw new RESTAuthorizationException(e.getMessage());
         }
+        if (itemRest.getDiscoverable() != item.isDiscoverable()) {
+            item.setDiscoverable(itemRest.getDiscoverable());
+            is.update(context, item);
+        }
+
     }
 
     @Override
@@ -164,28 +146,19 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     }
 
     @Override
-    protected void delete(Context context, UUID id) throws AuthorizeException {
+    protected void delete(Context context, UUID id) throws AuthorizeException, SQLException, IOException {
         Item item = null;
-        try {
-            item = is.find(context, id);
-            if (is.isInProgressSubmission(context, item)) {
-                throw new UnprocessableEntityException("The item cannot be deleted. "
-                        + "It's part of a in-progress submission.");
-            }
-            if (item.getTemplateItemOf() != null) {
-                throw new UnprocessableEntityException("The item cannot be deleted. "
-                        + "It's a template for a collection");
-            }
-        } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
+        item = is.find(context, id);
+        if (is.isInProgressSubmission(context, item)) {
+            throw new UnprocessableEntityException("The item cannot be deleted. "
+                    + "It's part of a in-progress submission.");
         }
-        try {
-            is.delete(context, item);
-        } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
-        } catch (IOException e) {
-            throw new RESTIOException(e.getMessage(), e);
+        if (item.getTemplateItemOf() != null) {
+            throw new UnprocessableEntityException("The item cannot be deleted. "
+                    + "It's a template for a collection");
         }
+        is.delete(context, item);
+
     }
 
 }

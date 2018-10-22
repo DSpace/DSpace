@@ -15,8 +15,10 @@ import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.exception.MissingPaginationException;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
+import org.dspace.app.rest.exception.RESTIOException;
 import org.dspace.app.rest.exception.RESTInputReaderException;
 import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -27,11 +29,12 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -103,7 +106,11 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      */
     public T findOne(ID id) {
         Context context = obtainContext();
-        return thisRepository.findOne(context, id);
+        try {
+            return thisRepository.findOne(context, id);
+        } catch (SQLException e) {
+            throw new DataRetrievalFailureException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -115,7 +122,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *            the rest object id
      * @return the REST object identified by its ID
      */
-    public abstract T findOne(Context context, ID id);
+    public abstract T findOne(Context context, ID id) throws SQLException;
 
     @Override
     /**
@@ -131,7 +138,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * This method cannot be implemented we required all the find method to be paginated
      */
     public final Iterable<T> findAll() {
-        throw new RuntimeException("findAll MUST be paginated");
+        throw new MissingPaginationException("findAll MUST be paginated");
     }
 
     @Override
@@ -140,7 +147,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * method doesn't allow pagination and it could be misused to retrieve thousand objects at once
      */
     public Iterable<T> findAll(Iterable<ID> ids) {
-        throw new RuntimeException("findAll MUST be paginated");
+        throw new MissingPaginationException("findAll MUST be paginated");
     }
 
     @Override
@@ -166,6 +173,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
             throw new RESTAuthorizationException(e);
         } catch (SQLException ex) {
             throw new RESTSQLException(ex.getMessage(), ex);
+        } catch (IOException e) {
+            throw new RESTIOException(e.getMessage(), e);
         }
     }
 
@@ -180,7 +189,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @throws RepositoryMethodNotImplementedException
      *             returned by the default implementation when the operation is not supported for the entity
      */
-    protected void delete(Context context, ID id) throws AuthorizeException, RepositoryMethodNotImplementedException {
+    protected void delete(Context context, ID id)
+            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException, IOException  {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
@@ -215,7 +225,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * This method cannot be implemented we required all the find method to be paginated
      */
     public final Iterable<T> findAll(Sort sort) {
-        throw new RuntimeException("findAll MUST be paginated");
+        throw new MissingPaginationException("findAll MUST be paginated");
     }
 
     @Override
@@ -224,7 +234,11 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      */
     public Page<T> findAll(Pageable pageable) {
         Context context = obtainContext();
-        return thisRepository.findAll(context, pageable);
+        try {
+            return thisRepository.findAll(context, pageable);
+        } catch (SQLException e) {
+            throw new DataRetrievalFailureException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -236,7 +250,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *            object embedding the requested pagination info
      * @return
      */
-    public abstract Page<T> findAll(Context context, Pageable pageable);
+    public abstract Page<T> findAll(Context context, Pageable pageable) throws SQLException;
 
     /**
      * The REST model supported by the repository
@@ -256,21 +270,21 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     /**
      * Create and return a new instance. Data are usually retrieved from the thread bound http request
-     * 
+     *
      * @return the created REST object
      */
     public T createAndReturn() {
-        Context context = null;
+        Context context = obtainContext();
+        T entity = null;
         try {
-            context = obtainContext();
-            T entity = thisRepository.createAndReturn(context);
+            entity = thisRepository.createAndReturn(context);
             context.commit();
-            return entity;
         } catch (AuthorizeException e) {
-            throw new RESTAuthorizationException(e);
-        } catch (SQLException ex) {
-            throw new RESTSQLException(ex.getMessage(), ex);
+            throw new RESTAuthorizationException(e.getMessage());
+        } catch (SQLException e) {
+            throw new RESTSQLException(e.getMessage(), e);
         }
+        return entity;
     }
 
     /**
@@ -312,26 +326,27 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Apply a partial update to the REST object via JSON Patch
      * 
-     * @param request
-     *            the http request
+     * @param request the http request
      * @param apiCategory
      * @param model
-     * @param id
-     *            the ID of the target REST object
-     * @param patch
-     * the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
+     * @param id the ID of the target REST object
+     * @param patch the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return
+     * @throws ResourceNotFoundException
      * @throws UnprocessableEntityException
      * @throws PatchBadRequestException
+     * @throws RESTSQLException
+     * @throws RESTAuthorizationException
      */
-    public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
-        throws UnprocessableEntityException, PatchBadRequestException {
+    public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) {
         Context context = obtainContext();
         try {
             thisRepository.patch(context, request, apiCategory, model, id, patch);
             context.commit();
         } catch (SQLException e) {
             throw new RESTSQLException(e.getMessage(), e);
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e.getMessage());
         }
         return findOne(id);
     }
@@ -348,19 +363,19 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param patch
      *            the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return the full new state of the REST object after patching
-     * @throws HttpRequestMethodNotSupportedException
      * @throws UnprocessableEntityException
+     *              returned when server unable to process a valid patch request
      * @throws PatchBadRequestException
+     *              returned for bad patch request
      * @throws RepositoryMethodNotImplementedException
      *             returned by the default implementation when the operation is not supported for the entity
-     * 
-     * @throws RESTSQLException
-     * @throws RESTAuthorizationException
-     * @throws RESTInputReaderException
+     * @throws RESTInputReaderException sever error when reading configuration
+     * @throws SQLException ]
+     * @throws AuthorizeException
      */
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
                          Patch patch)
-        throws RepositoryMethodNotImplementedException, RESTSQLException, RESTAuthorizationException,
+            throws RepositoryMethodNotImplementedException, PatchBadRequestException, SQLException, AuthorizeException,
             RESTInputReaderException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }

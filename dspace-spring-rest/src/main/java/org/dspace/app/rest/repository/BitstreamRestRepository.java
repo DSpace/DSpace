@@ -27,7 +27,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -62,7 +61,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         try {
             bit = bs.find(context, id);
         } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         if (bit == null) {
             return null;
@@ -72,25 +71,19 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
                 throw new ResourceNotFoundException();
             }
         } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         return converter.fromModel(bit);
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<BitstreamRest> findAll(Context context, Pageable pageable) {
+    public Page<BitstreamRest> findAll(Context context, Pageable pageable) throws SQLException {
         List<Bitstream> bit = new ArrayList<Bitstream>();
-        Iterator<Bitstream> it = null;
-        int total = 0;
-        try {
-            total = bs.countTotal(context);
-            it = bs.findAll(context, pageable.getPageSize(), pageable.getOffset());
-            while (it.hasNext()) {
-                bit.add(it.next());
-            }
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+        int total = bs.countTotal(context);
+        Iterator<Bitstream> it = bs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+        while (it.hasNext()) {
+            bit.add(it.next());
         }
         Page<BitstreamRest> page = new PageImpl<Bitstream>(bit, pageable, total).map(converter);
         return page;
@@ -107,23 +100,14 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
     }
 
     @Override
-    protected void delete(Context context, UUID id) throws AuthorizeException {
+    protected void delete(Context context, UUID id) throws AuthorizeException, SQLException, IOException {
         Bitstream bit = null;
-        try {
-            bit = bs.find(context, id);
-            if (bit.getCommunity() != null | bit.getCollection() != null) {
-                throw new UnprocessableEntityException("The bitstream cannot be deleted it is a logo");
-            }
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+        bit = bs.find(context, id);
+        if (bit.getCommunity() != null | bit.getCollection() != null) {
+            throw new UnprocessableEntityException("The bitstream cannot be deleted it is a logo");
         }
-        try {
-            bs.delete(context, bit);
-        } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
-        } catch (IOException e) {
-            throw new RESTIOException(e.getMessage(), e);
-        }
+        bs.delete(context, bit);
+
     }
 
     public InputStream retrieve(UUID uuid) {
@@ -132,7 +116,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
         try {
             bit = bs.find(context, uuid);
         } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         if (bit == null) {
             return null;

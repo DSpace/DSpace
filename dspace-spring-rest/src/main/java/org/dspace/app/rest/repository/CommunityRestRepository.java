@@ -91,13 +91,8 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 
     @Override
     @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'READ')")
-    public CommunityRest findOne(Context context, UUID id) {
-        Community community = null;
-        try {
-            community = cs.find(context, id);
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+    public CommunityRest findOne(Context context, UUID id) throws SQLException {
+        Community community = cs.find(context, id);
         if (community == null) {
             return null;
         }
@@ -105,18 +100,12 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     }
 
     @Override
-    public Page<CommunityRest> findAll(Context context, Pageable pageable) {
-        List<Community> it = null;
+    public Page<CommunityRest> findAll(Context context, Pageable pageable) throws SQLException {
         List<Community> communities = new ArrayList<Community>();
-        int total = 0;
-        try {
-            total = cs.countTotal(context);
-            it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
-            for (Community c : it) {
-                communities.add(c);
-            }
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+        int total = cs.countTotal(context);
+        List<Community> it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+        for (Community c : it) {
+            communities.add(c);
         }
         Page<CommunityRest> page = new PageImpl<Community>(communities, pageable, total).map(converter);
         return page;

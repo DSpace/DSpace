@@ -35,8 +35,7 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
 
         // Note: the list of possible operations is taken from JsonPatchConverter class. Does not implement
         // test https://tools.ietf.org/html/rfc6902#section-4.6
-        ops:
-        for (Operation op : operations) {
+        ops: for (Operation op : operations) {
             switch (op.getOp()) {
                 case "add":
                     restModel = add(restModel, op);
@@ -75,6 +74,7 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
 
     protected R replace(R restModel, Operation operation)
             throws UnprocessableEntityException, PatchBadRequestException {
+
         throw new UnprocessableEntityException(
                 "The replace operation is not supported."
         );
@@ -82,7 +82,6 @@ public abstract class AbstractResourcePatch<R extends RestModel> {
     }
 
     protected R remove(R restModel, Operation operation)
-
             throws UnprocessableEntityException, PatchBadRequestException {
 
         throw new UnprocessableEntityException(

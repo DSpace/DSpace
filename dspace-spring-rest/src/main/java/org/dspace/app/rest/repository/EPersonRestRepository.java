@@ -20,9 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.EPersonConverter;
-import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
-import org.dspace.app.rest.exception.RESTIOException;
 import org.dspace.app.rest.exception.RESTSQLException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
@@ -38,7 +36,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -67,8 +64,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     EPersonPatch epersonPatch;
 
     @Override
-    protected EPersonRest createAndReturn(Context context)
-            throws AuthorizeException {
+    protected EPersonRest createAndReturn(Context context) throws AuthorizeException, SQLException {
         // this need to be revisited we should receive an EPersonRest as input
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
@@ -80,27 +76,23 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
         }
 
         EPerson eperson = null;
-        try {
-            eperson = es.create(context);
+        eperson = es.create(context);
 
-            // this should be probably moved to the converter (a merge method?)
-            eperson.setCanLogIn(epersonRest.isCanLogIn());
-            eperson.setRequireCertificate(epersonRest.isRequireCertificate());
-            eperson.setEmail(epersonRest.getEmail());
-            eperson.setNetid(epersonRest.getNetid());
-            if (epersonRest.getPassword() != null) {
-                es.setPassword(eperson, epersonRest.getPassword());
+        // this should be probably moved to the converter (a merge method?)
+        eperson.setCanLogIn(epersonRest.isCanLogIn());
+        eperson.setRequireCertificate(epersonRest.isRequireCertificate());
+        eperson.setEmail(epersonRest.getEmail());
+        eperson.setNetid(epersonRest.getNetid());
+        if (epersonRest.getPassword() != null) {
+            es.setPassword(eperson, epersonRest.getPassword());
+        }
+        es.update(context, eperson);
+        if (epersonRest.getMetadata() != null) {
+            for (MetadataEntryRest mer : epersonRest.getMetadata()) {
+                String[] metadatakey = mer.getKey().split("\\.");
+                es.addMetadata(context, eperson, metadatakey[0], metadatakey[1],
+                        metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
             }
-            es.update(context, eperson);
-            if (epersonRest.getMetadata() != null) {
-                for (MetadataEntryRest mer : epersonRest.getMetadata()) {
-                    String[] metadatakey = mer.getKey().split("\\.");
-                    es.addMetadata(context, eperson, metadatakey[0], metadatakey[1],
-                            metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
-                }
-            }
-        } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
         }
 
         return converter.convert(eperson);
@@ -108,13 +100,8 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
 
     @Override
     @PreAuthorize("hasPermission(#id, 'EPERSON', 'READ')")
-    public EPersonRest findOne(Context context, UUID id) {
-        EPerson eperson = null;
-        try {
-            eperson = es.find(context, id);
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
-        }
+    public EPersonRest findOne(Context context, UUID id) throws SQLException {
+        EPerson eperson = es.find(context, id);
         if (eperson == null) {
             return null;
         }
@@ -123,19 +110,16 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<EPersonRest> findAll(Context context, Pageable pageable) {
+    public Page<EPersonRest> findAll(Context context, Pageable pageable)
+            throws SQLException {
         List<EPerson> epersons = null;
         int total = 0;
-        try {
-            if (!authorizeService.isAdmin(context)) {
-                throw new RESTAuthorizationException(
-                        "The EPerson collection endpoint is reserved to system administrators");
-            }
-            total = es.countTotal(context);
-            epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(), pageable.getOffset());
-        } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+        if (!authorizeService.isAdmin(context)) {
+            throw new RESTAuthorizationException(
+                    "The EPerson collection endpoint is reserved to system administrators");
         }
+        total = es.countTotal(context);
+        epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(), pageable.getOffset());
         Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(converter);
         return page;
     }
@@ -172,8 +156,6 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
      *
      * @param email
      *            is the *required* email address
-     * @param pageable
-     *            contains the pagination information
      * @return a Page of EPersonRest instances matching the user query
      */
     @SearchRestMethod(name = "byEmail")
@@ -183,7 +165,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
             Context context = obtainContext();
             eperson = es.findByEmail(context, email);
         } catch (SQLException e) {
-            throw new DataRetrievalFailureException(e.getMessage(), e);
+            throw new RESTSQLException(e.getMessage(), e);
         }
         if (eperson == null) {
             return null;
@@ -194,24 +176,17 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
-                      Patch patch)
-            throws UnprocessableEntityException, PatchBadRequestException, ResourceNotFoundException {
+                      Patch patch) throws SQLException, AuthorizeException {
 
-        try {
-            EPerson eperson = es.find(context, uuid);
-            if (eperson == null) {
-                throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
-            }
-            List<Operation> operations = patch.getOperations();
-            EPersonRest ePersonRest = findOne(context, uuid);
-            EPersonRest patchedModel = (EPersonRest) epersonPatch.patch(ePersonRest, operations);
-            updatePatchedValues(context, patchedModel, eperson);
-
-        } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
-        } catch (AuthorizeException e) {
-            throw new RESTAuthorizationException(e.getMessage());
+        EPerson eperson = es.find(context, uuid);
+        if (eperson == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
         }
+        List<Operation> operations = patch.getOperations();
+        EPersonRest ePersonRest = findOne(context, uuid);
+        EPersonRest patchedModel = (EPersonRest) epersonPatch.patch(ePersonRest, operations);
+        updatePatchedValues(context, patchedModel, eperson);
+
     }
 
     /**
@@ -243,26 +218,18 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     }
 
     @Override
-    protected void delete(Context context, UUID id) throws AuthorizeException {
+    protected void delete(Context context, UUID id) throws AuthorizeException, SQLException, IOException {
         EPerson eperson = null;
-        try {
-            eperson = es.find(context, id);
-            List<String> constraints = es.getDeleteConstraints(context, eperson);
-            if (constraints != null && constraints.size() > 0) {
-                throw new UnprocessableEntityException(
-                        "The eperson cannot be deleted due to the following constraints: "
-                                + StringUtils.join(constraints, ", "));
-            }
-        } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
+
+        eperson = es.find(context, id);
+        List<String> constraints = es.getDeleteConstraints(context, eperson);
+        if (constraints != null && constraints.size() > 0) {
+            throw new UnprocessableEntityException(
+                    "The eperson cannot be deleted due to the following constraints: "
+                            + StringUtils.join(constraints, ", "));
         }
-        try {
-            es.delete(context, eperson);
-        } catch (SQLException e) {
-            throw new RESTSQLException(e.getMessage(), e);
-        } catch (IOException e) {
-            throw new RESTIOException(e.getMessage(), e);
-        }
+        es.delete(context, eperson);
+
     }
 
     @Override

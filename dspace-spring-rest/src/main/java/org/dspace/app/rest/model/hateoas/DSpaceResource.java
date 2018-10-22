@@ -18,6 +18,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.exception.LinkMethodException;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
@@ -76,10 +77,9 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
                                     found = true;
                                 }
                             }
-                            // TODO custom exception
                             if (!found) {
-                                throw new RuntimeException(
-                                    "Method for relation " + linkAnnotation.name() + " not found: " + linkAnnotation
+                                throw new LinkMethodException("Method for relation "
+                                        + linkAnnotation.name() + " not found: " + linkAnnotation
                                         .method());
                             }
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -168,10 +168,10 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
                                             found = true;
                                         }
                                     }
-                                    // TODO custom exception
                                     if (!found) {
-                                        throw new RuntimeException("Method for relation " + linkAnnotation
-                                            .name() + " not found: " + linkAnnotation.method());
+                                        throw new LinkMethodException("Method for relation " +
+                                                linkAnnotation.name() + " not found: " + linkAnnotation
+                                                .method());
                                     }
                                 } catch (IllegalAccessException | IllegalArgumentException |
                                     InvocationTargetException e) {
