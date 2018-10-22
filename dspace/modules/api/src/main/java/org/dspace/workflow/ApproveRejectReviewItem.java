@@ -236,13 +236,6 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    private static SearchService getSearchService() {
-        DSpace dspace = new DSpace();
-        org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
-        return manager.getServiceByName(SearchService.class.getName(), SearchService.class);
-    }
-
-
     /**
      * Copies manuscript metadata into a dryad data package
      * @param dataPackage
