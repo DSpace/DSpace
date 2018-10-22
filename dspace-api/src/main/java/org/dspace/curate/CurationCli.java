@@ -62,7 +62,9 @@ public class CurationCli {
         options.addOption("e", "eperson", true,
                           "email address of curating eperson");
         options.addOption("r", "reporter", true,
-                          "reporter to manage results - use '-' to report to console. If absent, no reporting");
+                "relative or absolute path to the desired report file.  "
+                        + "Use '-' to report to console.  "
+                        + "If absent, no reporting");
         options.addOption("s", "scope", true,
                           "transaction scope to impose: use 'object', 'curation', or 'open'. If absent, 'open' " +
                               "applies");
