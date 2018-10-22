@@ -408,17 +408,15 @@ public class JournalUtils {
         return null;
     }
 
-    public static boolean manuscriptIsKnownFormerManuscriptNumber(Item item, Manuscript manuscript) {
+    public static boolean manuscriptIsKnownFormerManuscriptNumber(DryadDataPackage dryadDataPackage, Manuscript manuscript) {
         if (manuscript.getManuscriptId() == null) {
             return false;
         }
         // is this manuscript one of this package's former msids?
-        DCValue[] formerMSIDs = item.getMetadata("dryad.formerManuscriptNumber");
-        if (formerMSIDs != null && formerMSIDs.length > 0) {
-            for (DCValue formerMSID : formerMSIDs) {
-                if (formerMSID.value.equalsIgnoreCase(manuscript.getManuscriptId())) {
-                    return true;
-                }
+        List<String> formerMSIDs = dryadDataPackage.getFormerManuscriptNumbers();
+        for (String formerMSID : formerMSIDs) {
+            if (formerMSID.equalsIgnoreCase(manuscript.getManuscriptId())) {
+                return true;
             }
         }
         return false;
@@ -573,20 +571,21 @@ public class JournalUtils {
         }
     }
 
-    public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript, StringBuilder resultString) throws RESTModelException {
+    public static Manuscript getCrossRefManuscriptMatchingManuscript(DryadDataPackage dryadDataPackage, StringBuilder resultString) throws RESTModelException {
         ArrayList<String> crossRefURLs = new ArrayList<>();
         if (resultString == null) {
             resultString = new StringBuilder();
         }
         StringBuilder queryString = new StringBuilder();
-        String pubDOI = queryManuscript.getPublicationDOI();
+        String pubDOI = dryadDataPackage.getPublicationDOI();
+        DryadJournalConcept dryadJournalConcept = JournalUtils.getJournalConceptByJournalName(dryadDataPackage.getPublicationName());
         if (pubDOI != null && (!"".equals(StringUtils.stripToEmpty(pubDOI).replaceAll("null","")))) {
-            crossRefURLs.add(crossRefApiRoot + "works/" + queryManuscript.getPublicationDOI() +
+            crossRefURLs.add(crossRefApiRoot + "works/" + dryadDataPackage.getPublicationDOI() +
                              "?mailto=" + ConfigurationManager.getProperty("alert.recipient"));
         } else {
             // make a query string of the authors' last names
             ArrayList<String> lastNames = new ArrayList<String>();
-            for (Author a : queryManuscript.getAuthorList()) {
+            for (Author a : dryadDataPackage.getAuthors()) {
                 // replace any hyphens in the last names with spaces for tokenizing.
                 lastNames.add(a.getNormalizedFamilyName().replaceAll("-"," "));
             }
@@ -594,8 +593,8 @@ public class JournalUtils {
             queryString.append(" ");
 
             // append the title to the query
-            queryString.append(queryManuscript.getTitle().replaceAll("[^a-zA-Z\\s]", "").replaceAll("\\s+", " "));
-            for (String issn : queryManuscript.getJournalConcept().getISSNs()) {
+            queryString.append(dryadDataPackage.getTitle().replaceAll("[^a-zA-Z\\s]", "").replaceAll("\\s+", " "));
+            for (String issn : dryadJournalConcept.getISSNs()) {
                 crossRefURLs.add(crossRefApiRoot + "journals/" + issn + "/works?sort=score&order=desc&query=" +
                                  queryString.toString().replaceAll("\\s+", "+") + "?mailto=" + ConfigurationManager.getProperty("alert.recipient"));
             }
@@ -639,11 +638,11 @@ public class JournalUtils {
 
             // sanity check:
             if (currentMatch != null) {
-                if (!queryManuscript.getJournalISSN().equals(currentMatch.getJournalISSN())) {
+                if (!dryadJournalConcept.getISSN().equals(currentMatch.getJournalISSN())) {
                     throw new RESTModelException("publication DOI listed for item does not belong to the correct journal");
                 }
                 // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
-                if (compareTitleToManuscript(queryManuscript.getTitle(), currentMatch, 0.5, resultString)) {
+                if (compareTitleToManuscript(dryadDataPackage.getTitle(), currentMatch, 0.5, resultString)) {
                     return currentMatch;
                 }
             }
@@ -663,16 +662,15 @@ public class JournalUtils {
         return true;
     }
 
-    public static int compareItemAuthorsToManuscript(Item item, Manuscript manuscript, StringBuilder result) {
+    public static int comparePackageAuthorsToManuscript(DryadDataPackage dryadDataPackage, Manuscript manuscript, StringBuilder result) {
         int numMatched = 0;
         // count number of authors and number of matched authors: if equal, this is a match.
-        DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
-        result.append("item " + item.getID() + " has " + itemAuthors.length + " authors while manuscript has " + manuscript.getAuthorList().size() + " authors\n");
-        for (int j = 0; j < itemAuthors.length; j++) {
-            Author itemAuthor = new Author(itemAuthors[j].value);
+        List<Author> authorList = dryadDataPackage.getAuthors();
+        result.append("package " + dryadDataPackage.getIdentifier() + " has " + authorList.size() + " authors while manuscript has " + manuscript.getAuthorList().size() + " authors\n");
+        for (Author itemAuthor : authorList) {
             for (Author msAuthor : manuscript.getAuthorList()) {
-                double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value).toLowerCase(), msAuthor.getNormalizedFullName().toLowerCase());
-                result.append("item author " + itemAuthors[j].value + " matched ms author " + msAuthor.getUnicodeFullName() + " with a score of " + score + "\n");
+                double score = JournalUtils.getHamrScore(itemAuthor.getNormalizedFullName().toLowerCase(), msAuthor.getNormalizedFullName().toLowerCase());
+                result.append("item author " + itemAuthor.getNormalizedFullName() + " matched ms author " + msAuthor.getUnicodeFullName() + " with a score of " + score + "\n");
                 if (itemAuthor.equals(msAuthor)) {
                     result.append("  matched\n");
                     numMatched++;
@@ -842,15 +840,14 @@ public class JournalUtils {
     }
 
     public static Manuscript getStoredManuscriptForWorkflowItem(Context c, DryadDataPackage dryadDataPackage) throws ApproveRejectReviewItemException {
-        Item item = dryadDataPackage.getItem();
-        Manuscript manuscript = new Manuscript(item);
+        Manuscript manuscript = new Manuscript(dryadDataPackage);
         try {
             c.turnOffAuthorisationSystem();
             List<Manuscript> storedManuscripts = getStoredManuscriptsMatchingManuscript(manuscript);
             if (storedManuscripts != null && storedManuscripts.size() > 0) {
                 Manuscript storedManuscript = storedManuscripts.get(0);
                 log.info("found stored manuscript " + storedManuscript.getManuscriptId() + " with status " + storedManuscript.getLiteralStatus());
-                if (!manuscriptIsKnownFormerManuscriptNumber(item, storedManuscript)) {
+                if (!manuscriptIsKnownFormerManuscriptNumber(dryadDataPackage, storedManuscript)) {
                     return storedManuscript;
                 } else {
                     log.info("stored manuscript match was a known former manuscript number");

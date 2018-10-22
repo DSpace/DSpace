@@ -5,6 +5,7 @@ package org.datadryad.rest.models;
 import java.lang.Exception;
 import java.lang.Override;
 import java.lang.String;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.dspace.JournalUtils;
 import org.dspace.content.DCValue;
 import org.dspace.identifier.DOIIdentifierProvider;
@@ -239,6 +241,16 @@ public class Manuscript {
                 this.keywords.add(keyword);
             }
         }
+    }
+
+    public Manuscript(DryadDataPackage dryadDataPackage) {
+        journalConcept = JournalUtils.getJournalConceptByJournalName(dryadDataPackage.getPublicationName());
+        setManuscriptId(dryadDataPackage.getManuscriptNumber());
+        setPublicationDOI(dryadDataPackage.getPublicationDOI());
+        String title = dryadDataPackage.getTitle().replaceAll("Data from: ", "");
+        setTitle(title);
+        List<Author> authorList = dryadDataPackage.getAuthors();
+        setAuthorsFromList(authorList);
     }
 
     public Manuscript(Item item) {
