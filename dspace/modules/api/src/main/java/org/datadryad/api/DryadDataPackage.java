@@ -480,8 +480,8 @@ public class DryadDataPackage extends DryadObject {
         addSingleMetadataValue(Boolean.TRUE, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
     }
 
-    public String getFormerManuscriptNumber() throws SQLException {
-        return getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
+    public List<String> getFormerManuscriptNumbers() {
+        return getMultipleMetadataValues(FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER);
     }
 
     public void setFormerManuscriptNumber(String manuscriptNumber) throws SQLException {
