@@ -25,7 +25,7 @@ import java.util.*;
 
 /**
  *
- * @author1 Dan Leehr <dan.leehr@nescent.org>
+ * @author Dan Leehr <dan.leehr@nescent.org>
  */
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -221,7 +221,13 @@ public class Package {
             jGen.writeStringField("identifier", dataPackage.getPublicationDOI());
             jGen.writeEndObject();
             jGen.writeEndArray();
-             
+
+            // When working with Dryad Classic packages, we want to disable the
+            // default DASH validation and interaction with DataCite
+            jGen.writeBooleanField("skipDataciteUpdate", true);
+            jGen.writeBooleanField("skipEmails", true);
+            jGen.writeBooleanField("loosenValidation", true);
+            
             jGen.writeEndObject();
         }
     }

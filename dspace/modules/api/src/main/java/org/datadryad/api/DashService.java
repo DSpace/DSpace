@@ -114,28 +114,28 @@ public class DashService {
         return response;
     }
 
-    /**
-       POSTs a DryadDataPackage to Dash, creating a new submission. This will eventually be
-       deprecated in favor of PUT, to ensure that only one submission is created for each identifier.
-    **/
-    public String postDataPackage(DryadDataPackage dataPackage) {
-        String dashJSON = dataPackage.getDashJSON();
-        String responseCode = "POST not completed";
-        log.debug("Got JSON object: " + dashJSON);
-            
-        BufferedReader reader = null;
 
-        //TODO: replace this pattern matching with real JSON parsing 
-        Pattern datasetIDPattern = Pattern.compile("(/api/datasets/.+?)\"},"); 
+    /**
+       PUTs a DryadDataPackage to Dash, creating a new submission or updating an
+       existing submission (using the DOI contained in the Data Package).
+
+       @return a HTTP response code
+    **/
+    public int putDataPackage(DryadDataPackage dataPackage) {
+        String dashJSON = dataPackage.getDashJSON();
+        log.debug("Got JSON object: " + dashJSON);
+        int responseCode = 0;
+        BufferedReader reader = null;
         
         try {
-            URL url = new URL(dashServer + "/api/datasets");
+            String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
+            connection.setRequestMethod("PUT");
 
             OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
             wr.write(dashJSON);
@@ -147,17 +147,18 @@ public class DashService {
             while ((line = reader.readLine()) != null) {
                 out.append(line);
             }
-
-            responseCode = connection.getResponseCode() + " " + connection.getResponseMessage();
             String response = out.toString();
-            String datasetID = "";
-            Matcher matcher = datasetIDPattern.matcher(response);
-            if (matcher.matches() && matcher.groupCount() > 0) {
-                datasetID = matcher.group(1);
-            }
+            
+            responseCode = connection.getResponseCode();
 
-            dataPackage.addDashTransferDate();
-            log.info("got dataset ID " + datasetID);
+            if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
+                log.debug("package create/update successful");
+                dataPackage.addDashTransferDate();
+            } else {
+                log.fatal("Unable to send item to DASH, response: " + responseCode +
+                          connection.getResponseMessage());
+            }
+            
             log.info("result object " + response);
         } catch (Exception e) {
             log.fatal("Unable to send item to DASH", e);
@@ -165,7 +166,7 @@ public class DashService {
 
         return responseCode;
     }
-    
+
 
     public static void main(String[] args) throws IOException {
         

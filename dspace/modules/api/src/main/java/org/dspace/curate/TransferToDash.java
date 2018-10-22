@@ -64,7 +64,7 @@ public class TransferToDash extends AbstractCurationTask {
             report("packageDOI");
         } else if (dso.getType() == Constants.ITEM) {
             DryadDataPackage dataPackage = new DryadDataPackage((Item)dso);
-            dashService.postDataPackage(dataPackage);
+            dashService.putDataPackage(dataPackage);
             
             String packageDOI = dataPackage.getIdentifier();
             
