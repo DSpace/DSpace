@@ -489,6 +489,33 @@ public class DryadDataPackage extends DryadObject {
         return dataPackageList;
     }
 
+    // this currently uses Item-based lookup; we will need to make a more abstract one that can encompass Dash
+    public Date getEnteredReviewDate() {
+        DCValue[] provenanceValues = item.getMetadata("dc.description.provenance");
+        if (provenanceValues != null && provenanceValues.length > 0) {
+            for (DCValue provenanceValue : provenanceValues) {
+                //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
+                String provenance = provenanceValue.value;
+                Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
+                Matcher matcher = pattern.matcher(provenance);
+                if (matcher.find()) {
+                    String dateString = matcher.group(1);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    Date reviewDate = null;
+                    try {
+                        reviewDate = sdf.parse(dateString);
+                        log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
+                        return reviewDate;
+                    } catch (Exception e) {
+                        log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
+                        return null;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public String getManuscriptNumber() {
         return getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
     }

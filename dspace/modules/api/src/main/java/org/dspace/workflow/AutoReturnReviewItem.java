@@ -161,29 +161,12 @@ public class AutoReturnReviewItem {
     }
 
     private static boolean itemIsOldItemInReview(Item item) {
-        DCValue[] provenanceValues = item.getMetadata("dc.description.provenance");
-        if (provenanceValues != null && provenanceValues.length > 0) {
-            for (DCValue provenanceValue : provenanceValues) {
-                //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
-                String provenance = provenanceValue.value;
-                Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
-                Matcher matcher = pattern.matcher(provenance);
-                if (matcher.find()) {
-                    String dateString = matcher.group(1);
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                    Date reviewDate = null;
-                    try {
-                        reviewDate = sdf.parse(dateString);
-                        log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
-                        return reviewDate.before(olderThanDate);
-                    } catch (Exception e) {
-                        log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
-                        return false;
-                    }
-                }
-            }
+        DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
+        Date reviewDate = dryadDataPackage.getEnteredReviewDate();
+        if (reviewDate == null) {
+            return false;
         }
-        return false;
+        return reviewDate.before(olderThanDate);
     }
 
     private static void setOlderThanDate() {
