@@ -199,6 +199,68 @@ public class DashService {
     }
 
     /**
+       PUTs a DryadDataFile to Dash, attaching it to the DryadDataPackage that contains it.
+       The DryadDataPackage must already have been PUT to Dash.
+
+       @return a HTTP response code
+    **/
+    // TODO
+    // - add json transformer in DryadDataFile
+    // - submit to proper PUT URL
+    // - use a temporary URL
+    // - document how to get/use the amazon tmp URLs
+    // - figure out the mime types for the http request
+    // - expand to all bitstreams and readmes
+    // - check character ecoding
+    private int putDataFile(DryadDataFile dataFile, DryadDataPackage dataPackage) {
+        String dashJSON = dataFile.getDashJSON();
+        log.debug("Got JSON object: " + dashJSON);
+        int responseCode = 0;
+        BufferedReader reader = null;
+        
+        try {
+            Bitstream firstBitstream = dataFile.getFirstBitstream();
+            String encodedFileName = URLEncoder.encode(firstBitstream.getName(), "UTF-8");
+            String encodedPackageDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/files/" + encodedFileName);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("PUT");
+
+            OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+            wr.write(dashJSON);
+            wr.close();
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = null;
+            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+            String response = out.toString();
+            
+            responseCode = connection.getResponseCode();
+
+            if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
+                log.debug("package create/update successful");
+                dataPackage.addDashTransferDate();
+            } else {
+                log.fatal("Unable to send item to DASH, response: " + responseCode +
+                          connection.getResponseMessage());
+            }
+            
+            log.info("result object " + response);
+        } catch (Exception e) {
+            log.fatal("Unable to send item to DASH", e);
+        }
+
+        return responseCode;
+    }
+
+    
+    /**
        Given the (unencoded) DOI of a Dryad Data Package that has
        already been transferred to DASH, force the DASH dataset into
        "submitted" status.
