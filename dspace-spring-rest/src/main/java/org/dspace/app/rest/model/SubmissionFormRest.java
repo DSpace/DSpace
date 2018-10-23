@@ -12,7 +12,7 @@ import java.util.List;
 import org.dspace.app.rest.RestResourceController;
 
 /**
- * The Input Form REST Resource
+ * The Submission Form REST Resource
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -21,19 +21,37 @@ public class SubmissionFormRest extends BaseObjectRest<String> {
     public static final String NAME_LINK_ON_PANEL = RestAddressableModel.CONFIGURATION;
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
+    /** 
+     * An unique name identifying the submission form
+     */
     private String name;
 
-    private List<SubmissionFormFieldRest> fields;
+    /**
+     * The list of row in the submission form
+     */
+    private List<SubmissionFormRowRest> rows;
 
     @Override
+    /**
+     * The id of the submission form is its name
+     */
     public String getId() {
         return name;
     }
 
+    /**
+     * Setter for {@link #name}
+     * 
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Getter for {@link #name}
+     * 
+     * @return {@link #name}
+     */
     public String getName() {
         return name;
     }
@@ -53,11 +71,20 @@ public class SubmissionFormRest extends BaseObjectRest<String> {
         return CATEGORY;
     }
 
-    public List<SubmissionFormFieldRest> getFields() {
-        return fields;
+    /**
+     * Getter for {@link #rows}
+     * 
+     * @return {@link #rows}
+     */
+    public List<SubmissionFormRowRest> getRows() {
+        return rows;
     }
 
-    public void setFields(List<SubmissionFormFieldRest> fields) {
-        this.fields = fields;
+    /**
+     * Setter for {@link #rows}
+     * 
+     */
+    public void setRows(List<SubmissionFormRowRest> rows) {
+        this.rows = rows;
     }
 }

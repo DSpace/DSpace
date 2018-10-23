@@ -23,6 +23,7 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
@@ -51,7 +52,17 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
         DataDescribe data = new DataDescribe();
         try {
             DCInputSet inputConfig = inputReader.getInputsByFormName(config.getId());
-            for (DCInput input : inputConfig.getFields()) {
+            readField(obj, config, data, inputConfig);
+        } catch (DCInputsReaderException e) {
+            log.error(e.getMessage(), e);
+        }
+        return data;
+    }
+
+    private void readField(InProgressSubmission obj, SubmissionStepConfig config, DataDescribe data,
+                           DCInputSet inputConfig) throws DCInputsReaderException {
+        for (DCInput[] row : inputConfig.getFields()) {
+            for (DCInput input : row) {
 
                 List<String> fieldsName = new ArrayList<String>();
                 if (input.isQualdropValue()) {
@@ -95,10 +106,7 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
                     }
                 }
             }
-        } catch (DCInputsReaderException e) {
-            log.error(e.getMessage(), e);
         }
-        return data;
     }
 
     @Override
