@@ -10,7 +10,7 @@ package org.dspace.app.rest.model;
 
 /**
  * The possible restriction options for the visibility attributes in the
- * SubmissionPanel resource and InputFormPage resource
+ * SubmissionPanel resource and SubmissionForm's fields
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */

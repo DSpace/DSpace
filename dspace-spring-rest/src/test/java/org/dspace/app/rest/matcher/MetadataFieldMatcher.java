@@ -51,4 +51,5 @@ public class MetadataFieldMatcher {
             hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields"))
         );
     }
+
 }
