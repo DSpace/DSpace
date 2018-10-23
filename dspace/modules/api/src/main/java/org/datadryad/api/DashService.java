@@ -14,15 +14,19 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
-
 
 
 
@@ -39,8 +43,35 @@ public class DashService {
         String dashAppSecret = ConfigurationManager.getProperty("dash.application.secret");
         
         oauthToken = getOAUTHtoken(dashServer, dashAppID, dashAppSecret);
+        fixHttpURLConnection();
     }
 
+    /**
+       Fix the fact that HttpURLConnection doesn't natively allow PATCH requests.
+
+       This will be "fixed" by replacement classes in Java 11. See https://bugs.openjdk.java.net/browse/JDK-8207840
+       Fix adapted from code at https://stackoverflow.com/questions/25163131/httpurlconnection-invalid-http-method-patch
+     **/
+    private static void fixHttpURLConnection() {
+        try {
+            Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
+
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
+
+            methodsField.setAccessible(true);
+
+            String[] oldMethods = (String[]) methodsField.get(null);
+            Set<String> methodsSet = new LinkedHashSet<>(Arrays.asList(oldMethods));
+            methodsSet.add("PATCH");
+            String[] newMethods = methodsSet.toArray(new String[0]);
+
+            methodsField.set(null/*static field*/, newMethods);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+    }
     
     private String getOAUTHtoken(String dashServer, String dashAppID, String dashAppSecret) {
         
@@ -167,6 +198,53 @@ public class DashService {
         return responseCode;
     }
 
+    /**
+       Given the (unencoded) DOI of a Dryad Data Package that has
+       already been transferred to DASH, force the DASH dataset into
+       "submitted" status.
+     **/
+    public int submitDashDataset(String doi) {
+        int responseCode = 0;
+        BufferedReader reader = null;
+        
+        try {
+            String encodedDOI = URLEncoder.encode(doi, "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json-patch+json; charset=UTF-8");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("PATCH");
+
+            OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+            wr.write("[{\"op\": \"replace\", \"path\": \"/versionStatus\", " +
+                     "\"value\": \"submitted\"}]");
+            wr.close();
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = null;
+            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+            String response = out.toString();
+            
+            responseCode = connection.getResponseCode();
+
+            if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
+                log.debug("package submission successful");
+            } else {
+                log.fatal("Unable to update submission status of item to DASH, response: " +
+                          responseCode + connection.getResponseMessage());
+            }
+            
+            log.info("result object " + response);
+        } catch (Exception e) {
+            log.fatal("Unable to update submission status of item in DASH", e);
+        }
+
+        return responseCode;        
+    }
 
     public static void main(String[] args) throws IOException {
         
