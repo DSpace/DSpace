@@ -25,7 +25,7 @@ import java.util.*;
 
 /**
  *
- * @author1 Dan Leehr <dan.leehr@nescent.org>
+ * @author Dan Leehr <dan.leehr@nescent.org>
  */
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -157,6 +157,7 @@ public class Package {
         }
         return packageList;
     }
+    
     public static class SchemaDotOrgSerializer extends JsonSerializer<Package> {
         @Override
         public void serialize(Package dataPackage, JsonGenerator jGen, SerializerProvider provider) throws IOException {
@@ -191,6 +192,42 @@ public class Package {
             jGen.writeStringField("url", "https://datadryad.org");
             jGen.writeEndObject();
 
+            jGen.writeEndObject();
+        }
+    }
+
+    public static class DashSerializer extends JsonSerializer<Package> {
+        @Override
+        public void serialize(Package dataPackage, JsonGenerator jGen, SerializerProvider provider) throws IOException {
+            jGen.writeStartObject();
+
+            jGen.writeStringField("identifier", dataPackage.getDryadDOI());
+            jGen.writeStringField("title", dataPackage.getTitle());
+            jGen.writeStringField("abstract", dataPackage.getAbstract());
+            jGen.writeObjectField("authors", dataPackage.getAuthorList());
+
+            if (dataPackage.getKeywords().size() > 0) {
+                jGen.writeObjectField("keywords", dataPackage.getKeywords());
+            }
+            
+            //TODO: replace this with a real epersonID OR DASH user ID
+            jGen.writeStringField("userID", "1");
+            
+            // write citation for article:
+            jGen.writeArrayFieldStart("relatedWorks");
+            jGen.writeStartObject();
+            jGen.writeStringField("relationship", "iscitedby");
+            jGen.writeStringField("identifierType", "DOI");
+            jGen.writeStringField("identifier", dataPackage.getPublicationDOI());
+            jGen.writeEndObject();
+            jGen.writeEndArray();
+
+            // When working with Dryad Classic packages, we want to disable the
+            // default DASH validation and interaction with DataCite
+            jGen.writeBooleanField("skipDataciteUpdate", true);
+            jGen.writeBooleanField("skipEmails", true);
+            jGen.writeBooleanField("loosenValidation", true);
+            
             jGen.writeEndObject();
         }
     }

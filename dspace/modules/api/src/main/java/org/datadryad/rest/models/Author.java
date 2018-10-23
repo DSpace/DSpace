@@ -228,4 +228,18 @@ public class Author {
             jGen.writeEndObject();
         }
     }
+
+    public static class DashSerializer extends JsonSerializer<Author> {
+        @Override
+        public void serialize(Author author, JsonGenerator jGen, SerializerProvider provider) throws IOException {
+            jGen.writeStartObject();
+            jGen.writeStringField("firstName", author.getGivenNames());
+            jGen.writeStringField("lastName", author.getFamilyName());
+            if (author.getIdentifierType() != null && author.getIdentifierType().equals(ORCID_TYPE)) {
+                jGen.writeStringField("orcid", author.getIdentifier());
+            }
+            jGen.writeEndObject();
+        }
+    }
+
 }

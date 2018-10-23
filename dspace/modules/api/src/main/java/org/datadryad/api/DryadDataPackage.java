@@ -8,6 +8,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,20 +78,16 @@ public class DryadDataPackage extends DryadObject {
     private static final String TITLE_SCHEMA = "dc";
     private static final String TITLE_ELEMENT = "title";
 
-    private static final String ABSTRACT_SCHEMA = "dc";
-    private static final String ABSTRACT_ELEMENT = "description";
-
     private static final String KEYWORD_SCHEMA = "dc";
     private static final String KEYWORD_ELEMENT = "subject";
-
-    private static final String AUTHOR_SCHEMA = "dc";
-    private static final String AUTHOR_ELEMENT = "contributor";
-    private static final String AUTHOR_QUALIFIER = "author";
 
     private final static String PUBLICATION_DATE_SCHEMA = "dc";
     private final static String PUBLICATION_DATE_ELEMENT = "date";
     private final static String PUBLICATION_DATE_QUALIFIER = "issued";
 
+    private static final String DASH_TRANSFER_SCHEMA = "dryad";
+    private static final String DASH_TRANSFER_ELEMENT = "dashTransferDate";
+    
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
@@ -388,6 +386,7 @@ public class DryadDataPackage extends DryadObject {
         addSingleMetadataValue(Boolean.FALSE,PROVENANCE_SCHEMA, PROVENANCE_ELEMENT, PROVENANCE_QUALIFIER, PROVENANCE_LANGUAGE, metadataValue);
     }
 
+    
     @Override
     Set<DryadObject> getRelatedObjects(final Context context) throws SQLException {
         return new HashSet<DryadObject>(getDataFiles(context));
@@ -539,11 +538,18 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public void setAbstract(String theAbstract) throws SQLException {
-        addSingleMetadataValue(Boolean.TRUE, ABSTRACT_SCHEMA, ABSTRACT_ELEMENT, null, theAbstract);
+        addSingleMetadataValue(Boolean.TRUE, "dc", "description", null, theAbstract);
     }
 
     public String getAbstract() throws SQLException {
-        return getSingleMetadataValue(ABSTRACT_SCHEMA, ABSTRACT_ELEMENT, null);
+        String theAbstract = getSingleMetadataValue("dc", "description", null);
+        String extraAbstract = getSingleMetadataValue("dc", "description", "abstract");
+
+        if (extraAbstract != null && extraAbstract.length() > 0) {
+            theAbstract = theAbstract + "\n" + extraAbstract;
+        }
+
+        return theAbstract;
     }
 
     public List<String> getKeywords() throws SQLException {
@@ -558,9 +564,24 @@ public class DryadDataPackage extends DryadObject {
         addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
     }
 
+    public void addDashTransferDate() throws SQLException {
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
+        String transferDate = sdf.format(now);
+        addSingleMetadataValue(Boolean.FALSE, DASH_TRANSFER_SCHEMA, DASH_TRANSFER_ELEMENT, null, transferDate);
+    }
+
     public List<Author> getAuthors() throws SQLException {
         ArrayList<Author> authors = new ArrayList<Author>();
-        DCValue[] metadata = item.getMetadata(AUTHOR_SCHEMA, AUTHOR_ELEMENT, AUTHOR_QUALIFIER, Item.ANY);
+        DCValue[] metadata = item.getMetadata("dc", "contributor", "author", Item.ANY);
+        for(DCValue dcValue : metadata) {
+            authors.add(new Author(dcValue));
+        }
+        metadata = item.getMetadata("dc", "contributor", null, Item.ANY);
+        for(DCValue dcValue : metadata) {
+            authors.add(new Author(dcValue));
+        }
+        metadata = item.getMetadata("dc", "creator", null, Item.ANY);
         for(DCValue dcValue : metadata) {
             authors.add(new Author(dcValue));
         }
@@ -581,6 +602,20 @@ public class DryadDataPackage extends DryadObject {
             mapper.registerModule(new SimpleModule().addSerializer(Package.class, new Package.SchemaDotOrgSerializer()));
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(new Package(this));
         } catch (Exception e) {
+            log.error("Unable to serialize Schema.org JSON", e);
+            return "";
+        }
+    }
+
+    // Convenience method to access a properly serialized JSON string, formatted for use with DASH.
+    public String getDashJSON() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.registerModule(new SimpleModule().addSerializer(Author.class, new Author.DashSerializer()));
+            mapper.registerModule(new SimpleModule().addSerializer(Package.class, new Package.DashSerializer()));
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(new Package(this));
+        } catch (Exception e) {
+            log.error("Unable to serialize Dash-style JSON", e);
             return "";
         }
     }
