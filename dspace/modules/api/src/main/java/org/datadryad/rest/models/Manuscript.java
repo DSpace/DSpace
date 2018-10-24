@@ -31,6 +31,7 @@ import org.datadryad.api.DryadJournalConcept;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.content.authority.Choices;
+import org.dspace.workflow.ApproveRejectReviewItemException;
 
 /**
  *
@@ -833,6 +834,21 @@ public class Manuscript {
         }
     }
 
+    public static Boolean statusIsApproved(String status) throws ApproveRejectReviewItemException {
+        Boolean approved = null;
+        if (Manuscript.statusIsAccepted(status)) {
+            approved = true;
+        } else if (Manuscript.statusIsRejected(status)) {
+            approved = false;
+        } else if (Manuscript.statusIsNeedsRevision(status)) {
+            approved = false;
+        } else if (Manuscript.statusIsPublished(status)) {
+            approved = true;
+        } else {
+            throw new ApproveRejectReviewItemException("Status " + status + " is neither approved nor rejected");
+        }
+        return approved;
+    }
 
 
     @Override

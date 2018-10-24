@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Author;
+import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Package;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -665,6 +666,90 @@ public class DryadDataPackage extends DryadObject {
             log.error("Exception while finding items matching manuscript " + this.getIdentifier());
         }
         return resultList;
+    }
+
+    /**
+     * Copies manuscript metadata into a dryad data package
+     * @param manuscript
+     * @param message
+     * @throws SQLException
+     */
+    public void associateWithManuscript(Manuscript manuscript, StringBuilder message) throws SQLException {
+        if (manuscript != null) {
+            // set publication DOI
+            if (!"".equals(manuscript.getPublicationDOI()) && !this.getPublicationDOI().equals(manuscript.getPublicationDOI())) {
+                String oldValue = this.getPublicationDOI();
+                this.setPublicationDOI(manuscript.getPublicationDOI());
+                message.append(" publication DOI was updated from " + oldValue + ".");
+            }
+            // set Manuscript ID
+            if (!"".equals(manuscript.getManuscriptId()) && !this.getManuscriptNumber().equals(manuscript.getManuscriptId())) {
+                String oldValue = this.getManuscriptNumber();
+                this.setManuscriptNumber(manuscript.getManuscriptId());
+                message.append(" manuscript number was updated from " + oldValue + ".");
+            }
+//            // union keywords
+//            if (manuscript.getKeywords().size() > 0) {
+//                ArrayList<String> unionKeywords = new ArrayList<String>();
+//                unionKeywords.addAll(dataPackage.getKeywords());
+//                for (String newKeyword : manuscript.getKeywords()) {
+//                    if (!unionKeywords.contains(newKeyword)) {
+//                        unionKeywords.add(newKeyword);
+//                    }
+//                }
+//                dataPackage.setKeywords(unionKeywords);
+//            }
+            // set title
+            if (!"".equals(manuscript.getTitle()) && !this.getTitle().equals(manuscript.getTitle())) {
+                String oldValue = this.getTitle();
+                this.setTitle(String.format("Data from: %s", manuscript.getTitle()));
+                message.append(" article title was updated from \"" + oldValue + "\".");
+            }
+            // set abstract
+            if (!"".equals(manuscript.getAbstract()) && !this.getAbstract().equals(manuscript.getAbstract())) {
+                this.setAbstract(manuscript.getAbstract());
+                message.append(" abstract was updated.");
+            }
+            // set publicationDate
+            if (manuscript.getPublicationDate() != null) {
+                SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
+                String dateString = dateIso.format(manuscript.getPublicationDate());
+                String oldValue = this.getPublicationDate();
+                if (!dateString.equals(oldValue)) {
+                    this.setPublicationDate(dateString);
+                    message.append(" publication date was updated from " + oldValue + ".");
+                }
+            }
+        }
+    }
+
+    public void disassociateFromManuscript(Manuscript manuscript) throws SQLException {
+        if (manuscript != null) {
+            // clear publication DOI
+            this.setPublicationDOI(null);
+            // If there is a manuscript number, move it to former msid
+            this.setFormerManuscriptNumber(this.getManuscriptNumber());
+            // clear Manuscript ID
+            this.setManuscriptNumber(null);
+            // disjoin keywords
+            List<String> packageKeywords = this.getKeywords();
+            List<String> manuscriptKeywords = manuscript.getKeywords();
+            List<String> prunedKeywords = subtractList(packageKeywords, manuscriptKeywords);
+
+            this.setKeywords(prunedKeywords);
+            // clear publicationDate
+            this.setBlackoutUntilDate(null);
+        }
+    }
+
+    private static List<String> subtractList(List<String> list1, List<String> list2) {
+        List<String> list = new ArrayList<String>(list1);
+        for(String string : list2) {
+            if(list.contains(string)) {
+                list.remove(string);
+            }
+        }
+        return list;
     }
 
     // Convenience method to access a properly serialized JSON-LD string, formatted for Schema.org.

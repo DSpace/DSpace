@@ -162,47 +162,23 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    private static Boolean statusIsApproved(String status) throws ApproveRejectReviewItemException {
-        Boolean approved = null;
-        if (Manuscript.statusIsAccepted(status)) {
-            approved = true;
-        } else if (Manuscript.statusIsRejected(status)) {
-            approved = false;
-        } else if (Manuscript.statusIsNeedsRevision(status)) {
-            approved = false;
-        } else if (Manuscript.statusIsPublished(status)) {
-            approved = true;
-        } else {
-            throw new ApproveRejectReviewItemException("Status " + status + " is neither approved nor rejected");
-        }
-        return approved;
-    }
-
     public static void processWorkflowItemUsingManuscript(Context c, WorkflowItem wfi, Manuscript manuscript) throws ApproveRejectReviewItemException {
-	// get a List of ClaimedTasks, using the WorkflowItem
-        List<ClaimedTask> claimedTasks = null;
         try {
-            if (wfi != null) {
-                claimedTasks = ClaimedTask.findByWorkflowId(c, wfi.getID());
-            }
-            //Check for a valid task
-            // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
             Item item = wfi.getItem();
             DryadDataPackage dataPackage = new DryadDataPackage(item);
             StringBuilder provenance = new StringBuilder();
             c.turnOffAuthorisationSystem();
             // update duplicate submission metadata for this item.
             item.checkForDuplicateItems(c);
-            if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
-                log.debug ("Item " + item.getID() + " not found or not in review");
-            } else {
+            if (DryadWorkflowUtils.isItemInReview(c, wfi)) {
+                List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(c, wfi.getID());
                 ClaimedTask claimedTask = claimedTasks.get(0);
-                associateWithManuscript(dataPackage, manuscript, provenance);
-                if (statusIsApproved(manuscript.getStatus())) { // approve
+                dataPackage.associateWithManuscript(manuscript, provenance);
+                if (Manuscript.statusIsApproved(manuscript.getStatus())) { // approve
                     Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
                     WorkflowActionConfig actionConfig = workflow.getStep(claimedTask.getStepID()).getActionConfig(claimedTask.getActionID());
 
-                    item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, statusIsApproved(manuscript.getStatus()).toString());
+                    item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, Manuscript.statusIsApproved(manuscript.getStatus()).toString());
 
                     WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
                     // Add provenance to item
@@ -225,7 +201,7 @@ public class ApproveRejectReviewItem {
                         }
                     }
                     WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, ePerson, null, reason, true);
-                    disassociateFromManuscript(dataPackage, manuscript);
+                    dataPackage.disassociateFromManuscript(manuscript);
                 }
             }
         } catch (Exception ex) {
@@ -234,95 +210,5 @@ public class ApproveRejectReviewItem {
         finally {
             c.restoreAuthSystemState();
         }
-    }
-
-    /**
-     * Copies manuscript metadata into a dryad data package
-     * @param dataPackage
-     * @param manuscript
-     * @param message
-     * @throws SQLException
-     */
-    private static void associateWithManuscript(DryadDataPackage dataPackage, Manuscript manuscript, StringBuilder message) throws SQLException {
-        if (manuscript != null) {
-            // set publication DOI
-            if (!"".equals(manuscript.getPublicationDOI()) && !dataPackage.getItem().hasMetadataEqualTo(PUBLICATION_DOI, manuscript.getPublicationDOI())) {
-                String oldValue = dataPackage.getPublicationDOI();
-                dataPackage.setPublicationDOI(manuscript.getPublicationDOI());
-                message.append(" " + PUBLICATION_DOI + " was updated from " + oldValue + ".");
-            }
-            // set Manuscript ID
-            if (!"".equals(manuscript.getManuscriptId()) && !dataPackage.getItem().hasMetadataEqualTo(MANUSCRIPT, manuscript.getManuscriptId())) {
-                String oldValue = dataPackage.getManuscriptNumber();
-                dataPackage.setManuscriptNumber(manuscript.getManuscriptId());
-                message.append(" " + MANUSCRIPT + " was updated from " + oldValue + ".");
-            }
-//            // union keywords
-//            if (manuscript.getKeywords().size() > 0) {
-//                ArrayList<String> unionKeywords = new ArrayList<String>();
-//                unionKeywords.addAll(dataPackage.getKeywords());
-//                for (String newKeyword : manuscript.getKeywords()) {
-//                    if (!unionKeywords.contains(newKeyword)) {
-//                        unionKeywords.add(newKeyword);
-//                    }
-//                }
-//                dataPackage.setKeywords(unionKeywords);
-//            }
-            // set title
-            if (!"".equals(manuscript.getTitle()) && !dataPackage.getItem().hasMetadataEqualTo(ARTICLE_TITLE, manuscript.getTitle())) {
-                String oldValue = dataPackage.getTitle();
-                dataPackage.setTitle(prefixTitle(manuscript.getTitle()));
-                message.append(" " + ARTICLE_TITLE + " was updated from \"" + oldValue + "\".");
-            }
-            // set abstract
-            if (!"".equals(manuscript.getAbstract()) && !dataPackage.getItem().hasMetadataEqualTo(ABSTRACT, manuscript.getAbstract())) {
-                dataPackage.setAbstract(manuscript.getAbstract());
-                message.append(" " + ABSTRACT + " was updated.");
-            }
-            // set publicationDate
-            if (manuscript.getPublicationDate() != null) {
-                SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
-                String dateString = dateIso.format(manuscript.getPublicationDate());
-                String oldValue = dataPackage.getPublicationDate();
-                if (!dateString.equals(oldValue)) {
-                    dataPackage.setPublicationDate(dateString);
-                    message.append(" " + PUBLICATION_DATE + " was updated from " + oldValue + ".");
-                }
-            }
-        }
-    }
-
-    private static void disassociateFromManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
-        if (manuscript != null) {
-            // clear publication DOI
-            dataPackage.setPublicationDOI(null);
-            // If there is a manuscript number, move it to former msid
-            dataPackage.setFormerManuscriptNumber(dataPackage.getManuscriptNumber());
-            // clear Manuscript ID
-            dataPackage.setManuscriptNumber(null);
-            // disjoin keywords
-            List<String> packageKeywords = dataPackage.getKeywords();
-            List<String> manuscriptKeywords = manuscript.getKeywords();
-            List<String> prunedKeywords = subtractList(packageKeywords, manuscriptKeywords);
-
-            dataPackage.setKeywords(prunedKeywords);
-            // clear publicationDate
-            dataPackage.setBlackoutUntilDate(null);
-        }
-    }
-
-    private static List<String> subtractList(List<String> list1, List<String> list2) {
-        List<String> list = new ArrayList<String>(list1);
-        for(String string : list2) {
-            if(list.contains(string)) {
-                list.remove(string);
-            }
-        }
-        return list;
-    }
-
-
-    private static String prefixTitle(String title) {
-        return String.format("Data from: %s", title);
     }
 }
