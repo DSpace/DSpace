@@ -34,7 +34,6 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
@@ -44,8 +43,6 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
@@ -59,7 +56,7 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {Application.class, ApplicationConfig.class, WebSecurityConfiguration.class,
-        MethodSecurityConfig.class})
+    MethodSecurityConfig.class})
 @TestExecutionListeners( {DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
     TransactionalTestExecutionListener.class})
 @DirtiesContext
@@ -72,11 +69,8 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     //sits before the actual authentication token and can be used to easily compose or parse the Authorization header.
     protected static final String AUTHORIZATION_TYPE = "Bearer ";
 
-    protected static final String REQUEST_SCHEME = "http";
-    protected static final String REQUEST_NAME = "localhost";
-    protected static final int REQUEST_PORT = 8080;
-    protected static final String REQUEST_CONTEXTPATH = "rest";
-    public static final String REST_SERVER_URL = REQUEST_SCHEME + "://" + REQUEST_NAME + ":" + REQUEST_PORT + "/" + REQUEST_CONTEXTPATH +"/";
+    public static final String REST_SERVER_URL = "http://localhost/api/";
+    public static final String BASE_REST_SERVER_URL = "http://localhost";
 
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
                                                     MediaTypes.HAL_JSON.getSubtype(), Charsets.UTF_8);
@@ -116,19 +110,10 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
             .addFilters(new ErrorPageFilter())
             .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]));
 
-        MockHttpServletRequestBuilder defaultRequestParameters = get("")
-            .with(request -> {
-                request.setScheme(REQUEST_SCHEME);
-                request.setServerName(REQUEST_NAME);
-                request.setServerPort(REQUEST_PORT);
-                request.setContextPath(REQUEST_CONTEXTPATH);
-                return request;
-            });
         if (StringUtils.isNotBlank(authToken)) {
             mockMvcBuilder.defaultRequest(
-                    get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
+                get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
         }
-        mockMvcBuilder.defaultRequest(defaultRequestParameters);
 
         return mockMvcBuilder
             .build();
@@ -143,8 +128,8 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     public String getAuthToken(String user, String password) throws Exception {
         return StringUtils.substringAfter(
-                getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER),
-                AUTHORIZATION_TYPE);
+            getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER),
+            AUTHORIZATION_TYPE);
     }
 
     public String getPatchContent(List<Operation> ops) {
@@ -164,4 +149,3 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
         };
     }
 }
-

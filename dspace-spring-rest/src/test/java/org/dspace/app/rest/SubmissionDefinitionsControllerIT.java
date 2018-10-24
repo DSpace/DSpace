@@ -55,7 +55,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                    .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(
-                       jsonPath("$._links.search.href", is(REST_SERVER_URL + "api/config/submissiondefinitions/search")))
+                       jsonPath("$._links.search.href", is(REST_SERVER_URL + "config/submissiondefinitions/search")))
 
                    //The array of browse index should have a size greater or equals to 1
                    .andExpect(jsonPath("$._embedded.submissiondefinitions", hasSize(greaterThanOrEqualTo(1))))
@@ -157,10 +157,10 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                                                hasJsonPath("$.type", is("submissionsection")),
                                                hasJsonPath("$._links.config.href",
                                                            is(REST_SERVER_URL +
-                                                                  "api/config/submissionforms/traditionalpageone")),
+                                                                  "config/submissionforms/traditionalpageone")),
                                                hasJsonPath("$._links.self.href",
                                                            is(REST_SERVER_URL +
-                                                                  "api/config/submissionsections/traditionalpageone"))
+                                                                  "config/submissionsections/traditionalpageone"))
                                            ))))
         ;
     }

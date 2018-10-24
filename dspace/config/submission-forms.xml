@@ -45,8 +45,8 @@
 	         <required></required>
 	       </field>
        </row>
-   </form>      
-   
+   </form>
+
    <form name="traditionalpageone">
      <row>
        <field>
@@ -175,7 +175,7 @@ it, please enter the types and the actual numbers or codes.</hint>
        </field>
      </row>
 	</form>
-	
+
 	<form name="traditionalpagetwo">
      <row>
        <field>
@@ -230,6 +230,7 @@ it, please enter the types and the actual numbers or codes.</hint>
    </form>
 
    <form name="peopleStep">
+     <row>
 
      <field>
        <dc-schema>person</dc-schema>
@@ -239,6 +240,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the last name of the person</hint>
      </field>
+     </row>
+     <row>
 
      <field>
        <dc-schema>person</dc-schema>
@@ -248,6 +251,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the first name of the person</hint>
      </field>
+     </row>
+     <row>
 
      <field>
        <dc-schema>person</dc-schema>
@@ -257,6 +262,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the email of the person</hint>
      </field>
+     </row>
+     <row>
 
      <field>
        <dc-schema>person</dc-schema>
@@ -266,6 +273,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the orcid of the person</hint>
      </field>
+     </row>
+     <row>
 
      <field>
        <dc-schema>person</dc-schema>
@@ -275,6 +284,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>date</input-type>
        <hint>Enter the birth date of the person</hint>
      </field>
+     </row>
+     <row>
 
      <field>
        <dc-schema>person</dc-schema>
@@ -284,6 +295,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the staff id of the person</hint>
      </field>
+     </row>
+     <row>
 
      <field>
        <dc-schema>person</dc-schema>
@@ -293,13 +306,16 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the job title of the person</hint>
      </field>
+     </row>
    </form>
 
 
 
 
    <form name="projectStep">
-     <field>
+       <row>
+
+       <field>
        <dc-schema>project</dc-schema>
        <dc-element>identifier</dc-element>
        <dc-qualifier>name</dc-qualifier>
@@ -307,8 +323,10 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the name of the project</hint>
      </field>
+       </row>
+       <row>
 
-     <field>
+       <field>
        <dc-schema>project</dc-schema>
        <dc-element>identifier</dc-element>
        <dc-qualifier>id</dc-qualifier>
@@ -316,7 +334,10 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the id of the project</hint>
      </field>
-     <field>
+       </row>
+       <row>
+
+       <field>
        <dc-schema>project</dc-schema>
        <dc-element>identifier</dc-element>
        <dc-qualifier>status</dc-qualifier>
@@ -324,7 +345,10 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the status of the project</hint>
      </field>
-     <field>
+       </row>
+       <row>
+
+       <field>
        <dc-schema>project</dc-schema>
        <dc-element>identifier</dc-element>
        <dc-qualifier>startdate</dc-qualifier>
@@ -332,6 +356,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>date</input-type>
        <hint>Enter the start date of the project</hint>
      </field>
+       </row>
+       <row>
      <field>
        <dc-schema>project</dc-schema>
        <dc-element>identifier</dc-element>
@@ -340,6 +366,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>date</input-type>
        <hint>Enter the expected completion date of the project</hint>
      </field>
+       </row>
+       <row>
      <field>
        <dc-schema>project</dc-schema>
        <dc-element>identifier</dc-element>
@@ -348,6 +376,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the keywords of the project</hint>
      </field>
+       </row>
+       <row>
      <field>
        <dc-schema>project</dc-schema>
        <dc-element>identifier</dc-element>
@@ -356,9 +386,11 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the description of the project</hint>
      </field>
+       </row>
    </form>
 
    <form name="orgUnitStep">
+       <row>
      <field>
        <dc-schema>orgunit</dc-schema>
        <dc-element>identifier</dc-element>
@@ -367,6 +399,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the name of the orgunit</hint>
      </field>
+       </row>
+       <row>
      <field>
        <dc-schema>orgunit</dc-schema>
        <dc-element>identifier</dc-element>
@@ -375,6 +409,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the id of the orgunit</hint>
      </field>
+       </row>
+       <row>
      <field>
        <dc-schema>orgunit</dc-schema>
        <dc-element>identifier</dc-element>
@@ -383,6 +419,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>date</input-type>
        <hint>Enter the established date of the orgunit</hint>
      </field>
+       </row>
+       <row>
      <field>
        <dc-schema>orgunit</dc-schema>
        <dc-element>identifier</dc-element>
@@ -391,6 +429,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the city of the orgunit</hint>
      </field>
+       </row>
+       <row>
      <field>
        <dc-schema>orgunit</dc-schema>
        <dc-element>identifier</dc-element>
@@ -399,6 +439,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the country of the orgunit</hint>
      </field>
+       </row>
+       <row>
      <field>
        <dc-schema>orgunit</dc-schema>
        <dc-element>identifier</dc-element>
@@ -407,10 +449,11 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the description of the orgunit</hint>
      </field>
+       </row>
    </form>
 
    <form name="journalStep">
-
+    <row>
      <field>
        <dc-schema>journal</dc-schema>
        <dc-element>identifier</dc-element>
@@ -419,6 +462,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the name of the journal</hint>
      </field>
+    </row>
+       <row>
 
      <field>
        <dc-schema>journal</dc-schema>
@@ -428,6 +473,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the editor of the journal</hint>
      </field>
+       </row>
+       <row>
 
      <field>
        <dc-schema>journal</dc-schema>
@@ -438,6 +485,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <hint>Enter the issn of the journal</hint>
      </field>
 
+       </row>
+       <row>
      <field>
        <dc-schema>journal</dc-schema>
        <dc-element>identifier</dc-element>
@@ -447,6 +496,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <hint>Enter the description of the journal</hint>
      </field>
 
+       </row>
+       <row>
      <field>
        <dc-schema>journal</dc-schema>
        <dc-element>publisher</dc-element>
@@ -454,11 +505,12 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the publisher of the journal</hint>
      </field>
+       </row>
 
    </form>
 
    <form name="journalVolumeStep">
-
+    <row>
      <field>
        <dc-schema>journalvolume</dc-schema>
        <dc-element>identifier</dc-element>
@@ -468,6 +520,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <hint>Enter the name of the journal volume</hint>
      </field>
 
+    </row>
+       <row>
      <field>
        <dc-schema>journalvolume</dc-schema>
        <dc-element>identifier</dc-element>
@@ -477,6 +531,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <hint>Enter the volume of the journal volume</hint>
      </field>
 
+       </row>
+       <row>
      <field>
        <dc-schema>journalvolume</dc-schema>
        <dc-element>issuedate</dc-element>
@@ -484,6 +540,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>date</input-type>
        <hint>Enter the issue date of the journal volume</hint>
      </field>
+       </row>
+       <row>
 
      <field>
        <dc-schema>journalvolume</dc-schema>
@@ -493,11 +551,11 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the description of the journal volume</hint>
      </field>
-
+       </row>
    </form>
 
    <form name="journalIssueStep">
-
+    <row>
      <field>
        <dc-schema>journalissue</dc-schema>
        <dc-element>identifier</dc-element>
@@ -506,6 +564,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the name of the journal issue</hint>
      </field>
+    </row>
+       <row>
 
      <field>
        <dc-schema>journalissue</dc-schema>
@@ -515,6 +575,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the number of the journal issue</hint>
      </field>
+       </row>
+       <row>
 
      <field>
        <dc-schema>journalissue</dc-schema>
@@ -523,6 +585,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>date</input-type>
        <hint>Enter the issue date of the journal issue</hint>
      </field>
+       </row>
+       <row>
 
      <field>
        <dc-schema>journalissue</dc-schema>
@@ -532,6 +596,8 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the description of the journal issue</hint>
      </field>
+       </row>
+       <row>
 
      <field>
        <dc-schema>journalissue</dc-schema>
@@ -541,6 +607,7 @@ it, please enter the types and the actual numbers or codes.</hint>
        <input-type>textarea</input-type>
        <hint>Enter the keywords of the journal issue</hint>
      </field>
+       </row>
 
    </form>
 

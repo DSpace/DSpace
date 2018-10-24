@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.builder;
 
 import java.sql.SQLException;
@@ -38,7 +45,7 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
             context.dispatchEvents();
 
             indexingService.commit();
-        } catch (SearchServiceException|SQLException|AuthorizeException e) {
+        } catch (SearchServiceException | SQLException | AuthorizeException e) {
             log.error(e);
         }
         return relationship;
@@ -57,12 +64,15 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
         indexingService.commit();
     }
 
-    public static RelationshipBuilder createRelationshipBuilder(Context context, Item leftItem, Item rightItem, RelationshipType relationshipType) {
+    public static RelationshipBuilder createRelationshipBuilder(Context context, Item leftItem, Item rightItem,
+                                                                RelationshipType relationshipType) {
 
         RelationshipBuilder relationshipBuilder = new RelationshipBuilder(context);
         return relationshipBuilder.create(context, leftItem, rightItem, relationshipType);
     }
-    private RelationshipBuilder create(Context context, Item leftItem, Item rightItem, RelationshipType relationshipType) {
+
+    private RelationshipBuilder create(Context context, Item leftItem, Item rightItem,
+                                       RelationshipType relationshipType) {
         this.context = context;
 
         try {
@@ -71,7 +81,7 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
             relationship.setRightItem(rightItem);
             relationship.setRelationshipType(relationshipType);
             relationshipService.create(context, relationship);
-        } catch (SQLException|AuthorizeException e) {
+        } catch (SQLException | AuthorizeException e) {
             e.printStackTrace();
         }
 

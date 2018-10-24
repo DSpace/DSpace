@@ -34,9 +34,9 @@ public class BrowseIndexMatcher {
             hasJsonPath("$.metadataBrowse", Matchers.is(true)),
             hasJsonPath("$.order", equalToIgnoringCase(order)),
             hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
-            hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "api/discover/browses/subject")),
-            hasJsonPath("$._links.entries.href", is(REST_SERVER_URL + "api/discover/browses/subject/entries")),
-            hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "api/discover/browses/subject/items"))
+            hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/subject")),
+            hasJsonPath("$._links.entries.href", is(REST_SERVER_URL + "discover/browses/subject/entries")),
+            hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "discover/browses/subject/items"))
         );
     }
 
@@ -46,8 +46,8 @@ public class BrowseIndexMatcher {
             hasJsonPath("$.metadataBrowse", Matchers.is(false)),
             hasJsonPath("$.order", equalToIgnoringCase(order)),
             hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
-            hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "api/discover/browses/title")),
-            hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "api/discover/browses/title/items"))
+            hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/title")),
+            hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "discover/browses/title/items"))
         );
     }
 
@@ -57,9 +57,9 @@ public class BrowseIndexMatcher {
             hasJsonPath("$.metadataBrowse", Matchers.is(true)),
             hasJsonPath("$.order", equalToIgnoringCase(order)),
             hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
-            hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "api/discover/browses/author")),
-            hasJsonPath("$._links.entries.href", is(REST_SERVER_URL + "api/discover/browses/author/entries")),
-            hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "api/discover/browses/author/items"))
+            hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/author")),
+            hasJsonPath("$._links.entries.href", is(REST_SERVER_URL + "discover/browses/author/entries")),
+            hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "discover/browses/author/items"))
         );
     }
 
@@ -69,8 +69,8 @@ public class BrowseIndexMatcher {
             hasJsonPath("$.metadataBrowse", Matchers.is(false)),
             hasJsonPath("$.order", equalToIgnoringCase(order)),
             hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
-            hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "api/discover/browses/dateissued")),
-            hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "api/discover/browses/dateissued/items"))
+            hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/dateissued")),
+            hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "discover/browses/dateissued/items"))
         );
     }
 }

@@ -8,22 +8,25 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.dspace.content.EntityType;
+import org.dspace.content.EntityType_;
 import org.dspace.content.dao.EntityTypeDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 
 public class EntityTypeDAOImpl extends AbstractHibernateDAO<EntityType> implements EntityTypeDAO {
 
-    public EntityType findByEntityType(Context context,String entityType) throws SQLException {
-        Criteria criteria = createCriteria(context,EntityType.class);
-        criteria.add(Restrictions.and(
-            Restrictions.eq("label", entityType).ignoreCase()
-        ));
-
-        return singleResult(criteria);
+    public EntityType findByEntityType(Context context, String entityType) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EntityType.class);
+        Root<EntityType> entityTypeRoot = criteriaQuery.from(EntityType.class);
+        criteriaQuery.select(entityTypeRoot);
+        criteriaQuery.where(criteriaBuilder.equal(criteriaBuilder.upper(entityTypeRoot.get(EntityType_.label)),
+                                                  entityType.toUpperCase()));
+        return uniqueResult(context, criteriaQuery, true, EntityType.class, -1, -1);
     }
 }

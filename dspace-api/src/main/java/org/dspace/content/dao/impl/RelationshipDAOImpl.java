@@ -9,34 +9,37 @@ package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
 import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
+import org.dspace.content.Relationship_;
 import org.dspace.content.dao.RelationshipDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 
 public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> implements RelationshipDAO {
 
-    public List<Relationship> findByItem(Context context,Item item) throws SQLException {
-        Criteria criteria = createCriteria(context,Relationship.class);
-        criteria.add(Restrictions.or(
-            Restrictions.eq("leftItem", item),
-            Restrictions.eq("rightItem", item)
-        ));
-
-        return list(criteria);
+    public List<Relationship> findByItem(Context context, Item item) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.select(relationshipRoot);
+        criteriaQuery
+            .where(criteriaBuilder.or(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
+                                      criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
+        return list(context, criteriaQuery, true, Relationship.class, -1, -1);
     }
 
     public int findLeftPlaceByLeftItem(Context context, Item item) throws SQLException {
-        Criteria criteria = createCriteria(context, Relationship.class);
-        criteria.add(Restrictions.and(
-            Restrictions.eq("leftItem", item)
-        ));
-
-        List<Relationship> list = list(criteria);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item));
+        List<Relationship> list = list(context, criteriaQuery, true, Relationship.class, -1, -1);
         list.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
         if (!list.isEmpty()) {
             return list.get(0).getLeftPlace();
@@ -46,13 +49,13 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     public int findRightPlaceByRightItem(Context context, Item item) throws SQLException {
-        Criteria criteria = createCriteria(context, Relationship.class);
-        criteria.add(Restrictions.and(
-            Restrictions.eq("rightItem", item)
-        ));
-
-        List<Relationship> list = list(criteria);
-        list.sort((o1, o2) -> o2.getRightPlace() - o1.getRightPlace());
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item));
+        List<Relationship> list = list(context, criteriaQuery, true, Relationship.class, -1, -1);
+        list.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
         if (!list.isEmpty()) {
             return list.get(0).getLeftPlace();
         } else {

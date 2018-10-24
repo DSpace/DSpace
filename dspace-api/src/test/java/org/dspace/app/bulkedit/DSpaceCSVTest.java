@@ -41,19 +41,19 @@ public class DSpaceCSVTest extends AbstractUnitTest {
     public void testDSpaceCSV() {
         try {
             // Test the CSV parsing
-            String[] csv = {"id,collection,\"dc.title[en]\",dc.contributor.author,dc.description.abstract",
-                "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,Easy line,\"Lewis, Stuart\",A nice short abstract",
-                "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,Two authors,\"Lewis, Stuart||Bloggs, Joe\",Two people wrote " +
+            String[] csv = {"id;collection;\"dc.title[en]\";dc.contributor.author;dc.description.abstract",
+                "+;56599ad5-c7d2-4ac3-8354-a1f277d5a31f;Easy line;\"Lewis, Stuart\";A nice short abstract",
+                "+;56599ad5-c7d2-4ac3-8354-a1f277d5a31f;Two authors;\"Lewis, Stuart||Bloggs, Joe\";Two people wrote " +
                     "this item",
-                "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,Three authors,\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\"," +
+                "+;56599ad5-c7d2-4ac3-8354-a1f277d5a31f;Three authors;\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\";" +
                     "Three people wrote this item",
-                "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,\"Two line\n\ntitle\",\"Lewis, Stuart\",abstract",
-                "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,\"Empty lines\n\nshould work too (DS-3245).\",\"Lewis, " +
-                    "Stuart\",abstract",
-                "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract" +
+                "+;56599ad5-c7d2-4ac3-8354-a1f277d5a31f;\"Two line\n\ntitle\";\"Lewis, Stuart\";abstract",
+                "+;56599ad5-c7d2-4ac3-8354-a1f277d5a31f;\"Empty lines\n\nshould work too (DS-3245).\";\"Lewis, " +
+                    "Stuart\";abstract",
+                "+;56599ad5-c7d2-4ac3-8354-a1f277d5a31f;\"\"\"Embedded quotes\"\" here\";\"Lewis, Stuart\";\"Abstract" +
                     " with\ntwo\nnew lines\"",
-                "+,56599ad5-c7d2-4ac3-8354-a1f277d5a31f,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, " +
-                    "Stuart\",\"Abstract with\ntwo\nnew lines\"",};
+                "+;56599ad5-c7d2-4ac3-8354-a1f277d5a31f;\"\"\"Unbalanced embedded\"\" quotes\"\" here\";\"Lewis, " +
+                    "Stuart\";\"Abstract with\ntwo\nnew lines\"",};
             // Write the string to a file
             String filename = "test.csv";
             BufferedWriter out = new BufferedWriter(
@@ -81,7 +81,7 @@ public class DSpaceCSVTest extends AbstractUnitTest {
             line = null;
 
             // Test the CSV parsing with a bad heading element value
-            csv[0] = "id,collection,\"dc.title[en]\",dc.contributor.foobar[en-US],dc.description.abstract";
+            csv[0] = "id;collection;\"dc.title[en]\";dc.contributor.foobar[en-US];dc.description.abstract";
             // Write the string to a file
             filename = "test.csv";
             out = new BufferedWriter(
@@ -109,7 +109,7 @@ public class DSpaceCSVTest extends AbstractUnitTest {
 
 
             // Test the CSV parsing with a bad heading schema value
-            csv[0] = "id,collection,\"dcdc.title[en]\",dc.contributor[en-US],dc.description.abstract";
+            csv[0] = "id;collection;\"dcdc.title[en]\";dc.contributor[en-US];dc.description.abstract";
             // Write the string to a file
             filename = "test.csv";
             out = new BufferedWriter(
