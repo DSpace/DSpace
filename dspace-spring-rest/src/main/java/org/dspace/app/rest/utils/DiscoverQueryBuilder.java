@@ -183,7 +183,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
         if (StringUtils.isNotBlank(query)) {
             //Note that these quotes are needed incase we try to query OR for example.
             //If the quotes aren't present, it'll crash.
-            queryArgs.setQuery("\"" + searchService.escapeQueryChars(query) + "\"");
+            queryArgs.setQuery(query);
         }
 
         //Limit results to DSO type
