@@ -18,14 +18,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
+import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.services.ConfigurationService;
 import org.junit.After;
@@ -44,6 +46,9 @@ public class EntityTypeRestRepositoryIT extends AbstractControllerIntegrationTes
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private RelationshipService relationshipService;
+
     @Before
     public void setup() throws Exception {
 
@@ -54,22 +59,37 @@ public class EntityTypeRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @After
-    public void destroy() throws SQLException, AuthorizeException {
-
+    public void destroy() throws Exception {
         //Clean up the database for the next test
         context.turnOffAuthorisationSystem();
         List<RelationshipType> relationshipTypeList = relationshipTypeService.findAll(context);
         List<EntityType> entityTypeList = entityTypeService.findAll(context);
+        List<Relationship> relationships = relationshipService.findAll(context);
 
-        for (RelationshipType relationshipType : relationshipTypeList) {
+        Iterator<Relationship> relationshipIterator = relationships.iterator();
+        while (relationshipIterator.hasNext()) {
+            Relationship relationship = relationshipIterator.next();
+            relationshipIterator.remove();
+            relationshipService.delete(context, relationship);
+        }
+
+        Iterator<RelationshipType> relationshipTypeIterator = relationshipTypeList.iterator();
+        while (relationshipTypeIterator.hasNext()) {
+            RelationshipType relationshipType = relationshipTypeIterator.next();
+            relationshipTypeIterator.remove();
             relationshipTypeService.delete(context, relationshipType);
         }
 
-        for (EntityType entityType : entityTypeList) {
+        Iterator<EntityType> entityTypeIterator = entityTypeList.iterator();
+        while (entityTypeIterator.hasNext()) {
+            EntityType entityType = entityTypeIterator.next();
+            entityTypeIterator.remove();
             entityTypeService.delete(context, entityType);
         }
-        context.restoreAuthSystemState();
+
+        super.destroy();
     }
+
     @Test
     public void findAllEntityTypesSizeTest() throws SQLException {
         assertEquals(7, entityTypeService.findAll(context).size());
@@ -116,6 +136,7 @@ public class EntityTypeRestRepositoryIT extends AbstractControllerIntegrationTes
         String type = "JournalIssue";
         checkEntityType(type);
     }
+
     private void checkEntityType(String type) throws SQLException {
         EntityType entityType = entityTypeService.findByEntityType(context, type);
         assertNotNull(entityType);
@@ -135,13 +156,16 @@ public class EntityTypeRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(jsonPath("$._links.self.href", containsString("api/core/entitytypes")))
                    //We have 4 facets in the default configuration, they need to all be present in the embedded section
                    .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Publication")),
+                       EntityTypeMatcher
+                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Publication")),
                        EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Person")),
                        EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Project")),
                        EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "OrgUnit")),
                        EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal")),
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalVolume")),
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalIssue"))
+                       EntityTypeMatcher
+                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalVolume")),
+                       EntityTypeMatcher
+                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalIssue"))
                    )));
     }
 }

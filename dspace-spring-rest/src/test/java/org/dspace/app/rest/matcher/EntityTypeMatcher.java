@@ -12,15 +12,18 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
-import org.dspace.content.Bitstream;
 import org.dspace.content.EntityType;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 public class EntityTypeMatcher {
+
+    private EntityTypeMatcher() {}
+
     public static Matcher<? super Object> matchEntityTypeEntry(EntityType entityType) {
         return matchEntityTypeExplicitValuesEntry(entityType.getId(), entityType.getLabel());
     }
+
     public static Matcher<? super Object> matchEntityTypeEntryForLabel(String label) {
         return matchEntityTypeExplicitValuesEntry(0, label);
     }

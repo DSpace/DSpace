@@ -8,28 +8,33 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.RelationshipType_;
 import org.dspace.content.dao.RelationshipTypeDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 
 public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipType> implements RelationshipTypeDAO {
 
-    public RelationshipType findbyTypesAndLabels(Context context,EntityType leftType,EntityType rightType,
-                                                 String leftLabel,String rightLabel)
-                                                    throws SQLException {
-        Criteria criteria = createCriteria(context,RelationshipType.class);
-        criteria.add(Restrictions.and(
-            Restrictions.eq("leftType", leftType),
-            Restrictions.eq("rightType", rightType),
-            Restrictions.eq("leftLabel", leftLabel),
-            Restrictions.eq("rightLabel", rightLabel)
-        ));
-        return singleResult(criteria);
+    public RelationshipType findbyTypesAndLabels(Context context, EntityType leftType, EntityType rightType,
+                                                 String leftLabel, String rightLabel)
+        throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
+        Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
+        criteriaQuery.select(relationshipTypeRoot);
+        criteriaQuery.where(
+            criteriaBuilder.and(criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftType), leftType),
+                                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), rightType),
+                                criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftLabel), leftLabel),
+                                criteriaBuilder
+                                    .equal(relationshipTypeRoot.get(RelationshipType_.rightLabel), rightLabel)));
+        return uniqueResult(context, criteriaQuery, false, RelationshipType.class, -1, -1);
     }
 
 }
