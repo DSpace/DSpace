@@ -11,6 +11,10 @@ import org.dspace.app.rest.model.FilteredDiscoveryPageRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
+/**
+ * FilteredDiscoveryPage HAL Resource. This resource adds the data from the REST object together with embedded objects
+ * and a set of links if applicable
+ */
 @RelNameDSpaceResource(FilteredDiscoveryPageRest.NAME)
 public class FilteredDiscoveryPageResource extends DSpaceResource<FilteredDiscoveryPageRest> {
     public FilteredDiscoveryPageResource(FilteredDiscoveryPageRest data, Utils utils,

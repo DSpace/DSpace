@@ -12,6 +12,11 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
 
+/**
+ * This class acts as the REST representation of the Relationship model class.
+ * This class acts as a data holder for the RelationshipResource
+ * Refer to {@link org.dspace.content.Relationship} for explanation about the properties
+ */
 public class RelationshipRest extends BaseObjectRest<Integer> {
     public static final String NAME = "relationship";
     public static final String CATEGORY = "core";

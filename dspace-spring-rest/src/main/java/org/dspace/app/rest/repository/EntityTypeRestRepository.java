@@ -22,6 +22,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+/**
+ * This is the repository that is responsible to manage EntityType Rest objects
+ */
 @Component(EntityTypeRest.CATEGORY + "." + EntityTypeRest.NAME)
 public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRest, Integer> {
 

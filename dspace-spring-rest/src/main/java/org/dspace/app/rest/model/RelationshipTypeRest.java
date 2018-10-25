@@ -10,6 +10,11 @@ package org.dspace.app.rest.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
 
+/**
+ * This class is the REST representation of the RelationshipType model class.
+ * This class acts as a data holder for the RelationshipTypeResource class
+ * Refer to {@link org.dspace.content.RelationshipType} for an explanation of the properties
+ */
 public class RelationshipTypeRest extends BaseObjectRest<Integer> {
 
     public static final String NAME = "relationshiptype";

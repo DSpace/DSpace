@@ -21,6 +21,10 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
 
+/**
+ * This script is used to populate the database with specific objects (see UUIDs) with a set of
+ * relationships so that various functionalities can be tested properly.
+ */
 public class AdditionalRelationshipScript {
 
     private RelationshipTypeService relationshipTypeService;
@@ -35,6 +39,14 @@ public class AdditionalRelationshipScript {
         itemService = ContentServiceFactory.getInstance().getItemService();
     }
 
+    /**
+     * The main method for this script
+     *
+     * @param argv  The commandline arguments given with this command, though nothing will be done with them
+     * @throws SQLException         If something goes wrong with the database
+     * @throws AuthorizeException   If something goes wrong with permissions
+     * @throws ParseException       If something goes wrong with the parsing
+     */
     public static void main(String[] argv) throws SQLException, AuthorizeException, ParseException {
         AdditionalRelationshipScript additionalRelationshipScript = new AdditionalRelationshipScript();
         additionalRelationshipScript.execute();

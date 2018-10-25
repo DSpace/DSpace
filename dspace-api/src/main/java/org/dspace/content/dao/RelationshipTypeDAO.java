@@ -14,6 +14,12 @@ import org.dspace.content.RelationshipType;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
+/**
+ * Database Access Object Interface class for the RelationshipType object
+ * The implementation of this class is responsible for all
+ * database calls for the RelationshipType object and is autowired by spring
+ * This class should only be accessed from a single service and should never be exposed outside of the API
+ */
 public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
 
     RelationshipType findbyTypesAndLabels(Context context,
