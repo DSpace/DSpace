@@ -10,6 +10,10 @@ package org.dspace.app.rest.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
+/**
+ * This class acts as the REST representation of the converted EntityType objects to this logic. This class acts
+ * as a data holder for the FilteredDiscoveryPageResource
+ */
 public class FilteredDiscoveryPageRest extends BaseObjectRest<String> {
 
     public static final String NAME = "filtered-discovery-page";
@@ -27,8 +31,14 @@ public class FilteredDiscoveryPageRest extends BaseObjectRest<String> {
         return NAME;
     }
 
+    /**
+     * The label of the filter
+     */
     @JsonProperty(value = "filter-name")
     private String label;
+    /**
+     * The filterQuery string that can be used to filter on the label
+     */
     @JsonProperty(value = "discovery-query")
     private String filterQueryString;
 

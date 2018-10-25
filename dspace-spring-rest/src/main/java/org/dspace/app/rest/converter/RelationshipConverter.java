@@ -17,6 +17,10 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * This converter is responsible for transforming the model representation of an Relationship to the REST
+ * representation of an Relationship and vice versa
+ */
 @Component
 public class RelationshipConverter extends DSpaceConverter<Relationship, RelationshipRest> {
 
@@ -29,6 +33,12 @@ public class RelationshipConverter extends DSpaceConverter<Relationship, Relatio
     private RelationshipTypeConverter relationshipTypeConverter;
 
 
+    /**
+     * This method converts the Relationship model object that is passed along in the params to the
+     * REST representation of this object
+     * @param obj   The Relationship model object to be converted
+     * @return      The Relationship REST object that is made from the model object
+     */
     public RelationshipRest fromModel(Relationship obj) {
         RelationshipRest relationshipRest = new RelationshipRest();
         relationshipRest.setId(obj.getId());
@@ -40,6 +50,12 @@ public class RelationshipConverter extends DSpaceConverter<Relationship, Relatio
         return relationshipRest;
     }
 
+    /**
+     * This method converts the Relationship REST object that is passed along in the params to the model
+     * representation of this object
+     * @param obj   The Relationship REST object to be converted
+     * @return      The Relationship model object that is made from the REST object
+     */
     public Relationship toModel(RelationshipRest obj) {
         Relationship relationship = new Relationship();
         try {

@@ -22,6 +22,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+/**
+ * This is the repository that is responsible to manage RelationshipType Rest objects
+ */
 @Component(RelationshipTypeRest.CATEGORY + "." + RelationshipTypeRest.NAME)
 public class RelationshipTypeRestRepository extends DSpaceRestRepository<RelationshipTypeRest, Integer> {
 

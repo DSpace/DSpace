@@ -24,6 +24,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+/**
+ * This is the repository that is responsible to manage FilteredDiscoveryPage Rest objects
+ */
 @Component(FilteredDiscoveryPageRest.CATEGORY + "." + FilteredDiscoveryPageRest.NAME)
 public class FilteredDiscoveryPageRestRepository extends DSpaceRestRepository<FilteredDiscoveryPageRest, String> {
 

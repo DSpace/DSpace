@@ -38,6 +38,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * This script is used to initialize the database with a set of relationshiptypes that are written
+ * in an xml file that is given to this script.
+ * This XML file needs to have a proper XML structure and needs to define the variables of the RelationshipType object
+ */
 public class InitializeEntities {
 
     private final static Logger log = Logger.getLogger(InitializeEntities.class);
@@ -53,6 +58,14 @@ public class InitializeEntities {
 
     }
 
+    /**
+     * The main method for this script
+     *
+     * @param argv  The commandline arguments given with this command
+     * @throws SQLException         If something goes wrong with the database
+     * @throws AuthorizeException   If something goes wrong with permissions
+     * @throws ParseException       If something goes wrong with the parsing
+     */
     public static void main(String[] argv) throws SQLException, AuthorizeException, ParseException {
         InitializeEntities initializeEntities = new InitializeEntities();
         CommandLineParser parser = new PosixParser();
