@@ -127,7 +127,7 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -145,6 +145,14 @@
                     <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Note: XOAI requires hamcrest both for testing and runtime -->
+        <!-- As our Parent POM sets this to 'test' scope, we must override it -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
