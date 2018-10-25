@@ -393,60 +393,6 @@ public class DryadDataPackage extends DryadObject {
         return new HashSet<DryadObject>(getDataFiles(context));
     }
 
-    public static DryadDataPackage findByIdentifier(Context context, String doi) throws IdentifierException {
-        DryadDataPackage dataPackage = null;
-        IdentifierService service = new DSpace().getSingletonService(IdentifierService.class);
-        DSpaceObject object = service.resolve(context, doi);
-        if(object.getType() == Constants.ITEM) {
-            dataPackage = new DryadDataPackage((Item)object);
-        } else {
-            throw new IdentifierException("DOI " + doi + " does not resolve to an item");
-        }
-        return dataPackage;
-    }
-
-    // From http://stackoverflow.com/questions/13592236/parse-the-uri-string-into-name-value-collection-in-java
-    public static Map<String, String> splitQuery(URL url) throws UnsupportedEncodingException {
-        Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-        String query = url.getQuery();
-        String[] pairs = query.split("&");
-        for (String pair : pairs) {
-            int idx = pair.indexOf("=");
-            query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
-        }
-        return query_pairs;
-    }
-
-    /**
-     * Finds a data package by the reviewer URL. reviewer URL may have DOI or wfID
-     * @param context Database context
-     * @param reviewerURL a URL containing doi or wfID query parameters
-     * @return a DryadDataPackage if one exists matching the identifier
-     */
-    public static DryadDataPackage findByReviewerURL(Context context, String reviewerURL) throws IdentifierException, SQLException {
-        DryadDataPackage dataPackage = null;
-        // Decompose the reviewer URL. Contains identifiers in query parameters:
-        // wfID or doi
-        try {
-            URL url = new URL(reviewerURL);
-            Map<String, String> queryMap = splitQuery(url);
-            if(queryMap.containsKey("doi")) {
-                String doi = queryMap.get("doi");
-                return findByIdentifier(context, doi);
-            } else if(queryMap.containsKey("wfID")) {
-                Integer workflowItemId = Integer.valueOf(queryMap.get("wfID"));
-                return findByWorkflowItemId(context, workflowItemId);
-            }
-        } catch (MalformedURLException ex) {
-            log.error("Unable to parse URL: " + reviewerURL, ex);
-        } catch (UnsupportedEncodingException ex) {
-            log.error("Unable to decode URL:" + reviewerURL, ex);
-        } catch (NumberFormatException ex) {
-            log.error("Unable to read workflow id", ex);
-        }
-        return dataPackage;
-    }
-
     public static DryadDataPackage findByWorkflowItemId(Context context, Integer workflowItemId) {
         DryadDataPackage dataPackage = null;
         try {
