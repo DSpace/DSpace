@@ -169,7 +169,6 @@ public class ApproveRejectReviewItem {
             StringBuilder provenance = new StringBuilder();
             c.turnOffAuthorisationSystem();
             // update duplicate submission metadata for this item.
-            item.checkForDuplicateItems(c);
             if (DryadWorkflowUtils.isItemInReview(c, wfi)) {
                 List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(c, wfi.getID());
                 ClaimedTask claimedTask = claimedTasks.get(0);

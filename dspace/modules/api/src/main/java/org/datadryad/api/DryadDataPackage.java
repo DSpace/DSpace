@@ -3,10 +3,6 @@
 package org.datadryad.api;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,20 +21,15 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierException;
-import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-import org.dspace.utils.DSpace;
-import org.dspace.versioning.VersionHistory;
-import org.dspace.versioning.VersioningService;
 import org.dspace.workflow.WorkflowItem;
 
 /**
@@ -586,19 +577,42 @@ public class DryadDataPackage extends DryadObject {
         return authors;
     }
 
-    public VersionHistory getVersionHistory(Context c) {
-        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-        VersionHistory history = versioningService.findVersionHistory(c, item.getID());
-        return history;
-    }
-
     public List<DryadDataPackage> getDuplicatePackages(Context context) {
         ArrayList<DryadDataPackage> resultList = new ArrayList<>();
         try {
+            if (useDryadClassic) {
+                DCValue[] duplicates = getItem().getMetadata("dryad.duplicateItem");
+                if (duplicates != null) {
+                    for (DCValue dup : duplicates) {
+                        Item item = Item.find(context, Integer.valueOf(dup.value));
+                        if (item != null) {
+                            resultList.add(new DryadDataPackage(item));
+                        }
+                    }
+                }
+            } else {
+
+            }
+        } catch (Exception e) {
+
+        }
+        return resultList;
+    }
+
+    public void updateDuplicatePackages(Context context) {
+        ArrayList<DryadDataPackage> resultList = new ArrayList<>();
+        try {
+            // get the current duplicate packages
+            resultList.addAll(getDuplicatePackages(context));
             // look for items that have the same pub DOI
             if (this.getPublicationDOI() != null && !this.getPublicationDOI().equals("")) {
                 log.debug("looking for items with doi " + this.getPublicationDOI());
-                resultList.addAll(findByPublicationDOI(context, this.getPublicationDOI()));
+                List<DryadDataPackage> packagesWithDOI = findByPublicationDOI(context, this.getPublicationDOI());
+                for (DryadDataPackage aPackage: packagesWithDOI) {
+                    if (!resultList.contains(aPackage)) {
+                        resultList.add(aPackage);
+                    }
+                }
             }
             // look for items that have the same msid
             if (this.getManuscriptNumber() != null && !this.getManuscriptNumber().equals("")) {
@@ -620,7 +634,16 @@ public class DryadDataPackage extends DryadObject {
         } catch (Exception e) {
             log.error("Exception while finding items matching manuscript " + this.getIdentifier());
         }
-        return resultList;
+
+        // update the data package's metadata:
+        if (useDryadClassic) {
+            getItem().clearMetadata("dryad.duplicateItem");
+            for (DryadDataPackage dryadDataPackage : resultList) {
+                getItem().addMetadata("dryad.duplicateItem", null, String.valueOf(getItem().getID()), null, Choices.CF_NOVALUE);
+            }
+        } else {
+
+        }
     }
 
     /**

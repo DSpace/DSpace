@@ -17,7 +17,6 @@ import java.util.*;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.datadryad.api.DryadDataPackage;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -256,28 +255,6 @@ public class Item extends DSpaceObject
         return new ItemIterator(context, rows);
     }
 
-    public boolean checkForDuplicateItems(Context context) {
-        DryadDataPackage dryadDataPackage = new DryadDataPackage(this);
-        List<DryadDataPackage> resultList = dryadDataPackage.getDuplicatePackages(context);
-        boolean result = false;
-        if (!resultList.isEmpty()) {
-            this.clearMetadata("dryad.duplicateItem");
-            for (DryadDataPackage dataPackage : resultList) {
-                if (!dryadDataPackage.equals(dataPackage)) {
-                    log.debug("adding duplicate item " + dataPackage.getIdentifier() + " to item " + getID());
-                    this.addMetadata("dryad.duplicateItem", null, String.valueOf(dataPackage.getIdentifier()), null, Choices.CF_NOVALUE);
-                    result = true;
-                }
-            }
-            try {
-                this.update();
-            } catch (Exception e) {
-                log.error("exception " + e.getMessage());
-            }
-        }
-        return result;
-    }
-
     /**
      * Get the internal ID of this item. In general, this shouldn't be exposed
      * to users
@@ -287,11 +264,6 @@ public class Item extends DSpaceObject
     public int getID() {
         return internalItemId;
     }
-
-
-
-
-
 
     /**
      * @see org.dspace.content.DSpaceObject#getHandle()

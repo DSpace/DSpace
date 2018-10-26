@@ -145,7 +145,6 @@ public class DryadWorkflowUtils {
 
     public static ArrayList<Item> getDuplicateWorkflowItems(Context context, Item item, boolean includeArchived) {
         ArrayList<Item> duplicateItems = new ArrayList<Item>();
-        item.checkForDuplicateItems(context);
         DCValue[] dupItemIDs = item.getMetadata("dryad.duplicateItem");
         if (dupItemIDs != null && dupItemIDs.length > 0) {
             try {
