@@ -71,6 +71,11 @@ public class TransferToDash extends AbstractCurationTask {
             // provide output for the console
             setResult("Last processed item = " + packageDOI);        
             report(packageDOI);
+            try {
+                Thread.sleep(2000);
+            } catch (Exception e) {
+                // ignore
+            }
         } else {
             log.info("Skipping -- non-item DSpace object");
             setResult("Object skipped (not an item)");

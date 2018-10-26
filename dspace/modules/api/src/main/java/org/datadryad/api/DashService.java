@@ -27,8 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
-
-
+import org.dspace.content.Bitstream;
 
 public class DashService {
 
@@ -213,7 +212,7 @@ public class DashService {
     // - expand to all bitstreams and readmes
     // - check character ecoding
     private int putDataFile(DryadDataFile dataFile, DryadDataPackage dataPackage) {
-        String dashJSON = dataFile.getDashJSON();
+        String dashJSON = ""; //TODO dataFile.getDashJSON();
         log.debug("Got JSON object: " + dashJSON);
         int responseCode = 0;
         BufferedReader reader = null;
@@ -222,7 +221,7 @@ public class DashService {
             Bitstream firstBitstream = dataFile.getFirstBitstream();
             String encodedFileName = URLEncoder.encode(firstBitstream.getName(), "UTF-8");
             String encodedPackageDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/files/" + encodedFileName);
+            URL url = new URL(dashServer + "/api/datasets/" + encodedPackageDOI + "/files/" + encodedFileName);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
