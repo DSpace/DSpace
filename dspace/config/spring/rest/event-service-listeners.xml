@@ -17,8 +17,9 @@
     </bean>
 
     <!-- Google Analytics recording  -->
-    <bean class="org.dspace.google.GoogleRecorderEventListener">
+    <bean class="org.dspace.google.GoogleAsyncEventListener" destroy-method="destroy">
         <property name="eventService" ref="org.dspace.services.EventService"/>
+        <constructor-arg ref="org.dspace.services.ConfigurationService"/>
     </bean>
 
 </beans>
