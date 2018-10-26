@@ -849,6 +849,26 @@ placeholders for header images -->
 			</script>
 		</xsl:if>
 		
+		<!-- Script para renderizar una alerta cuando la razón del embargo de un bitstream supera los 100 caracteres -->
+        <xsl:if test="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-upload']">
+          <script type="text/javascript">
+              <xsl:text disable-output-escaping="yes">
+              $('textarea#aspect_submission_StepTransformer_field_reason').change(function(){
+                  if($('textarea#aspect_submission_StepTransformer_field_reason').val().length &gt; 100 ) {
+                    $('textarea#aspect_submission_StepTransformer_field_reason').css("border", "1px solid rgb(244, 134, 32)");
+                    
+                    if($('p#motive_max_length_alert').length &lt; 1) {
+                        $('textarea#aspect_submission_StepTransformer_field_reason').after('&lt;p id="motive_max_length_alert"&gt;&lt;b&gt;ALERTA:&lt;/b&gt; El texto ingresado supera los 100 caraceres&lt;/p&gt;');
+                    }
+                  }else{
+                    $('textarea#aspect_submission_StepTransformer_field_reason').css("border", "");
+                    $('p#motive_max_length_alert').remove();
+                  }
+                });
+                </xsl:text>
+            </script>
+        </xsl:if>
+		
     </xsl:template>
 
     <!--

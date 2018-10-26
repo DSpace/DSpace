@@ -808,7 +808,7 @@
 <message key="xmlui.Submission.submit.AccessStep.name_help">Una descripción corta de la política (hasta 30 caracteres). Se podría mostrar a los usuarios,  p.ej. "Sólo personal". Opcional, pero recomendado.</message>
 <message key="xmlui.Submission.submit.AccessStep.description">Descripción</message>
 <message key="xmlui.Submission.submit.AccessStep.reason">Motivo del embargo</message>
-<message key="xmlui.Submission.submit.AccessStep.reason_help">La razón del embargo, para uso interno normalmente. Opcional.</message>
+<message key="xmlui.Submission.submit.AccessStep.reason_help">La razón del embargo (100 caracteres máximo), para uso interno normalmente. Opcional.</message>
 <message key="xmlui.Submission.submit.AccessStep.submit_add_policy">Confirmar privilegios &amp; añadir más</message>
 <message key="xmlui.Submission.submit.AccessStep.list_assigned_groups">Grupos</message>
 <message key="xmlui.Submission.submit.AccessStep.error_format_date">Error en el formato de la fecha</message>

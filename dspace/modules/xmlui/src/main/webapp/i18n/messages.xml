@@ -822,7 +822,7 @@
     <message key="xmlui.Submission.submit.AccessStep.name_help">A short, descriptive name for the policy (up to 30 characters). May be shown to end users. Example: "Staff-only". Optional but recommended.</message>
     <message key="xmlui.Submission.submit.AccessStep.description">Description</message>
     <message key="xmlui.Submission.submit.AccessStep.reason">Embargo reason</message>
-    <message key="xmlui.Submission.submit.AccessStep.reason_help">The reason for the embargo, typically for internal use only. Optional.</message>
+    <message key="xmlui.Submission.submit.AccessStep.reason_help">The reason for the embargo (100 characters maximum), typically for internal use only. Optional.</message>
     <message key="xmlui.Submission.submit.AccessStep.submit_add_policy">Confirm Policy &amp; add another</message>
     <message key="xmlui.Submission.submit.AccessStep.list_assigned_groups">Group</message>
     <message key="xmlui.Submission.submit.AccessStep.error_format_date">Error format date</message>
