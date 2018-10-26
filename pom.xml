@@ -1130,12 +1130,6 @@
                 <artifactId>apache-jena-libs</artifactId>
                 <type>pom</type>
                 <version>${jena.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>org.apache.commons</artifactId>
-                        <groupId>commons-lang3</groupId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
