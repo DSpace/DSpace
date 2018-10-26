@@ -92,6 +92,15 @@ public class DryadDataPackage extends DryadObject {
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
+    private static boolean useDryadClassic = true;
+
+    static {
+        String dryadSystem = ConfigurationManager.getProperty("dryad.system");
+        if (dryadSystem != null && dryadSystem.toLowerCase().equals("dash")) {
+            useDryadClassic = false;
+        }
+    }
+
     public DryadDataPackage(Item item) {
         super(item);
     }
