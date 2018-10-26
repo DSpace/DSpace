@@ -176,13 +176,15 @@ public class DryadDataPackage extends DryadObject {
         return dataPackage;
     }
 
-    public WorkflowItem getWorkflowItem(Context context) throws SQLException {
+    public WorkflowItem getWorkflowItem(Context context) {
         try {
             return WorkflowItem.findByItemId(context, getItem().getID());
         } catch (AuthorizeException ex) {
             log.error("Authorize exception getting workflow item for data package", ex);
         } catch (IOException ex) {
             log.error("IO exception getting workflow item for data package", ex);
+        } catch (SQLException ex) {
+            log.error("SQL exception getting workflow item for data package", ex);
         }
         return null;
     }
@@ -309,7 +311,7 @@ public class DryadDataPackage extends DryadObject {
         return getSingleMetadataValue(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER);
     }
 
-    public void setPublicationDate(String publicationDate) throws SQLException {
+    public void setPublicationDate(String publicationDate) {
         addSingleMetadataValue(Boolean.TRUE, PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, publicationDate);
     }
 
@@ -317,7 +319,7 @@ public class DryadDataPackage extends DryadObject {
         return getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
     }
 
-    public void setPublicationName(String publicationName) throws SQLException {
+    public void setPublicationName(String publicationName) {
         addSingleMetadataValue(Boolean.TRUE, PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, publicationName);
     }
 
@@ -467,7 +469,7 @@ public class DryadDataPackage extends DryadObject {
         return getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
     }
 
-    public void setManuscriptNumber(String manuscriptNumber) throws SQLException {
+    public void setManuscriptNumber(String manuscriptNumber) {
         addSingleMetadataValue(Boolean.TRUE, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
     }
 
@@ -475,10 +477,10 @@ public class DryadDataPackage extends DryadObject {
         return getMultipleMetadataValues(FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER);
     }
 
-    public void setFormerManuscriptNumber(String manuscriptNumber) throws SQLException {
+    public void setFormerManuscriptNumber(String manuscriptNumber) {
         addSingleMetadataValue(Boolean.TRUE, FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
     }
-    public void setBlackoutUntilDate(Date blackoutUntilDate) throws SQLException {
+    public void setBlackoutUntilDate(Date blackoutUntilDate) {
         String dateString = null;
         if(blackoutUntilDate != null)  {
              dateString = new DCDate(blackoutUntilDate).toString();
@@ -495,7 +497,7 @@ public class DryadDataPackage extends DryadObject {
         return blackoutUntilDate;
     }
 
-    public void setPublicationDOI(String publicationDOI) throws SQLException {
+    public void setPublicationDOI(String publicationDOI) {
         // check that this DOI starts with the doi: prefix. if not, add it.
         if (publicationDOI != null) {
             Pattern doiPattern = Pattern.compile("^doi:.*");
@@ -507,7 +509,7 @@ public class DryadDataPackage extends DryadObject {
         addSingleMetadataValue(Boolean.FALSE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, publicationDOI);
     }
 
-    public void clearPublicationDOI() throws SQLException {
+    public void clearPublicationDOI() {
         // Need to filter just on metadata values that are publication DOIs
         addSingleMetadataValue(Boolean.TRUE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, null);
     }
@@ -526,7 +528,7 @@ public class DryadDataPackage extends DryadObject {
         return getSingleMetadataValue(TITLE_SCHEMA, TITLE_ELEMENT, null);
     }
 
-    public void setAbstract(String theAbstract) throws SQLException {
+    public void setAbstract(String theAbstract) {
         addSingleMetadataValue(Boolean.TRUE, "dc", "description", null, theAbstract);
     }
 
@@ -541,19 +543,19 @@ public class DryadDataPackage extends DryadObject {
         return theAbstract;
     }
 
-    public List<String> getKeywords() throws SQLException {
+    public List<String> getKeywords() {
         return getMultipleMetadataValues(KEYWORD_SCHEMA, KEYWORD_ELEMENT, null);
     }
 
-    public void setKeywords(List<String> keywords) throws SQLException {
+    public void setKeywords(List<String> keywords) {
         addMultipleMetadataValues(Boolean.TRUE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
     }
 
-    public void addKeywords(List<String> keywords) throws SQLException {
+    public void addKeywords(List<String> keywords) {
         addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
     }
 
-    public void addDashTransferDate() throws SQLException {
+    public void addDashTransferDate() {
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
         String transferDate = sdf.format(now);

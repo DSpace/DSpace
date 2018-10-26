@@ -84,12 +84,7 @@ public class Package {
     }
 
     public List<String> getKeywords() {
-        try {
-            return dataPackage.getKeywords();
-        } catch (SQLException e) {
-            log.error("couldn't find keywords for item " + itemID);
-        }
-        return null;
+        return dataPackage.getKeywords();
     }
 
     public String getDryadDOI() {
