@@ -1268,6 +1268,27 @@ prevent the generation of resource policy entry values with null dspace_object a
         return false;
     }
 
+    /**
+     * This method will return a list of MetadataValue objects that contains all the regular
+     * metadata of the item passed along in the parameters as well as all the virtual metadata
+     * which will be generated and processed together with the {@link VirtualMetadataPopulator}
+     * by processing the item's relationships
+     * @param item         the Item to be processed
+     * @param schema       the schema for the metadata field. <em>Must</em> match
+     *                     the <code>name</code> of an existing metadata schema.
+     * @param element      the element name. <code>DSpaceObject.ANY</code> matches any
+     *                     element. <code>null</code> doesn't really make sense as all
+     *                     metadata must have an element.
+     * @param qualifier    the qualifier. <code>null</code> means unqualified, and
+     *                     <code>DSpaceObject.ANY</code> means any qualifier (including
+     *                     unqualified.)
+     * @param lang         the ISO639 language code, optionally followed by an underscore
+     *                     and the ISO3166 country code. <code>null</code> means only
+     *                     values with no language are returned, and
+     *                     <code>DSpaceObject.ANY</code> means values with any country code or
+     *                     no country code are returned.
+     * @return
+     */
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang) {
         List<MetadataValue> dbMetadataValues = super.getMetadata(item, schema, element, qualifier, lang);
