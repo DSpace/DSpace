@@ -6,7 +6,6 @@ import org.datadryad.api.DryadDataPackage;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -14,10 +13,7 @@ import org.dspace.eperson.EPerson;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * User: Daisie Huang
@@ -120,7 +116,7 @@ public class AutoReturnReviewItem {
                 //Check for a valid task
                 Item item = wfi.getItem();
                 DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(context, wfi.getID());
-                if (!DryadWorkflowUtils.isItemInReview(context, wfi)) {
+                if (!dryadDataPackage.isPackageInReview(context)) {
                     log.debug("Item " + item.getID() + " not found or not in review");
                 } else {
                     // make sure that this item is updated according to the ApproveReject mechanism:
@@ -128,7 +124,7 @@ public class AutoReturnReviewItem {
                         log.info("check to see if item " + item.getID() + " is approved or rejected");
                         Manuscript databaseManuscript = JournalUtils.getStoredManuscriptForWorkflowItem(context, dryadDataPackage);
                         if (databaseManuscript != null && databaseManuscript.isAccepted()) {
-                            ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfi, databaseManuscript);
+                            ApproveRejectReviewItem.processReviewPackageUsingManuscript(context, dryadDataPackage, databaseManuscript);
                         }
                     }
                     if (itemIsOldItemInReview(item)) {

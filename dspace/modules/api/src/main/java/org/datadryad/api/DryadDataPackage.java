@@ -18,19 +18,17 @@ import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Package;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.*;
+import org.dspace.workflow.actions.WorkflowActionConfig;
 
 /**
  *
@@ -389,6 +387,14 @@ public class DryadDataPackage extends DryadObject {
         addSingleMetadataValue(Boolean.FALSE,PROVENANCE_SCHEMA, PROVENANCE_ELEMENT, PROVENANCE_QUALIFIER, PROVENANCE_LANGUAGE, metadataValue);
     }
 
+    public void changeCurationStatus(String status, String reason) {
+        if (useDryadClassic) {
+
+        } else {
+            // add a curation activity note
+        }
+    }
+
     
     @Override
     Set<DryadObject> getRelatedObjects(final Context context) throws SQLException {
@@ -579,6 +585,15 @@ public class DryadDataPackage extends DryadObject {
         return authors;
     }
 
+    public boolean isPackageInReview(Context c) {
+        if (useDryadClassic) {
+            return DryadWorkflowUtils.isItemInReview(c, getWorkflowItem(c));
+        } else {
+            // get curation status of package
+        }
+        return false;
+    }
+
     public List<DryadDataPackage> getDuplicatePackages(Context context) {
         ArrayList<DryadDataPackage> resultList = new ArrayList<>();
         try {
@@ -654,7 +669,7 @@ public class DryadDataPackage extends DryadObject {
      * @param message
      * @throws SQLException
      */
-    public void associateWithManuscript(Manuscript manuscript, StringBuilder message) throws SQLException {
+    private void associateWithManuscript(Manuscript manuscript, StringBuilder message) {
         if (manuscript != null) {
             // set publication DOI
             if (!"".equals(manuscript.getPublicationDOI()) && !this.getPublicationDOI().equals(manuscript.getPublicationDOI())) {
@@ -703,7 +718,7 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
-    public void disassociateFromManuscript(Manuscript manuscript) throws SQLException {
+    private void disassociateFromManuscript(Manuscript manuscript) {
         if (manuscript != null) {
             // clear publication DOI
             this.setPublicationDOI(null);
@@ -730,6 +745,70 @@ public class DryadDataPackage extends DryadObject {
             }
         }
         return list;
+    }
+
+    public void approvePackageUsingManuscript(Context c, Manuscript manuscript) {
+        StringBuilder reason = new StringBuilder();
+        // Add provenance to item
+        String manuscriptNumber = "<null>";
+        if (manuscript != null) {
+            manuscriptNumber = manuscript.getManuscriptId();
+        }
+        reason.append("Approved by ApproveRejectReviewItem based on metadata for ").append(manuscriptNumber).append(" on ").append(DCDate.getCurrent().toString()).append(" (GMT)");
+        associateWithManuscript(manuscript, reason);
+
+        if (useDryadClassic) {
+            c.turnOffAuthorisationSystem();
+            try {
+                WorkflowItem wfi = getWorkflowItem(c);
+                Item item = wfi.getItem();
+                List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(c, wfi.getID());
+                ClaimedTask claimedTask = claimedTasks.get(0);
+                Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
+                WorkflowActionConfig actionConfig = workflow.getStep(claimedTask.getStepID()).getActionConfig(claimedTask.getActionID());
+
+                item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, Manuscript.statusIsApproved(manuscript.getStatus()).toString());
+
+                WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
+                item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", reason.toString());
+                item.update();
+            } catch (Exception e) {
+                //something
+            } finally {
+                c.restoreAuthSystemState();
+            }
+
+        } else {
+            changeCurationStatus("Curation", reason.toString());
+        }
+    }
+
+    public void rejectPackageUsingManuscript(Context c, Manuscript manuscript) {
+        disassociateFromManuscript(manuscript);
+        if (useDryadClassic) {
+            try {
+                c.turnOffAuthorisationSystem();
+                WorkflowItem wfi = getWorkflowItem(c);
+                String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error or wish to re-submit your data associated with a different journal, please contact us at help@datadryad.org.";
+                EPerson ePerson = EPerson.findByEmail(c, ConfigurationManager.getProperty("system.curator.account"));
+                //Also reject all the data files
+                Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
+                for (Item dataFile : dataFiles) {
+                    try {
+                        WorkflowManager.rejectWorkflowItem(c, WorkflowItem.findByItemId(c, dataFile.getID()), ePerson, null, reason, false);
+                    } catch (Exception e) {
+                        throw new IOException(e);
+                    }
+                }
+                WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, ePerson, null, reason, true);
+            } catch (Exception e) {
+                //something
+            } finally {
+                c.restoreAuthSystemState();
+            }
+        } else {
+
+        }
     }
 
     // Convenience method to access a properly serialized JSON-LD string, formatted for Schema.org.

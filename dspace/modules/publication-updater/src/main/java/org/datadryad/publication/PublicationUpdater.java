@@ -240,12 +240,6 @@ public class PublicationUpdater extends HttpServlet {
             for (WorkflowItem wfi : items) {
                 if (DryadWorkflowUtils.isDataPackage(wfi)) {
                     // is this package in review?
-                    boolean isInReview = false;
-                    try {
-                        isInReview = DryadWorkflowUtils.isItemInReview(context, wfi);
-                    } catch (SQLException e) {
-                        LOGGER.debug("couldn't find claimed task for item " + wfi.getItem().getID());
-                    }
                     StringBuilder message = new StringBuilder();
                     Item item = wfi.getItem();
                     LOGGER.debug(">>> processing workflow item with internal ID " + item.getID());
@@ -256,14 +250,14 @@ public class PublicationUpdater extends HttpServlet {
                     try {
                         DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
                         databaseManuscript = JournalUtils.getStoredManuscriptForWorkflowItem(context, dryadDataPackage);
-                        if (isInReview && databaseManuscript != null) {
+                        if (dryadDataPackage.isPackageInReview(context) && databaseManuscript != null) {
                             StringBuilder provenance = new StringBuilder("Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ");
                             if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {
                                 message = provenance;
                             }
                             if (databaseManuscript.isAccepted()) {
                                 // see if this can be pushed out of review
-                                ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfi, databaseManuscript);
+                                ApproveRejectReviewItem.processReviewPackageUsingManuscript(context, dryadDataPackage, databaseManuscript);
                             }
                         }
                     } catch (ApproveRejectReviewItemException e) {

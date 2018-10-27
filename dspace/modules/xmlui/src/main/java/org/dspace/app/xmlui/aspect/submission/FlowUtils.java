@@ -965,7 +965,7 @@ public class FlowUtils {
             if (storedManuscript != null) {
                 if (storedManuscript.isAccepted()) {
                     // if the ms is accepted, push the item into curation from review
-                    ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfPublication, storedManuscript);
+                    ApproveRejectReviewItem.processReviewPackageUsingManuscript(context, dryadDataPackage, storedManuscript);
                 } else if (storedManuscript.isRejected()) {
                     // if it's rejected, keep it in the review queue, but move the manuscript number to former.
                     dryadDataPackage.setFormerManuscriptNumber(dryadDataPackage.getManuscriptNumber());
