@@ -21,7 +21,6 @@ public class IdentifierStatsIndexPlugin implements SolrStatsIndexPlugin
     {
         document.addField("search.uniqueid", dso.getType() + "-"
                 + dso.getID());   
-
     }
     
 }
