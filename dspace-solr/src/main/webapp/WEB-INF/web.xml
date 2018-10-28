@@ -108,10 +108,6 @@
 
     <!-- Otherwise it will continue to the old servlets -->
 
-    <listener>
-        <listener-class>org.dspace.solr.filters.ConfigureLog4jListener</listener-class>
-    </listener>
-
     <servlet>
         <servlet-name>Zookeeper</servlet-name>
         <servlet-class>org.apache.solr.servlet.ZookeeperInfoServlet</servlet-class>
