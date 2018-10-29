@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 
@@ -83,10 +83,27 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                     if (ue.getAction() == UsageEvent.Action.VIEW &&
                             ue.getObject().getType() == Constants.BITSTREAM) {
 
-                        // Client Id, should uniquely identify the user or device. If we have a session id for the user
-                        // then lets use it, else generate a UUID.
+                        // Client Id, should uniquely identify the user or device. If we have a _ga cookie, get the value
+                        // from it. Otherwise, if we have a session id for the user then let's use it. Else generate a UUID.
+                        Cookie gaCookie = null;
+                        if (ue.getRequest().getCookies() != null) {
+                            for (Cookie cookie : ue.getRequest().getCookies()) {
+                                if ("_ga".equals(cookie.getName())) {
+                                    gaCookie = cookie;
+                                    break;
+                                }
+                            }
+                        }
+
                         String cid;
-                        if (ue.getRequest().getSession(false) != null) {
+                        if (gaCookie != null) {
+                            String[] gaValue = gaCookie.getValue().split("\\.");
+                            if (gaValue.length >=2 ) {
+                                cid = gaValue[gaValue.length-2] + "." + gaValue[gaValue.length-1];
+                            } else {
+                                cid = gaCookie.getValue();
+                            }
+                        } else if (ue.getRequest().getSession(false) != null) {
                             cid = ue.getRequest().getSession().getId();
                         } else {
                             cid = UUID.randomUUID().toString();
