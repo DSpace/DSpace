@@ -58,6 +58,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     private static Buffer buffer;
     private static ExecutorService executor;
     private static Future future;
+    private static boolean reportAsPageView = false;
     private static boolean destroyed = false;
     private static ConfigurationService configurationService;
 
@@ -65,6 +66,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
         configurationService = configurationServiceRef;
         analyticsKey = configurationService.getProperty("google.analytics.key");
         if (StringUtils.isNotEmpty(analyticsKey)) {
+            reportAsPageView = configurationService.getBooleanProperty("google.analytics.type.pageview", false);
             int analyticsBufferlimit = configurationService.getIntProperty("google.analytics.buffer.limit", 256);
             buffer = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(analyticsBufferlimit));
             httpclient = HttpClients.createDefault();
@@ -173,16 +175,18 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                             String download = "v=1" +
                                     "&tid=" + analyticsKey +
                                     "&cid=" + event.getCid() +
-                                    "&t=event" +
+                                    "&t=" + (reportAsPageView ? "pageview" : "event") +
                                     "&uip=" + URLEncoder.encode(event.getUip(), "UTF-8") +
                                     "&ua=" + URLEncoder.encode(event.getUa(), "UTF-8") +
                                     "&dr=" + URLEncoder.encode(event.getDr(), "UTF-8") +
                                     "&dp=" + URLEncoder.encode(event.getDp(), "UTF-8") +
                                     "&dt=" + URLEncoder.encode(event.getDt(), "UTF-8") +
-                                    "&qt=" + (System.currentTimeMillis() - event.getTime()) +
-                                    "&ec=bitstream" +
-                                    "&ea=download" +
-                                    "&el=item";
+                                    "&qt=" + (System.currentTimeMillis() - event.getTime());
+                            if (!reportAsPageView) {
+                                download += "&ec=bitstream" +
+                                        "&ea=download" +
+                                        "&el=item";
+                            }
                             if (request == null) {
                                 request = new StringBuilder(download);
                             } else {
