@@ -781,7 +781,8 @@ Common usage:
     <!-- Test the connection to the database -->
     <target name="test_database">
         <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="log4j.configuration"
+		         value="file:config/log4j2-console.xml" />
             <sysproperty key="dspace.log.init.disable" value="true" />
             <sysproperty key="dspace.dir" value="${dspace.dir}" />
             <arg value="database" />
@@ -955,7 +956,8 @@ You may manually install this file by following these steps:
 
         <!-- Determine what version of Solr/Lucene is being used in DSpace. -->
         <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" outputproperty="latest_version">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="log4j.configuration"
+		         value="file:config/log4j2-console.xml" />
             <sysproperty key="dspace.log.init.disable" value="true" />
             <arg value="-v" />
         </java>
@@ -1044,7 +1046,8 @@ You may manually install this file by following these steps:
         <!-- Check if the Solr Statistics index is AT LEAST compatible with Solr/Lucene version 3.5 -->
         <echo>Checking if the Solr index at ${indexDir} is >= Solr ${version}</echo>
         <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" resultproperty="version_returncode" outputproperty="version_compare">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="log4j.configuration"
+		         value="file:config/log4j2-console.xml" />
             <sysproperty key="dspace.log.init.disable" value="true" />
             <arg value="${indexDir}" />
             <arg value="${version}" />
@@ -1153,8 +1156,10 @@ For more information, please see the Upgrade Instructions.
                 <echo>Upgrading the Solr index in ${indexDir}. Depending on the index size, this may take a while (please be patient)...</echo>
                 <!-- Run the Lucene IndexUpgrader on this index. This will upgrade the index based on the version of "lucene-core.jar" -->
                 <java classname="org.apache.lucene.index.IndexUpgrader" classpath="./lucene-core-${version}.jar" fork="yes" failonerror="yes">
-                    <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-                    <sysproperty key="dspace.log.init.disable" value="true" />
+                    <sysproperty key="log4j.configuration"
+				 value="file:config/log4j2-console.xml" />
+                    <sysproperty key="dspace.log.init.disable"
+				 value="true" />
                     <arg value="${indexDir}" />
                 </java>
             </then>
@@ -1168,8 +1173,10 @@ For more information, please see the Upgrade Instructions.
                 <echo>Upgrading the Solr index in ${indexDir}. Depending on the index size, this may take a while (please be patient)...</echo>
                 <!-- Run the Lucene IndexUpgrader on this index. This will upgrade the index based on the version of "lucene-core.jar" -->
                 <java classname="org.apache.lucene.index.IndexUpgrader" classpathref="class.path" fork="yes" failonerror="yes">
-                    <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-                    <sysproperty key="dspace.log.init.disable" value="true" />
+                    <sysproperty key="log4j.configuration"
+				 value="file:config/log4j2-console.xml" />
+                    <sysproperty key="dspace.log.init.disable"
+				 value="true" />
                     <arg value="${indexDir}" />
                 </java>
             </then>
