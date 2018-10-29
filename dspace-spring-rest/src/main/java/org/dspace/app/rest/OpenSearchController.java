@@ -204,7 +204,6 @@ public class OpenSearchController implements ErrorController {
 
     /**
      * Internal method for controller initialization
-     * Not used currently
      */
     private void init() {
         if (searchIndices == null) {
