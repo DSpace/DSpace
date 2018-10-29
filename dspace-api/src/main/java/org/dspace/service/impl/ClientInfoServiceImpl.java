@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link ClientInfoService} that can provide information on DSpace client requests
+ *
+ * @author tom dot desair at gmail dot com
  */
 public class ClientInfoServiceImpl implements ClientInfoService {
 

@@ -12,7 +12,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.servlet.RequestDispatcher;
@@ -21,17 +25,22 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.dspace.core.Utils;
+
 /**
  * A mock request for testing.
  *
  * @author mwood
  */
-class DummyHttpServletRequest implements HttpServletRequest {
+public class DummyHttpServletRequest implements HttpServletRequest {
     private String agent = null;
 
     private String address = null;
 
     private String remoteHost = null;
+
+    private Map<String, List<String>> headers = new HashMap<>();
 
     public void setAgent(String agent) {
         this.agent = agent;
@@ -81,6 +90,15 @@ class DummyHttpServletRequest implements HttpServletRequest {
         return 0;
     }
 
+    /**
+     * Add a request header to this dummy request
+     * @param headerName The name of the header to add
+     * @param headerValue The value of the header
+     */
+    public void addHeader(String headerName, String headerValue) {
+        List<String> values = headers.computeIfAbsent(headerName, k -> new LinkedList<>());
+        values.add(headerValue);
+    }
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServletRequest#getHeader(java.lang.String)
      */
@@ -89,7 +107,7 @@ class DummyHttpServletRequest implements HttpServletRequest {
         if ("User-Agent".equals(key)) {
             return agent;
         } else {
-            return null;
+            return CollectionUtils.isEmpty(headers.get(key)) ? null : headers.get(key).get(0);
         }
     }
 
@@ -98,8 +116,7 @@ class DummyHttpServletRequest implements HttpServletRequest {
      */
     @Override
     public Enumeration getHeaderNames() {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.enumeration(headers.keySet());
     }
 
     /* (non-Javadoc)
@@ -107,8 +124,7 @@ class DummyHttpServletRequest implements HttpServletRequest {
      */
     @Override
     public Enumeration getHeaders(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.enumeration(Utils.emptyIfNull(headers.get(arg0)));
     }
 
     /* (non-Javadoc)
@@ -116,8 +132,7 @@ class DummyHttpServletRequest implements HttpServletRequest {
      */
     @Override
     public int getIntHeader(String arg0) {
-        // TODO Auto-generated method stub
-        return 0;
+        return headers.containsKey(arg0) ? Integer.parseInt(getHeader(arg0)) : -1;
     }
 
     /* (non-Javadoc)
