@@ -267,6 +267,12 @@ public class DashService {
     public int submitDashDataset(String doi) {
         int responseCode = 0;
         BufferedReader reader = null;
+
+        String submissionsFinalize = ConfigurationManager.getProperty("dash.submissions.finalize");
+        if(!submissionsFinalize.equals("true")) {
+            log.info("Skipping finalization of " + doi + " due to dash.submissios.finalize = " + submissionsFinalize);
+            return 200;
+        }
         
         try {
             String encodedDOI = URLEncoder.encode(doi, "UTF-8");
