@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -36,8 +37,9 @@ public class OpenSearchControllerTest extends AbstractControllerIntegrationTest 
         ;
     }
 
-    /* HTML is an open issue in OpenSearch, so skip this test at the moment
+    // HTML is an open issue in OpenSearch, so skip this test at the moment
     @Test
+    @Ignore
     public void searchHtmlTest() throws Exception {
         //When we call the root endpoint
         getClient().perform(get("/opensearch/search")
@@ -49,7 +51,6 @@ public class OpenSearchControllerTest extends AbstractControllerIntegrationTest 
                    .andExpect(content().contentType("text/html;charset=UTF-8"))
         ;
     }
-    */
 
     @Test
     public void searchRssTest() throws Exception {
