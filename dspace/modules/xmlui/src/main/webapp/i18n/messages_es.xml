@@ -878,7 +878,7 @@
 
 <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Subir Archivo(s)</message>
 <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">Archivo</message>
-<message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_help">Por favor, introduzca el path completo del archivo que corresponda a su ítem. Si pulsa "Ver.." aparecerá una nueva ventana desde la que podrá seleccionar el archivo.</message>
+<message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_help">Por favor, seleccione el archivo que desea subir haciendo clic en "Seleccionar archivo". A continuación aparecerá una ventana desde la que podrá elegir el archivo. Luego, haga clic en "Subir archivo &amp; añadir otro" y repita tantas veces como archivos desee subir.</message>
 <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_error">El ítem debe contener al menos un archivo.</message>
 <message key="xmlui.Submission.submit.UploadWithEmbargoStep.upload_error">Hubo un problema subiendo su archivo. Bien el nombre del archivo era incorrecto, o hubo un problema de red  que impidió que el archivo nos llegase correctamente, o ha adjuntado un archivo cuyo formato solo se permite para usos internos del sistema. Por favor, inténtelo de nuevo.</message>
 <message key="xmlui.Submission.submit.UploadWithEmbargoStep.virus_error">No se ha subido el archivo ya que parece contener un virus. Por favor, contacte con el administrador del sistema.</message>
