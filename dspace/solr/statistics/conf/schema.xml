@@ -286,19 +286,19 @@
    -->
 
    <field name="type" type="integer" indexed="true" stored="true" required="false" />
-   <field name="id" type="integer" indexed="true" stored="true" required="false" />
+   <field name="id" type="string" indexed="true" stored="true" required="false" />
    <field name="ip" type="string" indexed="true" stored="true" required="false" docValues="true"/>
    <field name="time" type="date" indexed="true" stored="true" required="true" /> 
-   <field name="epersonid" type="integer" indexed="true" stored="true" required="false" />
+   <field name="epersonid" type="string" indexed="true" stored="true" required="false" />
    <field name="continent" type="string" indexed="true" stored="true" required="false" docValues="true"/>
    <field name="country" type="string" indexed="true" stored="true" required="false" docValues="true"/>
    <field name="countryCode" type="string" indexed="true" stored="true" required="false" docValues="true"/>
    <field name="city" type="string" indexed="true" stored="true" required="false" docValues="true"/>
    <field name="longitude" type="float" indexed="true" stored="true" required="false" />
    <field name="latitude" type="float" indexed="true" stored="true" required="false" />
-   <field name="owningComm" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="owningColl" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="owningItem" type="integer" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="owningComm" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="owningColl" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="owningItem" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="dns" type="string" indexed="true" stored="true" required="false" docValues="true"/>
    <field name="userAgent" type="string" indexed="true" stored="true" required="false" docValues="true"/>
    <field name="isBot" type="boolean" indexed="true" stored="true" required="false" />
@@ -313,7 +313,7 @@
    <!-- Search specific  -->
    <field name="query" type="string" indexed="true" stored="true" required="false" multiValued="true" docValues="true"/>
    <field name="scopeType" type="integer" indexed="true" stored="true" required="false" />
-   <field name="scopeId" type="integer" indexed="true" stored="true" required="false" />
+   <field name="scopeId" type="string" indexed="true" stored="true" required="false" />
    <field name="rpp" type="integer" indexed="true" stored="true" required="false" />
    <field name="sortBy" type="string" indexed="true" stored="true" required="false" docValues="true"/>
    <field name="sortOrder" type="string" indexed="true" stored="true" required="false" docValues="true"/>
@@ -323,8 +323,8 @@
    <field name="workflowStep" type="string" indexed="true" stored="true" required="false" multiValued="true" docValues="true"/>
    <field name="previousWorkflowStep" type="string" indexed="true" stored="true" required="false" multiValued="true" docValues="true"/>
    <field name="owner" type="string" indexed="true" stored="true" required="false" multiValued="true" docValues="true"/>
-   <field name="submitter" type="integer" indexed="true" stored="true" required="false" />
-   <field name="actor" type="integer" indexed="true" stored="true" required="false" />
+   <field name="submitter" type="string" indexed="true" stored="true" required="false" />
+   <field name="actor" type="string" indexed="true" stored="true" required="false" />
    <field name="workflowItemId" type="integer" indexed="true" stored="true" required="false" />
 
 
