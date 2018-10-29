@@ -65,7 +65,6 @@
 	<function-signature>boolean isGroupFieldsHiddenWithStructural(org.dspace.app.cris.model.ResearcherPage,java.lang.String)</function-signature>
 </function>
 
-
 <function>
 	<description>Check if box are not public</description>
 	<name>isBoxHidden</name>

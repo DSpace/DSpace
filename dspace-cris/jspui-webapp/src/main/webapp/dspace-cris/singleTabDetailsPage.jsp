@@ -17,6 +17,10 @@
 <%@ page import="java.net.URL"%>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="java.util.Locale"%>
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.Map"%>
+<%@ page import="java.util.HashMap"%>
+<%@ page import="it.cilea.osd.jdyna.web.Box"%>
 
 <%@ taglib uri="jdynatags" prefix="dyna"%>
 <%@ taglib uri="researchertags" prefix="researcher"%>
@@ -26,12 +30,21 @@
 	if (sessionLocale != null) {
 		currLocale = sessionLocale.toString();
 	}
+    List<Box> boxs = (List<Box>)(request.getAttribute("propertiesHolders"));
+    Map<String, Long> mapCount = new HashMap<String, Long>();
+   	for(Box box : boxs) {
+	 	if(box!=null) {
+		 	   String nameBoxCountAttribute = "count" + box.getShortName(); 
+		 	   Long objnameBoxCountAttribute = (Long)request.getAttribute(nameBoxCountAttribute);
+			   mapCount.put(box.getShortName(), objnameBoxCountAttribute);
+ 		} 
+	}
 %>
 <c:set var="currLocale"><%=currLocale %></c:set>
-
 	<div id="tab-${area.id}">
 		<div class="row">
 					<c:forEach items="${propertiesHolders}" var="holder">
+					<c:set var="holdershortname" value="${holder.shortName}" scope="page"/>
 					<c:set var="extraCSS">
 						<c:choose>
 							<c:when test="${holder.priority % 10 == 2}">col-md-6</c:when>
@@ -39,11 +52,17 @@
 						</c:choose>
 					</c:set>
 					
+					<% Long counterBoxMap = (Long)mapCount.get(pageContext.getAttribute("holdershortname")); 
+						if(counterBoxMap==null) {
+					%>
 						<c:set
 							value="${researcher:isBoxHidden(entity,holder.shortName)}"
 							var="invisibleBox"></c:set>
-
-
+					<% } else {	%>
+						<c:set
+							value="<%= counterBoxMap>0?false:true %>"
+							var="invisibleBox"></c:set>
+					<% } %>		
 						<c:if test="${invisibleBox==false}">
 
 							<%!public URL fileURL;%>
