@@ -12,7 +12,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
+import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
+import org.dspace.app.rest.builder.ItemBuilder;
+
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -62,6 +71,111 @@ public class OpenSearchControllerTest extends AbstractControllerIntegrationTest 
                    .andExpect(status().isOk())
                    //We expect the content type to be "application/rss+xml;charset=UTF-8"
                    .andExpect(content().contentType("application/rss+xml;charset=UTF-8"))
+        ;
+    }
+
+    @Test
+    public void noResultsTest() throws Exception {
+        //When we call the root endpoint
+        getClient().perform(get("/opensearch/search")
+                                .param("query", "this query is not supposed to have a result"))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/atom+xml;charset=UTF-8"
+                   .andExpect(content().contentType("application/atom+xml;charset=UTF-8"))
+                   .andExpect(xpath("feed/totalResults").string("0"))
+                   .andExpect(xpath("feed/Query/@searchTerms").string("this+query+is+not+supposed+to+have+a+result"))
+        ;
+    }
+
+    @Test
+    public void findResultSimpleTest() throws Exception {
+        //Turn off the authorization system, otherwise we can't make the objects
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                          .withTitle("Boars at Yellowstonepark")
+                                          .withIssueDate("2017-10-17")
+                                          .withAuthor("Ballini, Andreas").withAuthor("Moriarti, Susan")
+                                          .build();
+        //When we call the root endpoint
+        getClient().perform(get("/opensearch/search")
+                                .param("query", "Boars"))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/atom+xml;charset=UTF-8"
+                   .andExpect(content().contentType("application/atom+xml;charset=UTF-8"))
+                   .andExpect(xpath("feed/Query/@searchTerms").string("Boars"))
+                   .andExpect(xpath("feed/totalResults").string("1"))
+        ;
+    }
+
+    @Test
+    public void findResultWithSpecialCharsTest() throws Exception {
+        //Turn off the authorization system, otherwise we can't make the objects
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                          .withTitle("Bären im Yellowstonepark")
+                                          .withIssueDate("2017-10-17")
+                                          .withAuthor("Bäcker, Nick")
+                                          .build();
+        //When we call the root endpoint
+        getClient().perform(get("/opensearch/search")
+                                .param("query", "Bär"))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/atom+xml;charset=UTF-8"
+                   .andExpect(content().contentType("application/atom+xml;charset=UTF-8"))
+                   .andExpect(xpath("feed/Query/@searchTerms").string("B%C3%A4r"))
+                   .andExpect(xpath("feed/totalResults").string("0"))
+        ;
+    }
+
+    @Test
+    public void invalidQueryTest() throws Exception {
+        //When we call the root endpoint
+        getClient().perform(get("/opensearch/search")
+                                .param("query", "urn::nbn:de:fake-123"))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/atom+xml;charset=UTF-8"
+                   .andExpect(content().contentType("application/atom+xml;charset=UTF-8"))
+                   .andExpect(xpath("feed/Query/@searchTerms").string("urn:nbn:de:fake-123"))
+                   .andExpect(xpath("feed/totalResults").string("0"))
+        ;
+    }
+
+    @Test
+    public void emptyQueryTest() throws Exception {
+        //When we call the root endpoint
+        getClient().perform(get("/opensearch/search")
+                                .param("query", ""))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/atom+xml;charset=UTF-8"
+                   .andExpect(content().contentType("application/atom+xml;charset=UTF-8"))
+                   .andExpect(xpath("feed/totalResults").string("0"))
         ;
     }
 
