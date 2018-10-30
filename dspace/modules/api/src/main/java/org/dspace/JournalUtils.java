@@ -265,7 +265,7 @@ public class JournalUtils {
         return getCanonicalManuscriptID(manuscript.getManuscriptId(), manuscript.getJournalConcept());
     }
 
-    public static String getCanonicalManuscriptID(String manuscriptId, DryadJournalConcept journalConcept) throws ParseException {
+    public static String getCanonicalManuscriptID(String manuscriptId, DryadJournalConcept journalConcept) {
         String canonicalID = manuscriptId;
         try {
             if (journalConcept != null && journalConcept.getCanonicalManuscriptNumberPattern() != null && !journalConcept.getCanonicalManuscriptNumberPattern().equals("")) {
@@ -280,7 +280,7 @@ public class JournalUtils {
                 canonicalID = manuscriptId;
             }
         } catch(Exception e) {
-            log.error(e.getMessage(),e);
+            log.error("error in getting canonical msid for " + manuscriptId + ": " + e.getMessage(),e);
         }
         return canonicalID;
     }
@@ -429,8 +429,6 @@ public class JournalUtils {
             StoragePath storagePath = StoragePath.createManuscriptPath(journalConcept.getISSN(), getCanonicalManuscriptID(manuscriptId, journalConcept));
             ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
             manuscripts.addAll(manuscriptStorage.getManuscriptsMatchingPath(storagePath, 10));
-        } catch (ParseException e) {
-            log.error(e.getMessage());
         } catch (StorageException e) {
             log.error("Exception getting manuscripts", e);
         }

@@ -284,11 +284,7 @@ public class WorkflowItem implements InProgressSubmission {
                     matchingItems.add(wfi);
                 }
             }
-        } catch (SQLException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (AuthorizeException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             throw new ApproveRejectReviewItemException(ex);
         }
 
@@ -305,14 +301,12 @@ public class WorkflowItem implements InProgressSubmission {
         }
         // check to see if this matches by msid:
         String msid = dryadDataPackage.getManuscriptNumber();
-        try {
+        if (msid != null) {
             String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msid, manuscript.getJournalConcept());
             if (manuscript.getManuscriptId().equals(canonicalMSID)) {
                 log.debug("matched " + dryadDataPackage.getIdentifier() + " by msid");
                 matched = true;
             }
-        } catch (Exception e) {
-            log.error("couldn't parse msid " + msid);
         }
 
         if (!matched) {
