@@ -314,7 +314,11 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public String getPublicationName() {
-        return getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
+        String result = getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
+        if (result == null) {
+            return "";
+        }
+        return result;
     }
 
     public void setPublicationName(String publicationName) {
@@ -412,60 +416,25 @@ public class DryadDataPackage extends DryadObject {
         return dataPackage;
     }
 
-    // this currently uses the Item lookup; we will need to make a more abstract one that can encompass Dash
-    private static List<DryadDataPackage> findByManuscriptNumber(Context context, String manuscriptNumber) throws SQLException {
-        ArrayList<DryadDataPackage> dataPackageList = new ArrayList<>();
-        try {
-            ItemIterator itemIterator = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber, false);
-            while (itemIterator.hasNext()) {
-                dataPackageList.add(new DryadDataPackage(itemIterator.next()));
-            }
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception getting data package from manuscript number", ex);
-        } catch (IOException ex) {
-            log.error("IO exception getting data package from manuscript number", ex);
-        }
-        return dataPackageList;
-    }
-
-    // this currently uses the Item lookup; we will need to make a more abstract one that can encompass Dash
-    private static List<DryadDataPackage> findByPublicationDOI(Context context, String pubDOI) {
-        ArrayList<DryadDataPackage> dataPackageList = new ArrayList<>();
-        try {
-            ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", pubDOI, false);
-            while (itemIterator.hasNext()) {
-                dataPackageList.add(new DryadDataPackage(itemIterator.next()));
-            }
-        } catch (Exception ex) {
-            log.error("Exception getting data package from publication DOI", ex);
-        }
-        return dataPackageList;
-    }
-
-    public static List<DryadDataPackage> findByDryadDOI(Context context, String dryadDOI) {
-        ArrayList<DryadDataPackage> dataPackageList = new ArrayList<>();
-        try {
-            ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", null, dryadDOI, false);
-            while (itemIterator.hasNext()) {
-                dataPackageList.add(new DryadDataPackage(itemIterator.next()));
-            }
-        } catch (Exception ex) {
-            log.error("Exception getting data package from publication DOI", ex);
-        }
-        return dataPackageList;
-    }
-
     public static List<DryadDataPackage> findAllByManuscript(Context context, Manuscript manuscript) {
         ArrayList<DryadDataPackage> dataPackageList = new ArrayList<>();
         try {
-            if (!"".equals(manuscript.getDryadDataDOI())) {
-                dataPackageList.addAll(findByDryadDOI(context, manuscript.getDryadDataDOI()));
+            // find all with same Dryad DOI
+            ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", null, manuscript.getDryadDataDOI(), false);
+            while (itemIterator.hasNext()) {
+                dataPackageList.add(new DryadDataPackage(itemIterator.next()));
             }
-            if (!"".equals(manuscript.getPublicationDOI())) {
-                dataPackageList.addAll(findByPublicationDOI(context, manuscript.getPublicationDOI()));
+            // find all with same publication DOI
+            itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", manuscript.getPublicationDOI(), false);
+            while (itemIterator.hasNext()) {
+                dataPackageList.add(new DryadDataPackage(itemIterator.next()));
             }
-            if (!"".equals(manuscript.getManuscriptId())) {
-                dataPackageList.addAll(findByManuscriptNumber(context, manuscript.getManuscriptId()));
+            // find all with same manuscript ID (in the same journal)
+            itemIterator = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscript.getManuscriptId(), false);
+            while (itemIterator.hasNext()) {
+                DryadDataPackage dataPackage = new DryadDataPackage(itemIterator.next());
+                if (dataPackage.getPublicationName().equals(manuscript.getJournalName()))
+                    dataPackageList.add(dataPackage);
             }
         } catch (Exception ex) {
             log.error("Exception getting data package from publication DOI", ex);
@@ -650,31 +619,7 @@ public class DryadDataPackage extends DryadObject {
         try {
             // get the current duplicate packages
             resultList.addAll(getDuplicatePackages(context));
-            // look for items that have the same pub DOI
-            if (this.getPublicationDOI() != null && !this.getPublicationDOI().equals("")) {
-                log.debug("looking for items with doi " + this.getPublicationDOI());
-                List<DryadDataPackage> packagesWithDOI = findByPublicationDOI(context, this.getPublicationDOI());
-                for (DryadDataPackage aPackage: packagesWithDOI) {
-                    if (!resultList.contains(aPackage)) {
-                        resultList.add(aPackage);
-                    }
-                }
-            }
-            // look for items that have the same msid
-            if (this.getManuscriptNumber() != null && !this.getManuscriptNumber().equals("")) {
-                log.debug("looking for items with msid " + this.getManuscriptNumber());
-                List<DryadDataPackage> packagesWithMSID = findByManuscriptNumber(context, this.getManuscriptNumber());
-                for (DryadDataPackage aPackage : packagesWithMSID) {
-                    // check journal name
-                    String journalName = this.getPublicationName();
-                    log.debug("found an item " + this.getIdentifier() + " with same msid " + this.getManuscriptNumber());
-                    if (!resultList.contains(aPackage)) {
-                        if (this.getPublicationName().equals(journalName)) {
-                            resultList.add(aPackage);
-                        }
-                    }
-                }
-            }
+            resultList.addAll(findAllByManuscript(context, new Manuscript(this)));
             // look for items that have the same journal + title + authors?
 
         } catch (Exception e) {
