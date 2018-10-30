@@ -755,25 +755,23 @@ public class DryadDataPackage extends DryadObject {
             manuscriptNumber = manuscript.getManuscriptId();
         }
         reason.append("Approved by ApproveRejectReviewItem based on metadata for ").append(manuscriptNumber).append(" on ").append(DCDate.getCurrent().toString()).append(" (GMT)");
-        associateWithManuscript(manuscript, reason);
 
         if (useDryadClassic) {
             c.turnOffAuthorisationSystem();
+            associateWithManuscript(manuscript, reason);
             try {
                 WorkflowItem wfi = getWorkflowItem(c);
-                Item item = wfi.getItem();
                 List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(c, wfi.getID());
                 ClaimedTask claimedTask = claimedTasks.get(0);
                 Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
                 WorkflowActionConfig actionConfig = workflow.getStep(claimedTask.getStepID()).getActionConfig(claimedTask.getActionID());
 
-                item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, Manuscript.statusIsApproved(manuscript.getStatus()).toString());
-
+                addSingleMetadataValue(true, WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, Manuscript.statusIsApproved(manuscript.getStatus()).toString());
                 WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
-                item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", reason.toString());
-                item.update();
+                addSingleMetadataValue(false, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", reason.toString());
+                c.commit();
             } catch (Exception e) {
-                //something
+                log.error("Exception approving package: " + e.getMessage());
             } finally {
                 c.restoreAuthSystemState();
             }
@@ -784,10 +782,10 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public void rejectPackageUsingManuscript(Context c, Manuscript manuscript) {
-        disassociateFromManuscript(manuscript);
         if (useDryadClassic) {
             try {
                 c.turnOffAuthorisationSystem();
+                disassociateFromManuscript(manuscript);
                 WorkflowItem wfi = getWorkflowItem(c);
                 String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error or wish to re-submit your data associated with a different journal, please contact us at help@datadryad.org.";
                 EPerson ePerson = EPerson.findByEmail(c, ConfigurationManager.getProperty("system.curator.account"));
@@ -802,7 +800,7 @@ public class DryadDataPackage extends DryadObject {
                 }
                 WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, ePerson, null, reason, true);
             } catch (Exception e) {
-                //something
+                log.error("Exception approving package: " + e.getMessage());
             } finally {
                 c.restoreAuthSystemState();
             }
