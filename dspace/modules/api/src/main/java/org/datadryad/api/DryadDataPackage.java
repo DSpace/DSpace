@@ -429,17 +429,15 @@ public class DryadDataPackage extends DryadObject {
     }
 
     // this currently uses the Item lookup; we will need to make a more abstract one that can encompass Dash
-    private static List<DryadDataPackage> findByPublicationDOI(Context context, String pubDOI) throws SQLException {
+    private static List<DryadDataPackage> findByPublicationDOI(Context context, String pubDOI) {
         ArrayList<DryadDataPackage> dataPackageList = new ArrayList<>();
         try {
             ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", pubDOI, false);
             while (itemIterator.hasNext()) {
                 dataPackageList.add(new DryadDataPackage(itemIterator.next()));
             }
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception getting data package from publication DOI", ex);
-        } catch (IOException ex) {
-            log.error("IO exception getting data package from publication DOI", ex);
+        } catch (Exception ex) {
+            log.error("Exception getting data package from publication DOI", ex);
         }
         return dataPackageList;
     }
