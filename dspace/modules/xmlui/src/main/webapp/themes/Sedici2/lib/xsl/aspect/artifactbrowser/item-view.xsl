@@ -250,16 +250,16 @@
 			</xsl:choose>
 	
 			<!-- embargo rows -->
-			<xsl:if test="contains(//mets:FLocat[@LOCTYPE='URL']/@xlink:href,'embargoDate')"> 
-				<div id="embargo-info">
-					<xsl:variable name="href" select="exts:getFileExtension(//mets:FLocat[@LOCTYPE='URL']/@xlink:href)" />
-					<xsl:variable name="date" select="substring-after($href, 'EMBARGODATE=')" />
-					<span class="embargo_msg"><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document-description</i18n:text></span>
-					<span class="embargo_date"><xsl:value-of select="substring($date,0,11)" /></span>
-				</div>
-			</xsl:if>
 			<xsl:text>&#160;</xsl:text>
         </div>
+		<xsl:if test="contains(//mets:FLocat[@LOCTYPE='URL']/@xlink:href,'embargoDate')"> 
+			<div id="embargo-info">
+				<xsl:variable name="href" select="exts:getFileExtension(//mets:FLocat[@LOCTYPE='URL']/@xlink:href)" />
+				<xsl:variable name="date" select="substring-after($href, 'EMBARGODATE=')" />
+				<span class="embargo_msg"><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document-description</i18n:text></span>
+				<span class="embargo_date"><xsl:value-of select="substring($date,0,11)" /></span>
+			</div>
+		</xsl:if>
         
 		<!-- Mostramos la Social Bar -->
 		<xsl:call-template name="showSocialBar"/>
