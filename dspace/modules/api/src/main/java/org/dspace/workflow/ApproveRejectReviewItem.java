@@ -8,7 +8,7 @@ import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
 import org.dspace.core.Context;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -71,7 +71,7 @@ public class ApproveRejectReviewItem {
             Manuscript manuscript = new Manuscript(journalConcept);
             manuscript.setManuscriptId(manuscriptNumber);
             manuscript.setStatus(status);
-            processWorkflowItemsUsingManuscript(manuscript);
+            processReviewPackagesUsingManuscript(manuscript);
         } else if(line.hasOption('i')) {
             // get a WorkflowItem using a workflow ID
             Integer wfItemId = Integer.parseInt(line.getOptionValue('i'));
@@ -101,46 +101,29 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    public static void processWorkflowItemsUsingManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
+    public static void processReviewPackagesUsingManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
         try {
             Context c = new Context();
-
-            ArrayList<WorkflowItem> workflowItems = new ArrayList<WorkflowItem>();
-
-            if (manuscript.getDryadDataDOI() != null) {
-                try {
-                    WorkflowItem wfi = WorkflowItem.findByDOI(c, manuscript.getDryadDataDOI());
-                    if (wfi != null) {
-                        workflowItems.add(wfi);
-                    }
-                } catch (ApproveRejectReviewItemException e) {
-    //                LOGGER.debug ("no workflow items matched DOI " + manuscript.dryadDataDOI);
-                }
+            List<DryadDataPackage> matchingPackages = DryadDataPackage.findAllByManuscript(c, manuscript);
+            for (DryadDataPackage dataPackage : matchingPackages) {
+                processReviewPackageUsingManuscript(c, dataPackage, manuscript);
             }
-
-            workflowItems.addAll(WorkflowItem.findAllByManuscript(c, manuscript));
-            for (WorkflowItem wfi : workflowItems) {
-                try {
-                    DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(c, wfi.getID());
-                    processReviewPackageUsingManuscript(c, dryadDataPackage, manuscript);
-                } catch (ApproveRejectReviewItemException e) {
-                    throw new ApproveRejectReviewItemException("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage(), e);
-                }
-            }
-        } catch (SQLException ex) {
-            throw new ApproveRejectReviewItemException(ex);
+            c.complete();
+        } catch (Exception e) {
+            throw new ApproveRejectReviewItemException(e);
         }
     }
 
     public static void processReviewPackageUsingManuscript(Context c, DryadDataPackage dryadDataPackage, Manuscript manuscript) throws ApproveRejectReviewItemException {
         try {
-            // update duplicate submission metadata for this item.
-            dryadDataPackage.updateDuplicatePackages(c);
             if (dryadDataPackage.isPackageInReview(c)) {
+                // update duplicate submission metadata for this item.
+                dryadDataPackage.updateDuplicatePackages(c);
                 if (Manuscript.statusIsApproved(manuscript.getStatus())) { // approve
                     dryadDataPackage.approvePackageUsingManuscript(c, manuscript);
                 } else { // reject
-                    dryadDataPackage.rejectPackageUsingManuscript(c, manuscript);
+                    String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error or wish to re-submit your data associated with a different journal, please contact us at help@datadryad.org.";
+                    dryadDataPackage.rejectPackageUsingManuscript(c, manuscript, reason);
                 }
             }
         } catch (Exception ex) {

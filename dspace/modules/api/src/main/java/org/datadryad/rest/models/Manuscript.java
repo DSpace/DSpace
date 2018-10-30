@@ -549,7 +549,7 @@ public class Manuscript {
         if (manuscriptMatcher.find()) {
             return "doi:" + manuscriptMatcher.group(0);
         } else {
-            return null;
+            return "";
         }
     }
 

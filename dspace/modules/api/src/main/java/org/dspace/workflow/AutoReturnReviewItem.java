@@ -5,13 +5,9 @@ import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -63,13 +59,9 @@ public class AutoReturnReviewItem {
             Context c = null;
             try {
                 c = new Context();
-                WorkflowItem wfi = WorkflowItem.find(c, workflowItemId);
-                purgeOldItem(c, wfi);
+                DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(c, workflowItemId);
+                purgeOldItem(c, dryadDataPackage);
             } catch (SQLException ex) {
-                throw new ApproveRejectReviewItemException(ex);
-            } catch (AuthorizeException ex) {
-                throw new ApproveRejectReviewItemException(ex);
-            } catch (IOException ex) {
                 throw new ApproveRejectReviewItemException(ex);
             } finally {
                 if (c != null) {
@@ -98,8 +90,8 @@ public class AutoReturnReviewItem {
             List<ClaimedTask> claimedTasks = ClaimedTask.findAllInStep(c, "reviewStep");
             for (ClaimedTask task : claimedTasks) {
                 int wfiID = task.getWorkflowItemID();
-                WorkflowItem wfi = WorkflowItem.find(c, wfiID);
-                purgeOldItem(c, wfi);
+                DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(c, wfiID);
+                purgeOldItem(c, dryadDataPackage);
             }
             c.complete();
         } catch (Exception ex) {
@@ -110,54 +102,35 @@ public class AutoReturnReviewItem {
         }
     }
 
-    private static void purgeOldItem(Context context, WorkflowItem wfi) {
+    private static void purgeOldItem(Context context, DryadDataPackage dryadDataPackage) {
         try {
-            if (wfi != null) {
-                //Check for a valid task
-                Item item = wfi.getItem();
-                DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(context, wfi.getID());
-                if (!dryadDataPackage.isPackageInReview(context)) {
-                    log.debug("Item " + item.getID() + " not found or not in review");
-                } else {
-                    // make sure that this item is updated according to the ApproveReject mechanism:
-                    if (!testMode) {
-                        log.info("check to see if item " + item.getID() + " is approved or rejected");
-                        Manuscript databaseManuscript = JournalUtils.getStoredManuscriptForWorkflowItem(context, dryadDataPackage);
-                        if (databaseManuscript != null && databaseManuscript.isAccepted()) {
-                            ApproveRejectReviewItem.processReviewPackageUsingManuscript(context, dryadDataPackage, databaseManuscript);
-                        }
+            if (!dryadDataPackage.isPackageInReview(context)) {
+                log.debug("Package " + dryadDataPackage.getIdentifier() + " not found or not in review");
+            } else {
+                // make sure that this item is updated according to the ApproveReject mechanism:
+                if (!testMode) {
+                    log.info("check to see if package " + dryadDataPackage.getIdentifier() + " is approved or rejected");
+                    Manuscript databaseManuscript = JournalUtils.getStoredManuscriptForWorkflowItem(context, dryadDataPackage);
+                    if (databaseManuscript != null && databaseManuscript.isAccepted()) {
+                        ApproveRejectReviewItem.processReviewPackageUsingManuscript(context, dryadDataPackage, databaseManuscript);
                     }
-                    if (itemIsOldItemInReview(item)) {
-                        if (testMode) {
-                            log.info("TEST: return item " + item.getID());
-                        } else {
-                            log.info("returning item " + item.getID());
-                            context.turnOffAuthorisationSystem();
-                            String reason = "Since this submission has been in review for more than " + olderThan + " years, we assume it is no longer needed. Feel free to delete it from your workspace.";
-                            EPerson ePerson = EPerson.findByEmail(context, ConfigurationManager.getProperty("system.curator.account"));
-                            //Also return all the data files
-                            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
-                            for (Item dataFile : dataFiles) {
-                                try {
-                                    WorkflowManager.rejectWorkflowItem(context, WorkflowItem.findByItemId(context, dataFile.getID()), ePerson, null, reason, false);
-                                } catch (Exception e) {
-                                    throw new IOException(e);
-                                }
-                            }
-                            WorkflowManager.rejectWorkflowItem(context, wfi, ePerson, null, reason, true);
-
-                            context.restoreAuthSystemState();
-                        }
+                }
+                if (packageIsOldReviewPackage(dryadDataPackage)) {
+                    if (testMode) {
+                        log.info("TEST: return package " + dryadDataPackage.getIdentifier());
+                    } else {
+                        log.info("returning package " + dryadDataPackage.getIdentifier());
+                        String reason = "Since this submission has been in review for more than " + olderThan + " years, we assume it is no longer needed. Feel free to delete it from your workspace.";
+                        dryadDataPackage.rejectPackageUsingManuscript(context, null, reason);
                     }
                 }
             }
         } catch (Exception ex) {
-            log.error("couldn't purge review workflowitem " + wfi.getID());
+            log.error("couldn't purge review package " + dryadDataPackage.getIdentifier());
         }
     }
 
-    private static boolean itemIsOldItemInReview(Item item) {
-        DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
+    private static boolean packageIsOldReviewPackage(DryadDataPackage dryadDataPackage) {
         Date reviewDate = dryadDataPackage.getEnteredReviewDate();
         if (reviewDate == null) {
             return false;

@@ -416,7 +416,7 @@ public class DryadDataPackage extends DryadObject {
     private static List<DryadDataPackage> findByManuscriptNumber(Context context, String manuscriptNumber) throws SQLException {
         ArrayList<DryadDataPackage> dataPackageList = new ArrayList<>();
         try {
-            ItemIterator itemIterator = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
+            ItemIterator itemIterator = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber, false);
             while (itemIterator.hasNext()) {
                 dataPackageList.add(new DryadDataPackage(itemIterator.next()));
             }
@@ -435,6 +435,37 @@ public class DryadDataPackage extends DryadObject {
             ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", pubDOI, false);
             while (itemIterator.hasNext()) {
                 dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+            }
+        } catch (Exception ex) {
+            log.error("Exception getting data package from publication DOI", ex);
+        }
+        return dataPackageList;
+    }
+
+    public static List<DryadDataPackage> findByDryadDOI(Context context, String dryadDOI) {
+        ArrayList<DryadDataPackage> dataPackageList = new ArrayList<>();
+        try {
+            ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", null, dryadDOI, false);
+            while (itemIterator.hasNext()) {
+                dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+            }
+        } catch (Exception ex) {
+            log.error("Exception getting data package from publication DOI", ex);
+        }
+        return dataPackageList;
+    }
+
+    public static List<DryadDataPackage> findAllByManuscript(Context context, Manuscript manuscript) {
+        ArrayList<DryadDataPackage> dataPackageList = new ArrayList<>();
+        try {
+            if (!"".equals(manuscript.getDryadDataDOI())) {
+                dataPackageList.addAll(findByDryadDOI(context, manuscript.getDryadDataDOI()));
+            }
+            if (!"".equals(manuscript.getPublicationDOI())) {
+                dataPackageList.addAll(findByPublicationDOI(context, manuscript.getPublicationDOI()));
+            }
+            if (!"".equals(manuscript.getManuscriptId())) {
+                dataPackageList.addAll(findByManuscriptNumber(context, manuscript.getManuscriptId()));
             }
         } catch (Exception ex) {
             log.error("Exception getting data package from publication DOI", ex);
@@ -779,13 +810,12 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
-    public void rejectPackageUsingManuscript(Context c, Manuscript manuscript) {
+    public void rejectPackageUsingManuscript(Context c, Manuscript manuscript, String reason) {
         if (useDryadClassic) {
             try {
                 c.turnOffAuthorisationSystem();
                 disassociateFromManuscript(manuscript);
                 WorkflowItem wfi = getWorkflowItem(c);
-                String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error or wish to re-submit your data associated with a different journal, please contact us at help@datadryad.org.";
                 EPerson ePerson = EPerson.findByEmail(c, ConfigurationManager.getProperty("system.curator.account"));
                 //Also reject all the data files
                 Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());

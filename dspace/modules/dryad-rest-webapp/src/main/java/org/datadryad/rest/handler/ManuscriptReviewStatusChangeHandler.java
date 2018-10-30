@@ -65,7 +65,7 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
                 // if it's just a submitted notice, there is no status to change.
                 return;
             }
-            ApproveRejectReviewItem.processWorkflowItemsUsingManuscript(manuscript);
+            ApproveRejectReviewItem.processReviewPackagesUsingManuscript(manuscript);
         } catch (ApproveRejectReviewItemException ex) {
             throw new HandlerException("Exception handling acceptance notice for manuscript " + manuscript.getManuscriptId(), ex);
         }
