@@ -33,43 +33,31 @@
 <!-- dc:rights - info-eu-repo AccessRights compliant-->
 <!-- Chequeo si es un doc embargado e imprimo la fecha de fin de embargo sedici.embargo.liftDate -->
 	<xsl:template name="accessRightsAndEmbargo" >
-		<xsl:param name="liftDate" />
 		<xsl:param name="context-name"/>
-		
+
+		<!--sedici.rights.* = rights -->
+		<xsl:variable name="bitstreams" select="/doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle'][./doc:field/text()='ORIGINAL']/doc:element[@name='bitstreams']/doc:element[@name='bitstream']"/>
+		<xsl:variable name="embargoed" select="$bitstreams/doc:field[@name='embargo']"/>
+
 		<xsl:variable name="date-prefix">
 			<xsl:if test="($context-name = 'driver') or ($context-name = 'openaire') or ($context-name = 'snrd')">
 				<xsl:text>info:eu-repo/date/embargoEnd/</xsl:text>
 			</xsl:if>
 		</xsl:variable>
+
 		<xsl:choose>
-			<xsl:when test="$liftDate">
+			<xsl:when test="count($bitstreams) = 0 or count($embargoed[text() = 'forever']) = count($bitstreams) ">
 				<doc:element name='driver'>
 					<doc:element name='rights'>
 						<doc:element name='accessRights'>
 							<doc:element name='es'>
-								<doc:field name="value">info:eu-repo/semantics/embargoedAccess</doc:field>
-							</doc:element>
-						</doc:element>
-					</doc:element>
-				</doc:element>
-				<doc:element name='{$context-name}'>
-					<doc:element name='rights'>
-						<doc:element name='embargoEndDate'>
-							<doc:element name='es'>
-								<doc:field name="value">
-								<xsl:call-template name="formatdate">
-									<xsl:with-param name="datestr">
-										<xsl:value-of select="$liftDate" />
-									</xsl:with-param>
-									<xsl:with-param name="prefix" select="$date-prefix"/>
-								</xsl:call-template>
-									</doc:field>
+								<doc:field name="value">info:eu-repo/semantics/closedAccess</doc:field>
 							</doc:element>
 						</doc:element>
 					</doc:element>
 				</doc:element>
 			</xsl:when>
-			<xsl:otherwise>
+			<xsl:when test="count($embargoed) = 0">
 				<doc:element name='driver'>
 					<doc:element name='rights'>
 						<doc:element name='accessRights'>
@@ -79,6 +67,53 @@
 						</doc:element>
 					</doc:element>
 				</doc:element>
+			</xsl:when>
+			<xsl:when test="count($embargoed[text() = 'forever']) &gt; 0">
+				<doc:element name='driver'>
+					<doc:element name='rights'>
+						<doc:element name='accessRights'>
+							<doc:element name='es'>
+								<doc:field name="value">info:eu-repo/semantics/restrictedAccess</doc:field>
+							</doc:element>
+						</doc:element>
+					</doc:element>
+				</doc:element>
+			</xsl:when>
+			<xsl:otherwise>
+<!-- 			es un embargoedAccess si o si -->
+			<xsl:for-each select="$embargoed">
+				<xsl:sort select="text()" />
+				<xsl:if test="position() = 1">
+					<xsl:variable name="liftDate">
+						<xsl:value-of select="text()" />
+					</xsl:variable>
+					<doc:element name='driver'>
+						<doc:element name='rights'>
+							<doc:element name='accessRights'>
+								<doc:element name='es'>
+									<doc:field name="value">info:eu-repo/semantics/embargoedAccess</doc:field>
+								</doc:element>
+							</doc:element>
+						</doc:element>
+					</doc:element>
+					<doc:element name='{$context-name}'>
+						<doc:element name='rights'>
+							<doc:element name='embargoEndDate'>
+								<doc:element name='es'>
+									<doc:field name="value">
+										<xsl:call-template name="formatdate">
+											<xsl:with-param name="datestr">
+												<xsl:value-of select="$liftDate" />
+											</xsl:with-param>
+											<xsl:with-param name="prefix" select="$date-prefix"/>
+										</xsl:call-template>
+									</doc:field>
+								</doc:element>
+							</doc:element>
+						</doc:element>
+					</doc:element>
+					</xsl:if>
+				</xsl:for-each>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
