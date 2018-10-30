@@ -316,6 +316,7 @@ public class DryadEmailSubmission extends HttpServlet {
             parser = getEmailParser(journalConcept.getParsingScheme());
             parser.parseMessage(dryadContent);
             manuscript = parser.getManuscript();
+            manuscript.setJournalConcept(journalConcept);
         } catch (SubmissionException e) {
             throw new SubmissionException("Journal " + journalID + " parsing scheme not found");
         }
