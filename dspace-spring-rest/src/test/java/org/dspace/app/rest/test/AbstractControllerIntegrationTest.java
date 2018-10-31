@@ -70,6 +70,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     protected static final String AUTHORIZATION_TYPE = "Bearer ";
 
     public static final String REST_SERVER_URL = "http://localhost/api/";
+    public static final String BASE_REST_SERVER_URL = "http://localhost";
 
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
                                                     MediaTypes.HAL_JSON.getSubtype(), Charsets.UTF_8);
