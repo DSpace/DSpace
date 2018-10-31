@@ -355,7 +355,7 @@ public class MetadataImport {
                         // Add the metadata to the item
                         List<BulkEditMetadataValue> relationships = new LinkedList<>();
                         for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                            if (StringUtils.equals(dcv.getSchema(), "relationship")) {
+                            if (StringUtils.equals(dcv.getSchema(), "relation")) {
 
                                 if (!StringUtils.equals(dcv.getElement(), "type")) {
                                     relationships.add(dcv);
@@ -628,7 +628,7 @@ public class MetadataImport {
             }
 
 
-            if (StringUtils.equals(schema, "relationship")) {
+            if (StringUtils.equals(schema, "relation")) {
                 handleRelationMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
             } else {
                 itemService.clearMetadata(c, item, schema, element, qualifier, language);
