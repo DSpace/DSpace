@@ -199,20 +199,22 @@ public class DSpaceCSV implements Serializable {
                     }
 
                     // Check that the scheme exists
-                    MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
-                    if (foundSchema == null) {
-                        throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.SCHEMA,
-                                                                        columnCounter);
-                    }
+                    if (!StringUtils.equals(metadataSchema, "relation")) {
+                        MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
+                        if (foundSchema == null) {
+                            throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                            MetadataImportInvalidHeadingException.SCHEMA,
+                                                                            columnCounter);
+                        }
 
-                    // Check that the metadata element exists in the schema
-                    MetadataField foundField = metadataFieldService
-                        .findByElement(c, foundSchema, metadataElement, metadataQualifier);
-                    if (foundField == null && !StringUtils.equals(metadataSchema, "relationship")) {
-                        throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.ELEMENT,
-                                                                        columnCounter);
+                        // Check that the metadata element exists in the schema
+                        MetadataField foundField = metadataFieldService
+                            .findByElement(c, foundSchema, metadataElement, metadataQualifier);
+                        if (foundField == null) {
+                            throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                            MetadataImportInvalidHeadingException.ELEMENT,
+                                                                            columnCounter);
+                        }
                     }
 
                     // Store the heading
