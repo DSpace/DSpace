@@ -58,7 +58,7 @@ import java.util.*;
  * 
  * @author Terry Brady, Georgetown University Library
  */
-public class SolrUpgradeStatistics6
+public class SolrUpgradePre6xStatistics
 {
         //Command line parameter constants
         private static final String INDEX_NAME_OPTION = "i";
@@ -79,8 +79,15 @@ public class SolrUpgradeStatistics6
         private static final int    FACET_CUTOFF = 10;
         
         private static final String INDEX_DEFAULT = "statistics";
-        private static final String MIGQUERY = "NOT(dspaceMig:*)";
+        private static final String MIGQUERY = "(id:* AND NOT(id:*-*)) OR (scopeId:* AND NOT(scopeId:*-*)) OR (epersonid:* AND NOT(epersonid:*-*))";
 
+        /*
+        private static final String MIGQUERYARR[] = {
+                "id:* AND NOT(id:*-*)",
+                "scopeId:* AND NOT(scopeId:*-*)",
+                "epersonid:* AND NOT(epersonid:*-*)"
+        };
+        */
 
         //Counters to determine the number of items to process
         private int numRec = NUMREC_DEFAULT;
@@ -108,7 +115,7 @@ public class SolrUpgradeStatistics6
         }
         
         //Logger
-        private static final Logger log = Logger.getLogger(SolrUpgradeStatistics6.class);
+        private static final Logger log = Logger.getLogger(SolrUpgradePre6xStatistics.class);
         
         //DSpace Servcies
         private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -139,7 +146,7 @@ public class SolrUpgradeStatistics6
          * @throws IOException 
          * @throws SolrServerException 
          */
-        public SolrUpgradeStatistics6(String indexName, int numRec, int batchSize) throws SolrServerException, IOException {
+        public SolrUpgradePre6xStatistics(String indexName, int numRec, int batchSize) throws SolrServerException, IOException {
                 String serverPath = configurationService.getProperty("solr-statistics.server");
                 serverPath = serverPath.replaceAll("statistics$", indexName);
                 System.out.println("Connecting to " + serverPath);
@@ -276,7 +283,7 @@ public class SolrUpgradeStatistics6
         private static void printHelpAndExit(Options options, int exitCode)
         {
                 HelpFormatter myhelp = new HelpFormatter();
-                myhelp.printHelp(SolrUpgradeStatistics6.class.getSimpleName() + "\n", options);
+                myhelp.printHelp(SolrUpgradePre6xStatistics.class.getSimpleName() + "\n", options);
                 System.out.println("\n\nCommand Defaults");
                 System.out.println("\tsolr-upgradeD6-statistics [-i statistics] [-n num_recs_to_process] [-b num_rec_to_update_at_once]");
                 System.out.println("");
@@ -350,7 +357,7 @@ public class SolrUpgradeStatistics6
                 }
                 
                 try {
-                        SolrUpgradeStatistics6 upgradeStats = new SolrUpgradeStatistics6(indexName, numrec, batchSize);
+                    SolrUpgradePre6xStatistics upgradeStats = new SolrUpgradePre6xStatistics(indexName, numrec, batchSize);
                         upgradeStats.run();
                 } catch (SolrServerException e) {
                         log.error("Error querying stats", e);
@@ -440,11 +447,11 @@ public class SolrUpgradeStatistics6
                 runReport();
                 logTime(false);
                 for(int processed = updateRecords(MIGQUERY); (processed != 0) && (numProcessed < numRec);  processed = updateRecords(MIGQUERY)){
-                        printTime(numProcessed, false);
-                        batchUpdateStats();
-                        if (context.getCacheSize() > CACHE_LIMIT) {
-                                refreshContext();
-                        }
+                    printTime(numProcessed, false);
+                    batchUpdateStats();
+                    if (context.getCacheSize() > CACHE_LIMIT) {
+                            refreshContext();
+                    }
                 }                
                 printTime(numProcessed, true);
                 
@@ -485,7 +492,6 @@ public class SolrUpgradeStatistics6
                         for(FIELD col: FIELD.values()) {
                                 mapField(input, col);
                         }
-                        input.addField("dspaceMig", "6.1");
                         
                         docs.add(input);
                         ++numProcessed;
