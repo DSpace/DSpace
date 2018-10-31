@@ -15,6 +15,7 @@ import org.datadryad.api.DashService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * TransferToDash processes a data package and sends it to a DASH-based Dryad system.
@@ -39,6 +40,7 @@ public class TransferToDash extends AbstractCurationTask {
     
     private static Logger log = Logger.getLogger(TransferToDash.class);
     private static long total = 0;
+    private static int delaySecs = 0;
     private DashService dashService;
 
     
@@ -46,6 +48,13 @@ public class TransferToDash extends AbstractCurationTask {
     public void init(Curator curator, String taskId) throws IOException {
         super.init(curator, taskId);
         dashService = new DashService();
+
+        String stringDelaySecs = ConfigurationManager.getProperty("dash.submissions.delaySeconds");
+        try {
+            delaySecs = Integer.parseInt(stringDelaySecs);
+        } catch (Exception e) {
+            log.error("Unable to initialize submission delay", e);
+        }
     }
  
     
@@ -72,7 +81,7 @@ public class TransferToDash extends AbstractCurationTask {
             setResult("Last processed item = " + packageDOI);        
             report(packageDOI);
             try {
-                Thread.sleep(2000);
+                Thread.sleep(delaySecs * 1000);
             } catch (Exception e) {
                 // ignore
             }
