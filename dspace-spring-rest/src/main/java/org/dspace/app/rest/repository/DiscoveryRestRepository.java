@@ -110,7 +110,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
         } catch (SearchServiceException e) {
             log.error("Error while searching with Discovery", e);
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
         }
 
         return discoverResultConverter
