@@ -132,7 +132,7 @@
 												var out = '<a href="#" id="null_'+data+'_'+row.uuid+'" class="action"><fmt:message key="jsp.layout.cris.relationmanagement.${confName}.status.normal"/></a>';
 												if (${isSelectEnabled})
 												{
-													out += '&nbsp;<a href="#" id="selected_'+row.uuid+'" class="action"><fmt:message key="jsp.layout.cris.relationmanagement.${confName}.status.selected"/></a>';
+													out += '&nbsp;<a href="#" id="selected_'+data+'_'+row.uuid+'" class="action"><fmt:message key="jsp.layout.cris.relationmanagement.${confName}.status.selected"/></a>';
 												}
 												if (${isUnlinkEnabled})
 												{
