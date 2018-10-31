@@ -335,7 +335,7 @@
 								</li>
 							</c:if>
 							<li>
-								<a href="${root}/cris/tools/rp/rebindItemsToRP.htm?id=${researcher.id}&operation=list"><i class="fa fa-search"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.list.items"/></a>
+								<a href="${root}/cris/tools/rp/rebindItemsToRP.htm?id=${researcher.id}&operation=list"><i class="fa fa-search"></i> <fmt:message key="jsp.authority-claim.choice.list.items"/></a>
 							</li>							
 						</ul>
 					</div> 

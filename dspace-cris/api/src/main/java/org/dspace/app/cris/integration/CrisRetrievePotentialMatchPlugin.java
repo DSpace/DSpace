@@ -7,12 +7,14 @@
  */
 package org.dspace.app.cris.integration;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
@@ -23,10 +25,13 @@ import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 
 public class CrisRetrievePotentialMatchPlugin implements
@@ -44,7 +49,6 @@ public class CrisRetrievePotentialMatchPlugin implements
 
 
         String authority = researcher.getCrisID();
-        Integer id = researcher.getId();
 
         List<NameResearcherPage> names = ResearcherPageUtils.getAllVariantsName(invalidIds,
                 researcher);
@@ -121,7 +125,7 @@ public class CrisRetrievePotentialMatchPlugin implements
 
     @Override
     public Map<NameResearcherPage, Item[]> retrieveGroupByName(Context context,
-            Map<String, Set<Integer>> mapInvalids, List<ResearcherPage> rps)
+            Map<String, Set<Integer>> mapInvalids, List<ResearcherPage> rps, boolean partialMatch)
     {
       
         Map<NameResearcherPage, Item[]> result = new HashMap<NameResearcherPage, Item[]>();
@@ -163,6 +167,18 @@ public class CrisRetrievePotentialMatchPlugin implements
                     scope.setBrowseIndex(bi);
                     // scope.setOrder(order);
                     scope.setFilterValue(tempName.getName());
+                    scope.setFilterValuePartial(partialMatch);
+                    
+                    String handleCommunity = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "retrievepotentialmatch.filter.bycommunity");
+                    if(StringUtils.isNotBlank(handleCommunity)) {
+                        Community community = (Community)HandleManager.resolveToObject(context, handleCommunity);
+                        scope.setCommunity(community);
+                    }
+                    String handleCollection = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "retrievepotentialmatch.filter.bycollection");
+                    if(StringUtils.isNotBlank(handleCollection)) {
+                        Collection collection = (Collection)HandleManager.resolveToObject(context, handleCollection);
+                        scope.setCollection(collection);
+                    }
                     // scope.setFilterValueLang(valueLang);
                     // scope.setJumpToItem(focus);
                     // scope.setJumpToValue(valueFocus);
@@ -185,7 +201,7 @@ public class CrisRetrievePotentialMatchPlugin implements
                     count++;
                 }
             }
-            catch (BrowseException e)
+            catch (BrowseException | IllegalStateException | SQLException e)
             {
                 log.error(LogManager.getHeader(context, "getPotentialMatch",
                         "researcher=" + authority), e);
