@@ -264,39 +264,42 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         try {
             DCInputsReader dcInputsReader = new DCInputsReader();
             for (DCInputSet dcinputSet : dcInputsReader.getAllInputs(Integer.MAX_VALUE, 0)) {
-                DCInput[] dcinputs = dcinputSet.getFields();
-                for (DCInput dcinput : dcinputs) {
-                    if (StringUtils.isNotBlank(dcinput.getPairsType())
-                        || StringUtils.isNotBlank(dcinput.getVocabulary())) {
-                        String authorityName = dcinput.getPairsType();
-                        if (StringUtils.isBlank(authorityName)) {
-                            authorityName = dcinput.getVocabulary();
-                        }
-                        if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
-                            String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
-                                                           dcinput.getQualifier());
-                            ChoiceAuthority ca = controller.get(authorityName);
-                            if (ca == null) {
-                                InputFormSelfRegisterWrapperAuthority ifa = new InputFormSelfRegisterWrapperAuthority();
-                                if (controller.containsKey(fieldKey)) {
-                                    ifa = (InputFormSelfRegisterWrapperAuthority) controller.get(fieldKey);
+                DCInput[][] dcinputs = dcinputSet.getFields();
+                for (DCInput[] dcrows : dcinputs) {
+                    for (DCInput dcinput : dcrows) {
+                        if (StringUtils.isNotBlank(dcinput.getPairsType())
+                            || StringUtils.isNotBlank(dcinput.getVocabulary())) {
+                            String authorityName = dcinput.getPairsType();
+                            if (StringUtils.isBlank(authorityName)) {
+                                authorityName = dcinput.getVocabulary();
+                            }
+                            if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
+                                String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
+                                                               dcinput.getQualifier());
+                                ChoiceAuthority ca = controller.get(authorityName);
+                                if (ca == null) {
+                                    InputFormSelfRegisterWrapperAuthority ifa = new
+                                        InputFormSelfRegisterWrapperAuthority();
+                                    if (controller.containsKey(fieldKey)) {
+                                        ifa = (InputFormSelfRegisterWrapperAuthority) controller.get(fieldKey);
+                                    }
+
+                                    ChoiceAuthority ma = (ChoiceAuthority) pluginService
+                                        .getNamedPlugin(ChoiceAuthority.class, authorityName);
+                                    if (ma == null) {
+                                        log.warn("Skipping invalid configuration for " + fieldKey
+                                                     + " because named plugin not found: " + authorityName);
+                                        continue;
+                                    }
+                                    ifa.getDelegates().put(dcinputSet.getFormName(), ma);
+                                    controller.put(fieldKey, ifa);
                                 }
 
-                                ChoiceAuthority ma = (ChoiceAuthority) pluginService
-                                    .getNamedPlugin(ChoiceAuthority.class, authorityName);
-                                if (ma == null) {
-                                    log.warn("Skipping invalid configuration for " + fieldKey
-                                                 + " because named plugin not found: " + authorityName);
-                                    continue;
+                                if (!authorities.containsKey(authorityName)) {
+                                    authorities.put(authorityName, fieldKey);
                                 }
-                                ifa.getDelegates().put(dcinputSet.getFormName(), ma);
-                                controller.put(fieldKey, ifa);
-                            }
 
-                            if (!authorities.containsKey(authorityName)) {
-                                authorities.put(authorityName, fieldKey);
                             }
-
                         }
                     }
                 }

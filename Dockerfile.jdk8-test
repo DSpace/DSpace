@@ -1,5 +1,12 @@
 # This image will be published as dspace/dspace
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
+# 
+# This version is JDK8 compatible
+# - tomcat:8-jre8
+# - ANT 1.10.5
+# - maven:latest
+# - note: expose /solr to any host; provide /rest over http
+# - default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x-jdk8-test
 
 # Step 1 - Run Maven Build
 FROM maven as build
@@ -9,10 +16,14 @@ WORKDIR /app
 ADD . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
+# Provide web.xml overrides to make webapps easier to test
+COPY dspace/src/main/docker/test/solr_web.xml /app/dspace-solr/src/main/webapp/WEB-INF/web.xml
+COPY dspace/src/main/docker/test/rest_web.xml /app/dspace-rest/src/main/webapp/WEB-INF/web.xml
+
 RUN mvn package
 
 # Step 2 - Run Ant Deploy
-FROM tomcat:8 as ant_build
+FROM tomcat:8-jre8 as ant_build
 ARG TARGET_DIR=dspace-installer
 COPY --from=build /app /dspace-src
 WORKDIR /dspace-src/dspace/target/${TARGET_DIR}
@@ -29,7 +40,7 @@ RUN ant update_configs update_code update_webapps update_solr_indexes
 
 # Step 3 - Run tomcat
 # Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:8
+FROM tomcat:8-jre8
 COPY --from=ant_build /dspace /dspace
 EXPOSE 8080 8009
 

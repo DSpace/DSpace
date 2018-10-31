@@ -40,6 +40,9 @@ Please be aware that, as a Java web application, DSpace requires a database (Pos
 and a servlet container (usually Tomcat) in order to function.
 More information about these and all other prerequisites can be found in the Installation instructions above.
 
+## Dockerfile Usage
+See the [DSpace Docker Tutorial](https://dspace-labs.github.io/DSpace-Docker-Images/).
+
 ## Contributing
 
 DSpace is a community built and supported project. We do not have a centralized development or support team, 
