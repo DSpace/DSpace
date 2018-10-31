@@ -7,6 +7,12 @@
  */
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -20,12 +26,6 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-
 /**
  * Processing class for an action where an assigned user can
  * assign another user to review the item
@@ -35,7 +35,7 @@ import java.util.UUID;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class SelectReviewerAction extends ProcessingAction{
+public class SelectReviewerAction extends ProcessingAction {
 
     public static final int MAIN_PAGE = 0;
     public static final int SEARCH_RESULTS_PAGE = 1;
@@ -51,30 +51,31 @@ public class SelectReviewerAction extends ProcessingAction{
     protected WorkflowItemRoleService workflowItemRoleService;
 
     @Override
-    public void activate(Context c, XmlWorkflowItem wf) throws SQLException, IOException, AuthorizeException, WorkflowException {
+    public void activate(Context c, XmlWorkflowItem wf)
+        throws SQLException, IOException, AuthorizeException, WorkflowException {
 
     }
 
     @Override
-    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException, WorkflowException {
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
         String submitButton = Util.getSubmitButton(request, "submit_cancel");
 
         //Check if our user has pressed cancel
-        if(submitButton.equals("submit_cancel")){
+        if (submitButton.equals("submit_cancel")) {
             //Send us back to the submissions page
             return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
 
-        }else
-        if(submitButton.equals("submit_search")){
+        } else if (submitButton.equals("submit_search")) {
             //Perform the search
             String query = request.getParameter("query");
             int page = Util.getIntParameter(request, "result-page");
-            if(page == -1){
+            if (page == -1) {
                 page = 0;
             }
 
             int resultCount = ePersonService.searchResultCount(c, query);
-            List<EPerson> epeople = ePersonService.search(c, query, page*RESULTS_PER_PAGE, RESULTS_PER_PAGE);
+            List<EPerson> epeople = ePersonService.search(c, query, page * RESULTS_PER_PAGE, RESULTS_PER_PAGE);
 
 
             request.setAttribute("eperson-result-count", resultCount);
@@ -82,8 +83,7 @@ public class SelectReviewerAction extends ProcessingAction{
             request.setAttribute("result-page", page);
             request.setAttribute("page", SEARCH_RESULTS_PAGE);
             return new ActionResult(ActionResult.TYPE.TYPE_PAGE, SEARCH_RESULTS_PAGE);
-        }else
-        if(submitButton.startsWith("submit_select_reviewer_")){
+        } else if (submitButton.startsWith("submit_select_reviewer_")) {
             //Retrieve the identifier of the eperson which will do the reviewing
             UUID reviewerId = UUID.fromString(submitButton.substring(submitButton.lastIndexOf("_") + 1));
             EPerson reviewer = ePersonService.find(c, reviewerId);

@@ -14,7 +14,6 @@ import org.dspace.app.rest.converter.BitstreamFormatConverter;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
 import org.dspace.content.BitstreamFormat;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,55 +21,58 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+
 /**
  * This is the repository responsible to manage BitstreamFormat Rest object
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(BitstreamFormatRest.CATEGORY + "." + BitstreamFormatRest.NAME)
 public class BitstreamFormatRestRepository extends DSpaceRestRepository<BitstreamFormatRest, Integer> {
-	BitstreamFormatService bfs = ContentServiceFactory.getInstance().getBitstreamFormatService();
-	@Autowired
-	BitstreamFormatConverter converter;
 
-	public BitstreamFormatRestRepository() {
-		System.out.println("Repository initialized by Spring");
-	}
+    @Autowired
+    BitstreamFormatService bfs;
 
-	@Override
-	public BitstreamFormatRest findOne(Context context, Integer id) {
-		BitstreamFormat bit = null;
-		try {
-			bit = bfs.find(context, id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (bit == null) {
-			return null;
-		}
-		return converter.fromModel(bit);
-	}
+    @Autowired
+    BitstreamFormatConverter converter;
 
-	@Override
-	public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
-		List<BitstreamFormat> bit = null;
-		try {
-			bit = bfs.findAll(context);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		Page<BitstreamFormatRest> page = utils.getPage(bit, pageable).map(converter);
-		return page;
-	}
+    public BitstreamFormatRestRepository() {
+        System.out.println("Repository initialized by Spring");
+    }
 
-	@Override
-	public Class<BitstreamFormatRest> getDomainClass() {
-		return BitstreamFormatRest.class;
-	}
+    @Override
+    public BitstreamFormatRest findOne(Context context, Integer id) {
+        BitstreamFormat bit = null;
+        try {
+            bit = bfs.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (bit == null) {
+            return null;
+        }
+        return converter.fromModel(bit);
+    }
 
-	@Override
-	public BitstreamFormatResource wrapResource(BitstreamFormatRest bs, String... rels) {
-		return new BitstreamFormatResource(bs, utils, rels);
-	}
+    @Override
+    public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
+        List<BitstreamFormat> bit = null;
+        try {
+            bit = bfs.findAll(context);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<BitstreamFormatRest> page = utils.getPage(bit, pageable).map(converter);
+        return page;
+    }
+
+    @Override
+    public Class<BitstreamFormatRest> getDomainClass() {
+        return BitstreamFormatRest.class;
+    }
+
+    @Override
+    public BitstreamFormatResource wrapResource(BitstreamFormatRest bs, String... rels) {
+        return new BitstreamFormatResource(bs, utils, rels);
+    }
 }

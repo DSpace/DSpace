@@ -36,6 +36,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
 import org.apache.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -99,33 +100,43 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * of the e-mail; they won't get filled out.
  * </p>
  *
- *
  * @author Robert Tansley
  * @author Jim Downing - added attachment handling code
  * @author Adan Roman Ruiz at arvo.es - added inputstream attachment handling code
  * @version $Revision: 5844 $
  */
-public class Email
-{
-    /** The content of the message */
+public class Email {
+    /**
+     * The content of the message
+     */
     private String content;
 
-    /** The subject of the message */
+    /**
+     * The subject of the message
+     */
     private String subject;
 
-    /** The arguments to fill out */
+    /**
+     * The arguments to fill out
+     */
     private List<Object> arguments;
 
-    /** The recipients */
+    /**
+     * The recipients
+     */
     private List<String> recipients;
 
-    /** Reply to field, if any */
+    /**
+     * Reply to field, if any
+     */
     private String replyTo;
 
     private List<FileAttachment> attachments;
     private List<InputStreamAttachment> moreAttachments;
 
-    /** The character set this message will be sent in */
+    /**
+     * The character set this message will be sent in
+     */
     private String charset;
 
     private static final Logger log = Logger.getLogger(Email.class);
@@ -133,8 +144,7 @@ public class Email
     /**
      * Create a new email message.
      */
-    public Email()
-    {
+    public Email() {
         arguments = new ArrayList<Object>(50);
         recipients = new ArrayList<String>(50);
         attachments = new ArrayList<FileAttachment>(10);
@@ -148,11 +158,9 @@ public class Email
     /**
      * Add a recipient
      *
-     * @param email
-     *            the recipient's email address
+     * @param email the recipient's email address
      */
-    public void addRecipient(String email)
-    {
+    public void addRecipient(String email) {
         recipients.add(email);
     }
 
@@ -161,11 +169,9 @@ public class Email
      * formatting -<code>addArgument</code> will start. Comments and any
      * "Subject:" line must be stripped.
      *
-     * @param cnt
-     *            the content of the message
+     * @param cnt the content of the message
      */
-    public void setContent(String cnt)
-    {
+    public void setContent(String cnt) {
         content = cnt;
         arguments = new ArrayList<Object>();
     }
@@ -173,47 +179,39 @@ public class Email
     /**
      * Set the subject of the message
      *
-     * @param s
-     *            the subject of the message
+     * @param s the subject of the message
      */
-    public void setSubject(String s)
-    {
+    public void setSubject(String s) {
         subject = s;
     }
 
     /**
      * Set the reply-to email address
      *
-     * @param email
-     *            the reply-to email address
+     * @param email the reply-to email address
      */
-    public void setReplyTo(String email)
-    {
+    public void setReplyTo(String email) {
         replyTo = email;
     }
 
     /**
      * Fill out the next argument in the template
      *
-     * @param arg
-     *            the value for the next argument
+     * @param arg the value for the next argument
      */
-    public void addArgument(Object arg)
-    {
+    public void addArgument(Object arg) {
         arguments.add(arg);
     }
 
-    public void addAttachment(File f, String name)
-    {
+    public void addAttachment(File f, String name) {
         attachments.add(new FileAttachment(f, name));
     }
-    public void addAttachment(InputStream is, String name,String mimetype)
-    {
-        moreAttachments.add(new InputStreamAttachment(is, name,mimetype));
+
+    public void addAttachment(InputStream is, String name, String mimetype) {
+        moreAttachments.add(new InputStreamAttachment(is, name, mimetype));
     }
 
-    public void setCharset(String cs)
-    {
+    public void setCharset(String cs) {
         charset = cs;
     }
 
@@ -221,8 +219,7 @@ public class Email
      * "Reset" the message. Clears the arguments and recipients, but leaves the
      * subject and content intact.
      */
-    public void reset()
-    {
+    public void reset() {
         arguments = new ArrayList<Object>(50);
         recipients = new ArrayList<String>(50);
         attachments = new ArrayList<FileAttachment>(10);
@@ -234,12 +231,10 @@ public class Email
     /**
      * Sends the email.
      *
-     * @throws MessagingException
-     *             if there was a problem sending the mail.
-     * @throws IOException if IO error
+     * @throws MessagingException if there was a problem sending the mail.
+     * @throws IOException        if IO error
      */
-    public void send() throws MessagingException, IOException
-    {
+    public void send() throws MessagingException, IOException {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         // Get the mail configuration properties
@@ -247,8 +242,7 @@ public class Email
         boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
 
         // If no character set specified, attempt to retrieve a default
-        if (charset == null)
-        {
+        if (charset == null) {
             charset = config.getProperty("mail.charset");
         }
 
@@ -261,10 +255,9 @@ public class Email
         // Set the recipients of the message
         Iterator<String> i = recipients.iterator();
 
-        while (i.hasNext())
-        {
+        while (i.hasNext()) {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(
-                    i.next()));
+                i.next()));
         }
 
         // Format the mail message
@@ -277,182 +270,152 @@ public class Email
 
         // Set the subject of the email (may contain parameters)
         String fullSubject = MessageFormat.format(subject, args);
-        if (charset != null)
-        {
+        if (charset != null) {
             message.setSubject(fullSubject, charset);
-        }
-        else
-        {
+        } else {
             message.setSubject(fullSubject);
         }
 
         // Add attachments
-        if (attachments.isEmpty() && moreAttachments.isEmpty())
-        {
+        if (attachments.isEmpty() && moreAttachments.isEmpty()) {
             // If a character set has been specified, or a default exists
-            if (charset != null)
-            {
+            if (charset != null) {
                 message.setText(fullMessage, charset);
-            }
-            else
-            {
+            } else {
                 message.setText(fullMessage);
             }
-        }
-        else
-        {
-             Multipart multipart = new MimeMultipart();
-                // create the first part of the email
-                BodyPart messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setText(fullMessage);
-                multipart.addBodyPart(messageBodyPart);
-             if (!attachments.isEmpty()) {
-                for (Iterator<FileAttachment> iter = attachments.iterator(); iter.hasNext();)
-                {
+        } else {
+            Multipart multipart = new MimeMultipart();
+            // create the first part of the email
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setText(fullMessage);
+            multipart.addBodyPart(messageBodyPart);
+            if (!attachments.isEmpty()) {
+                for (Iterator<FileAttachment> iter = attachments.iterator(); iter.hasNext(); ) {
                     FileAttachment f = iter.next();
                     // add the file
                     messageBodyPart = new MimeBodyPart();
                     messageBodyPart.setDataHandler(new DataHandler(
-                            new FileDataSource(f.file)));
+                        new FileDataSource(f.file)));
                     messageBodyPart.setFileName(f.name);
                     multipart.addBodyPart(messageBodyPart);
                 }
                 message.setContent(multipart);
-             }
-             if (!moreAttachments.isEmpty()) {
-                 for (Iterator<InputStreamAttachment> iter = moreAttachments.iterator(); iter.hasNext();)
-                 {
-                     InputStreamAttachment isa = iter.next();
-                     // add the stream
-                     messageBodyPart = new MimeBodyPart();
-                     messageBodyPart.setDataHandler(
-                         new DataHandler(new InputStreamDataSource(
-                             isa.name,
-                             isa.mimetype, 
-                             isa.is)
-                         )
-                     );
-                     messageBodyPart.setFileName(isa.name);
-                     multipart.addBodyPart(messageBodyPart);
-                 }
-                 message.setContent(multipart);
-             }
+            }
+            if (!moreAttachments.isEmpty()) {
+                for (Iterator<InputStreamAttachment> iter = moreAttachments.iterator(); iter.hasNext(); ) {
+                    InputStreamAttachment isa = iter.next();
+                    // add the stream
+                    messageBodyPart = new MimeBodyPart();
+                    messageBodyPart.setDataHandler(
+                        new DataHandler(new InputStreamDataSource(
+                            isa.name,
+                            isa.mimetype,
+                            isa.is)
+                        )
+                    );
+                    messageBodyPart.setFileName(isa.name);
+                    multipart.addBodyPart(messageBodyPart);
+                }
+                message.setContent(multipart);
+            }
         }
 
-        if (replyTo != null)
-        {
+        if (replyTo != null) {
             Address[] replyToAddr = new Address[1];
             replyToAddr[0] = new InternetAddress(replyTo);
             message.setReplyTo(replyToAddr);
         }
 
-        if (disabled)
-        {
+        if (disabled) {
             StringBuffer text = new StringBuffer(
                 "Message not sent due to mail.server.disabled:\n");
 
             Enumeration<String> headers = message.getAllHeaderLines();
-            while (headers.hasMoreElements())
+            while (headers.hasMoreElements()) {
                 text.append(headers.nextElement()).append('\n');
+            }
 
-            if (!attachments.isEmpty())
-            {
+            if (!attachments.isEmpty()) {
                 text.append("\nAttachments:\n");
-                for (FileAttachment f : attachments)
+                for (FileAttachment f : attachments) {
                     text.append(f.name).append('\n');
+                }
                 text.append('\n');
             }
 
             text.append('\n').append(fullMessage);
 
             log.info(text);
-        }
-        else
+        } else {
             Transport.send(message);
+        }
     }
 
     /**
      * Get the template for an email message. The message is suitable for
      * inserting values using <code>java.text.MessageFormat</code>.
      *
-     * @param emailFile
-     *            full name for the email template, for example "/dspace/config/emails/register".
-     *
+     * @param emailFile full name for the email template, for example "/dspace/config/emails/register".
      * @return the email object, with the content and subject filled out from
-     *         the template
-     *
+     * the template
      * @throws IOException if IO error
-     *             if the template couldn't be found, or there was some other
-     *             error reading the template
+     *                     if the template couldn't be found, or there was some other
+     *                     error reading the template
      */
     public static Email getEmail(String emailFile)
-        throws IOException
-    {
+        throws IOException {
         String charset = null;
         String subject = "";
         StringBuilder contentBuffer = new StringBuilder();
         InputStream is = null;
         InputStreamReader ir = null;
         BufferedReader reader = null;
-        try
-        {
+        try {
             is = new FileInputStream(emailFile);
             ir = new InputStreamReader(is, "UTF-8");
             reader = new BufferedReader(ir);
             boolean more = true;
-            while (more)
-            {
+            while (more) {
                 String line = reader.readLine();
-                if (line == null)
-                {
+                if (line == null) {
                     more = false;
-                }
-                else if (line.toLowerCase().startsWith("subject:"))
-                {
+                } else if (line.toLowerCase().startsWith("subject:")) {
                     subject = line.substring(8).trim();
-                }
-                else if (line.toLowerCase().startsWith("charset:"))
-                {
+                } else if (line.toLowerCase().startsWith("charset:")) {
                     charset = line.substring(8).trim();
-                }
-                else if (!line.startsWith("#"))
-                {
+                } else if (!line.startsWith("#")) {
                     contentBuffer.append(line);
                     contentBuffer.append("\n");
                 }
             }
-        } finally
-        {
-            if (reader != null)
-            {
+        } finally {
+            if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException ioe)
-                {
+                } catch (IOException ioe) {
+                    // ignore
                 }
             }
-            if (ir != null)
-            {
+            if (ir != null) {
                 try {
                     ir.close();
-                } catch (IOException ioe)
-                {
+                } catch (IOException ioe) {
+                    // ignore
                 }
             }
-            if (is != null)
-            {
+            if (is != null) {
                 try {
                     is.close();
-                } catch (IOException ioe)
-                {
+                } catch (IOException ioe) {
+                    // ignore
                 }
             }
         }
         Email email = new Email();
         email.setSubject(subject);
         email.setContent(contentBuffer.toString());
-        if (charset != null)
-        {
+        if (charset != null) {
             email.setCharset(charset);
         }
         return email;
@@ -472,8 +435,7 @@ public class Email
      *
      * @param args the command line arguments given
      */
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         String to = config.getProperty("mail.admin");
         String subject = "DSpace test email";
@@ -488,10 +450,8 @@ public class Email
         System.out.println(" - Subject: " + subject);
         System.out.println(" - Server: " + server);
         boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
-        try
-        {
-            if (disabled)
-            {
+        try {
+            if (disabled) {
                 System.err.println("\nError sending email:");
                 System.err.println(" - Error: cannot test email because mail.server.disabled is set to true");
                 System.err.println("\nPlease see the DSpace documentation for assistance.\n");
@@ -500,17 +460,13 @@ public class Email
                 return;
             }
             e.send();
-        }
-        catch (MessagingException me)
-        {
+        } catch (MessagingException me) {
             System.err.println("\nError sending email:");
             System.err.println(" - Error: " + me);
             System.err.println("\nPlease see the DSpace documentation for assistance.\n");
             System.err.println("\n");
             System.exit(1);
-        }
-        catch (IOException e1)
-        {
+        } catch (IOException e1) {
             System.err.println("\nError sending email:");
             System.err.println(" - Error: " + e1);
             System.err.println("\nPlease see the DSpace documentation for assistance.\n");
@@ -524,12 +480,9 @@ public class Email
      * Utility struct class for handling file attachments.
      *
      * @author ojd20
-     *
      */
-    private static class FileAttachment
-    {
-        public FileAttachment(File f, String n)
-        {
+    private static class FileAttachment {
+        public FileAttachment(File f, String n) {
             this.file = f;
             this.name = n;
         }
@@ -541,14 +494,11 @@ public class Email
 
     /**
      * Utility struct class for handling file attachments.
-     * 
+     *
      * @author Adán Román Ruiz at arvo.es
-     * 
      */
-    private static class InputStreamAttachment
-    {
-        public InputStreamAttachment(InputStream is, String name, String mimetype)
-        {
+    private static class InputStreamAttachment {
+        public InputStreamAttachment(InputStream is, String name, String mimetype) {
             this.is = is;
             this.name = name;
             this.mimetype = mimetype;
@@ -558,46 +508,45 @@ public class Email
         String mimetype;
         String name;
     }
-    
+
     /**
-    *
-    * @author arnaldo
-    */
-   public class InputStreamDataSource implements DataSource {
-       private String name;       
-       private String contentType;        
-       private ByteArrayOutputStream baos;                
-       
-       InputStreamDataSource(String name, String contentType, InputStream inputStream) throws IOException {            
-           this.name = name;            
-           this.contentType = contentType;                        
-           baos = new ByteArrayOutputStream();                        
-           int read;            
-           byte[] buff = new byte[256];            
-           while((read = inputStream.read(buff)) != -1) {                
-               baos.write(buff, 0, read);            
-           }        
-       }                
+     * @author arnaldo
+     */
+    public class InputStreamDataSource implements DataSource {
+        private String name;
+        private String contentType;
+        private ByteArrayOutputStream baos;
 
-       @Override
-       public String getContentType() {
-           return contentType;        
-       }         
-       
-       @Override
-       public InputStream getInputStream() throws IOException {
-           return new ByteArrayInputStream(baos.toByteArray());
-       }         
-       
-       @Override
-       public String getName() {
-           return name;        
-       }         
+        InputStreamDataSource(String name, String contentType, InputStream inputStream) throws IOException {
+            this.name = name;
+            this.contentType = contentType;
+            baos = new ByteArrayOutputStream();
+            int read;
+            byte[] buff = new byte[256];
+            while ((read = inputStream.read(buff)) != -1) {
+                baos.write(buff, 0, read);
+            }
+        }
 
-       @Override
-       public OutputStream getOutputStream() throws IOException {
-           throw new IOException("Cannot write to this read-only resource");        
-       }    
-   }
+        @Override
+        public String getContentType() {
+            return contentType;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return new ByteArrayInputStream(baos.toByteArray());
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public OutputStream getOutputStream() throws IOException {
+            throw new IOException("Cannot write to this read-only resource");
+        }
+    }
 
 }

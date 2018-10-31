@@ -7,16 +7,16 @@
  */
 package org.dspace.xoai.tests.helpers;
 
-import org.springframework.mock.web.MockHttpServletRequest;
-
-import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.mock.web.MockHttpServletRequest;
 
 public class HttpRequestBuilder {
     private MockHttpServletRequest request = new MockHttpServletRequest();
 
-    public HttpRequestBuilder withUrl (String url) {
+    public HttpRequestBuilder withUrl(String url) {
         try {
             URI uri = new URI(url);
         } catch (URISyntaxException e) {
@@ -25,12 +25,12 @@ public class HttpRequestBuilder {
         return this;
     }
 
-    public HttpRequestBuilder usingGetMethod () {
+    public HttpRequestBuilder usingGetMethod() {
         request.setMethod("GET");
         return this;
     }
 
-    public HttpServletRequest build () {
+    public HttpServletRequest build() {
 
         return request;
     }

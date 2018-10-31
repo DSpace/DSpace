@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dspace-oai</artifactId>
     <packaging>war</packaging>
@@ -15,7 +16,6 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <spring.version>3.2.5.RELEASE</spring.version>
         <xoai.version>3.2.10</xoai.version>
         <jtwig.version>2.0.1</jtwig.version>
     </properties>
@@ -104,8 +104,8 @@
                     <artifactId>xml-apis</artifactId>
                 </exclusion>
                 <exclusion>
-                     <groupId>org.apache.commons</groupId>
-                     <artifactId>commons-lang3</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -144,10 +144,6 @@
             <version>${jtwig.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
@@ -156,8 +152,12 @@
                     <artifactId>javassist</artifactId>
                 </exclusion>
                 <exclusion>
-                     <groupId>org.apache.commons</groupId>
-                     <artifactId>commons-lang3</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -184,7 +184,7 @@
         <!-- Web API -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -223,10 +223,12 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Note: XOAI requires hamcrest both for testing and runtime -->
+        <!-- As our Parent POM sets this to 'test' scope, we must override it -->
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <scope>test</scope>
+            <artifactId>hamcrest-all</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>

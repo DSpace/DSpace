@@ -27,16 +27,21 @@ import org.dspace.eperson.EPerson;
 /**
  * Utility class to manage generation and storing of the license text that the
  * submitter has to grant/granted for archiving the item
- * 
+ *
  * @author bollini
- * 
  */
-public class LicenseUtils
-{
+public class LicenseUtils {
     private static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    private static final BitstreamFormatService bitstreamFormat = ContentServiceFactory.getInstance().getBitstreamFormatService();
-    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private static final BitstreamFormatService bitstreamFormat = ContentServiceFactory.getInstance()
+                                                                                       .getBitstreamFormatService();
+    private static final CollectionService collectionService = ContentServiceFactory.getInstance()
+                                                                                    .getCollectionService();
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+    /**
+     * Default constructor
+     */
+    private LicenseUtils() { }
 
     /**
      * Return the text of the license that the user has granted/must grant
@@ -55,23 +60,17 @@ public class LicenseUtils
      * LicenseArgumentFormatter plugin (if defined)<br>
      * {x} any addition argument supplied wrapped in the
      * LicenseArgumentFormatter based on his type (map key)
-     * 
-     * @param locale
-     *     Formatter locale
-     * @param collection
-     *     collection to get license from
-     * @param item
-     *     the item object of the license
-     * @param eperson
-     *     EPerson to get firstname, lastname and email from
-     * @param additionalInfo
-     *     additional template arguments beyond 0-6
+     *
+     * @param locale         Formatter locale
+     * @param collection     collection to get license from
+     * @param item           the item object of the license
+     * @param eperson        EPerson to get firstname, lastname and email from
+     * @param additionalInfo additional template arguments beyond 0-6
      * @return the license text obtained substituting the provided argument in
-     *         the license template
+     * the license template
      */
     public static String getLicenseText(Locale locale, Collection collection,
-            Item item, EPerson eperson, Map<String, Object> additionalInfo)
-    {
+                                        Item item, EPerson eperson, Map<String, Object> additionalInfo) {
         Formatter formatter = new Formatter(locale);
 
         // EPerson firstname, lastname, email and the current date
@@ -88,11 +87,9 @@ public class LicenseUtils
         args[5] = new FormattableArgument("item", item);
         args[6] = new FormattableArgument("eperson", eperson);
 
-        if (additionalInfo != null)
-        {
+        if (additionalInfo != null) {
             int i = 7; // Start is next index after previous args
-            for (Map.Entry<String, Object> info : additionalInfo.entrySet())
-            {
+            for (Map.Entry<String, Object> info : additionalInfo.entrySet()) {
                 args[i] = new FormattableArgument(info.getKey(), info.getValue());
                 i++;
             }
@@ -108,39 +105,31 @@ public class LicenseUtils
      * license template. (equivalent to calling the full getLicenseText
      * supplying {@code null} for the additionalInfo argument)
      *
-     * @param locale
-     *     Formatter locale
-     * @param collection
-     *     collection to get license from
-     * @param item
-     *     the item object of the license
-     * @param eperson
-     *     EPerson to get firstname, lastname and email from
+     * @param locale     Formatter locale
+     * @param collection collection to get license from
+     * @param item       the item object of the license
+     * @param eperson    EPerson to get firstname, lastname and email from
      * @return the license text, with no custom substitutions.
      */
     public static String getLicenseText(Locale locale, Collection collection,
-            Item item, EPerson eperson)
-    {
+                                        Item item, EPerson eperson) {
         return getLicenseText(locale, collection, item, eperson, null);
     }
 
     /**
      * Store a copy of the license a user granted in the item.
-     * 
-     * @param context
-     *            the dspace context
-     * @param item
-     *            the item object of the license
-     * @param licenseText
-     *            the license the user granted
-     * @throws SQLException if database error
-     * @throws IOException if IO error
+     *
+     * @param context        the dspace context
+     * @param item           the item object of the license
+     * @param licenseText    the license the user granted
+     * @param acceptanceDate TODO
+     * @throws SQLException       if database error
+     * @throws IOException        if IO error
      * @throws AuthorizeException if authorization error
      */
     public static void grantLicense(Context context, Item item,
-            String licenseText) throws SQLException, IOException,
-            AuthorizeException
-    {
+                                    String licenseText, String acceptanceDate) throws SQLException, IOException,
+        AuthorizeException {
         // Put together text to store
         // String licenseText = "License granted by " + eperson.getFullName()
         // + " (" + eperson.getEmail() + ") on "
@@ -155,9 +144,14 @@ public class LicenseUtils
         b.setName(context, "license.txt");
         b.setSource(context, "Written by org.dspace.content.LicenseUtils");
 
+        DCDate acceptanceDCDate = DCDate.getCurrent();
+        if (acceptanceDate != null) {
+            acceptanceDCDate = new DCDate(acceptanceDate);
+        }
+        b.setAcceptanceDate(context, acceptanceDCDate);
         // Find the License format
         BitstreamFormat bf = bitstreamFormat.findByShortDescription(context,
-                "License");
+                                                                    "License");
         b.setFormat(bf);
 
         bitstreamService.update(context, b);

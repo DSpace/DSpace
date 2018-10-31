@@ -7,11 +7,11 @@
  */
 package org.dspace.ctask.general;
 
-import org.dspace.content.MetadataValue;
-import org.dspace.content.Item;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 
 /**
  * A link checker that builds upon the BasicLinkChecker to check URLs that
@@ -24,15 +24,12 @@ import java.util.List;
 public class MetadataValueLinkChecker extends BasicLinkChecker {
 
     @Override
-    protected List<String> getURLs(Item item)
-    {
+    protected List<String> getURLs(Item item) {
         // Get all metadata elements that start with http:// or https://
         List<MetadataValue> urls = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         ArrayList<String> theURLs = new ArrayList<String>();
-        for (MetadataValue url : urls)
-        {
-            if ((url.getValue().startsWith("http://")) || (url.getValue().startsWith("https://")))
-            {
+        for (MetadataValue url : urls) {
+            if ((url.getValue().startsWith("http://")) || (url.getValue().startsWith("https://"))) {
                 theURLs.add(url.getValue());
             }
         }

@@ -7,18 +7,32 @@
  */
 package org.dspace.content;
 
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.*;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
-
-import javax.persistence.*;
-import java.sql.SQLException;
-import java.util.*;
-import org.dspace.authorize.AuthorizeException;
 
 /**
  * Class representing a collection.
@@ -35,21 +49,24 @@ import org.dspace.authorize.AuthorizeException;
  * @version $Revision$
  */
 @Entity
-@Table(name="collection")
+@Table(name = "collection")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport
-{
+public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport {
 
-    @Column(name="collection_id", insertable = false, updatable = false)
+    @Column(name = "collection_id", insertable = false, updatable = false)
     private Integer legacyId;
 
-    /** The logo bitstream */
+    /**
+     * The logo bitstream
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "logo_bitstream_id")
     private Bitstream logo;
 
-    /** The item template */
+    /**
+     * The item template
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_item_id")
     private Item template;
@@ -83,9 +100,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinTable(
-            name = "community2collection",
-            joinColumns = {@JoinColumn(name = "collection_id") },
-            inverseJoinColumns = {@JoinColumn(name = "community_id") }
+        name = "community2collection",
+        joinColumns = {@JoinColumn(name = "collection_id")},
+        inverseJoinColumns = {@JoinColumn(name = "community_id")}
     )
     private Set<Community> communities = new HashSet<>();
 
@@ -109,17 +126,15 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * {@link org.dspace.content.service.CollectionService#create(Context, Community)}
      * or
      * {@link org.dspace.content.service.CollectionService#create(Context, Community, String)}
-     *
      */
-    protected Collection()
-    {
+    protected Collection() {
 
     }
 
     @Override
-    public String getName()
-    {
-        String value = getCollectionService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+    public String getName() {
+        String value = getCollectionService()
+            .getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 
@@ -129,8 +144,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      *
      * @return the logo of the collection, or <code>null</code>
      */
-    public Bitstream getLogo()
-    {
+    public Bitstream getLogo() {
         return logo;
     }
 
@@ -149,10 +163,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * <code>collection_100_submit</code>.
      *
      * @return the default group of submitters, or <code>null</code> if there
-     *         is no default group.
+     * is no default group.
      */
-    public Group getSubmitters()
-    {
+    public Group getSubmitters() {
         return submitters;
     }
 
@@ -178,10 +191,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * <code>collection_100_admin</code>.
      *
      * @return group of administrators, or <code>null</code> if there is no
-     *         default group.
+     * default group.
      */
-    public Group getAdministrators()
-    {
+    public Group getAdministrators() {
         return admins;
     }
 
@@ -223,8 +235,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      *
      * @return the license for this collection
      */
-    public String getLicenseCollection()
-    {
+    public String getLicenseCollection() {
         return getCollectionService().getMetadata(this, "license");
     }
 
@@ -249,8 +260,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @return the item template, or <code>null</code>
      * @throws SQLException if database error
      */
-    public Item getTemplateItem() throws SQLException
-    {
+    public Item getTemplateItem() throws SQLException {
         return template;
     }
 
@@ -265,11 +275,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @return array of <code>Community</code> objects
      * @throws SQLException if database error
      */
-    public List<Community> getCommunities() throws SQLException
-    {
+    public List<Community> getCommunities() throws SQLException {
         // We return a copy because we do not want people to add elements to this collection directly.
         // We return a list to maintain backwards compatibility
-        Community[] output = communities.toArray(new Community[]{});
+        Community[] output = communities.toArray(new Community[] {});
         Arrays.sort(output, new NameAscendingComparator());
         return Arrays.asList(output);
     }
@@ -289,41 +298,34 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Return <code>true</code> if <code>other</code> is the same Collection
      * as this object, <code>false</code> otherwise
      *
-     * @param other
-     *            object to compare to
-     *
+     * @param other object to compare to
      * @return <code>true</code> if object passed in represents the same
-     *         collection as this object
+     * collection as this object
      */
-     @Override
-     public boolean equals(Object other)
-     {
-         if (other == null)
-         {
-             return false;
-         }
-         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
-         if (this.getClass() != objClass)
-         {
-             return false;
-         }
-         final Collection otherCollection = (Collection) other;
-         if (!this.getID().equals(otherCollection.getID() ))
-         {
-             return false;
-         }
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
+        if (this.getClass() != objClass) {
+            return false;
+        }
+        final Collection otherCollection = (Collection) other;
+        if (!this.getID().equals(otherCollection.getID())) {
+            return false;
+        }
 
-         return true;
-     }
+        return true;
+    }
 
-     @Override
-     public int hashCode()
-     {
-         int hash = 5;
-         hash += 71 * hash + getType();
-         hash += 71 * hash + getID().hashCode();
-         return hash;
-     }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash += 71 * hash + getType();
+        hash += 71 * hash + getID().hashCode();
+        return hash;
+    }
 
     /**
      * return type found in Constants
@@ -331,14 +333,12 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @return int Constants.COLLECTION
      */
     @Override
-    public int getType()
-    {
+    public int getType() {
         return Constants.COLLECTION;
     }
 
     public void setWorkflowGroup(Context context, int step, Group g)
-            throws SQLException, AuthorizeException 
-    {
+        throws SQLException, AuthorizeException {
         getCollectionService().setWorkflowGroup(context, this, step, g);
     }
 
@@ -348,8 +348,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     }
 
     private CollectionService getCollectionService() {
-        if(collectionService == null)
-        {
+        if (collectionService == null) {
             collectionService = ContentServiceFactory.getInstance().getCollectionService();
         }
         return collectionService;

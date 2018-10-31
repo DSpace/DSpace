@@ -7,6 +7,8 @@
  */
 package org.dspace.authority.factory;
 
+import java.util.List;
+
 import org.dspace.authority.AuthoritySearchService;
 import org.dspace.authority.AuthorityTypes;
 import org.dspace.authority.indexer.AuthorityIndexerInterface;
@@ -15,10 +17,9 @@ import org.dspace.authority.service.AuthorityService;
 import org.dspace.authority.service.AuthorityValueService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
 /**
- * Factory implementation to get services for the authority package, use AuthorityServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the authority package, use AuthorityServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

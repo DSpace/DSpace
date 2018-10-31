@@ -7,35 +7,12 @@
  */
 package org.dspace.sword2;
 
-import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BundleService;
-import org.dspace.content.service.ItemService;
-import org.dspace.core.*;
-import org.swordapp.server.AuthCredentials;
-import org.swordapp.server.Deposit;
-import org.swordapp.server.DepositReceipt;
-import org.swordapp.server.SwordAuthException;
-import org.swordapp.server.SwordError;
-import org.swordapp.server.SwordServerException;
-import org.swordapp.server.UriRegistry;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -50,8 +27,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class DSpaceSwordAPI
-{
+import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.core.Utils;
+import org.swordapp.server.AuthCredentials;
+import org.swordapp.server.Deposit;
+import org.swordapp.server.DepositReceipt;
+import org.swordapp.server.SwordAuthException;
+import org.swordapp.server.SwordError;
+import org.swordapp.server.SwordServerException;
+import org.swordapp.server.UriRegistry;
+
+public class DSpaceSwordAPI {
     private static Logger log = Logger.getLogger(DSpaceSwordAPI.class);
 
     protected ItemService itemService =
@@ -67,8 +67,7 @@ public class DSpaceSwordAPI
         ContentServiceFactory.getInstance().getBitstreamFormatService();
 
     public SwordContext noAuthContext()
-            throws DSpaceSwordException
-    {
+        throws DSpaceSwordException {
         SwordContext sc = new SwordContext();
         Context context = new Context();
         sc.setContext(context);
@@ -76,11 +75,9 @@ public class DSpaceSwordAPI
     }
 
     public SwordContext doAuth(AuthCredentials authCredentials)
-            throws SwordAuthException, SwordError, DSpaceSwordException
-    {
+        throws SwordAuthException, SwordError, DSpaceSwordException {
         // if there is no supplied username, then we should request a retry
-        if (authCredentials.getUsername() == null)
-        {
+        if (authCredentials.getUsername() == null) {
             throw new SwordAuthException(true);
         }
 
@@ -91,33 +88,28 @@ public class DSpaceSwordAPI
 
         // log the request
         String un = authCredentials.getUsername() != null ?
-                authCredentials.getUsername() :
-                "NONE";
+            authCredentials.getUsername() :
+            "NONE";
         String obo = authCredentials.getOnBehalfOf() != null ?
-                authCredentials.getOnBehalfOf() :
-                "NONE";
+            authCredentials.getOnBehalfOf() :
+            "NONE";
         log.info(LogManager.getHeader(sc.getContext(), "sword_auth_request",
-                "username=" + un + ",on_behalf_of=" + obo));
+                                      "username=" + un + ",on_behalf_of=" + obo));
 
         return sc;
     }
 
-    public String getHeader(Map<String, String> map, String header, String def)
-    {
-        for (String key : map.keySet())
-        {
-            if (key.toLowerCase().equals(header.toLowerCase()))
-            {
+    public String getHeader(Map<String, String> map, String header, String def) {
+        for (String key : map.keySet()) {
+            if (key.toLowerCase().equals(header.toLowerCase())) {
                 return map.get(key);
             }
         }
         return def;
     }
 
-    public TreeMap<Float, List<String>> analyseAccept(String acceptHeader)
-    {
-        if (acceptHeader == null)
-        {
+    public TreeMap<Float, List<String>> analyseAccept(String acceptHeader) {
+        if (acceptHeader == null) {
             return null;
         }
 
@@ -126,8 +118,7 @@ public class DSpaceSwordAPI
         List<Object[]> unsorted = new ArrayList<Object[]>();
         float highest_q = 0;
         int counter = 0;
-        for (String part : parts)
-        {
+        for (String part : parts) {
             counter += 1;
 
             // the components of the part can be "type;params;q" "type;params", "type;q" or just "type"
@@ -144,42 +135,34 @@ public class DSpaceSwordAPI
 
             // There are then 3 possibilities remaining to check for: "type;q", "type;params" and "type;params;q"
             // ("type" is already handled by the default cases set up above)
-            if (components.length == 2)
-            {
+            if (components.length == 2) {
                 // "type;q" or "type;params"
-                if (components[1].trim().startsWith("q="))
-                {
+                if (components[1].trim().startsWith("q=")) {
                     // "type;q"
                     //strip the "q=" from the start of the q value
-                    q = Float.parseFloat(components[1].trim().substring( 2));
+                    q = Float.parseFloat(components[1].trim().substring(2));
 
                     // if the q value is the highest one we've seen so far, record it
-                    if (q > highest_q)
-                    {
+                    if (q > highest_q) {
                         highest_q = q;
                     }
-                }
-                else
-                {
+                } else {
                     // "type;params"
                     params = components[1].trim();
                 }
-            }
-            else if (components.length == 3)
-            {
+            } else if (components.length == 3) {
                 // "type;params;q"
                 params = components[1].trim();
                 q = Float.parseFloat(components[1].trim().substring(
-                        2)); // strip the "q=" from the start of the q value
+                    2)); // strip the "q=" from the start of the q value
 
                 // if the q value is the highest one we've seen so far, record it
-                if (q > highest_q)
-                {
+                if (q > highest_q) {
                     highest_q = q;
                 }
             }
 
-            Object[] res = new Object[] { type, params, q };
+            Object[] res = new Object[] {type, params, q};
             unsorted.add(res);
         }
 
@@ -194,43 +177,34 @@ public class DSpaceSwordAPI
         TreeMap<Float, List<String>> sorted = new TreeMap<Float, List<String>>();
 
         // go through the unsorted list
-        for (Object[] oa : unsorted)
-        {
+        for (Object[] oa : unsorted) {
             String contentType = (String) oa[0];
             String p = (String) oa[1];
-            if (p != null)
-            {
+            if (p != null) {
                 contentType += ";" + p;
             }
             Float qv = (Float) oa[2];
 
-            if (qv > 0)
-            {
-                // if the q value is greater than 0 it was explicitly assigned in the Accept header and we can just place
+            if (qv > 0) {
+                // if the q value is greater than 0 it was explicitly assigned in the Accept header and we can just
+                // place
                 // it into the sorted dictionary
-                if (sorted.containsKey(qv))
-                {
+                if (sorted.containsKey(qv)) {
                     sorted.get(qv).add(contentType);
-                }
-                else
-                {
+                } else {
                     List<String> cts = new ArrayList<String>();
                     cts.add(contentType);
                     sorted.put(qv, cts);
                 }
-            }
-            else
-            {
+            } else {
                 // otherwise, we have to calculate the q value using the following equation which creates a q value "qv"
-                // within "q_range" of 1.0 [the first part of the eqn] based on the fraction of the way through the total
+                // within "q_range" of 1.0 [the first part of the eqn] based on the fraction of the way through the
+                // total
                 // accept header list scaled by the q_range [the second part of the eqn]
                 float nq = (1 - q_range) + (((-1 * qv) / counter) * q_range);
-                if (sorted.containsKey(nq))
-                {
+                if (sorted.containsKey(nq)) {
                     sorted.get(nq).add(contentType);
-                }
-                else
-                {
+                } else {
                     List<String> cts = new ArrayList<String>();
                     cts.add(contentType);
                     sorted.put(nq, cts);
@@ -242,46 +216,40 @@ public class DSpaceSwordAPI
     }
 
     public void isAcceptable(SwordConfigurationDSpace swordConfig,
-            Context context, Deposit deposit, DSpaceObject dso)
-            throws SwordError, DSpaceSwordException
-    {
+                             Context context, Deposit deposit, DSpaceObject dso)
+        throws SwordError, DSpaceSwordException {
         // determine if this is an acceptable file format
         if (!swordConfig
-                .isAcceptableContentType(context, deposit.getMimeType(), dso))
-        {
+            .isAcceptableContentType(context, deposit.getMimeType(), dso)) {
             log.error("Unacceptable content type detected: " +
-                deposit.getMimeType() + " for object " + dso.getID());
+                          deposit.getMimeType() + " for object " + dso.getID());
             throw new SwordError(UriRegistry.ERROR_CONTENT,
-                "Unacceptable content type in deposit request: " +
-                deposit.getMimeType());
+                                 "Unacceptable content type in deposit request: " +
+                                     deposit.getMimeType());
         }
 
         // determine if this is an acceptable packaging type for the deposit
         // if not, we throw a 415 HTTP error (Unsupported Media Type, ERROR_CONTENT)
-        if (!swordConfig.isAcceptedPackaging(deposit.getPackaging(), dso))
-        {
+        if (!swordConfig.isAcceptedPackaging(deposit.getPackaging(), dso)) {
             log.error("Unacceptable packaging type detected: " +
-                deposit.getPackaging() + " for object " + dso.getID());
+                          deposit.getPackaging() + " for object " + dso.getID());
             throw new SwordError(UriRegistry.ERROR_CONTENT,
-                "Unacceptable packaging type in deposit request: " +
-                deposit.getPackaging());
+                                 "Unacceptable packaging type in deposit request: " +
+                                     deposit.getPackaging());
         }
     }
 
     public void storeOriginals(SwordConfigurationDSpace swordConfig,
-            Context context, VerboseDescription verboseDescription,
-            Deposit deposit, DepositResult result)
-            throws DSpaceSwordException, SwordServerException
-    {
+                               Context context, VerboseDescription verboseDescription,
+                               Deposit deposit, DepositResult result)
+        throws DSpaceSwordException, SwordServerException {
         // if there's an item availalble, and we want to keep the original
         // then do that
-        try
-        {
-            if (swordConfig.isKeepOriginal())
-            {
+        try {
+            if (swordConfig.isKeepOriginal()) {
                 verboseDescription.append(
                     "DSpace will store an original copy of the deposit, " +
-                    "as well as ingesting the item into the archive");
+                        "as well as ingesting the item into the archive");
 
                 // in order to be allowed to add the file back to the item, we need to ignore authorisations
                 // for a moment
@@ -289,29 +257,24 @@ public class DSpaceSwordAPI
 
                 String bundleName = ConfigurationManager.getProperty(
                     "swordv2-server", "bundle.name");
-                if (bundleName == null || "".equals(bundleName))
-                {
+                if (bundleName == null || "".equals(bundleName)) {
                     bundleName = "SWORD";
                 }
                 Item item = result.getItem();
                 List<Bundle> bundles = item.getBundles();
                 Bundle swordBundle = null;
-                for (Bundle bundle : bundles)
-                {
-                    if (bundleName.equals(bundle.getName()))
-                    {
+                for (Bundle bundle : bundles) {
+                    if (bundleName.equals(bundle.getName())) {
                         swordBundle = bundle;
                         break;
                     }
                 }
-                if (swordBundle == null)
-                {
+                if (swordBundle == null) {
                     swordBundle = bundleService.create(
                         context, item, bundleName);
                 }
 
-                if (deposit.isMultipart() || deposit.isEntryOnly())
-                {
+                if (deposit.isMultipart() || deposit.isEntryOnly()) {
                     String entry = deposit.getSwordEntry().toString();
                     ByteArrayInputStream bais = new ByteArrayInputStream(
                         entry.getBytes());
@@ -321,43 +284,34 @@ public class DSpaceSwordAPI
                     String fn = this.createEntryFilename(context, deposit, true);
                     entryBitstream.setName(context, fn);
                     entryBitstream.setDescription(context,
-                        "Original SWORD entry document");
+                                                  "Original SWORD entry document");
 
                     BitstreamFormat bf = bitstreamFormatService
-                            .findByMIMEType(context, "application/xml");
-                    if (bf != null)
-                    {
+                        .findByMIMEType(context, "application/xml");
+                    if (bf != null) {
                         entryBitstream.setFormat(context, bf);
                     }
 
                     bitstreamService.update(context, entryBitstream);
 
                     verboseDescription.append("Original entry stored as " + fn +
-                            ", in item bundle " + swordBundle);
+                                                  ", in item bundle " + swordBundle);
                 }
 
-                if (deposit.isMultipart() || deposit.isBinaryOnly())
-                {
+                if (deposit.isMultipart() || deposit.isBinaryOnly()) {
                     String fn = this.createFilename(context, deposit, true);
 
                     Bitstream bitstream;
                     InputStream fis = null;
-                    try
-                    {
+                    try {
                         fis = deposit.getInputStream();
                         bitstream = bitstreamService
-                                .create(context, swordBundle, fis);
-                    }
-                    finally
-                    {
-                        if (fis != null)
-                        {
-                            try
-                            {
+                            .create(context, swordBundle, fis);
+                    } finally {
+                        if (fis != null) {
+                            try {
                                 fis.close();
-                            }
-                            catch (IOException e)
-                            {
+                            } catch (IOException e) {
                                 // problem closing input stream; leave it to the garbage collector
                             }
                         }
@@ -365,25 +319,23 @@ public class DSpaceSwordAPI
 
                     bitstream.setName(context, fn);
                     bitstream.setDescription(context,
-                        "Original SWORD deposit file");
+                                             "Original SWORD deposit file");
 
                     BitstreamFormat bf = bitstreamFormatService
-                            .findByMIMEType(context, deposit.getMimeType());
-                    if (bf != null)
-                    {
+                        .findByMIMEType(context, deposit.getMimeType());
+                    if (bf != null) {
                         bitstream.setFormat(context, bf);
                     }
 
                     bitstreamService.update(context, bitstream);
-                    if (result.getOriginalDeposit() == null)
-                    {
+                    if (result.getOriginalDeposit() == null) {
                         // it may be that the original deposit is already set, in which case we
                         // shouldn't mess with it
                         result.setOriginalDeposit(bitstream);
                     }
                     verboseDescription.append(
                         "Original deposit stored as " + fn +
-                        ", in item bundle " + swordBundle);
+                            ", in item bundle " + swordBundle);
                 }
 
                 bundleService.update(context, swordBundle);
@@ -392,9 +344,7 @@ public class DSpaceSwordAPI
                 // now reset the context ignore authorisation
                 context.restoreAuthSystemState();
             }
-        }
-        catch (SQLException | AuthorizeException | IOException e)
-        {
+        } catch (SQLException | AuthorizeException | IOException e) {
             log.error("caught exception: ", e);
             throw new DSpaceSwordException(e);
         }
@@ -403,63 +353,49 @@ public class DSpaceSwordAPI
     /**
      * Construct the most appropriate filename for the incoming deposit.
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param deposit
-     *     deposit request
-     * @param original
-     *     use the ".original" filename suffix?
+     * @param context  The relevant DSpace Context.
+     * @param deposit  deposit request
+     * @param original use the ".original" filename suffix?
      * @return filename for deposit
-     * @throws DSpaceSwordException
-     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws DSpaceSwordException can be thrown by the internals of the DSpace SWORD implementation
      */
     public String createFilename(Context context, Deposit deposit,
-            boolean original)
-            throws DSpaceSwordException
-    {
-        try
-        {
+                                 boolean original)
+        throws DSpaceSwordException {
+        try {
             BitstreamFormat bf = bitstreamFormatService
-                    .findByMIMEType(context, deposit.getMimeType());
+                .findByMIMEType(context, deposit.getMimeType());
             List<String> exts = null;
-            if (bf != null)
-            {
+            if (bf != null) {
                 exts = bf.getExtensions();
             }
 
             String fn = deposit.getFilename();
-            if (fn == null || "".equals(fn))
-            {
+            if (fn == null || "".equals(fn)) {
                 SimpleDateFormat sdf = new SimpleDateFormat(
-                        "yyyy-MM-dd'T'HH:mm:ss");
+                    "yyyy-MM-dd'T'HH:mm:ss");
                 fn = "sword-" + sdf.format(new Date());
-                if (original)
-                {
+                if (original) {
                     fn = fn + ".original";
                 }
-                if (exts != null)
-                {
+                if (exts != null) {
                     fn = fn + "." + exts.get(0);
                 }
             }
 
             return fn;
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw new DSpaceSwordException(e);
         }
     }
 
     public String createEntryFilename(Context context, Deposit deposit,
-            boolean original)
-            throws DSpaceSwordException
-    {
+                                      boolean original)
+        throws DSpaceSwordException {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         String fn = "sword-" + sdf.format(new Date());
-        if (original)
-        {
+        if (original) {
             fn = fn + ".original";
         }
 
@@ -470,44 +406,38 @@ public class DSpaceSwordAPI
      * Store original package on disk and companion file containing SWORD headers as found in the deposit object
      * Also write companion file with header info from the deposit object.
      *
-     * @param deposit
-     *     deposit object to store as package
-     * @param auth
-     *     authentication credentials
-     * @param config
-     *     SWORD configuration
-     * @throws IOException
-     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @param deposit deposit object to store as package
+     * @param auth    authentication credentials
+     * @param config  SWORD configuration
+     * @throws IOException A general class of exceptions produced by failed or interrupted I/O operations.
      */
     protected void storePackageAsFile(Deposit deposit, AuthCredentials auth,
-            SwordConfigurationDSpace config) throws IOException
-    {
+                                      SwordConfigurationDSpace config) throws IOException {
         String path = config.getFailedPackageDir();
 
         File dir = new File(path);
-        if (!dir.exists() || !dir.isDirectory())
-        {
+        if (!dir.exists() || !dir.isDirectory()) {
             throw new IOException(
                 "Directory does not exist for writing packages on ingest error.");
         }
 
         String filenameBase =
-                "sword-" + auth.getUsername() + "-" + (new Date()).getTime();
+            "sword-" + auth.getUsername() + "-" + (new Date()).getTime();
 
         File packageFile = new File(path, filenameBase);
         File headersFile = new File(path, filenameBase + "-headers");
 
         InputStream is = new BufferedInputStream(
-                new FileInputStream(deposit.getFile()));
+            new FileInputStream(deposit.getFile()));
         OutputStream fos = new BufferedOutputStream(
-                new FileOutputStream(packageFile));
+            new FileOutputStream(packageFile));
         Utils.copy(is, fos);
         fos.close();
         is.close();
 
         //write companion file with headers
         PrintWriter pw = new PrintWriter(
-                new BufferedWriter(new FileWriter(headersFile)));
+            new BufferedWriter(new FileWriter(headersFile)));
 
         pw.println("Filename=" + deposit.getFilename());
         pw.println("Content-Type=" + deposit.getMimeType());
@@ -522,29 +452,23 @@ public class DSpaceSwordAPI
      * Store original package on disk and companion file containing SWORD headers as found in the deposit object
      * Also write companion file with header info from the deposit object.
      *
-     * @param deposit
-     *     deposit object to store as package
-     * @param auth
-     *     authentication credentials
-     * @param config
-     *     SWORD configuration
-     * @throws IOException
-     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @param deposit deposit object to store as package
+     * @param auth    authentication credentials
+     * @param config  SWORD configuration
+     * @throws IOException A general class of exceptions produced by failed or interrupted I/O operations.
      */
     protected void storeEntryAsFile(Deposit deposit, AuthCredentials auth,
-            SwordConfigurationDSpace config) throws IOException
-    {
+                                    SwordConfigurationDSpace config) throws IOException {
         String path = config.getFailedPackageDir();
 
         File dir = new File(path);
-        if (!dir.exists() || !dir.isDirectory())
-        {
+        if (!dir.exists() || !dir.isDirectory()) {
             throw new IOException(
                 "Directory does not exist for writing packages on ingest error.");
         }
 
         String filenameBase =
-                "sword-" + auth.getUsername() + "-" + (new Date()).getTime();
+            "sword-" + auth.getUsername() + "-" + (new Date()).getTime();
 
         File packageFile = new File(path, filenameBase);
         File headersFile = new File(path, filenameBase + "-headers");
@@ -552,14 +476,14 @@ public class DSpaceSwordAPI
         String entry = deposit.getSwordEntry().toString();
         ByteArrayInputStream is = new ByteArrayInputStream(entry.getBytes());
         OutputStream fos = new BufferedOutputStream(
-                new FileOutputStream(packageFile));
+            new FileOutputStream(packageFile));
         Utils.copy(is, fos);
         fos.close();
         is.close();
 
         //write companion file with headers
         PrintWriter pw = new PrintWriter(
-                new BufferedWriter(new FileWriter(headersFile)));
+            new BufferedWriter(new FileWriter(headersFile)));
 
         pw.println("Filename=" + deposit.getFilename());
         pw.println("Content-Type=" + deposit.getMimeType());
@@ -571,13 +495,11 @@ public class DSpaceSwordAPI
     }
 
     protected void addVerboseDescription(DepositReceipt receipt,
-            VerboseDescription verboseDescription)
-    {
+                                         VerboseDescription verboseDescription) {
         boolean includeVerbose = ConfigurationManager
-                .getBooleanProperty("swordv2-server",
-                        "verbose-description.receipt.enable");
-        if (includeVerbose)
-        {
+            .getBooleanProperty("swordv2-server",
+                                "verbose-description.receipt.enable");
+        if (includeVerbose) {
             receipt.setVerboseDescription(verboseDescription.toString());
         }
     }

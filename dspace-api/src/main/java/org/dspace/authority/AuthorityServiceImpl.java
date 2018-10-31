@@ -7,6 +7,9 @@
  */
 package org.dspace.authority;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.authority.indexer.AuthorityIndexerInterface;
 import org.dspace.authority.indexer.AuthorityIndexingService;
 import org.dspace.authority.service.AuthorityService;
@@ -14,9 +17,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.List;
 
 
 /**
@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class AuthorityServiceImpl implements AuthorityService{
+public class AuthorityServiceImpl implements AuthorityService {
 
 
     @Autowired(required = true)
@@ -34,42 +34,35 @@ public class AuthorityServiceImpl implements AuthorityService{
     @Autowired(required = true)
     protected List<AuthorityIndexerInterface> indexers;
 
-    protected AuthorityServiceImpl()
-    {
+    protected AuthorityServiceImpl() {
 
     }
 
     @Override
     public void indexItem(Context context, Item item) throws SQLException, AuthorizeException {
-        if(!isConfigurationValid()){
+        if (!isConfigurationValid()) {
             //Cannot index, configuration not valid
             return;
         }
 
         for (AuthorityIndexerInterface indexerInterface : indexers) {
-
-            indexerInterface.init(context , item);
-            while (indexerInterface.hasMore()) {
-                AuthorityValue authorityValue = indexerInterface.nextValue();
-                if(authorityValue != null)
-                    indexingService.indexContent(authorityValue, true);
+            List<AuthorityValue> authorityValues = indexerInterface.getAuthorityValues(context , item);
+            for (AuthorityValue authorityValue : authorityValues) {
+                indexingService.indexContent(authorityValue);
             }
-            //Close up
-            indexerInterface.close();
         }
         //Commit to our server
         indexingService.commit();
     }
 
     @Override
-    public boolean isConfigurationValid()
-    {
-        if(!indexingService.isConfiguredProperly()){
+    public boolean isConfigurationValid() {
+        if (!indexingService.isConfiguredProperly()) {
             return false;
         }
 
         for (AuthorityIndexerInterface indexerInterface : indexers) {
-            if(!indexerInterface.isConfiguredProperly()){
+            if (!indexerInterface.isConfiguredProperly()) {
                 return false;
             }
         }

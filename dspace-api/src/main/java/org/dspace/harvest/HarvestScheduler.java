@@ -7,6 +7,14 @@
  */
 package org.dspace.harvest;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Stack;
+import java.util.UUID;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -18,16 +26,12 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
-
 /**
  * The class responsible for scheduling harvesting cycles are regular intervals.
+ *
  * @author alexey
  */
-public class HarvestScheduler implements Runnable
-{
+public class HarvestScheduler implements Runnable {
     protected static Logger log = Logger.getLogger(HarvestScheduler.class);
 
 
@@ -73,8 +77,10 @@ public class HarvestScheduler implements Runnable
 
     protected static long maxHeartbeat;
 
-    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private static final HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+    private static final CollectionService collectionService = ContentServiceFactory.getInstance()
+                                                                                    .getCollectionService();
+    private static final HarvestedCollectionService harvestedCollectionService =
+        HarvestServiceFactory.getInstance().getHarvestedCollectionService();
 
     public static boolean hasStatus(int statusToCheck) {
         return status == statusToCheck;
@@ -98,17 +104,18 @@ public class HarvestScheduler implements Runnable
             case HARVESTER_STATUS_RUNNING:
                 switch (interrupt) {
                     case HARVESTER_INTERRUPT_PAUSE:
-                        return("The scheduler is finishing active harvests before pausing. ");
+                        return ("The scheduler is finishing active harvests before pausing. ");
                     case HARVESTER_INTERRUPT_STOP:
-                        return("The scheduler is shutting down. ");
+                        return ("The scheduler is shutting down. ");
+                    default:
+                        return ("The scheduler is actively harvesting collections. ");
                 }
-                return("The scheduler is actively harvesting collections. ");
             case HARVESTER_STATUS_SLEEPING:
-                return("The scheduler is waiting for collections to harvest. ");
+                return ("The scheduler is waiting for collections to harvest. ");
             case HARVESTER_STATUS_PAUSED:
-                return("The scheduler is paused. ");
+                return ("The scheduler is paused. ");
             default:
-                return("Automatic harvesting is not active. ");
+                return ("Automatic harvesting is not active. ");
         }
     }
 
@@ -116,26 +123,23 @@ public class HarvestScheduler implements Runnable
         mainContext = new Context();
         String harvestAdminParam = ConfigurationManager.getProperty("oai", "harvester.eperson");
         harvestAdmin = null;
-        if (harvestAdminParam != null && harvestAdminParam.length() > 0)
-        {
-            harvestAdmin = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(mainContext, harvestAdminParam);
+        if (harvestAdminParam != null && harvestAdminParam.length() > 0) {
+            harvestAdmin = EPersonServiceFactory.getInstance().getEPersonService()
+                                                .findByEmail(mainContext, harvestAdminParam);
         }
 
         harvestThreads = new Stack<HarvestThread>();
 
         maxActiveThreads = ConfigurationManager.getIntProperty("oai", "harvester.maxThreads");
-        if (maxActiveThreads == 0)
-        {
+        if (maxActiveThreads == 0) {
             maxActiveThreads = 3;
         }
         minHeartbeat = ConfigurationManager.getIntProperty("oai", "harvester.minHeartbeat") * 1000;
-        if (minHeartbeat == 0)
-        {
+        if (minHeartbeat == 0) {
             minHeartbeat = 30000;
         }
         maxHeartbeat = ConfigurationManager.getIntProperty("oai", "harvester.maxHeartbeat") * 1000;
-        if (maxHeartbeat == 0)
-        {
+        if (maxHeartbeat == 0) {
             maxHeartbeat = 3600000;
         }
     }
@@ -146,11 +150,9 @@ public class HarvestScheduler implements Runnable
     }
 
     protected void scheduleLoop() {
-        long i=0;
-        while(true)
-        {
-            try
-            {
+        long i = 0;
+        while (true) {
+            try {
                 mainContext = new Context();
 
                 synchronized (HarvestScheduler.class) {
@@ -159,7 +161,8 @@ public class HarvestScheduler implements Runnable
                             break;
                         case HARVESTER_INTERRUPT_INSERT_THREAD:
                             interrupt = HARVESTER_INTERRUPT_NONE;
-                            addThread(mainContext, harvestedCollectionService.find(mainContext, collectionService.find(mainContext, interruptValue)));
+                            addThread(mainContext, harvestedCollectionService
+                                .find(mainContext, collectionService.find(mainContext, interruptValue)));
                             interruptValue = null;
                             break;
                         case HARVESTER_INTERRUPT_PAUSE:
@@ -170,11 +173,13 @@ public class HarvestScheduler implements Runnable
                             interrupt = HARVESTER_INTERRUPT_NONE;
                             status = HARVESTER_STATUS_STOPPED;
                             return;
+                        default:
+                            break;
                     }
                 }
 
                 if (status == HARVESTER_STATUS_PAUSED) {
-                    while(interrupt != HARVESTER_INTERRUPT_RESUME && interrupt != HARVESTER_INTERRUPT_STOP) {
+                    while (interrupt != HARVESTER_INTERRUPT_RESUME && interrupt != HARVESTER_INTERRUPT_STOP) {
                         Thread.sleep(1000);
                     }
 
@@ -195,7 +200,7 @@ public class HarvestScheduler implements Runnable
 
                 // Stage #2: start up all the threads currently in the queue up to the maximum number
                 while (!harvestThreads.isEmpty()) {
-                    synchronized(HarvestScheduler.class) {
+                    synchronized (HarvestScheduler.class) {
                         activeThreads++;
                     }
                     Thread activeThread = new Thread(harvestThreads.pop());
@@ -215,23 +220,22 @@ public class HarvestScheduler implements Runnable
                 // FIXME: also, this might lead to a situation when a single thread getting stuck without
                 // throwing an exception would shut down the whole scheduler
                 while (activeThreads != 0) {
-                        /* Wait a second */
-                        Thread.sleep(1000);
+                    /* Wait a second */
+                    Thread.sleep(1000);
                 }
 
                 // Commit everything
                 try {
-                        mainContext.complete();
-                        log.info("Done with iteration " + i);
+                    mainContext.complete();
+                    log.info("Done with iteration " + i);
                 } catch (SQLException e) {
-                        e.printStackTrace();
-                        mainContext.abort();
+                    e.printStackTrace();
+                    mainContext.abort();
                 }
 
-            }
-            catch (Exception e) {
-                    log.error("Exception on iteration: " + i);
-                    e.printStackTrace();
+            } catch (Exception e) {
+                log.error("Exception on iteration: " + i);
+                e.printStackTrace();
             }
 
             // Stage #3: figure out how long until the next iteration and wait
@@ -240,8 +244,7 @@ public class HarvestScheduler implements Runnable
                 HarvestedCollection hc = harvestedCollectionService.findOldestHarvest(tempContext);
 
                 int harvestInterval = ConfigurationManager.getIntProperty("oai", "harvester.harvestFrequency");
-                if (harvestInterval == 0)
-                {
+                if (harvestInterval == 0) {
                     harvestInterval = 720;
                 }
 
@@ -252,25 +255,23 @@ public class HarvestScheduler implements Runnable
                     calendar.setTime(hc.getHarvestDate());
                     calendar.add(Calendar.MINUTE, harvestInterval);
                     nextTime = calendar.getTime();
-                    nextHarvest = nextTime.getTime() +  - new Date().getTime();
+                    nextHarvest = nextTime.getTime() + -new Date().getTime();
                 }
 
-                long upperBound = Math.min(nextHarvest,maxHeartbeat);
+                long upperBound = Math.min(nextHarvest, maxHeartbeat);
                 long delay = Math.max(upperBound, minHeartbeat) + 1000;
 
 
                 tempContext.complete();
 
                 status = HARVESTER_STATUS_SLEEPING;
-                synchronized(lock) {
+                synchronized (lock) {
                     lock.wait(delay);
                 }
-            }
-            catch (InterruptedException ie) {
-                    log.warn("Interrupt: " + ie.getMessage());
-            }
-            catch (SQLException e) {
-                    e.printStackTrace();
+            } catch (InterruptedException ie) {
+                log.warn("Interrupt: " + ie.getMessage());
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
 
             i++;
@@ -284,19 +285,15 @@ public class HarvestScheduler implements Runnable
      * from the UI that still "plays nice" with these thread mechanics instead of making an
      * asynchronous call to runHarvest().
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param harvestedCollection
-     *     collection to be harvested
-     * @throws IOException
-     *     A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SQLException
-     *     An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException
-     *     Exception indicating the current user of the context does not have permission
-     *     to perform a particular action.
+     * @param context             The relevant DSpace Context.
+     * @param harvestedCollection collection to be harvested
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      */
-    public void addThread(Context context, HarvestedCollection harvestedCollection) throws SQLException, IOException, AuthorizeException {
+    public void addThread(Context context, HarvestedCollection harvestedCollection)
+        throws SQLException, IOException, AuthorizeException {
         log.debug("****** Entered the addThread method. Active threads: " + harvestThreads.toString());
         context.setCurrentUser(harvestAdmin);
 

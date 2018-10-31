@@ -14,7 +14,6 @@ import org.dspace.app.rest.converter.MetadataSchemaConverter;
 import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.model.hateoas.MetadataSchemaResource;
 import org.dspace.content.MetadataSchema;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,52 +23,54 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the repository responsible to manage MetadataSchema Rest object
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(MetadataSchemaRest.CATEGORY + "." + MetadataSchemaRest.NAME)
 public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataSchemaRest, Integer> {
-	MetadataSchemaService metaScemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
-	@Autowired
-	MetadataSchemaConverter converter;
 
-	public MetadataSchemaRestRepository() {
-	}
+    @Autowired
+    MetadataSchemaService metaScemaService;
 
-	@Override
-	public MetadataSchemaRest findOne(Context context, Integer id) {
-		MetadataSchema metadataSchema = null;
-		try {
-			metadataSchema = metaScemaService.find(context, id);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		if (metadataSchema == null) {
-			return null;
-		}
-		return converter.fromModel(metadataSchema);
-	}
+    @Autowired
+    MetadataSchemaConverter converter;
 
-	@Override
-	public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
-		List<MetadataSchema> metadataSchema = null;
-		try {
-			metadataSchema = metaScemaService.findAll(context);
-		} catch (SQLException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-		Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable).map(converter);
-		return page;
-	}
+    public MetadataSchemaRestRepository() {
+    }
 
-	@Override
-	public Class<MetadataSchemaRest> getDomainClass() {
-		return MetadataSchemaRest.class;
-	}
+    @Override
+    public MetadataSchemaRest findOne(Context context, Integer id) {
+        MetadataSchema metadataSchema = null;
+        try {
+            metadataSchema = metaScemaService.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (metadataSchema == null) {
+            return null;
+        }
+        return converter.fromModel(metadataSchema);
+    }
 
-	@Override
-	public MetadataSchemaResource wrapResource(MetadataSchemaRest bs, String... rels) {
-		return new MetadataSchemaResource(bs, utils, rels);
-	}
+    @Override
+    public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
+        List<MetadataSchema> metadataSchema = null;
+        try {
+            metadataSchema = metaScemaService.findAll(context);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable).map(converter);
+        return page;
+    }
+
+    @Override
+    public Class<MetadataSchemaRest> getDomainClass() {
+        return MetadataSchemaRest.class;
+    }
+
+    @Override
+    public MetadataSchemaResource wrapResource(MetadataSchemaRest bs, String... rels) {
+        return new MetadataSchemaResource(bs, utils, rels);
+    }
 }

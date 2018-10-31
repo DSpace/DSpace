@@ -20,25 +20,22 @@ import org.dspace.core.Context;
  * implement the process method and appear in the configuration will be run
  * before the at the start of preparing the collection home page has any chance
  * to continue its execution
- * 
+ *
  * @author Richard Jones
- * 
  */
-public interface CollectionHomeProcessor
-{
-	/**
-	 * execute the process
-	 * 
-	 * @param context       the DSpace context
-	 * @param request	    the HTTP request
-	 * @param response	    the HTTP response
-	 * @param collection	the collection object whose home page we are on
-	 * 
-	 * @throws PluginException	any particular problem with the plugin execution
-	 * @throws AuthorizeException	Authorisation errors during plugin execution
-	 */
-	void process(Context context, HttpServletRequest request,
-    		HttpServletResponse response, Collection collection)
-		throws PluginException, AuthorizeException;
-	
+public interface CollectionHomeProcessor {
+    /**
+     * execute the process
+     *
+     * @param context    the DSpace context
+     * @param request    the HTTP request
+     * @param response   the HTTP response
+     * @param collection the collection object whose home page we are on
+     * @throws PluginException    any particular problem with the plugin execution
+     * @throws AuthorizeException Authorisation errors during plugin execution
+     */
+    void process(Context context, HttpServletRequest request,
+                 HttpServletResponse response, Collection collection)
+        throws PluginException, AuthorizeException;
+
 }

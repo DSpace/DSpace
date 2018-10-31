@@ -9,11 +9,12 @@ package org.dspace.services;
 
 import java.util.List;
 import java.util.Properties;
+
 import org.apache.commons.configuration.Configuration;
 
 
 /**
- * This service handles retrieval of the configuration data for a DSpace 
+ * This service handles retrieval of the configuration data for a DSpace
  * instance.
  * <p>
  * The configuration files are properties files which look like this for
@@ -24,37 +25,37 @@ import org.apache.commons.configuration.Configuration;
  * thing.on = true
  * thing.value = abc,def,ghi
  * }
- * For these simple cases the service will automatically translate the 
+ * For these simple cases the service will automatically translate the
  * settings into strings, booleans, numbers and arrays as requested
  * in the various {@link #getPropertyAsType(String, Class)} methods.
  * <p>
  * There are special case configuration parameters allowed as well.
  * <p>
- * The first allows setting of a parameter on any DSpace service by the 
+ * The first allows setting of a parameter on any DSpace service by the
  * given name:
  * {@code
  * emailEnabled@org.dspace.Service = true
  * adminUser@org.dspace.impl.MyService = aaronz
  * }
- * This should be used sparingly and really only by system admins (not 
- * developers).  Developers should be using simple config values to 
+ * This should be used sparingly and really only by system admins (not
+ * developers).  Developers should be using simple config values to
  * expose service configurations.
  * <p>
- * The second allows controlling the implementation used for a service 
+ * The second allows controlling the implementation used for a service
  * interface or provider:
  * {@code
  * $org.dspace.Service = org.dspace.impl.MyService
  * }
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface ConfigurationService {
 
     /**
-     * Get a configuration property (setting) from the system as a 
+     * Get a configuration property (setting) from the system as a
      * specified type.
-     * 
-     * @param <T> class type
+     *
+     * @param <T>  class type
      * @param name the property name
      * @param type the type to return the property as
      * @return the property value OR null if none is found
@@ -65,9 +66,9 @@ public interface ConfigurationService {
     /**
      * Get a configuration property (setting) from the system, or return
      * a default value if none is found.
-     * 
-     * @param <T> class type
-     * @param name the property name
+     *
+     * @param <T>          class type
+     * @param name         the property name
      * @param defaultValue the value to return if this name is not found
      * @return the property value OR null if none is found
      * @throws IllegalArgumentException if the defaultValue type does not match the type of the property by name
@@ -75,16 +76,16 @@ public interface ConfigurationService {
     public <T> T getPropertyAsType(String name, T defaultValue);
 
     /**
-     * Get a configuration property (setting) from the system, or return 
+     * Get a configuration property (setting) from the system, or return
      * (and possibly store) a default value if none is found.
-     * 
-     * @param <T> class type
-     * @param name the property name
-     * @param defaultValue the value to return if this name is not found
-     * @param setDefaultIfNotFound if this is true and the config value 
-     * is not found then the default value will be set in the 
-     * configuration store assuming it is not null.  Otherwise the
-     * default value is just returned but not set.
+     *
+     * @param <T>                  class type
+     * @param name                 the property name
+     * @param defaultValue         the value to return if this name is not found
+     * @param setDefaultIfNotFound if this is true and the config value
+     *                             is not found then the default value will be set in the
+     *                             configuration store assuming it is not null.  Otherwise the
+     *                             default value is just returned but not set.
      * @return the property value OR null if none is found
      * @throws IllegalArgumentException if the defaultValue type does not match the type of the property by name
      */
@@ -92,7 +93,7 @@ public interface ConfigurationService {
 
     /**
      * Get keys all currently known configuration settings
-     * 
+     *
      * @return all the configuration keys as a List
      */
     public List<String> getPropertyKeys();
@@ -109,9 +110,9 @@ public interface ConfigurationService {
     public List<String> getPropertyKeys(String prefix);
 
     /**
-     * Convenience method - get a configuration property (setting) from 
+     * Convenience method - get a configuration property (setting) from
      * the system as a String.
-     * 
+     *
      * @param name the property name
      * @return the property value OR null if none is found
      */
@@ -121,7 +122,7 @@ public interface ConfigurationService {
      * Convenience method - get a configuration property (setting) from
      * the system as a String.
      *
-     * @param name the property name
+     * @param name         the property name
      * @param defaultValue default value if property not found
      * @return the property value OR default value if not found
      */
@@ -140,7 +141,7 @@ public interface ConfigurationService {
      * Convenience method - get a configuration property (setting) from
      * the system as a String Array.
      *
-     * @param name the property name
+     * @param name         the property name
      * @param defaultValue the default value if property not found
      * @return the String Array value or default value if not found
      */
@@ -159,7 +160,7 @@ public interface ConfigurationService {
      * Convenience method - get a configuration property (setting) from
      * the system as a boolean value.
      *
-     * @param name the property name
+     * @param name         the property name
      * @param defaultValue the default value if property not found
      * @return the boolean property value (true/false) or default value if not found
      */
@@ -178,7 +179,7 @@ public interface ConfigurationService {
      * Convenience method - get a configuration property (setting) from
      * the system as an int value.
      *
-     * @param name the property name
+     * @param name         the property name
      * @param defaultValue the default value if property not found
      * @return the integer property value or default value if not found
      */
@@ -197,7 +198,7 @@ public interface ConfigurationService {
      * Convenience method - get a configuration property (setting) from
      * the system as a long value.
      *
-     * @param name the property name
+     * @param name         the property name
      * @param defaultValue the default value if property not found
      * @return the long property value or default value if not found
      */
@@ -206,7 +207,7 @@ public interface ConfigurationService {
     /**
      * Convenience method - get a configuration property (setting) from
      * the system as its stored object
-     * 
+     *
      * @param name the property name
      * @return the property value OR null if none is found
      */
@@ -223,7 +224,7 @@ public interface ConfigurationService {
     /**
      * Convenience method - get entire configuration (settings)
      * from the system.
-     * 
+     *
      * @return Configuration object representing the system configuration
      */
     public Configuration getConfiguration();
@@ -240,12 +241,13 @@ public interface ConfigurationService {
      * Set a configuration property (setting) in the system.
      * Type is not important here since conversion happens automatically
      * when properties are requested.
-     * 
-     * @param name the property name 
+     *
+     * @param name  the property name
      * @param value the property value (set this to null to clear out the property)
      * @return true if the property is new or changed from the existing value, false if it is the same
-     * @throws IllegalArgumentException if the name is null
-     * @throws UnsupportedOperationException if the type cannot be converted to something that is understandable by the system as a configuration property value
+     * @throws IllegalArgumentException      if the name is null
+     * @throws UnsupportedOperationException if the type cannot be converted to something that is understandable by
+     * the system as a configuration property value
      */
     public boolean setProperty(String name, Object value);
 

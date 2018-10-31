@@ -9,12 +9,10 @@
 package org.dspace.rdf;
 
 /**
- *
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
  */
 public class ItemNotArchivedException extends Exception {
-    public ItemNotArchivedException()
-    {
+    public ItemNotArchivedException() {
         super("The processed item is not part of the main archive.");
     }
 }

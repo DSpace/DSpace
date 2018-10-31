@@ -8,11 +8,9 @@
     http://www.dspace.org/license/
 
 -->
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://java.sun.com/xml/ns/javaee"
-         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         id="WebApp_ID" version="2.5">
+<web-app id="DSpace-RESTv6" version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
     <filter>
         <filter-name>dspace.request</filter-name>
@@ -68,7 +66,7 @@
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>
-    
+
     <!-- ConfigurationService initialization for dspace.dir -->
     <context-param>
         <description>
@@ -98,7 +96,7 @@
     <listener>
         <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
     </listener>
-    
+
     <listener>
         <listener-class>
             org.springframework.web.context.ContextLoaderListener

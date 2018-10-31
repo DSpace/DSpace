@@ -14,7 +14,8 @@ import org.dspace.workflowbasic.service.BasicWorkflowService;
 import org.dspace.workflowbasic.service.TaskListItemService;
 
 /**
- * Abstract factory to get services for the workflowbasic package, use BasicWorkflowServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the workflowbasic package, use BasicWorkflowServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -26,8 +27,8 @@ public abstract class BasicWorkflowServiceFactory extends WorkflowServiceFactory
 
     public abstract TaskListItemService getTaskListItemService();
 
-    public static BasicWorkflowServiceFactory getInstance()
-    {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("workflowServiceFactory", BasicWorkflowServiceFactory.class);
+    public static BasicWorkflowServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("workflowServiceFactory", BasicWorkflowServiceFactory.class);
     }
 }

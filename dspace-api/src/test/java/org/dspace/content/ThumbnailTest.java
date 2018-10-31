@@ -7,27 +7,33 @@
  */
 package org.dspace.content;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamService;
-import org.junit.*;
-import static org.junit.Assert.* ;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Unit Test for class Thumbnail. The class is a bean (just getters and setters)
  * so no specific tests are created.
+ *
  * @author pvillega
  */
-public class ThumbnailTest extends AbstractUnitTest
-{
+public class ThumbnailTest extends AbstractUnitTest {
 
-    /** log4j category */
+    /**
+     * log4j category
+     */
     private static final Logger log = Logger.getLogger(ThumbnailTest.class);
 
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
@@ -56,23 +62,18 @@ public class ThumbnailTest extends AbstractUnitTest
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
-        try
-        {
+        try {
             //we have to create a new bitstream in the database
             File f = new File(testProps.get("test.bitstream").toString());
             thumb = bitstreamService.create(context, new FileInputStream(f));
             orig = bitstreamService.create(context, new FileInputStream(f));
             t = new Thumbnail(thumb, orig);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             log.error("IO Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
@@ -87,8 +88,7 @@ public class ThumbnailTest extends AbstractUnitTest
      */
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         thumb = null;
         orig = null;
         t = null;
@@ -99,8 +99,7 @@ public class ThumbnailTest extends AbstractUnitTest
      * Dummy test to avoid initialization errors
      */
     @Test
-    public void testDummy()
-    {
+    public void testDummy() {
         assertTrue(true);
     }
 }

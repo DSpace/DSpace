@@ -10,39 +10,38 @@ package org.dspace.app.rest.model;
 /**
  * An embeddable representation of the Metadata to use in with DSpace REST
  * Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class MetadataEntryRest {
-	String key;
+    String key;
 
-	String value;
+    String value;
 
-	String language;
+    String language;
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	public String getValue() {
-		return value;
-	}
+    public String getValue() {
+        return value;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-	public String getLanguage() {
-		return language;
-	}
+    public String getLanguage() {
+        return language;
+    }
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
 }

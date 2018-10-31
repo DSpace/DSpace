@@ -7,8 +7,8 @@
  */
 package org.dspace.sword2;
 
-import org.dspace.core.Context;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.swordapp.server.Deposit;
@@ -20,10 +20,14 @@ import org.swordapp.server.UriRegistry;
  * SWORDIngester interface.
  *
  * @author Richard Jones
- *
  */
-public class SwordIngesterFactory
-{
+public class SwordIngesterFactory {
+
+    /**
+     * Default constructor
+     */
+    private SwordIngesterFactory() { }
+
     /**
      * Generate an object which conforms to the SWORDIngester interface.
      * This Factory method may use the given DSpace context and the given
@@ -34,22 +38,16 @@ public class SwordIngesterFactory
      * for the appropriate media types and defaults.  See the SWORD configuration
      * documentation for more details.
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param deposit
-     *     The original deposit request
-     * @param dso
-     *     target DSpace object
+     * @param context The relevant DSpace Context.
+     * @param deposit The original deposit request
+     * @param dso     target DSpace object
      * @return SWORDIngester object
-     * @throws DSpaceSwordException
-     *     can be thrown by the internals of the DSpace SWORD implementation
-     * @throws SwordError
-     *     if no suitable ingester is configured.
+     * @throws DSpaceSwordException can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SwordError           if no suitable ingester is configured.
      */
     public static SwordContentIngester getContentInstance(Context context,
-            Deposit deposit, DSpaceObject dso)
-            throws DSpaceSwordException, SwordError
-    {
+                                                          Deposit deposit, DSpaceObject dso)
+        throws DSpaceSwordException, SwordError {
         SwordContentIngester ingester = null;
 
         PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
@@ -57,33 +55,29 @@ public class SwordIngesterFactory
         // first look to see if there's an intester for the content type
         ingester = (SwordContentIngester) pluginService
             .getNamedPlugin(SwordContentIngester.class, deposit.getMimeType());
-        if (ingester != null)
-        {
+        if (ingester != null) {
             return ingester;
         }
 
-        // if no ingester, then 
+        // if no ingester, then
         // look to see if there's an ingester for the package format
         ingester = (SwordContentIngester) pluginService
             .getNamedPlugin(SwordContentIngester.class, deposit.getPackaging());
-        if (ingester == null)
-        {
+        if (ingester == null) {
             throw new SwordError(UriRegistry.ERROR_CONTENT,
-                "No ingester configured for this package type");
+                                 "No ingester configured for this package type");
         }
         return ingester;
     }
 
     public static SwordEntryIngester getEntryInstance(Context context,
-            Deposit deposit, DSpaceObject dso)
-            throws DSpaceSwordException, SwordError
-    {
+                                                      Deposit deposit, DSpaceObject dso)
+        throws DSpaceSwordException, SwordError {
         SwordEntryIngester ingester = (SwordEntryIngester) CoreServiceFactory.getInstance().getPluginService()
-            .getSinglePlugin(SwordEntryIngester.class);
-        if (ingester == null)
-        {
+                                                                             .getSinglePlugin(SwordEntryIngester.class);
+        if (ingester == null) {
             throw new SwordError(UriRegistry.ERROR_CONTENT,
-                "No ingester configured for handling SWORD entry documents");
+                                 "No ingester configured for handling SWORD entry documents");
         }
         return ingester;
     }

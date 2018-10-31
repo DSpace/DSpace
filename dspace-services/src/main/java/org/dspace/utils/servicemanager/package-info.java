@@ -5,6 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
+
 /**
  * Handy types to support ServiceManagers.
  */

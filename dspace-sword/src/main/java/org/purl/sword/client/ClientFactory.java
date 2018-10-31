@@ -12,7 +12,7 @@ import org.apache.log4j.PropertyConfigurator;
 /**
  * Entry point for the SWORD Demonstration Client. This will parse the list of
  * command line options and load either a Command Line client or a GUI client.
- * 
+ *
  * @author Neil Taylor
  */
 public class ClientFactory {
@@ -25,13 +25,13 @@ public class ClientFactory {
         // reload these properties if it is set to capture the output and
         // display it in a panel.
         PropertyConfigurator.configure(this.getClass().getClassLoader()
-            .getResource(ClientConstants.LOGGING_PROPERTY_FILE));
+                                           .getResource(ClientConstants.LOGGING_PROPERTY_FILE));
     }
 
     /**
      * Generate a string that specifies the command line options for this
      * program.
-     * 
+     *
      * @return A list of the options for this program.
      */
     public static String usage() {
@@ -101,10 +101,8 @@ public class ClientFactory {
     /**
      * Create a client. If GUI mode is set, a GUI client is created. Otherwise,
      * a command line client is created.
-     * 
-     * @param options
-     *            The list of options extracted from the command line.
-     * 
+     *
+     * @param options The list of options extracted from the command line.
      * @return A new client.
      */
     public ClientType createClient(ClientOptions options) {
@@ -115,7 +113,7 @@ public class ClientFactory {
      * Start the application and determine which client should be loaded. The
      * application currently has two modes: GUI and client. The GUI mode is the
      * default option.
-     * 
+     *
      * @param args the command line arguments given
      */
     public static void main(String[] args) {
