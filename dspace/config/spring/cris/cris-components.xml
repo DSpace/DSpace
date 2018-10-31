@@ -57,9 +57,10 @@
 		class="org.dspace.app.webui.cris.components.BeanFacetComponent">
 		<property name="componentIdentifier" value="selected" />
 		<property name="facetQuery"><value>relationpreferences.crisrp.publications.selected:{1}</value></property>
-		<property name="order"><value>asc</value></property>
+		<property name="order"><value>desc</value></property>
 		<property name="rpp"><value>20</value></property>		
-		<property name="sortby"><value>1</value></property>						
+		<!-- selected component should be sorted by score (-1) -->
+	    <property name="sortby"><value>-1</value></property>		
 	</bean>
 	
 	<bean id="journalComponent"
@@ -135,9 +136,10 @@
 		class="org.dspace.app.webui.cris.components.BeanFacetComponent">
 		<property name="componentIdentifier" value="selectedproject" />
 		<property name="facetQuery"><value>relationpreferences.crisproject.projects.selected:{1}</value></property>
-		<property name="order"><value>asc</value></property>
-		<property name="rpp"><value>5</value></property>
-		<property name="sortby"><value>5</value></property>				
+		<property name="order"><value>desc</value></property>
+		<property name="rpp"><value>5</value></property>		
+		<!-- selected component should be sorted by score (-1) -->
+	    <property name="sortby"><value>-1</value></property>				
 	</bean>
 	
 	<bean id="investigatoredComponent"

@@ -296,9 +296,9 @@
 		            		changeD.append(j('<span>').html('Selected list re-ordered'));
 				            change.append(changeS).append(changeD);
 				            j('#relation_management_changesLog_queue').append(change);
-				            j('#submit_save').attr('disabled', 'disabled');
-				            j('#savemessage').hide();
-				            j('#disabledsavemessage').show();
+				            j('#submit_save').removeAttr('disabled');
+				            j('#savemessage').show();
+				            j('#disabledsavemessage').hide();
 	            		}
 	            		rebuildSelectList();
 	            	}
