@@ -81,15 +81,7 @@ public class SolrUpgradePre6xStatistics
         private static final String INDEX_DEFAULT = "statistics";
         private static final String MIGQUERY = "(id:* AND -(id:*-*)) OR (scopeId:* AND -(scopeId:*-*)) OR (epersonid:* AND -(epersonid:*-*))";
 
-        /*
-        private static final String MIGQUERYARR[] = {
-                "id:* AND -(id:*-*)",
-                "scopeId:* AND -(scopeId:*-*)",
-                "epersonid:* AND -(epersonid:*-*)"
-        };
-        */
-
-        //Counters to determine the number of items to process
+      //Counters to determine the number of items to process
         private int numRec = NUMREC_DEFAULT;
         private int batchSize = BATCH_DEFAULT;
         
@@ -545,6 +537,8 @@ public class SolrUpgradePre6xStatistics
                                         }
                                         if (uuid != null) {
                                                 newvals.add(uuid.toString());
+                                        } else {
+                                            newvals.add(oval+"-unmigrated");
                                         }
                                 } catch (NumberFormatException e) {
                                         log.warn("Non numeric legacy id "+ col.name() +":" + oval.toString());
@@ -555,7 +549,6 @@ public class SolrUpgradePre6xStatistics
                                 for(String nv: newvals) {
                                         input.addField(col.name(), nv);
                                 }
-                                
                         }
                 }
         }
