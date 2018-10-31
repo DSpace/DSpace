@@ -28,8 +28,7 @@ package org.dspace.core;
  * @version $Revision$
  * @see org.dspace.core.service.PluginService
  */
-public abstract class SelfNamedPlugin
-{
+public abstract class SelfNamedPlugin {
     // the specific alias used to find the class that created this instance.
     private String myName = null;
 
@@ -49,8 +48,7 @@ public abstract class SelfNamedPlugin
      *
      * @return array of names of this plugin
      */
-    public static String[] getPluginNames()
-    {
+    public static String[] getPluginNames() {
         return null;
     }
 
@@ -65,8 +63,7 @@ public abstract class SelfNamedPlugin
      *
      * @return name or null if not available.
      */
-    public String getPluginInstanceName()
-    {
+    public String getPluginInstanceName() {
         return myName;
     }
 
@@ -78,8 +75,7 @@ public abstract class SelfNamedPlugin
      *
      * @param name -- name used to select this class.
      */
-    protected void setPluginInstanceName(String name)
-    {
+    protected void setPluginInstanceName(String name) {
         myName = name;
     }
 }

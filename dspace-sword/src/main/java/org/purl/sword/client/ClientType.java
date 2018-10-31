@@ -8,17 +8,16 @@
 package org.purl.sword.client;
 
 /**
- * Interface for a client. This contains a single method that allows the factory 
- * to pass a set of command line options to the client. 
+ * Interface for a client. This contains a single method that allows the factory
+ * to pass a set of command line options to the client.
  *
  * @author Neil Taylor
  */
-public interface ClientType
-{
-   /**
-    * Run the client, processing the specified options.
-    *  
-    * @param options The options extracted from the command line. 
-    */
-   public void run( ClientOptions options ); 
+public interface ClientType {
+    /**
+     * Run the client, processing the specified options.
+     *
+     * @param options The options extracted from the command line.
+     */
+    public void run(ClientOptions options);
 }

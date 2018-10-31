@@ -24,17 +24,12 @@ public class DSpaceSolrServerResolver implements SolrServerResolver {
     private ConfigurationService configurationService;
 
     @Override
-    public SolrServer getServer() throws SolrServerException
-    {
-        if (server == null)
-        {
-            try
-            {
+    public SolrServer getServer() throws SolrServerException {
+        if (server == null) {
+            try {
                 server = new HttpSolrServer(configurationService.getProperty("oai", "solr.url"));
                 log.debug("Solr Server Initialized");
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         }

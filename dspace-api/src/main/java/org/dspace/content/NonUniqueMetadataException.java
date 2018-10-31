@@ -10,27 +10,23 @@ package org.dspace.content;
 /**
  * An exception that gets thrown when a metadata field cannot be created or
  * saved due to an existing field with an identical element and qualifier.
- * 
+ *
  * @author Martin Hald
  */
-public class NonUniqueMetadataException extends Exception
-{
+public class NonUniqueMetadataException extends Exception {
     /**
      * Create an empty authorize exception
      */
-    public NonUniqueMetadataException()
-    {
+    public NonUniqueMetadataException() {
         super();
     }
 
     /**
      * Create an exception with only a message
-     * 
-     * @param message
-     *     message string
+     *
+     * @param message message string
      */
-    public NonUniqueMetadataException(String message)
-    {
+    public NonUniqueMetadataException(String message) {
         super(message);
     }
 }

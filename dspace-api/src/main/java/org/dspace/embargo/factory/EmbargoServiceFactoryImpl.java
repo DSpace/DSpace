@@ -11,7 +11,8 @@ import org.dspace.embargo.service.EmbargoService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the embargo package, use EmbargoServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the embargo package, use EmbargoServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

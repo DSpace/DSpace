@@ -9,17 +9,14 @@ package org.dspace.app.sherpa.submit;
 
 import java.util.List;
 
-public class SHERPASubmitConfigurationService
-{
+public class SHERPASubmitConfigurationService {
     private List<ISSNItemExtractor> issnItemExtractors;
 
-    public void setIssnItemExtractors(List<ISSNItemExtractor> issnItemExtractors)
-    {
+    public void setIssnItemExtractors(List<ISSNItemExtractor> issnItemExtractors) {
         this.issnItemExtractors = issnItemExtractors;
     }
-    
-    public List<ISSNItemExtractor> getIssnItemExtractors()
-    {
+
+    public List<ISSNItemExtractor> getIssnItemExtractors() {
         return issnItemExtractors;
     }
 }

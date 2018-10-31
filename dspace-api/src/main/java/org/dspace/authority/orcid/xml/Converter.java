@@ -7,16 +7,23 @@
  */
 package org.dspace.authority.orcid.xml;
 
+import java.io.InputStream;
+import java.net.URISyntaxException;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 
 /**
- *
+ * @param <T> type
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
- * @param <T> type
  */
 public abstract class Converter<T> {
 
@@ -25,11 +32,15 @@ public abstract class Converter<T> {
      */
     private static Logger log = Logger.getLogger(Converter.class);
 
+    public abstract T convert(InputStream document);
 
-    protected void processError(Document xml) {
-        String errorMessage = XMLErrors.getErrorMessage(xml);
-        log.error("The orcid-message reports an error: " + errorMessage);
+    protected Object unmarshall(InputStream input, Class<?> type) throws SAXException, URISyntaxException {
+        try {
+            JAXBContext context = JAXBContext.newInstance(type);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            return unmarshaller.unmarshal(input);
+        } catch (JAXBException e) {
+            throw new RuntimeException("Unable to unmarshall orcid message" + e);
+        }
     }
-
-    public abstract T convert(Document document);
 }

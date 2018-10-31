@@ -10,102 +10,117 @@ package org.dspace.app.rest.model;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.RestResourceController;
+
 
 /**
  * The EPerson REST Resource
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class EPersonRest extends DSpaceObjectRest {
-	public static final String NAME = "eperson";
-	public static final String CATEGORY = RestModel.EPERSON;
-	private String netid;
+    public static final String NAME = "eperson";
+    public static final String CATEGORY = RestAddressableModel.EPERSON;
+    private String netid;
 
-	private Date lastActive;
+    private Date lastActive;
 
-	private boolean canLogIn;
+    private boolean canLogIn;
 
-	private String email;
+    private String email;
 
-	private boolean requireCertificate = false;
+    private boolean requireCertificate = false;
 
-	private boolean selfRegistered = false;
+    private boolean selfRegistered = false;
 
-	// FIXME this should be annotated with @JsonIgnore but right now only simple
-	// rest resource can be embedded not list, see
-	// https://jira.duraspace.org/browse/DS-3483
-	private List<GroupRest> groups;
+    @JsonProperty(access = Access.WRITE_ONLY)
+    private String password;
 
-	@Override
-	public String getType() {
-		return NAME;
-	}
+    // FIXME this should be annotated with @JsonIgnore but right now only simple
+    // rest resource can be embedded not list, see
+    // https://jira.duraspace.org/browse/DS-3483
+    private List<GroupRest> groups;
 
-	public String getNetid() {
-		return netid;
-	}
+    @Override
+    @JsonProperty(access = Access.READ_ONLY)
+    public String getType() {
+        return NAME;
+    }
 
-	public void setNetid(String netid) {
-		this.netid = netid;
-	}
+    public String getNetid() {
+        return netid;
+    }
 
-	public Date getLastActive() {
-		return lastActive;
-	}
+    public void setNetid(String netid) {
+        this.netid = netid;
+    }
 
-	public void setLastActive(Date lastActive) {
-		this.lastActive = lastActive;
-	}
+    public Date getLastActive() {
+        return lastActive;
+    }
 
-	public boolean isCanLogIn() {
-		return canLogIn;
-	}
+    public void setLastActive(Date lastActive) {
+        this.lastActive = lastActive;
+    }
 
-	public void setCanLogIn(boolean canLogIn) {
-		this.canLogIn = canLogIn;
-	}
+    public boolean isCanLogIn() {
+        return canLogIn;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setCanLogIn(boolean canLogIn) {
+        this.canLogIn = canLogIn;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public boolean isRequireCertificate() {
-		return requireCertificate;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setRequireCertificate(boolean requireCertificate) {
-		this.requireCertificate = requireCertificate;
-	}
+    public boolean isRequireCertificate() {
+        return requireCertificate;
+    }
 
-	public boolean isSelfRegistered() {
-		return selfRegistered;
-	}
+    public void setRequireCertificate(boolean requireCertificate) {
+        this.requireCertificate = requireCertificate;
+    }
 
-	public void setSelfRegistered(boolean selfRegistered) {
-		this.selfRegistered = selfRegistered;
-	}
-	
-	public List<GroupRest> getGroups() {
-		return groups;
-	}
-	
-	public void setGroups(List<GroupRest> groups) {
-		this.groups = groups;
-	}
+    public boolean isSelfRegistered() {
+        return selfRegistered;
+    }
 
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
-	
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
+    public void setSelfRegistered(boolean selfRegistered) {
+        this.selfRegistered = selfRegistered;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<GroupRest> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<GroupRest> groups) {
+        this.groups = groups;
+    }
+
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
+
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
+
 }

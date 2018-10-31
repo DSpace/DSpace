@@ -296,8 +296,8 @@
    <field name="city" type="string" indexed="true" stored="true" required="false" docValues="true"/>
    <field name="longitude" type="float" indexed="true" stored="true" required="false" />
    <field name="latitude" type="float" indexed="true" stored="true" required="false" />
-   <field name="owningComm" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="owningColl" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="owningComm" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="owningColl" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="owningItem" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="dns" type="string" indexed="true" stored="true" required="false" docValues="true"/>
    <field name="userAgent" type="string" indexed="true" stored="true" required="false" docValues="true"/>

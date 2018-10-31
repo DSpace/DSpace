@@ -7,7 +7,6 @@
  */
 package org.dspace.workflow;
 
-
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.ReloadableEntity;
 

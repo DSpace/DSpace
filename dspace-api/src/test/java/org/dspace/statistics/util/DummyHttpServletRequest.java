@@ -10,51 +10,64 @@ package org.dspace.statistics.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
 
 /**
  * A mock request for testing.
  *
  * @author mwood
  */
-class DummyHttpServletRequest implements HttpServletRequest
-{
+class DummyHttpServletRequest implements HttpServletRequest {
     private String agent = null;
 
     private String address = null;
 
     private String remoteHost = null;
 
-    public void setAgent(String agent)
-    {
+    public void setAgent(String agent) {
         this.agent = agent;
     }
 
-    public void setAddress(String address)
-    {
+    public void setAddress(String address) {
         this.address = address;
     }
 
-    public void setRemoteHost(String host)
-    {
+    public void setRemoteHost(String host) {
         this.remoteHost = host;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#changeSessionId
+     */
+    @Override
+    public String changeSessionId() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServletRequest#getAuthType()
      */
     @Override
-    public String getAuthType()
-    {
+    public String getAuthType() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -63,8 +76,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getContextPath()
      */
     @Override
-    public String getContextPath()
-    {
+    public String getContextPath() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -73,8 +85,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getCookies()
      */
     @Override
-    public Cookie[] getCookies()
-    {
+    public Cookie[] getCookies() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -83,24 +94,28 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getDateHeader(java.lang.String)
      */
     @Override
-    public long getDateHeader(String arg0)
-    {
+    public long getDateHeader(String arg0) {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#getDispatcherType()
+     */
+    @Override
+    public DispatcherType getDispatcherType() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServletRequest#getHeader(java.lang.String)
      */
     @Override
-    public String getHeader(String key)
-    {
-        if ("User-Agent".equals(key))
-        {
+    public String getHeader(String key) {
+        if ("User-Agent".equals(key)) {
             return agent;
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
@@ -109,8 +124,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getHeaderNames()
      */
     @Override
-    public Enumeration getHeaderNames()
-    {
+    public Enumeration getHeaderNames() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -119,8 +133,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getHeaders(java.lang.String)
      */
     @Override
-    public Enumeration getHeaders(String arg0)
-    {
+    public Enumeration getHeaders(String arg0) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -129,8 +142,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getIntHeader(java.lang.String)
      */
     @Override
-    public int getIntHeader(String arg0)
-    {
+    public int getIntHeader(String arg0) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -139,8 +151,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getMethod()
      */
     @Override
-    public String getMethod()
-    {
+    public String getMethod() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -149,8 +160,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getPathInfo()
      */
     @Override
-    public String getPathInfo()
-    {
+    public String getPathInfo() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -159,8 +169,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getPathTranslated()
      */
     @Override
-    public String getPathTranslated()
-    {
+    public String getPathTranslated() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -169,8 +178,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getQueryString()
      */
     @Override
-    public String getQueryString()
-    {
+    public String getQueryString() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -179,8 +187,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getRemoteUser()
      */
     @Override
-    public String getRemoteUser()
-    {
+    public String getRemoteUser() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -189,8 +196,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getRequestURI()
      */
     @Override
-    public String getRequestURI()
-    {
+    public String getRequestURI() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -199,8 +205,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getRequestURL()
      */
     @Override
-    public StringBuffer getRequestURL()
-    {
+    public StringBuffer getRequestURL() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -209,8 +214,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getRequestedSessionId()
      */
     @Override
-    public String getRequestedSessionId()
-    {
+    public String getRequestedSessionId() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -219,8 +223,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getServletPath()
      */
     @Override
-    public String getServletPath()
-    {
+    public String getServletPath() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -229,8 +232,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getSession()
      */
     @Override
-    public HttpSession getSession()
-    {
+    public HttpSession getSession() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -239,8 +241,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getSession(boolean)
      */
     @Override
-    public HttpSession getSession(boolean arg0)
-    {
+    public HttpSession getSession(boolean arg0) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -249,8 +250,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#getUserPrincipal()
      */
     @Override
-    public Principal getUserPrincipal()
-    {
+    public Principal getUserPrincipal() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -259,8 +259,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#isRequestedSessionIdFromCookie()
      */
     @Override
-    public boolean isRequestedSessionIdFromCookie()
-    {
+    public boolean isRequestedSessionIdFromCookie() {
         // TODO Auto-generated method stub
         return false;
     }
@@ -269,8 +268,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#isRequestedSessionIdFromURL()
      */
     @Override
-    public boolean isRequestedSessionIdFromURL()
-    {
+    public boolean isRequestedSessionIdFromURL() {
         // TODO Auto-generated method stub
         return false;
     }
@@ -279,18 +277,65 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#isRequestedSessionIdFromUrl()
      */
     @Override
-    public boolean isRequestedSessionIdFromUrl()
-    {
+    public boolean isRequestedSessionIdFromUrl() {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#authenticate(javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public boolean authenticate(HttpServletResponse httpServletResponse) {
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#login(java.lang.String,java.lang.String)
+     */
+    @Override
+    public void login(String s, String s1) {
+        return;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#logout()
+     */
+    @Override
+    public void logout() {
+        return;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#getPart(java.lang.String)
+     */
+    @Override
+    public Part getPart(String arg0) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#getParts()
+     */
+    @Override
+    public Collection<Part> getParts() {
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequest#upgrade(java.lang.Class<T>)
+     */
+    @Override
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
+        return null;
     }
 
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServletRequest#isRequestedSessionIdValid()
      */
     @Override
-    public boolean isRequestedSessionIdValid()
-    {
+    public boolean isRequestedSessionIdValid() {
         // TODO Auto-generated method stub
         return false;
     }
@@ -299,8 +344,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.http.HttpServletRequest#isUserInRole(java.lang.String)
      */
     @Override
-    public boolean isUserInRole(String arg0)
-    {
+    public boolean isUserInRole(String arg0) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -309,8 +353,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getAttribute(java.lang.String)
      */
     @Override
-    public Object getAttribute(String arg0)
-    {
+    public Object getAttribute(String arg0) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -319,8 +362,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getAttributeNames()
      */
     @Override
-    public Enumeration getAttributeNames()
-    {
+    public Enumeration getAttributeNames() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -329,8 +371,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getCharacterEncoding()
      */
     @Override
-    public String getCharacterEncoding()
-    {
+    public String getCharacterEncoding() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -339,9 +380,16 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getContentLength()
      */
     @Override
-    public int getContentLength()
-    {
+    public int getContentLength() {
         // TODO Auto-generated method stub
+        return 0;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#getContentLengthLong()
+     */
+    @Override
+    public long getContentLengthLong() {
         return 0;
     }
 
@@ -349,8 +397,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getContentType()
      */
     @Override
-    public String getContentType()
-    {
+    public String getContentType() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -359,8 +406,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getInputStream()
      */
     @Override
-    public ServletInputStream getInputStream() throws IOException
-    {
+    public ServletInputStream getInputStream() throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -369,8 +415,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getLocale()
      */
     @Override
-    public Locale getLocale()
-    {
+    public Locale getLocale() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -379,8 +424,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getLocales()
      */
     @Override
-    public Enumeration getLocales()
-    {
+    public Enumeration getLocales() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -389,8 +433,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getParameter(java.lang.String)
      */
     @Override
-    public String getParameter(String arg0)
-    {
+    public String getParameter(String arg0) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -399,8 +442,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getParameterMap()
      */
     @Override
-    public Map getParameterMap()
-    {
+    public Map getParameterMap() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -409,8 +451,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getParameterNames()
      */
     @Override
-    public Enumeration getParameterNames()
-    {
+    public Enumeration getParameterNames() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -419,8 +460,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getParameterValues(java.lang.String)
      */
     @Override
-    public String[] getParameterValues(String arg0)
-    {
+    public String[] getParameterValues(String arg0) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -429,8 +469,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getProtocol()
      */
     @Override
-    public String getProtocol()
-    {
+    public String getProtocol() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -439,8 +478,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getReader()
      */
     @Override
-    public BufferedReader getReader() throws IOException
-    {
+    public BufferedReader getReader() throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -449,8 +487,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getRealPath(java.lang.String)
      */
     @Override
-    public String getRealPath(String arg0)
-    {
+    public String getRealPath(String arg0) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -459,8 +496,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getRemoteAddr()
      */
     @Override
-    public String getRemoteAddr()
-    {
+    public String getRemoteAddr() {
         return address;
     }
 
@@ -468,8 +504,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getRemoteHost()
      */
     @Override
-    public String getRemoteHost()
-    {
+    public String getRemoteHost() {
         return remoteHost;
     }
 
@@ -477,8 +512,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getRequestDispatcher(java.lang.String)
      */
     @Override
-    public RequestDispatcher getRequestDispatcher(String arg0)
-    {
+    public RequestDispatcher getRequestDispatcher(String arg0) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -487,8 +521,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getScheme()
      */
     @Override
-    public String getScheme()
-    {
+    public String getScheme() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -497,8 +530,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getServerName()
      */
     @Override
-    public String getServerName()
-    {
+    public String getServerName() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -507,8 +539,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#getServerPort()
      */
     @Override
-    public int getServerPort()
-    {
+    public int getServerPort() {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -517,8 +548,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#isSecure()
      */
     @Override
-    public boolean isSecure()
-    {
+    public boolean isSecure() {
         // TODO Auto-generated method stub
         return false;
     }
@@ -527,8 +557,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#removeAttribute(java.lang.String)
      */
     @Override
-    public void removeAttribute(String arg0)
-    {
+    public void removeAttribute(String arg0) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -536,8 +565,7 @@ class DummyHttpServletRequest implements HttpServletRequest
      * @see javax.servlet.ServletRequest#setAttribute(java.lang.String, java.lang.Object)
      */
     @Override
-    public void setAttribute(String arg0, Object arg1)
-    {
+    public void setAttribute(String arg0, Object arg1) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -546,33 +574,77 @@ class DummyHttpServletRequest implements HttpServletRequest
      */
     @Override
     public void setCharacterEncoding(String arg0)
-            throws UnsupportedEncodingException
-    {
+        throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#startAsync
+     */
+    @Override
+    public AsyncContext startAsync() throws IllegalStateException {
+        throw new IllegalStateException("Not supported yet.");
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#startAsync(javax.servlet.ServletRequest,javax.servlet.ServletResponse)
+     */
+    @Override
+    public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
+        throws IllegalStateException {
+        throw new IllegalStateException("Not supported yet.");
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#isAsyncStarted
+     */
+    @Override
+    public boolean isAsyncStarted() {
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#isAsyncSupported
+     */
+    @Override
+    public boolean isAsyncSupported() {
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#getAsyncContext
+     */
+    @Override
+    public AsyncContext getAsyncContext() {
+        return null;
+    }
+
+    @Override
+    public int getRemotePort() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public int getRemotePort()
-    {
+    public String getLocalName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getLocalName()
-    {
+    public String getLocalAddr() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String getLocalAddr()
-    {
+    public int getLocalPort() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletRequest#getServletContext
+     */
     @Override
-    public int getLocalPort()
-    {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public ServletContext getServletContext() {
+        return null;
     }
 
 }

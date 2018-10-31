@@ -7,6 +7,11 @@
  */
 package org.dspace.identifier;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -16,12 +21,6 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.lang.StringUtils;
-import org.dspace.core.Constants;
 
 /**
  * The main service class used to reserve, register and resolve identifiers
@@ -34,7 +33,9 @@ public class IdentifierServiceImpl implements IdentifierService {
 
     private List<IdentifierProvider> providers;
 
-    /** log4j category */
+    /**
+     * log4j category
+     */
     private static Logger log = Logger.getLogger(IdentifierServiceImpl.class);
 
     @Autowired(required = true)
@@ -42,37 +43,32 @@ public class IdentifierServiceImpl implements IdentifierService {
     @Autowired(required = true)
     protected HandleService handleService;
 
-    protected IdentifierServiceImpl()
-    {
+    protected IdentifierServiceImpl() {
 
     }
 
     @Autowired
     @Required
-    public void setProviders(List<IdentifierProvider> providers)
-    {
+    public void setProviders(List<IdentifierProvider> providers) {
         this.providers = providers;
- 
-        for (IdentifierProvider p : providers)
-        {
+
+        for (IdentifierProvider p : providers) {
             p.setParentService(this);
         }
     }
 
     /**
      * Reserves identifiers for the item
+     *
      * @param context dspace context
-     * @param dso dspace object
+     * @param dso     dspace object
      */
     @Override
     public void reserve(Context context, DSpaceObject dso)
-        throws AuthorizeException, SQLException, IdentifierException
-    {
-        for (IdentifierProvider service : providers)
-        {
+        throws AuthorizeException, SQLException, IdentifierException {
+        for (IdentifierProvider service : providers) {
             String identifier = service.mint(context, dso);
-            if (!StringUtils.isEmpty(identifier))
-            {
+            if (!StringUtils.isEmpty(identifier)) {
                 service.reserve(context, dso, identifier);
             }
         }
@@ -82,13 +78,10 @@ public class IdentifierServiceImpl implements IdentifierService {
 
     @Override
     public void reserve(Context context, DSpaceObject dso, String identifier)
-        throws AuthorizeException, SQLException, IdentifierException
-    {
+        throws AuthorizeException, SQLException, IdentifierException {
         // Next resolve all other services
-        for (IdentifierProvider service : providers)
-        {
-            if (service.supports(identifier))
-            {
+        for (IdentifierProvider service : providers) {
+            if (service.supports(identifier)) {
                 service.reserve(context, dso, identifier);
             }
         }
@@ -98,12 +91,10 @@ public class IdentifierServiceImpl implements IdentifierService {
 
     @Override
     public void register(Context context, DSpaceObject dso)
-        throws AuthorizeException, SQLException, IdentifierException
-    {
+        throws AuthorizeException, SQLException, IdentifierException {
         //We need to commit our context because one of the providers might require the handle created above
         // Next resolve all other services
-        for (IdentifierProvider service : providers)
-        {
+        for (IdentifierProvider service : providers) {
             service.register(context, dso);
         }
         //Update our item
@@ -112,101 +103,82 @@ public class IdentifierServiceImpl implements IdentifierService {
 
     @Override
     public void register(Context context, DSpaceObject object, String identifier)
-        throws AuthorizeException, SQLException, IdentifierException
-    {
+        throws AuthorizeException, SQLException, IdentifierException {
         //We need to commit our context because one of the providers might require the handle created above
         // Next resolve all other services
         boolean registered = false;
-        for (IdentifierProvider service : providers)
-        {
-            if (service.supports(identifier))
-            {
+        for (IdentifierProvider service : providers) {
+            if (service.supports(identifier)) {
                 service.register(context, object, identifier);
                 registered = true;
             }
         }
-        if (!registered)
-        {
+        if (!registered) {
             throw new IdentifierException("Cannot register identifier: Didn't "
-                + "find a provider that supports this identifier.");
+                                              + "find a provider that supports this identifier.");
         }
         //Update our item
         contentServiceFactory.getDSpaceObjectService(object).update(context, object);
     }
 
     @Override
-    public String lookup(Context context, DSpaceObject dso, Class<? extends Identifier> identifier)
-    {
-        for (IdentifierProvider service : providers)
-        {
-            if (service.supports(identifier))
-            {
-               try{
-                   String result = service.lookup(context, dso);
-                   if (result != null){
-                       return result;
-                   }
-               }
-               catch (IdentifierNotFoundException ex)
-               {
-                   log.info(service.getClass().getName() + " doesn't find an "
-                           + "Identifier for " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + ", "
-                           + dso.getID().toString() + ".");
-                   log.debug(ex.getMessage(), ex);
-               }
-               catch (IdentifierException e)
-               {
-                   log.error(e.getMessage(),e);
-               }
+    public String lookup(Context context, DSpaceObject dso, Class<? extends Identifier> identifier) {
+        for (IdentifierProvider service : providers) {
+            if (service.supports(identifier)) {
+                try {
+                    String result = service.lookup(context, dso);
+                    if (result != null) {
+                        return result;
+                    }
+                } catch (IdentifierNotFoundException ex) {
+                    log.info(service.getClass().getName() + " doesn't find an "
+                                 + "Identifier for " + contentServiceFactory.getDSpaceObjectService(dso)
+                                                                            .getTypeText(dso) + ", "
+                                 + dso.getID().toString() + ".");
+                    log.debug(ex.getMessage(), ex);
+                } catch (IdentifierException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
         }
         return null;
     }
-    
+
     @Override
-    public List<String> lookup(Context context, DSpaceObject dso)
-    {
+    public List<String> lookup(Context context, DSpaceObject dso) {
         List<String> identifiers = new ArrayList<>();
-        for (IdentifierProvider service : providers)
-        {
+        for (IdentifierProvider service : providers) {
             try {
                 String result = service.lookup(context, dso);
-                if (!StringUtils.isEmpty(result))
-                {
-                    if (log.isDebugEnabled())
-                    {
+                if (!StringUtils.isEmpty(result)) {
+                    if (log.isDebugEnabled()) {
                         try {
-                            log.debug("Got an identifier from " 
-                                    + service.getClass().getCanonicalName() + ".");
+                            log.debug("Got an identifier from "
+                                          + service.getClass().getCanonicalName() + ".");
                         } catch (NullPointerException ex) {
                             log.debug(ex.getMessage(), ex);
                         }
                     }
-                    
+
                     identifiers.add(result);
                 }
-            }
-            catch (IdentifierNotFoundException ex)
-            {
+            } catch (IdentifierNotFoundException ex) {
                 log.info(service.getClass().getName() + " doesn't find an "
-                        + "Identifier for " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + ", "
-                        + dso.getID().toString() + ".");
+                             + "Identifier for " + contentServiceFactory.getDSpaceObjectService(dso)
+                                                                        .getTypeText(dso) + ", "
+                             + dso.getID().toString() + ".");
                 log.debug(ex.getMessage(), ex);
-            }
-            catch (IdentifierException ex)
-            {
+            } catch (IdentifierException ex) {
                 log.error(ex.getMessage(), ex);
             }
         }
-        
+
         try {
             String handle = dso.getHandle();
-            if (!StringUtils.isEmpty(handle))
-            {
+            if (!StringUtils.isEmpty(handle)) {
                 if (!identifiers.contains(handle)
-                        && !identifiers.contains("hdl:" + handle)
-                        && !identifiers.contains(handleService.getCanonicalForm(handle)))
-                {
+                    && !identifiers.contains("hdl:" + handle)
+                    && !identifiers.contains(handleService.getCanonicalForm(handle))) {
                     // The VerionedHandleIdentifierProvider gets loaded by default
                     // it returns handles without any scheme (neither hdl: nor http:).
                     // If the VersionedHandleIdentifierProvider is not loaded,
@@ -214,46 +186,36 @@ public class IdentifierServiceImpl implements IdentifierService {
                     // Generally it would be better if identifiers would be added
                     // here in a way they could be recognized.
                     log.info("Adding handle '" + handle + "' to the "
-                            + "array of looked up identifiers.");
+                                 + "array of looked up identifiers.");
                     identifiers.add(handle);
                 }
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             // nothing is expected here, but if an exception is thrown it
             // should not stop everything running.
             log.error(ex.getMessage(), ex);
         }
-        
+
         log.debug("Found identifiers: " + identifiers.toString());
         return identifiers;
     }
 
     @Override
     public DSpaceObject resolve(Context context, String identifier)
-        throws IdentifierNotFoundException, IdentifierNotResolvableException
-    {
-        for (IdentifierProvider service : providers)
-        {
-            if (service.supports(identifier))
-            {   try
-                {
+        throws IdentifierNotFoundException, IdentifierNotResolvableException {
+        for (IdentifierProvider service : providers) {
+            if (service.supports(identifier)) {
+                try {
                     DSpaceObject result = service.resolve(context, identifier);
-                    if (result != null)
-                    {
+                    if (result != null) {
                         return result;
                     }
-                }
-                catch (IdentifierNotFoundException ex)
-                {
+                } catch (IdentifierNotFoundException ex) {
                     log.info(service.getClass().getName() + " cannot resolve "
-                            + "Identifier " + identifier + ": identifier not "
-                            + "found.");
+                                 + "Identifier " + identifier + ": identifier not "
+                                 + "found.");
                     log.debug(ex.getMessage(), ex);
-                }
-                catch (IdentifierException ex)
-                {
+                } catch (IdentifierException ex) {
                     log.error(ex.getMessage(), ex);
                 }
             }
@@ -264,33 +226,26 @@ public class IdentifierServiceImpl implements IdentifierService {
 
     @Override
     public void delete(Context context, DSpaceObject dso)
-       throws AuthorizeException, SQLException, IdentifierException
-    {
-       for (IdentifierProvider service : providers)
-       {
-            try
-            {
+        throws AuthorizeException, SQLException, IdentifierException {
+        for (IdentifierProvider service : providers) {
+            try {
                 service.delete(context, dso);
             } catch (IdentifierException e) {
-                log.error(e.getMessage(),e);
+                log.error(e.getMessage(), e);
             }
         }
     }
 
     @Override
     public void delete(Context context, DSpaceObject dso, String identifier)
-        throws AuthorizeException, SQLException, IdentifierException
-    {
-        for (IdentifierProvider service : providers)
-        {
-            try
-            {
-                if (service.supports(identifier))
-                {
+        throws AuthorizeException, SQLException, IdentifierException {
+        for (IdentifierProvider service : providers) {
+            try {
+                if (service.supports(identifier)) {
                     service.delete(context, dso, identifier);
                 }
             } catch (IdentifierException e) {
-                log.error(e.getMessage(),e);
+                log.error(e.getMessage(), e);
             }
         }
     }

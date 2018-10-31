@@ -7,6 +7,8 @@
  */
 package org.dspace.eperson;
 
+import java.sql.SQLException;
+
 import org.dspace.AbstractUnitTest;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
@@ -14,18 +16,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.sql.SQLException;
-
 /**
  * Test integration of GroupServiceImpl.
  *
  * @author mwood
  */
 public class GroupServiceImplIT
-        extends AbstractUnitTest
-{
-    public GroupServiceImplIT()
-    {
+    extends AbstractUnitTest {
+    public GroupServiceImplIT() {
         super();
     }
 
@@ -45,15 +43,13 @@ public class GroupServiceImplIT
 
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
     }
 
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         super.destroy();
     }
 
@@ -100,8 +96,7 @@ public class GroupServiceImplIT
      */
     @Test(expected = SQLException.class)
     public void testSetName_permanent()
-            throws Exception
-    {
+        throws Exception {
         System.out.println("setName on a 'permanent' Group");
         String name = "NOTANONYMOUS";
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
@@ -408,8 +403,7 @@ public class GroupServiceImplIT
      */
     @Test(expected = SQLException.class)
     public void testDelete_permanent()
-            throws Exception
-    {
+        throws Exception {
         System.out.println("delete on a 'permanent' Group");
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group group = groupService.findByName(context, Group.ANONYMOUS);

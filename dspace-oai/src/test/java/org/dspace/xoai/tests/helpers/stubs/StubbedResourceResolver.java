@@ -7,15 +7,15 @@
  */
 package org.dspace.xoai.tests.helpers.stubs;
 
-import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+
+import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
 
 public class StubbedResourceResolver implements ResourceResolver {
     private static TransformerFactory factory = TransformerFactory.newInstance();

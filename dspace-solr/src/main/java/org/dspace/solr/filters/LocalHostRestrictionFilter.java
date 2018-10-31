@@ -9,7 +9,6 @@ package org.dspace.solr.filters;
 
 import java.io.IOException;
 import java.net.InetAddress;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -32,21 +31,19 @@ public class LocalHostRestrictionFilter implements Filter {
     }
 
     public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain)
-        throws IOException, ServletException
-    {
+                         FilterChain chain)
+        throws IOException, ServletException {
 
-        if (enabled){
+        if (enabled) {
             InetAddress ia = InetAddress.getLocalHost();
             String localAddr = ia.getHostAddress();
             String remoteAddr = request.getRemoteAddr();
 
             if (!(localAddr.equals(remoteAddr) ||
                 remoteAddr.equals("127.0.0.1") ||
-                remoteAddr.startsWith("0:0:0:0:0:0:0:1")))
-            {
-                ((HttpServletResponse)response).sendError(403);
-                    return;
+                remoteAddr.startsWith("0:0:0:0:0:0:0:1"))) {
+                ((HttpServletResponse) response).sendError(403);
+                return;
             }
 
         }
@@ -58,12 +55,10 @@ public class LocalHostRestrictionFilter implements Filter {
      *
      */
     public void init(FilterConfig arg0)
-        throws ServletException
-    {
+        throws ServletException {
         String restrict = arg0.getServletContext().getInitParameter(
             "LocalHostRestrictionFilter.localhost");
-        if ("false".equalsIgnoreCase(restrict))
-        {
+        if ("false".equalsIgnoreCase(restrict)) {
             enabled = false;
         }
     }

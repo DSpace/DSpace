@@ -8,18 +8,18 @@
 package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.MetadataSchemaRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**
  * MetadataSchema Rest HAL Resource. The HAL Resource wraps the REST Resource
  * adding support for the links and embedded resources
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @RelNameDSpaceResource(MetadataSchemaRest.NAME)
 public class MetadataSchemaResource extends DSpaceResource<MetadataSchemaRest> {
-	public MetadataSchemaResource(MetadataSchemaRest ms, Utils utils, String... rels) {
-		super(ms, utils, rels);
-	}
+    public MetadataSchemaResource(MetadataSchemaRest ms, Utils utils, String... rels) {
+        super(ms, utils, rels);
+    }
 }

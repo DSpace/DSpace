@@ -7,7 +7,17 @@
  */
 package org.dspace.app.harvest;
 
-import org.apache.commons.cli.*;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -27,27 +37,21 @@ import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
 /**
- *  Test class for harvested collections.
+ * Test class for harvested collections.
  *
  * @author Alexey Maslov
  */
-public class Harvest
-{
+public class Harvest {
     private static Context context;
 
-    private static final HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+    private static final HarvestedCollectionService harvestedCollectionService =
+        HarvestServiceFactory.getInstance().getHarvestedCollectionService();
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private static final CollectionService collectionService =
+        ContentServiceFactory.getInstance().getCollectionService();
 
-    public static void main(String[] argv) throws Exception
-    {
+    public static void main(String[] argv) throws Exception {
         // create an options object and populate it
         CommandLineParser parser = new PosixParser();
 
@@ -61,47 +65,50 @@ public class Harvest
         options.addOption("S", "start", false, "start the harvest loop");
         options.addOption("R", "reset", false, "reset harvest status on all collections");
         options.addOption("P", "purge", false, "purge all harvestable collections");
-        
+
 
         options.addOption("e", "eperson", true,
-            "eperson");
+                          "eperson");
         options.addOption("c", "collection", true,
-            "harvesting collection (handle or id)");
+                          "harvesting collection (handle or id)");
         options.addOption("t", "type", true,
-            "type of harvesting (0 for none)");
+                          "type of harvesting (0 for none)");
         options.addOption("a", "address", true,
-            "address of the OAI-PMH server");
+                          "address of the OAI-PMH server");
         options.addOption("i", "oai_set_id", true,
-            "id of the PMH set representing the harvested collection");
+                          "id of the PMH set representing the harvested collection");
         options.addOption("m", "metadata_format", true,
-            "the name of the desired metadata format for harvesting, resolved to namespace and crosswalk in dspace.cfg");
+                          "the name of the desired metadata format for harvesting, resolved to namespace and " +
+                              "crosswalk in dspace.cfg");
 
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, argv);
 
-        String command = null; 
+        String command = null;
         String eperson = null;
         String collection = null;
         String oaiSource = null;
         String oaiSetID = null;
         String metadataKey = null;
         int harvestType = 0;
-        
-        if (line.hasOption('h'))
-        {
+
+        if (line.hasOption('h')) {
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("Harvest\n", options);
             System.out.println("\nPING OAI server: Harvest -g -a oai_source -i oai_set_id");
-            System.out.println("RUNONCE harvest with arbitrary options: Harvest -o -e eperson -c collection -t harvest_type -a oai_source -i oai_set_id -m metadata_format");
-            System.out.println("SETUP a collection for harvesting: Harvest -s -c collection -t harvest_type -a oai_source -i oai_set_id -m metadata_format");
+            System.out.println(
+                "RUNONCE harvest with arbitrary options: Harvest -o -e eperson -c collection -t harvest_type -a " +
+                    "oai_source -i oai_set_id -m metadata_format");
+            System.out.println(
+                "SETUP a collection for harvesting: Harvest -s -c collection -t harvest_type -a oai_source -i " +
+                    "oai_set_id -m metadata_format");
             System.out.println("RUN harvest once: Harvest -r -e eperson -c collection");
             System.out.println("START harvest scheduler: Harvest -S");
             System.out.println("RESET all harvest status: Harvest -R");
             System.out.println("PURGE a collection of items and settings: Harvest -p -e eperson -c collection");
             System.out.println("PURGE all harvestable collections: Harvest -P -e eperson");
-            
-            
+
 
             System.exit(0);
         }
@@ -131,7 +138,7 @@ public class Harvest
             command = "purgeAll";
         }
 
-        
+
         if (line.hasOption('e')) {
             eperson = line.getOptionValue('e');
         }
@@ -152,106 +159,87 @@ public class Harvest
         if (line.hasOption('m')) {
             metadataKey = line.getOptionValue('m');
         }
-        
+
 
         // Instantiate our class
         Harvest harvester = new Harvest();
         harvester.context = new Context(Context.Mode.BATCH_EDIT);
-        
-        
+
+
         // Check our options
-        if (command == null)
-        {
+        if (command == null) {
             System.out
-                    .println("Error - no parameters specified (run with -h flag for details)");
+                .println("Error - no parameters specified (run with -h flag for details)");
             System.exit(1);
-        }
-        // Run a single harvest cycle on a collection using saved settings.
-        else if ("run".equals(command))
-        {
-            if (collection == null || eperson == null)
-            {
+        } else if ("run".equals(command)) {
+            // Run a single harvest cycle on a collection using saved settings.
+            if (collection == null || eperson == null) {
                 System.out
-                        .println("Error - a target collection and eperson must be provided");
+                    .println("Error - a target collection and eperson must be provided");
                 System.out.println(" (run with -h flag for details)");
                 System.exit(1);
             }
-            
+
             harvester.runHarvest(collection, eperson);
-        }
-        // start the harvest loop
-        else if ("start".equals(command))
-        {
+        } else if ("start".equals(command)) {
+            // start the harvest loop
             startHarvester();
-        }
-        // reset harvesting status
-        else if ("reset".equals(command))
-        {
+        } else if ("reset".equals(command)) {
+            // reset harvesting status
             resetHarvesting();
-        }
-        // purge all collections that are set up for harvesting (obviously for testing purposes only)
-        else if ("purgeAll".equals(command))
-        {
-            if (eperson == null)
-            {
+        } else if ("purgeAll".equals(command)) {
+            // purge all collections that are set up for harvesting (obviously for testing purposes only)
+            if (eperson == null) {
                 System.out
-                        .println("Error - an eperson must be provided");
+                    .println("Error - an eperson must be provided");
                 System.out.println(" (run with -h flag for details)");
                 System.exit(1);
             }
 
             List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
-            for (HarvestedCollection harvestedCollection : harvestedCollections)
-            {
-                System.out.println("Purging the following collections (deleting items and resetting harvest status): " + harvestedCollection.getCollection().getID().toString());
+            for (HarvestedCollection harvestedCollection : harvestedCollections) {
+                System.out.println(
+                    "Purging the following collections (deleting items and resetting harvest status): " +
+                        harvestedCollection
+                            .getCollection().getID().toString());
                 harvester.purgeCollection(harvestedCollection.getCollection().getID().toString(), eperson);
             }
             context.complete();
-        }
-        // Delete all items in a collection. Useful for testing fresh harvests.
-        else if ("purge".equals(command))
-        {
-            if (collection == null || eperson == null)
-            {
+        } else if ("purge".equals(command)) {
+            // Delete all items in a collection. Useful for testing fresh harvests.
+            if (collection == null || eperson == null) {
                 System.out
-                        .println("Error - a target collection and eperson must be provided");
+                    .println("Error - a target collection and eperson must be provided");
                 System.out.println(" (run with -h flag for details)");
                 System.exit(1);
             }
-            
+
             harvester.purgeCollection(collection, eperson);
             context.complete();
-            
+
             //TODO: implement this... remove all items and remember to unset "last-harvested" settings
-        }
-        // Configure a collection with the three main settings 
-        else if ("config".equals(command))
-        {
-            if (collection == null)
-            {
+        } else if ("config".equals(command)) {
+            // Configure a collection with the three main settings
+            if (collection == null) {
                 System.out.println("Error -  a target collection must be provided");
                 System.out.println(" (run with -h flag for details)");
                 System.exit(1);
             }
-            if (oaiSource == null || oaiSetID == null)
-            {
+            if (oaiSource == null || oaiSetID == null) {
                 System.out.println("Error - both the OAI server address and OAI set id must be specified");
                 System.out.println(" (run with -h flag for details)");
                 System.exit(1);
             }
-            if (metadataKey == null)
-            {
-                System.out.println("Error - a metadata key (commonly the prefix) must be specified for this collection");
+            if (metadataKey == null) {
+                System.out
+                    .println("Error - a metadata key (commonly the prefix) must be specified for this collection");
                 System.out.println(" (run with -h flag for details)");
                 System.exit(1);
             }
-            
+
             harvester.configureCollection(collection, harvestType, oaiSource, oaiSetID, metadataKey);
-        }
-        else if ("ping".equals(command))
-        {
-            if (oaiSource == null || oaiSetID == null)
-            {
+        } else if ("ping".equals(command)) {
+            if (oaiSource == null || oaiSetID == null) {
                 System.out.println("Error - both the OAI server address and OAI set id must be specified");
                 System.out.println(" (run with -h flag for details)");
                 System.exit(1);
@@ -260,10 +248,10 @@ public class Harvest
             pingResponder(oaiSource, oaiSetID, metadataKey);
         }
     }
-    
+
     /*
      * Resolve the ID into a collection and check to see if its harvesting options are set. If so, return
-     * the collection, if not, bail out. 
+     * the collection, if not, bail out.
      */
     private Collection resolveCollection(String collectionID) {
 
@@ -272,47 +260,39 @@ public class Harvest
 
         try {
             // is the ID a handle?
-            if (collectionID != null)
-            {
-                if (collectionID.indexOf('/') != -1)
-                {
+            if (collectionID != null) {
+                if (collectionID.indexOf('/') != -1) {
                     // string has a / so it must be a handle - try and resolve it
                     dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, collectionID);
 
                     // resolved, now make sure it's a collection
-                    if (dso == null || dso.getType() != Constants.COLLECTION)
-                    {
+                    if (dso == null || dso.getType() != Constants.COLLECTION) {
                         targetCollection = null;
-                    }
-                    else
-                    {
+                    } else {
                         targetCollection = (Collection) dso;
                     }
-                }
-                // not a handle, try and treat it as an integer collection
-                // database ID
-                else
-                {
-                    System.out.println("Looking up by id: " + collectionID + ", parsed as '" + Integer.parseInt(collectionID) + "', " + "in context: " + context);
+                } else {
+                    // not a handle, try and treat it as an integer collection database ID
+                    System.out.println("Looking up by id: " + collectionID + ", parsed as '" + Integer
+                        .parseInt(collectionID) + "', " + "in context: " + context);
                     targetCollection = collectionService.find(context, UUID.fromString(collectionID));
                 }
             }
             // was the collection valid?
-            if (targetCollection == null)
-            {
+            if (targetCollection == null) {
                 System.out.println("Cannot resolve " + collectionID + " to collection");
                 System.exit(1);
             }
-        }
-        catch (SQLException se) {
+        } catch (SQLException se) {
             se.printStackTrace();
         }
 
         return targetCollection;
     }
-    
-    
-    private void configureCollection(String collectionID, int type, String oaiSource, String oaiSetId, String mdConfigId) {
+
+
+    private void configureCollection(String collectionID, int type, String oaiSource, String oaiSetId,
+                                     String mdConfigId) {
         System.out.println("Running: configure collection");
 
         Collection collection = resolveCollection(collectionID);
@@ -330,55 +310,52 @@ public class Harvest
             harvestedCollectionService.update(context, hc);
             context.restoreAuthSystemState();
             context.complete();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Changes could not be committed");
             e.printStackTrace();
             System.exit(1);
-        }
-        finally {
-            if (context != null)
-            {
+        } finally {
+            if (context != null) {
                 context.restoreAuthSystemState();
             }
         }
     }
-    
-    
+
+
     /**
      * Purges a collection of all harvest-related data and settings. All items in the collection will be deleted.
-     * 
+     *
      * @param collectionID
      * @param email
      */
     private void purgeCollection(String collectionID, String email) {
-        System.out.println("Purging collection of all items and resetting last_harvested and harvest_message: " + collectionID);
+        System.out.println(
+            "Purging collection of all items and resetting last_harvested and harvest_message: " + collectionID);
         Collection collection = resolveCollection(collectionID);
 
-        try
-        {
+        try {
             EPerson eperson = ePersonService.findByEmail(context, email);
             context.setCurrentUser(eperson);
             context.turnOffAuthorisationSystem();
 
             ItemService itemService = ContentServiceFactory.getInstance().getItemService();
             Iterator<Item> it = itemService.findByCollection(context, collection);
-            int i=0;
+            int i = 0;
             while (it.hasNext()) {
                 i++;
                 Item item = it.next();
                 System.out.println("Deleting: " + item.getHandle());
                 collectionService.removeItem(context, collection, item);
-    			context.uncacheEntity(item);// Dispatch events every 50 items
-    			if (i%50 == 0) {
-    				context.dispatchEvents();
-    				i=0;
-    			}
-    		}
-    		
-    		HarvestedCollection hc = harvestedCollectionService.find(context, collection);
-    		if (hc != null) {
-	    		hc.setLastHarvested(null);
+                context.uncacheEntity(item);// Dispatch events every 50 items
+                if (i % 50 == 0) {
+                    context.dispatchEvents();
+                    i = 0;
+                }
+            }
+
+            HarvestedCollection hc = harvestedCollectionService.find(context, collection);
+            if (hc != null) {
+                hc.setLastHarvested(null);
                 hc.setHarvestMessage("");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
                 hc.setHarvestStartTime(null);
@@ -386,20 +363,18 @@ public class Harvest
             }
             context.restoreAuthSystemState();
             context.dispatchEvents();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Changes could not be committed");
             e.printStackTrace();
             System.exit(1);
-        }
-        finally {
+        } finally {
             context.restoreAuthSystemState();
         }
     }
-    
-    
+
+
     /**
-     * Run a single harvest cycle on the specified collection under the authorization of the supplied EPerson 
+     * Run a single harvest cycle on the specified collection under the authorization of the supplied EPerson
      */
     private void runHarvest(String collectionID, String email) {
         System.out.println("Running: a harvest cycle on " + collectionID);
@@ -411,8 +386,7 @@ public class Harvest
             HarvestedCollection hc = harvestedCollectionService.find(context, collection);
             harvester = new OAIHarvester(context, collection, hc);
             System.out.println("success. ");
-        }
-        catch (HarvestingException hex) {
+        } catch (HarvestingException hex) {
             System.out.print("failed. ");
             System.out.println(hex.getMessage());
             throw new IllegalStateException("Unable to harvest", hex);
@@ -429,14 +403,11 @@ public class Harvest
             context.setCurrentUser(eperson);
             harvester.runHarvest();
             context.complete();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new IllegalStateException("Failed to run harvester", e);
-        }
-        catch (AuthorizeException e) {
+        } catch (AuthorizeException e) {
             throw new IllegalStateException("Failed to run harvester", e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new IllegalStateException("Failed to run harvester", e);
         }
 
@@ -444,24 +415,22 @@ public class Harvest
     }
 
     /**
-     * Resets harvest_status and harvest_start_time flags for all collections that have a row in the harvested_collections table 
+     * Resets harvest_status and harvest_start_time flags for all collections that have a row in the
+     * harvested_collections table
      */
     private static void resetHarvesting() {
         System.out.print("Resetting harvest status flag on all collections... ");
 
-        try
-        {
+        try {
             List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
-            for (HarvestedCollection harvestedCollection : harvestedCollections)
-            {
+            for (HarvestedCollection harvestedCollection : harvestedCollections) {
                 //hc.setHarvestResult(null,"");
                 harvestedCollection.setHarvestStartTime(null);
                 harvestedCollection.setHarvestStatus(HarvestedCollection.STATUS_READY);
                 harvestedCollectionService.update(context, harvestedCollection);
             }
             System.out.println("success. ");
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             System.out.println("failed. ");
             ex.printStackTrace();
         }
@@ -470,15 +439,12 @@ public class Harvest
     /**
      * Starts up the harvest scheduler. Terminating this process will stop the scheduler.
      */
-    private static void startHarvester()
-    {
-        try
-        {
+    private static void startHarvester() {
+        try {
             System.out.print("Starting harvest loop... ");
             HarvestServiceFactory.getInstance().getHarvestSchedulingService().startNewScheduler();
             System.out.println("running. ");
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -486,34 +452,33 @@ public class Harvest
     /**
      * See if the responder is alive and working.
      *
-     * @param server address of the responder's host.
-     * @param set name of an item set.
+     * @param server         address of the responder's host.
+     * @param set            name of an item set.
      * @param metadataFormat local prefix name, or null for "dc".
      */
-    private static void pingResponder(String server, String set, String metadataFormat)
-    {
+    private static void pingResponder(String server, String set, String metadataFormat) {
         List<String> errors;
 
         System.out.print("Testing basic PMH access:  ");
         errors = OAIHarvester.verifyOAIharvester(server, set,
-                (null != metadataFormat) ? metadataFormat : "dc", false);
-        if (errors.isEmpty())
+                                                 (null != metadataFormat) ? metadataFormat : "dc", false);
+        if (errors.isEmpty()) {
             System.out.println("OK");
-        else
-        {
-            for (String error : errors)
+        } else {
+            for (String error : errors) {
                 System.err.println(error);
+            }
         }
 
         System.out.print("Testing ORE support:  ");
         errors = OAIHarvester.verifyOAIharvester(server, set,
-                (null != metadataFormat) ? metadataFormat : "dc", true);
-        if (errors.isEmpty())
+                                                 (null != metadataFormat) ? metadataFormat : "dc", true);
+        if (errors.isEmpty()) {
             System.out.println("OK");
-        else
-        {
-            for (String error : errors)
+        } else {
+            for (String error : errors) {
                 System.err.println(error);
+            }
         }
     }
 }

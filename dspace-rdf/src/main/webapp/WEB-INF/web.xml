@@ -8,11 +8,9 @@
     http://www.dspace.org/license/
 
 -->
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://java.sun.com/xml/ns/javaee"
-         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         id="WebApp_ID" version="2.5">
+<web-app id="DSpace-RDF" version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
     <display-name>RDF Data Provider</display-name>
 
@@ -46,7 +44,7 @@
         <servlet-name>rdf-serialization</servlet-name>
         <servlet-class>org.dspace.rdf.providing.DataProviderServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>local-uri-redirection</servlet-name>
         <servlet-class>org.dspace.rdf.providing.LocalURIRedirectionServlet</servlet-class>
@@ -57,7 +55,7 @@
         <servlet-name>rdf-serialization</servlet-name>
         <url-pattern>/handle/*</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>local-uri-redirection</servlet-name>
         <url-pattern>/resource/*</url-pattern>

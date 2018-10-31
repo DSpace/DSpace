@@ -7,12 +7,12 @@
  */
 package org.dspace.importer.external.datamodel;
 
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 
 /**
  * This class contains all MetadatumDTO objects from an imported item
@@ -34,8 +34,7 @@ public class ImportRecord {
     /**
      * Create an ImportRecord instance initialized with a List of MetadatumDTO objects
      *
-     * @param valueList
-     *     list of metadata values
+     * @param valueList list of metadata values
      */
     public ImportRecord(List<MetadatumDTO> valueList) {
         //don't want to alter the original list. Also now I can control the type of list
@@ -54,7 +53,7 @@ public class ImportRecord {
         final StringBuilder sb = new StringBuilder();
         sb.append("Record");
         sb.append("{valueList=");
-        for (MetadatumDTO val:valueList) {
+        for (MetadatumDTO val : valueList) {
             sb.append("{");
             sb.append(val.getSchema());
             sb.append("; ");
@@ -75,19 +74,20 @@ public class ImportRecord {
 
     /**
      * Return the MetadatumDTO's that are related to a given schema/element/qualifier pair/triplet
-     * @param schema metadata field schema
-     * @param element metadata field element
+     *
+     * @param schema    metadata field schema
+     * @param element   metadata field element
      * @param qualifier metadata field qualifier
      * @return the MetadatumDTO's that are related to a given schema/element/qualifier pair/triplet
      */
     public Collection<MetadatumDTO> getValue(String schema, String element, String qualifier) {
         List<MetadatumDTO> values = new LinkedList<MetadatumDTO>();
-        for (MetadatumDTO value:valueList) {
-            if (value.getSchema().equals(schema)&&value.getElement().equals(element)) {
-               if (qualifier==null && value.getQualifier() == null) {
-                   values.add(value);
-               } else if (value.getQualifier() != null && value.getQualifier().equals(qualifier)) {
-                   values.add(value);
+        for (MetadatumDTO value : valueList) {
+            if (value.getSchema().equals(schema) && value.getElement().equals(element)) {
+                if (qualifier == null && value.getQualifier() == null) {
+                    values.add(value);
+                } else if (value.getQualifier() != null && value.getQualifier().equals(qualifier)) {
+                    values.add(value);
                 }
             }
         }
@@ -96,6 +96,7 @@ public class ImportRecord {
 
     /**
      * Add a value to the valueList
+     *
      * @param value The MetadatumDTO to add to the valueList
      */
     public void addValue(MetadatumDTO value) {

@@ -7,6 +7,16 @@
  */
 package org.dspace.statistics.content;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -25,12 +35,6 @@ import org.dspace.statistics.ObjectCount;
 import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.content.filter.StatisticsFilter;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.*;
-
 /**
  * A workflow data implementation that will query the statistics backend for workflow information
  *
@@ -42,9 +46,13 @@ public class StatisticsDataWorkflow extends StatisticsData {
 
     private static final Logger log = Logger.getLogger(StatisticsDataWorkflow.class);
 
-    /** Current DSpaceObject for which to generate the statistics. */
+    /**
+     * Current DSpaceObject for which to generate the statistics.
+     */
     private DSpaceObject currentDso;
-    /** Variable used to indicate of how many months an average is required (-1 is inactive) **/
+    /**
+     * Variable used to indicate of how many months an average is required (-1 is inactive)
+     **/
     private int averageMonths = -1;
 
     public StatisticsDataWorkflow(DSpaceObject dso, int averageMonths) {
@@ -55,11 +63,11 @@ public class StatisticsDataWorkflow extends StatisticsData {
 
 
     @Override
-    public Dataset createDataset(Context context) throws SQLException, SolrServerException, IOException, ParseException {
-                // Check if we already have one.
+    public Dataset createDataset(Context context)
+        throws SQLException, SolrServerException, IOException, ParseException {
+        // Check if we already have one.
         // If we do then give it back.
-        if(getDataset() != null)
-        {
+        if (getDataset() != null) {
             return getDataset();
         }
 
@@ -73,29 +81,31 @@ public class StatisticsDataWorkflow extends StatisticsData {
 
         String query = getQuery();
 
-        Dataset dataset = new Dataset(0,0);
+        Dataset dataset = new Dataset(0, 0);
         List<DatasetGenerator> datasetGenerators = getDatasetGenerators();
-        if(0 < datasetGenerators.size()){
+        if (0 < datasetGenerators.size()) {
             //At the moment we can only have one dataset generator
             DatasetGenerator datasetGenerator = datasetGenerators.get(0);
-            if(datasetGenerator instanceof DatasetTypeGenerator){
+            if (datasetGenerator instanceof DatasetTypeGenerator) {
                 DatasetTypeGenerator typeGenerator = (DatasetTypeGenerator) datasetGenerator;
-                ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, defaultFilterQuery, typeGenerator.getType(), typeGenerator.getMax(), typeGenerator.isIncludeTotal(), null);
+                ObjectCount[] topCounts = solrLoggerService
+                    .queryFacetField(query, defaultFilterQuery, typeGenerator.getType(), typeGenerator.getMax(),
+                                     typeGenerator.isIncludeTotal(), null);
 
                 //Retrieve our total field counts
                 Map<String, Long> totalFieldCounts = new HashMap<String, Long>();
-                if(averageMonths != -1){
+                if (averageMonths != -1) {
                     totalFieldCounts = getTotalFacetCounts(typeGenerator);
                 }
                 long monthDifference = 1;
-                if(getOldestWorkflowItemDate() != null){
+                if (getOldestWorkflowItemDate() != null) {
                     monthDifference = getMonthsDifference(new Date(), getOldestWorkflowItemDate());
                 }
 
                 dataset = new Dataset(topCounts.length, (averageMonths != -1 ? 3 : 2));
                 dataset.setColLabel(0, "step");
                 dataset.setColLabel(1, "performed");
-                if(averageMonths != -1){
+                if (averageMonths != -1) {
                     dataset.setColLabel(2, "average");
                 }
                 for (int i = 0; i < topCounts.length; i++) {
@@ -103,10 +113,10 @@ public class StatisticsDataWorkflow extends StatisticsData {
                     dataset.setRowLabel(i, String.valueOf(i + 1));
                     dataset.addValueToMatrix(i, 0, topCount.getValue());
                     dataset.addValueToMatrix(i, 1, topCount.getCount());
-                    if(averageMonths != -1){
+                    if (averageMonths != -1) {
                         //Calculate the average of one month
                         long monthlyAverage = 0;
-                        if(totalFieldCounts.get(topCount.getValue()) != null){
+                        if (totalFieldCounts.get(topCount.getValue()) != null) {
                             monthlyAverage = totalFieldCounts.get(topCount.getValue()) / monthDifference;
                         }
                         //We multiple our average for one month by the number of
@@ -123,17 +133,17 @@ public class StatisticsDataWorkflow extends StatisticsData {
     /**
      * Returns the query to be used in solr
      * in case of a dso a scopeDso query will be returned otherwise the default *:* query will be used
+     *
      * @return the query as a string
      */
     protected String getQuery() {
         String query = "statistics_type:" + SolrLoggerServiceImpl.StatisticsType.WORKFLOW.text();
         query += " AND NOT(previousWorkflowStep: SUBMIT)";
-        if(currentDso != null){
-            if(currentDso.getType() == Constants.COMMUNITY){
+        if (currentDso != null) {
+            if (currentDso.getType() == Constants.COMMUNITY) {
                 query += " AND owningComm:";
 
-            }else
-            if(currentDso.getType() == Constants.COLLECTION){
+            } else if (currentDso.getType() == Constants.COLLECTION) {
                 query += " AND owningColl:";
             }
             query += currentDso.getID();
@@ -150,12 +160,14 @@ public class StatisticsDataWorkflow extends StatisticsData {
 
     /**
      * Retrieve the total counts for the facets (total count is same query but none of the filter queries).
+     *
      * @param typeGenerator the type generator
      * @return counts for each facet by name.
      * @throws org.apache.solr.client.solrj.SolrServerException passed through.
      */
     protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator) throws SolrServerException {
-        ObjectCount[] objectCounts = solrLoggerService.queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);
+        ObjectCount[] objectCounts = solrLoggerService
+            .queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);
         Map<String, Long> result = new HashMap<String, Long>();
         for (ObjectCount objectCount : objectCounts) {
             result.put(objectCount.getValue(), objectCount.getCount());
@@ -164,22 +176,24 @@ public class StatisticsDataWorkflow extends StatisticsData {
     }
 
 
-
     protected Date getOldestWorkflowItemDate() throws SolrServerException {
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String workflowStartDate = configurationService.getProperty("usage-statistics.workflow-start-date");
-        if(workflowStartDate == null){
+        if (workflowStartDate == null) {
             //Query our solr for it !
-            QueryResponse oldestRecord = solrLoggerService.query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true);
-            if(0 < oldestRecord.getResults().getNumFound()){
+            QueryResponse oldestRecord = solrLoggerService
+                .query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true);
+            if (0 < oldestRecord.getResults().getNumFound()) {
                 SolrDocument solrDocument = oldestRecord.getResults().get(0);
                 Date oldestDate = (Date) solrDocument.getFieldValue("time");
                 //Store the date, we only need to retrieve this once !
                 try {
-                    //Also store it in the solr-statics configuration file, the reason for this being that the sort query
-                    //can be very time consuming & we do not want this delay each time we want to see workflow statistics
+                    //Also store it in the solr-statics configuration file, the reason for this being that the sort
+                    // query
+                    //can be very time consuming & we do not want this delay each time we want to see workflow
+                    // statistics
                     String solrConfigDir = configurationService.getProperty("dspace.dir") + File.separator + "config"
-                            + File.separator + "modules" + File.separator + "usage-statistics.cfg";
+                        + File.separator + "modules" + File.separator + "usage-statistics.cfg";
                     PropertiesConfiguration config = new PropertiesConfiguration(solrConfigDir);
                     config.setProperty("workflow-start-date", new DCDate(oldestDate));
                     config.save();
@@ -187,15 +201,16 @@ public class StatisticsDataWorkflow extends StatisticsData {
                     log.error("Error while storing workflow start date", e);
                 }
                 //Also store it in our local config !
-                configurationService.setProperty("usage-statistics.workflow-start-date", new DCDate(oldestDate).toString());
+                configurationService
+                    .setProperty("usage-statistics.workflow-start-date", new DCDate(oldestDate).toString());
 
                 //Write to file
                 return oldestDate;
-            }else{
+            } else {
                 return null;
             }
 
-        }else{
+        } else {
             return new DCDate(workflowStartDate).toDate();
         }
     }
