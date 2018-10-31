@@ -537,6 +537,8 @@ public class SolrUpgradePre6xStatistics
                                         }
                                         if (uuid != null) {
                                                 newvals.add(uuid.toString());
+                                        } else {
+                                            newvals.add(oval+"-unmigrated");
                                         }
                                 } catch (NumberFormatException e) {
                                         log.warn("Non numeric legacy id "+ col.name() +":" + oval.toString());
@@ -547,7 +549,6 @@ public class SolrUpgradePre6xStatistics
                                 for(String nv: newvals) {
                                         input.addField(col.name(), nv);
                                 }
-                                
                         }
                 }
         }
