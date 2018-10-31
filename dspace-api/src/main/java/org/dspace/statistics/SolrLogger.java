@@ -368,13 +368,6 @@ public class SolrLogger
 					currentUser);
 			if (doc1 == null)
 				return;
-			if (dspaceObject instanceof Bitstream) {
-				Bitstream bit = (Bitstream) dspaceObject;
-				Bundle[] bundles = bit.getBundles();
-				for (Bundle bundle : bundles) {
-					doc1.addField("bundleName", bundle.getName());
-				}
-			}
 
 			doc1.addField("statistics_type", StatisticsType.VIEW.text());
 

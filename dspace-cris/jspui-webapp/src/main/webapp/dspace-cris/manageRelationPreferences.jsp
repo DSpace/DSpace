@@ -132,7 +132,7 @@
 												var out = '<a href="#" id="null_'+data+'_'+row.uuid+'" class="action"><fmt:message key="jsp.layout.cris.relationmanagement.${confName}.status.normal"/></a>';
 												if (${isSelectEnabled})
 												{
-													out += '&nbsp;<a href="#" id="selected_'+row.uuid+'" class="action"><fmt:message key="jsp.layout.cris.relationmanagement.${confName}.status.selected"/></a>';
+													out += '&nbsp;<a href="#" id="selected_'+data+'_'+row.uuid+'" class="action"><fmt:message key="jsp.layout.cris.relationmanagement.${confName}.status.selected"/></a>';
 												}
 												if (${isUnlinkEnabled})
 												{
@@ -296,9 +296,9 @@
 		            		changeD.append(j('<span>').html('Selected list re-ordered'));
 				            change.append(changeS).append(changeD);
 				            j('#relation_management_changesLog_queue').append(change);
-				            j('#submit_save').attr('disabled', 'disabled');
-				            j('#savemessage').hide();
-				            j('#disabledsavemessage').show();
+				            j('#submit_save').removeAttr('disabled');
+				            j('#savemessage').show();
+				            j('#disabledsavemessage').hide();
 	            		}
 	            		rebuildSelectList();
 	            	}
