@@ -79,13 +79,13 @@ public class SolrUpgradePre6xStatistics
         private static final int    FACET_CUTOFF = 10;
         
         private static final String INDEX_DEFAULT = "statistics";
-        private static final String MIGQUERY = "(id:* AND NOT(id:*-*)) OR (scopeId:* AND NOT(scopeId:*-*)) OR (epersonid:* AND NOT(epersonid:*-*))";
+        private static final String MIGQUERY = "(id:* AND -(id:*-*)) OR (scopeId:* AND -(scopeId:*-*)) OR (epersonid:* AND -(epersonid:*-*))";
 
         /*
         private static final String MIGQUERYARR[] = {
-                "id:* AND NOT(id:*-*)",
-                "scopeId:* AND NOT(scopeId:*-*)",
-                "epersonid:* AND NOT(epersonid:*-*)"
+                "id:* AND -(id:*-*)",
+                "scopeId:* AND -(scopeId:*-*)",
+                "epersonid:* AND -(epersonid:*-*)"
         };
         */
 
