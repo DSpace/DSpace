@@ -10,6 +10,7 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,11 +20,15 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.EPersonConverter;
+import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.EPersonPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -34,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +59,9 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
 
     @Autowired
     EPersonConverter converter;
+
+    @Autowired
+    EPersonPatch epersonPatch;
 
     @Override
     protected EPersonRest createAndReturn(Context context)
@@ -177,6 +186,56 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
             return null;
         }
         return converter.fromModel(eperson);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
+                      Patch patch)
+            throws UnprocessableEntityException, PatchBadRequestException, AuthorizeException,
+            ResourceNotFoundException {
+
+        try {
+            EPerson eperson = es.find(context, uuid);
+            if (eperson == null) {
+                throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
+            }
+            List<Operation> operations = patch.getOperations();
+            EPersonRest ePersonRest = findOne(context, uuid);
+            EPersonRest patchedModel = (EPersonRest) epersonPatch.patch(ePersonRest, operations);
+            updatePatchedValues(context, patchedModel, eperson);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Applies changes in the rest model.
+     * @param context
+     * @param ePersonRest the updated eperson rest
+     * @param ePerson the eperson content object
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    private void updatePatchedValues(Context context, EPersonRest ePersonRest, EPerson ePerson)
+            throws SQLException, AuthorizeException {
+
+        if (ePersonRest.getPassword() != null) {
+            es.setPassword(ePerson, ePersonRest.getPassword());
+        }
+        if (ePersonRest.isRequireCertificate() != ePerson.getRequireCertificate()) {
+            ePerson.setRequireCertificate(ePersonRest.isRequireCertificate());
+        }
+        if (ePersonRest.isCanLogIn() != ePerson.canLogIn()) {
+            ePerson.setCanLogIn(ePersonRest.isCanLogIn());
+        }
+        if (!Objects.equals(ePersonRest.getNetid(), ePerson.getNetid())) {
+            ePerson.setNetid(ePersonRest.getNetid());
+        }
+
+        es.update(context, ePerson);
+
     }
 
     @Override

@@ -152,7 +152,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        log.info("solr-statistics.spidersfile:" + configurationService.getProperty("solr-statistics.spidersfile"));
         log.info("solr-statistics.server:" + configurationService.getProperty("solr-statistics.server"));
         log.info("usage-statistics.dbfile:" + configurationService.getProperty("usage-statistics.dbfile"));
 
