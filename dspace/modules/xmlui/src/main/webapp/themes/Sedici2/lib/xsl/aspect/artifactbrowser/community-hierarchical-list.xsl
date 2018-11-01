@@ -135,6 +135,12 @@
                      </xsl:otherwise>
                  </xsl:choose>
 			</a>
+			<!--Display community strengths (item counts) if they exist-->
+            <xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+                <xsl:text> [</xsl:text>
+                <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                <xsl:text>]</xsl:text>
+            </xsl:if>
 <!--             <span id="{@OBJID}" class="topCommunity"> -->
 <!--                  <xsl:choose> -->
 <!--                      <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0"> -->
