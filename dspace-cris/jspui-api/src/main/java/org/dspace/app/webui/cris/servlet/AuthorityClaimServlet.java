@@ -175,6 +175,8 @@ public class AuthorityClaimServlet extends DSpaceServlet
                 Metadatum[] metadatum = item
                         .getMetadataByMetadataString(standardizeField);
 
+                haveSimilar.put(field, false);
+                
                 for (Metadatum meta : metadatum)
                 {
                     String similar = null;
@@ -201,7 +203,6 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                     haveSimilar.put(field, true);
                                     break;
                                 }
-                                haveSimilar.put(field, false);
                             }
                         }
                     }
