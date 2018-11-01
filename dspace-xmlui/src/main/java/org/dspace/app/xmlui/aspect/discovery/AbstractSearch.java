@@ -166,7 +166,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                     validity.add("size:" + results.size());
 
                     for (DSpaceObject dso : results) {
-                        validity.add(dso);
+                        validity.addIfItemOnlyAddOriginalBundles(dso);
                     }
                 }
 
