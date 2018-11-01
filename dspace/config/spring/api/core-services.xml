@@ -93,6 +93,7 @@
     <bean class="org.dspace.license.CreativeCommonsServiceImpl"/>
 
     <bean id="spiderDetectorService" class="org.dspace.statistics.util.SpiderDetectorServiceImpl"/>
+    <bean id="clientInfoService" class="org.dspace.service.impl.ClientInfoServiceImpl"/>
 
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 

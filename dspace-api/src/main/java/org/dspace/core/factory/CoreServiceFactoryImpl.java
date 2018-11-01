@@ -10,6 +10,7 @@ package org.dspace.core.factory;
 import org.dspace.core.service.LicenseService;
 import org.dspace.core.service.NewsService;
 import org.dspace.core.service.PluginService;
+import org.dspace.service.ClientInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -29,6 +30,9 @@ public class CoreServiceFactoryImpl extends CoreServiceFactory {
     @Autowired(required = true)
     private PluginService pluginService;
 
+    @Autowired(required = true)
+    private ClientInfoService clientInfoService;
+
     @Override
     public LicenseService getLicenseService() {
         return licenseService;
@@ -42,5 +46,9 @@ public class CoreServiceFactoryImpl extends CoreServiceFactory {
     @Override
     public PluginService getPluginService() {
         return pluginService;
+    }
+
+    public ClientInfoService getClientInfoService() {
+        return clientInfoService;
     }
 }
