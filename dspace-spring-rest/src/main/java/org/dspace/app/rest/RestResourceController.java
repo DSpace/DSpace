@@ -924,11 +924,7 @@ public class RestResourceController implements InitializingBean {
             result = assembler.toResource(resources, link);
         } else {
             if (searchResult == null) {
-                try {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                } catch (IOException e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 return null;
             }
             DSpaceResource<T> dsResource = repository.wrapResource((T) searchResult);
