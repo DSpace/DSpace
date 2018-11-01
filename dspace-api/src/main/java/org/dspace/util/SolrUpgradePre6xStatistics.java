@@ -137,10 +137,11 @@ public class SolrUpgradePre6xStatistics {
      * Construct the utility class from the command line options
      * @param indexName name of the statistics shard to update
      * @param numRec    maximum number of records to process
-     * @throws IOException 
-     * @throws SolrServerException 
+     * @throws IOException
+     * @throws SolrServerException
      */
-    public SolrUpgradePre6xStatistics(String indexName, int numRec, int batchSize) throws SolrServerException, IOException {
+    public SolrUpgradePre6xStatistics(String indexName, int numRec, int batchSize)
+            throws SolrServerException, IOException {
         String serverPath = configurationService.getProperty("solr-statistics.server");
         serverPath = serverPath.replaceAll("statistics$", indexName);
         System.out.println("Connecting to " + serverPath);
@@ -164,14 +165,15 @@ public class SolrUpgradePre6xStatistics {
 
     /**
      * Refresh the DSpace Context object in order to periodically release objects from memory
-     * @throws IOException 
-     * @throws SolrServerException 
+     * @throws IOException
+     * @throws SolrServerException
      */
     private void refreshContext() throws SolrServerException, IOException {
         if (context != null) {
             try {
                 totalCache += numUncache + context.getCacheSize();
             } catch (SQLException e) {
+                log.warn(e.getMessage());
             }
         }
         this.context = new Context(Context.Mode.READ_ONLY);
