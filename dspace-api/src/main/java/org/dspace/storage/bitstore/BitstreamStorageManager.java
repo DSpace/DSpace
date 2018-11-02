@@ -570,21 +570,10 @@ public class BitstreamStorageManager
         InputStream resultInputStream = null;
         TableRow bitstream = DatabaseManager.find(context, "bitstream", id);
         int storeNumber = bitstream.getIntColumn("store_number");
-        String sInternalId = bitstream.getStringColumn("internal_id");
-        
+       
         if(storeNumber == S3_ASSETSTORE) {
-            String key = getFullS3Key(sInternalId + "");
-            log.debug("retrieving item " + key + " from Amazon S3 bucket " + s3BucketName);
-            try {
-                //get tomorrow's date:
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.DAY_OF_YEAR, 2);
-                URL url = s3Service.generatePresignedUrl(s3BucketName, key, calendar.getTime());
-                resultInputStream = url.openStream();
-            } catch (Exception e) {
-                log.error("Unable to get S3 item " + key + " from bucket " + s3BucketName, e);
-                throw new IOException(e);
-            }
+            URL url = getS3AccessURL(bitstream);
+            resultInputStream = url.openStream();
         } else {
             // retrieve from local file storage
             File file = getFile(bitstream);
@@ -592,6 +581,28 @@ public class BitstreamStorageManager
         }
         
         return resultInputStream;
+    }
+
+    /**
+       Returns a URL that allows access to a bitstream stored in Amazon S3.
+    **/
+    public static getS3AccessURL(Bitstream bitstream) {
+        String sInternalId = bitstream.getStringColumn("internal_id");
+        String key = getFullS3Key(sInternalId + "");
+        URL url = null;
+        
+        log.debug("retrieving item " + key + " from Amazon S3 bucket " + s3BucketName);
+        try {
+            //get a date slightly in the future for the expiration of the URL:
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_YEAR, 5);
+            url = s3Service.generatePresignedUrl(s3BucketName, key, calendar.getTime());
+        } catch (Exception e) {
+            log.error("Unable to get S3 item " + key + " from bucket " + s3BucketName, e);
+            throw new IOException(e);
+        }
+
+        return url;
     }
 
     /**

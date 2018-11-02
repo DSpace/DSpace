@@ -1,4 +1,7 @@
 /*
+  The main class that provides access to Dryad Data Package objects. Each
+  DryadDataPackage contains a DSpace Item object, and adds Dryad-specific functionality
+  on top of it.
  */
 package org.datadryad.api;
 

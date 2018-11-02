@@ -198,63 +198,69 @@ public class DashService {
     }
 
     /**
-       PUTs a DryadDataFile to Dash, attaching it to the DryadDataPackage that contains it.
+       POSTs references for all data files Dash, attaching them to the DryadDataPackage.
        The DryadDataPackage must already have been PUT to Dash.
 
-       @return a HTTP response code
+       @return a HTTP response code, or -1 if there is an exception that prevents getting a response code
     **/
     // TODO
-    // - add json transformer in DryadDataFile
+    // - add json transformer in DryadBitstream
     // - submit to proper PUT URL
     // - use a temporary URL
     // - document how to get/use the amazon tmp URLs
     // - figure out the mime types for the http request
     // - expand to all bitstreams and readmes
     // - check character ecoding
-    private int putDataFile(DryadDataFile dataFile, DryadDataPackage dataPackage) {
-        String dashJSON = ""; //TODO dataFile.getDashJSON();
-        log.debug("Got JSON object: " + dashJSON);
+    private int postDataFileReferences(DryadDataPackage dataPackage) {
         int responseCode = 0;
         BufferedReader reader = null;
-        
-        try {
-            Bitstream firstBitstream = dataFile.getFirstBitstream();
-            String encodedFileName = URLEncoder.encode(firstBitstream.getName(), "UTF-8");
-            String encodedPackageDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
-            URL url = new URL(dashServer + "/api/datasets/" + encodedPackageDOI + "/files/" + encodedFileName);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
-            connection.setDoOutput(true);
-            connection.setRequestMethod("PUT");
 
-            OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
-            wr.write(dashJSON);
-            wr.close();
+        for(DryadDataFile dryadFile : dataPackage.getFiles()) {
+            String fileName = dryadFile.getTitle();
+            String fileDescription = dryadFile.getDescription();
+            for(Bitstream dryadBitstream : dryadFile.getAllBitstreams()) {
+                log.debug("transferring bitstream " + dryadBitstream.getName());
+                String dashJSON = bitstream.getDashReferenceJSON();
+                log.debug("Got JSON object: " + dashJSON);
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line = null;
-            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
-            while ((line = reader.readLine()) != null) {
-                out.append(line);
+                try {
+                    URL url = new URL(dashServer + "/api/datasets/" + encodedPackageDOI + "/urls");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+                    connection.setDoOutput(true);
+                    connection.setRequestMethod("POST");
+                    
+                    OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+                    wr.write(dashJSON);
+                    wr.close();
+                    
+                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    String line = null;
+                    StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+                    while ((line = reader.readLine()) != null) {
+                        out.append(line);
+                    }
+                    String response = out.toString();
+                    
+                    responseCode = connection.getResponseCode();
+                    
+                    if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
+                        log.debug("file create/update successful");
+                    } else {
+                        log.fatal("Unable to send file reference to DASH, response: " + responseCode +
+                                  connection.getResponseMessage());
+                        return responseCode;
+                    }
+                    
+                    log.info("result object " + response);
+                } catch (Exception e) {
+                    log.fatal("Unable to send item to DASH", e);
+                    return -1;
+                }       
             }
-            String response = out.toString();
-            
-            responseCode = connection.getResponseCode();
-
-            if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
-                log.debug("package create/update successful");
-                dataPackage.addDashTransferDate();
-            } else {
-                log.fatal("Unable to send item to DASH, response: " + responseCode +
-                          connection.getResponseMessage());
-            }
-            
-            log.info("result object " + response);
-        } catch (Exception e) {
-            log.fatal("Unable to send item to DASH", e);
         }
-
+            
         return responseCode;
     }
 
