@@ -297,18 +297,8 @@ public class SolrLogger
         {
             SolrInputDocument doc1 = getCommonSolrDocByRequest(dspaceObject, request, currentUser);
             if (doc1 == null) return;
-            if(dspaceObject instanceof Bitstream)
-            {
-                Bitstream bit = (Bitstream) dspaceObject;
-                Bundle[] bundles = bit.getBundles();
-                for (Bundle bundle : bundles) {
-                    doc1.addField("bundleName", bundle.getName());
-                }
-            }
 
             doc1.addField("statistics_type", StatisticsType.VIEW.text());
-
-
             solr.add(doc1);
             //commits are executed automatically using the solr autocommit
 //            solr.commit(false, false);
@@ -335,13 +325,6 @@ public class SolrLogger
 			SolrInputDocument doc1 = getCommonSolrDocByFinalIP(dspaceObject, ip, dns, null, currentUser);
 			if (doc1 == null)
 				return;
-			if (dspaceObject instanceof Bitstream) {
-				Bitstream bit = (Bitstream) dspaceObject;
-				Bundle[] bundles = bit.getBundles();
-				for (Bundle bundle : bundles) {
-					doc1.addField("bundleName", bundle.getName());
-				}
-			}
 
 			doc1.addField("statistics_type", StatisticsType.VIEW.text());
 
