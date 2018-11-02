@@ -12,6 +12,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.AccountService;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -27,6 +28,7 @@ public class EPersonCLITool {
     private static final Option VERB_DELETE = new Option("d", "delete", false, "delete an existing EPerson");
     private static final Option VERB_LIST = new Option("L", "list", false, "list EPersons");
     private static final Option VERB_MODIFY = new Option("M", "modify", false, "modify an EPerson");
+    private static final Option VERB_RESET = new Option("R", "reset", false, "generate reset password link for an EPerson");
 
     private static final Option OPT_GIVENNAME = new Option("g", "givenname", true, "the person's actual first or personal name");
     private static final Option OPT_SURNAME = new Option("s", "surname", true, "the person's actual last or family name");
@@ -42,6 +44,7 @@ public class EPersonCLITool {
     private static final Option OPT_NEW_NETID = new Option("I", "newNetid", true, "new network ID");
 
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private static final AccountService accountService = EPersonServiceFactory.getInstance().getAccountService();
 
     /**
      * Tool for manipulating user accounts.
@@ -53,6 +56,7 @@ public class EPersonCLITool {
         VERBS.addOption(VERB_DELETE);
         VERBS.addOption(VERB_LIST);
         VERBS.addOption(VERB_MODIFY);
+        VERBS.addOption(VERB_RESET);
 
         final Options globalOptions = new Options();
         globalOptions.addOptionGroup(VERBS);
@@ -74,6 +78,10 @@ public class EPersonCLITool {
         else if (command.hasOption(VERB_DELETE.getOpt()))
         {
             status = cmdDelete(context, argv);
+        }
+        else if (command.hasOption(VERB_RESET.getOpt()))
+        {
+            status = cmdReset(context, argv);
         }
         else if (command.hasOption(VERB_MODIFY.getOpt()))
         {
@@ -276,6 +284,76 @@ public class EPersonCLITool {
         return 0;
     }
 
+    /** Command to generate password reset link for an EPerson. */
+    private static int cmdReset(Context context, String[] argv)
+    {
+        Options options = new Options();
+
+        options.addOption(VERB_RESET);
+
+        final OptionGroup identityOptions = new OptionGroup();
+        identityOptions.addOption(OPT_EMAIL);
+        identityOptions.addOption(OPT_NETID);
+
+        options.addOptionGroup(identityOptions);
+
+        options.addOption("h", "help", false, "explain --reset options");
+
+        GnuParser parser = new GnuParser();
+        CommandLine command;
+        try {
+            command = parser.parse(options, argv);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            return 1;
+        }
+
+        if (command.hasOption('h'))
+        {
+            new HelpFormatter().printHelp("user --reset [options]", options);
+            return 0;
+        }
+
+        // Generate Reset Link!
+        EPerson eperson = null;
+        try {
+            if (command.hasOption(OPT_NETID.getOpt()))
+            {
+                eperson = ePersonService.findByNetid(context, command.getOptionValue(OPT_NETID.getOpt()));
+            }
+            else if (command.hasOption(OPT_EMAIL.getOpt()))
+            {
+                eperson = ePersonService.findByEmail(context, command.getOptionValue(OPT_EMAIL.getOpt()));
+            }
+            else
+            {
+                System.err.println("You must specify the user's email address or netid.");
+                return 1;
+            }
+        } catch (SQLException e) {
+            System.err.append(e.getMessage());
+            return 1;
+        }
+
+        if (null == eperson)
+        {
+            System.err.println("No such EPerson");
+            return 1;
+        }
+
+        try {
+            String resetLink = accountService.getForgotPasswordLink(context, eperson.getEmail());
+            System.out.printf("Password Reset Link: %s\n", resetLink);
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            return 1;
+        } catch (AuthorizeException ex) {
+            System.err.println(ex.getMessage());
+            return 1;
+        }
+
+        return 0;
+    }
     /** Command to modify an EPerson. */
     private static int cmdModify(Context context, String[] argv) throws AuthorizeException, SQLException {
         Options options = new Options();

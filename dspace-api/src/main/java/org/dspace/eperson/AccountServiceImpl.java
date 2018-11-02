@@ -92,6 +92,44 @@ public class AccountServiceImpl implements AccountService
     }
 
     /**
+     * Generate forgot password info for the CLI Tool.
+     *
+     * Potential error conditions: No EPerson with that email (returns null)
+     * Cannot create registration data in database (throws SQLException)
+     * Authorization error (throws AuthorizeException)
+     *
+     * @param context
+     *            DSpace context
+     * @param email
+     *            Email address to send the forgot-password email to
+     * @return Password reset link with token.
+     */
+    @Override
+    public String getForgotPasswordLink(Context context, String email)
+            throws SQLException, AuthorizeException
+    {
+	// See if a registration token already exists for this user
+        RegistrationData rd = registrationDataService.findByEmail(context, email);
+
+        // Create token and update
+        if (rd == null)
+        {
+            rd = registrationDataService.create(context);
+            rd.setToken(Utils.generateHexKey());
+            rd.setEmail(email);
+            registrationDataService.update(context, rd);
+        }
+        String base = ConfigurationManager.getProperty("dspace.url");
+
+        String resetLink = new StringBuffer().append(base).append(
+            base.endsWith("/") ? "" : "/").append("forgot?token=")
+                                          .append(rd.getToken())
+                                          .toString();
+
+        return resetLink;
+    }
+
+    /**
      * <p>
      * Return the EPerson corresponding to token, where token was emailed to the
      * person by either the sendRegistrationInfo or sendForgotPasswordInfo
