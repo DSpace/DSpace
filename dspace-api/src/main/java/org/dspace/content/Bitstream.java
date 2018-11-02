@@ -729,36 +729,4 @@ public class Bitstream extends DSpaceObject
             }                                   
         }
     }
-
-
-    // Convenience method to access a properly serialized JSON string, formatted for use with DASH.
-    public String getDashJSON() {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            mapper.registerModule(new SimpleModule().addSerializer(Bitstream.class, new Bitstream.DashSerializer()));
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
-        } catch (Exception e) {
-            log.error("Unable to serialize Dash-style JSON", e);
-            return "";
-        }
-    }
-
-    /**
-       Serializes this bitstream into a JSON object for use with DASH.
-       Assumes the bitstream is stored in Amazon S3.
-    **/
-    public static class DashSerializer extends JsonSerializer<Package> {
-        @Override
-        public void serialize(Bitstream bitstream, JsonGenerator jGen, SerializerProvider provider) throws IOException {
-            jGen.writeStartObject();
-            
-            jGen.writeStringField("url", BitstreamStorageManager.getS3AccessURL(bitstream));
-            jGen.writeStringField("path", bitstream.getName());
-            jGen.writeStringField("description", bitstream.getFileDescription());
-            jGen.writeStringField("mimeType", bitstream.getFormat().getMIMEType());
-
-            jGen.writeEndObject();
-        }
-    }
-    
 }

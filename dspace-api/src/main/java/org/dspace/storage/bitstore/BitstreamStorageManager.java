@@ -21,6 +21,7 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.checker.BitstreamInfoDAO;
+import org.dspace.content.Bitstream;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -579,6 +580,10 @@ public class BitstreamStorageManager
             File file = getFile(bitstream);
             resultInputStream = (file != null) ? new FileInputStream(file) : null;
         }
+
+        if(resultInputStream == null) {
+            throw new IOException("Unable to get S3 presigned url " + key + " from bucket " + s3BucketName);
+        }
         
         return resultInputStream;
     }
@@ -586,20 +591,24 @@ public class BitstreamStorageManager
     /**
        Returns a URL that allows access to a bitstream stored in Amazon S3.
     **/
-    public static getS3AccessURL(Bitstream bitstream) {
-        String sInternalId = bitstream.getStringColumn("internal_id");
+    public static URL getS3AccessURL(Bitstream bitstream) throws SQLException {
+        TableRow bitstreamRow = DatabaseManager.find(context, "bitstream", bitstream.getID());
+        return getS3AccessURL(bitstreamRow);
+    }
+
+    private static URL getS3AccessURL(TableRow bitstream) {
+        String sInternalId = bitstreamRow.getStringColumn("internal_id");
         String key = getFullS3Key(sInternalId + "");
         URL url = null;
         
-        log.debug("retrieving item " + key + " from Amazon S3 bucket " + s3BucketName);
+        log.debug("generating presigned URL for " + key + " from Amazon S3 bucket " + s3BucketName);
         try {
             //get a date slightly in the future for the expiration of the URL:
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DAY_OF_YEAR, 5);
             url = s3Service.generatePresignedUrl(s3BucketName, key, calendar.getTime());
         } catch (Exception e) {
-            log.error("Unable to get S3 item " + key + " from bucket " + s3BucketName, e);
-            throw new IOException(e);
+            log.error("Unable to get S3 presigned url " + key + " from bucket " + s3BucketName, e);
         }
 
         return url;
