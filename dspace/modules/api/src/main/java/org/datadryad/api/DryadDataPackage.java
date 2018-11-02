@@ -313,7 +313,11 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public String getPublicationDate() {
-        return getSingleMetadataValue(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER);
+        String result = getSingleMetadataValue(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER);
+        if (result == null) {
+            return "";
+        }
+        return result;
     }
 
     public void setPublicationDate(String publicationDate) {
@@ -515,7 +519,11 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public String getManuscriptNumber() {
-        return getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
+        String result = getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
+        if (result != null) {
+            return result;
+        }
+        return "";
     }
 
     public void setManuscriptNumber(String manuscriptNumber) {
@@ -579,7 +587,11 @@ public class DryadDataPackage extends DryadObject {
      * @throws SQLException
      */
     public String getPublicationDOI() {
-        return getSingleMetadataValue(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER);
+        String result = getSingleMetadataValue(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER);
+        if (result != null) {
+            return result;
+        }
+        return "";
     }
 
     public String getTitle() {
@@ -852,28 +864,33 @@ public class DryadDataPackage extends DryadObject {
             return false;
         }
 
-        if (!"".equals(manuscript.getPublicationDOI()) && !"".equals(getPublicationDOI())) {
+        if (!"".equals(manuscript.getPublicationDOI()) && !getPublicationDOI().equals(manuscript.getPublicationDOI())) {
             fieldsChanged.add(PUBLICATION_DOI);
             setPublicationDOI(manuscript.getPublicationDOI());
             log.debug("adding publication DOI " + manuscript.getPublicationDOI());
             provenance.append(" " + PUBLICATION_DOI + " was updated.");
         }
-        if (!"".equals(manuscript.getManuscriptId()) && !"".equals(getManuscriptNumber())) {
+        if (!"".equals(manuscript.getManuscriptId()) && !getManuscriptNumber().equals(manuscript.getManuscriptId())) {
             fieldsChanged.add(MANUSCRIPT_NUMBER);
             setManuscriptNumber(manuscript.getManuscriptId());
             log.debug("adding msid " + manuscript.getManuscriptId());
             provenance.append(" " + MANUSCRIPT_NUMBER + " was updated.");
         }
 
-        SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
         if (manuscript.getPublicationDate() != null) {
-            String dateString = dateIso.format(manuscript.getPublicationDate());
-            if (getPublicationDate() != null && getPublicationDate().equals(dateString)) {
+            SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
+            String msDateString = dateIso.format(manuscript.getPublicationDate());
+            String pubDateString = getPublicationDate();
+            if (pubDateString.length() > 6) {
+                pubDateString = getPublicationDate().substring(0, 7);
+            }
+            if (!pubDateString.equals(msDateString.substring(0, 7))) {
                 fieldsChanged.add(PUBLICATION_DATE);
-                setPublicationDate(dateString);
-                log.debug("adding pub date " + dateString);
+                setPublicationDate(msDateString);
+                log.debug("adding pub date " + msDateString);
                 provenance.append(" " + PUBLICATION_DATE + " was updated.");
             }
+
         }
 
         // Only required for Dryad Classic, as Dash won't have manually-curated citation metadata

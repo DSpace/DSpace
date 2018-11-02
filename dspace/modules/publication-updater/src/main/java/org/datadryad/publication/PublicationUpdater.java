@@ -319,7 +319,6 @@ public class PublicationUpdater extends HttpServlet {
                 LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
             }
         }
-        LOGGER.debug("updated package: " + message);
         return message;
     }
 
