@@ -5,6 +5,8 @@ package org.datadryad.api;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -17,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Package;
+import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
@@ -57,6 +60,10 @@ public class DryadDataPackage extends DryadObject {
     private static final String FORMER_MANUSCRIPT_NUMBER_SCHEMA = "dryad";
     private static final String FORMER_MANUSCRIPT_NUMBER_ELEMENT = "formerManuscriptNumber";
     private static final String FORMER_MANUSCRIPT_NUMBER_QUALIFIER = null;
+
+    private static final String MISMATCHED_DOI_SCHEMA = "dryad";
+    private static final String MISMATCHED_DOI_ELEMENT = "citationMismatchedDOI";
+    private static final String MISMATCHED_DOI_QUALIFIER = null;
 
     private static final String BLACKOUT_UNTIL_SCHEMA = "dc";
     private static final String BLACKOUT_UNTIL_ELEMENT = "date";
@@ -392,8 +399,8 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public void changeCurationStatus(String status, String reason) {
-        if (useDryadClassic) {
-
+        if (getItem() != null) {
+            item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + reason + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
         } else {
             // add a curation activity note
         }
@@ -416,55 +423,93 @@ public class DryadDataPackage extends DryadObject {
         return dataPackage;
     }
 
-    public static List<DryadDataPackage> findAllByManuscript(Context context, Manuscript manuscript) {
+    public static List<DryadDataPackage> findAllUnarchivedPackagesByISSN(Context context, String ISSN, boolean onlyRecent) {
         ArrayList<DryadDataPackage> dataPackageList = new ArrayList<>();
-        try {
-            // find all with same Dryad DOI
-            ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", null, manuscript.getDryadDataDOI(), false);
-            while (itemIterator.hasNext()) {
-                dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+        if (useDryadClassic) {
+            try {
+                WorkflowItem[] itemArray = WorkflowItem.findAllByISSN(context, ISSN);
+                for (WorkflowItem wfi : itemArray) {
+                    DryadDataPackage dryadDataPackage = new DryadDataPackage(wfi.getItem());
+                    if (DryadWorkflowUtils.isDataPackage(wfi)) {
+                        Item item = wfi.getItem();
+                        if (onlyRecent) {
+                            LocalDate twoYearsAgo = LocalDate.now().minusYears(2);
+                            LocalDate dateItemModified = item.getLastModified().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                            if (dateItemModified.isAfter(twoYearsAgo)) {
+                                dataPackageList.add(new DryadDataPackage(wfi.getItem()));
+                            } else {
+                                log.debug("skipping item " + item.getID() + " because it's too old");
+                            }
+                        } else {
+                            dataPackageList.add(dryadDataPackage);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.error("couldn't find unarchived packages for journal " + ISSN);
             }
-            // find all with same publication DOI
-            itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", manuscript.getPublicationDOI(), false);
-            while (itemIterator.hasNext()) {
-                dataPackageList.add(new DryadDataPackage(itemIterator.next()));
-            }
-            // find all with same manuscript ID (in the same journal)
-            itemIterator = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscript.getManuscriptId(), false);
-            while (itemIterator.hasNext()) {
-                DryadDataPackage dataPackage = new DryadDataPackage(itemIterator.next());
-                if (dataPackage.getPublicationName().equals(manuscript.getJournalName()))
-                    dataPackageList.add(dataPackage);
-            }
-        } catch (Exception ex) {
-            log.error("Exception getting data package from publication DOI", ex);
+        } else {
+            // something
         }
         return dataPackageList;
     }
 
-    // this currently uses Item-based lookup; we will need to make a more abstract one that can encompass Dash
+    public static List<DryadDataPackage> findAllByManuscript(Context context, Manuscript manuscript) {
+        ArrayList<DryadDataPackage> dataPackageList = new ArrayList<>();
+        if (useDryadClassic) {
+            try {
+                // find all with same Dryad DOI
+                ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", null, manuscript.getDryadDataDOI(), false);
+                while (itemIterator.hasNext()) {
+                    dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+                }
+                // find all with same publication DOI
+                itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", manuscript.getPublicationDOI(), false);
+                while (itemIterator.hasNext()) {
+                    dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+                }
+                // find all with same manuscript ID (in the same journal)
+                itemIterator = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscript.getManuscriptId(), false);
+                while (itemIterator.hasNext()) {
+                    DryadDataPackage dataPackage = new DryadDataPackage(itemIterator.next());
+                    if (dataPackage.getPublicationName().equals(manuscript.getJournalName()))
+                        dataPackageList.add(dataPackage);
+                }
+            } catch (Exception ex) {
+                log.error("Exception getting data package from publication DOI", ex);
+            }
+        } else {
+            //something
+        }
+        return dataPackageList;
+    }
+
     public Date getEnteredReviewDate() {
-        DCValue[] provenanceValues = item.getMetadata("dc.description.provenance");
-        if (provenanceValues != null && provenanceValues.length > 0) {
-            for (DCValue provenanceValue : provenanceValues) {
-                //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
-                String provenance = provenanceValue.value;
-                Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
-                Matcher matcher = pattern.matcher(provenance);
-                if (matcher.find()) {
-                    String dateString = matcher.group(1);
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                    Date reviewDate = null;
-                    try {
-                        reviewDate = sdf.parse(dateString);
-                        log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
-                        return reviewDate;
-                    } catch (Exception e) {
-                        log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
-                        return null;
+        if (useDryadClassic) {
+            DCValue[] provenanceValues = item.getMetadata("dc.description.provenance");
+            if (provenanceValues != null && provenanceValues.length > 0) {
+                for (DCValue provenanceValue : provenanceValues) {
+                    //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
+                    String provenance = provenanceValue.value;
+                    Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
+                    Matcher matcher = pattern.matcher(provenance);
+                    if (matcher.find()) {
+                        String dateString = matcher.group(1);
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                        Date reviewDate = null;
+                        try {
+                            reviewDate = sdf.parse(dateString);
+                            log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
+                            return reviewDate;
+                        } catch (Exception e) {
+                            log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
+                            return null;
+                        }
                     }
                 }
             }
+        } else {
+            //something
         }
         return null;
     }
@@ -484,6 +529,15 @@ public class DryadDataPackage extends DryadObject {
     public void setFormerManuscriptNumber(String manuscriptNumber) {
         addSingleMetadataValue(Boolean.TRUE, FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
     }
+
+    public List<String> getMismatchedDOIs() {
+        return getMultipleMetadataValues(MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER);
+    }
+
+    public void setMismatchedDOIs(String mismatchedDOI) {
+        addSingleMetadataValue(Boolean.TRUE, MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER, mismatchedDOI);
+    }
+
     public void setBlackoutUntilDate(Date blackoutUntilDate) {
         String dateString = null;
         if(blackoutUntilDate != null)  {
@@ -780,6 +834,122 @@ public class DryadDataPackage extends DryadObject {
         } else {
 
         }
+    }
+
+    private final static String PUBLICATION_DOI = "dc.relation.isreferencedby";
+    private final static String FULL_CITATION = "dc.identifier.citation";
+    private final static String MANUSCRIPT_NUMBER = "dc.identifier.manuscriptNumber";
+    private final static String PUBLICATION_DATE = "dc.date.issued";
+    private final static String CITATION_IN_PROGRESS = "dryad.citationInProgress";
+    private final static String PROVENANCE = "dc.description.provenance";
+
+    public boolean updateMetadataFromManuscript(Manuscript manuscript, Context context, StringBuilder provenance) {
+        HashSet<String> fieldsChanged = new HashSet<>();
+        log.debug("comparing metadata for package " + getIdentifier() + " to manuscript " + manuscript.toString());
+        // first, check to see if this is one of the known mismatches:
+        if (isManuscriptMismatchForPackage(manuscript)) {
+            log.error("pub " + manuscript.getPublicationDOI() + " is known to be a mismatch for " + getIdentifier());
+            return false;
+        }
+
+        if (!"".equals(manuscript.getPublicationDOI()) && !"".equals(getPublicationDOI())) {
+            fieldsChanged.add(PUBLICATION_DOI);
+            setPublicationDOI(manuscript.getPublicationDOI());
+            log.debug("adding publication DOI " + manuscript.getPublicationDOI());
+            provenance.append(" " + PUBLICATION_DOI + " was updated.");
+        }
+        if (!"".equals(manuscript.getManuscriptId()) && !"".equals(getManuscriptNumber())) {
+            fieldsChanged.add(MANUSCRIPT_NUMBER);
+            setManuscriptNumber(manuscript.getManuscriptId());
+            log.debug("adding msid " + manuscript.getManuscriptId());
+            provenance.append(" " + MANUSCRIPT_NUMBER + " was updated.");
+        }
+
+        SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
+        if (manuscript.getPublicationDate() != null) {
+            String dateString = dateIso.format(manuscript.getPublicationDate());
+            if (getPublicationDate() != null && getPublicationDate().equals(dateString)) {
+                fieldsChanged.add(PUBLICATION_DATE);
+                setPublicationDate(dateString);
+                log.debug("adding pub date " + dateString);
+                provenance.append(" " + PUBLICATION_DATE + " was updated.");
+            }
+        }
+
+        // Only required for Dryad Classic, as Dash won't have manually-curated citation metadata
+        if (useDryadClassic) {
+            if (!"".equals(manuscript.getFullCitation())) {
+                String itemCitation = "";
+                DCValue[] citations = item.getMetadata(FULL_CITATION);
+                if (citations != null && citations.length > 0) {
+                    itemCitation = citations[0].value;
+                }
+                double score = JournalUtils.getHamrScore(manuscript.getFullCitation().toLowerCase(), itemCitation.toLowerCase());
+                log.debug("old citation was: " + itemCitation);
+                log.debug("new citation is: " + manuscript.getFullCitation());
+                log.debug("citation match score is " + score);
+                // old citation doesn't match new citation, or old citation had "null" for page number (match score is still v high)
+                if ((score < 0.95) || (itemCitation.contains("null"))) {
+                    fieldsChanged.add(FULL_CITATION);
+                    item.clearMetadata(FULL_CITATION);
+                    item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);
+                    log.debug("adding citation " + manuscript.getFullCitation());
+                    provenance.append(" " + FULL_CITATION + " was updated.");
+                }
+            }
+            if (fieldsChanged.size() > 0) {
+                item.clearMetadata(CITATION_IN_PROGRESS);
+                item.addMetadata(CITATION_IN_PROGRESS, null, "true", null, -1);
+            }
+            try {
+                item.update();
+                context.commit();
+            } catch (Exception e) {
+                log.error("couldn't save metadata: " + e.getMessage());
+            }
+        }
+        if (fieldsChanged.size() > 0) {
+            if (!"".equals(provenance.toString())) {
+                log.info("writing provenance for package " + getIdentifier() + ": " + provenance);
+                changeCurationStatus("Status Unchanged", provenance.toString());
+            }
+
+            // only return true if we want to get email notifications about this update: FULL_CITATION or PUBLICATION_DOI was updated.
+            return (fieldsChanged.contains(FULL_CITATION) || fieldsChanged.contains(PUBLICATION_DOI));
+        } else {
+            log.debug("nothing changed");
+            return false;
+        }
+    }
+
+    private boolean isManuscriptMismatchForPackage(Manuscript manuscript) {
+        if ("".equals(manuscript.getPublicationDOI())) {
+            return false;
+        }
+        log.debug("looking for mismatches for " + manuscript.getPublicationDOI());
+        // normalize the pubDOI from the manuscript: remove leading "doi:" or "doi.org/"
+        String msDOI = null;
+        Pattern doi = Pattern.compile(".*(10\\.\\d+/.+)");
+        Matcher m = doi.matcher(manuscript.getPublicationDOI().toLowerCase());
+        if (m.matches()) {
+            msDOI = m.group(1);
+        }
+        if (msDOI == null) {
+            log.error("msDOI not in correct format");
+            return false;
+        }
+        List<String> itemMismatches = getMismatchedDOIs();
+        for (String dcv : itemMismatches) {
+            m = doi.matcher(dcv.toLowerCase());
+            if (m.matches()) {
+                if (msDOI.equals(m.group(1))) {
+                    log.error("found a mismatch: " + m.group(1));
+                    return true;
+                }
+            }
+        }
+        log.error("no mismatches");
+        return false;
     }
 
     // Convenience method to access a properly serialized JSON-LD string, formatted for Schema.org.
