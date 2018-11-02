@@ -29,7 +29,11 @@
     <bean id="org.dspace.app.cris.statistics.BundleNameAdditionalStatisticsData" 
     	class="org.dspace.app.cris.statistics.BundleNameAdditionalStatisticsData">
     </bean>
-    
+
+    <bean id="org.dspace.app.statistics.StoreParentsAdditionalStatisticsData" 
+    	class="org.dspace.app.statistics.StoreParentsAdditionalStatisticsData">
+    </bean>
+        
 	<!-- Components for Cris Object -->	
 	<bean id="rpStatsComponent" class="org.dspace.app.cris.integration.statistics.CrisStatComponentsService">
 
