@@ -526,40 +526,50 @@ public class SolrUpgradePre6xStatistics {
         if (ifield != null) {
             Collection<Object> vals = ifield.getValues();
             ArrayList<String> newvals = new ArrayList<>();
-            for (Object oval : vals) {
-                try {
-                    UUID uuid = null;
-                    if (col == FIELD.owner) {
-                        if (oval.toString().length() > 1) {
-                            String owntype = oval.toString().substring(0, 1);
-                            int legacy = Integer.parseInt(oval.toString().substring(1));
-                            uuid = mapOwner(owntype, legacy);
-                        }
-                    } else {
-                        int legacy = Integer.parseInt(oval.toString());
-                        if (col == FIELD.id) {
-                            Object otype = input.getFieldValue("type");
-                            if (otype != null) {
-                                int type = Integer.parseInt(otype.toString());
-                                uuid = mapType(type, legacy);
-                            }
-                        } else if (col == FIELD.scopeId) {
-                            Object otype = input.getFieldValue("scopeType");
-                            if (otype != null) {
-                                int type = Integer.parseInt(otype.toString());
-                                uuid = mapType(type, legacy);
+            for (Object ovalx : vals) {
+                //DS-3436 documented an issue in which multi-values in shards were converted to a comma separated string
+                //It also produced strings containing "\" at the end of a value
+                for (String oval: ovalx.toString().split(",")) {
+                    oval = oval.replace("\\","");
+                    try {
+                        UUID uuid = null;
+                        if (col == FIELD.owner) {
+                            if (oval.length() > 1) {
+                                String owntype = oval.substring(0, 1);
+                                int legacy = Integer.parseInt(oval.substring(1));
+                                uuid = mapOwner(owntype, legacy);
                             }
                         } else {
-                            uuid = mapId(col, legacy);
+                            int legacy = Integer.parseInt(oval);
+                            if (col == FIELD.id) {
+                                Object otype = input.getFieldValue("type");
+                                if (otype != null) {
+                                    int type = Integer.parseInt(otype.toString());
+                                    uuid = mapType(type, legacy);
+                                }
+                            } else if (col == FIELD.scopeId) {
+                                Object otype = input.getFieldValue("scopeType");
+                                if (otype != null) {
+                                    int type = Integer.parseInt(otype.toString());
+                                    uuid = mapType(type, legacy);
+                                }
+                            } else {
+                                uuid = mapId(col, legacy);
+                            }
                         }
+                        if (uuid != null) {
+                            if (!newvals.contains(uuid.toString())) {
+                                newvals.add(uuid.toString());
+                            }
+                        } else {
+                            String s = oval + "-unmigrated";
+                            if (!newvals.contains(s)) {
+                                newvals.add(s);
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        log.warn("Non numeric legacy id " + col.name() + ":" + oval);
                     }
-                    if (uuid != null) {
-                        newvals.add(uuid.toString());
-                    } else {
-                        newvals.add(oval + "-unmigrated");
-                    }
-                } catch (NumberFormatException e) {
-                    log.warn("Non numeric legacy id " + col.name() + ":" + oval.toString());
                 }
             }
             if (newvals.size() > 0) {
