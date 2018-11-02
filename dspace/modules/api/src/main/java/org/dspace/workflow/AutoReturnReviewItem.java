@@ -110,7 +110,7 @@ public class AutoReturnReviewItem {
                 // make sure that this item is updated according to the ApproveReject mechanism:
                 if (!testMode) {
                     log.info("check to see if package " + dryadDataPackage.getIdentifier() + " is approved or rejected");
-                    Manuscript databaseManuscript = JournalUtils.getStoredManuscriptForWorkflowItem(context, dryadDataPackage);
+                    Manuscript databaseManuscript = JournalUtils.getStoredManuscriptForPackage(context, dryadDataPackage);
                     if (databaseManuscript != null && databaseManuscript.isAccepted()) {
                         ApproveRejectReviewItem.processReviewPackageUsingManuscript(context, dryadDataPackage, databaseManuscript);
                     }

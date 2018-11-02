@@ -57,7 +57,6 @@ import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
@@ -961,7 +960,7 @@ public class FlowUtils {
 
 			DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(context, wfPublication.getID());
             // look for stored manuscripts to see if its status has been updated since submission was started:
-            Manuscript storedManuscript = JournalUtils.getStoredManuscriptForWorkflowItem(context, dryadDataPackage);
+            Manuscript storedManuscript = JournalUtils.getStoredManuscriptForPackage(context, dryadDataPackage);
             if (storedManuscript != null) {
                 if (storedManuscript.isAccepted()) {
                     // if the ms is accepted, push the item into curation from review

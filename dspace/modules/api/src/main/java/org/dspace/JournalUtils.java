@@ -837,7 +837,7 @@ public class JournalUtils {
         }
     }
 
-    public static Manuscript getStoredManuscriptForWorkflowItem(Context c, DryadDataPackage dryadDataPackage) throws ApproveRejectReviewItemException {
+    public static Manuscript getStoredManuscriptForPackage(Context c, DryadDataPackage dryadDataPackage) {
         Manuscript manuscript = new Manuscript(dryadDataPackage);
         try {
             c.turnOffAuthorisationSystem();
@@ -853,7 +853,7 @@ public class JournalUtils {
             }
             c.restoreAuthSystemState();
         } catch (Exception e) {
-            throw new ApproveRejectReviewItemException("couldn't process workflowitem " + dryadDataPackage.getIdentifier() + ": " + e.getMessage());
+            log.error("couldn't process workflowitem " + dryadDataPackage.getIdentifier() + ": " + e.getMessage());
         }
         return null;
     }
