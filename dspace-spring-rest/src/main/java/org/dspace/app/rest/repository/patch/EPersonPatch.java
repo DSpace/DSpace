@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Provides patch operations for eperson updates.
+ *
+ * @author Michael Spalti
  */
 @Component
 public class EPersonPatch extends DSpaceObjectPatch<EPersonRest> {
@@ -33,7 +35,6 @@ public class EPersonPatch extends DSpaceObjectPatch<EPersonRest> {
      * @throws PatchBadRequestException
      */
     protected EPersonRest replace(EPersonRest eperson, Operation operation) {
-
         ResourcePatchOperation<EPersonRest> patchOperation =
                 patchFactory.getReplaceOperationForPath(operation.getPath());
 

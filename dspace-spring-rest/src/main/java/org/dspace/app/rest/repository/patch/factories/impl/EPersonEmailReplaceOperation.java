@@ -13,46 +13,42 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation for EPerson requires certificate patches.
+ * Implementation for EPerson password patches.
  *
  * Example: <code>
  * curl -X PATCH http://${dspace.url}/api/epersons/eperson/<:id-eperson> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
- * /certificate", "value": true|false]'
+ * /email", "value": "new@email"]'
  * </code>
  *
  * @author Michael Spalti
  */
 @Component
-public class EPersonCertificateReplaceOperation extends ReplacePatchOperation<EPersonRest, Boolean>
+public class EPersonEmailReplaceOperation extends ReplacePatchOperation<EPersonRest, String>
         implements ResourcePatchOperation<EPersonRest> {
-
     @Override
-    public EPersonRest replace(EPersonRest eperson, Operation operation) {
+    EPersonRest replace(EPersonRest eperson, Operation operation) {
 
-        Boolean requireCert = getBooleanOperationValue(operation.getValue());
-        eperson.setRequireCertificate(requireCert);
+        eperson.setEmail((String) operation.getValue());
         return eperson;
-
     }
 
     @Override
     void checkModelForExistingValue(EPersonRest resource, Operation operation) {
-        // TODO: many (all?) boolean values on the rest model should never be null.
-        // So perhaps the error to throw in this case is different...IllegalStateException?
-        // Or perhaps do nothing (no check is required).
-        if ((Object) resource.isRequireCertificate() == null) {
+        if (resource.getEmail() == null) {
             throw new PatchBadRequestException("Attempting to replace a non-existent value.");
         }
     }
 
     @Override
-    protected Class<Boolean[]> getArrayClassForEvaluation() {
-        return Boolean[].class;
+    protected Class<String[]> getArrayClassForEvaluation() {
+
+        return String[].class;
     }
 
     @Override
-    protected Class<Boolean> getClassForEvaluation() {
-        return Boolean.class;
+    protected Class<String> getClassForEvaluation() {
+
+        return String.class;
     }
 }
