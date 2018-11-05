@@ -8,6 +8,7 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -35,6 +36,21 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
                                 criteriaBuilder
                                     .equal(relationshipTypeRoot.get(RelationshipType_.rightLabel), rightLabel)));
         return uniqueResult(context, criteriaQuery, false, RelationshipType.class, -1, -1);
+    }
+
+    public List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
+        Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
+        criteriaQuery.select(relationshipTypeRoot);
+        criteriaQuery.where(
+            criteriaBuilder.or(criteriaBuilder.
+                                    equal(relationshipTypeRoot.get(RelationshipType_.leftType), entityType),
+                               criteriaBuilder
+                                   .equal(relationshipTypeRoot.get(RelationshipType_.rightType), entityType)
+            )
+        );
+        return list(context, criteriaQuery, false, RelationshipType.class, -1, -1);
     }
 
 }

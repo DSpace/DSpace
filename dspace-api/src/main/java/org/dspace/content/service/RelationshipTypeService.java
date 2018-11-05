@@ -52,4 +52,6 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @throws SQLException If something goes wrong
      */
     List<RelationshipType> findAll(Context context) throws SQLException;
+
+    List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException;
 }

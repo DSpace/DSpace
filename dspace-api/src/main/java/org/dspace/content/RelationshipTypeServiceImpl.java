@@ -53,6 +53,10 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
         return relationshipTypeDAO.findAll(context, RelationshipType.class);
     }
 
+    public List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException {
+        return relationshipTypeDAO.findByEntityType(context, entityType);
+    }
+
     public RelationshipType find(Context context,int id) throws SQLException {
         return relationshipTypeDAO.findByID(context, RelationshipType.class, id);
     }
