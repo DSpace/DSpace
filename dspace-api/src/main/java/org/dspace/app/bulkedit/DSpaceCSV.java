@@ -203,7 +203,8 @@ public class DSpaceCSV implements Serializable {
                         MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
                         if (foundSchema == null) {
                             throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                            MetadataImportInvalidHeadingException.SCHEMA,
+                                                                            MetadataImportInvalidHeadingException
+                                                                                .SCHEMA,
                                                                             columnCounter);
                         }
 
@@ -212,7 +213,8 @@ public class DSpaceCSV implements Serializable {
                             .findByElement(c, foundSchema, metadataElement, metadataQualifier);
                         if (foundField == null) {
                             throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                            MetadataImportInvalidHeadingException.ELEMENT,
+                                                                            MetadataImportInvalidHeadingException
+                                                                                .ELEMENT,
                                                                             columnCounter);
                         }
                     }
