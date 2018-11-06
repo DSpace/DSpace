@@ -296,6 +296,9 @@ public abstract class DryadObject {
     }
 
     public String getDryadDOI() {
-        return DOIIdentifierProvider.getDoiValue(item);
+        if (getItem() != null) {
+            return DOIIdentifierProvider.getDoiValue(item);
+        }
+        return identifier;
     }
 }
