@@ -51,6 +51,9 @@ public abstract class DryadObject {
     // Package haspart file
     static final String RELATION_HASPART_QUALIFIER = "haspart";
 
+    private String title = "";
+    private String identifier = "";
+
     private static Logger log = Logger.getLogger(DryadObject.class);
 
     /* Considered using DCDate instead of a distinct SimpleDateFormat,
@@ -58,6 +61,9 @@ public abstract class DryadObject {
      * getting strings from dates. So we'd need our own formatter anyways
      */
     protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+    // no-arg constructor for Jackson
+    protected DryadObject() { }
 
     protected Item item;
     protected DryadObject(Item item) {
@@ -163,7 +169,14 @@ public abstract class DryadObject {
     }
 
     public String getIdentifier() {
-        return DOIIdentifierProvider.getDoiValue(getItem());
+        if (getItem() != null) {
+            return DOIIdentifierProvider.getDoiValue(getItem());
+        }
+        return identifier;
+    }
+
+    public void setIdentifier(String newIdentifier) {
+        identifier = newIdentifier;
     }
 
     protected void createIdentifier(Context context) throws SQLException, IdentifierException {
@@ -187,7 +200,11 @@ public abstract class DryadObject {
     }
 
     public void setTitle(String newTitle) {
-        addSingleMetadataValue(Boolean.TRUE, TITLE_SCHEMA, TITLE_ELEMENT, null, newTitle);
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.TRUE, TITLE_SCHEMA, TITLE_ELEMENT, null, newTitle);
+        } else {
+            title = newTitle;
+        }
     }
 
     protected final void addToCollectionAndArchive(Collection collection) throws SQLException {
