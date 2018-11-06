@@ -1347,6 +1347,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             resultingMetadataValueList.addAll(handleRelationshipTypeMetadataMappping(item, hashMaps,
                                                                                      otherItem, relationName));
         }
+        resultingMetadataValueList.add(getRelationMetadataFromOtherItem(otherItem, relationName));
         return resultingMetadataValueList;
     }
 
@@ -1365,8 +1366,6 @@ prevent the generation of resource policy entry values with null dspace_object a
                 resultingMetadataValueList.add(metadataValue);
             }
         }
-
-        resultingMetadataValueList.add(getRelationMetadataFromOtherItem(otherItem, relationName));
         return resultingMetadataValueList;
     }
 
