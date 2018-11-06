@@ -654,23 +654,25 @@ public class MetadataImport {
             handleRelationTypeMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
 
         } else {
-            handleRelationOtherMetadata(c, item, element, values);
+            for (String value : values) {
+                handleRelationOtherMetadata(c, item, element, value);
+            }
         }
 
     }
 
-    private void handleRelationOtherMetadata(Context c, Item item, String element, List<String> values)
+    private void handleRelationOtherMetadata(Context c, Item item, String element, String value)
         throws SQLException, AuthorizeException {
         Entity entity = entityService.findByItemId(c, item.getID());
         boolean left = false;
         List<RelationshipType> acceptableRelationshipTypes = new LinkedList<>();
-        String[] components = values.get(0).split("-");
-        String url = handleService.resolveToURL(c, values.get(0));
+        String[] components = value.split("-");
+        String url = handleService.resolveToURL(c, value);
         if (components.length != 5 && StringUtils.isNotBlank(url)) {
             return;
         }
 
-        Entity relationEntity = entityService.findByItemId(c, UUID.fromString(values.get(0)));
+        Entity relationEntity = entityService.findByItemId(c, UUID.fromString(value));
 
 
         List<RelationshipType> leftRelationshipTypesForEntity = entityService.getLeftRelationshipTypes(c, entity);
@@ -701,20 +703,20 @@ public class MetadataImport {
             return;
         }
 
-        buildRelationObject(c, item, values, left, acceptableRelationshipTypes);
+        buildRelationObject(c, item, value, left, acceptableRelationshipTypes);
     }
 
-    private void buildRelationObject(Context c, Item item, List<String> values, boolean left,
+    private void buildRelationObject(Context c, Item item, String value, boolean left,
                                      List<RelationshipType> acceptableRelationshipTypes)
         throws SQLException, AuthorizeException {
         Relationship relationship = new Relationship();
         RelationshipType acceptedRelationshipType = acceptableRelationshipTypes.get(0);
         if (left) {
             relationship.setLeftItem(item);
-            relationship.setRightItem(itemService.findByIdOrLegacyId(c, values.get(0)));
+            relationship.setRightItem(itemService.findByIdOrLegacyId(c, value));
         } else {
             relationship.setRightItem(item);
-            relationship.setLeftItem(itemService.findByIdOrLegacyId(c, values.get(0)));
+            relationship.setLeftItem(itemService.findByIdOrLegacyId(c, value));
         }
         relationship.setRelationshipType(acceptedRelationshipType);
         relationship.setLeftPlace(relationshipService.findLeftPlaceByLeftItem(c, relationship.getLeftItem()) + 1);
