@@ -314,10 +314,6 @@ public class SubscribeCLITool {
 
         boolean test = line.hasOption("t");
 
-        if (test) {
-            //TODO Replace with log4j2: org.apache.logging.log4j.core.config.Configurator.setLevel();
-        }
-
         Context context = null;
 
         try {
