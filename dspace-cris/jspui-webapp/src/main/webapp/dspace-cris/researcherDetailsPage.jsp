@@ -376,6 +376,22 @@
 				key="jsp.layout.hku.detail.researcher-disabled.fixit" /></a>
 		</p>
 	</c:if>
+	
+	
+	<c:if test="${!empty infoPendingImpRecord && researcher_page_menu}">
+		<c:forEach var="entry" items="${infoPendingImpRecord}">
+    	    <p class="warning pending">
+    	    	<c:choose>				
+					<c:when test="${admin}">
+						<a href="<%=request.getContextPath()%>/tools/importrecord?crisid=${researcher.crisID}&sourceref=${entry.key}"><c:out value="${entry.value}"/></a>
+	    	    	</c:when>
+	    	    	<c:otherwise>
+						<a href="<%=request.getContextPath()%>/tools/importrecord?sourceref=${entry.key}"><c:out value="${entry.value}"/></a>    	    	
+	    	    	</c:otherwise>
+    	    	</c:choose>
+    	    </p>
+		</c:forEach>
+	</c:if>
 
 	<c:if test="${pendingItems > 0 && publicationSelfClaimRP}">
 		<p class="warning pending">
