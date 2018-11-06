@@ -34,7 +34,7 @@ public class Package {
 
     // can un-ignore itemID for debugging purposes
     @JsonIgnore
-    private Integer itemID;
+    private Integer itemID = 0;
 
     @JsonIgnore
     private DryadDataPackage dataPackage;
@@ -49,7 +49,9 @@ public class Package {
 
     public Package(DryadDataPackage dataPackage) {
         this.dataPackage = dataPackage;
-        this.itemID = dataPackage.getItem().getID();
+        if (this.dataPackage.getItem() != null) {
+            this.itemID = dataPackage.getItem().getID();
+        }
     }
 
     public Integer getItemID() {
