@@ -570,10 +570,11 @@ public class BitstreamStorageManager
     {
         InputStream resultInputStream = null;
         TableRow bitstream = DatabaseManager.find(context, "bitstream", id);
+        String sInternalId = bitstream.getStringColumn("internal_id");
         int storeNumber = bitstream.getIntColumn("store_number");
        
         if(storeNumber == S3_ASSETSTORE) {
-            URL url = getS3AccessURL(bitstream);
+            URL url = getS3AccessURL(sInternalId);
             resultInputStream = url.openStream();
         } else {
             // retrieve from local file storage
@@ -582,7 +583,7 @@ public class BitstreamStorageManager
         }
 
         if(resultInputStream == null) {
-            throw new IOException("Unable to get S3 presigned url " + key + " from bucket " + s3BucketName);
+            throw new IOException("Unable to open input stream for bitstream " + id);
         }
         
         return resultInputStream;
@@ -592,12 +593,10 @@ public class BitstreamStorageManager
        Returns a URL that allows access to a bitstream stored in Amazon S3.
     **/
     public static URL getS3AccessURL(Bitstream bitstream) throws SQLException {
-        TableRow bitstreamRow = DatabaseManager.find(context, "bitstream", bitstream.getID());
-        return getS3AccessURL(bitstreamRow);
+        return getS3AccessURL(bitstream.getInternalID());
     }
 
-    private static URL getS3AccessURL(TableRow bitstream) {
-        String sInternalId = bitstreamRow.getStringColumn("internal_id");
+    private static URL getS3AccessURL(String sInternalId) {
         String key = getFullS3Key(sInternalId + "");
         URL url = null;
         

@@ -26,7 +26,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataFile;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.content.Bitstream;
 
 public class DashService {
@@ -211,19 +213,21 @@ public class DashService {
     // - figure out the mime types for the http request
     // - expand to all bitstreams and readmes
     // - check character ecoding
-    private int postDataFileReferences(DryadDataPackage dataPackage) {
+    public int postDataFileReferences(Context context, DryadDataPackage dataPackage) {
         int responseCode = 0;
         BufferedReader reader = null;
 
-        for(DryadDataFile dryadFile : dataPackage.getFiles()) {
-            String fileName = dryadFile.getTitle();
-            String fileDescription = dryadFile.getDescription();
-            for(Bitstream dryadBitstream : dryadFile.getAllBitstreams()) {
-                log.debug("transferring bitstream " + dryadBitstream.getName());
-                String dashJSON = bitstream.getDashReferenceJSON();
-                log.debug("Got JSON object: " + dashJSON);
-
-                try {
+        try {
+            for(DryadDataFile dryadFile : dataPackage.getDataFiles(context)) {
+                String fileName = dryadFile.getTitle();
+                String fileDescription = dryadFile.getDescription();
+                for(Bitstream dspaceBitstream : dryadFile.getAllBitstreams()) {
+                    log.debug("transferring bitstream " + dspaceBitstream.getName());
+                    DryadBitstream dryadBitstream = new DryadBitstream(dspaceBitstream);
+                    dryadBitstream.setFileDescription(fileDescription);
+                    String dashJSON = dryadBitstream.getDashReferenceJSON();
+                    log.debug("Got JSON object: " + dashJSON);
+                    String encodedPackageDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
                     URL url = new URL(dashServer + "/api/datasets/" + encodedPackageDOI + "/urls");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -254,12 +258,12 @@ public class DashService {
                     }
                     
                     log.info("result object " + response);
-                } catch (Exception e) {
-                    log.fatal("Unable to send item to DASH", e);
-                    return -1;
-                }       
+                }
             }
-        }
+        } catch (Exception e) {
+            log.fatal("Unable to send item to DASH", e);
+            return -1;
+        }       
             
         return responseCode;
     }
@@ -276,7 +280,7 @@ public class DashService {
 
         String submissionsFinalize = ConfigurationManager.getProperty("dash.submissions.finalize");
         if(!submissionsFinalize.equals("true")) {
-            log.info("Skipping finalization of " + doi + " due to dash.submissios.finalize = " + submissionsFinalize);
+            log.info("Skipping finalization of " + doi + " due to dash.submissions.finalize = " + submissionsFinalize);
             return 200;
         }
         
