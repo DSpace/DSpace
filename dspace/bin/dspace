@@ -44,5 +44,4 @@ fi
 # Now invoke Java
 java $JAVA_OPTS \
      -classpath $FULLPATH \
-     -Dlog4j.configurationFile=$DSPACEDIR/config/log4j2.xml \
      org.dspace.app.launcher.ScriptLauncher "$@"
