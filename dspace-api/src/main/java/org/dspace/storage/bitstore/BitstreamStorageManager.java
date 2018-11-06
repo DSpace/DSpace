@@ -189,7 +189,7 @@ public class BitstreamStorageManager
 
         // bucket name
         if (s3BucketName == null || s3BucketName.length() == 0) {
-            s3BucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
+            s3BucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname").replace('.','-');
             log.warn("S3 BucketName is not configured, setting default: " + s3BucketName);
         }
 
