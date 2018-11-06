@@ -7,8 +7,6 @@
  */
 package org.purl.sword.client;
 
-// Replace with log4j 2: import org.apache.logging.log4j.PropertyConfigurator;
-
 /**
  * Entry point for the SWORD Demonstration Client. This will parse the list of
  * command line options and load either a Command Line client or a GUI client.
@@ -24,8 +22,6 @@ public class ClientFactory {
         // configure the logger from the property file. The GUI client will
         // reload these properties if it is set to capture the output and
         // display it in a panel.
-        // Replace with log4j 2: PropertyConfigurator.configure(this.getClass()
-        // .getClassLoader().getResource(ClientConstants.LOGGING_PROPERTY_FILE));
     }
 
     /**
@@ -35,7 +31,7 @@ public class ClientFactory {
      * @return A list of the options for this program.
      */
     public static String usage() {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("swordclient: version ");
         buffer.append(ClientConstants.CLIENT_VERSION);
         buffer.append("\n");
