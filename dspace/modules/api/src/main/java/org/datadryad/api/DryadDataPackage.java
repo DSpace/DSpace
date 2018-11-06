@@ -72,9 +72,6 @@ public class DryadDataPackage extends DryadObject {
     // Publication DOI in a data package
     private static final String RELATION_ISREFERENCEDBY_QUALIFIER = "isreferencedby";
 
-    private static final String TITLE_SCHEMA = "dc";
-    private static final String TITLE_ELEMENT = "title";
-
     private static final String KEYWORD_SCHEMA = "dc";
     private static final String KEYWORD_ELEMENT = "subject";
 
@@ -84,7 +81,14 @@ public class DryadDataPackage extends DryadObject {
 
     private static final String DASH_TRANSFER_SCHEMA = "dryad";
     private static final String DASH_TRANSFER_ELEMENT = "dashTransferDate";
-    
+
+    private final static String PUBLICATION_DOI = "dc.relation.isreferencedby";
+    private final static String FULL_CITATION = "dc.identifier.citation";
+    private final static String MANUSCRIPT_NUMBER = "dc.identifier.manuscriptNumber";
+    private final static String PUBLICATION_DATE = "dc.date.issued";
+    private final static String CITATION_IN_PROGRESS = "dryad.citationInProgress";
+    private final static String PROVENANCE = "dc.description.provenance";
+
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
@@ -99,11 +103,6 @@ public class DryadDataPackage extends DryadObject {
 
     public DryadDataPackage(Item item) {
         super(item);
-    }
-
-    public static Collection getCollection(Context context) throws SQLException {
-        String handle = ConfigurationManager.getProperty(PACKAGES_COLLECTION_HANDLE_KEY);
-        return DryadObject.collectionFromHandle(context, handle);
     }
 
     public static DryadDataPackage create(Context context) throws SQLException {
@@ -125,6 +124,316 @@ public class DryadDataPackage extends DryadObject {
             log.error("IO exception creating a Data Package", ex);
         }
         return dataPackage;
+    }
+
+    // Getters and setters for metadata and internal data
+    public String getPublicationDate() {
+        String result = getSingleMetadataValue(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER);
+        if (result == null) {
+            return "";
+        }
+        return result;
+    }
+
+    public void setPublicationDate(String publicationDate) {
+        addSingleMetadataValue(Boolean.TRUE, PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, publicationDate);
+    }
+
+    public String getPublicationName() {
+        String result = getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
+        if (result == null) {
+            return "";
+        }
+        return result;
+    }
+
+    public void setPublicationName(String publicationName) {
+        addSingleMetadataValue(Boolean.TRUE, PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, publicationName);
+    }
+
+    public String getManuscriptNumber() {
+        String result = getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
+        if (result != null) {
+            return result;
+        }
+        return "";
+    }
+
+    public void setManuscriptNumber(String manuscriptNumber) {
+        addSingleMetadataValue(Boolean.TRUE, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
+    }
+
+    public List<String> getFormerManuscriptNumbers() {
+        return getMultipleMetadataValues(FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER);
+    }
+
+    public void setFormerManuscriptNumber(String manuscriptNumber) {
+        addSingleMetadataValue(Boolean.TRUE, FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
+    }
+
+    public List<String> getMismatchedDOIs() {
+        return getMultipleMetadataValues(MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER);
+    }
+
+    public void setMismatchedDOIs(String mismatchedDOI) {
+        addSingleMetadataValue(Boolean.TRUE, MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER, mismatchedDOI);
+    }
+
+    public void setBlackoutUntilDate(Date blackoutUntilDate) {
+        String dateString = null;
+        if(blackoutUntilDate != null)  {
+            dateString = new DCDate(blackoutUntilDate).toString();
+        }
+        addSingleMetadataValue(Boolean.TRUE, BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, dateString);
+    }
+
+    public Date getBlackoutUntilDate() {
+        Date blackoutUntilDate = null;
+        String dateString =getSingleMetadataValue(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER);
+        if(dateString != null) {
+            blackoutUntilDate = new DCDate(dateString).toDate();
+        }
+        return blackoutUntilDate;
+    }
+
+    public void setPublicationDOI(String publicationDOI) {
+        // check that this DOI starts with the doi: prefix. if not, add it.
+        if (publicationDOI != null) {
+            Pattern doiPattern = Pattern.compile("^doi:.*");
+            Matcher matcher = doiPattern.matcher(publicationDOI);
+            if (!("".equals(publicationDOI)) && !matcher.find()) {
+                publicationDOI = "doi:" + publicationDOI;
+            }
+        }
+        addSingleMetadataValue(Boolean.FALSE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, publicationDOI);
+    }
+
+    public void clearPublicationDOI() {
+        // Need to filter just on metadata values that are publication DOIs
+        addSingleMetadataValue(Boolean.TRUE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, null);
+    }
+
+    /**
+     * Get the publication DOI. Does not account for pubmed IDs, assumes
+     * first dc.relation.isreferencedby is the publication DOI
+     * @return
+     * @throws SQLException
+     */
+    public String getPublicationDOI() {
+        String result = getSingleMetadataValue(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER);
+        if (result != null) {
+            return result;
+        }
+        return "";
+    }
+
+    public void setAbstract(String theAbstract) {
+        addSingleMetadataValue(Boolean.TRUE, "dc", "description", null, theAbstract);
+    }
+
+    public String getAbstract() {
+        String theAbstract = getSingleMetadataValue("dc", "description", null);
+        String extraAbstract = getSingleMetadataValue("dc", "description", "abstract");
+
+        if (extraAbstract != null && extraAbstract.length() > 0) {
+            theAbstract = theAbstract + "\n" + extraAbstract;
+        }
+
+        return theAbstract;
+    }
+
+    public List<String> getKeywords() {
+        return getMultipleMetadataValues(KEYWORD_SCHEMA, KEYWORD_ELEMENT, null);
+    }
+
+    public void setKeywords(List<String> keywords) {
+        addMultipleMetadataValues(Boolean.TRUE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+    }
+
+    public void addKeywords(List<String> keywords) {
+        addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+    }
+
+    public List<Author> getAuthors() {
+        ArrayList<Author> authors = new ArrayList<Author>();
+        DCValue[] metadata = item.getMetadata("dc", "contributor", "author", Item.ANY);
+        for(DCValue dcValue : metadata) {
+            authors.add(new Author(dcValue));
+        }
+        metadata = item.getMetadata("dc", "contributor", null, Item.ANY);
+        for(DCValue dcValue : metadata) {
+            authors.add(new Author(dcValue));
+        }
+        metadata = item.getMetadata("dc", "creator", null, Item.ANY);
+        for(DCValue dcValue : metadata) {
+            authors.add(new Author(dcValue));
+        }
+        return authors;
+    }
+
+    public List<DryadDataPackage> getDuplicatePackages(Context context) {
+        ArrayList<DryadDataPackage> resultList = new ArrayList<>();
+        try {
+            if (useDryadClassic) {
+                DCValue[] duplicates = getItem().getMetadata("dryad.duplicateItem");
+                if (duplicates != null) {
+                    for (DCValue dup : duplicates) {
+                        Item item = Item.find(context, Integer.valueOf(dup.value));
+                        if (item != null) {
+                            resultList.add(new DryadDataPackage(item));
+                        }
+                    }
+                }
+            } else {
+
+            }
+        } catch (Exception e) {
+
+        }
+        return resultList;
+    }
+
+    public void updateDuplicatePackages(Context context) {
+        ArrayList<DryadDataPackage> resultList = new ArrayList<>();
+        try {
+            // get the current duplicate packages
+            resultList.addAll(getDuplicatePackages(context));
+            resultList.addAll(findAllByManuscript(context, new Manuscript(this)));
+            // look for items that have the same journal + title + authors?
+
+        } catch (Exception e) {
+            log.error("Exception while finding items matching manuscript " + this.getIdentifier());
+        }
+
+        // update the data package's metadata:
+        if (useDryadClassic) {
+            getItem().clearMetadata("dryad.duplicateItem");
+            for (DryadDataPackage dryadDataPackage : resultList) {
+                getItem().addMetadata("dryad.duplicateItem", null, String.valueOf(getItem().getID()), null, Choices.CF_NOVALUE);
+            }
+        } else {
+
+        }
+    }
+
+    // Curation status methods
+    /**
+     * Generate a Dryad-formatted 'Submitted by ...' provenance string
+     * @param date
+     * @param submitterName
+     * @param submitterEmail
+     * @param provenanceStartId
+     * @param bitstreamProvenanceMessage
+     * @return
+     */
+    static String makeSubmittedProvenance(DCDate date, String submitterName,
+            String submitterEmail, String provenanceStartId, String bitstreamProvenanceMessage) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Submitted by ");
+        if(submitterName == null || submitterEmail == null) {
+            builder.append("unknown (probably automated)");
+        } else {
+            builder.append(submitterName);
+            builder.append(" (");
+            builder.append(submitterEmail);
+            builder.append(")");
+        }
+        builder.append(" on ");
+        builder.append(date.toString());
+        builder.append(" workflow start=");
+        builder.append(provenanceStartId);
+        builder.append("\n");
+        builder.append(bitstreamProvenanceMessage);
+        return builder.toString();
+    }
+
+    /**
+     * Gets the most-recent provenance metadata beginning with
+     * 'Submitted by '
+     * @return the provenance information
+     */
+    public String getSubmittedProvenance() {
+        String provenance = null;
+        // Assumes metadata are ordered by place
+        DCValue[] metadata = item.getMetadata(PROVENANCE_SCHEMA, PROVENANCE_ELEMENT, PROVENANCE_QUALIFIER, PROVENANCE_LANGUAGE);
+        // find the last entry that starts with "Submitted by "
+        ArrayUtils.reverse(metadata);
+        for(DCValue dcValue : metadata) {
+            if(dcValue.value.startsWith("Submitted by ")) {
+                provenance = dcValue.value;
+                break;
+            }
+        }
+        return provenance;
+    }
+
+    /**
+     * Adds Dryad-formatted 'Submitted by ...' metadata to a data package. Does
+     * not remove existing provenance metadata.
+     * @param date
+     * @param submitterName
+     * @param submitterEmail
+     * @param provenanceStartId
+     * @param bitstreamProvenanceMessage
+     * @throws SQLException
+     */
+    public void addSubmittedProvenance(DCDate date, String submitterName,
+                                       String submitterEmail, String provenanceStartId, String bitstreamProvenanceMessage) throws SQLException {
+        String metadataValue = makeSubmittedProvenance(date, submitterName, submitterEmail, provenanceStartId, bitstreamProvenanceMessage);
+        addSingleMetadataValue(Boolean.FALSE,PROVENANCE_SCHEMA, PROVENANCE_ELEMENT, PROVENANCE_QUALIFIER, PROVENANCE_LANGUAGE, metadataValue);
+    }
+
+    public void changeCurationStatus(String status, String reason) {
+        if (getItem() != null) {
+            item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + reason + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
+        } else {
+            // add a curation activity note
+        }
+    }
+
+    public Date getEnteredReviewDate() {
+        if (useDryadClassic) {
+            DCValue[] provenanceValues = item.getMetadata("dc.description.provenance");
+            if (provenanceValues != null && provenanceValues.length > 0) {
+                for (DCValue provenanceValue : provenanceValues) {
+                    //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
+                    String provenance = provenanceValue.value;
+                    Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
+                    Matcher matcher = pattern.matcher(provenance);
+                    if (matcher.find()) {
+                        String dateString = matcher.group(1);
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                        Date reviewDate = null;
+                        try {
+                            reviewDate = sdf.parse(dateString);
+                            log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
+                            return reviewDate;
+                        } catch (Exception e) {
+                            log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
+                            return null;
+                        }
+                    }
+                }
+            }
+        } else {
+            //something
+        }
+        return null;
+    }
+
+    public boolean isPackageInReview(Context c) {
+        if (useDryadClassic) {
+            return DryadWorkflowUtils.isItemInReview(c, getWorkflowItem(c));
+        } else {
+            // get curation status of package
+        }
+        return false;
+    }
+
+    // DSpace-specific methods (without Dash equivalents)
+    public static Collection getCollection(Context context) throws SQLException {
+        String handle = ConfigurationManager.getProperty(PACKAGES_COLLECTION_HANDLE_KEY);
+        return DryadObject.collectionFromHandle(context, handle);
     }
 
     public static DryadDataPackage createInWorkflow(Context context) throws SQLException {
@@ -302,7 +611,7 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
-    static Integer indexOfValue(final DCValue[] dcValues, final String value) {
+    private Integer indexOfValue(final DCValue[] dcValues, final String value) {
         Integer foundIndex = -1;
         for(Integer index = 0;index < dcValues.length;index++) {
             if(dcValues[index].value.equals(value)) {
@@ -312,110 +621,12 @@ public class DryadDataPackage extends DryadObject {
         return foundIndex;
     }
 
-    public String getPublicationDate() {
-        String result = getSingleMetadataValue(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER);
-        if (result == null) {
-            return "";
-        }
-        return result;
-    }
-
-    public void setPublicationDate(String publicationDate) {
-        addSingleMetadataValue(Boolean.TRUE, PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, publicationDate);
-    }
-
-    public String getPublicationName() {
-        String result = getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
-        if (result == null) {
-            return "";
-        }
-        return result;
-    }
-
-    public void setPublicationName(String publicationName) {
-        addSingleMetadataValue(Boolean.TRUE, PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, publicationName);
-    }
-
-    /**
-     * Generate a Dryad-formatted 'Submitted by ...' provenance string
-     * @param date
-     * @param submitterName
-     * @param submitterEmail
-     * @param provenanceStartId
-     * @param bitstreamProvenanceMessage
-     * @return
-     */
-    static String makeSubmittedProvenance(DCDate date, String submitterName,
-            String submitterEmail, String provenanceStartId, String bitstreamProvenanceMessage) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Submitted by ");
-        if(submitterName == null || submitterEmail == null) {
-            builder.append("unknown (probably automated)");
-        } else {
-            builder.append(submitterName);
-            builder.append(" (");
-            builder.append(submitterEmail);
-            builder.append(")");
-        }
-        builder.append(" on ");
-        builder.append(date.toString());
-        builder.append(" workflow start=");
-        builder.append(provenanceStartId);
-        builder.append("\n");
-        builder.append(bitstreamProvenanceMessage);
-        return builder.toString();
-    }
-
-    /**
-     * Gets the most-recent provenance metadata beginning with
-     * 'Submitted by '
-     * @return the provenance information
-     */
-    public String getSubmittedProvenance() {
-        String provenance = null;
-        // Assumes metadata are ordered by place
-        DCValue[] metadata = item.getMetadata(PROVENANCE_SCHEMA, PROVENANCE_ELEMENT, PROVENANCE_QUALIFIER, PROVENANCE_LANGUAGE);
-        // find the last entry that starts with "Submitted by "
-        ArrayUtils.reverse(metadata);
-        for(DCValue dcValue : metadata) {
-            if(dcValue.value.startsWith("Submitted by ")) {
-                provenance = dcValue.value;
-                break;
-            }
-        }
-        return provenance;
-    }
-
-    /**
-     * Adds Dryad-formatted 'Submitted by ...' metadata to a data package. Does
-     * not remove existing provenance metadata.
-     * @param date
-     * @param submitterName
-     * @param submitterEmail
-     * @param provenanceStartId
-     * @param bitstreamProvenanceMessage
-     * @throws SQLException
-     */
-    public void addSubmittedProvenance(DCDate date, String submitterName,
-            String submitterEmail, String provenanceStartId, String bitstreamProvenanceMessage) throws SQLException {
-        String metadataValue = makeSubmittedProvenance(date, submitterName, submitterEmail, provenanceStartId, bitstreamProvenanceMessage);
-        addSingleMetadataValue(Boolean.FALSE,PROVENANCE_SCHEMA, PROVENANCE_ELEMENT, PROVENANCE_QUALIFIER, PROVENANCE_LANGUAGE, metadataValue);
-    }
-
-    public void changeCurationStatus(String status, String reason) {
-        if (getItem() != null) {
-            item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + reason + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
-        } else {
-            // add a curation activity note
-        }
-    }
-
-    
     @Override
     Set<DryadObject> getRelatedObjects(final Context context) throws SQLException {
         return new HashSet<DryadObject>(getDataFiles(context));
     }
 
+    // static methods
     public static DryadDataPackage findByWorkflowItemId(Context context, Integer workflowItemId) {
         DryadDataPackage dataPackage = null;
         try {
@@ -488,219 +699,11 @@ public class DryadDataPackage extends DryadObject {
         return dataPackageList;
     }
 
-    public Date getEnteredReviewDate() {
-        if (useDryadClassic) {
-            DCValue[] provenanceValues = item.getMetadata("dc.description.provenance");
-            if (provenanceValues != null && provenanceValues.length > 0) {
-                for (DCValue provenanceValue : provenanceValues) {
-                    //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
-                    String provenance = provenanceValue.value;
-                    Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
-                    Matcher matcher = pattern.matcher(provenance);
-                    if (matcher.find()) {
-                        String dateString = matcher.group(1);
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                        Date reviewDate = null;
-                        try {
-                            reviewDate = sdf.parse(dateString);
-                            log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
-                            return reviewDate;
-                        } catch (Exception e) {
-                            log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
-                            return null;
-                        }
-                    }
-                }
-            }
-        } else {
-            //something
-        }
-        return null;
-    }
-
-    public String getManuscriptNumber() {
-        String result = getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
-        if (result != null) {
-            return result;
-        }
-        return "";
-    }
-
-    public void setManuscriptNumber(String manuscriptNumber) {
-        addSingleMetadataValue(Boolean.TRUE, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
-    }
-
-    public List<String> getFormerManuscriptNumbers() {
-        return getMultipleMetadataValues(FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER);
-    }
-
-    public void setFormerManuscriptNumber(String manuscriptNumber) {
-        addSingleMetadataValue(Boolean.TRUE, FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
-    }
-
-    public List<String> getMismatchedDOIs() {
-        return getMultipleMetadataValues(MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER);
-    }
-
-    public void setMismatchedDOIs(String mismatchedDOI) {
-        addSingleMetadataValue(Boolean.TRUE, MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER, mismatchedDOI);
-    }
-
-    public void setBlackoutUntilDate(Date blackoutUntilDate) {
-        String dateString = null;
-        if(blackoutUntilDate != null)  {
-             dateString = new DCDate(blackoutUntilDate).toString();
-        }
-        addSingleMetadataValue(Boolean.TRUE, BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, dateString);
-    }
-
-    public Date getBlackoutUntilDate() {
-        Date blackoutUntilDate = null;
-        String dateString =getSingleMetadataValue(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER);
-        if(dateString != null) {
-            blackoutUntilDate = new DCDate(dateString).toDate();
-        }
-        return blackoutUntilDate;
-    }
-
-    public void setPublicationDOI(String publicationDOI) {
-        // check that this DOI starts with the doi: prefix. if not, add it.
-        if (publicationDOI != null) {
-            Pattern doiPattern = Pattern.compile("^doi:.*");
-            Matcher matcher = doiPattern.matcher(publicationDOI);
-            if (!("".equals(publicationDOI)) && !matcher.find()) {
-                publicationDOI = "doi:" + publicationDOI;
-            }
-        }
-        addSingleMetadataValue(Boolean.FALSE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, publicationDOI);
-    }
-
-    public void clearPublicationDOI() {
-        // Need to filter just on metadata values that are publication DOIs
-        addSingleMetadataValue(Boolean.TRUE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, null);
-    }
-
-    /**
-     * Get the publication DOI. Does not account for pubmed IDs, assumes
-     * first dc.relation.isreferencedby is the publication DOI
-     * @return
-     * @throws SQLException
-     */
-    public String getPublicationDOI() {
-        String result = getSingleMetadataValue(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER);
-        if (result != null) {
-            return result;
-        }
-        return "";
-    }
-
-    public String getTitle() {
-        return getSingleMetadataValue(TITLE_SCHEMA, TITLE_ELEMENT, null);
-    }
-
-    public void setAbstract(String theAbstract) {
-        addSingleMetadataValue(Boolean.TRUE, "dc", "description", null, theAbstract);
-    }
-
-    public String getAbstract() {
-        String theAbstract = getSingleMetadataValue("dc", "description", null);
-        String extraAbstract = getSingleMetadataValue("dc", "description", "abstract");
-
-        if (extraAbstract != null && extraAbstract.length() > 0) {
-            theAbstract = theAbstract + "\n" + extraAbstract;
-        }
-
-        return theAbstract;
-    }
-
-    public List<String> getKeywords() {
-        return getMultipleMetadataValues(KEYWORD_SCHEMA, KEYWORD_ELEMENT, null);
-    }
-
-    public void setKeywords(List<String> keywords) {
-        addMultipleMetadataValues(Boolean.TRUE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
-    }
-
-    public void addKeywords(List<String> keywords) {
-        addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
-    }
-
     public void addDashTransferDate() {
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
         String transferDate = sdf.format(now);
         addSingleMetadataValue(Boolean.FALSE, DASH_TRANSFER_SCHEMA, DASH_TRANSFER_ELEMENT, null, transferDate);
-    }
-
-    public List<Author> getAuthors() {
-        ArrayList<Author> authors = new ArrayList<Author>();
-        DCValue[] metadata = item.getMetadata("dc", "contributor", "author", Item.ANY);
-        for(DCValue dcValue : metadata) {
-            authors.add(new Author(dcValue));
-        }
-        metadata = item.getMetadata("dc", "contributor", null, Item.ANY);
-        for(DCValue dcValue : metadata) {
-            authors.add(new Author(dcValue));
-        }
-        metadata = item.getMetadata("dc", "creator", null, Item.ANY);
-        for(DCValue dcValue : metadata) {
-            authors.add(new Author(dcValue));
-        }
-        return authors;
-    }
-
-    public boolean isPackageInReview(Context c) {
-        if (useDryadClassic) {
-            return DryadWorkflowUtils.isItemInReview(c, getWorkflowItem(c));
-        } else {
-            // get curation status of package
-        }
-        return false;
-    }
-
-    public List<DryadDataPackage> getDuplicatePackages(Context context) {
-        ArrayList<DryadDataPackage> resultList = new ArrayList<>();
-        try {
-            if (useDryadClassic) {
-                DCValue[] duplicates = getItem().getMetadata("dryad.duplicateItem");
-                if (duplicates != null) {
-                    for (DCValue dup : duplicates) {
-                        Item item = Item.find(context, Integer.valueOf(dup.value));
-                        if (item != null) {
-                            resultList.add(new DryadDataPackage(item));
-                        }
-                    }
-                }
-            } else {
-
-            }
-        } catch (Exception e) {
-
-        }
-        return resultList;
-    }
-
-    public void updateDuplicatePackages(Context context) {
-        ArrayList<DryadDataPackage> resultList = new ArrayList<>();
-        try {
-            // get the current duplicate packages
-            resultList.addAll(getDuplicatePackages(context));
-            resultList.addAll(findAllByManuscript(context, new Manuscript(this)));
-            // look for items that have the same journal + title + authors?
-
-        } catch (Exception e) {
-            log.error("Exception while finding items matching manuscript " + this.getIdentifier());
-        }
-
-        // update the data package's metadata:
-        if (useDryadClassic) {
-            getItem().clearMetadata("dryad.duplicateItem");
-            for (DryadDataPackage dryadDataPackage : resultList) {
-                getItem().addMetadata("dryad.duplicateItem", null, String.valueOf(getItem().getID()), null, Choices.CF_NOVALUE);
-            }
-        } else {
-
-        }
     }
 
     /**
@@ -848,13 +851,6 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
-    private final static String PUBLICATION_DOI = "dc.relation.isreferencedby";
-    private final static String FULL_CITATION = "dc.identifier.citation";
-    private final static String MANUSCRIPT_NUMBER = "dc.identifier.manuscriptNumber";
-    private final static String PUBLICATION_DATE = "dc.date.issued";
-    private final static String CITATION_IN_PROGRESS = "dryad.citationInProgress";
-    private final static String PROVENANCE = "dc.description.provenance";
-
     public boolean updateMetadataFromManuscript(Manuscript manuscript, Context context, StringBuilder provenance) {
         HashSet<String> fieldsChanged = new HashSet<>();
         log.debug("comparing metadata for package " + getIdentifier() + " to manuscript " + manuscript.toString());
@@ -994,6 +990,5 @@ public class DryadDataPackage extends DryadObject {
             return "";
         }
     }
-
 }
 
