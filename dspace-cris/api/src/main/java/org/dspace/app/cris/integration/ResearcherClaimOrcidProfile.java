@@ -13,8 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.RPProperty;
+import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authenticate.ExtraLoggedInAction;
@@ -46,35 +48,20 @@ public class ResearcherClaimOrcidProfile implements ExtraLoggedInAction {
 			}
 		}
 
-		// setup token
-		String token = (String) request.getAttribute("access_token");
-		String scopeMetadata = ConfigurationManager.getProperty("authentication-oauth",
-				"application-client-scope");
-		if (StringUtils.isNotBlank(scopeMetadata) && StringUtils.isNotBlank(token)) {
-			for (String scopeConfigurated : OAuthUtils.decodeScopes(scopeMetadata)) {
-				// clear all token
-				List<RPProperty> rppp = rp.getAnagrafica4view()
-						.get("system-orcid-token" + scopeConfigurated.replace("/", "-"));
-				if (rppp != null && !rppp.isEmpty()) {
-					for (RPProperty rpppp : rppp) {
-						rp.removeProprieta(rpppp);
-					}
-				}
-			}
-		}
-
-		applicationService.saveOrUpdate(ResearcherPage.class, rp);
-		
-		// rebuild token
-		if (StringUtils.isNotBlank(scope) && StringUtils.isNotBlank(token)) {
-			for (String scopeConfigurated : OAuthUtils.decodeScopes(scope)) {
-				ResearcherPageUtils.buildTextValue(rp, token,
-						"system-orcid-token" + scopeConfigurated.replace("/", "-"));
-			}
-		}
-
 		// rebuild orcid
 		ResearcherPageUtils.buildTextValue(rp, orcid, "orcid");
+		
+		// setup token
+		String token = (String) request.getAttribute("access_token");
+		OrcidPreferencesUtils.setTokens(rp, token);
+		
+		// should we register a webhook?
+		if ("all".equalsIgnoreCase(
+				ConfigurationManager.getProperty("authentication-oauth", "orcid-webhook"))
+				|| "connected".equalsIgnoreCase(
+						ConfigurationManager.getProperty("authentication-oauth", "orcid-webhook"))) {
+			OrcidPreferencesUtils.registerOrcidWebHook(rp);
+		}
 
 		applicationService.saveOrUpdate(ResearcherPage.class, rp);
 	}

@@ -617,6 +617,15 @@ return decorator.generateDisplayValue(alternativeName, rp);
 		return null;
 	}
 	
+	public static Boolean getBooleanValue(ACrisObject ro, String key) {
+		List<? extends Property> dpList = (List<? extends Property>) ro.getAnagrafica4view().get(key);
+		if (dpList != null && dpList.size() > 0)
+		{
+			return (Boolean) dpList.get(0).getObject();
+		}
+		return null;
+	}
+	
 	public static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, 
 		ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void buildTextValue(ACrisObject<P, TP, NP, NTP, ACNO, ATNO> ro, 
 				String valueToSet, String pdefKey) {

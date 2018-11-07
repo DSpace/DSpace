@@ -4,7 +4,7 @@
   <parent>
     <artifactId>dspace-cris-webservices</artifactId>
     <groupId>org.dspace</groupId>
-    <version>CRIS-5.8.1-SNAPSHOT</version>
+    <version>CRIS-5.10.0-SNAPSHOT</version>
   </parent>
   <groupId>org.dspace</groupId>
   <artifactId>dspace-cris-webservices-webapp</artifactId>
