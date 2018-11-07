@@ -76,10 +76,13 @@ authentication-ip.Campus = 128.8.0.0/255.255.0.0, 129.2.0.0/255.255.0.0, 131.118
 #####################
 # DOI CONFIGURATION #
 #####################
-identifier.doi.ezid.shoulder = 10.5072/FK2
-identifier.doi.ezid.user = apitest
-identifier.doi.ezid.password = apitest
-identifier.doi.ezid.publisher = Digital Repository at the University of Maryland
+identifier.doi.user =
+identifier.doi.password =
+identifier.doi.prefix = 10.33522
+identifier.doi.datacite.host = mds.test.datacite.org
+identifier.doi.mintRandom = true
+# identifier.doi.namespaceseparator = 
+crosswalk.dissemination.DataCite.publisher = Digital Repository at the University of Maryland
 
 ####################
 # GOOGLE ANALYTICS #
