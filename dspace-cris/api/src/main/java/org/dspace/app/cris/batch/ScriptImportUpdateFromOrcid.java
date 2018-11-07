@@ -9,9 +9,7 @@ package org.dspace.app.cris.batch;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,22 +24,17 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.dspace.app.cris.integration.PushToORCID;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
-import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authority.orcid.OrcidService;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.utils.DSpace;
 
 public class ScriptImportUpdateFromOrcid {
@@ -196,7 +189,7 @@ public class ScriptImportUpdateFromOrcid {
 	            	}
 				}
 				else {
-					String token = PushToORCID.getTokenReleasedForSync(rp, OrcidService.SYSTEM_ORCID_TOKEN_READ_LIMITED_SCOPE);
+					String token = OrcidPreferencesUtils.getTokenReleasedForSync(rp, OrcidService.SYSTEM_ORCID_TOKEN_READ_LIMITED_SCOPE);
 					orcidParam = ResearcherPageUtils.getStringValue(rp, "orcid");
 					boolean orcidPopulated = OrcidPreferencesUtils.populateRP(rp, orcidParam, token, propsToSkip, propsToReplace);
 	            	if (orcidPopulated) {
@@ -228,7 +221,7 @@ public class ScriptImportUpdateFromOrcid {
 					for (SolrDocument sd : qResp.getResults()) {
 						String crisID = (String) qResp.getResults().get(0).getFirstValue("cris-id");
 						ResearcherPage rp = applicationService.uniqueByCrisID(crisID);
-						String token = PushToORCID.getTokenReleasedForSync(rp, OrcidService.SYSTEM_ORCID_TOKEN_READ_LIMITED_SCOPE);
+						String token = OrcidPreferencesUtils.getTokenReleasedForSync(rp, OrcidService.SYSTEM_ORCID_TOKEN_READ_LIMITED_SCOPE);
 						String orcidRP = ResearcherPageUtils.getStringValue(rp, "orcid");
 						boolean orcidPopulated = OrcidPreferencesUtils.populateRP(rp,
 								orcidRP, token, propsToSkip, propsToReplace);

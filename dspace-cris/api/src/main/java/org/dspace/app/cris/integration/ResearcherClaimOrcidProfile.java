@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
@@ -54,6 +55,14 @@ public class ResearcherClaimOrcidProfile implements ExtraLoggedInAction {
 		String token = (String) request.getAttribute("access_token");
 		OrcidPreferencesUtils.setTokens(rp, token);
 		
+		// should we register a webhook?
+		if ("all".equalsIgnoreCase(
+				ConfigurationManager.getProperty("authentication-oauth", "orcid-webhook"))
+				|| "connected".equalsIgnoreCase(
+						ConfigurationManager.getProperty("authentication-oauth", "orcid-webhook"))) {
+			OrcidPreferencesUtils.registerOrcidWebHook(rp);
+		}
+
 		applicationService.saveOrUpdate(ResearcherPage.class, rp);
 	}
 

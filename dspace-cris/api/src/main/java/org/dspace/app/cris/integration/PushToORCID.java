@@ -228,7 +228,7 @@ public class PushToORCID
                         + " AND orcid iD:" + orcid);
                 try
                 {
-                    String tokenCreateWork = getTokenReleasedForSync(researcher,
+                    String tokenCreateWork = OrcidPreferencesUtils.getTokenReleasedForSync(researcher,
                                     OrcidService.SYSTEM_ORCID_TOKEN_ACTIVITIES_CREATE_SCOPE);
                     DSpaceObject dso = HandleManager.resolveToObject(context,
                             uuid);
@@ -310,9 +310,9 @@ public class PushToORCID
                         + " AND orcid iD:" + orcid);
                 try
                 {
-                    String tokenUpdateBio = getTokenReleasedForSync(researcher,
+                    String tokenUpdateBio = OrcidPreferencesUtils.getTokenReleasedForSync(researcher,
                             OrcidService.SYSTEM_ORCID_TOKEN_PROFILE_CREATE_SCOPE);
-                    String tokenActivities = getTokenReleasedForSync(researcher,
+                    String tokenActivities = OrcidPreferencesUtils.getTokenReleasedForSync(researcher,
                             OrcidService.SYSTEM_ORCID_TOKEN_ACTIVITIES_CREATE_SCOPE);
                     if (tokenUpdateBio != null)
                     {
@@ -395,7 +395,7 @@ public class PushToORCID
                         + " AND orcid iD:" + orcid);
                 try
                 {
-                    String tokenCreateFunding = getTokenReleasedForSync(
+                    String tokenCreateFunding = OrcidPreferencesUtils.getTokenReleasedForSync(
                             researcher, OrcidService.SYSTEM_ORCID_TOKEN_ACTIVITIES_CREATE_SCOPE);
 
                     Project project = (Project) applicationService
@@ -3148,13 +3148,6 @@ public class PushToORCID
         }
     }
 
-    //UTILITY METHODS
-    public static String getTokenReleasedForSync(ResearcherPage researcher,
-            String tokenName)
-    {
-        return ResearcherPageUtils.getStringValue(researcher, tokenName);
-    }
-    
     private static String getMd5Hash(String value) throws NoSuchAlgorithmException, UnsupportedEncodingException
     {
         MessageDigest digester = MessageDigest.getInstance("MD5");

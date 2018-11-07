@@ -153,6 +153,8 @@ public class OrcidService extends RestSource
     public static final String WORKS_ENDPOINT = "/works";
 
     private static final String SEARCH_ENDPOINT = "/search";
+    
+    private static final String WEBHOOK_SCOPE = "/webhook";
 
     private static final String READ_PUBLIC_SCOPE = "/read-public";
 
@@ -215,8 +217,7 @@ public class OrcidService extends RestSource
     /**
      * Returns the fields and "works" research activities that are set as
      * "Public" in the ORCID Record for the scholar represented by the specified
-     * orcid_id. When used with the Member API, limited-access data is also
-     * returned if permissions were grant by the user.
+     * orcid_id. 
      * 
      * Public API
      * 
@@ -489,20 +490,6 @@ public class OrcidService extends RestSource
     public OrcidAccessToken getMemberSearchToken() throws IOException
     {
         String code = READ_PUBLIC_SCOPE;
-        return getAccessToken(code, "scope", "client_credentials");
-    }
-
-    /**
-     * 
-     * Allows an ORCID client to obtain an OAuth Access Token to create new
-     * ORCID iDs and Records
-     * 
-     * @return
-     * @throws IOException
-     */
-    public OrcidAccessToken getMemberProfileCreateToken() throws IOException
-    {
-        String code = PROFILE_CREATE_SCOPE;
         return getAccessToken(code, "scope", "client_credentials");
     }
 
@@ -1588,6 +1575,69 @@ public class OrcidService extends RestSource
         }
     }    
     
+    /**
+     * Register a webhook for the supplied orcid
+     * @param orcid the orcid of the record to monitor for update
+     * @return true if the webhook is created or exist
+     */
+    public boolean registerWebHook(String orcid) {
+    	String callbackUrl = ConfigurationManager.getProperty("dspace.url") + "/orcidwebhook/" + orcid;
+    	
+    	WebTarget target = restConnector.getClientRest(orcid + "/webhook/" + URLEncoder.encode(callbackUrl));
+
+        try
+        {
+            Response response = target.request().header(HttpHeaders.AUTHORIZATION,
+                    "Bearer " + getAccessToken(WEBHOOK_SCOPE, "scope",
+                            "client_credentials").getAccess_token())
+                    .accept(APPLICATION_ORCID_XML).acceptEncoding("UTF-8")
+                    .post(null);
+            int status = response.getStatus();
+			if (status == 201 || status == 204) {
+				log.debug("WebHook for ORCID " + orcid + " registered, return code " + status);
+            	return true;
+            }
+        }
+        catch (IOException e)
+        {
+        	log.error(e.getMessage(), e);
+        }
+
+    	return false;
+    }
+    
+    /**
+     * Remove the webhook for the supplied orcid
+     * @param orcid the orcid of the record to stop to monitor for update
+     * @return true if the webhook is removed or was not present
+     */
+    public boolean unregisterWebHook(String orcid) {
+    	String callbackUrl = ConfigurationManager.getProperty("dspace.url") + "/orcidwebhook/" + orcid;
+    	
+    	WebTarget target = restConnector.getClientRest(orcid + "/webhook/" + URLEncoder.encode(callbackUrl));
+
+        try
+        {
+            Response response = target.request().header(HttpHeaders.AUTHORIZATION,
+                    "Bearer " + getAccessToken(WEBHOOK_SCOPE, "scope",
+                            "client_credentials").getAccess_token())
+                    .accept(APPLICATION_ORCID_XML).acceptEncoding("UTF-8")
+                    .delete();
+            int status = response.getStatus();
+			if (status == 204 || status == 404) {
+				log.debug("WebHook for ORCID " + orcid + " removed, return code " + status);
+            	return true;
+            }
+        }
+        catch (IOException e)
+        {
+        	log.error(e.getMessage(), e);
+        }
+
+    	return false;
+
+    }
+    
     // Utility call
     public int higherDisplayIndex(WorkGroup orcidGroup)
     {
@@ -1785,13 +1835,13 @@ public class OrcidService extends RestSource
             String clientid = line.getOptionValue("i");
             String secretid = line.getOptionValue("s");
             System.out.println(
-                    "Try to validate against ORCID MEMBER API 'https://api.orcid.org/v2.0' and ORCID MEMBER TOKEN URL 'https://orcid.org/oauth/token'");
+                    "Try to validate against ORCID MEMBER API 'https://api.orcid.org/v2.1' and ORCID MEMBER TOKEN URL 'https://orcid.org/oauth/token'");
             System.out.println("Your Production Credentials:");
             System.out.println("Client iD:'" + clientid + "'");
             System.out.println("Client Secret:'" + secretid + "'");
 
             OrcidService orcidService = new OrcidService(
-                    "https://api.orcid.org/v2.0", clientid, secretid,
+                    "https://api.orcid.org/v2.1", clientid, secretid,
                     "https://orcid.org/oauth/token");
             try
             {

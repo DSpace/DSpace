@@ -77,6 +77,8 @@ public class OrcidPreferencesUtils
 		}
 	};
 	
+	public static final String RPPDEF_ORCID_WEBHOOK = "orcid-webhook";
+	
     public static final String[] ORCID_RESEARCHER_ATTRIBUTES = new String[] {
             "primary-email", "name", "other-names", "other-emails",
             "iso-3166-country", "keywords", "biography", "credit-name" };
@@ -1083,8 +1085,14 @@ public class OrcidPreferencesUtils
                         }
                     }
                 }
-            }
-            return true;
+
+        		// should we register a webhook?
+				if ("all".equalsIgnoreCase(
+						ConfigurationManager.getProperty("authentication-oauth", "orcid-webhook"))) {
+        			registerOrcidWebHook(crisObject);
+        		}
+                return true;
+            } // end orcidProfile != null
         }
         return false;
     }
@@ -1168,10 +1176,42 @@ public class OrcidPreferencesUtils
         return false;
     }
 
+	public static boolean registerOrcidWebHook(ResearcherPage rp) {
+		String orcid = ResearcherPageUtils.getStringValue(rp, "orcid");
+		if (orcid != null && OrcidService.getOrcid().registerWebHook(orcid)) {
+			// clear previous flags
+			List<RPProperty> rppp = rp.getAnagrafica4view().get(RPPDEF_ORCID_WEBHOOK);
+			if (rppp != null && !rppp.isEmpty()) {
+				for (RPProperty rpppp : rppp) {
+					rp.removeProprieta(rpppp);
+				}
+			}
+			ResearcherPageUtils.buildGenericValue(rp, Boolean.TRUE, RPPDEF_ORCID_WEBHOOK, VisibilityConstants.PUBLIC);
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean unregisterOrcidWebHook(ResearcherPage rp) {
+		String orcid = ResearcherPageUtils.getStringValue(rp, "orcid");
+		if (orcid != null && OrcidService.getOrcid().unregisterWebHook(orcid)) {
+			// clear previous flags
+			List<RPProperty> rppp = rp.getAnagrafica4view().get(RPPDEF_ORCID_WEBHOOK);
+			if (rppp != null && !rppp.isEmpty()) {
+				for (RPProperty rpppp : rppp) {
+					rp.removeProprieta(rpppp);
+				}
+			}
+			ResearcherPageUtils.buildGenericValue(rp, Boolean.FALSE, RPPDEF_ORCID_WEBHOOK, VisibilityConstants.PUBLIC);
+			return true;
+		}
+		return false;
+	}
+
 	public static void setTokens(ResearcherPage rp, String token) {
 		String scopeMetadata = ConfigurationManager.getProperty("authentication-oauth",
 				"application-client-scope");
-		if (StringUtils.isNotBlank(scopeMetadata) && StringUtils.isNotBlank(token)) {
+		if (StringUtils.isNotBlank(scopeMetadata)) {
 			for (String scopeConfigurated : OAuthUtils.decodeScopes(scopeMetadata)) {
 				// clear all token
 				List<RPProperty> rppp = rp.getAnagrafica4view()
@@ -1190,6 +1230,12 @@ public class OrcidPreferencesUtils
 						"system-orcid-token" + scopeConfigurated.replace("/", "-"));
 			}
 		}
-
+	}
+	
+	//UTILITY METHODS
+	public static String getTokenReleasedForSync(ResearcherPage researcher,
+	        String tokenName)
+	{
+	    return ResearcherPageUtils.getStringValue(researcher, tokenName);
 	}
 }
