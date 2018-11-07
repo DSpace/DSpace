@@ -14,16 +14,6 @@ package org.purl.sword.client;
  * @author Neil Taylor
  */
 public class ClientFactory {
-
-    /**
-     * Create a new instance.
-     */
-    public ClientFactory() {
-        // configure the logger from the property file. The GUI client will
-        // reload these properties if it is set to capture the output and
-        // display it in a panel.
-    }
-
     /**
      * Generate a string that specifies the command line options for this
      * program.
