@@ -17,6 +17,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.dspace.core.I18nUtil;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 
+import it.cilea.osd.jdyna.model.AWidget;
 import it.cilea.osd.jdyna.model.IPropertiesDefinition;
 import it.cilea.osd.jdyna.widget.WidgetCheckRadio;
 
@@ -41,13 +42,20 @@ public final class PropertyDefinitionI18NWrapper implements MethodInterceptor {
 			String name = invocation.getMethod().getName();
 			if ("getLabel".equals(name)) {
 				return getLabel(invocation);
-			} else if ("getReal".equals(name)) {
+			} else if ("getReal".equals(name) || "getObject".equals(name)) {
 				return getWrapper((IPropertiesDefinition) invocation.proceed(), localeString);
 			} else if ("getMask".equals(name)) {
 				return getMask(invocation);
 			} else if ("getPriority".equals(name)) {
                 return priority;
-            }
+			} else if ("getRendering".equals(name)) {
+				AWidget widget = (AWidget) invocation.proceed();
+				if (widget instanceof WidgetCheckRadio) {
+					WidgetCheckRadio wCheck = (WidgetCheckRadio) widget;
+					return getWidgetCheckRadioWrapper(wCheck, simpleName, shortName, locale);
+				}
+				return widget;
+			}
 			
 		}
 		return invocation.proceed();

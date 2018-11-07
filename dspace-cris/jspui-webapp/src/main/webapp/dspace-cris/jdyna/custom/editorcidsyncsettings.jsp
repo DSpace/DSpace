@@ -12,6 +12,18 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="jdynatags" prefix="dyna"%>
+<%@ taglib uri="researchertags" prefix="researcher"%>
+<%@ page import="java.util.Locale"%>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+
+<%
+Locale sessionLocale = UIUtil.getSessionLocale(request);
+String currLocale = null;
+if (sessionLocale != null) {
+	currLocale = sessionLocale.toString();
+}
+
+%>
 <c:set var="root"><%=request.getContextPath()%></c:set>
 <div class="panel-group" id="${holder.shortName}">
 	<div class="panel panel-default">
@@ -40,7 +52,8 @@
 								<div class="col-md-12">
 									<c:forEach
 										items="${propertiesDefinitionsInHolder[holder.shortName]}"
-										var="tipologiaDaVisualizzare">
+										var="tipologiaDaVisualizzareNoI18n">
+										<c:set var="tipologiaDaVisualizzare" value="${researcher:getPropertyDefinitionI18N(tipologiaDaVisualizzareNoI18n,currLocale)}" />
 										<c:if
 											test="${tipologiaDaVisualizzare.shortName eq 'orcid-push-manual'}">
 											<dyna:edit tipologia="${tipologiaDaVisualizzare.object}"
@@ -72,7 +85,8 @@
     							<div class="clearfix"></div>
 								<c:forEach
 									items="${propertiesDefinitionsInHolder[holder.shortName]}"
-									var="tipologiaDaVisualizzare">									
+									var="tipologiaDaVisualizzareNoI18n">			
+									<c:set var="tipologiaDaVisualizzare" value="${researcher:getPropertyDefinitionI18N(tipologiaDaVisualizzareNoI18n,currLocale)}" />						
 									<c:if test="${tipologiaDaVisualizzare.shortName eq 'orcid-publications-prefs'}">
 										<dyna:edit tipologia="${tipologiaDaVisualizzare.object}" disabled="${disabled}"
 											propertyPath="anagraficadto.anagraficaProperties[${tipologiaDaVisualizzare.shortName}]"
@@ -94,7 +108,8 @@
     							<div class="clearfix"></div>
 								<c:forEach
 									items="${propertiesDefinitionsInHolder[holder.shortName]}"
-									var="tipologiaDaVisualizzare">
+									var="tipologiaDaVisualizzareNoI18n">
+									<c:set var="tipologiaDaVisualizzare" value="${researcher:getPropertyDefinitionI18N(tipologiaDaVisualizzareNoI18n,currLocale)}" />
 									<c:if test="${tipologiaDaVisualizzare.shortName eq 'orcid-projects-prefs'}">
 										<dyna:edit tipologia="${tipologiaDaVisualizzare.object}" disabled="${disabled}"
 											propertyPath="anagraficadto.anagraficaProperties[${tipologiaDaVisualizzare.shortName}]"
@@ -118,8 +133,8 @@
     							<div class="clearfix"></div>		
 								<c:forEach
 									items="${propertiesDefinitionsInHolder[holder.shortName]}"
-									var="tipologiaDaVisualizzare">
-
+									var="tipologiaDaVisualizzareNoI18n">
+									<c:set var="tipologiaDaVisualizzare" value="${researcher:getPropertyDefinitionI18N(tipologiaDaVisualizzareNoI18n,currLocale)}" />
 									<c:if test="${fn:startsWith(tipologiaDaVisualizzare.shortName, 'orcid-profile-pref-')}">
 										<dyna:edit tipologia="${tipologiaDaVisualizzare.object}" disabled="${disabled}"
 											propertyPath="anagraficadto.anagraficaProperties[${tipologiaDaVisualizzare.shortName}]"
