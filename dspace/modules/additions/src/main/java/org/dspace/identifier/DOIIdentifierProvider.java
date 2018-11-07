@@ -974,7 +974,7 @@ public class DOIIdentifierProvider
         }
         Item item = (Item) dso;
 
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, doiService.DOIToExternalForm(doi));
+        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, null, null, doiService.formatIdentifier(doi));
         try
         {
             itemService.update(context, item);
