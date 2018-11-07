@@ -60,9 +60,6 @@ public class ORCIDWebHookCallbackServlet extends DSpaceServlet {
 
         if (orcid == null)
         {
-        	if (ConfigurationManager.getBooleanProperty("authentication-oauth", "orcid-webhook.invalid.unregister")) {
-        		orcidService.unregisterWebHook("");
-        	}
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -73,6 +70,22 @@ public class ORCIDWebHookCallbackServlet extends DSpaceServlet {
             orcid = orcid.substring(1);
         }
 
+        final String[] split = orcid.split("/");
+		if (split.length != 2) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+		}
+		
+		String secret = split[0];
+		orcid = split[1];
+		
+		if (!secret.equalsIgnoreCase(ConfigurationManager.getProperty("authentication-oauth", "orcid-webhook.secret"))) {
+			if (ConfigurationManager.getBooleanProperty("authentication-oauth", "orcid-webhook.invalid.unregister")) {
+        		orcidService.unregisterWebHook(secret, orcid);
+        	}
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+		}
         
         // check if the orcid is syntatically valid
         if (!orcidService.isValid(orcid)) {

@@ -1581,17 +1581,17 @@ public class OrcidService extends RestSource
      * @return true if the webhook is created or exist
      */
     public boolean registerWebHook(String orcid) {
-    	String callbackUrl = ConfigurationManager.getProperty("dspace.url") + "/orcidwebhook/" + orcid;
+    	String callbackUrl = ConfigurationManager.getProperty("authentication-oauth", "orcid-webhook.callback-url") + orcid;
     	
-    	WebTarget target = restConnector.getClientRest(orcid + "/webhook/" + URLEncoder.encode(callbackUrl));
+    	WebTarget target = restConnector.getClientRest(orcid + "/webhook/" + URLEncoder.encode(callbackUrl), true);
 
         try
         {
             Response response = target.request().header(HttpHeaders.AUTHORIZATION,
                     "Bearer " + getAccessToken(WEBHOOK_SCOPE, "scope",
                             "client_credentials").getAccess_token())
-                    .accept(APPLICATION_ORCID_XML).acceptEncoding("UTF-8")
-                    .post(null);
+                    .accept("application/json")
+                    .put(Entity.json(""));
             int status = response.getStatus();
 			if (status == 201 || status == 204) {
 				log.debug("WebHook for ORCID " + orcid + " registered, return code " + status);
@@ -1607,21 +1607,58 @@ public class OrcidService extends RestSource
     }
     
     /**
-     * Remove the webhook for the supplied orcid
+     * Remove the webhook for the supplied orcid with an old secret.
+     * <b>This is only used to deregister webhook created with a previous secret</b>
+     * 
+     * @param oldsecret
+     * the old/wrong secret
      * @param orcid the orcid of the record to stop to monitor for update
+     * 
      * @return true if the webhook is removed or was not present
      */
-    public boolean unregisterWebHook(String orcid) {
-    	String callbackUrl = ConfigurationManager.getProperty("dspace.url") + "/orcidwebhook/" + orcid;
+    public boolean unregisterWebHook(String oldsecret, String orcid) {
+    	String callbackUrl = ConfigurationManager.getProperty("dspace.url") + "/" + oldsecret + "/orcidwebhook/"  + orcid;
     	
-    	WebTarget target = restConnector.getClientRest(orcid + "/webhook/" + URLEncoder.encode(callbackUrl));
+    	WebTarget target = restConnector.getClientRest(orcid + "/webhook/" + URLEncoder.encode(callbackUrl), true);
 
         try
         {
             Response response = target.request().header(HttpHeaders.AUTHORIZATION,
                     "Bearer " + getAccessToken(WEBHOOK_SCOPE, "scope",
                             "client_credentials").getAccess_token())
-                    .accept(APPLICATION_ORCID_XML).acceptEncoding("UTF-8")
+                    .accept("application/json")
+                    .delete();
+            int status = response.getStatus();
+			if (status == 204 || status == 404) {
+				log.debug("WebHook for ORCID " + orcid + " removed, return code " + status);
+            	return true;
+            }
+        }
+        catch (IOException e)
+        {
+        	log.error(e.getMessage(), e);
+        }
+
+    	return false;
+
+    }
+    
+    /**
+     * Remove the webhook for the supplied orcid
+     * @param orcid the orcid of the record to stop to monitor for update
+     * @return true if the webhook is removed or was not present
+     */
+    public boolean unregisterWebHook(String orcid) {
+    	String callbackUrl = ConfigurationManager.getProperty("authentication-oauth", "orcid-webhook.callback-url") + orcid;
+    	
+    	WebTarget target = restConnector.getClientRest(orcid + "/webhook/" + URLEncoder.encode(callbackUrl), true);
+
+        try
+        {
+            Response response = target.request().header(HttpHeaders.AUTHORIZATION,
+                    "Bearer " + getAccessToken(WEBHOOK_SCOPE, "scope",
+                            "client_credentials").getAccess_token())
+                    .accept("application/json")
                     .delete();
             int status = response.getStatus();
 			if (status == 204 || status == 404) {
