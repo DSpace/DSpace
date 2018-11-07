@@ -278,7 +278,7 @@ public class PMCEuropeFeed
         {
             pmcidMetadata = line.getOptionValue("n");
         }
-        if (line.hasOption("0"))
+        if (line.hasOption("o"))
         {
             status = line.getOptionValue("o");
         }
