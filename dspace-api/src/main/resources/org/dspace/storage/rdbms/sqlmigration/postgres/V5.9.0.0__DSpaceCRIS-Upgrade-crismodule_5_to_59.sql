@@ -5,6 +5,7 @@
 --
 -- http://www.dspace.org/license/
 --
+
 ALTER TABLE cris_rp_prop
   DROP CONSTRAINT cris_rp_prop_positiondef_typo_id_parent_id_key;
 
