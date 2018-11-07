@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>CRIS-5.8.1-SNAPSHOT</version>
+        <version>CRIS-5.10.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
