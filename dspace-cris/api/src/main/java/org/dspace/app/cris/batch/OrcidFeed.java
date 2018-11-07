@@ -66,10 +66,6 @@ public class OrcidFeed
 
     private static final Logger log = Logger.getLogger(OrcidFeed.class);
 
-    // p = workspace, w = workflow step 1, y = workflow step 2, x =
-    // workflow step 3, z = inarchive
-    private static String status = "p";
-
     private static TransformationEngine feedTransformationEnginePhaseOne = new DSpace()
             .getServiceManager()
             .getServiceByName("orcidFeedTransformationEnginePhaseOne",
@@ -102,11 +98,7 @@ public class OrcidFeed
 
         options.addOption(OptionBuilder.isRequired(true)
                 .withArgName("collectionID").hasArg(true)
-                .withDescription("Collection for item submision").create("c"));
-
-        options.addOption(OptionBuilder.withArgName("test").hasArg(false)
-                .withDescription("dry run, do not save any change")
-                .create("t"));
+                .withDescription("Collection for item submission").create("c"));
 
         options.addOption(OptionBuilder.isRequired(true).withArgName("Eperson")
                 .hasArg(true).withDescription("Submitter of the records")
@@ -138,6 +130,7 @@ public class OrcidFeed
         }
 
         String person = line.getOptionValue("p");
+        
         EPerson eperson = null;
         if (StringUtils.isNumeric(person))
         {
@@ -163,19 +156,10 @@ public class OrcidFeed
         boolean forceCollectionId = line.hasOption("f");
         String orcid = line.getOptionValue("i");
 
-        // select putcode already imported
-        TableRowIterator tri = DatabaseManager.query(context,
-                "SELECT DISTINCT " + IMP_RECORD_ID + " from imp_record where "
-                        + IMP_EPERSON_ID + " = " + eperson.getID() + " AND "
-                        + IMP_SOURCE_REF + " like 'orcid'");
-
-        List<String> alreadyInImpRecord = new ArrayList<String>();
-        while (tri.hasNext())
-        {
-            TableRow row = tri.next();
-            alreadyInImpRecord.add(row.getStringColumn(IMP_RECORD_ID));
-        }
-
+        // p = workspace, w = workflow step 1, y = workflow step 2, x =
+        // workflow step 3, z = inarchive
+        String status = "p";
+        
         if (line.hasOption("o"))
         {
             status = line.getOptionValue("o");
@@ -186,74 +170,8 @@ public class OrcidFeed
         try
         {
 
-            int total = 0;
-            int deleted = 0;
-
-            ImpRecordDAO dao = ImpRecordDAOFactory.getInstance(context);
-
-            List<ImpRecordItem> pmeItemList = new ArrayList<ImpRecordItem>();
-            pmeItemList.addAll(convertToImpRecordItem(context, orcid));
-
-            for (ImpRecordItem pmeItem : pmeItemList)
-            {
-                boolean foundAlready = false;
-                for (String already : alreadyInImpRecord)
-                {
-                    if (pmeItem.getSourceId().equals(already))
-                    {
-                        foundAlready = true;
-                        break;
-                    }
-                }
-
-                if (!foundAlready)
-                {
-                    try
-                    {
-                        int tmpCollectionID = collection_id;
-                        if (!forceCollectionId)
-                        {
-                            Set<ImpRecordMetadata> t = pmeItem.getMetadata()
-                                    .get("dc.source.type");
-                            if (t != null && !t.isEmpty())
-                            {
-                                String stringTmpCollectionID = "";
-                                Iterator<ImpRecordMetadata> iterator = t
-                                        .iterator();
-                                while (iterator.hasNext())
-                                {
-                                    String stringTrimTmpCollectionID = iterator
-                                            .next().getValue();
-                                    stringTmpCollectionID += stringTrimTmpCollectionID
-                                            .trim();
-                                }
-                                tmpCollectionID = ConfigurationManager
-                                        .getIntProperty("cris",
-                                                "orcid.type."
-                                                        + stringTmpCollectionID
-                                                        + ".collectionid",
-                                                collection_id);
-                            }
-                        }
-
-                        total++;
-                        String action = "insert";
-                        DTOImpRecord impRecord = writeImpRecord(context, dao,
-                                tmpCollectionID, pmeItem, action,
-                                eperson.getID());
-
-                        dao.write(impRecord, false);
-                    }
-                    catch (Exception ex)
-                    {
-                        deleted++;
-                    }
-                }
-            }
-
-            System.out.println("Imported " + (total - deleted) + " record; "
-                    + deleted + " marked as removed");
-            pmeItemList.clear();
+            retrievePublication(context, eperson, collection_id,
+                    forceCollectionId, orcid, status);
 
             context.complete();
 
@@ -272,9 +190,96 @@ public class OrcidFeed
 
     }
 
+    public static void retrievePublication(Context context, EPerson eperson,
+            Integer collection_id, boolean forceCollectionId, String orcid, String status) throws HttpException, IOException,
+            BadTransformationSpec, MalformedSourceException, SQLException
+    {
+        
+        // select putcode already imported
+        TableRowIterator tri = DatabaseManager.query(context,
+                "SELECT DISTINCT " + IMP_RECORD_ID + " from imp_record where "
+                        + IMP_EPERSON_ID + " = " + eperson.getID() + " AND "
+                        + IMP_SOURCE_REF + " like 'orcid'");
+
+        List<String> alreadyInImpRecord = new ArrayList<String>();
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+            alreadyInImpRecord.add(row.getStringColumn(IMP_RECORD_ID));
+        }
+        
+        int total = 0;
+        int deleted = 0;
+
+        ImpRecordDAO dao = ImpRecordDAOFactory.getInstance(context);
+
+        List<ImpRecordItem> pmeItemList = new ArrayList<ImpRecordItem>();
+        pmeItemList.addAll(convertToImpRecordItem(context, orcid));
+
+        for (ImpRecordItem pmeItem : pmeItemList)
+        {
+            boolean foundAlready = false;
+            for (String already : alreadyInImpRecord)
+            {
+                if (pmeItem.getSourceId().equals(already))
+                {
+                    foundAlready = true;
+                    break;
+                }
+            }
+
+            if (!foundAlready)
+            {
+                try
+                {
+                    int tmpCollectionID = collection_id;
+                    if (!forceCollectionId)
+                    {
+                        Set<ImpRecordMetadata> t = pmeItem.getMetadata()
+                                .get("dc.source.type");
+                        if (t != null && !t.isEmpty())
+                        {
+                            String stringTmpCollectionID = "";
+                            Iterator<ImpRecordMetadata> iterator = t
+                                    .iterator();
+                            while (iterator.hasNext())
+                            {
+                                String stringTrimTmpCollectionID = iterator
+                                        .next().getValue();
+                                stringTmpCollectionID += stringTrimTmpCollectionID
+                                        .trim();
+                            }
+                            tmpCollectionID = ConfigurationManager
+                                    .getIntProperty("cris",
+                                            "orcid.type."
+                                                    + stringTmpCollectionID
+                                                    + ".collectionid",
+                                            collection_id);
+                        }
+                    }
+
+                    total++;
+                    String action = "insert";
+                    DTOImpRecord impRecord = writeImpRecord(context, dao,
+                            tmpCollectionID, pmeItem, action,
+                            eperson.getID(), status);
+
+                    dao.write(impRecord, false);
+                }
+                catch (Exception ex)
+                {
+                    deleted++;
+                }
+            }
+        }
+
+        System.out.println("Imported " + (total - deleted) + " record; "
+                + deleted + " marked as removed");
+    }
+
     private static DTOImpRecord writeImpRecord(Context context,
             ImpRecordDAO dao, int collection_id, ImpRecordItem pmeItem,
-            String action, Integer epersonId) throws SQLException
+            String action, Integer epersonId, String status) throws SQLException
     {
         DTOImpRecord dto = new DTOImpRecord(dao);
 

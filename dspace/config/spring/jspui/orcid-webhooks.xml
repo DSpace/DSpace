@@ -14,4 +14,7 @@
 	<bean id="revokeORCIDPermissionCallback" 
 		class="org.dspace.app.cris.integration.orcid.RevokeORCIDPermission"/>
 
+	<bean id="retrievePublicationsCallback" 
+		class="org.dspace.app.cris.integration.orcid.RetrievePublications"/>
+		
 </beans>
