@@ -252,7 +252,6 @@ public class ResearcherPageDetailsController
 
         mvc.getModel().putAll(model);
         
-        List<ICrisHomeProcessor<ResearcherPage>> resultProcessors = new ArrayList<ICrisHomeProcessor<ResearcherPage>>();
         Map<String, Object> extraTotal = new HashMap<String, Object>();
         Map<String, ItemMetricsDTO> metricsTotal = new HashMap<String, ItemMetricsDTO>();
         HashSet<String> metricsTypeTotal = new LinkedHashSet<String>();
@@ -263,13 +262,16 @@ public class ResearcherPageDetailsController
                 processor.process(context, request, response, researcher);
                 Map<String, Object> extra = (Map<String, Object>)request.getAttribute("extra");
                 if(extra!=null && !extra.isEmpty()) {
-                    Map<String, ItemMetricsDTO> metrics = (Map<String, ItemMetricsDTO>)extra.get("metrics");
-                    List<String> metricTypes = (List<String>)extra.get("metricTypes");
-                    if(metrics!=null && !metrics.isEmpty()) {
-                        metricsTotal.putAll(metrics);
-                    }
-                    if(metricTypes!=null && !metricTypes.isEmpty()) {
-                        metricsTypeTotal.addAll(metricTypes);
+                    Object metricsObject = extra.get("metrics");
+                    if(metricsObject!=null) {
+                        Map<String, ItemMetricsDTO> metrics = (Map<String, ItemMetricsDTO>)metricsObject;
+                        List<String> metricTypes = (List<String>)extra.get("metricTypes");
+                        if(metrics!=null && !metrics.isEmpty()) {
+                            metricsTotal.putAll(metrics);
+                        }
+                        if(metricTypes!=null && !metricTypes.isEmpty()) {
+                            metricsTypeTotal.addAll(metricTypes);
+                        }
                     }
                 }
             }

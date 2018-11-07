@@ -123,7 +123,9 @@ public class ItemImportMainOA
                     "muted logs");
             options.addOption("t", "threads", true,
                     "Threads numbers (default 0, if omitted read by configuration)");
-
+            options.addOption("q", "query", true,
+                    "Find by query (work only in singlethread mode)");
+            
             CommandLine line = parser.parse(options, args);
             if (line.hasOption('h'))
             {
@@ -152,6 +154,12 @@ public class ItemImportMainOA
                 silent = true;
             }
 
+            String query = null;
+            if (line.hasOption('q'))
+            {
+                query = line.getOptionValue("q");
+            }
+            
             String[] metadataClean = null;
             if (line.hasOption('m'))
             {
@@ -216,33 +224,37 @@ public class ItemImportMainOA
 
             AtomicInteger row_discarded = new AtomicInteger(0);
 
-            int numOfThread = getNumberOfThread(line);
-
+            int numOfThread = 0;
+            String sql = "SELECT * FROM imp_record WHERE last_modified is NULL order by imp_id ASC";
+            if(StringUtils.isNotBlank(query)) {
+                //query mode work only in single thread
+                sql = query;
+            }
+            else {
+                numOfThread = getNumberOfThread(line);
+            }
+    
             if (numOfThread > 1)
             {
                 TableRowIterator rows;
-                String sql;
-
                 sql = "SELECT a.*, (select count(imp_record_id) from imp_record b where b.imp_record_id=a.imp_record_id and b.last_modified is NULL ) as cardinality FROM imp_record a WHERE last_modified is NULL order by imp_id ASC";// and
                 log.debug(sql);
                 rows = DatabaseManager.query(context, sql);
                 parallelizeOperationsTri(line, metadataClean, batchJob, count,
-                        row_discarded, numOfThread, rows);
+                         row_discarded, numOfThread, rows);
             }
             else
             {
-                String sql = "SELECT * FROM imp_record WHERE last_modified is NULL order by imp_id ASC";
-                
                 TableRowIterator rows = DatabaseManager.query(context, sql);
 
                 AtomicReference<Context> ctxHolder = ItemImportThread
-                        .initCtxHolder();
-
+                            .initCtxHolder();
+    
                 while (rows.hasNext())
                 {
                     TableRow row_data = rows.next();
                     multithreadedMain(line, metadataClean, batchJob, count,
-                            row_data, row_discarded, ctxHolder);
+                             row_data, row_discarded, ctxHolder);
                 }
                 rows.close();
             }

@@ -79,29 +79,6 @@
 	</bean>	
 
 	<bean class="org.dspace.app.cris.integration.CrisItemEnhancer">
-		<property name="alias" value="classification" />
-		<property name="metadata">
-			<list>
-				<value>dc.subject.INGV</value>
-			</list>
-		</property>
-		<property name="clazz">
-			<value>org.dspace.app.cris.model.ResearchObject</value>
-		</property>
-		<property name="type">
-			<value>classification</value>
-		</property>		
-		<property name="qualifiers2path">
-			<map>
-				<entry key="parent">
-					<value>classificationparentclassification</value>
-				</entry>
-			</map>
-		</property>
-	</bean>	
-
-
-	<bean class="org.dspace.app.cris.integration.CrisItemEnhancer">
 		<property name="alias" value="journal" />
 		<property name="metadata">
 			<list>

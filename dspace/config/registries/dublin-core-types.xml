@@ -676,11 +676,17 @@
         <scope_note></scope_note>
     </dc-type>
     
-    
 	<dc-type>
         <schema>dc</schema>
         <element>identifier</element>
         <qualifier>bibcode</qualifier>
         <scope_note></scope_note>
     </dc-type>        
+
+	<dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>external</qualifier>
+        <scope_note></scope_note>
+    </dc-type>    
 </dspace-dc-types>

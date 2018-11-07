@@ -8,6 +8,7 @@
 package org.dspace.app.cris.batch.bte;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ImpRecordItem
@@ -39,6 +40,19 @@ public class ImpRecordItem
         this.metadata.put(metadataName, values);
     }
 
+    public void addMetadata(String metadataName, ImpRecordMetadata value)
+    {
+        Set<ImpRecordMetadata> metadataMap = null;
+        if(this.metadata.containsKey(metadataName)) {
+            metadataMap = this.metadata.get(metadataName);
+        }
+        else {
+            metadataMap = new HashSet<ImpRecordMetadata>();            
+        }
+        metadataMap.add(value);
+        this.metadata.put(metadataName, metadataMap);
+    }
+    
     public String getSourceId()
     {
         return sourceId;

@@ -7,7 +7,6 @@
  */
 package org.dspace.app.cris.statistics.batch;
 
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -44,161 +43,265 @@ public class RebuildDerivateStatisticsMetadata
      * @throws IOException
      * @throws SQLException
      */
-    public static void main(String[] args) throws SolrServerException,
-            IOException, SQLException
+    public static void main(String[] args)
+            throws SolrServerException, IOException, SQLException
     {
-        
-        String usage = "org.dspace.app.cris.statistics.batch.RebuildDerivateStatisticsMetadata [-a|y <year>]";
+
+        String usage = "org.dspace.app.cris.statistics.batch.RebuildDerivateStatisticsMetadata [y <year> | c <crisentity> | o <community_collection_gotocrisentity>]";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
 
-    
         options.addOption("y", "year", true, "Year");
         options.addOption("c", "crisentity", true, "Cris entity");
         options.addOption("o", "other", true, "Other DSpace type");
-        
-        try {
+
+        try
+        {
             line = new PosixParser().parse(options, args);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // automatically generate the help statement
             formatter.printHelp(usage, e.getMessage(), options, "");
             System.exit(1);
         }
 
-        if (line.hasOption("h")) {
+        if (line.hasOption("h"))
+        {
             // automatically generate the help statement
             formatter.printHelp(usage, options);
             System.exit(1);
         }
-        
-        
+
         DSpace dspace = new DSpace();
 
-        SolrLogger indexer = dspace.getServiceManager().getServiceByName(SolrLogger.class.getName(),SolrLogger.class);
+        SolrLogger indexer = dspace.getServiceManager()
+                .getServiceByName(SolrLogger.class.getName(), SolrLogger.class);
 
-        
         SolrDocumentList sdl = null;
-        
+
+        boolean gotoCris = false;
         int dspaceType = Constants.ITEM;
-        if (line.hasOption("o")) {
+        if (line.hasOption("o"))
+        {
             dspaceType = Integer.parseInt(line.getOptionValue("o"));
+            if (dspaceType >= 9)
+            {
+                gotoCris = true;
+            }
         }
+        
+        int failed = 0;
+        int total = 0;
+        StringBuilder errorsBuffer = new StringBuilder();
         
         boolean year = line.hasOption("y");
-        
-        if (year) {
-            System.out.println("YEAR");
-            sdl = indexer.getRawData(dspaceType, Integer.parseInt(line.getOptionValue("y")));
-        } else {
-            System.out.println("ALL");
-            sdl = indexer.getRawData(dspaceType);
-        }
-        
-        System.out.println("Found " + sdl.getNumFound()
-                + " access in the statistics core");
-        HttpSolrServer solr = indexer.getSolr();
-        if(year) {
-            indexer.deleteByTypeAndYear(dspaceType, Integer.parseInt(line.getOptionValue("y")));
-        }
-        else {
-            indexer.deleteByType(dspaceType);
-        }
-        solr.commit();
-        System.out.println("Remove old data");
-        Context context = new Context();
-        context.turnOffAuthorisationSystem();
-        int i = 0;
-        one:for (SolrDocument sd : sdl)
+
+        int yearFound = Integer.parseInt(line.getOptionValue("y"));
+
+        if (!gotoCris)
         {
-            i++;
-            System.out.println("Processed access #" + i + " of "
-                    + sdl.getNumFound());
-            SolrInputDocument sdi = ClientUtils.toSolrInputDocument(sd);
-            Integer id = (Integer) sd.getFieldValue("id");
-            Integer type = (Integer) sd.getFieldValue("type");
-
-            DSpaceObject dso = DSpaceObject.find(context, type, id);
-            
-            // Do any additional indexing, depends on the plugins
-            List<SolrStatsIndexPlugin> solrServiceIndexPlugins = new DSpace()
-                    .getServiceManager().getServicesByType(
-                            SolrStatsIndexPlugin.class);
-            two:for (SolrStatsIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
+            if (year)
             {
-                try {
-                    solrServiceIndexPlugin.additionalIndex(null, dso,
-                        sdi);
-                }
-                catch(Exception ex) {
-                    System.out.println("SolrDoc:"+ (sdi==null?"null":"OK") + " - DSO:" + (dso==null?"null":"OK") + " search.uniqueid " + type+"-"+id + " Error:" + ex.getMessage());
-                    continue one;                    
-                }
+                System.out.println("YEAR");
+                sdl = indexer.getRawData(dspaceType, yearFound);
             }
-            
-            context.removeCached(dso, id);
-            solr.add(sdi);
-        }
-        solr.commit();
-        solr.optimize();
+            else
+            {
+                System.out.println("ALL");
+                sdl = indexer.getRawData(dspaceType);
+            }
 
-        if(!year && line.hasOption("c")) {
-            
+            System.out.println("Found " + sdl.getNumFound()
+                    + " access in the statistics core");
+            HttpSolrServer solr = indexer.getSolr();
+            if (year)
+            {
+                indexer.deleteByTypeAndYear(dspaceType, yearFound);
+            }
+            else
+            {
+                indexer.deleteByType(dspaceType);
+            }
+            solr.commit();
+            System.out.println("Remove old data");
+            Context context = new Context();
+            context.turnOffAuthorisationSystem();
+            int i = 0;
+            one: for (SolrDocument sd : sdl)
+            {
+                i++;
+                System.out.println(
+                        "Processed access #" + i + " of " + sdl.getNumFound());
+                SolrInputDocument sdi = ClientUtils.toSolrInputDocument(sd);
+                Integer id = (Integer) sd.getFieldValue("id");
+                Integer type = (Integer) sd.getFieldValue("type");
+
+                DSpaceObject dso = null;
+                try
+                {
+                    dso = DSpaceObject.find(context, type, id);
+                }
+                catch (Exception ex)
+                {
+                    failed++;
+                    System.out.println("SolrDoc:"
+                            + (sdi == null ? "null" : "OK") + " - DSO:"
+                            + (dso == null ? "null" : "OK")
+                            + " search.uniqueid " + type + "-" + id
+                            + " Error:" + ex.getMessage());
+                    errorsBuffer.append(sdi);
+                    continue one;
+                }
+                // Do any additional indexing, depends on the plugins
+                List<SolrStatsIndexPlugin> solrServiceIndexPlugins = new DSpace()
+                        .getServiceManager()
+                        .getServicesByType(SolrStatsIndexPlugin.class);
+                two: for (SolrStatsIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
+                {
+                    try
+                    {
+                        solrServiceIndexPlugin.additionalIndex(null, dso, sdi);
+                    }
+                    catch (Exception ex)
+                    {
+                        failed++;                        
+                        System.out.println("SolrDoc:"
+                                + (sdi == null ? "null" : "OK") + " - DSO:"
+                                + (dso == null ? "null" : "OK")
+                                + " search.uniqueid " + type + "-" + id
+                                + " Error:" + ex.getMessage());
+                        errorsBuffer.append(sdi);
+                        continue one;
+                    }
+                }
+
+                context.removeCached(dso, id);
+                solr.add(sdi);
+            }
+            total += i;
+            solr.commit();
+            solr.optimize();
+        }
+        if (gotoCris || line.hasOption("c"))
+        {
             Integer crisType = Integer.parseInt(line.getOptionValue("c"));
-            sdl = indexer.getRawData(crisType);
+            if (year)
+            {
+                System.out.println("YEAR CRIS " + crisType);
+                sdl = indexer.getRawData(crisType, yearFound);
+            }
+            else
+            {
+                System.out.println("ALL CRIS " + crisType);
+                sdl = indexer.getRawData(crisType);
+            }
+
             System.out.println("Found " + sdl.getNumFound()
                     + " access in the RP statistics core");
             HttpSolrServer rpsolr = indexer.getSolr();
-            indexer.deleteByType(crisType);
+            if (year)
+            {
+                indexer.deleteByTypeAndYear(crisType, yearFound);
+            }
+            else
+            {
+                indexer.deleteByType(crisType);
+            }
+
             rpsolr.commit();
-    
+
             System.out.println("Remove old data");
-            
+
             ApplicationService as = dspace.getServiceManager().getServiceByName(
                     "applicationService", ApplicationService.class);
-            i = 0;
-            for (SolrDocument sd : sdl)
+            int i = 0;
+            one: for (SolrDocument sd : sdl)
             {
                 i++;
                 System.out.println("Processed RP access #" + i + " of "
                         + sdl.getNumFound());
                 SolrInputDocument sdi = ClientUtils.toSolrInputDocument(sd);
                 Integer id = (Integer) sd.getFieldValue("id");
-                
+
                 ACrisObject rp = null;
-                switch (crisType)
+                try
                 {
-                case 9:
-                    rp = as.get(ResearcherPage.class, id);
-                    break;
-                case 10:
-                    rp = as.get(Project.class, id);
-                    break;
-                case 11:
-                    rp = as.get(OrganizationUnit.class, id);
-                    break;
-                default:
-                    rp = as.get(ResearchObject.class, id);
-                    break;
+                    switch (crisType)
+                    {
+                    case 9:
+                        rp = as.get(ResearcherPage.class, id);
+                        break;
+                    case 10:
+                        rp = as.get(Project.class, id);
+                        break;
+                    case 11:
+                        rp = as.get(OrganizationUnit.class, id);
+                        break;
+                    default:
+                        rp = as.get(ResearchObject.class, id);
+                        break;
+                    }
                 }
-                    
-                if (rp == null)
-                    continue;
-    
+                catch (Exception ex)
+                {
+                    failed++;
+                    System.out.println("SolrDoc:"
+                            + (sdi == null ? "null" : "OK") + " - DSO:"
+                            + (rp == null ? "null" : "OK")
+                            + " search.uniqueid " + crisType + "-" + id
+                            + " Error:" + ex.getMessage());
+                    System.out.println(sdi);
+                    errorsBuffer.append(sdi);
+                    continue one;
+                }
+                
+                if (rp == null) {
+                    failed++;
+                    System.out.println("SolrDoc:"
+                            + (sdi == null ? "null" : "OK") + " - DSO:"
+                            + (rp == null ? "null" : "OK")
+                            + " search.uniqueid " + crisType + "-" + id
+                            );
+                    System.out.println(sdi);
+                    errorsBuffer.append(sdi);
+                    continue one;
+                }
+
                 // Do any additional indexing, depends on the plugins
                 List<SolrStatsIndexPlugin> solrServiceIndexPlugins = new DSpace()
-                        .getServiceManager().getServicesByType(
-                                SolrStatsIndexPlugin.class);
+                        .getServiceManager()
+                        .getServicesByType(SolrStatsIndexPlugin.class);
                 for (SolrStatsIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
                 {
-                    solrServiceIndexPlugin.additionalIndex(null, rp,
-                            sdi);
+                    try
+                    {
+                        solrServiceIndexPlugin.additionalIndex(null, rp, sdi);
+                    }
+                    catch (Exception ex)
+                    {
+                        failed++;                        
+                        System.out.println("SolrDoc:"
+                                + (sdi == null ? "null" : "OK") + " - DSO:"
+                                + (rp == null ? "null" : "OK")
+                                + " search.uniqueid " + crisType + "-" + id
+                                + " Error:" + ex.getMessage());
+                        errorsBuffer.append(sdi);
+                        continue one;
+                    }
                 }
-               
+
                 rpsolr.add(sdi);
             }
+            
+            total += i;
             rpsolr.commit();
             rpsolr.optimize();
         }
+        
+        System.out.println("TOTAL:" + total);
+        System.out.println("FAILED:" + failed);
+        System.out.println(errorsBuffer.toString());
     }
 }
