@@ -103,7 +103,7 @@ public class ImportRecordServlet extends DSpaceServlet
                     }
                     else {
                         DatabaseManager.updateQuery(context,
-                                "UPDATE imp_record " + "SET last_modified = LOCALTIMESTAMP, operation = 'discard'"
+                                "UPDATE imp_record " + "SET last_modified = LOCALTIMESTAMP, operation = 'ignored'"
                                         + " WHERE imp_record_id = ? AND imp_sourceref = ?", recordId, recordRef);
                         context.commit();
                     }

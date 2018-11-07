@@ -631,7 +631,8 @@
 				<entry key="abstract" value="abstract" />				
 				<entry key="language" value="language" />
 				<entry key="authors" value="authors" />				
-				<entry key="orcid" value="orcid" />		
+				<entry key="orcid" value="orcid" />
+				<entry key="putcode" value="externalID" />				
 				<entry key="arxiv" value="arxiv" />
 				<entry key="eid" value="eid" />
 				<entry key="doi" value="doi" />
@@ -791,7 +792,8 @@
 				<entry value="providerType" key="dc.source.type" />
 				<entry value="orcid" key="dc.contributor.orcid" />
 				<entry value="rights" key="dc.rights" />
-				<entry value="description" key="dc.description" />				
+				<entry value="description" key="dc.description" />
+				<entry value="externalID" key="dc.identifier.external" />				
 				
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
 				<!-- 
@@ -1168,5 +1170,29 @@
 		<property name="outputMap" ref="outputMap"/>
 		<property name="sourceIdMetadata" value="dc.identifier.adsbibcode" />
 		<property name="providerName" value="scopus" />		
-	</bean>	
+	</bean>
+	
+	<!--  ORCID FEED -->	
+	<bean name="orcidFeedTransformationEnginePhaseOne" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="orcidDataLoader"/>
+    	<property name="workflow" ref="phase1LinearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+  	</bean>
+  	<bean name="orcidDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	    <property name="dataloadersMap">
+	        <map>
+	            <entry key="orcid" value-ref="orcidOnlineDataLoader"/>
+			</map>
+	    </property>
+	</bean>
+	<bean name="orcidFeedTransformationEnginePhaseTwo" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="submissionItemDataLoader"/>
+    	<property name="workflow" ref="phase2linearWorkflow"/>
+    	<property name="outputGenerator" ref="orcidGenerator"/>
+  	</bean>
+	<bean name="orcidGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
+		<property name="outputMap" ref="outputMap"/>
+		<property name="sourceIdMetadata" value="dc.identifier.external" />
+		<property name="providerName" value="orcid" />		
+	</bean>		
 </beans>

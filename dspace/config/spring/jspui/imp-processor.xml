@@ -12,7 +12,12 @@
 	<context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
 	<bean class="org.dspace.app.webui.cris.processor.RPImpRecordProcessor"
-		name="rpImpRecordProcessor">
+		name="pubmedEuropeRPImpRecordProcessor">
+		<property name="sourceRef" value="pubmedEurope" />
+	</bean> 
+	
+	<bean class="org.dspace.app.webui.cris.processor.RPImpRecordProcessor"
+		name="orcidRPImpRecordProcessor">
 		<property name="sourceRef" value="orcid" />
 	</bean>
 
