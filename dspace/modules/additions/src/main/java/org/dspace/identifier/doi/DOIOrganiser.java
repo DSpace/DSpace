@@ -424,6 +424,10 @@ public class DOIOrganiser {
         }
         
         try {
+            if (isNonUniqueDoi(context, doiRow)) {
+                setNewDoi(context, doiRow);
+            }
+
             provider.registerOnline(context, dso,
                     DOI.SCHEME + doiRow.getDoi());
             
@@ -508,6 +512,10 @@ public class DOIOrganiser {
         
         try 
         {
+            if (isNonUniqueDoi(context, doiRow)) {
+                setNewDoi(context, doiRow);
+            }
+
             provider.reserveOnline(context, dso, 
                     DOI.SCHEME + doiRow.getDoi());
             
@@ -706,6 +714,51 @@ public class DOIOrganiser {
                         + " online. Take a look in log file.");
             }
         }
+    }
+    
+    /**
+     * If the DOI is marked as TO_BE_REGISTERED or TO_BE_RESERVED locally, but it
+     * already is reserved with the provider then it is possible that the randomly
+     * generated local DOI is not gloabally unique. This is possible if the
+     * same DOI was created with the provider external to this DSpace instance (From
+     * a different application or manually)
+     * 
+     * @see DOIIdentifierProvider#mintRandomUniqueDoi()
+     * @see DOIIdentifierProvider#mintRandomGloballyUniqueDoi()
+     * 
+     * @param context
+     * @param doi
+     * @return
+     * @throws DOIIdentifierException
+     */
+    private boolean isNonUniqueDoi(Context context, DOI doi) throws DOIIdentifierException {
+        if (doi.getStatus() == null ||
+                provider.TO_BE_RESERVED.equals(doi.getStatus()) ||
+                provider.TO_BE_REGISTERED.equals(doi.getStatus())) {
+            if (provider.isReservedOnline(context, doi.getDoi())) {
+                System.out.println("The DOI: " + doi.getDoi() + " associated with item (handle:" +
+                        doi.getDSpaceObject().getHandle() + ") is already reserved externally!");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Mint a new DOI that is unique both locally and in the provider system.
+     * 
+     * @param context
+     * @param doiRow
+     * @throws SQLException
+     * @throws DOIIdentifierException
+     */
+    private void setNewDoi(Context context, DOI doiRow) throws SQLException, DOIIdentifierException {
+        System.out.println("Minting new DOI for item with handle: " + doiRow.getDSpaceObject().getHandle());
+        doiRow.setDoi(provider.mintRandomGloballyUniqueDoi(context));
+        doiService.update(context, doiRow);
+        System.out.println("Minted new unique DOI: " +  doiRow.getDoi() + " for item with handle " +
+                doiRow.getDSpaceObject().getHandle());
+        
     }
     
     /**

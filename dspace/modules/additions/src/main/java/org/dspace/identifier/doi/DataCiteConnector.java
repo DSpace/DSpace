@@ -534,6 +534,7 @@ implements DOIConnector
         switch(resp.statusCode)
         {
             // 201 -> created/updated -> okay
+            case (200) :
             case (201) :
             {
                 return;

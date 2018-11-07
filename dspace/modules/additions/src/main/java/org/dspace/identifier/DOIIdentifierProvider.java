@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
@@ -63,6 +64,7 @@ public class DOIIdentifierProvider
     private DOIConnector connector;
     
     static final String CFG_PREFIX = "identifier.doi.prefix";
+    static final String CFG_MINT_RANDOM = "identifier.doi.mintRandom";
     static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
     static final char SLASH = '/';
         
@@ -96,6 +98,11 @@ public class DOIIdentifierProvider
      * Prefix of DOI namespace. Set in dspace.cfg.
      */
     private String PREFIX;
+
+    /**
+     * Enable random generation of DOI. Set in dspace.cfg.
+     */
+    private Boolean mintRandom;
     
     /**
      * Part of DOI to separate several applications that generate DOIs.
@@ -119,6 +126,15 @@ public class DOIIdentifierProvider
             }
         }
         return this.PREFIX;
+    }
+
+    protected boolean isMintRandom()
+    {
+        if (null == this.mintRandom)
+        {
+            this.mintRandom = this.configurationService.getBooleanProperty(CFG_MINT_RANDOM, false);
+        }
+        return this.mintRandom;
     }
     
     protected String getNamespaceSeparator()
@@ -273,6 +289,18 @@ public class DOIIdentifierProvider
         }
     }
 
+    /**
+     * Checks if a DOI is reserved with the provider.
+     * 
+     * @param context
+     * @param doi
+     * @return true if reserved, false otherwise.
+     * @throws DOIIdentifierException
+     */
+    public boolean isReservedOnline(Context context, String doi) throws DOIIdentifierException {
+        return connector.isDOIReserved(context, doiService.formatIdentifier(doi));
+    }
+
     public void reserveOnline(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException, IllegalArgumentException, SQLException
     {        
@@ -286,7 +314,7 @@ public class DOIIdentifierProvider
             throw new DOIIdentifierException("You tried to reserve a DOI that "
                     + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
         }
-        
+
         connector.reserveDOI(context, dso, doi);
         
         doiRow.setStatus(IS_RESERVED);
@@ -306,7 +334,7 @@ public class DOIIdentifierProvider
             throw new DOIIdentifierException("You tried to register a DOI that "
                     + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
         }
-        
+
         // register DOI Online
         try {
             connector.registerDOI(context, dso, doi);
@@ -840,8 +868,12 @@ public class DOIIdentifierProvider
         {
             // We need to generate a new DOI.
             doi = doiService.create(context);
-            doiIdentifier = this.getPrefix() + "/" + this.getNamespaceSeparator() + 
+            if (isMintRandom()) {
+                doiIdentifier = mintRandomUniqueDoi(context);
+            } else {
+                doiIdentifier = this.getPrefix() + "/" + this.getNamespaceSeparator() + 
                     doi.getID();
+            }
         }
 
         // prepare new doiRow
@@ -855,6 +887,46 @@ public class DOIIdentifierProvider
         }
 
         return doi;
+    }
+
+    /**
+     * The method generates a DOI that is guaranteed to be unique within the current DSpace instance,  but it 
+     * cannot guarantee that the DOI is NOT already registered with the provider external to the DSpace instance.
+     * 
+     * This method can be used as part of the DSpace Item submission workflow.
+     * 
+     * @param context
+     * @return doi
+     * @throws SQLException
+     */
+    public String mintRandomUniqueDoi(Context context) throws SQLException {
+        String identifier = this.getPrefix() + "/" + this.getNamespaceSeparator() +
+                RandomStringUtils.randomAlphanumeric(4).toLowerCase() + "-" +
+                RandomStringUtils.randomAlphanumeric(4).toLowerCase();
+        if (doiService.findByDoi(context, identifier) != null) {
+            return mintRandomUniqueDoi(context);
+        }
+        return identifier;
+    }
+    
+
+    /**
+     * The method generates a DOI that is guaranteed to be unique both locally and globally. The generated DOI is
+     * checked against the local database and the provider service to ensure it is unique.
+     * 
+     * This method should NOT be used as part of the DSpace Item submission workflow as it would make the workflow
+     * dependent on the external DOI Provider service.
+     * 
+     * @param context
+     * @return doi
+     * @throws SQLException
+     */
+    public String mintRandomGloballyUniqueDoi(Context context) throws SQLException, DOIIdentifierException {
+        String identifier = mintRandomUniqueDoi(context);
+        if (isReservedOnline(context, identifier)) {
+            return mintRandomGloballyUniqueDoi(context);
+        }
+        return identifier;
     }
     
     /**
