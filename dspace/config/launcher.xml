@@ -243,6 +243,13 @@
         </step>
     </command>
     <command>
+        <name>solr-upgrade-statistics-6x</name>
+        <description>Upgrade statistics (integer to UUID) to DSpace 6.x (or above) compatibility</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrUpgradePre6xStatistics</class>
+        </step>
+    </command>
+    <command>
         <name>stat-general</name>
         <description>Compile the general statistics</description>
         <step passuserargs="false">
