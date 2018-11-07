@@ -61,7 +61,7 @@ public class ORCIDWebHookCallbackServlet extends DSpaceServlet {
         if (orcid == null)
         {
         	if (ConfigurationManager.getBooleanProperty("authentication-oauth", "orcid-webhook.invalid.unregister")) {
-        		orcidService.unregisterWebHook(orcid);
+        		orcidService.unregisterWebHook("");
         	}
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
