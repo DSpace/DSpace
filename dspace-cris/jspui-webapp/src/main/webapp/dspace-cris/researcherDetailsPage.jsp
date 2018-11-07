@@ -380,16 +380,18 @@
 	
 	<c:if test="${!empty infoPendingImpRecord && researcher_page_menu}">
 		<c:forEach var="entry" items="${infoPendingImpRecord}">
+			<c:if test="${entry.value>0}">
     	    <p class="warning pending">
     	    	<c:choose>				
 					<c:when test="${admin}">
-						<a href="<%=request.getContextPath()%>/tools/importrecord?crisid=${researcher.crisID}&sourceref=${entry.key}"><c:out value="${entry.value}"/></a>
+						<a href="<%=request.getContextPath()%>/tools/importrecord?crisid=${researcher.crisID}&sourceref=${entry.key}"><fmt:message key="jsp.cris.detail.imprecord.result-match.${entry.key}"><fmt:param>${entry.value}</fmt:param></fmt:message></a>
 	    	    	</c:when>
 	    	    	<c:otherwise>
-						<a href="<%=request.getContextPath()%>/tools/importrecord?sourceref=${entry.key}"><c:out value="${entry.value}"/></a>    	    	
+						<a href="<%=request.getContextPath()%>/tools/importrecord?sourceref=${entry.key}"><fmt:message key="jsp.cris.detail.imprecord.result-match.${entry.key}"><fmt:param>${entry.value}</fmt:param></fmt:message></a>    	    	
 	    	    	</c:otherwise>
     	    	</c:choose>
     	    </p>
+    	  	</c:if>
 		</c:forEach>
 	</c:if>
 

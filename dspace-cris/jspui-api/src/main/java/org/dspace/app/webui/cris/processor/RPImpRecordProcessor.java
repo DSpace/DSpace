@@ -43,7 +43,7 @@ public class RPImpRecordProcessor
                 if(mapInfo == null) {
                     mapInfo = new HashMap<String, String>();
                 }
-                mapInfo.put(sourceRef, I18nUtil.getMessage("jsp.cris.detail.imprecord.result-match." + sourceRef, new Object[] {count}, context.getCurrentLocale(), false));
+                mapInfo.put(sourceRef, ""+count);
                 request.setAttribute("infoPendingImpRecord", mapInfo);
             }
             catch (SQLException e)
