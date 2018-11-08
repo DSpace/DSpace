@@ -15,6 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.dspace.core.ReloadableEntity;
+
 /**
  * Class representing an EntityType
  * This class contains an Integer ID that will be the unique value for this class and also the primary key
@@ -22,7 +24,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "entity_type")
-public class EntityType {
+public class EntityType implements ReloadableEntity<Integer> {
 
     /**
      * The Integer ID used as a primary key for this database object.
@@ -40,14 +42,6 @@ public class EntityType {
      */
     @Column(name = "label", nullable = false)
     private String label;
-
-    /**
-     * The standard getter for the ID of this EntityType
-     * @return  The ID for this EntityType
-     */
-    public Integer getId() {
-        return id;
-    }
 
     /**
      * The standard setter for the ID of this EntityType
@@ -73,4 +67,11 @@ public class EntityType {
         this.label = label;
     }
 
+    /**
+     * The standard getter for the ID of this EntityType
+     * @return  The ID for this EntityType
+     */
+    public Integer getID() {
+        return id;
+    }
 }

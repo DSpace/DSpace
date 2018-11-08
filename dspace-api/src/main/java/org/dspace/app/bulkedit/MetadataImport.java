@@ -59,6 +59,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.util.UUIDUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -427,6 +428,14 @@ public class MetadataImport {
         return changes;
     }
 
+
+    /**
+     * This metod handles the BulkEditMetadataValue objects that correspond to Relationship metadatavalues
+     * @param item  The item to which this metadatavalue will belong
+     * @param dcv   The BulkEditMetadataValue to be processed
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     private void handleRelationshipMetadataValueFromBulkEditMetadataValue(Item item, BulkEditMetadataValue dcv)
         throws SQLException, AuthorizeException {
         LinkedList<String> values = new LinkedList<>();
@@ -639,6 +648,21 @@ public class MetadataImport {
         }
     }
 
+    /**
+     * This method decides whether the metadatavalue is of type relation.type or if it corresponds to
+     * a relationship and handles it accordingly to their respective methods
+     * @param c             The relevant DSpace context
+     * @param item          The item to which this metadatavalue belongs to
+     * @param schema        The schema for the metadatavalue
+     * @param element       The element for the metadatavalue
+     * @param qualifier     The qualifier for the metadatavalue
+     * @param language      The language for the metadatavalue
+     * @param values        The values for the metadatavalue
+     * @param authorities   The authorities for the metadatavalue
+     * @param confidences   The confidences for the metadatavalue
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     private void handleRelationMetadata(Context c, Item item, String schema, String element, String qualifier,
                                         String language, List<String> values, List<String> authorities,
                                         List<Integer> confidences) throws SQLException, AuthorizeException {
@@ -652,14 +676,23 @@ public class MetadataImport {
 
     }
 
+    /**
+     * This method takes the item, element and values to determine what relationships should be built
+     * for these parameters and calls on the method to construct them
+     * @param c         The relevant DSpace context
+     * @param item      The item that the relationships will be made for
+     * @param element   The string determining which relationshiptype is to be used
+     * @param values    The value for the relationship
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     private void handleRelationOtherMetadata(Context c, Item item, String element, List<String> values)
         throws SQLException, AuthorizeException {
         Entity entity = entityService.findByItemId(c, item.getID());
         boolean left = false;
         List<RelationshipType> acceptableRelationshipTypes = new LinkedList<>();
-        String[] components = values.get(0).split("-");
         String url = handleService.resolveToURL(c, values.get(0));
-        if (components.length != 5 && StringUtils.isNotBlank(url)) {
+        if (UUIDUtils.fromString(values.get(0)) == null && StringUtils.isNotBlank(url)) {
             return;
         }
 
@@ -697,6 +730,16 @@ public class MetadataImport {
         buildRelationObject(c, item, values, left, acceptableRelationshipTypes);
     }
 
+    /**
+     * This method creates the relationship for the item and stores it in the database
+     * @param c         The relevant DSpace context
+     * @param item      The item for which this relationship will be constructed
+     * @param values    The value for the relationship
+     * @param left      A boolean indicating whether the item is the leftItem or the rightItem
+     * @param acceptableRelationshipTypes   The acceptable relationship types
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     private void buildRelationObject(Context c, Item item, List<String> values, boolean left,
                                      List<RelationshipType> acceptableRelationshipTypes)
         throws SQLException, AuthorizeException {
@@ -716,6 +759,23 @@ public class MetadataImport {
         relationshipService.update(c, persistedRelationship);
     }
 
+    /**
+     * This method will add RelationshipType objects to the acceptableRelationshipTypes list
+     * if applicable and valid RelationshipType objects are found. It will also return a boolean indicating
+     * whether we're dealing with a left Relationship or not
+     * @param c                                 The relevant DSpace context
+     * @param entity                            The Entity for which the RelationshipType has to be checked
+     * @param relationEntity                    The other Entity of the Relationship
+     * @param left                              Boolean indicating whether the Relationship is left or not
+     * @param acceptableRelationshipTypes       The list of RelationshipType objects that will be added to
+     * @param rightRelationshipTypesForEntity   The list of RelationshipType objects that are possible
+     *                                          for the right entity
+     * @param relationshipType                  The RelationshipType object that we want to check whether it's
+     *                                          valid to be added or not
+     * @return                                  A boolean indicating whether the relationship is left or right, will
+     *                                          be false in this case
+     * @throws SQLException                     If something goes wrong
+     */
     private boolean handleRightLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
                                                                     boolean left,
                                                                     List<RelationshipType> acceptableRelationshipTypes,
@@ -741,6 +801,23 @@ public class MetadataImport {
         return left;
     }
 
+    /**
+     * This method will add RelationshipType objects to the acceptableRelationshipTypes list
+     * if applicable and valid RelationshipType objects are found. It will also return a boolean indicating
+     * whether we're dealing with a left Relationship or not
+     * @param c                                 The relevant DSpace context
+     * @param entity                            The Entity for which the RelationshipType has to be checked
+     * @param relationEntity                    The other Entity of the Relationship
+     * @param left                              Boolean indicating whether the Relationship is left or not
+     * @param acceptableRelationshipTypes       The list of RelationshipType objects that will be added to
+     * @param leftRelationshipTypesForEntity    The list of RelationshipType objects that are possible
+     *                                          for the left entity
+     * @param relationshipType                  The RelationshipType object that we want to check whether it's
+     *                                          valid to be added or not
+     * @return                                  A boolean indicating whether the relationship is left or right, will
+     *                                          be true in this case
+     * @throws SQLException                     If something goes wrong
+     */
     private boolean handleLeftLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
                                                                    boolean left,
                                                                    List<RelationshipType> acceptableRelationshipTypes,
@@ -765,13 +842,30 @@ public class MetadataImport {
         return left;
     }
 
+    /**
+     * This method will add the relationship.type metadata to the item if an EntityType can be found for the value in
+     * the values list.
+     * @param c             The relevant DSpace context
+     * @param item          The item to which this metadatavalue will be added
+     * @param schema        The schema for the metadatavalue to be added
+     * @param element       The element for the metadatavalue to be added
+     * @param qualifier     The qualifier for the metadatavalue to be added
+     * @param language      The language for the metadatavalue to be added
+     * @param values        The value on which we'll search for EntityType object and it's the value
+     *                      for the metadatavalue that will be created
+     * @param authorities   The authority for the metadatavalue. This will be filled with the ID
+     *                      of the found EntityType for the value if it exists
+     * @param confidences   The confidence for the metadatavalue
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     private void handleRelationTypeMetadata(Context c, Item item, String schema, String element, String qualifier,
                                             String language, List<String> values, List<String> authorities,
                                             List<Integer> confidences)
         throws SQLException, AuthorizeException {
         EntityType entityType = entityTypeService.findByEntityType(c, values.get(0));
         if (entityType != null) {
-            authorities.add(String.valueOf(entityType.getId()));
+            authorities.add(String.valueOf(entityType.getID()));
             itemService.clearMetadata(c, item, schema, element, qualifier, language);
             itemService.addMetadata(c, item, schema, element, qualifier, language,
                                     values, authorities, confidences);

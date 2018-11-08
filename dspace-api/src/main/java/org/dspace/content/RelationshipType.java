@@ -19,6 +19,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.dspace.core.ReloadableEntity;
+
 /**
  * Class representing a RelationshipType
  * This class contains an Integer ID that will be the unique value and primary key in the database.
@@ -29,7 +31,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "relationship_type")
-public class RelationshipType {
+public class RelationshipType implements ReloadableEntity<Integer> {
 
     /**
      * The Integer ID used as a primary key for this database object.
@@ -98,14 +100,6 @@ public class RelationshipType {
      */
     @Column(name = "right_max_cardinality")
     private int rightMaxCardinality;
-
-    /**
-     * Standard getter for the ID of this RelationshipType
-     * @return  The ID of this RelationshipType
-     */
-    public Integer getId() {
-        return id;
-    }
 
     /**
      * Standard getter for the ID of this RelationshipType
@@ -241,5 +235,13 @@ public class RelationshipType {
      */
     public void setRightMaxCardinality(int rightMaxCardinality) {
         this.rightMaxCardinality = rightMaxCardinality;
+    }
+
+    /**
+     * Standard getter for the ID of this RelationshipType
+     * @return  The ID of this RelationshipType
+     */
+    public Integer getID() {
+        return id;
     }
 }

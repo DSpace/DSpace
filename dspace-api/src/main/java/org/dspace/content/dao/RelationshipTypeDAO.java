@@ -22,6 +22,17 @@ import org.dspace.core.GenericDAO;
  */
 public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
 
+    /**
+     * This method is used to retrieve the RelationshipType object that has the same
+     * leftType, rightType, leftLabel and rightLabel as given in the parameters
+     * @param context       The relevant DSpace context
+     * @param leftType      The leftType EntityType object to be matched in the query
+     * @param rightType     The rightType EntityType object to be matched in the query
+     * @param leftLabel     The leftLabel String to be matched in the query
+     * @param rightLabel    The rightLabel String to be matched in the query
+     * @return              The RelationshipType object that matches all the given parameters
+     * @throws SQLException If something goes wrong
+     */
     RelationshipType findbyTypesAndLabels(Context context,
                                           EntityType leftType,EntityType rightType,String leftLabel,String rightLabel)
                                                 throws SQLException;

@@ -21,6 +21,15 @@ import org.dspace.core.GenericDAO;
  */
 public interface EntityTypeDAO extends GenericDAO<EntityType> {
 
+    /**
+     * This method returns the EntityType object that has the given entityType String
+     * as label
+     * @param context       The relevant DSpace context
+     * @param entityType    The entityType String that will be matched on to find
+     *                      the correct EntityType
+     * @return              The EntityType object that has the entityType String as label
+     * @throws SQLException If something goes wrong
+     */
     public EntityType findByEntityType(Context context, String entityType) throws SQLException;
 
 }

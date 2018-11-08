@@ -18,12 +18,6 @@
 	<!-- for handle "default". -->
 	<submission-map>
 		<name-map collection-handle="default" submission-name="traditional" />
-		<name-map collection-handle="123456789/6" submission-name="People"/>
-		<name-map collection-handle="123456789/7" submission-name="Project"/>
-		<name-map collection-handle="123456789/8" submission-name="OrgUnit"/>
-		<name-map collection-handle="123456789/28" submission-name="Journals"/>
-		<name-map collection-handle="123456789/29" submission-name="JournalVolumes"/>
-		<name-map collection-handle="123456789/30" submission-name="JournalIssues"/>
 	</submission-map>
 
 
