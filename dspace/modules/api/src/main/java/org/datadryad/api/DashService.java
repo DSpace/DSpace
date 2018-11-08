@@ -214,19 +214,11 @@ public class DashService {
     }
 
     /**
-       POSTs references for all data files Dash, attaching them to the DryadDataPackage.
+       POSTs references for all data files to Dash, attaching them to the DryadDataPackage.
        The DryadDataPackage must already have been PUT to Dash.
 
        @return a HTTP response code, or -1 if there is an exception that prevents getting a response code
     **/
-    // TODO
-    // - add json transformer in DryadBitstream
-    // - submit to proper PUT URL
-    // - use a temporary URL
-    // - document how to get/use the amazon tmp URLs
-    // - figure out the mime types for the http request
-    // - expand to all bitstreams and readmes
-    // - check character ecoding
     public int postDataFileReferences(Context context, DryadDataPackage dataPackage) {
         int responseCode = 0;
         BufferedReader reader = null;
