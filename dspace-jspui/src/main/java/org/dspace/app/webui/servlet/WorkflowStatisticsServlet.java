@@ -141,7 +141,7 @@ public class WorkflowStatisticsServlet extends DSpaceServlet {
 		
 		
 		
-		StatisticsBean wStats = generateStats(context, dso, averageMonth, maxResults, filters, "previousWorkflowStep");
+		StatisticsBean wStats = generateStats(context, dso, averageMonth, maxResults, filters, "workflowStep");
 		StatisticsBean oStats = generateStats(context, dso, averageMonth, maxResults, filters, "owner");
         
         request.setAttribute("workflowStats", wStats);

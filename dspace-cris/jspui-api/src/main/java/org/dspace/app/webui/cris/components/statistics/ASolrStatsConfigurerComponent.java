@@ -215,10 +215,10 @@ public abstract class ASolrStatsConfigurerComponent<T extends DSpaceObject>
                     if (result.getVal(i).getClass().equals(Integer.class))
                     {
                         String name = (String) result.getName(i);
-                        if (StringUtils.isEmpty(name))
+                        if (StringUtils.isBlank(name))
                             name = "Unknown";
                         // if (i<limit && (Integer)result.getVal(i)>0){
-                        if (i < limit && !(name.startsWith("Unknown") || (key3.equals(_COUNTRY_CODE) && name.equals("O1"))))
+                        if (i < limit && (Integer)result.getVal(i)>0)
                         {
                             limitedData.add(new StatisticDatasBeanRow(name,
                                     result.getVal(i)));
