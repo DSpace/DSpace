@@ -73,9 +73,11 @@
             	Set<ImpRecordMetadata> valueSet = result.getMetadata().get(column);
             %>
             	<td>
-            <%  for(ImpRecordMetadata valueMetadata : valueSet) { %>
+            <%  
+            	if(valueSet!=null) {
+            	for(ImpRecordMetadata valueMetadata : valueSet) { %>
             	<%= valueMetadata.getValue() %><fmt:message key="jsp.dspace.imprecord-list.value.separator" />	
-			<%  }  %>
+			<%  } } %>
 				</td> 			
         	<% } %>
 		</tr>        	
