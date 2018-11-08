@@ -37,9 +37,17 @@ import org.springframework.hateoas.Link;
  * available information included as embedded resource
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @param <T> Holder of a user request for a manipulable object.
  */
 public abstract class DSpaceResource<T extends RestAddressableModel> extends HALResource<T> {
 
+    /**
+     * Constructor.
+     *
+     * @param data a request for a resource.
+     * @param utils utility methods.
+     * @param rels names of desired linked resource types.
+     */
     public DSpaceResource(T data, Utils utils, String... rels) {
         super(data);
 
