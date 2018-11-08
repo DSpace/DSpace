@@ -81,7 +81,7 @@ public class Group2GroupCache implements Serializable {
 
     @Override
     public int hashCode() {
-        return new org.apache.commons.lang.builder.HashCodeBuilder()
+        return new org.apache.commons.lang3.builder.HashCodeBuilder()
             .append(parent == null ? "" : parent.getID())
             .append(child == null ? "" : child.getID())
             .toHashCode();

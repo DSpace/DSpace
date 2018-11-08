@@ -19,8 +19,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.configuration.ConversionException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.configuration2.ex.ConversionException;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;

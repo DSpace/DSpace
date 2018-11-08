@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.services.ConfigurationService;

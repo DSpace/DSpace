@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -686,7 +686,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public Group findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if (org.apache.commons.lang.StringUtils.isNumeric(id)) {
+        if (org.apache.commons.lang3.StringUtils.isNumeric(id)) {
             return findByLegacyId(context, Integer.parseInt(id));
         } else {
             return find(context, UUIDUtils.fromString(id));

@@ -9,8 +9,8 @@ package org.dspace.content.comparator;
 
 import java.util.Comparator;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 
 public class NameAscendingComparator implements Comparator<DSpaceObject> {
