@@ -20,12 +20,13 @@ import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataFile;
 import org.dspace.core.ConfigurationManager;
@@ -43,7 +44,7 @@ public class DashService {
         dashServer = ConfigurationManager.getProperty("dash.server");
         String dashAppID = ConfigurationManager.getProperty("dash.application.id");
         String dashAppSecret = ConfigurationManager.getProperty("dash.application.secret");
-        
+
         oauthToken = getOAUTHtoken(dashServer, dashAppID, dashAppSecret);
         fixHttpURLConnection();
     }
@@ -74,9 +75,9 @@ public class DashService {
             throw new IllegalStateException(e);
         }
     }
-    
+
     private String getOAUTHtoken(String dashServer, String dashAppID, String dashAppSecret) {
-        
+
         String url = dashServer + "/oauth/token";
         String auth = dashAppID + ":" + dashAppSecret;
         String authentication = Base64.getEncoder().encodeToString(auth.getBytes());
@@ -91,7 +92,7 @@ public class DashService {
             con.setRequestProperty("Authorization", "Basic " + authentication);
             con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
             con.setRequestProperty("Accept", "application/json");
-            
+
             PrintStream os = new PrintStream(con.getOutputStream());
             os.print("grant_type=client_credentials");
             os.close();
@@ -99,7 +100,7 @@ public class DashService {
             InputStream stream = con.getErrorStream();
             if (stream == null) {
                 stream = con.getInputStream();
-            }                                         
+            }
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(con.getContentLength() > 0 ? con.getContentLength() : 2048);
@@ -127,7 +128,7 @@ public class DashService {
     public String getDashJSON(String doi) {
         String response = "";
         log.debug("getting Dash JSON for " + doi);
-        
+
         try {
             doi = URLEncoder.encode(doi, "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + doi);
@@ -140,7 +141,7 @@ public class DashService {
             InputStream stream = connection.getErrorStream();
             if (stream == null) {
                 stream = connection.getInputStream();
-            }                                         
+            }
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter responseContent = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
@@ -152,7 +153,7 @@ public class DashService {
         } catch (Exception e) {
             log.error("Unable to get Dash JSON", e);
         }
-        
+
         return response;
     }
 
@@ -168,7 +169,7 @@ public class DashService {
         log.debug("Got JSON object: " + dashJSON);
         int responseCode = 0;
         BufferedReader reader = null;
-        
+
         try {
             String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI);
@@ -186,7 +187,7 @@ public class DashService {
             InputStream stream = connection.getErrorStream();
             if (stream == null) {
                 stream = connection.getInputStream();
-            }                                         
+            }
             reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
@@ -194,7 +195,7 @@ public class DashService {
                 out.append(line);
             }
             String response = out.toString();
-            
+
             responseCode = connection.getResponseCode();
 
             if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
@@ -204,7 +205,7 @@ public class DashService {
                 log.fatal("Unable to send item to DASH, response: " + responseCode +
                           connection.getResponseMessage());
             }
-            
+
             log.info("result object " + response);
         } catch (Exception e) {
             log.fatal("Unable to send item to DASH", e);
@@ -242,18 +243,18 @@ public class DashService {
                     connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
                     connection.setDoOutput(true);
                     connection.setRequestMethod("POST");
-                    
+
                     OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
                     wr.write(dashJSON);
                     wr.close();
 
                     responseCode = connection.getResponseCode();
                     log.info("response code = " + responseCode);
-                    
+
                     InputStream stream = connection.getErrorStream();
                     if (stream == null) {
                         stream = connection.getInputStream();
-                    }                                         
+                    }
                     reader = new BufferedReader(new InputStreamReader(stream));
                     String line = null;
                     StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
@@ -262,25 +263,25 @@ public class DashService {
                     }
                     String response = out.toString();
                     log.info("result object " + response);
-                    
+
                     if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
                         log.debug("file create/update successful");
                     } else {
                         log.fatal("Unable to send file reference to DASH, response: " + responseCode +
                                   connection.getResponseMessage());
                         return responseCode;
-                    }                    
+                    }
                 }
             }
         } catch (Exception e) {
             log.fatal("Unable to send item to DASH", e);
             return -1;
-        }       
-            
+        }
+
         return responseCode;
     }
 
-    
+
     /**
        Given the (unencoded) DOI of a Dryad Data Package that has
        already been transferred to DASH, force the DASH dataset into
@@ -295,7 +296,7 @@ public class DashService {
             log.info("Skipping finalization of " + doi + " due to dash.submissions.finalize = " + submissionsFinalize);
             return 200;
         }
-        
+
         try {
             String encodedDOI = URLEncoder.encode(doi, "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI);
@@ -313,7 +314,7 @@ public class DashService {
             InputStream stream = connection.getErrorStream();
             if (stream == null) {
                 stream = connection.getInputStream();
-            }                                         
+            }
             reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
@@ -325,18 +326,133 @@ public class DashService {
             responseCode = connection.getResponseCode();
 
             if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
-                log.debug("package submission successful");
+                log.debug("curation activity added");
             } else {
-                log.fatal("Unable to update submission status of item to DASH, response: " +
-                          responseCode + connection.getResponseMessage());
+                log.fatal("Unable to send curation activity to DASH, response: " + responseCode +
+                        connection.getResponseMessage());
             }
-            
+
             log.info("result object " + response);
         } catch (Exception e) {
-            log.fatal("Unable to update submission status of item in DASH", e);
+            log.fatal("Unable to send curation_activity to DASH", e);
         }
 
-        return responseCode;        
+        return responseCode;
+    }
+
+    public int addCurationStatus(DryadDataPackage dataPackage, String status, String reason) {
+        String dashJSON = "{\"status\": \"" + status + "\", \"note\": \"" + reason + "\"}";
+        int responseCode = 0;
+        BufferedReader reader = null;
+
+        try {
+            String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+
+            OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+            wr.write(dashJSON);
+            wr.close();
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = null;
+            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+            String response = out.toString();
+
+            responseCode = connection.getResponseCode();
+
+            if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
+                log.debug("curation activity added");
+            } else {
+                log.fatal("Unable to send curation activity to DASH, response: " + responseCode +
+                        connection.getResponseMessage());
+            }
+
+            log.info("result object " + response);
+        } catch (Exception e) {
+            log.fatal("Unable to send curation_activity to DASH", e);
+        }
+
+        return responseCode;
+    }
+
+    public List<DryadDataPackage> findAllUnpublishedPackagesWithISSN(String issn) {
+        String[] unpublishedStatuses = {
+                "Unsubmitted",
+                "Submitted",
+                "Private for Peer Review",
+                "Curation",
+                "Author Action Required",
+                "Embargoed"
+        };
+
+        ArrayList<DryadDataPackage> dryadDataPackages = new ArrayList<>();
+        for (String status : unpublishedStatuses) {
+            HashMap<String, String> queryPairs = new HashMap<>();
+            queryPairs.put("publicationISSN", issn);
+            queryPairs.put("curationStatus", status);
+            dryadDataPackages.addAll(getPackagesWithQueryParameters(queryPairs));
+        }
+        return dryadDataPackages;
+    }
+
+    private List<DryadDataPackage> getPackagesWithQueryParameters(Map<String, String> queryPairs) {
+        int responseCode = 0;
+        BufferedReader reader = null;
+        ArrayList<DryadDataPackage> dryadDataPackages = new ArrayList<>();
+
+        try {
+            URIBuilder ub = new URIBuilder(dashServer + "/api/datasets/");
+            for (String param : queryPairs.keySet()) {
+                ub.addParameter(param, queryPairs.get(param));
+            }
+            URL url = new URL(ub.toString());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("GET");
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = null;
+            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+
+            responseCode = connection.getResponseCode();
+
+            if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
+                log.debug("DASH query successful");
+            } else {
+                log.fatal("Unable to get query from DASH, response: " + responseCode +
+                        connection.getResponseMessage());
+            }
+
+            ObjectMapper m = new ObjectMapper();
+            JsonNode rootNode = m.readTree(out.toString());
+            JsonNode packagesNode = rootNode.path("_embedded").path("stash:datasets");
+            if (!packagesNode.isMissingNode() && packagesNode.isArray()) {
+                for (int i = 0; i < packagesNode.size(); i++) {
+                    JsonNode packageNode = packagesNode.get(i);
+                    dryadDataPackages.add(new DryadDataPackage(packageNode));
+                }
+            }
+        } catch (Exception e) {
+            log.fatal("Unable to get query from DASH", e);
+        }
+
+        return dryadDataPackages;
     }
 
     public static void main(String[] args) throws IOException {

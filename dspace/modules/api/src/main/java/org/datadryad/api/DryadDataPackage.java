@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.lang.ArrayUtils;
@@ -102,19 +103,81 @@ public class DryadDataPackage extends DryadObject {
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
     private static boolean useDryadClassic = true;
+    private static DashService dashService = null;
 
     static {
         String dryadSystem = ConfigurationManager.getProperty("dryad.system");
         if (dryadSystem != null && dryadSystem.toLowerCase().equals("dash")) {
             useDryadClassic = false;
+            dashService = new DashService();
         }
     }
+
+    public DryadDataPackage() {}
 
     public DryadDataPackage(Item item) {
         super(item);
         String pubName = getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
         if (pubName != null && !pubName.equals("")) {
             journalConcept = JournalUtils.getJournalConceptByJournalName(getPublicationName());
+        }
+    }
+
+    public DryadDataPackage(Manuscript manuscript) {
+        super();
+        setJournalConcept(manuscript.getJournalConcept());
+        setTitle(manuscript.getTitle());
+        setAbstract(manuscript.getAbstract());
+        setManuscriptNumber(manuscript.getManuscriptId());
+        if (!"".equals(manuscript.getPublicationDOI())) {
+            setPublicationDOI(manuscript.getPublicationDOI());
+        }
+        if (manuscript.getKeywords() != null && manuscript.getKeywords().size() > 0) {
+            setKeywords(manuscript.getKeywords());
+        }
+        if (!"".equals(manuscript.getPublicationDateAsString())) {
+            setPublicationDate(manuscript.getPublicationDateAsString());
+        }
+        for (Author author : manuscript.getAuthorList()) {
+            addAuthor(author);
+        }
+        if (!"".equals(manuscript.getDryadDataDOI())) {
+            setIdentifier(manuscript.getDryadDataDOI());
+        }
+    }
+
+    public DryadDataPackage(JsonNode jsonNode) {
+        super();
+        try {
+            if (!jsonNode.path("identifier").isMissingNode()) {
+                setIdentifier(jsonNode.path("identifier").textValue());
+            }
+            if (!jsonNode.path("title").isMissingNode()) {
+                setTitle(jsonNode.path("title").textValue());
+            }
+            if (!jsonNode.path("abstract").isMissingNode()) {
+                setAbstract(jsonNode.path("abstract").textValue());
+            }
+            if (!jsonNode.path("curationStatus").isMissingNode()) {
+                curationStatus = jsonNode.path("identifier").textValue();
+            }
+            JsonNode authorsNode = jsonNode.path("authors");
+            if (!authorsNode.isMissingNode() && authorsNode.isArray()) {
+                for (JsonNode authorNode : authorsNode) {
+                    Author author = new Author(authorNode.path("lastName").textValue(),authorNode.path("firstName").textValue());
+                    if (!authorNode.path("orcid").isMissingNode()) {
+                        author.setIdentifier(authorNode.path("orcid").textValue());
+                        author.setIdentifierType(Author.ORCID_TYPE);
+                    }
+                    addAuthor(author);
+                }
+            }
+        } catch (Exception e) {
+            StackTraceElement[] element = e.getStackTrace();
+            log.error("error parsing DryadDataPackage from json: " + e.getMessage());
+            for (int i = 0; i < 10; i++) {
+                log.error(element[i].toString());
+            }
         }
     }
 
@@ -175,7 +238,7 @@ public class DryadDataPackage extends DryadObject {
 
         }
     }
-    
+
     public DryadJournalConcept getJournalConcept() {
         return journalConcept;
     }
@@ -405,6 +468,27 @@ public class DryadDataPackage extends DryadObject {
     }
 
     // Curation status methods
+    public String getCurationStatus() {
+        if (getItem() != null) {
+            if (getItem().isArchived()) {
+                return "Published";
+            } else {
+                return "Unpublished";
+            }
+        } else {
+            return curationStatus;
+        }
+    }
+
+    public void setCurationStatus(String status, String reason) {
+        if (getItem() != null) {
+            item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + reason + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
+        } else {
+            // add a curation activity note
+            dashService.addCurationStatus(this, status, reason);
+        }
+    }
+
     /**
      * Generate a Dryad-formatted 'Submitted by ...' provenance string
      * @param date
@@ -752,7 +836,7 @@ public class DryadDataPackage extends DryadObject {
                 log.error("couldn't find unarchived packages for journal " + ISSN);
             }
         } else {
-            // something
+            dataPackageList.addAll(dashService.findAllUnpublishedPackagesWithISSN(ISSN));
         }
         return dataPackageList;
     }
@@ -910,7 +994,7 @@ public class DryadDataPackage extends DryadObject {
             }
 
         } else {
-            changeCurationStatus("Curation", reason.toString());
+            setCurationStatus("Curation", reason.toString());
         }
     }
 
@@ -1014,7 +1098,7 @@ public class DryadDataPackage extends DryadObject {
         if (fieldsChanged.size() > 0) {
             if (!"".equals(provenance.toString())) {
                 log.info("writing provenance for package " + getIdentifier() + ": " + provenance);
-                changeCurationStatus("Status Unchanged", provenance.toString());
+                setCurationStatus("Status Unchanged", provenance.toString());
             }
 
             // only return true if we want to get email notifications about this update: FULL_CITATION or PUBLICATION_DOI was updated.
