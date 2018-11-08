@@ -79,7 +79,7 @@ public class RequestItemBuilder
     @Override
     public void delete(RequestItem request)
             throws Exception {
-        new RequestItemHelperDAO().delete(context, request.getToken());
+        requestItemService.delete(context, request);
     }
 
     @Override
