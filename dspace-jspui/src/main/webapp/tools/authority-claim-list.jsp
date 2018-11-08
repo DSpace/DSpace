@@ -138,7 +138,7 @@
 			        String confidence = record[2];
 			        String language = record[3];
 			        String similar = record[4];
-			        if(crisID.equals(authority) && confidence!="600") {
+			        if(crisID.equals(authority) && !confidence.equals("600")) {
 			            toggleTab = true;
 			            break;
 			        }
@@ -196,7 +196,7 @@
 				 %>
 				<% 	if(crisID.equals(authority)) {
 				    	countSimilar++;
-				    	if(confidence!="600") {
+				    	if(!confidence.equals("600")) {
 				    	    showFoundYourAuthorityLowConfidence = true;
 				    	} else {
 			    			showFoundYourAuthority = true;
