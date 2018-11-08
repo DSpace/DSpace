@@ -1,0 +1,21 @@
+ # /etc/cron.d/backups-solr: crontab fragment for backups
+
+# Shell to use
+SHELL=/bin/sh
+
+SOLR_BACKUP_DIR=/home/backup/solr
+SOLR_DSPACE_CORES_DIR=/var/solr/solr_sedici/
+SOLR_SERVER=127.0.0.1:8080/solr_sedici
+
+DATESTR=date +%Y-%m-%d_%H%M
+DATEMTH=date +%m
+
+#################################################################################
+#### SOLR SOLR SOLR SOLR SOLR SOLR SOLR SOLR SOLR SOLR SOLR SOLR SOLR SOLR 
+#################################################################################
+
+#backup del índice 'statistics' en Solr, todos los viernes a las 10PM. El nombre del backup se lo asigna Solr automaticamente y mantiene solamente un backup a la vez (numberToKeep=1)
+0 22 * * 5   root    { echo "Realizo backup del core statistics a las $($DATESTR)"; wget -q -O - "http://$SOLR_SERVER/statistics/replication?command=backup&location=$SOLR_BACKUP_DIR/statistics/&numberToKeep=1"; }>> $SOLR_BACKUP_DIR/log/solr-backups.log
+
+#backup del directorio 'conf' del core 'statistics', todos los viernes a las 10:30PM
+30 22 * * 5  root    tar --directory $SOLR_DSPACE_CORES_DIR -czf $SOLR_BACKUP_DIR/statistics/conf.backup.$($DATESTR).tgz statistics/conf/
