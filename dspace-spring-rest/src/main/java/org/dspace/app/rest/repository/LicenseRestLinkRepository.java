@@ -10,7 +10,7 @@ package org.dspace.app.rest.repository;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.LicenseRest;
 import org.dspace.app.rest.model.hateoas.HALResource;

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.persistence.Query;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.MetadataField;
 import org.dspace.core.AbstractHibernateDSODAO;
