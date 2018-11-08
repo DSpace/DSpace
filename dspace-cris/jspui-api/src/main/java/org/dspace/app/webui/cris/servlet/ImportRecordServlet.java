@@ -2,6 +2,7 @@ package org.dspace.app.webui.cris.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -23,9 +24,12 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.utils.DSpace;
+
+import it.cilea.osd.common.constants.Constants;
 
 public class ImportRecordServlet extends DSpaceServlet
 {
@@ -78,11 +82,13 @@ public class ImportRecordServlet extends DSpaceServlet
                 "submit_cancel");
 
         String crisID = context.getCrisID();
-        
         if (!"submit_cancel".equals(submitButton))
         {
-
+            String sourceRef = request.getParameter("sourceRef");
+            String message = null;
             int[] selectedIds = UIUtil.getIntParameters(request, "selectedId");
+            int failures = 0;
+            int successes = 0;
             for (int selectedId : selectedIds)
             {
                 String selectedIdentifier = request
@@ -95,9 +101,11 @@ public class ImportRecordServlet extends DSpaceServlet
                         try
                         {
                             ItemImportMainOA.main(new String[]{"-q","SELECT * FROM imp_record WHERE last_modified is NULL AND imp_record_id = '"+recordId+"' AND imp_sourceref = '"+recordRef+"' order by imp_id ASC"});
+                            successes++;
                         }
                         catch (Exception e)
                         {
+                            failures++;
                             log.error(e.getMessage(), e);
                         }
                     }
@@ -109,7 +117,20 @@ public class ImportRecordServlet extends DSpaceServlet
                     }
                 }
             }
-
+            if(failures>0) {
+                message = I18nUtil.getMessage("jsp.dspace.imprecord-list.failure." + sourceRef, new Object[] {successes, failures}, context.getCurrentLocale(), false);
+            }
+            else {
+                if(successes > 0) {
+                    message = I18nUtil.getMessage("jsp.dspace.imprecord-list.success." + sourceRef, new Object[] {successes}, context.getCurrentLocale(), false);
+                }
+                else {
+                    message = I18nUtil.getMessage("jsp.dspace.imprecord-list.reject." + sourceRef, new Object[] {selectedIds.length}, context.getCurrentLocale(), false);
+                }
+            }
+            if(StringUtils.isNotBlank(message)) {
+                request.getSession().setAttribute(Constants.MESSAGES_KEY, Arrays.asList(message));
+            }
         }
         
         response.sendRedirect(request.getContextPath() + "/cris/rp/" + crisID);

@@ -75,9 +75,10 @@
             	<td>
             <%  
             	if(valueSet!=null) {
+            	    int idxSep = 0;
             	for(ImpRecordMetadata valueMetadata : valueSet) { %>
-            	<%= valueMetadata.getValue() %><fmt:message key="jsp.dspace.imprecord-list.value.separator" />	
-			<%  } } %>
+            	<%= valueMetadata.getValue() %><% if(idxSep < valueSet.size()-1) { %><fmt:message key="jsp.dspace.imprecord-list.value.separator" /><% } %>            	            		
+			<%  idxSep++;} } %>
 				</td> 			
         	<% } %>
 		</tr>        	
@@ -86,15 +87,10 @@
 %>  		
 </tbody>
 <tfoot>
-	<tr>
-		<th>&nbsp;</th>
-		<% for (String column : columns) { %>	
-			<th>&nbsp;</th>
-		<% } %>
-	</tr>	
 </tfoot>
 </table>
 	<div class="row col-md-12 pull-right">
+		<input type="hidden" name="sourceRef" value="<%= sourceRef %>" />
 		<input class="btn btn-primary pull-right col-md-3" type="submit" name="submit_import" value="<fmt:message key="jsp.tools.general.import"/>" />
 		<input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_discard" value="<fmt:message key="jsp.tools.general.discard"/>" />
 		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
