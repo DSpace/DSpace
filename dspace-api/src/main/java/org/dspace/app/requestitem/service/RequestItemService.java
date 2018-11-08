@@ -16,8 +16,8 @@ import org.dspace.core.Context;
 
 /**
  * Service interface class for the RequestItem object.
- * The implementation of this class is responsible for all business logic calls for the RequestItem object and is
- * autowired by spring
+ * The implementation of this class is responsible for all business logic calls
+ * for the RequestItem object and is autowired by Spring.
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -51,5 +51,11 @@ public interface RequestItemService {
      */
     public void update(Context context, RequestItem requestItem);
 
-
+    /**
+     * Remove the record from the database.
+     *
+     * @param context current DSpace context.
+     * @param request record to be removed.
+     */
+    public void delete(Context context, RequestItem request);
 }
