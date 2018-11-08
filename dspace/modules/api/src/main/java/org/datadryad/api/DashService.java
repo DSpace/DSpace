@@ -9,6 +9,7 @@ package org.datadryad.api;
  **/
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -94,7 +95,12 @@ public class DashService {
             PrintStream os = new PrintStream(con.getOutputStream());
             os.print("grant_type=client_credentials");
             os.close();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+            InputStream stream = con.getErrorStream();
+            if (stream == null) {
+                stream = con.getInputStream();
+            }                                         
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(con.getContentLength() > 0 ? con.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -131,7 +137,11 @@ public class DashService {
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }                                         
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter responseContent = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -173,7 +183,11 @@ public class DashService {
             wr.write(dashJSON);
             wr.close();
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }                                         
+            reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -216,8 +230,9 @@ public class DashService {
     public int postDataFileReferences(Context context, DryadDataPackage dataPackage) {
         int responseCode = 0;
         BufferedReader reader = null;
-
+        log.debug("posting data file references");
         try {
+            log.debug("number of files: " + dataPackage.getDataFiles(context).size());
             for(DryadDataFile dryadFile : dataPackage.getDataFiles(context)) {
                 String fileName = dryadFile.getTitle();
                 String fileDescription = dryadFile.getDescription();
@@ -231,6 +246,7 @@ public class DashService {
                     URL url = new URL(dashServer + "/api/datasets/" + encodedPackageDOI + "/urls");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    connection.setRequestProperty("Accept", "application/json");
                     connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
                     connection.setDoOutput(true);
                     connection.setRequestMethod("POST");
@@ -238,16 +254,22 @@ public class DashService {
                     OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
                     wr.write(dashJSON);
                     wr.close();
+
+                    responseCode = connection.getResponseCode();
+                    log.info("response code = " + responseCode);
                     
-                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    InputStream stream = connection.getErrorStream();
+                    if (stream == null) {
+                        stream = connection.getInputStream();
+                    }                                         
+                    reader = new BufferedReader(new InputStreamReader(stream));
                     String line = null;
                     StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
                     while ((line = reader.readLine()) != null) {
                         out.append(line);
                     }
                     String response = out.toString();
-                    
-                    responseCode = connection.getResponseCode();
+                    log.info("result object " + response);
                     
                     if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
                         log.debug("file create/update successful");
@@ -255,9 +277,7 @@ public class DashService {
                         log.fatal("Unable to send file reference to DASH, response: " + responseCode +
                                   connection.getResponseMessage());
                         return responseCode;
-                    }
-                    
-                    log.info("result object " + response);
+                    }                    
                 }
             }
         } catch (Exception e) {
@@ -298,7 +318,11 @@ public class DashService {
                      "\"value\": \"submitted\"}]");
             wr.close();
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }                                         
+            reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {

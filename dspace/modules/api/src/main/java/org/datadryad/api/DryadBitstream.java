@@ -64,8 +64,12 @@ public class DryadBitstream {
                 
                 jGen.writeStringField("url", BitstreamStorageManager.getS3AccessURL(dspaceBitstream).toString());
                 jGen.writeStringField("path", dspaceBitstream.getName());
+                jGen.writeNumberField("size", dspaceBitstream.getSize());
                 jGen.writeStringField("description", dryadBitstream.getFileDescription());
                 jGen.writeStringField("mimeType", dspaceBitstream.getFormat().getMIMEType());
+                jGen.writeStringField("digest", dspaceBitstream.getChecksum());
+                jGen.writeStringField("digestType", dspaceBitstream.getChecksumAlgorithm().toLowerCase());
+                jGen.writeBooleanField("skipValidation", true);
                 
                 jGen.writeEndObject();
             } catch (Exception e) {
