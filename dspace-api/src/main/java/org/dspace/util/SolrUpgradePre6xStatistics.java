@@ -272,8 +272,6 @@ public class SolrUpgradePre6xStatistics {
         options.addOption(NUMREC_OPTION, "num-rec", true, "Total number of records to update (defaut=100,000).");
         options.addOption(BATCH_OPTION, "batch-size", true,
                 "Number of records to batch update to SOLR at one time (default=10,000).");
-        options.addOption(TYPE_OPTION, "type", true,
-                "(4) Communities, (3) Collections, (2) Items (0) Bitstreams (default=all)");
         return options;
     }
 
@@ -292,7 +290,7 @@ public class SolrUpgradePre6xStatistics {
         myhelp.printHelp(SolrUpgradePre6xStatistics.class.getSimpleName() + "\n", options);
         System.out.println("\n\nCommand Defaults");
         System.out.println(
-                "\tsolr-upgradeD6-statistics [-i statistics] [-n num_recs_to_process] [-b num_rec_to_update_at_once]");
+                "\tsolr-upgrade-statistics-6x [-i statistics] [-n num_recs_to_process] [-b num_rec_to_update_at_once]");
         System.out.println("");
         System.out.println(
                 "\tAfter upgrading to DSpace 6, this process should be run iteratively over every statistics shard ");
