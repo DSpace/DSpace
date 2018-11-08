@@ -90,6 +90,9 @@ public class DryadDataPackage extends DryadObject {
     private final static String PROVENANCE = "dc.description.provenance";
 
     private Set<DryadDataFile> dataFiles;
+    private String curationStatus = "";
+    private String abstractString = "";
+    private ArrayList<Author> authors = new ArrayList<>();
     private DryadJournalConcept journalConcept = null;
 
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
@@ -134,15 +137,22 @@ public class DryadDataPackage extends DryadObject {
 
     // Getters and setters for metadata and internal data
     public String getPublicationDate() {
-        String result = getSingleMetadataValue(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER);
-        if (result == null) {
-            return "";
+        String result = "";
+        if (getItem() != null) {
+            result = getSingleMetadataValue(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER);
+            result = (result == null ? "" : result);
+        } else {
+
         }
         return result;
     }
 
     public void setPublicationDate(String publicationDate) {
-        addSingleMetadataValue(Boolean.TRUE, PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, publicationDate);
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.TRUE, PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, publicationDate);
+        } else {
+
+        }
     }
 
     public String getPublicationName() {
@@ -171,15 +181,22 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public String getManuscriptNumber() {
-        String result = getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
-        if (result != null) {
-            return result;
+        String result = "";
+        if (getItem() != null) {
+            result = getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
+            result = (result == null ? "" : result);
+        } else {
+
         }
-        return "";
+        return result;
     }
 
     public void setManuscriptNumber(String manuscriptNumber) {
-        addSingleMetadataValue(Boolean.TRUE, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.TRUE, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
+        } else {
+
+        }
     }
 
     public List<String> getFormerManuscriptNumbers() {
@@ -203,14 +220,18 @@ public class DryadDataPackage extends DryadObject {
         if(blackoutUntilDate != null)  {
             dateString = new DCDate(blackoutUntilDate).toString();
         }
-        addSingleMetadataValue(Boolean.TRUE, BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, dateString);
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.TRUE, BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, dateString);
+        }
     }
 
     public Date getBlackoutUntilDate() {
         Date blackoutUntilDate = null;
-        String dateString =getSingleMetadataValue(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER);
-        if(dateString != null) {
-            blackoutUntilDate = new DCDate(dateString).toDate();
+        if (getItem() != null) {
+            String dateString = getSingleMetadataValue(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER);
+            blackoutUntilDate = (dateString == null ? null : new DCDate(dateString).toDate());
+        } else {
+
         }
         return blackoutUntilDate;
     }
@@ -224,12 +245,20 @@ public class DryadDataPackage extends DryadObject {
                 publicationDOI = "doi:" + publicationDOI;
             }
         }
-        addSingleMetadataValue(Boolean.FALSE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, publicationDOI);
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.FALSE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, publicationDOI);
+        } else {
+
+        }
     }
 
     public void clearPublicationDOI() {
         // Need to filter just on metadata values that are publication DOIs
-        addSingleMetadataValue(Boolean.TRUE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, null);
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.TRUE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, null);
+        } else {
+
+        }
     }
 
     /**
@@ -239,26 +268,36 @@ public class DryadDataPackage extends DryadObject {
      * @throws SQLException
      */
     public String getPublicationDOI() {
-        String result = getSingleMetadataValue(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER);
-        if (result != null) {
-            return result;
-        }
-        return "";
-    }
+        String result = "";
+        if (getItem() != null) {
+            result = getSingleMetadataValue(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER);
+            result = (result == null ? "" : result);
+        } else {
 
-    public void setAbstract(String theAbstract) {
-        addSingleMetadataValue(Boolean.TRUE, "dc", "description", null, theAbstract);
+        }
+        return result;
     }
 
     public String getAbstract() {
-        String theAbstract = getSingleMetadataValue("dc", "description", null);
-        String extraAbstract = getSingleMetadataValue("dc", "description", "abstract");
+        if (getItem() != null) {
+            String theAbstract = getSingleMetadataValue("dc", "description", null);
+            String extraAbstract = getSingleMetadataValue("dc", "description", "abstract");
 
-        if (extraAbstract != null && extraAbstract.length() > 0) {
-            theAbstract = theAbstract + "\n" + extraAbstract;
+            if (extraAbstract != null && extraAbstract.length() > 0) {
+                theAbstract = theAbstract + "\n" + extraAbstract;
+            }
+            return theAbstract;
+        } else {
+            return abstractString;
         }
+    }
 
-        return theAbstract;
+    public void setAbstract(String theAbstract) {
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.TRUE, "dc", "description", null, theAbstract);
+        } else {
+            abstractString = theAbstract;
+        }
     }
 
     public List<String> getKeywords() {
@@ -274,20 +313,28 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public List<Author> getAuthors() {
-        ArrayList<Author> authors = new ArrayList<Author>();
-        DCValue[] metadata = item.getMetadata("dc", "contributor", "author", Item.ANY);
-        for(DCValue dcValue : metadata) {
-            authors.add(new Author(dcValue));
+        ArrayList<Author> authorList = new ArrayList<>();
+        if (getItem() != null) {
+            DCValue[] metadata = item.getMetadata("dc", "contributor", "author", Item.ANY);
+            for (DCValue dcValue : metadata) {
+                authorList.add(new Author(dcValue));
+            }
+            metadata = item.getMetadata("dc", "contributor", null, Item.ANY);
+            for (DCValue dcValue : metadata) {
+                authorList.add(new Author(dcValue));
+            }
+            metadata = item.getMetadata("dc", "creator", null, Item.ANY);
+            for (DCValue dcValue : metadata) {
+                authorList.add(new Author(dcValue));
+            }
+        } else {
+            authorList.addAll(authors);
         }
-        metadata = item.getMetadata("dc", "contributor", null, Item.ANY);
-        for(DCValue dcValue : metadata) {
-            authors.add(new Author(dcValue));
-        }
-        metadata = item.getMetadata("dc", "creator", null, Item.ANY);
-        for(DCValue dcValue : metadata) {
-            authors.add(new Author(dcValue));
-        }
-        return authors;
+        return authorList;
+    }
+
+    public void addAuthor(Author author) {
+        authors.add(author);
     }
 
     public List<DryadDataPackage> getDuplicatePackages(Context context) {
