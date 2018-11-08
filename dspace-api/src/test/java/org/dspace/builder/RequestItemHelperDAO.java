@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.app.rest.builder;
+package org.dspace.builder;
 
 import java.sql.SQLException;
 import javax.persistence.Query;
