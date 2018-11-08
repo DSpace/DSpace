@@ -62,6 +62,7 @@ import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.params.MapSolrParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.ShardParams;
+import org.dspace.app.statistics.StoreParentsAdditionalStatisticsData;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -297,18 +298,8 @@ public class SolrLogger
         {
             SolrInputDocument doc1 = getCommonSolrDocByRequest(dspaceObject, request, currentUser);
             if (doc1 == null) return;
-            if(dspaceObject instanceof Bitstream)
-            {
-                Bitstream bit = (Bitstream) dspaceObject;
-                Bundle[] bundles = bit.getBundles();
-                for (Bundle bundle : bundles) {
-                    doc1.addField("bundleName", bundle.getName());
-                }
-            }
 
             doc1.addField("statistics_type", StatisticsType.VIEW.text());
-
-
             solr.add(doc1);
             //commits are executed automatically using the solr autocommit
 //            solr.commit(false, false);
@@ -335,13 +326,6 @@ public class SolrLogger
 			SolrInputDocument doc1 = getCommonSolrDocByFinalIP(dspaceObject, ip, dns, null, currentUser);
 			if (doc1 == null)
 				return;
-			if (dspaceObject instanceof Bitstream) {
-				Bitstream bit = (Bitstream) dspaceObject;
-				Bundle[] bundles = bit.getBundles();
-				for (Bundle bundle : bundles) {
-					doc1.addField("bundleName", bundle.getName());
-				}
-			}
 
 			doc1.addField("statistics_type", StatisticsType.VIEW.text());
 
@@ -368,13 +352,6 @@ public class SolrLogger
 					currentUser);
 			if (doc1 == null)
 				return;
-			if (dspaceObject instanceof Bitstream) {
-				Bitstream bit = (Bitstream) dspaceObject;
-				Bundle[] bundles = bit.getBundles();
-				for (Bundle bundle : bundles) {
-					doc1.addField("bundleName", bundle.getName());
-				}
-			}
 
 			doc1.addField("statistics_type", StatisticsType.VIEW.text());
 
@@ -453,7 +430,6 @@ public class SolrLogger
         if(dspaceObject != null){
             doc1.addField("id", dspaceObject.getID());
             doc1.addField("type", dspaceObject.getType());
-            storeParents(doc1, dspaceObject);
         }
         // Save the current time
         doc1.addField("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
@@ -530,7 +506,6 @@ public class SolrLogger
         if(dspaceObject != null){
             doc1.addField("id", dspaceObject.getID());
             doc1.addField("type", dspaceObject.getType());
-            storeParents(doc1, dspaceObject);
         }
         // Save the current time
         doc1.addField("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
@@ -670,53 +645,8 @@ public class SolrLogger
     public void storeParents(SolrInputDocument doc1, DSpaceObject dso)
             throws SQLException
     {
-        if (dso instanceof Community)
-        {
-            Community comm = (Community) dso;
-            while (comm != null && comm.getParentCommunity() != null)
-            {
-                comm = comm.getParentCommunity();
-                doc1.addField("owningComm", comm.getID());
-            }
-        }
-        else if (dso instanceof Collection)
-        {
-            Collection coll = (Collection) dso;
-            Community[] communities = coll.getCommunities();
-            for (int i = 0; i < communities.length; i++)
-            {
-                Community community = communities[i];
-                doc1.addField("owningComm", community.getID());
-                storeParents(doc1, community);
-            }
-        }
-        else if (dso instanceof Item)
-        {
-            Item item = (Item) dso;
-            Collection[] collections = item.getCollections();
-            for (int i = 0; i < collections.length; i++)
-            {
-                Collection collection = collections[i];
-                doc1.addField("owningColl", collection.getID());
-                storeParents(doc1, collection);
-            }
-        }
-        else if (dso instanceof Bitstream)
-        {
-            Bitstream bitstream = (Bitstream) dso;
-            Bundle[] bundles = bitstream.getBundles();
-            for (int i = 0; i < bundles.length; i++)
-            {
-                Bundle bundle = bundles[i];
-                Item[] items = bundle.getItems();
-                for (int j = 0; j < items.length; j++)
-                {
-                    Item item = items[j];
-                    doc1.addField("owningItem", item.getID());
-                    storeParents(doc1, item);
-                }
-            }
-        }
+        StoreParentsAdditionalStatisticsData storeParent = new StoreParentsAdditionalStatisticsData();
+        storeParent.storeParents(doc1, dso);
     }
 
     public boolean isUseProxies()

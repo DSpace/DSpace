@@ -12,15 +12,26 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.batch.bte.ImpRecordItem;
+import org.dspace.app.cris.batch.bte.ImpRecordMetadata;
 import org.dspace.app.cris.batch.dto.BitstreamInterface;
 import org.dspace.app.cris.batch.dto.DTOImpRecord;
 import org.dspace.app.cris.batch.dto.MetadataInterface;
+import org.dspace.app.util.Util;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.util.ItemUtils;
 
 public abstract class ImpRecordDAO
 {
@@ -29,6 +40,12 @@ public abstract class ImpRecordDAO
 
     private final String GET_IMPRECORDIDTOITEMID_BY_IMP_RECORD_ID_QUERY = "SELECT * FROM imp_record_to_item WHERE imp_record_id = ?";
 
+    private final String GET_BY_LAST_MODIFIED_AND_EPERSON_ID_AND_SOURCEREF = "SELECT * FROM imp_record WHERE last_modified is NULL AND imp_eperson_id = ? AND imp_sourceref = ? order by imp_id ASC";
+    
+    private final String COUNT_BY_LAST_MODIFIED_AND_EPERSON_ID_AND_SOURCEREF = "SELECT count(*) FROM imp_record WHERE last_modified is NULL AND imp_eperson_id = ? AND imp_sourceref = ?";
+
+    private final String GET_BY_METADATA_BY_IMPID = "SELECT * FROM imp_metadatavalue WHERE imp_id = ? ORDER BY imp_schema, imp_element, imp_qualifier, metadata_order ASC";
+    
     protected Context context;
     
     private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss");
@@ -162,6 +179,83 @@ public abstract class ImpRecordDAO
 	                    o.getEmbargoPolicy(), o.getEmbargoStartDate());
             }
         }
+    }
+
+    public List<ImpRecordItem> findByEPersonIDAndSourceRefAndLastModifiedInNull(
+            Integer epersonID, String sourceRef) throws SQLException
+    {   
+        List<ImpRecordItem> results = new ArrayList<ImpRecordItem>();
+        TableRowIterator tri = DatabaseManager.query(context, GET_BY_LAST_MODIFIED_AND_EPERSON_ID_AND_SOURCEREF, epersonID, sourceRef);
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                ImpRecordItem impRecord = new ImpRecordItem();
+                
+                TableRow row = tri.next();
+                Integer impId = row.getIntColumn("imp_id");
+                String impRecordId = row.getStringColumn("imp_record_id");
+                String impSourceRef = row.getStringColumn("imp_sourceref");
+                
+                impRecord.setSourceId(impRecordId);
+                impRecord.setSourceRef(impSourceRef);
+                
+                TableRowIterator triMetadata = DatabaseManager.query(context, GET_BY_METADATA_BY_IMPID, impId);                
+                try
+                {
+                    Set<ImpRecordMetadata> setMetadata = new HashSet<ImpRecordMetadata>();
+                    while (triMetadata.hasNext())
+                    {
+                        ImpRecordMetadata impRecordMetadata = new ImpRecordMetadata();
+                        
+                        TableRow rowMetadata = triMetadata.next();
+                        
+                        String schema = rowMetadata.getStringColumn("imp_schema");
+                        String element = rowMetadata.getStringColumn("imp_element");
+                        String qualifier = rowMetadata.getStringColumn("imp_qualifier");
+                        String authority = rowMetadata.getStringColumn("imp_authority");
+                        String language = rowMetadata.getStringColumn("text_lang");
+                        String value = rowMetadata.getStringColumn("imp_value");
+                        Integer metadataOrder = rowMetadata.getIntColumn("metadata_order");
+                        Integer share = rowMetadata.getIntColumn("imp_share");
+                        Integer confidence = rowMetadata.getIntColumn("imp_confidence");
+
+                        impRecordMetadata.setAuthority(authority);
+                        impRecordMetadata.setConfidence(confidence);
+                        impRecordMetadata.setMetadataOrder(metadataOrder);
+                        impRecordMetadata.setShare(share);
+                        impRecordMetadata.setValue(value);
+                        impRecordMetadata.setLanguage(language);
+                                                
+                        String metadataName = Utils.standardize(schema, element, qualifier, ".");
+                        impRecord.addMetadata(metadataName, impRecordMetadata); 
+                    }
+                    
+                } finally
+                {
+                    if (triMetadata != null)
+                    {
+                        triMetadata.close();
+                    }
+                }       
+                results.add(impRecord);
+            }
+        } finally
+        {
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+        
+        return results;
+    }
+
+    public Integer countByEPersonIDAndSourceRefAndLastModifiedInNull(
+            Integer epersonID, String sourceRef) throws SQLException
+    {
+        return DatabaseManager.querySingle(context, COUNT_BY_LAST_MODIFIED_AND_EPERSON_ID_AND_SOURCEREF, epersonID, sourceRef).getIntColumn("count");
     }
 
 }

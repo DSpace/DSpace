@@ -41,11 +41,22 @@ public class RESTConnector {
     }
 
     public WebTarget getClientRest(String path) {
-    	Client client = ClientBuilder.newClient(getClientConfig());
-    	WebTarget target = client.target(url).path(path);
-    	return target;
+    	return getClientRest(path, false);
     }
 
+    public WebTarget getClientRest(String path, boolean excludeVersion) {
+    	String targetUrl = url;
+    	if (excludeVersion) {
+    		String[] split = url.split("/");
+    		if (split[split.length-1].startsWith("v")) {
+    			targetUrl = targetUrl.substring(0, targetUrl.length() - split[split.length-1].length() -1);
+    		}
+    	}
+    	Client client = ClientBuilder.newClient(getClientConfig());
+    	WebTarget target = client.target(targetUrl).path(path);
+    	return target;
+    }
+    
 	public ClientConfig getClientConfig() {
 		if(this.clientConfig == null) {
 	        ConfigurationService configurationService = new DSpace().getConfigurationService();

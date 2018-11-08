@@ -20,6 +20,8 @@ public class ImpRecordMetadata
     
     private int share = -1;
     
+    private String language;
+    
     public String getValue()
     {
         return value;
@@ -68,6 +70,16 @@ public class ImpRecordMetadata
     public void setShare(int share)
     {
         this.share = share;
+    }
+
+    public String getLanguage()
+    {
+        return language;
+    }
+
+    public void setLanguage(String language)
+    {
+        this.language = language;
     }
 
   

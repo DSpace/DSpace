@@ -79,6 +79,7 @@
 		<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/static/css/responsive.bootstrap.min.css"/>
 		<link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
 		<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/css/bootstrap-datetimepicker.min.css" />
+			<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/static/css/select.dataTables.min.css" />
 <%
     if (!"NONE".equals(feedRef))
     {
@@ -120,6 +121,7 @@
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/buttons.html5.min.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/dataTables.responsive.min.js"></script>	
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/dataTables.select.min.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jszip.min.js"></script>
 	<script type='text/javascript'>
 		var j = jQuery.noConflict();

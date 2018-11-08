@@ -532,7 +532,12 @@
     	<servlet-name>authority-claim</servlet-name>
     	<servlet-class>org.dspace.app.webui.cris.servlet.AuthorityClaimServlet</servlet-class>
   	</servlet>
-  			
+
+	<servlet>
+    	<servlet-name>import-record</servlet-name>
+    	<servlet-class>org.dspace.app.webui.cris.servlet.ImportRecordServlet</servlet-class>
+  	</servlet>
+  	  			
 	<servlet>
     	<servlet-name>sherpapolicy</servlet-name>
     	<servlet-class>org.dspace.app.webui.servlet.SHERPAPublisherPolicyServlet</servlet-class>
@@ -1003,6 +1008,11 @@
     	<servlet-name>authority-claim</servlet-name>
     	<url-pattern>/tools/claim</url-pattern>
   	</servlet-mapping>
+
+  	<servlet-mapping>
+    	<servlet-name>import-record</servlet-name>
+    	<url-pattern>/tools/importrecord</url-pattern>
+  	</servlet-mapping>
       
   	<servlet-mapping>
     	<servlet-name>sherpapolicy</servlet-name>
@@ -1218,4 +1228,15 @@
         <servlet-name>spring-ws</servlet-name>
         <url-pattern>/webservices/*</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+    	<servlet-name>orcidwebhookcallback</servlet-name>
+    	<servlet-class>org.dspace.app.webui.cris.servlet.ORCIDWebHookCallbackServlet</servlet-class>
+  	</servlet>
+  	
+  	<servlet-mapping>
+        <servlet-name>orcidwebhookcallback</servlet-name>
+        <url-pattern>/orcidwebhook/*</url-pattern>
+    </servlet-mapping>
+    
 </web-app>

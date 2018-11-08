@@ -334,6 +334,9 @@
 									<a href="${root}/cris/tools/rp/rebindItemsToRP.htm?id=${researcher.id}"><i class="fa fa-search"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.bind.items"/></a>
 								</li>
 							</c:if>
+							<li>
+								<a href="${root}/cris/tools/rp/rebindItemsToRP.htm?id=${researcher.id}&operation=list"><i class="fa fa-search"></i> <fmt:message key="jsp.authority-claim.choice.list.items"/></a>
+							</li>							
 						</ul>
 					</div> 
 					
@@ -372,6 +375,24 @@
 				href="<%= request.getContextPath() %>/cris/tools/rp/editDynamicData.htm?id=${researcher.id}&anagraficaId=${researcher.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><fmt:message
 				key="jsp.layout.hku.detail.researcher-disabled.fixit" /></a>
 		</p>
+	</c:if>
+	
+	
+	<c:if test="${!empty infoPendingImpRecord && researcher_page_menu}">
+		<c:forEach var="entry" items="${infoPendingImpRecord}">
+			<c:if test="${entry.value>0}">
+    	    <p class="warning pending">
+    	    	<c:choose>				
+					<c:when test="${admin}">
+						<a href="<%=request.getContextPath()%>/tools/importrecord?crisid=${researcher.crisID}&sourceref=${entry.key}"><fmt:message key="jsp.cris.detail.imprecord.result-match.${entry.key}"><fmt:param>${entry.value}</fmt:param></fmt:message></a>
+	    	    	</c:when>
+	    	    	<c:otherwise>
+						<a href="<%=request.getContextPath()%>/tools/importrecord?sourceref=${entry.key}"><fmt:message key="jsp.cris.detail.imprecord.result-match.${entry.key}"><fmt:param>${entry.value}</fmt:param></fmt:message></a>    	    	
+	    	    	</c:otherwise>
+    	    	</c:choose>
+    	    </p>
+    	  	</c:if>
+		</c:forEach>
 	</c:if>
 
 	<c:if test="${pendingItems > 0 && publicationSelfClaimRP}">
