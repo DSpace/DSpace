@@ -90,6 +90,8 @@ public class DryadDataPackage extends DryadObject {
     private final static String PROVENANCE = "dc.description.provenance";
 
     private Set<DryadDataFile> dataFiles;
+    private DryadJournalConcept journalConcept = null;
+
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
     private static boolean useDryadClassic = true;
@@ -103,6 +105,10 @@ public class DryadDataPackage extends DryadObject {
 
     public DryadDataPackage(Item item) {
         super(item);
+        String pubName = getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
+        if (pubName != null && !pubName.equals("")) {
+            journalConcept = JournalUtils.getJournalConceptByJournalName(getPublicationName());
+        }
     }
 
     public static DryadDataPackage create(Context context) throws SQLException {
@@ -140,15 +146,28 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public String getPublicationName() {
-        String result = getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
-        if (result == null) {
-            return "";
+        String result = "";
+        if (journalConcept != null) {
+            result = journalConcept.getFullName();
         }
         return result;
     }
 
     public void setPublicationName(String publicationName) {
-        addSingleMetadataValue(Boolean.TRUE, PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, publicationName);
+        journalConcept = JournalUtils.getJournalConceptByJournalName(publicationName);
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.TRUE, PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, publicationName);
+        } else {
+
+        }
+    }
+    
+    public DryadJournalConcept getJournalConcept() {
+        return journalConcept;
+    }
+
+    public void setJournalConcept(DryadJournalConcept concept) {
+        journalConcept = concept;
     }
 
     public String getManuscriptNumber() {

@@ -215,6 +215,7 @@ public class PublicationUpdater extends HttpServlet {
         LOGGER.debug("found " + packages.size() + " unarchived packages");
         if (packages.size() > 0) {
             for (DryadDataPackage dryadDataPackage : packages) {
+                dryadDataPackage.setJournalConcept(dryadJournalConcept);
                 StringBuilder message = new StringBuilder();
                 LOGGER.debug(">>> processing unarchived package " + dryadDataPackage.getIdentifier());
                 // First, compare this package with anything in manuscript metadata storage:
@@ -256,6 +257,7 @@ public class PublicationUpdater extends HttpServlet {
         // For all found items, look for matches in CrossRef publications.
         for (Item item : items) {
             DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
+            dryadDataPackage.setJournalConcept(dryadJournalConcept);
             LOGGER.debug(">>> processing archived package " + dryadDataPackage.getIdentifier());
             StringBuilder message = matchPackageToCrossref(context, dryadDataPackage, null);
             if (!"".equals(message.toString())) {
