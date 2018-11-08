@@ -134,7 +134,10 @@ public class StatTopObjectComponent<T extends DSpaceObject> extends
         solrQuery.addFacetField(_CONTINENT, _COUNTRY_CODE, _CITY, ID, _LOCATION,
                 _FISCALYEAR, _SOLARYEAR);
         solrQuery.set("facet.missing", true);
-        solrQuery.set("f." + _LOCATION + ".facet.missing", false);
+        solrQuery.set("f." + _LOCATION + ".facet.missing", true);
+        solrQuery.set("f." + _CONTINENT + ".facet.missing", true);
+        solrQuery.set("f." + _COUNTRY_CODE + ".facet.missing", true);
+        solrQuery.set("f." + _CITY + ".facet.missing", true);
         solrQuery.set("f." + ID + ".facet.missing", false);
         solrQuery.set("f." + _FISCALYEAR + ".facet.missing", false);
         solrQuery.set("f." + _SOLARYEAR + ".facet.missing", false);
