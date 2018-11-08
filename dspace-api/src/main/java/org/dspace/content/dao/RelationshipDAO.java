@@ -23,9 +23,37 @@ import org.dspace.core.GenericDAO;
  */
 public interface RelationshipDAO extends GenericDAO<Relationship> {
 
+    /**
+     * This method returns a list of Relationship objects that have the given Item object
+     * as a leftItem or a rightItem
+     * @param context   The relevant DSpace context
+     * @param item      The item that should be either a leftItem or a rightItem of all
+     *                  the Relationship objects in the returned list
+     * @return          The list of Relationship objects that contain either a left or a
+     *                  right item that is equal to the given item
+     * @throws SQLException If something goes wrong
+     */
     List<Relationship> findByItem(Context context,Item item) throws SQLException;
 
+    /**
+     * This method returns the highest leftplace integer for all the relationships where this
+     * item is the leftitem so that we can set a proper leftplace attribute on the next relationship
+     * @param context   The relevant DSpace context
+     * @param item      The item to be matched on leftItem
+     * @return          The integer for the highest leftPlace value for all the relatonship objects
+     *                  that have the given item as leftItem
+     * @throws SQLException If something goes wrong
+     */
     int findLeftPlaceByLeftItem(Context context,Item item) throws SQLException;
 
+    /**
+     * This method returns the highest rightplace integer for all the relationships where this
+     * item is the rightitem so that we can set a proper rightplace attribute on the next relationship
+     * @param context   The relevant DSpace context
+     * @param item      The item to be matched on rightItem
+     * @return          The integer for the highest rightPlace value for all the relatonship objects
+     *                  that have the given item as rightItem
+     * @throws SQLException If something goes wrong
+     */
     int findRightPlaceByRightItem(Context context,Item item) throws SQLException;
 }

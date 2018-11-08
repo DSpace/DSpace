@@ -29,15 +29,15 @@ public class RelationshipTypeMatcher {
     private static Matcher<? super Object> matchRelationshipTypeExplicitEntityTypes(RelationshipType relationshipType,
                                                                                     EntityType leftType,
                                                                                     EntityType rightType) {
-        return matchRelationshipTypeExplicitEntityTypeValues(relationshipType, leftType.getId(), leftType.getLabel(),
-                                                             rightType.getId(), rightType.getLabel());
+        return matchRelationshipTypeExplicitEntityTypeValues(relationshipType, leftType.getID(), leftType.getLabel(),
+                                                             rightType.getID(), rightType.getLabel());
     }
 
     private static Matcher<? super Object> matchRelationshipTypeExplicitEntityTypeValues(
         RelationshipType relationshipType, int leftEntityTypeId, String leftEntityTypeLabel, int rightEntityTypeId,
         String rightEntityTypeLabel) {
 
-        return matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(relationshipType.getId(),
+        return matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(relationshipType.getID(),
                                                                               relationshipType.getLeftLabel(),
                                                                               relationshipType.getRightLabel(),
                                                                               relationshipType.getLeftMinCardinality(),
@@ -55,9 +55,9 @@ public class RelationshipTypeMatcher {
                                                                               leftMinCardinality, leftMaxCardinality,
                                                                               rightMinCardinality,
                                                                               rightMaxCardinality,
-                                                                              leftEntityType.getId(),
+                                                                              leftEntityType.getID(),
                                                                               leftEntityType.getLabel(),
-                                                                              rightEntityType.getId(),
+                                                                              rightEntityType.getID(),
                                                                               rightEntityType.getLabel());
     }
 

@@ -226,7 +226,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
         }
 
         if (foundRelationshipType != null) {
-            getClient().perform(get("/api/core/relationshiptypes/" + foundRelationshipType.getId()))
+            getClient().perform(get("/api/core/relationshiptypes/" + foundRelationshipType.getID()))
                        .andExpect(jsonPath("$._embedded.leftType",
                                            EntityTypeMatcher.matchEntityTypeEntryForLabel("Publication")))
                        .andExpect(
@@ -248,7 +248,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
         assertEquals(Integer.MAX_VALUE, relationshipType.getLeftMaxCardinality());
         assertEquals(Integer.MAX_VALUE, relationshipType.getRightMaxCardinality());
 
-        getClient().perform(get("/api/core/relationshiptypes/" + relationshipType.getId()))
+        getClient().perform(get("/api/core/relationshiptypes/" + relationshipType.getID()))
                    .andExpect(jsonPath("$.leftMinCardinality", is(0)))
                    .andExpect(jsonPath("$.rightMinCardinality", is(0)))
                    .andExpect(jsonPath("$.leftMaxCardinality", is(Integer.MAX_VALUE)))
@@ -271,7 +271,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
         }
 
         if (foundRelationshipType != null) {
-            getClient().perform(get("/api/core/relationshiptypes/" + foundRelationshipType.getId()))
+            getClient().perform(get("/api/core/relationshiptypes/" + foundRelationshipType.getID()))
                        .andExpect(jsonPath("$._embedded.leftType",
                                            EntityTypeMatcher.matchEntityTypeEntryForLabel("JournalVolume")))
                        .andExpect(jsonPath("$._embedded.rightType",
@@ -293,7 +293,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
         assertEquals(Integer.MAX_VALUE, relationshipType.getLeftMaxCardinality());
         assertEquals(1, relationshipType.getRightMaxCardinality());
 
-        getClient().perform(get("/api/core/relationshiptypes/" + relationshipType.getId()))
+        getClient().perform(get("/api/core/relationshiptypes/" + relationshipType.getID()))
                    .andExpect(jsonPath("$.leftMinCardinality", is(0)))
                    .andExpect(jsonPath("$.rightMinCardinality", is(1)))
                    .andExpect(jsonPath("$.leftMaxCardinality", is(Integer.MAX_VALUE)))
