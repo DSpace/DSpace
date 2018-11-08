@@ -44,30 +44,6 @@ public class RequestItemRepositoryIT
             + RequestItemRest.CATEGORY + '/'
             + RequestItemRest.NAME + 's';
 
-/*
-    @BeforeClass
-    public static void setUpClass() {
-    }
-*/
-
-/*
-    @AfterClass
-    public static void tearDownClass() {
-    }
-*/
-
-/*
-    @Before
-    public void setUp() {
-    }
-*/
-
-/*
-    @After
-    public void tearDown() {
-    }
-*/
-
     /**
      * Test of findOne method, of class RequestItemRepository.
      * @throws java.lang.Exception passed through.
@@ -173,7 +149,7 @@ public class RequestItemRepositoryIT
         System.out.println("getDomainClass");
         RequestItemRepository instance = new RequestItemRepository();
         Class instanceClass = instance.getDomainClass();
-        assertEquals("Wrong domain class", instanceClass, RequestItemRest.class);
+        assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
     }
 
     /**
