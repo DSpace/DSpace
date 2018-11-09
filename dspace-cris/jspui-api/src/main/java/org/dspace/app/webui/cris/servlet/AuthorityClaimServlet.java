@@ -271,16 +271,33 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
         if (!"submit_cancel".equals(submitButton))
         {
-
-            int[] selectedIds = UIUtil.getIntParameters(request, "selectedId");
-            for (int selectedId : selectedIds)
+            Context subcontext = null;
+            try
             {
-                String selectedHandle = request
-                        .getParameter("handle_" + selectedId);
-                workNow(context, request, now, selectedHandle, crisID, notifyGroupSelfClaim, selfClaim,
-                        selectedId, submitButton);
+                subcontext = new Context();
+                subcontext.turnOffAuthorisationSystem();
+                subcontext.setDispatcher("onlyindex");
+                int[] selectedIds = UIUtil.getIntParameters(request,
+                        "selectedId");
+                for (int selectedId : selectedIds)
+                {
+                    String selectedHandle = request
+                            .getParameter("handle_" + selectedId);
+                    workNow(subcontext, request, now, selectedHandle, crisID,
+                            notifyGroupSelfClaim, selfClaim, selectedId,
+                            submitButton);
+                }
+                subcontext.complete();
             }
-
+            catch (Exception ex)
+            {
+                log.error(ex.getMessage(), ex);
+            }
+            finally {
+                if (subcontext != null && subcontext.isValid()) {
+                    subcontext.abort();
+                }
+            }
         }
         
         if(StringUtils.isBlank(handle)) {
