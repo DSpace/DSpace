@@ -16,6 +16,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
+import org.dspace.identifier.DOI;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Verifier;
@@ -223,6 +224,13 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
             {
                 key = metadataSchema.getName() + "." + metadataField.getElement();
                 name = names.get(key);
+            }
+
+            // Transform DOI text to URL
+            if (key.equals("dc.identifier")) {
+                if (v.getValue() != null && v.getValue().startsWith(DOI.SCHEME)) {
+                    v.setValue(DOI.RESOLVER + "/" + v.getValue().substring(DOI.SCHEME.length()));
+                }
             }
 		    
             // Do not include description.provenance

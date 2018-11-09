@@ -847,7 +847,11 @@
                     <xsl:when test="dim:field[@element='identifier'][not(@qualifier)]">
                         <xsl:for-each select="dim:field[@element='identifier'][not(@qualifier)]">
                             <div>
-                                <xsl:copy-of select="node()"/>
+                                <xsl:call-template name="hyperlink">
+                                    <xsl:with-param name="text">
+                                        <xsl:copy-of select="node()"/>
+                                    </xsl:with-param>
+                                </xsl:call-template>
                             </div>
                         </xsl:for-each>
                     </xsl:when>
