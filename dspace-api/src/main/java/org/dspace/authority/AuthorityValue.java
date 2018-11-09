@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.AuthorizeException;
@@ -234,7 +234,7 @@ public class AuthorityValue {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(AuthorityValue.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorityValue.class);
 
     @Override
     public String toString() {

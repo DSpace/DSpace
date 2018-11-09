@@ -12,8 +12,8 @@ import java.util.List;
 
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterValue;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.results.SolrFilterResult;
 

@@ -8,7 +8,7 @@
 package org.dspace.authority.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -21,7 +21,7 @@ public class EnumUtils {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(EnumUtils.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(EnumUtils.class);
 
     /**
      * Default constructor

@@ -11,7 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.textmining.extraction.TextExtractor;
 import org.textmining.extraction.word.WordTextExtractorFactory;
@@ -24,7 +24,7 @@ import org.textmining.extraction.word.WordTextExtractorFactory;
  */
 public class WordFilter extends MediaFilter {
 
-    private static Logger log = Logger.getLogger(WordFilter.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(WordFilter.class);
 
     @Override
     public String getFilteredName(String oldFilename) {

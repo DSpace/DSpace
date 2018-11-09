@@ -29,7 +29,16 @@
         <param-value>org.dspace.sword2.ServiceDocumentManagerDSpace</param-value>
     </context-param>
 
-    <!-- this can be omitted if the server does not wish to support listing collection contents -->
+    <context-param>
+        <param-name>log4jConfiguration</param-name>
+        <param-value>${dspace.dir}/config/log4j2.xml</param-value>
+        <description>
+	    The location of the Log4J configuration
+        </description>
+    </context-param>
+
+    <!-- This can be omitted if the server does not wish to support
+	 listing collection contents -->
     <context-param>
         <description>The CollectionListManager server implementation class name</description>
         <param-name>collection-list-impl</param-name>

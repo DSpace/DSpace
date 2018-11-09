@@ -29,7 +29,7 @@ import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.PCData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
@@ -82,7 +82,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @see AbstractPackageDisseminator
  */
 public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
-    private static final Logger log = Logger.getLogger(DSpaceAIPDisseminator.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceAIPDisseminator.class);
 
     /**
      * Unique identifier for the profile of the METS document.

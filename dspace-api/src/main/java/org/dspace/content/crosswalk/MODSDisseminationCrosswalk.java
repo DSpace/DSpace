@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -90,7 +90,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(MODSDisseminationCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MODSDisseminationCrosswalk.class);
 
     private static final String CONFIG_PREFIX = "crosswalk.mods.properties.";
 

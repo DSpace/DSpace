@@ -17,7 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
@@ -47,7 +47,7 @@ public class RegistryLoader {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(RegistryLoader.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RegistryLoader.class);
 
     protected static BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
                                                                                           .getBitstreamFormatService();

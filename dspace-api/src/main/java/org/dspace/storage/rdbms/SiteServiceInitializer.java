@@ -9,7 +9,7 @@ package org.dspace.storage.rdbms;
 
 import java.sql.Connection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.flywaydb.core.api.MigrationInfo;
@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SiteServiceInitializer implements FlywayCallback {
 
-    private Logger log = Logger.getLogger(SiteServiceInitializer.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(SiteServiceInitializer.class);
 
     @Autowired(required = true)
     protected SiteService siteService;

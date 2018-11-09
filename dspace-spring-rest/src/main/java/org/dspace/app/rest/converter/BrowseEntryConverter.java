@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.BrowseEntryRest;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BrowseEntryConverter implements Converter<String[], BrowseEntryRest> {
-    private static final Logger log = Logger.getLogger(BrowseEntryConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BrowseEntryConverter.class);
 
     @Override
     public BrowseEntryRest convert(String[] source) {

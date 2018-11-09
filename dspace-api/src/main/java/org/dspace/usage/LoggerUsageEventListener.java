@@ -7,7 +7,7 @@
  */
 package org.dspace.usage;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -23,8 +23,7 @@ public class LoggerUsageEventListener extends AbstractUsageEventListener {
     /**
      * log4j category
      */
-    private static Logger log = Logger
-        .getLogger(LoggerUsageEventListener.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(LoggerUsageEventListener.class);
 
     @Override
     public void receiveEvent(Event event) {

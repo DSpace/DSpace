@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.core.Context;
@@ -36,7 +36,7 @@ public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.
     @Autowired(required = true)
     private GroupService groupService;
 
-    private static final Logger log = Logger.getLogger(EPersonConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EPersonConverter.class);
 
     @Override
     public EPersonRest fromModel(EPerson obj) {

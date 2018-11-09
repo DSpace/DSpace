@@ -25,7 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -58,7 +58,7 @@ public class FilteredItemsResource extends Resource {
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private static Logger log = Logger.getLogger(FilteredItemsResource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(FilteredItemsResource.class);
 
     /**
      * Return instance of collection with passed id. You can add more properties

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
@@ -49,7 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see ChoiceAuthority
  */
 public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService {
-    private Logger log = Logger.getLogger(ChoiceAuthorityServiceImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(ChoiceAuthorityServiceImpl.class);
 
     // map of field key to authority plugin
     protected Map<String, ChoiceAuthority> controller = new HashMap<String, ChoiceAuthority>();

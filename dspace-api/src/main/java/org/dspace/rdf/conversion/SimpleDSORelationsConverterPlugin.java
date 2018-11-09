@@ -19,7 +19,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.util.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -57,7 +57,8 @@ public class SimpleDSORelationsConverterPlugin
     public static final String SIMPLE_RELATIONS_ITEM2BITSTREAM_KEY = "rdf.simplerelations.item2bitstream";
 
 
-    private static final Logger log = Logger.getLogger(SimpleDSORelationsConverterPlugin.class);
+    private static final Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(SimpleDSORelationsConverterPlugin.class);
 
     @Autowired(required = true)
     protected BitstreamService bitstreamService;

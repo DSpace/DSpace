@@ -7,7 +7,7 @@
  */
 package org.dspace.submit.step;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.dspace.license.factory.LicenseServiceFactory;
@@ -18,7 +18,7 @@ public class CCLicenseStep extends AbstractProcessingStep {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(CCLicenseStep.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CCLicenseStep.class);
 
     protected final CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance()
                                                                                          .getCreativeCommonsService();

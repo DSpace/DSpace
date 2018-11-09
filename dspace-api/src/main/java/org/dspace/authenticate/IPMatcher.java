@@ -10,7 +10,7 @@ package org.dspace.authenticate;
 import java.net.Inet6Address;
 import java.net.UnknownHostException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * <p>
@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
  * @version $Revision$
  */
 public class IPMatcher {
-    private static Logger log = Logger.getLogger(IPMatcher.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IPMatcher.class);
 
     /**
      * Network to match

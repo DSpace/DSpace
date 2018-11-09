@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
@@ -224,7 +224,7 @@ public class Event implements Serializable {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(Event.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Event.class);
 
     /**
      * Constructor.

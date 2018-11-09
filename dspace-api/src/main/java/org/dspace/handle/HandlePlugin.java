@@ -21,7 +21,7 @@ import net.handle.hdllib.HandleValue;
 import net.handle.hdllib.ScanCallback;
 import net.handle.hdllib.Util;
 import net.handle.util.StreamTable;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
@@ -51,7 +51,7 @@ public class HandlePlugin implements HandleStorage {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(HandlePlugin.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HandlePlugin.class);
 
     /**
      * The DSpace service manager kernel

@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -97,7 +97,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(QDCCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(QDCCrosswalk.class);
 
     // map of qdc to JDOM Element
     private Map<String, Element> qdc2element = new HashMap<String, Element>();

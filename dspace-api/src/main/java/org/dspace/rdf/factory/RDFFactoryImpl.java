@@ -8,7 +8,7 @@
 
 package org.dspace.rdf.factory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.rdf.conversion.RDFConverter;
 import org.dspace.rdf.storage.RDFStorage;
 import org.dspace.rdf.storage.URIGenerator;
@@ -23,7 +23,7 @@ public class RDFFactoryImpl extends RDFFactory {
     // by type here. So we use setters and properties in Spring configuration
     // instead.
 
-    private static final Logger log = Logger.getLogger(RDFFactoryImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RDFFactoryImpl.class);
 
     private RDFStorage storage;
     private URIGenerator generator;

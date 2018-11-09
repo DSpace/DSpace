@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
@@ -62,7 +62,7 @@ public class BasicWorkflowAuthorizationIT
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(BasicWorkflowAuthorizationIT.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicWorkflowAuthorizationIT.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
