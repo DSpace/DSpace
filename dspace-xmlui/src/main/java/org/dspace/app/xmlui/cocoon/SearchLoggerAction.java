@@ -14,6 +14,7 @@ import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.app.xmlui.utils.BadRequestException;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
@@ -49,7 +50,11 @@ public abstract class SearchLoggerAction extends AbstractAction {
                 null, getQueries(request), scope);
 
         if(!StringUtils.isBlank(request.getParameter("rpp"))){
-            searchEvent.setRpp(Integer.parseInt(request.getParameter("rpp")));
+        	try {
+        		Integer.parseInt(request.getParameter("rpp")); 
+        	}catch (NumberFormatException e) {
+                throw new BadRequestException("Invalid parameters");
+			}
         }
         if(!StringUtils.isBlank(request.getParameter("sort_by"))){
             searchEvent.setSortBy(request.getParameter("sort_by"));
@@ -58,7 +63,11 @@ public abstract class SearchLoggerAction extends AbstractAction {
             searchEvent.setSortOrder(request.getParameter("order"));
         }
         if(!StringUtils.isBlank(request.getParameter("page"))){
-            searchEvent.setPage(Integer.parseInt(request.getParameter("page")));
+        	try {
+        		Integer.parseInt(request.getParameter("page")); 
+        	}catch (NumberFormatException e) {
+                throw new BadRequestException("Invalid parameters");
+			}
         }
 
         //Fire our event
