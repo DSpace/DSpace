@@ -52,7 +52,8 @@ public class RebuildDerivateStatisticsMetadata
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
 
-        options.addOption("y", "year", true, "Year");
+        options.addOption("y", "year", true, "Year");        
+        options.addOption("q", "query", true, "by query");
         options.addOption("c", "crisentity", true, "Cris entity");
         options.addOption("o", "other", true, "Other DSpace type");
 
@@ -97,15 +98,27 @@ public class RebuildDerivateStatisticsMetadata
         StringBuilder errorsBuffer = new StringBuilder();
         
         boolean year = line.hasOption("y");
+        int yearFound = -1;
+        if(year) {
+            yearFound = Integer.parseInt(line.getOptionValue("y"));
+        }
 
-        int yearFound = Integer.parseInt(line.getOptionValue("y"));
-
+        boolean byQuery = line.hasOption("q");
+        String query = null;
+        if(byQuery) {
+            query = line.getOptionValue("q");
+        }
         if (!gotoCris)
         {
             if (year)
             {
                 System.out.println("YEAR");
                 sdl = indexer.getRawData(dspaceType, yearFound);
+            }
+            else if(byQuery)
+            {
+                System.out.println("BYQUERY");
+                sdl = indexer.getRawData(dspaceType, query);
             }
             else
             {
@@ -119,6 +132,10 @@ public class RebuildDerivateStatisticsMetadata
             if (year)
             {
                 indexer.deleteByTypeAndYear(dspaceType, yearFound);
+            }
+            else if(byQuery)
+            {
+                indexer.deleteByTypeAndQuery(dspaceType, query);
             }
             else
             {
@@ -192,6 +209,11 @@ public class RebuildDerivateStatisticsMetadata
                 System.out.println("YEAR CRIS " + crisType);
                 sdl = indexer.getRawData(crisType, yearFound);
             }
+            else if(byQuery)
+            {
+                System.out.println("BYQUERY " + crisType);
+                sdl = indexer.getRawData(crisType, query);
+            }
             else
             {
                 System.out.println("ALL CRIS " + crisType);
@@ -204,6 +226,10 @@ public class RebuildDerivateStatisticsMetadata
             if (year)
             {
                 indexer.deleteByTypeAndYear(crisType, yearFound);
+            }
+            else if(byQuery)
+            {
+                indexer.deleteByTypeAndQuery(crisType, query);
             }
             else
             {
