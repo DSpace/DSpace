@@ -27,6 +27,7 @@
         <poi-version>3.17</poi-version>
         <postgresql.driver.version>42.2.1</postgresql.driver.version>
         <jena.version>2.13.0</jena.version>
+        <log4j.version>2.6.2</log4j.version>
         <slf4j.version>1.7.22</slf4j.version>
         <jackson.version>2.8.11</jackson.version>
         <jersey.version>2.26</jersey.version>
@@ -1227,11 +1228,6 @@
                 <version>3.7</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>3.6</version>
-            </dependency>
-            <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>1.2</version>
@@ -1282,7 +1278,7 @@
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
-		<version>${log4j.version}</version>
+                <version>${log4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
@@ -1291,8 +1287,8 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
-		<artifactId>log4j-core</artifactId>
-		<version>${log4j.version}</version>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
 	    <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
