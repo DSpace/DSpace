@@ -56,6 +56,12 @@ import org.dspace.utils.DSpace;
  */
 public class BindItemToRP
 {
+    private static final String COMMAND_WORK = "work";
+    
+    private static final String COMMAND_LIST = "list";
+
+    private static final String COMMAND_LISTEXCLUDEAUTHORITY = "listexcludeauthority";
+
     /** the logger */
     private static Logger log = Logger.getLogger(BindItemToRP.class);
 
@@ -284,7 +290,7 @@ public class BindItemToRP
     {
         log.debug("Working...building names list");
 
-        doWorkOrList("work", rps, relationPreferenceService);
+        doWorkOrList(COMMAND_WORK, rps, relationPreferenceService);
     }
 
     public static void bindItemsToRP(
@@ -567,7 +573,13 @@ public class BindItemToRP
     public static Map<NameResearcherPage, Item[]> list(List<ResearcherPage> rps,
             RelationPreferenceService relationPreferenceService)
     {
-        return doWorkOrList("list", rps, relationPreferenceService);
+        return doWorkOrList(COMMAND_LIST, rps, relationPreferenceService);
+    }
+
+    public static Map<NameResearcherPage, Item[]> listExcludeAuthority(List<ResearcherPage> rps,
+            RelationPreferenceService relationPreferenceService)
+    {
+        return doWorkOrList(COMMAND_LISTEXCLUDEAUTHORITY, rps, relationPreferenceService);
     }
     
     public static Map<NameResearcherPage, Item[]> doWorkOrList(String command, List<ResearcherPage> rps,
@@ -618,7 +630,7 @@ public class BindItemToRP
             
             Map<NameResearcherPage, Item[]> result = null;
             
-            if(!"list".equals(command)) {
+            if(COMMAND_WORK.equals(command)) {
                 //do work command
                 result = plugin
                         .retrieveGroupByName(context, mapInvalids, rps, false);
@@ -634,8 +646,14 @@ public class BindItemToRP
                 }
             }
             else {
-                result = plugin
+                if(COMMAND_LISTEXCLUDEAUTHORITY.equals(command)) {
+                    result = plugin
+                            .retrieveGroupByNameExceptAuthority(context, mapInvalids, rps, true, true);                    
+                }
+                else if(COMMAND_LIST.equals(command)) {
+                    result = plugin
                         .retrieveGroupByName(context, mapInvalids, rps, true);
+                }
             }
             
             return result;
