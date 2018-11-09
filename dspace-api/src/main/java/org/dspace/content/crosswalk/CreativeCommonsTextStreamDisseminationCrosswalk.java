@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
@@ -42,7 +42,8 @@ public class CreativeCommonsTextStreamDisseminationCrosswalk
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(CreativeCommonsTextStreamDisseminationCrosswalk.class);
+    private static Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsTextStreamDisseminationCrosswalk.class);
 
     @Override
     public boolean canDisseminate(Context context, DSpaceObject dso) {

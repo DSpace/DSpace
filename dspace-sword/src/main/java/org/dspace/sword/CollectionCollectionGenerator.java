@@ -10,7 +10,7 @@ package org.dspace.sword;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -26,7 +26,7 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator {
      * logger
      */
     private static Logger log =
-        Logger.getLogger(CollectionCollectionGenerator.class);
+        org.apache.logging.log4j.LogManager.getLogger(CollectionCollectionGenerator.class);
 
     protected CollectionService collectionService =
         ContentServiceFactory.getInstance().getCollectionService();

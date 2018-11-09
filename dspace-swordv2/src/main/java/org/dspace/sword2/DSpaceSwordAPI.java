@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -52,7 +52,7 @@ import org.swordapp.server.SwordServerException;
 import org.swordapp.server.UriRegistry;
 
 public class DSpaceSwordAPI {
-    private static Logger log = Logger.getLogger(DSpaceSwordAPI.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceSwordAPI.class);
 
     protected ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();

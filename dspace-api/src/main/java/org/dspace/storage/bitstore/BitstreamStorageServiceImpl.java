@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.content.Bitstream;
@@ -62,7 +62,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     /**
      * log4j log
      */
-    private static Logger log = Logger.getLogger(BitstreamStorageServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamStorageServiceImpl.class);
 
     @Autowired(required = true)
     protected BitstreamService bitstreamService;

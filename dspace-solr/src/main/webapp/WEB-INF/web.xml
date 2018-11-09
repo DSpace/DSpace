@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-        "http://java.sun.com/dtd/web-app_2_3.dtd">
 <!--
 
     The contents of this file are subject to the license and copyright
@@ -11,7 +9,11 @@
 
 -->
 
-<web-app>
+<web-app version='2.5'
+         xmlns='http://java.sun.com/xml/ns/javaee'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://java.sun.com/xml/ns/javaee
+	      http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd'>
 
     <!-- Uncomment if you are trying to use a Resin version before 3.0.19.
       Their XML implementation isn't entirely compatible with Xerces.
@@ -24,31 +26,34 @@
                "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl"/>
      -->
 
-    <!-- People who want to hardcode their "Solr Home" directly into the
-         WAR File can set the JNDI property here...
-     -->
-    <!--
-      <env-entry>
-         <env-entry-name>solr/home</env-entry-name>
-         <env-entry-value>/put/your/solr/home/here</env-entry-value>
-         <env-entry-type>java.lang.String</env-entry-type>
-      </env-entry>
-     -->
     <env-entry>
+        <description>Solr home:  configuration, cores etc.</description>
         <env-entry-name>solr/home</env-entry-name>
         <env-entry-value>${dspace.dir}/solr</env-entry-value>
         <env-entry-type>java.lang.String</env-entry-type>
     </env-entry>
 
     <!-- Tell Solr where its log4j configuration is located -->
-    <!-- NOTE: Solr cannot use the default DSpace log4j configuration as it isn't
-         initialized until the DSpace Kernel starts up, and we don't want Solr to
-         depend on the DSpace Kernel/API -->
+    <!-- NOTE: Solr cannot use the default DSpace log4j configuration as it
+         isn't initialized until the DSpace Kernel starts up, and we don't want
+         Solr to depend on the DSpace Kernel/API -->
     <context-param>
-        <param-name>log4j.configuration</param-name>
-        <param-value>${dspace.dir}/config/log4j-solr.properties</param-value>
-        <description>URL locating a Log4J configuration file (properties or XML).</description>
+        <description>
+	    URL locating a Log4J configuration file (properties or XML).
+	</description>
+        <param-name>log4jConfiguration</param-name>
+        <param-value>${dspace.dir}/config/log4j-solr.xml</param-value>
     </context-param>
+
+    <listener>
+        <listener-class>org.apache.logging.log4j.web.Log4jServletContextListener</listener-class>
+    </listener>
+
+    <filter>
+        <description>Activate logging</description>
+        <filter-name>log4jServletFilter</filter-name>
+        <filter-class>org.apache.logging.log4j.web.Log4jServletFilter</filter-class>
+    </filter>
 
     <!-- Any path (name) registered in solrconfig.xml will be sent to that filter -->
     <filter>
@@ -83,6 +88,14 @@
         -->
     </filter>
 
+    <filter-mapping>
+        <filter-name>log4jServletFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
 
     <filter-mapping>
         <filter-name>LocalHostRestrictionFilter</filter-name>
@@ -105,10 +118,6 @@
     </filter-mapping>
 
     <!-- Otherwise it will continue to the old servlets -->
-
-    <listener>
-        <listener-class>org.dspace.solr.filters.ConfigureLog4jListener</listener-class>
-    </listener>
 
     <servlet>
         <servlet-name>Zookeeper</servlet-name>

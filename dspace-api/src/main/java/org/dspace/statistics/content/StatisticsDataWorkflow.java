@@ -22,7 +22,7 @@ import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -46,7 +46,7 @@ import org.dspace.statistics.content.filter.StatisticsFilter;
  */
 public class StatisticsDataWorkflow extends StatisticsData {
 
-    private static final Logger log = Logger.getLogger(StatisticsDataWorkflow.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StatisticsDataWorkflow.class);
 
     /**
      * Current DSpaceObject for which to generate the statistics.

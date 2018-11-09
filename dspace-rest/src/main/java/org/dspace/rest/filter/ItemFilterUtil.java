@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import com.ibm.icu.util.Calendar;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -25,7 +25,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class ItemFilterUtil {
     protected static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    static Logger log = Logger.getLogger(ItemFilterUtil.class);
+    static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemFilterUtil.class);
 
     public enum BundleName { ORIGINAL, TEXT, LICENSE, THUMBNAIL }
 

@@ -19,7 +19,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.rdf.RDFUtil;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -29,7 +29,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class NegotiationFilter implements Filter {
     public static final String ACCEPT_HEADER_NAME = "Accept";
 
-    private static final Logger log = Logger.getLogger(NegotiationFilter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(NegotiationFilter.class);
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

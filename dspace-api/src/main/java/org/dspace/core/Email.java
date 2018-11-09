@@ -37,7 +37,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -139,7 +139,7 @@ public class Email {
      */
     private String charset;
 
-    private static final Logger log = Logger.getLogger(Email.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Email.class);
 
     /**
      * Create a new email message.

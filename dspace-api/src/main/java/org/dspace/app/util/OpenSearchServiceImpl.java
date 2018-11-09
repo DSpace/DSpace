@@ -20,7 +20,7 @@ import com.sun.syndication.feed.module.opensearch.OpenSearchModule;
 import com.sun.syndication.feed.module.opensearch.entity.OSQuery;
 import com.sun.syndication.feed.module.opensearch.impl.OpenSearchModuleImpl;
 import com.sun.syndication.io.FeedException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
@@ -54,7 +54,7 @@ import org.w3c.dom.Document;
  * @author Richard Rodgers
  */
 public class OpenSearchServiceImpl implements OpenSearchService, InitializingBean {
-    private static final Logger log = Logger.getLogger(OpenSearchServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenSearchServiceImpl.class);
 
     // are open search queries enabled?
     protected boolean enabled = false;

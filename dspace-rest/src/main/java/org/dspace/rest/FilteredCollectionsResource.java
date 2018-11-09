@@ -24,7 +24,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -45,7 +45,7 @@ public class FilteredCollectionsResource extends Resource {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    private static Logger log = Logger.getLogger(FilteredCollectionsResource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(FilteredCollectionsResource.class);
 
     /**
      * Return array of all collections in DSpace. You can add more properties

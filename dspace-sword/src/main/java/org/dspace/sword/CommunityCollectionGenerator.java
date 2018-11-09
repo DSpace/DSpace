@@ -10,7 +10,8 @@ package org.dspace.sword;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
@@ -19,8 +20,7 @@ import org.dspace.content.service.CommunityService;
 import org.purl.sword.base.Collection;
 
 public class CommunityCollectionGenerator extends ATOMCollectionGenerator {
-    private static Logger log = Logger
-        .getLogger(CommunityCollectionGenerator.class);
+    private static Logger log = LogManager.getLogger(CommunityCollectionGenerator.class);
 
     protected CommunityService communityService = ContentServiceFactory
         .getInstance().getCommunityService();

@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.BitstreamFormatDAO;
@@ -33,7 +33,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(BitstreamFormat.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamFormat.class);
 
     @Autowired(required = true)
     protected BitstreamFormatDAO bitstreamFormatDAO;

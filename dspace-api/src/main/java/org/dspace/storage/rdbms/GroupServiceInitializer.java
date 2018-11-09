@@ -9,7 +9,7 @@ package org.dspace.storage.rdbms;
 
 import java.sql.Connection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.service.GroupService;
 import org.flywaydb.core.api.MigrationInfo;
@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class GroupServiceInitializer implements FlywayCallback {
 
-    private final Logger log = Logger.getLogger(GroupServiceInitializer.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(GroupServiceInitializer.class);
 
     @Autowired(required = true)
     protected GroupService groupService;

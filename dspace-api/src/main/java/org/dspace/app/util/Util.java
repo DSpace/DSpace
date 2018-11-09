@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -44,7 +44,7 @@ public class Util {
     // cache for source version result
     private static String sourceVersion = null;
 
-    private static Logger log = Logger.getLogger(Util.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Util.class);
 
     /**
      * Default constructor. Must be protected as org.dspace.xmlworkflow.WorkflowUtils extends it

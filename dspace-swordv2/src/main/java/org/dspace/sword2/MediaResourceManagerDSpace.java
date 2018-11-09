@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -41,7 +41,7 @@ import org.swordapp.server.UriRegistry;
 
 public class MediaResourceManagerDSpace extends DSpaceSwordAPI
     implements MediaResourceManager {
-    private static Logger log = Logger
+    private static Logger log = org.apache.logging.log4j.LogManager
         .getLogger(MediaResourceManagerDSpace.class);
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory
