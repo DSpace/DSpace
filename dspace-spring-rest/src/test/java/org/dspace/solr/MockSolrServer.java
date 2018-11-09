@@ -13,13 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-<<<<<<< HEAD
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
-=======
-import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
->>>>>>> [DS-3695] Upgrade Solr *client* to 7.3.0.
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
