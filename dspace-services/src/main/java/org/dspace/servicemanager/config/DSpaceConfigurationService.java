@@ -360,6 +360,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             value = ((String) value).trim();
         }
 
+        Configuration configuration = getConfiguration();
         boolean isNew = !configuration.containsKey(name);
         configuration.addProperty(name, value);
         return isNew;
