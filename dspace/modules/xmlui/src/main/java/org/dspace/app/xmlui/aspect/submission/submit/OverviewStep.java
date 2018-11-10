@@ -1,5 +1,6 @@
 package org.dspace.app.xmlui.aspect.submission.submit;
 
+import org.datadryad.api.DryadDataPackage;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.utils.UIException;
@@ -67,7 +68,9 @@ public class OverviewStep extends AbstractStep {
         helpDivision.setHead(T_MAIN_HEAD);
         helpDivision.addPara(T_MAIN_HELP);
 
-        if (publication.checkForDuplicateItems(context)) {
+        DryadDataPackage dryadDataPackage = new DryadDataPackage(publication);
+        dryadDataPackage.updateDuplicatePackages(context);
+        if (dryadDataPackage.getDuplicatePackages(context).size() > 0) {
             Division dupDivision = body.addDivision("duplicate-info", "duplicate-info");
             dupDivision.addPara(T_DUP_SUBMISSION);
         }

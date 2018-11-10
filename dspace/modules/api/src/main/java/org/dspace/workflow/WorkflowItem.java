@@ -1,6 +1,7 @@
 package org.dspace.workflow;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
@@ -283,11 +284,7 @@ public class WorkflowItem implements InProgressSubmission {
                     matchingItems.add(wfi);
                 }
             }
-        } catch (SQLException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (AuthorizeException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             throw new ApproveRejectReviewItemException(ex);
         }
 
@@ -296,36 +293,28 @@ public class WorkflowItem implements InProgressSubmission {
 
     private boolean compareToManuscript(Manuscript manuscript, StringBuilder result) {
         boolean matched = false;
-        Item item = getItem();
+        DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(ourContext, getID());
         // make sure this isn't matching a former msid:
-        if (JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item,manuscript)) {
-            log.error("manuscript number " + manuscript.getManuscriptId() + " matches a former msid for item " + item.getID());
+        if (JournalUtils.manuscriptIsKnownFormerManuscriptNumber(dryadDataPackage, manuscript)) {
+            log.error("manuscript number " + manuscript.getManuscriptId() + " matches a former msid for package " + dryadDataPackage.getIdentifier());
             return false;
         }
         // check to see if this matches by msid:
-        DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
-        if (msids != null && msids.length > 0) {
-            DCValue msid = msids[0];
-            try {
-                String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msid.value, manuscript.getJournalConcept());
-                if (manuscript.getManuscriptId().equals(canonicalMSID)) {
-                    log.debug("matched " + item.getID() + " by msid");
-                    matched = true;
-                }
-            } catch (Exception e) {
-                log.error("couldn't parse msid " + msid.value);
+        String msid = dryadDataPackage.getManuscriptNumber();
+        if (msid != null) {
+            String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msid, manuscript.getJournalConcept());
+            if (manuscript.getManuscriptId().equals(canonicalMSID)) {
+                log.debug("matched " + dryadDataPackage.getIdentifier() + " by msid");
+                matched = true;
             }
         }
 
         if (!matched) {
             // compare authors: if they all match, compare titles.
-            if (JournalUtils.compareItemAuthorsToManuscript(item, manuscript, result) == manuscript.getAuthorList().size()) {
+            if (JournalUtils.comparePackageAuthorsToManuscript(dryadDataPackage, manuscript, result) == manuscript.getAuthorList().size()) {
                 // compare titles
-                DCValue[] titles = item.getMetadata("dc", "title", Item.ANY, Item.ANY);
-                if (titles != null && titles.length > 0) {
-                    DCValue title = titles[0];
-                    matched = JournalUtils.compareTitleToManuscript(title.value.replace("Data from: ", ""), manuscript, 0.4, result);
-                }
+                String title = dryadDataPackage.getTitle();
+                matched = JournalUtils.compareTitleToManuscript(title.replace("Data from: ", ""), manuscript, 0.4, result);
             }
         }
         return matched;

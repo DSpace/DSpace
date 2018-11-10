@@ -30,7 +30,7 @@ public class Author {
     private String identifier;
     private String identifierType;
 
-    private static final String ORCID_TYPE = "ORCID";
+    public static final String ORCID_TYPE = "ORCID";
     public Author() {}
 
     public Author(String familyName, String givenNames) {

@@ -5,6 +5,7 @@ package org.datadryad.rest.models;
 import java.lang.Exception;
 import java.lang.Override;
 import java.lang.String;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.dspace.JournalUtils;
 import org.dspace.content.DCValue;
 import org.dspace.identifier.DOIIdentifierProvider;
@@ -29,6 +31,7 @@ import org.datadryad.api.DryadJournalConcept;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.content.authority.Choices;
+import org.dspace.workflow.ApproveRejectReviewItemException;
 
 /**
  *
@@ -239,6 +242,16 @@ public class Manuscript {
                 this.keywords.add(keyword);
             }
         }
+    }
+
+    public Manuscript(DryadDataPackage dryadDataPackage) {
+        journalConcept = JournalUtils.getJournalConceptByJournalName(dryadDataPackage.getPublicationName());
+        setManuscriptId(dryadDataPackage.getManuscriptNumber());
+        setPublicationDOI(dryadDataPackage.getPublicationDOI());
+        String title = dryadDataPackage.getTitle().replaceAll("Data from: ", "");
+        setTitle(title);
+        List<Author> authorList = dryadDataPackage.getAuthors();
+        setAuthorsFromList(authorList);
     }
 
     public Manuscript(Item item) {
@@ -536,7 +549,7 @@ public class Manuscript {
         if (manuscriptMatcher.find()) {
             return "doi:" + manuscriptMatcher.group(0);
         } else {
-            return null;
+            return "";
         }
     }
 
@@ -821,6 +834,21 @@ public class Manuscript {
         }
     }
 
+    public static Boolean statusIsApproved(String status) throws ApproveRejectReviewItemException {
+        Boolean approved = null;
+        if (Manuscript.statusIsAccepted(status)) {
+            approved = true;
+        } else if (Manuscript.statusIsRejected(status)) {
+            approved = false;
+        } else if (Manuscript.statusIsNeedsRevision(status)) {
+            approved = false;
+        } else if (Manuscript.statusIsPublished(status)) {
+            approved = true;
+        } else {
+            throw new ApproveRejectReviewItemException("Status " + status + " is neither approved nor rejected");
+        }
+        return approved;
+    }
 
 
     @Override

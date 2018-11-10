@@ -98,7 +98,7 @@ public class DryadDataFile extends DryadObject {
         return dataPackage;
     }
 
-    private void clearIsPartOf() throws SQLException {
+    private void clearIsPartOf() {
         getItem().clearMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, Item.ANY);
     }
 
@@ -173,12 +173,12 @@ public class DryadDataFile extends DryadObject {
         return isEmbargoed;
     }
 
-    public void clearEmbargo() throws SQLException {
+    public void clearEmbargo() {
         addSingleMetadataValue(Boolean.TRUE, EMBARGO_TYPE_SCHEMA, EMBARGO_TYPE_ELEMENT, EMBARGO_TYPE_QUALIFIER, Item.ANY, null);
         addSingleMetadataValue(Boolean.TRUE, EMBARGO_DATE_SCHEMA, EMBARGO_DATE_ELEMENT, EMBARGO_DATE_QUALIFIER, Item.ANY, null);
     }
 
-    public void setEmbargo(String embargoType, Date liftDate) throws SQLException {
+    public void setEmbargo(String embargoType, Date liftDate) {
         if(!DryadEmbargoTypes.validate(embargoType)) {
             throw new IllegalArgumentException("EmbargoType '"
                     + embargoType + "' is not valid");
