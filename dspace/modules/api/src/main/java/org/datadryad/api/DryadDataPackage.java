@@ -422,6 +422,10 @@ public class DryadDataPackage extends DryadObject {
         authors.add(author);
     }
 
+    public void clearAuthors() {
+        authors = new ArrayList<>();
+    }
+
     public List<DryadDataPackage> getDuplicatePackages(Context context) {
         ArrayList<DryadDataPackage> resultList = new ArrayList<>();
         try {

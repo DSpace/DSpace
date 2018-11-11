@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
@@ -45,13 +44,21 @@ public class Package {
     static {
     }
 
-    public Package() {} // JAXB needs this
+    public Package() {
+        this.dataPackage = new DryadDataPackage();
+    } // JAXB needs this
 
     public Package(DryadDataPackage dataPackage) {
         this.dataPackage = dataPackage;
         if (this.dataPackage.getItem() != null) {
             this.itemID = dataPackage.getItem().getID();
+        } else {
+            this.itemID = 0;
         }
+    }
+
+    public DryadDataPackage getDataPackage() {
+        return dataPackage;
     }
 
     public Integer getItemID() {
@@ -66,8 +73,23 @@ public class Package {
         return publicationDOI;
     }
 
+    public void setPublicationDOI(String doi) {
+        dataPackage.setPublicationDOI(doi);
+    }
+
     public String getPublicationDate() {
         return sdf.format(dataPackage.getDateAccessioned());
+    }
+
+    public void setPublicationDate(String date) {
+        dataPackage.setPublicationDate(date);
+    }
+
+    public void setAuthors(List<Author> authorList) {
+        dataPackage.clearAuthors();
+        for (Author author : authorList) {
+            dataPackage.addAuthor(author);
+        }
     }
 
     public AuthorsList getAuthors() {
@@ -89,8 +111,24 @@ public class Package {
         return dataPackage.getKeywords();
     }
 
+    public void setKeywords(List<String> keywords) {
+        dataPackage.setKeywords(keywords);
+    }
+
     public String getDryadDOI() {
         return dataPackage.getDryadDOI();
+    }
+
+    public void setDryadDOI(String doi) {
+        dataPackage.setIdentifier(doi);
+    }
+
+    public String getManuscriptNumber() {
+        return dataPackage.getManuscriptNumber();
+    }
+
+    public void setManuscriptNumber(String msID) {
+        dataPackage.setManuscriptNumber(msID);
     }
 
     @JsonIgnore
@@ -102,9 +140,17 @@ public class Package {
         return dataPackage.getTitle();
     }
 
+    public void setTitle(String title) {
+        dataPackage.setTitle(title);
+    }
+
     @JsonIgnore
     public String getAbstract() {
         return dataPackage.getAbstract();
+    }
+
+    public void setAbstract(String theAbstract) {
+        dataPackage.setAbstract(theAbstract);
     }
 
     @Override
