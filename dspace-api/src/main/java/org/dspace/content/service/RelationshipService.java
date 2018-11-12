@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
 
@@ -71,4 +72,8 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @throws SQLException If something goes wrong
      */
     int findRightPlaceByRightItem(Context context, Item item) throws SQLException;
+
+    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
+                                                            RelationshipType relationshipType)
+        throws SQLException;
 }

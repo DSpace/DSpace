@@ -638,6 +638,13 @@ public class MetadataImport {
 
 
             if (StringUtils.equals(schema, "relation")) {
+                List<RelationshipType> relationshipTypeList = relationshipTypeService.findByLeftOrRightLabel(c, element);
+                for (RelationshipType relationshipType : relationshipTypeList) {
+                    for (Relationship relationship : relationshipService.findByItemAndRelationshipType(c, item, relationshipType)) {
+                        relationshipService.delete(c, relationship);
+                        relationshipService.update(c, relationship);
+                    }
+                }
                 handleRelationMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
             } else {
                 itemService.clearMetadata(c, item, schema, element, qualifier, language);
@@ -671,7 +678,9 @@ public class MetadataImport {
             handleRelationTypeMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
 
         } else {
-            handleRelationOtherMetadata(c, item, element, values);
+            for (String value : values) {
+                handleRelationOtherMetadata(c, item, element, value);
+            }
         }
 
     }
@@ -682,21 +691,21 @@ public class MetadataImport {
      * @param c         The relevant DSpace context
      * @param item      The item that the relationships will be made for
      * @param element   The string determining which relationshiptype is to be used
-     * @param values    The value for the relationship
+     * @param value    The value for the relationship
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    private void handleRelationOtherMetadata(Context c, Item item, String element, List<String> values)
+    private void handleRelationOtherMetadata(Context c, Item item, String element, String value)
         throws SQLException, AuthorizeException {
         Entity entity = entityService.findByItemId(c, item.getID());
         boolean left = false;
         List<RelationshipType> acceptableRelationshipTypes = new LinkedList<>();
-        String url = handleService.resolveToURL(c, values.get(0));
-        if (UUIDUtils.fromString(values.get(0)) == null && StringUtils.isNotBlank(url)) {
+        String url = handleService.resolveToURL(c, value);
+        if (UUIDUtils.fromString(value) == null && StringUtils.isNotBlank(url)) {
             return;
         }
 
-        Entity relationEntity = entityService.findByItemId(c, UUID.fromString(values.get(0)));
+        Entity relationEntity = entityService.findByItemId(c, UUID.fromString(value));
 
 
         List<RelationshipType> leftRelationshipTypesForEntity = entityService.getLeftRelationshipTypes(c, entity);
@@ -727,30 +736,30 @@ public class MetadataImport {
             return;
         }
 
-        buildRelationObject(c, item, values, left, acceptableRelationshipTypes);
+        buildRelationObject(c, item, value, left, acceptableRelationshipTypes);
     }
 
     /**
      * This method creates the relationship for the item and stores it in the database
      * @param c         The relevant DSpace context
      * @param item      The item for which this relationship will be constructed
-     * @param values    The value for the relationship
+     * @param value    The value for the relationship
      * @param left      A boolean indicating whether the item is the leftItem or the rightItem
      * @param acceptableRelationshipTypes   The acceptable relationship types
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    private void buildRelationObject(Context c, Item item, List<String> values, boolean left,
+    private void buildRelationObject(Context c, Item item, String value, boolean left,
                                      List<RelationshipType> acceptableRelationshipTypes)
         throws SQLException, AuthorizeException {
         Relationship relationship = new Relationship();
         RelationshipType acceptedRelationshipType = acceptableRelationshipTypes.get(0);
         if (left) {
             relationship.setLeftItem(item);
-            relationship.setRightItem(itemService.findByIdOrLegacyId(c, values.get(0)));
+            relationship.setRightItem(itemService.findByIdOrLegacyId(c, value));
         } else {
             relationship.setRightItem(item);
-            relationship.setLeftItem(itemService.findByIdOrLegacyId(c, values.get(0)));
+            relationship.setLeftItem(itemService.findByIdOrLegacyId(c, value));
         }
         relationship.setRelationshipType(acceptedRelationshipType);
         relationship.setLeftPlace(relationshipService.findLeftPlaceByLeftItem(c, relationship.getLeftItem()) + 1);

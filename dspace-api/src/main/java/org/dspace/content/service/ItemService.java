@@ -648,6 +648,6 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @param item  The Item that will be processed through it's Relationships
      * @return      The list of MetadataValue objects constructed through the Relationships
      */
-    public List<MetadataValue> getRelationshipMetadata(Item item);
+    public List<MetadataValue> getRelationshipMetadata(Item item, boolean extra);
 
 }

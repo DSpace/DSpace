@@ -294,4 +294,17 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
         return listToReturn;
     }
+
+    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
+                                                            RelationshipType relationshipType)
+        throws SQLException {
+        List<Relationship> list = this.findByItem(context, item);
+        List<Relationship> listToReturn = new LinkedList<>();
+        for (Relationship relationship : list) {
+            if (relationship.getRelationshipType().equals(relationshipType)) {
+                listToReturn.add(relationship);
+            }
+        }
+        return listToReturn;
+    }
 }

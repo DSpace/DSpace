@@ -8,6 +8,7 @@
 package org.dspace.content.dao;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
@@ -36,5 +37,6 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
     RelationshipType findbyTypesAndLabels(Context context,
                                           EntityType leftType,EntityType rightType,String leftLabel,String rightLabel)
                                                 throws SQLException;
+    List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException;
 
 }
