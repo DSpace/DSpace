@@ -638,9 +638,13 @@ public class MetadataImport {
 
 
             if (StringUtils.equals(schema, "relation")) {
-                List<RelationshipType> relationshipTypeList = relationshipTypeService.findByLeftOrRightLabel(c, element);
+                List<RelationshipType> relationshipTypeList = relationshipTypeService
+                                                                .findByLeftOrRightLabel(c, element);
                 for (RelationshipType relationshipType : relationshipTypeList) {
-                    for (Relationship relationship : relationshipService.findByItemAndRelationshipType(c, item, relationshipType)) {
+                    for (Relationship relationship : relationshipService
+                                                        .findByItemAndRelationshipType(c,
+                                                                                       item,
+                                                                                       relationshipType)) {
                         relationshipService.delete(c, relationship);
                         relationshipService.update(c, relationship);
                     }
