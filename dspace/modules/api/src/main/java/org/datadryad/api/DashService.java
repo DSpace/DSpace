@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
-import org.datadryad.api.DryadDataFile;
+import org.datadryad.rest.models.Package;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Bitstream;
@@ -163,15 +163,16 @@ public class DashService {
        existing submission (using the DOI contained in the Data Package).
 
        @return a HTTP response code
-    **/
-    public int putDataPackage(DryadDataPackage dataPackage) {
-        String dashJSON = dataPackage.getDashJSON();
+    *
+     * @param pkg*/
+    public int putDataset(Package pkg) {
+        String dashJSON = pkg.getDataPackage().getDashJSON();
         log.debug("Got JSON object: " + dashJSON);
         int responseCode = 0;
         BufferedReader reader = null;
 
         try {
-            String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
+            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getIdentifier(), "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -200,7 +201,7 @@ public class DashService {
 
             if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
                 log.debug("package create/update successful");
-                dataPackage.addDashTransferDate();
+                pkg.getDataPackage().addDashTransferDate();
             } else {
                 log.fatal("Unable to send item to DASH, response: " + responseCode +
                           connection.getResponseMessage());

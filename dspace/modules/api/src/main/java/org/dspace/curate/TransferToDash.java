@@ -12,6 +12,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DashService;
+import org.datadryad.rest.models.Package;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -76,7 +77,7 @@ public class TransferToDash extends AbstractCurationTask {
         } else if (dso.getType() == Constants.ITEM) {
             DryadDataPackage dataPackage = new DryadDataPackage((Item)dso);
             String packageDOI = dataPackage.getIdentifier();
-            dashService.putDataPackage(dataPackage);
+            dashService.putDataset(new Package(dataPackage));
             dashService.postDataFileReferences(context, dataPackage);
             dashService.submitDashDataset(packageDOI);
             
