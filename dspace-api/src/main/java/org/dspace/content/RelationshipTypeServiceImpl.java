@@ -84,4 +84,8 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
         }
         relationshipTypeDAO.delete(context, relationshipType);
     }
+
+    public List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException {
+        return relationshipTypeDAO.findByLeftOrRightLabel(context, label);
+    }
 }

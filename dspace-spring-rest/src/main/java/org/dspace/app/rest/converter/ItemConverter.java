@@ -96,7 +96,7 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
 
         List<MetadataValue> fullList = new LinkedList<>();
         fullList.addAll(obj.getMetadata());
-        fullList.addAll(itemService.getRelationshipMetadata(obj));
+        fullList.addAll(itemService.getRelationshipMetadata(obj, true));
 
         List<MetadataEntryRest> metadata = super.convertMetadataToRest(fullList);
         item.setMetadata(metadata);
