@@ -74,7 +74,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         if (!leftRelationships.isEmpty()) {
             leftRelationships.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
             for (int i = 0; i < leftRelationships.size(); i++) {
-                leftRelationships.get(i).setLeftPlace(i + 1);
+                leftRelationships.get(leftRelationships.size() - 1 - i).setLeftPlace(i + 1);
             }
             relationship.setLeftPlace(leftRelationships.get(0).getLeftPlace() + 1);
         } else {
@@ -84,7 +84,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         if (!rightRelationships.isEmpty()) {
             rightRelationships.sort((o1, o2) -> o2.getRightPlace() - o1.getRightPlace());
             for (int i = 0; i < rightRelationships.size(); i++) {
-                rightRelationships.get(i).setRightPlace(i + 1);
+                rightRelationships.get(rightRelationships.size() - 1 - i).setRightPlace(i + 1);
             }
             relationship.setRightPlace(rightRelationships.get(0).getRightPlace() + 1);
         } else {
