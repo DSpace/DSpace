@@ -385,6 +385,156 @@ public class DashService {
         return responseCode;
     }
 
+    public JsonNode getInternalData(Package pkg) {
+        BufferedReader reader = null;
+
+        try {
+            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getIdentifier(), "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/internal_data");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+            connection.setRequestMethod("GET");
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = null;
+            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+            ObjectMapper m = new ObjectMapper();
+            JsonNode rootNode = m.readTree(out.toString());
+            if (rootNode.isArray()) {
+                return rootNode;
+            }
+        } catch (Exception e) {
+            log.fatal("Unable to send item to DASH", e);
+        }
+        return null;
+    }
+
+    public String getPublicationISSN(Package pkg) {
+        JsonNode resultNode = getInternalData(pkg);
+        for (int i=0; i < resultNode.size(); i++) {
+            if (resultNode.get(i).get("data_type").textValue().equals("publicationISSN")) {
+                return resultNode.get(i).get("value").textValue();
+            }
+        }
+        return "";
+    }
+
+    public int setPublicationISSN(Package pkg, String ISSN) {
+        return postInternalDatum(pkg, "set", "publicationISSN", ISSN);
+    }
+
+    public int setManuscriptNumber(Package pkg, String msid) {
+        return postInternalDatum(pkg, "set", "manuscriptNumber", msid);
+    }
+
+    public String getManuscriptNumber(Package pkg) {
+        JsonNode resultNode = getInternalData(pkg);
+        for (int i=0; i < resultNode.size(); i++) {
+            if (resultNode.get(i).get("data_type").textValue().equals("manuscriptNumber")) {
+                return resultNode.get(i).get("value").textValue();
+            }
+        }
+        return "";
+    }
+
+    public int addFormerManuscriptNumber(Package pkg, String formerMSID) {
+        return postInternalDatum(pkg, "add", "formerManuscriptNumber", formerMSID);
+    }
+
+    public List<String> getFormerManuscriptNumbers(Package pkg) {
+        ArrayList<String> result = new ArrayList<>();
+        JsonNode resultNode = getInternalData(pkg);
+        for (int i=0; i < resultNode.size(); i++) {
+            if (resultNode.get(i).get("data_type").textValue().equals("formerManuscriptNumber")) {
+                result.add(resultNode.get(i).get("value").textValue());
+            }
+        }
+        return result;
+    }
+
+    public int addMismatchedDOI(Package pkg, String mismatchedDOI) {
+        return postInternalDatum(pkg, "add", "mismatchedDOI", mismatchedDOI);
+    }
+
+    public List<String> getMismatchedDOIs(Package pkg) {
+        ArrayList<String> result = new ArrayList<>();
+        JsonNode resultNode = getInternalData(pkg);
+        for (int i=0; i < resultNode.size(); i++) {
+            if (resultNode.get(i).get("data_type").textValue().equals("mismatchedDOI")) {
+                result.add(resultNode.get(i).get("value").textValue());
+            }
+        }
+        return result;
+    }
+
+    public int addDuplicateItem(Package pkg, String duplicateItem) {
+        Pattern itemIDPattern = Pattern.compile("\\d+");
+        if (itemIDPattern.matcher(duplicateItem).matches()) {
+            duplicateItem = pkg.getDryadDOI();
+        }
+        return postInternalDatum(pkg, "add", "duplicateItem", duplicateItem);
+    }
+
+    public List<String> getDuplicateItems(Package pkg) {
+        ArrayList<String> result = new ArrayList<>();
+        JsonNode resultNode = getInternalData(pkg);
+        for (int i=0; i < resultNode.size(); i++) {
+            if (resultNode.get(i).get("data_type").textValue().equals("duplicateItem")) {
+                result.add(resultNode.get(i).get("value").textValue());
+            }
+        }
+        return result;
+    }
+
+    private int postInternalDatum(Package pkg, String requestType, String dataType, String value) {
+        String dashJSON = "{\"data_type\": \"" + dataType + "\", \"value\": \"" + value + "\"}";
+        int responseCode = 0;
+        BufferedReader reader = null;
+
+        try {
+            String encodedDOI = URLEncoder.encode(pkg.getDryadDOI(), "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/" + requestType + "_internal_datum");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+
+            OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+            wr.write(dashJSON);
+            wr.close();
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = null;
+            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+            String response = out.toString();
+
+            responseCode = connection.getResponseCode();
+
+            if (responseCode == 200 || responseCode == 201 || responseCode == 202) {
+                log.debug("internal datum added");
+            } else {
+                log.fatal("Unable to send internal datum to DASH, response: " + responseCode +
+                        connection.getResponseMessage());
+            }
+
+            log.info("result object " + response);
+        } catch (Exception e) {
+            log.fatal("Unable to send internal datum to DASH", e);
+        }
+
+        return responseCode;
+    }
+
     public List<DryadDataPackage> findAllUnpublishedPackagesWithISSN(String issn) {
         String[] unpublishedStatuses = {
                 "Unsubmitted",
