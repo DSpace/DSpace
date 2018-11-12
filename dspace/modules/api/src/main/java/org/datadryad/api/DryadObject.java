@@ -192,9 +192,12 @@ public abstract class DryadObject {
     }
 
     public String getTitle() {
-        String result = getSingleMetadataValue(TITLE_SCHEMA, TITLE_ELEMENT, null);
-        if (result == null) {
-            result = "Untitled";
+        String result = "";
+        if (getItem() != null) {
+            result = getSingleMetadataValue(TITLE_SCHEMA, TITLE_ELEMENT, null);
+            result = (result == null) ? "" : result;
+        } else {
+            result = title;
         }
         return result;
     }

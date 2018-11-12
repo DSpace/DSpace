@@ -97,6 +97,7 @@ public class DryadDataPackage extends DryadObject {
     private String abstractString = "";
     private ArrayList<Author> authors = new ArrayList<>();
     private DryadJournalConcept journalConcept = null;
+    private String manuscriptNumber = "";
 
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
@@ -189,7 +190,7 @@ public class DryadDataPackage extends DryadObject {
             result = getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
             result = (result == null ? "" : result);
         } else {
-
+            result = manuscriptNumber;
         }
         return result;
     }
@@ -198,24 +199,34 @@ public class DryadDataPackage extends DryadObject {
         if (getItem() != null) {
             addSingleMetadataValue(Boolean.TRUE, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
         } else {
-
+            this.manuscriptNumber = manuscriptNumber;
         }
     }
 
     public List<String> getFormerManuscriptNumbers() {
-        return getMultipleMetadataValues(FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER);
+        if (getItem() != null) {
+            return getMultipleMetadataValues(FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER);
+        }
+        return new ArrayList<>();
     }
 
     public void setFormerManuscriptNumber(String manuscriptNumber) {
-        addSingleMetadataValue(Boolean.TRUE, FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.TRUE, FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
+        }
     }
 
     public List<String> getMismatchedDOIs() {
-        return getMultipleMetadataValues(MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER);
+        if (getItem() != null) {
+            return getMultipleMetadataValues(MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER);
+        }
+        return new ArrayList<>();
     }
 
     public void setMismatchedDOIs(String mismatchedDOI) {
-        addSingleMetadataValue(Boolean.TRUE, MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER, mismatchedDOI);
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.TRUE, MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER, mismatchedDOI);
+        }
     }
 
     public void setBlackoutUntilDate(Date blackoutUntilDate) {
@@ -304,15 +315,23 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public List<String> getKeywords() {
-        return getMultipleMetadataValues(KEYWORD_SCHEMA, KEYWORD_ELEMENT, null);
+        if (getItem() != null) {
+            return getMultipleMetadataValues(KEYWORD_SCHEMA, KEYWORD_ELEMENT, null);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public void setKeywords(List<String> keywords) {
-        addMultipleMetadataValues(Boolean.TRUE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+        if (getItem() != null) {
+            addMultipleMetadataValues(Boolean.TRUE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+        }
     }
 
     public void addKeywords(List<String> keywords) {
-        addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+        if (getItem() != null) {
+            addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+        }
     }
 
     public List<Author> getAuthors() {
@@ -769,10 +788,12 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public void addDashTransferDate() {
-        Date now = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
-        String transferDate = sdf.format(now);
-        addSingleMetadataValue(Boolean.FALSE, DASH_TRANSFER_SCHEMA, DASH_TRANSFER_ELEMENT, null, transferDate);
+        if (getItem() != null) {
+            Date now = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSSZ");
+            String transferDate = sdf.format(now);
+            addSingleMetadataValue(Boolean.FALSE, DASH_TRANSFER_SCHEMA, DASH_TRANSFER_ELEMENT, null, transferDate);
+        }
     }
 
     /**
