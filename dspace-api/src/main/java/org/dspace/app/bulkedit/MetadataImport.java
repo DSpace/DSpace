@@ -692,11 +692,12 @@ public class MetadataImport {
         boolean left = false;
         List<RelationshipType> acceptableRelationshipTypes = new LinkedList<>();
         String url = handleService.resolveToURL(c, values.get(0));
-        if (UUIDUtils.fromString(values.get(0)) == null && StringUtils.isNotBlank(url)) {
+        UUID uuid = UUIDUtils.fromString(values.get(0));
+        if (uuid == null && StringUtils.isNotBlank(url)) {
             return;
         }
 
-        Entity relationEntity = entityService.findByItemId(c, UUID.fromString(values.get(0)));
+        Entity relationEntity = entityService.findByItemId(c, uuid);
 
 
         List<RelationshipType> leftRelationshipTypesForEntity = entityService.getLeftRelationshipTypes(c, entity);
