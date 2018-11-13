@@ -23,7 +23,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
-	double checksimilarity = 0.5;	
+	double checksimilarity = 0.9;	
 	Map<String, Map<String, List<String[]>>> result = (Map<String, Map<String, List<String[]>>>) request.getAttribute("result");
 	Map<String, Map<String, Boolean>> haveSimilar = (Map<String, Map<String, Boolean>>)request.getAttribute("haveSimilar");
 	Map<String, DSpaceObject> mapItem = (Map<String, DSpaceObject>)request.getAttribute("items");

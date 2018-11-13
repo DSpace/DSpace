@@ -24,8 +24,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.lucene.search.spell.JaroWinklerDistance;
 import org.dspace.app.cris.integration.BindItemToRP;
-import org.dspace.app.cris.integration.NameResearcherPage;
+import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.servlet.DSpaceServlet;
@@ -51,6 +53,7 @@ import org.dspace.discovery.configuration.DiscoveryViewAndHighlightConfiguration
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
+import org.dspace.utils.DSpace;
 
 import it.cilea.osd.common.constants.Constants;
 
@@ -71,6 +74,12 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
     private Logger log = Logger.getLogger(AuthorityClaimServlet.class);
 
+    private DSpace dspace = new DSpace();
+    
+    private ApplicationService applicationService = dspace.getServiceManager()
+            .getServiceByName("applicationService",
+                    ApplicationService.class);
+    
     @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -119,12 +128,13 @@ public class AuthorityClaimServlet extends DSpaceServlet
         Map<String, Map<String, List<String[]>>> mapResult = new HashMap<String, Map<String, List<String[]>>>();
         Map<String, Map<String, Boolean>> haveSimilarResult = new HashMap<String, Map<String, Boolean>>();
         Map<String, DSpaceObject> mapItem = new HashMap<String, DSpaceObject>();
+        ResearcherPage rp = applicationService.getEntityByCrisId(crisID, ResearcherPage.class);
         for (Item ii : publications)
         {
             Map<String, List<String[]>> result = new HashMap<String, List<String[]>>();
             Map<String, Boolean> haveSimilar = new HashMap<String, Boolean>();
             String handle = ii.getHandle();
-            internalDoResult(context, handle, crisID, result, haveSimilar);
+            internalDoResult(context, handle, crisID, result, haveSimilar, rp);
             mapResult.put(handle, result);
             mapItem.put(handle, HandleManager.resolveToObject(context, handle));
             haveSimilarResult.put(handle, haveSimilar);
@@ -149,7 +159,9 @@ public class AuthorityClaimServlet extends DSpaceServlet
             throws SQLException, ServletException, IOException
     {
 
-        internalDoResult(context, handle, crisID, result, haveSimilar);
+        ResearcherPage rp = applicationService.getEntityByCrisId(crisID, ResearcherPage.class);
+        
+        internalDoResult(context, handle, crisID, result, haveSimilar, rp);
 
         request.setAttribute("item",
                 HandleManager.resolveToObject(context, handle));
@@ -166,8 +178,12 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
     private void internalDoResult(Context context, String handle, String crisID,
             Map<String, List<String[]>> result,
-            Map<String, Boolean> haveSimilar) throws SQLException
+            Map<String, Boolean> haveSimilar, ResearcherPage rp) throws SQLException
     {
+        
+        JaroWinklerDistance jaroWinklerDistance = new JaroWinklerDistance();
+        double checksimilarity = 0.9;
+        
         if (StringUtils.isNotBlank(handle))
         {
 
@@ -209,13 +225,15 @@ public class AuthorityClaimServlet extends DSpaceServlet
                     {
                         if (choices.total > 0)
                         {
-                            for (Choice choice : choices.values)
+                            choice : for (Choice choice : choices.values)
                             {
-                                if (crisID.equals(choice.authority))
-                                {
-                                    similar = choice.value;
-                                    haveSimilar.put(field, true);
-                                    break;
+                                for(String allname : rp.getAllNames()) {
+                                    if (crisID.equals(choice.authority) || allname.equals(choice.value) || jaroWinklerDistance.getDistance(allname,choice.value)>checksimilarity)
+                                    {
+                                        similar = meta.value;
+                                        haveSimilar.put(field, true);
+                                        break choice;
+                                    }
                                 }
                             }
                         }
