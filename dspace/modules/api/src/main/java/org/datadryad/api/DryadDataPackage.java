@@ -276,6 +276,8 @@ public class DryadDataPackage extends DryadObject {
     public void setFormerManuscriptNumber(String manuscriptNumber) {
         if (getItem() != null) {
             addSingleMetadataValue(Boolean.TRUE, FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
+        } else {
+            dashService.addFormerManuscriptNumber(new Package(this), this.getIdentifier());
         }
     }
 
@@ -289,6 +291,8 @@ public class DryadDataPackage extends DryadObject {
     public void setMismatchedDOIs(String mismatchedDOI) {
         if (getItem() != null) {
             addSingleMetadataValue(Boolean.TRUE, MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER, mismatchedDOI);
+        } else {
+            dashService.addMismatchedDOI(new Package(this), this.getIdentifier());
         }
     }
 
@@ -467,7 +471,7 @@ public class DryadDataPackage extends DryadObject {
                 getItem().addMetadata("dryad.duplicateItem", null, String.valueOf(getItem().getID()), null, Choices.CF_NOVALUE);
             }
         } else {
-
+            dashService.addDuplicateItem(new Package(this), this.getIdentifier());
         }
     }
 
