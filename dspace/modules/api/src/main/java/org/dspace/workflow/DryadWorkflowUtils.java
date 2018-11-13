@@ -2,7 +2,6 @@ package org.dspace.workflow;
 
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
@@ -79,11 +78,16 @@ public class DryadWorkflowUtils {
         return null;
     }
 
-    public static boolean isItemInReview(Context context, WorkflowItem wfi) throws SQLException {
+    public static boolean isItemInReview(Context context, WorkflowItem wfi) {
         boolean isInReview = false;
-        List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
-        if (claimedTasks != null && claimedTasks.size() > 0 && claimedTasks.get(0).getActionID().equals("reviewAction")) {
-            isInReview = true;
+        if (wfi == null) return false;
+        try {
+            List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
+            if (claimedTasks != null && claimedTasks.size() > 0 && claimedTasks.get(0).getActionID().equals("reviewAction")) {
+                isInReview = true;
+            }
+        } catch (SQLException e) {
+            log.error("SQL exception looking up whether item " + wfi.getItem().getID() + " is in review: " + e.getMessage());
         }
         return isInReview;
     }
@@ -145,7 +149,6 @@ public class DryadWorkflowUtils {
 
     public static ArrayList<Item> getDuplicateWorkflowItems(Context context, Item item, boolean includeArchived) {
         ArrayList<Item> duplicateItems = new ArrayList<Item>();
-        item.checkForDuplicateItems(context);
         DCValue[] dupItemIDs = item.getMetadata("dryad.duplicateItem");
         if (dupItemIDs != null && dupItemIDs.length > 0) {
             try {

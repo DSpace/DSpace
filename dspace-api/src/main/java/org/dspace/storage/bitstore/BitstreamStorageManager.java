@@ -21,6 +21,7 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.checker.BitstreamInfoDAO;
+import org.dspace.content.Bitstream;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -188,7 +189,7 @@ public class BitstreamStorageManager
 
         // bucket name
         if (s3BucketName == null || s3BucketName.length() == 0) {
-            s3BucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
+            s3BucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname").replace('.','-');
             log.warn("S3 BucketName is not configured, setting default: " + s3BucketName);
         }
 
@@ -569,29 +570,47 @@ public class BitstreamStorageManager
     {
         InputStream resultInputStream = null;
         TableRow bitstream = DatabaseManager.find(context, "bitstream", id);
-        int storeNumber = bitstream.getIntColumn("store_number");
         String sInternalId = bitstream.getStringColumn("internal_id");
-        
+        int storeNumber = bitstream.getIntColumn("store_number");
+       
         if(storeNumber == S3_ASSETSTORE) {
-            String key = getFullS3Key(sInternalId + "");
-            log.debug("retrieving item " + key + " from Amazon S3 bucket " + s3BucketName);
-            try {
-                //get tomorrow's date:
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.DAY_OF_YEAR, 2);
-                URL url = s3Service.generatePresignedUrl(s3BucketName, key, calendar.getTime());
-                resultInputStream = url.openStream();
-            } catch (Exception e) {
-                log.error("Unable to get S3 item " + key + " from bucket " + s3BucketName, e);
-                throw new IOException(e);
-            }
+            URL url = getS3AccessURL(sInternalId);
+            resultInputStream = url.openStream();
         } else {
             // retrieve from local file storage
             File file = getFile(bitstream);
             resultInputStream = (file != null) ? new FileInputStream(file) : null;
         }
+
+        if(resultInputStream == null) {
+            throw new IOException("Unable to open input stream for bitstream " + id);
+        }
         
         return resultInputStream;
+    }
+
+    /**
+       Returns a URL that allows access to a bitstream stored in Amazon S3.
+    **/
+    public static URL getS3AccessURL(Bitstream bitstream) throws SQLException {
+        return getS3AccessURL(bitstream.getInternalID());
+    }
+
+    private static URL getS3AccessURL(String sInternalId) {
+        String key = getFullS3Key(sInternalId + "");
+        URL url = null;
+        
+        log.debug("generating presigned URL for " + key + " from Amazon S3 bucket " + s3BucketName);
+        try {
+            //get a date slightly in the future for the expiration of the URL:
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_YEAR, 5);
+            url = s3Service.generatePresignedUrl(s3BucketName, key, calendar.getTime());
+        } catch (Exception e) {
+            log.error("Unable to get S3 presigned url " + key + " from bucket " + s3BucketName, e);
+        }
+
+        return url;
     }
 
     /**

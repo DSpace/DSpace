@@ -51,6 +51,9 @@ public abstract class DryadObject {
     // Package haspart file
     static final String RELATION_HASPART_QUALIFIER = "haspart";
 
+    private String title = "";
+    private String identifier = "";
+
     private static Logger log = Logger.getLogger(DryadObject.class);
 
     /* Considered using DCDate instead of a distinct SimpleDateFormat,
@@ -58,6 +61,9 @@ public abstract class DryadObject {
      * getting strings from dates. So we'd need our own formatter anyways
      */
     protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+    // no-arg constructor for Jackson
+    protected DryadObject() { }
 
     protected Item item;
     protected DryadObject(Item item) {
@@ -163,7 +169,14 @@ public abstract class DryadObject {
     }
 
     public String getIdentifier() {
-        return DOIIdentifierProvider.getDoiValue(getItem());
+        if (getItem() != null) {
+            return DOIIdentifierProvider.getDoiValue(getItem());
+        }
+        return identifier;
+    }
+
+    public void setIdentifier(String newIdentifier) {
+        identifier = newIdentifier;
     }
 
     protected void createIdentifier(Context context) throws SQLException, IdentifierException {
@@ -178,7 +191,7 @@ public abstract class DryadObject {
         }
     }
 
-    public String getTitle() throws SQLException {
+    public String getTitle() {
         String result = getSingleMetadataValue(TITLE_SCHEMA, TITLE_ELEMENT, null);
         if (result == null) {
             result = "Untitled";
@@ -186,8 +199,12 @@ public abstract class DryadObject {
         return result;
     }
 
-    public void setTitle(String newTitle) throws SQLException {
-        addSingleMetadataValue(Boolean.TRUE, TITLE_SCHEMA, TITLE_ELEMENT, null, newTitle);
+    public void setTitle(String newTitle) {
+        if (getItem() != null) {
+            addSingleMetadataValue(Boolean.TRUE, TITLE_SCHEMA, TITLE_ELEMENT, null, newTitle);
+        } else {
+            title = newTitle;
+        }
     }
 
     protected final void addToCollectionAndArchive(Collection collection) throws SQLException {
@@ -216,17 +233,17 @@ public abstract class DryadObject {
         return dateAccessioned;
     }
 
-    public void setDateAccessioned(Date dateAccessioned) throws SQLException {
+    public void setDateAccessioned(Date dateAccessioned) {
         String dateAccessionedString = formatDate(dateAccessioned);
         addSingleMetadataValue(Boolean.TRUE, DATE_ACCESSIONED_SCHEMA, DATE_ACCESSIONED_ELEMENT, DATE_ACCESSIONED_QUALIFIER, dateAccessionedString);
     }
 
     /* Metadata access */
-    protected void addSingleMetadataValue(Boolean clearFirst, String schema, String element, String qualifier, String value) throws SQLException {
+    protected void addSingleMetadataValue(Boolean clearFirst, String schema, String element, String qualifier, String value) {
         addSingleMetadataValue(clearFirst, schema, element, qualifier, null, value);
     }
 
-    protected void addSingleMetadataValue(Boolean clearFirst, String schema, String element, String qualifier, String language, String value) throws SQLException {
+    protected void addSingleMetadataValue(Boolean clearFirst, String schema, String element, String qualifier, String language, String value) {
         if(clearFirst) {
             getItem().clearMetadata(schema, element, qualifier, language == null ? Item.ANY : language);
         }
@@ -235,8 +252,8 @@ public abstract class DryadObject {
         }
         try {
             getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception setting " + schema + "." + element + "." + qualifier, ex);
+        } catch (Exception ex) {
+            log.error("Exception setting " + schema + "." + element + "." + qualifier, ex);
         }
     }
 
@@ -249,7 +266,7 @@ public abstract class DryadObject {
         return value;
     }
 
-    protected List<String> getMultipleMetadataValues(String schema, String element, String qualifier) throws SQLException {
+    protected List<String> getMultipleMetadataValues(String schema, String element, String qualifier) {
         List<String> values = new ArrayList<String>();
         DCValue[] metadata = item.getMetadata(schema, element, qualifier, Item.ANY);
         for(DCValue dcValue : metadata) {
@@ -258,11 +275,11 @@ public abstract class DryadObject {
         return values;
     }
 
-    protected void addMultipleMetadataValues(Boolean clearFirst, String schema, String element, String qualifier, List<String> values) throws SQLException {
+    protected void addMultipleMetadataValues(Boolean clearFirst, String schema, String element, String qualifier, List<String> values) {
         addMultipleMetadataValues(clearFirst, schema, element, qualifier, null, values);
     }
 
-    protected void addMultipleMetadataValues(Boolean clearFirst, String schema, String element, String qualifier, String language, List<String> values) throws SQLException {
+    protected void addMultipleMetadataValues(Boolean clearFirst, String schema, String element, String qualifier, String language, List<String> values) {
         if(clearFirst) {
             getItem().clearMetadata(schema, element, qualifier, language == null ? Item.ANY : language);
         }
@@ -273,8 +290,8 @@ public abstract class DryadObject {
         }
         try {
             getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception setting " + schema + "." + element + "." + qualifier, ex);
+        } catch (Exception ex) {
+            log.error("Exception setting " + schema + "." + element + "." + qualifier, ex);
         }
     }
 

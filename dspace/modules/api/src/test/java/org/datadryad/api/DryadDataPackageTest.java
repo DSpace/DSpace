@@ -198,27 +198,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
         result = dataPackage.getDataFiles(context).size();
         assertEquals(expResult, result);
     }
-
-    /**
-     * Test of indexOfValue method, of class DryadDataPackage.
-     */
-    @Test
-    public void testIndexOfValue() {
-        log.info("indexOfValue");
-        Integer numValues = 4;
-        DCValue[] dcValues = new DCValue[numValues];
-        for(Integer i=0;i<numValues;i++) {
-            dcValues[i] = new DCValue();
-            dcValues[i].value = String.format("Value %d", i * 100);
-        }
-
-        // "Value 200" should be at index 2
-        String value = "Value 200";
-        Integer expResult = 2;
-        Integer result = DryadDataPackage.indexOfValue(dcValues, value);
-        assertEquals(expResult, result);
-    }
-
+    
     /**
      * Test of setPublicationName method, of class DryadDataPackage.
      */

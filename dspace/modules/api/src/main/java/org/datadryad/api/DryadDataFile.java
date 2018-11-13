@@ -5,8 +5,10 @@ package org.datadryad.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -98,7 +100,7 @@ public class DryadDataFile extends DryadObject {
         return dataPackage;
     }
 
-    private void clearIsPartOf() throws SQLException {
+    private void clearIsPartOf() {
         getItem().clearMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, Item.ANY);
     }
 
@@ -173,12 +175,12 @@ public class DryadDataFile extends DryadObject {
         return isEmbargoed;
     }
 
-    public void clearEmbargo() throws SQLException {
+    public void clearEmbargo() {
         addSingleMetadataValue(Boolean.TRUE, EMBARGO_TYPE_SCHEMA, EMBARGO_TYPE_ELEMENT, EMBARGO_TYPE_QUALIFIER, Item.ANY, null);
         addSingleMetadataValue(Boolean.TRUE, EMBARGO_DATE_SCHEMA, EMBARGO_DATE_ELEMENT, EMBARGO_DATE_QUALIFIER, Item.ANY, null);
     }
 
-    public void setEmbargo(String embargoType, Date liftDate) throws SQLException {
+    public void setEmbargo(String embargoType, Date liftDate) {
         if(!DryadEmbargoTypes.validate(embargoType)) {
             throw new IllegalArgumentException("EmbargoType '"
                     + embargoType + "' is not valid");
@@ -234,6 +236,37 @@ public class DryadDataFile extends DryadObject {
         return result;
     }
 
+    public List<Bitstream> getAllBitstreams() {
+        List<Bitstream> bitstreamList = new ArrayList<Bitstream>();
+        Item item = getItem();
+                
+        Bitstream readme = getREADME();
+        if(readme != null) {
+            bitstreamList.add(readme);
+        }
+
+        Bitstream aBitstream = null;
+        try {
+            Bundle[] bundles = item.getBundles("ORIGINAL"); // anything not ORIGINAL is not a "real" bitstream
+            if (bundles.length == 0) {
+                log.error("Didn't find any original bundles for " + item.getHandle());
+                throw new IOException("data bundle for " + item.getHandle() + " not found");
+            }
+            log.debug("This object has " + bundles.length + " bundles");
+
+            for(int b = 0; b < bundles.length; b++) {
+                Bitstream[] bitstreams = bundles[b].getBitstreams();
+                for(int i = 0; i < bitstreams.length; i++) {
+                    bitstreamList.add(bitstreams[i]);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Unable to process bitstreams of type ORIGINAL", e);
+        }
+
+        return bitstreamList;
+    }
+
     public Bitstream getREADME() {
         Item item = getItem();
 
@@ -264,6 +297,17 @@ public class DryadDataFile extends DryadObject {
             }
         }
         return size;
+    }
+
+    public String getDescription() throws SQLException {
+        String theAbstract = getSingleMetadataValue("dc", "description", null);
+        String extraAbstract = getSingleMetadataValue("dc", "description", "abstract");
+
+        if (extraAbstract != null && extraAbstract.length() > 0) {
+            theAbstract = theAbstract + "\n" + extraAbstract;
+        }
+
+        return theAbstract;
     }
 
     @Override

@@ -15,6 +15,8 @@ import org.datadryad.api.DashService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * TransferToDash processes a data package and sends it to a DASH-based Dryad system.
@@ -39,13 +41,22 @@ public class TransferToDash extends AbstractCurationTask {
     
     private static Logger log = Logger.getLogger(TransferToDash.class);
     private static long total = 0;
+    private static int delaySecs = 0;
     private DashService dashService;
+    private Context context;
 
     
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
         super.init(curator, taskId);
         dashService = new DashService();
+        String stringDelaySecs = ConfigurationManager.getProperty("dash.submissions.delaySeconds");
+        try {
+            delaySecs = Integer.parseInt(stringDelaySecs);
+            context = new Context();
+        } catch (Exception e) {
+            log.error("Unable to initialize transfer", e);
+        }
     }
  
     
@@ -64,13 +75,19 @@ public class TransferToDash extends AbstractCurationTask {
             report("packageDOI");
         } else if (dso.getType() == Constants.ITEM) {
             DryadDataPackage dataPackage = new DryadDataPackage((Item)dso);
-            dashService.putDataPackage(dataPackage);
-            
             String packageDOI = dataPackage.getIdentifier();
+            dashService.putDataPackage(dataPackage);
+            dashService.postDataFileReferences(context, dataPackage);
+            dashService.submitDashDataset(packageDOI);
             
             // provide output for the console
             setResult("Last processed item = " + packageDOI);        
             report(packageDOI);
+            try {
+                Thread.sleep(delaySecs * 1000);
+            } catch (Exception e) {
+                // ignore
+            }
         } else {
             log.info("Skipping -- non-item DSpace object");
             setResult("Object skipped (not an item)");

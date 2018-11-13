@@ -34,7 +34,7 @@ public class Package {
 
     // can un-ignore itemID for debugging purposes
     @JsonIgnore
-    private Integer itemID;
+    private Integer itemID = 0;
 
     @JsonIgnore
     private DryadDataPackage dataPackage;
@@ -49,7 +49,9 @@ public class Package {
 
     public Package(DryadDataPackage dataPackage) {
         this.dataPackage = dataPackage;
-        this.itemID = dataPackage.getItem().getID();
+        if (this.dataPackage.getItem() != null) {
+            this.itemID = dataPackage.getItem().getID();
+        }
     }
 
     public Integer getItemID() {
@@ -57,12 +59,7 @@ public class Package {
     }
 
     public String getPublicationDOI() {
-        String publicationDOI = null;
-        try {
-            publicationDOI = dataPackage.getPublicationDOI();
-        } catch (SQLException e) {
-            log.error("couldn't find publication DOI for item " + itemID);
-        }
+        String publicationDOI = dataPackage.getPublicationDOI();
         if (publicationDOI == null) {
             publicationDOI = "";
         }
@@ -84,22 +81,12 @@ public class Package {
 
     @JsonIgnore
     private List<Author> getAuthorList() {
-        List<Author> authors = new ArrayList<Author>();
-        try {
-            authors = dataPackage.getAuthors();
-        } catch (SQLException e) {
-            log.error("couldn't find authors for item " + itemID);
-        }
+        List<Author> authors = dataPackage.getAuthors();
         return authors;
     }
 
     public List<String> getKeywords() {
-        try {
-            return dataPackage.getKeywords();
-        } catch (SQLException e) {
-            log.error("couldn't find keywords for item " + itemID);
-        }
-        return null;
+        return dataPackage.getKeywords();
     }
 
     public String getDryadDOI() {
@@ -108,32 +95,16 @@ public class Package {
 
     @JsonIgnore
     public DryadJournalConcept getJournalConcept() {
-        DryadJournalConcept journalConcept = null;
-        try {
-            journalConcept = JournalUtils.getJournalConceptByJournalName(dataPackage.getPublicationName());
-        } catch (SQLException e) {
-            log.error("couldn't find journal concept for item " + itemID);
-        }
-        return journalConcept;
+        return JournalUtils.getJournalConceptByJournalName(dataPackage.getPublicationName());
     }
 
     public String getTitle() {
-        try {
-            return dataPackage.getTitle();
-        } catch (SQLException e) {
-            log.error("couldn't find title for item " + itemID);
-        }
-        return null;
+        return dataPackage.getTitle();
     }
 
     @JsonIgnore
     public String getAbstract() {
-        try {
-            return dataPackage.getAbstract();
-        } catch (SQLException e) {
-            log.error("couldn't find abstract for item " + itemID);
-        }
-        return null;
+        return dataPackage.getAbstract();
     }
 
     @Override

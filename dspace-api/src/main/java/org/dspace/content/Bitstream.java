@@ -135,7 +135,7 @@ public class Bitstream extends DSpaceObject
         if (log.isDebugEnabled())
         {
             log.debug(LogManager.getHeader(context, "find_bitstream",
-                    "bitstream_id=" + id));
+                                           "bitstream_id=" + id));
         }
 
         return new Bitstream(context, row);
@@ -252,13 +252,23 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
-     * Get the internal identifier of this bitstream
+     * Get the bitstream (database) identifier of this bitstream
      * 
-     * @return the internal identifier
+     * @return the bitstream identifier
      */
     public int getID()
     {
         return bRow.getIntColumn("bitstream_id");
+    }
+
+    /**
+     * Get the internal (storage) identifier of this bitstream
+     * 
+     * @return the internal identifier
+     */
+    public String getInternalID()
+    {
+        return bRow.getStringColumn("internal_id");
     }
 
     public String getHandle()

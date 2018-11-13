@@ -6,22 +6,8 @@ import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCDate;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.WorkspaceItem;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchService;
-import org.dspace.eperson.EPerson;
-import org.dspace.utils.DSpace;
-import org.dspace.workflow.actions.WorkflowActionConfig;
-
-import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -85,25 +71,18 @@ public class ApproveRejectReviewItem {
             Manuscript manuscript = new Manuscript(journalConcept);
             manuscript.setManuscriptId(manuscriptNumber);
             manuscript.setStatus(status);
-            processWorkflowItemsUsingManuscript(manuscript);
+            processReviewPackagesUsingManuscript(manuscript);
         } else if(line.hasOption('i')) {
             // get a WorkflowItem using a workflow ID
             Integer wfItemId = Integer.parseInt(line.getOptionValue('i'));
             Context c = null;
             try {
                 c = new Context();
-                c.turnOffAuthorisationSystem();
-                WorkflowItem wfi = WorkflowItem.find(c, wfItemId);
+                DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(c, wfItemId);
                 Manuscript manuscript = new Manuscript();
                 manuscript.setStatus(approved ? Manuscript.STATUS_ACCEPTED : Manuscript.STATUS_REJECTED);
-
-                processWorkflowItemUsingManuscript(c, wfi, manuscript);
-                c.restoreAuthSystemState();
+                processReviewPackageUsingManuscript(c, dryadDataPackage, manuscript);
             } catch (SQLException ex) {
-                throw new ApproveRejectReviewItemException(ex);
-            } catch (AuthorizeException ex) {
-                throw new ApproveRejectReviewItemException(ex);
-            } catch (IOException ex) {
                 throw new ApproveRejectReviewItemException(ex);
             } finally {
                 if(c != null) {
@@ -122,236 +101,33 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    public static Manuscript getStoredManuscriptForWorkflowItem(Context c, WorkflowItem workflowItem) throws ApproveRejectReviewItemException {
-        Item item = workflowItem.getItem();
-        Manuscript manuscript = new Manuscript(item);
+    public static void processReviewPackagesUsingManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
         try {
-            c.turnOffAuthorisationSystem();
-            List<Manuscript> storedManuscripts = JournalUtils.getStoredManuscriptsMatchingManuscript(manuscript);
-            if (storedManuscripts != null && storedManuscripts.size() > 0) {
-                Manuscript storedManuscript = storedManuscripts.get(0);
-                log.info("found stored manuscript " + storedManuscript.getManuscriptId() + " with status " + storedManuscript.getLiteralStatus());
-                if (!JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item, storedManuscript)) {
-                    return storedManuscript;
-                } else {
-                    log.info("stored manuscript match was a known former manuscript number");
-                }
+            Context c = new Context();
+            List<DryadDataPackage> matchingPackages = DryadDataPackage.findAllByManuscript(c, manuscript);
+            for (DryadDataPackage dataPackage : matchingPackages) {
+                processReviewPackageUsingManuscript(c, dataPackage, manuscript);
             }
-            c.restoreAuthSystemState();
+            c.complete();
         } catch (Exception e) {
-            throw new ApproveRejectReviewItemException("couldn't process workflowitem " + workflowItem.getID() + ": " + e.getMessage());
+            throw new ApproveRejectReviewItemException(e);
         }
-        return null;
     }
 
-    public static void processWorkflowItemsUsingManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
-        Context c = null;
+    public static void processReviewPackageUsingManuscript(Context c, DryadDataPackage dryadDataPackage, Manuscript manuscript) throws ApproveRejectReviewItemException {
         try {
-            c = new Context();
-            c.turnOffAuthorisationSystem();
-
-            ArrayList<WorkflowItem> workflowItems = new ArrayList<WorkflowItem>();
-
-            if (manuscript.getDryadDataDOI() != null) {
-                try {
-                    WorkflowItem wfi = WorkflowItem.findByDOI(c, manuscript.getDryadDataDOI());
-                    if (wfi != null) {
-                        workflowItems.add(wfi);
-                    }
-                } catch (ApproveRejectReviewItemException e) {
-    //                LOGGER.debug ("no workflow items matched DOI " + manuscript.dryadDataDOI);
-                }
-            }
-
-            workflowItems.addAll(WorkflowItem.findAllByManuscript(c, manuscript));
-            for (WorkflowItem wfi : workflowItems) {
-                try {
-                    processWorkflowItemUsingManuscript(c, wfi, manuscript);
-                } catch (ApproveRejectReviewItemException e) {
-                    throw new ApproveRejectReviewItemException("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage(), e);
-                }
-            }
-        } catch (SQLException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } finally {
-            if(c != null) {
-                try {
-                    c.complete();
-                } catch (SQLException ex) {
-                    // Swallow it
-                }
-            }
-        }
-    }
-
-    private static Boolean statusIsApproved(String status) throws ApproveRejectReviewItemException {
-        Boolean approved = null;
-        if (Manuscript.statusIsAccepted(status)) {
-            approved = true;
-        } else if (Manuscript.statusIsRejected(status)) {
-            approved = false;
-        } else if (Manuscript.statusIsNeedsRevision(status)) {
-            approved = false;
-        } else if (Manuscript.statusIsPublished(status)) {
-            approved = true;
-        } else {
-            throw new ApproveRejectReviewItemException("Status " + status + " is neither approved nor rejected");
-        }
-        return approved;
-    }
-
-    public static void processWorkflowItemUsingManuscript(Context c, WorkflowItem wfi, Manuscript manuscript) throws ApproveRejectReviewItemException {
-	// get a List of ClaimedTasks, using the WorkflowItem
-        List<ClaimedTask> claimedTasks = null;
-        try {
-            if (wfi != null) {
-                claimedTasks = ClaimedTask.findByWorkflowId(c, wfi.getID());
-            }
-            //Check for a valid task
-            // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
-            Item item = wfi.getItem();
-            DryadDataPackage dataPackage = new DryadDataPackage(item);
-            StringBuilder provenance = new StringBuilder();
-            c.turnOffAuthorisationSystem();
-            // update duplicate submission metadata for this item.
-            item.checkForDuplicateItems(c);
-            if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
-                log.debug ("Item " + item.getID() + " not found or not in review");
-            } else {
-                ClaimedTask claimedTask = claimedTasks.get(0);
-                associateWithManuscript(dataPackage, manuscript, provenance);
-                if (statusIsApproved(manuscript.getStatus())) { // approve
-                    Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
-                    WorkflowActionConfig actionConfig = workflow.getStep(claimedTask.getStepID()).getActionConfig(claimedTask.getActionID());
-
-                    item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, statusIsApproved(manuscript.getStatus()).toString());
-
-                    WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
-                    // Add provenance to item
-                    String manuscriptNumber = "<null>";
-                    if (manuscript != null) {
-                        manuscriptNumber = manuscript.getManuscriptId();
-                    }
-                    item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", "Approved by ApproveRejectReviewItem based on metadata for " + manuscriptNumber + " on " + DCDate.getCurrent().toString() + " (GMT)" + provenance.toString());
-                    item.update();
+            if (dryadDataPackage.isPackageInReview(c)) {
+                // update duplicate submission metadata for this item.
+                dryadDataPackage.updateDuplicatePackages(c);
+                if (Manuscript.statusIsApproved(manuscript.getStatus())) { // approve
+                    dryadDataPackage.approvePackageUsingManuscript(c, manuscript);
                 } else { // reject
                     String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error or wish to re-submit your data associated with a different journal, please contact us at help@datadryad.org.";
-                    EPerson ePerson = EPerson.findByEmail(c, ConfigurationManager.getProperty("system.curator.account"));
-                    //Also reject all the data files
-                    Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
-                    for (Item dataFile : dataFiles) {
-                        try {
-                            WorkflowManager.rejectWorkflowItem(c, WorkflowItem.findByItemId(c, dataFile.getID()), ePerson, null, reason, false);
-                        } catch (Exception e) {
-                            throw new IOException(e);
-                        }
-                    }
-                    WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, ePerson, null, reason, true);
-                    disassociateFromManuscript(dataPackage, manuscript);
+                    dryadDataPackage.rejectPackageUsingManuscript(c, manuscript, reason);
                 }
             }
         } catch (Exception ex) {
             throw new ApproveRejectReviewItemException(ex);
         }
-        finally {
-            c.restoreAuthSystemState();
-        }
-    }
-
-    private static SearchService getSearchService() {
-        DSpace dspace = new DSpace();
-        org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
-        return manager.getServiceByName(SearchService.class.getName(), SearchService.class);
-    }
-
-
-    /**
-     * Copies manuscript metadata into a dryad data package
-     * @param dataPackage
-     * @param manuscript
-     * @param message
-     * @throws SQLException
-     */
-    private static void associateWithManuscript(DryadDataPackage dataPackage, Manuscript manuscript, StringBuilder message) throws SQLException {
-        if (manuscript != null) {
-            // set publication DOI
-            if (!"".equals(manuscript.getPublicationDOI()) && !dataPackage.getItem().hasMetadataEqualTo(PUBLICATION_DOI, manuscript.getPublicationDOI())) {
-                String oldValue = dataPackage.getPublicationDOI();
-                dataPackage.setPublicationDOI(manuscript.getPublicationDOI());
-                message.append(" " + PUBLICATION_DOI + " was updated from " + oldValue + ".");
-            }
-            // set Manuscript ID
-            if (!"".equals(manuscript.getManuscriptId()) && !dataPackage.getItem().hasMetadataEqualTo(MANUSCRIPT, manuscript.getManuscriptId())) {
-                String oldValue = dataPackage.getManuscriptNumber();
-                dataPackage.setManuscriptNumber(manuscript.getManuscriptId());
-                message.append(" " + MANUSCRIPT + " was updated from " + oldValue + ".");
-            }
-//            // union keywords
-//            if (manuscript.getKeywords().size() > 0) {
-//                ArrayList<String> unionKeywords = new ArrayList<String>();
-//                unionKeywords.addAll(dataPackage.getKeywords());
-//                for (String newKeyword : manuscript.getKeywords()) {
-//                    if (!unionKeywords.contains(newKeyword)) {
-//                        unionKeywords.add(newKeyword);
-//                    }
-//                }
-//                dataPackage.setKeywords(unionKeywords);
-//            }
-            // set title
-            if (!"".equals(manuscript.getTitle()) && !dataPackage.getItem().hasMetadataEqualTo(ARTICLE_TITLE, manuscript.getTitle())) {
-                String oldValue = dataPackage.getTitle();
-                dataPackage.setTitle(prefixTitle(manuscript.getTitle()));
-                message.append(" " + ARTICLE_TITLE + " was updated from \"" + oldValue + "\".");
-            }
-            // set abstract
-            if (!"".equals(manuscript.getAbstract()) && !dataPackage.getItem().hasMetadataEqualTo(ABSTRACT, manuscript.getAbstract())) {
-                dataPackage.setAbstract(manuscript.getAbstract());
-                message.append(" " + ABSTRACT + " was updated.");
-            }
-            // set publicationDate
-            if (manuscript.getPublicationDate() != null) {
-                SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
-                String dateString = dateIso.format(manuscript.getPublicationDate());
-                String oldValue = dataPackage.getPublicationDate();
-                if (!dateString.equals(oldValue)) {
-                    dataPackage.setPublicationDate(dateString);
-                    message.append(" " + PUBLICATION_DATE + " was updated from " + oldValue + ".");
-                }
-            }
-        }
-    }
-
-    private static void disassociateFromManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
-        if (manuscript != null) {
-            // clear publication DOI
-            dataPackage.setPublicationDOI(null);
-            // If there is a manuscript number, move it to former msid
-            dataPackage.setFormerManuscriptNumber(dataPackage.getManuscriptNumber());
-            // clear Manuscript ID
-            dataPackage.setManuscriptNumber(null);
-            // disjoin keywords
-            List<String> packageKeywords = dataPackage.getKeywords();
-            List<String> manuscriptKeywords = manuscript.getKeywords();
-            List<String> prunedKeywords = subtractList(packageKeywords, manuscriptKeywords);
-
-            dataPackage.setKeywords(prunedKeywords);
-            // clear publicationDate
-            dataPackage.setBlackoutUntilDate(null);
-        }
-    }
-
-    private static List<String> subtractList(List<String> list1, List<String> list2) {
-        List<String> list = new ArrayList<String>(list1);
-        for(String string : list2) {
-            if(list.contains(string)) {
-                list.remove(string);
-            }
-        }
-        return list;
-    }
-
-
-    private static String prefixTitle(String title) {
-        return String.format("Data from: %s", title);
     }
 }

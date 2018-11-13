@@ -7,7 +7,6 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.submit.step.DescribeStep;
 import org.xml.sax.SAXException;
 
 import java.sql.SQLException;
@@ -61,7 +60,9 @@ public class DescribePublicationStep extends AbstractSubmissionStep {
 
         body.addDivision("step-link","step-link").addPara(T_TRAIL);
 
-        if (item.checkForDuplicateItems(context)) {
+        DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
+        dryadDataPackage.updateDuplicatePackages(context);
+        if (dryadDataPackage.getDuplicatePackages(context).size() > 0) {
             Division dupDivision = body.addDivision("duplicate-info", "duplicate-info");
             dupDivision.addPara(T_DUP_SUBMISSION);
         }
@@ -129,23 +130,19 @@ public class DescribePublicationStep extends AbstractSubmissionStep {
 
     private static Boolean hasDetails(org.dspace.content.Item item) {
         DryadDataPackage dataPackage = new DryadDataPackage(item);
-        try {
-            String manuscriptNumber = dataPackage.getManuscriptNumber();
-            String doiOrPMID = dataPackage.getPublicationDOI();
-            if(manuscriptNumber != null) {
-                if(!manuscriptNumber.trim().isEmpty()) {
-                    // manuscript number is present
-                    return true;
-                }
+        String manuscriptNumber = dataPackage.getManuscriptNumber();
+        String doiOrPMID = dataPackage.getPublicationDOI();
+        if(manuscriptNumber != null) {
+            if(!manuscriptNumber.trim().isEmpty()) {
+                // manuscript number is present
+                return true;
             }
-            if(doiOrPMID != null) {
-                if(!doiOrPMID.trim().isEmpty()) {
-                    // DOI or PMID is present
-                    return true;
-                }
+        }
+        if(doiOrPMID != null) {
+            if(!doiOrPMID.trim().isEmpty()) {
+                // DOI or PMID is present
+                return true;
             }
-        } catch (SQLException ex) {
-            log.error("SQL Exception checking for MSID/DOI in new submission", ex);
         }
         return false;
     }

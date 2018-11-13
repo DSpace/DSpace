@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.lang.RuntimeException;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -316,6 +315,7 @@ public class DryadEmailSubmission extends HttpServlet {
             parser = getEmailParser(journalConcept.getParsingScheme());
             parser.parseMessage(dryadContent);
             manuscript = parser.getManuscript();
+            manuscript.setJournalConcept(journalConcept);
         } catch (SubmissionException e) {
             throw new SubmissionException("Journal " + journalID + " parsing scheme not found");
         }
@@ -357,7 +357,7 @@ public class DryadEmailSubmission extends HttpServlet {
                         LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
                     }
 
-                    ApproveRejectReviewItem.processWorkflowItemsUsingManuscript(manuscript);
+                    ApproveRejectReviewItem.processReviewPackagesUsingManuscript(manuscript);
                 }
             } catch (StorageException e) {
                 LOGGER.error("failed to write ms " + manuscript.getManuscriptId());

@@ -48,6 +48,7 @@ import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataFile;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.rest.models.Manuscript;
+import org.dspace.JournalUtils;
 import org.dspace.app.util.*;
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -56,7 +57,6 @@ import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
@@ -958,15 +958,15 @@ public class FlowUtils {
                 }
             }
 
+			DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(context, wfPublication.getID());
             // look for stored manuscripts to see if its status has been updated since submission was started:
-            Manuscript storedManuscript = ApproveRejectReviewItem.getStoredManuscriptForWorkflowItem(context, wfPublication);
+            Manuscript storedManuscript = JournalUtils.getStoredManuscriptForPackage(context, dryadDataPackage);
             if (storedManuscript != null) {
                 if (storedManuscript.isAccepted()) {
                     // if the ms is accepted, push the item into curation from review
-                    ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfPublication, storedManuscript);
+                    ApproveRejectReviewItem.processReviewPackageUsingManuscript(context, dryadDataPackage, storedManuscript);
                 } else if (storedManuscript.isRejected()) {
                     // if it's rejected, keep it in the review queue, but move the manuscript number to former.
-                    DryadDataPackage dryadDataPackage = DryadDataPackage.findByWorkflowItemId(context, wfPublication.getID());
                     dryadDataPackage.setFormerManuscriptNumber(dryadDataPackage.getManuscriptNumber());
                     dryadDataPackage.setManuscriptNumber(null);
                 }
