@@ -92,12 +92,12 @@
 		    int i = 0;
 		    for (String key : subresult.keySet())
 		    {
-		        
+		        String labelTab = "jsp.dspace.authority-claim-" + key;
 		        String keyID = item.getID() + "_" + key;
 		%>
 		
 				  <li id="li_<%= keyID %>" class="nav-item  <%= i==0?"active":""%>" >
-				    <a class="nav-link" id="<%= keyID %>-tab" data-toggle="tab" href="#<%= keyID %>" role="tab" aria-controls="<%= keyID %>" <%= i==0?"aria-selected=\"true\"":""%>><fmt:message key="<%= key %>" /></a>
+				    <a class="nav-link" id="<%= keyID %>-tab" data-toggle="tab" href="#<%= keyID %>" role="tab" aria-controls="<%= keyID %>" <%= i==0?"aria-selected=\"true\"":""%>><fmt:message key="<%= labelTab %>" /></a>
 				  </li>
 		  
 		<%
@@ -265,7 +265,9 @@
 		          %>>
 		            <%= value %>
 		          </option>
-			<% } %>
+			<% 
+					subCount++;
+				} %>
 			</select>
 				</div>
 				<div class="col-md-7">
