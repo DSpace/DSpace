@@ -33,7 +33,7 @@
 	JaroWinklerDistance jaroWinklerDistance = new JaroWinklerDistance();	
 %>
 
-<dspace:layout titlekey="jsp.dspace.authority-claim.title">
+<dspace:layout titlekey="jsp.dspace.authority-listclaim.title">
 <style>
 .list-group-item {
 	border: none;
@@ -43,9 +43,9 @@
 	float: right !important;
 }
 </style>
-<h3><fmt:message key="jsp.dspace.authority-claim.info-heading" /></h3>
+<h3><fmt:message key="jsp.dspace.authority-listclaim.info-heading" /></h3>
 
-<fmt:message key="jsp.dspace.authority-claim.info" />
+<fmt:message key="jsp.dspace.authority-listclaim.info" />
 <ul>
 <fmt:message key="jsp.dspace.authority-listclaim.info.case1" />
 <fmt:message key="jsp.dspace.authority-listclaim.info.case2" />
@@ -302,17 +302,13 @@
 		%>
 </tbody>
 <tfoot>
-	<tr>
-		<th>&nbsp;</th>
-		<th>
-        <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit_approve" value="<fmt:message key="jsp.tools.general.approve"/>" />
-        <input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_reject" value="<fmt:message key="jsp.tools.general.reject"/>" />
-		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
-		</th>
-	</tr>	
 </tfoot>
 </table>
-
+	<div class="row col-md-12 pull-right">
+        <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit_approve" value="<fmt:message key="jsp.authority.listclaim.approve"/>" />
+        <input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_reject" value="<fmt:message key="jsp.authority.listclaim.reject"/>" />
+		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.authority.listclaim.cancel"/>" />
+	</div>	
 <script type="text/javascript">
 j(document).ready(function() {
 	

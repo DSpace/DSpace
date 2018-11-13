@@ -324,7 +324,7 @@ public class AuthorityClaimServlet extends DSpaceServlet
                 {
                     message = I18nUtil.getMessage(
                             "jsp.dspace.authority-listclaim.failure",
-                            new Object[] { successes, failures },
+                            new Object[] { selectedIds.length, failures },
                             context.getCurrentLocale(), false);
                 }
                 else
