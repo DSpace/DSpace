@@ -331,6 +331,7 @@ public class RPAuthority extends CRISAuthority implements
         {
             context = new Context();
             context.turnOffAuthorisationSystem();
+            context.setDispatcher("onlyindex");
             List<String> list = new ArrayList<String>();
             for(int itemID : itemIDs) {
                 list.add(String.valueOf(itemID));    
