@@ -79,10 +79,9 @@
 	<td id="checkbox_<%= item.getID() %>"><div class="data" data-id="<%= item.getID() %>">&nbsp;</div></td>
 	<td>
 		<p style="display:none" id="foundyourauthority_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.your.authority"/></p>
-		<p style="display:none" id="foundlowlevelauthority_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.your.authority.low.level.confidence"/></p>
 		<p style="display:none" id="founddifferentauthority_<%= item.getID() %>" class="text-danger"><fmt:message key="jsp.authority-claim.found.different.authority"/></p>
 		<dspace:discovery-artifact style="global" artifact="<%= item %>" view="<%= mapViewMetadata.get(\"publications\") %>" selectorCssView="<%=selectorViewMetadata %>"/>
-		<ul class="nav nav-tabs" role="tablist">
+		<ul class="nav nav-tabs" role="tablist" id="ul<%= item.getID() %>">
 		<%
 		    // Keep a count of the number of values of each element+qualifier
 		    // key is "element" or "element_qualifier" (String)
@@ -105,7 +104,7 @@
 		    } %>
 		</ul>
 			
-		<div class="tab-content" id="myTabContent" >
+		<div class="tab-content" id="myTabContent<%= item.getID() %>" >
 		  
 		<%    
 		i = 0;
@@ -222,18 +221,16 @@
 				<% if(showFoundYourAuthority) { %>
 					<script type="text/javascript">
 						jQuery("#foundyourauthority_<%= item.getID() %>").toggle();
+						jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
+						jQuery("#myTabContent<%= item.getID() %>").toggle();
+						jQuery("#ul<%= item.getID() %>").toggle();
 					</script>					
-				<% } else if(showFoundDifferentAuthority && (!showFoundYourAuthority && !showFoundYourAuthorityLowConfidence)) { %>
+				<% } else if(showFoundDifferentAuthority && !showFoundYourAuthority) { %>
 					<script type="text/javascript">
 						jQuery("#founddifferentauthority_<%= item.getID() %>").toggle();
 					</script>						    
 				<%						    
-				   } else if (showFoundYourAuthorityLowConfidence) { %>
-					<script type="text/javascript">
-					jQuery("#foundlowlevelauthority_<%= item.getID() %>").toggle();
-					</script>						    
-				<%		
-				   }
+				   } 
 				%>
 							
 			<label for="userchoice_<%= keyID %>"> <fmt:message key="jsp.authority-claim.choice.fromdropdown"/></label>

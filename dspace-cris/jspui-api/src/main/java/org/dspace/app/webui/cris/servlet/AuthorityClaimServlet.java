@@ -646,14 +646,14 @@ public class AuthorityClaimServlet extends DSpaceServlet
         }
         
         if(failures>0) {
-            message = I18nUtil.getMessage("jsp.dspace.authority-claim-list.failure", new Object[] {successes, failures}, context.getCurrentLocale(), false);
+            message = I18nUtil.getMessage("jsp.dspace.authority-listclaim.failure", new Object[] {successes, failures}, context.getCurrentLocale(), false);
         }
         else {
             if(successes > 0) {
-                message = I18nUtil.getMessage("jsp.dspace.authority-claim-list.success", new Object[] {successes}, context.getCurrentLocale(), false);
+                message = I18nUtil.getMessage("jsp.dspace.authority-listclaim.success", new Object[] {successes}, context.getCurrentLocale(), false);
             }
             else {
-                message = I18nUtil.getMessage("jsp.dspace.authority-claim-list.reject", new Object[] {choices.size()}, context.getCurrentLocale(), false);
+                message = I18nUtil.getMessage("jsp.dspace.authority-listclaim.reject", new Object[] {choices.size()}, context.getCurrentLocale(), false);
             }
         }
         if(StringUtils.isNotBlank(message)) {
