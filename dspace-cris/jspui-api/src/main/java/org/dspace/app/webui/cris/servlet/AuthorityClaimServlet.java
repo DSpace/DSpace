@@ -299,6 +299,7 @@ public class AuthorityClaimServlet extends DSpaceServlet
                 String message = null;
                 int failures = 0;
                 int successes = 0;
+                int discarded = 0;
                 for (int selectedId : selectedIds)
                 {
                     try
@@ -311,6 +312,8 @@ public class AuthorityClaimServlet extends DSpaceServlet
                         if ("submit_approve".equalsIgnoreCase(submitButton))
                         {
                             successes++;
+                        } else {
+                            discarded++;
                         }
                     }
                     catch (Exception ex)
@@ -322,10 +325,18 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
                 if (failures > 0)
                 {
-                    message = I18nUtil.getMessage(
-                            "jsp.dspace.authority-listclaim.failure",
-                            new Object[] { selectedIds.length, failures },
-                            context.getCurrentLocale(), false);
+                    if ("submit_approve".equalsIgnoreCase(submitButton))
+                    {
+                        message = I18nUtil.getMessage(
+                                "jsp.dspace.authority-listclaim.failure.success",
+                                new Object[] { successes, failures },
+                                context.getCurrentLocale(), false);
+                    } else {
+                        message = I18nUtil.getMessage(
+                                "jsp.dspace.authority-listclaim.failure.reject",
+                                new Object[] { discarded, failures },
+                                context.getCurrentLocale(), false);
+                    }
                 }
                 else
                 {

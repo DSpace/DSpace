@@ -46,12 +46,6 @@
 <h3><fmt:message key="jsp.dspace.authority-listclaim.info-heading" /></h3>
 
 <fmt:message key="jsp.dspace.authority-listclaim.info" />
-<ul>
-<fmt:message key="jsp.dspace.authority-listclaim.info.case1" />
-<fmt:message key="jsp.dspace.authority-listclaim.info.case2" />
-<fmt:message key="jsp.dspace.authority-listclaim.info.case3" />
-</ul>
-
 
 <form method="post">
 
