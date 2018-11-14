@@ -144,7 +144,6 @@ public class Package {
         dataPackage.setTitle(title);
     }
 
-    @JsonIgnore
     public String getAbstract() {
         return dataPackage.getAbstract();
     }

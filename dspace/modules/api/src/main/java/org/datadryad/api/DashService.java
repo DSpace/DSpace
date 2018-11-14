@@ -341,7 +341,7 @@ public class DashService {
         return responseCode;
     }
 
-    public int addCurationStatus(DryadDataPackage dataPackage, String status, String reason) {
+    public int addCurationActivity(DryadDataPackage dataPackage, String status, String reason) {
         String dashJSON = "{\"status\": \"" + status + "\", \"note\": \"" + reason + "\"}";
         int responseCode = 0;
         BufferedReader reader = null;
@@ -385,7 +385,36 @@ public class DashService {
         return responseCode;
     }
 
-    public JsonNode getInternalData(Package pkg) {
+    public JsonNode getCurationActivity(Package pkg) {
+        BufferedReader reader = null;
+
+        try {
+            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getIdentifier(), "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+            connection.setRequestMethod("GET");
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = null;
+            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+            ObjectMapper m = new ObjectMapper();
+            JsonNode rootNode = m.readTree(out.toString());
+            if (rootNode.isArray()) {
+                return rootNode;
+            }
+        } catch (Exception e) {
+            log.fatal("Unable to get curation activity from Dash", e);
+        }
+        return null;
+    }
+
+    private JsonNode getInternalData(Package pkg) {
         BufferedReader reader = null;
 
         try {
@@ -409,7 +438,7 @@ public class DashService {
                 return rootNode;
             }
         } catch (Exception e) {
-            log.fatal("Unable to send item to DASH", e);
+            log.fatal("Unable to get internal data from Dash", e);
         }
         return null;
     }

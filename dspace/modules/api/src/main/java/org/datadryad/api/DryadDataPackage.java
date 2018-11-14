@@ -93,12 +93,20 @@ public class DryadDataPackage extends DryadObject {
     private final static String CITATION_IN_PROGRESS = "dryad.citationInProgress";
     private final static String PROVENANCE = "dc.description.provenance";
 
+    // title and identifier are declared in DryadObject
     private Set<DryadDataFile> dataFiles;
     private String curationStatus = "";
+    private String curationStatusReason = "";
     private String abstractString = "";
     private ArrayList<Author> authors = new ArrayList<>();
     private DryadJournalConcept journalConcept = null;
     private String manuscriptNumber = "";
+    private String publicationDOI = "";
+    private String publicationDate = "";
+    private ArrayList<String> keywords = new ArrayList<>();
+    private ArrayList<String> formerManuscriptNumbers = new ArrayList<>();
+    private ArrayList<String> mismatchedDOIs = new ArrayList<>();
+    private ArrayList<DryadDataPackage> duplicateItems = new ArrayList<>();
 
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
@@ -209,7 +217,7 @@ public class DryadDataPackage extends DryadObject {
             result = getSingleMetadataValue(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER);
             result = (result == null ? "" : result);
         } else {
-
+            result = publicationDate;
         }
         return result;
     }
@@ -218,7 +226,7 @@ public class DryadDataPackage extends DryadObject {
         if (getItem() != null) {
             addSingleMetadataValue(Boolean.TRUE, PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, publicationDate);
         } else {
-
+            this.publicationDate = publicationDate;
         }
     }
 
@@ -234,8 +242,6 @@ public class DryadDataPackage extends DryadObject {
         journalConcept = JournalUtils.getJournalConceptByJournalName(publicationName);
         if (getItem() != null) {
             addSingleMetadataValue(Boolean.TRUE, PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, publicationName);
-        } else {
-
         }
     }
 
@@ -270,14 +276,14 @@ public class DryadDataPackage extends DryadObject {
         if (getItem() != null) {
             return getMultipleMetadataValues(FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER);
         }
-        return new ArrayList<>();
+        return formerManuscriptNumbers;
     }
 
     public void setFormerManuscriptNumber(String manuscriptNumber) {
         if (getItem() != null) {
             addSingleMetadataValue(Boolean.TRUE, FORMER_MANUSCRIPT_NUMBER_SCHEMA, FORMER_MANUSCRIPT_NUMBER_ELEMENT, FORMER_MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
         } else {
-            dashService.addFormerManuscriptNumber(new Package(this), this.getIdentifier());
+            formerManuscriptNumbers.add(this.getIdentifier());
         }
     }
 
@@ -285,17 +291,18 @@ public class DryadDataPackage extends DryadObject {
         if (getItem() != null) {
             return getMultipleMetadataValues(MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER);
         }
-        return new ArrayList<>();
+        return mismatchedDOIs;
     }
 
-    public void setMismatchedDOIs(String mismatchedDOI) {
+    public void addMismatchedDOIs(String mismatchedDOI) {
         if (getItem() != null) {
             addSingleMetadataValue(Boolean.TRUE, MISMATCHED_DOI_SCHEMA, MISMATCHED_DOI_ELEMENT, MISMATCHED_DOI_QUALIFIER, mismatchedDOI);
         } else {
-            dashService.addMismatchedDOI(new Package(this), this.getIdentifier());
+            mismatchedDOIs.add(this.getIdentifier());
         }
     }
 
+    // TODO: what is the Dash equivalent for these?
     public void setBlackoutUntilDate(Date blackoutUntilDate) {
         String dateString = null;
         if(blackoutUntilDate != null)  {
@@ -329,7 +336,7 @@ public class DryadDataPackage extends DryadObject {
         if (getItem() != null) {
             addSingleMetadataValue(Boolean.FALSE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, publicationDOI);
         } else {
-
+            this.publicationDOI = publicationDOI;
         }
     }
 
@@ -338,7 +345,7 @@ public class DryadDataPackage extends DryadObject {
         if (getItem() != null) {
             addSingleMetadataValue(Boolean.TRUE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, null);
         } else {
-
+            this.publicationDOI = "";
         }
     }
 
@@ -354,7 +361,7 @@ public class DryadDataPackage extends DryadObject {
             result = getSingleMetadataValue(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER);
             result = (result == null ? "" : result);
         } else {
-
+            result = this.publicationDOI;
         }
         return result;
     }
@@ -385,19 +392,24 @@ public class DryadDataPackage extends DryadObject {
         if (getItem() != null) {
             return getMultipleMetadataValues(KEYWORD_SCHEMA, KEYWORD_ELEMENT, null);
         } else {
-            return new ArrayList<>();
+            return keywords;
         }
     }
 
     public void setKeywords(List<String> keywords) {
         if (getItem() != null) {
             addMultipleMetadataValues(Boolean.TRUE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+        } else {
+            this.keywords.clear();
+            this.keywords.addAll(keywords);
         }
     }
 
     public void addKeywords(List<String> keywords) {
         if (getItem() != null) {
             addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+        } else {
+            this.keywords.addAll(keywords);
         }
     }
 
@@ -444,7 +456,7 @@ public class DryadDataPackage extends DryadObject {
                     }
                 }
             } else {
-
+                return duplicateItems;
             }
         } catch (Exception e) {
 
@@ -453,11 +465,11 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public void updateDuplicatePackages(Context context) {
-        ArrayList<DryadDataPackage> resultList = new ArrayList<>();
+        HashSet<DryadDataPackage> resultSet = new HashSet<>();
         try {
             // get the current duplicate packages
-            resultList.addAll(getDuplicatePackages(context));
-            resultList.addAll(findAllByManuscript(context, new Manuscript(this)));
+            resultSet.addAll(getDuplicatePackages(context));
+            resultSet.addAll(findAllByManuscript(context, new Manuscript(this)));
             // look for items that have the same journal + title + authors?
 
         } catch (Exception e) {
@@ -467,11 +479,11 @@ public class DryadDataPackage extends DryadObject {
         // update the data package's metadata:
         if (useDryadClassic) {
             getItem().clearMetadata("dryad.duplicateItem");
-            for (DryadDataPackage dryadDataPackage : resultList) {
-                getItem().addMetadata("dryad.duplicateItem", null, String.valueOf(getItem().getID()), null, Choices.CF_NOVALUE);
+            for (DryadDataPackage dryadDataPackage : resultSet) {
+                getItem().addMetadata("dryad.duplicateItem", null, String.valueOf(dryadDataPackage.getItem().getID()), null, Choices.CF_NOVALUE);
             }
         } else {
-            dashService.addDuplicateItem(new Package(this), this.getIdentifier());
+            duplicateItems.addAll(resultSet);
         }
     }
 
@@ -493,9 +505,109 @@ public class DryadDataPackage extends DryadObject {
             item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + reason + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
         } else {
             // add a curation activity note
-            dashService.addCurationStatus(this, status, reason);
+            curationStatus = status;
+            curationStatusReason = reason;
         }
     }
+    // this method does not assume that the package is in review; only used by AutoReturnReviewItem.
+    public Date getEnteredReviewDate() {
+        if (useDryadClassic) {
+            DCValue[] provenanceValues = item.getMetadata("dc.description.provenance");
+            if (provenanceValues != null && provenanceValues.length > 0) {
+                for (DCValue provenanceValue : provenanceValues) {
+                    //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
+                    String provenance = provenanceValue.value;
+                    Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
+                    Matcher matcher = pattern.matcher(provenance);
+                    if (matcher.find()) {
+                        String dateString = matcher.group(1);
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                        try {
+                            Date reviewDate = sdf.parse(dateString);
+                            log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
+                            return reviewDate;
+                        } catch (Exception e) {
+                            log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
+                            return null;
+                        }
+                    }
+                }
+            }
+        } else {
+            JsonNode resultNode = dashService.getCurationActivity(new Package(this));
+            // the curation activities are returned in descending order of recency
+            for (int i=0; i < resultNode.size(); i++) {
+                if (resultNode.get(i).get("status").textValue().equals("Private for Peer Review")) {
+                    String dateString = resultNode.get(i).get("created_at").textValue();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                    try {
+                        Date reviewDate = sdf.parse(dateString);
+                        log.info("package " + this.getIdentifier() + " entered review on " + reviewDate.toString());
+                        return reviewDate;
+                    } catch (Exception e) {
+                        log.error("couldn't find review date for package " + this.getIdentifier() + ": " + dateString);
+                        return null;
+                    }
+                }
+            }
+
+        }
+        return null;
+    }
+
+    public boolean isPackageInReview(Context c) {
+        if (useDryadClassic) {
+            return DryadWorkflowUtils.isItemInReview(c, getWorkflowItem(c));
+        } else {
+            return curationStatus.equals("Private for Peer Review");
+        }
+    }
+
+    public void updateToDash() {
+        Package pkg = new Package(this);
+        // first, set the dataset itself:
+        dashService.putDataset(pkg);
+
+        // next, check to see if the curation status has been updated: if there's no reason, we haven't updated it
+        if (!"".equals(curationStatusReason)) {
+            log.info("updating curation status");
+            dashService.addCurationActivity(this, curationStatus, curationStatusReason);
+        }
+
+        // finally, update the internal data:
+        if (!"".equals(getManuscriptNumber())) {
+            dashService.setManuscriptNumber(pkg, getManuscriptNumber());
+        }
+        if (getJournalConcept() != null) {
+            dashService.setPublicationISSN(pkg, getJournalConcept().getISSN());
+        }
+        if (getFormerManuscriptNumbers().size() > 0) {
+            List<String> prevFormerMSIDs = dashService.getFormerManuscriptNumbers(pkg);
+            for (String msid : getFormerManuscriptNumbers()) {
+                if (!prevFormerMSIDs.contains(msid)) {
+                    dashService.addFormerManuscriptNumber(pkg, msid);
+                }
+            }
+        }
+        if (getMismatchedDOIs().size() > 0) {
+            List<String> prevMismatches = dashService.getMismatchedDOIs(pkg);
+            for (String doi : getMismatchedDOIs()) {
+                if (!prevMismatches.contains(doi)) {
+                    dashService.addMismatchedDOI(pkg, doi);
+                }
+            }
+        }
+        if (getDuplicatePackages(null).size() > 0) {
+            List<String> prevDuplicates = dashService.getDuplicateItems(pkg);
+            for (DryadDataPackage dup : getDuplicatePackages(null)) {
+                if (!prevDuplicates.contains(dup.getIdentifier())) {
+                    dashService.addFormerManuscriptNumber(pkg, dup.getIdentifier());
+                }
+            }
+        }
+    }
+
+    // DSpace-specific methods (without Dash equivalents)
 
     /**
      * Generate a Dryad-formatted 'Submitted by ...' provenance string
@@ -507,7 +619,7 @@ public class DryadDataPackage extends DryadObject {
      * @return
      */
     static String makeSubmittedProvenance(DCDate date, String submitterName,
-            String submitterEmail, String provenanceStartId, String bitstreamProvenanceMessage) {
+                                          String submitterEmail, String provenanceStartId, String bitstreamProvenanceMessage) {
         StringBuilder builder = new StringBuilder();
         builder.append("Submitted by ");
         if(submitterName == null || submitterEmail == null) {
@@ -558,59 +670,11 @@ public class DryadDataPackage extends DryadObject {
      * @throws SQLException
      */
     public void addSubmittedProvenance(DCDate date, String submitterName,
-                                       String submitterEmail, String provenanceStartId, String bitstreamProvenanceMessage) throws SQLException {
+                                       String submitterEmail, String provenanceStartId, String bitstreamProvenanceMessage) {
         String metadataValue = makeSubmittedProvenance(date, submitterName, submitterEmail, provenanceStartId, bitstreamProvenanceMessage);
         addSingleMetadataValue(Boolean.FALSE,PROVENANCE_SCHEMA, PROVENANCE_ELEMENT, PROVENANCE_QUALIFIER, PROVENANCE_LANGUAGE, metadataValue);
     }
 
-    public void changeCurationStatus(String status, String reason) {
-        if (getItem() != null) {
-            item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + reason + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
-        } else {
-            // add a curation activity note
-        }
-    }
-
-    public Date getEnteredReviewDate() {
-        if (useDryadClassic) {
-            DCValue[] provenanceValues = item.getMetadata("dc.description.provenance");
-            if (provenanceValues != null && provenanceValues.length > 0) {
-                for (DCValue provenanceValue : provenanceValues) {
-                    //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
-                    String provenance = provenanceValue.value;
-                    Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
-                    Matcher matcher = pattern.matcher(provenance);
-                    if (matcher.find()) {
-                        String dateString = matcher.group(1);
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                        Date reviewDate = null;
-                        try {
-                            reviewDate = sdf.parse(dateString);
-                            log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
-                            return reviewDate;
-                        } catch (Exception e) {
-                            log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
-                            return null;
-                        }
-                    }
-                }
-            }
-        } else {
-            //something
-        }
-        return null;
-    }
-
-    public boolean isPackageInReview(Context c) {
-        if (useDryadClassic) {
-            return DryadWorkflowUtils.isItemInReview(c, getWorkflowItem(c));
-        } else {
-            // get curation status of package
-        }
-        return false;
-    }
-
-    // DSpace-specific methods (without Dash equivalents)
     public static Collection getCollection(Context context) throws SQLException {
         String handle = ConfigurationManager.getProperty(PACKAGES_COLLECTION_HANDLE_KEY);
         return DryadObject.collectionFromHandle(context, handle);
@@ -1102,6 +1166,11 @@ public class DryadDataPackage extends DryadObject {
             } catch (Exception e) {
                 log.error("couldn't save metadata: " + e.getMessage());
             }
+        }
+
+        // Only required for Dash:
+        if (!useDryadClassic) {
+            updateToDash();
         }
         if (fieldsChanged.size() > 0) {
             if (!"".equals(provenance.toString())) {
