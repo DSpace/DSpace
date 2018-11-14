@@ -214,8 +214,7 @@
 			</map:match>
 		</map:pipeline>
 
-
-		<map:handle-errors>
+<!--		<map:handle-errors>
 			<map:act type="DspacePropertyAction" >
 				<map:parameter name="module" value="sedici-dspace" />
 				<map:parameter name="property" value="xmlui.debug" />
@@ -226,7 +225,6 @@
 				
 				<map:select type="exceptionSedici">
 					<map:when test="bad-request">
-						<!--  Error 400/Bad Request -->
 						<map:transform src="exception2html.xslt">
 							<map:parameter name="contextPath" value="{request:contextPath}" />
 							<map:parameter name="printDebug" value="{xmlui_debug}" />
@@ -243,7 +241,6 @@
 					</map:when>
 					
 					<map:when test="not-found">
-						<!--  Error 404/Resource not found -->
 						<map:transform src="exception2html.xslt">
 							<map:parameter name="contextPath" value="{request:contextPath}" />
 							<map:parameter name="printDebug" value="{xmlui_debug}" />
@@ -260,7 +257,6 @@
 					</map:when>
 					
 					<map:when test="invalid-continuation">
-						<!--  Error 404/invalidContinuation -->
 						<map:transform src="exception2html.xslt">
 							<map:parameter name="contextPath" value="{request:contextPath}" />
 							<map:parameter name="printDebug" value="{xmlui_debug}" />
@@ -292,7 +288,6 @@
 					</map:when>
 					
 					<map:when test="file-not-found-exception">
-					<!--  Error 404/Resource not found -->
 						<map:transform src="exception2html.xslt">
 							<map:parameter name="contextPath" value="{request:contextPath}" />
 							<map:parameter name="printDebug" value="{xmlui_debug}" />
@@ -308,7 +303,6 @@
 						<map:serialize type="xhtml" status-code="404" />
 	                </map:when>
 					<map:otherwise>
-						<!--  Error 5xx -->
 						<map:act type="ExceptionAction" />
 						
 						<map:transform src="exception2html.xslt">
@@ -328,6 +322,6 @@
 				</map:select>
 
 			</map:act>
-		</map:handle-errors>
+		</map:handle-errors>-->
 	</map:pipelines>
 </map:sitemap>
