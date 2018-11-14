@@ -11,14 +11,16 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:ex="http://apache.org/cocoon/exception/1.0"
-                xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
+                xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+                xmlns:date="http://exslt.org/dates-and-times" 
+                extension-element-prefixes="date">
 
   <xsl:param name="realPath"/>
   <xsl:param name="errorKind">internalError</xsl:param>
   <xsl:param name="contextPath">/</xsl:param>
   <xsl:param name="printDebug">false</xsl:param>
   <xsl:param name="requestQueryString"></xsl:param>
-  <xsl:param name="themePath"></xsl:param>
+  <xsl:param name="themePath">Sedici2</xsl:param>
 <xsl:template match="/">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -84,7 +86,7 @@
 	<div id="ds-main" xmlns="http://di.tamu.edu/DRI/1.0/"
 		xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
 		<div id="ds-header-wrapper">
-          	<div id="ds-header" class="clearfix">
+          	<div id="ds-header" class="clearfix" style="height: 3em;">
             	<a id="ds-header-logo-link">
                     <xsl:attribute name="href">
                         <xsl:value-of select="concat($contextPath,'/')"/>
@@ -162,7 +164,7 @@
 		                    <a href="http://prebi.unlp.edu.ar/" target="_blank">PREBI</a>
 		                    <span> - </span>
 		                    <a href="http://sedici.unlp.edu.ar/" target="_blank">SEDICI</a>
-		                    &#xA9; 2003-2013
+		                    &#xA9; 2003-<xsl:value-of select="date:year()"/>
 		                    <br/>
 		                    <a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a>
 	                    </strong>
@@ -173,11 +175,11 @@
 	            </div>
 	            <div class="column" id="footercol3">
 	                <div class="datos_sedici">
-	                    Calle 49 y 115 s/n 1er piso - Edificio ex Liceo
-	                    <br/>
-	                    La Plata, Buenos Aires (C.P. 1900)
-	                    <br/>
-	                    Tel 0221 423 6696/6677 (int. 141)
+	                    <i18n:text>xmlui.dri2xhtml.structural.footer.developers.address</i18n:text>
+                        <br/>
+                        <i18n:text>xmlui.dri2xhtml.structural.footer.developers.district</i18n:text>
+                        <br/>
+                        <i18n:text>xmlui.dri2xhtml.structural.footer.developers.contact-phone</i18n:text>
 	                </div>
                     <div class="footer-icon">
                         <a title="Como llegar a SEDICI">
