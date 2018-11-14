@@ -128,6 +128,7 @@
                 <entry key="isJournalOfVolume" value-ref="isJournalOfVolumeMap"/>
 		        <entry key="isVolumeOfJournal" value-ref="isVolumeOfJournalMap"/>
                 <entry key="isIssueOfJournalVolume" value-ref="isIssueOfJournalVolumeMap"/>
+                <entry key="isJournalIssueOfPublication" value-ref="isJournalIssueOfPublicationMap"/>
             </map>
         </property>
     </bean>
@@ -215,7 +216,8 @@
     </bean>
 
     <util:map id="isJournalVolumeOfIssueMap">
-        <entry key="journalvolume_identifier_volume" value-ref="issueVolume_volume"/>
+        <entry key="journalvolume.identifier.volume" value-ref="issueVolume_volume"/>
+        <entry key="journal.identifier.issn" value-ref="volumeJournal_issn_related"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Concatenate" id="issueVolume_volume">
         <property name="fields">
@@ -226,6 +228,11 @@
         <property name="separator">
             <value>, </value>
         </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Related" id="volumeJournal_issn_related">
+        <property name="relationshipTypeString" value="isJournalOfVolume"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="volumeJournal_issn"/>
     </bean>
 
     <util:map id="isJournalOfVolumeMap">
@@ -268,6 +275,16 @@
         <property name="separator">
             <value>, </value>
         </property>
+    </bean>
+
+    <util:map id="isJournalIssueOfPublicationMap">
+        <entry key="journal.identifier.issn"  value-ref="issueVolumeJournal_issn_related"/>
+    </util:map>
+
+    <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_issn_related">
+        <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="volumeJournal_issn_related"/>
     </bean>
 </beans>
 
