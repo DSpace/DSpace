@@ -178,7 +178,6 @@
                                 <exception name="invalid-continuation" class="org.apache.cocoon.components.flow.InvalidContinuationException"/>
                                 <exception name="bad-request" class="org.dspace.app.xmlui.utils.BadRequestException"/>
                                 <exception name="authorize-exception" class="org.dspace.authorize.AuthorizeException"/>
-                                <exception name="file-not-found-exception" class="java.io.FileNotFoundException"/>
                                 <!-- The statement below tells the selector to unroll as much exceptions as possible -->
                                 <exception class="java.lang.Throwable" unroll="true"/>
                         </map:selector>
@@ -772,23 +771,6 @@
 			                        <map:serialize type="xhtml" status-code="404" />
 			                    </map:when>
 			                    
-			                    <map:when test="file-not-found-exception">
-			                    <!--  Error 404/Resource not found -->
-			                        <map:generate type="exception"/>
-			                        <map:transform src="exception2html.xslt">
-			                            <map:parameter name="contextPath" value="{request:contextPath}" />
-			                            <map:parameter name="printDebug" value="{xmlui_debug}" />
-			                            <map:parameter name="errorKind" value="resourceNotFound" />
-			                            <map:parameter name="requestQueryString" value="{request:queryString}"/>
-			                        </map:transform>
-			                        <map:act type="locale">
-			                            <map:transform type="i18n">
-			                                <map:parameter name="locale" value="{locale}" />
-			                            </map:transform>
-			                        </map:act>
-			                        <map:serialize type="xhtml" status-code="404" />
-			                    </map:when>
-
                                 <map:otherwise>
                                         <map:generate type="exception"/>
                                         <map:act type="ExceptionAction" />
