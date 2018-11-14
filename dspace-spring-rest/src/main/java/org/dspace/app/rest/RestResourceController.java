@@ -679,10 +679,15 @@ public class RestResourceController implements InitializingBean {
                         Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
                                 .invoke(linkRepository, request, uuid, page, projection);
 
-                        //TODO we need to strip any existing paging information from the query string
-                        //Even if the paging info is not removed, the params don't get duplicated.
-                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
-                                .slash(subpath + '?' + request.getQueryString()).withSelfRel();
+                        Link link = null;
+                        String querystring = request.getQueryString();
+                        if (querystring != null) {
+                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
+                                .slash(subpath + '?' + querystring).withSelfRel();
+                        } else {
+                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid).withSelfRel();
+                        }
+
                         Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
                         halResources.forEach(linkService::addLinks);
 
