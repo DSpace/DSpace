@@ -107,6 +107,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         clonedBitstream.setSizeBytes(bitstream.getSizeBytes());
         clonedBitstream.setChecksum(bitstream.getChecksum());
         clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+        clonedBitstream.setFormat(bitstream.getBitstreamFormat());
 
         try 
         {
