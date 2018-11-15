@@ -25,4 +25,16 @@ public interface VirtualBean {
      * @throws SQLException If something goes wrong
      */
     String getValue(Context context, Item item) throws SQLException;
+
+    /**
+     * Generic setter for the useForPlace property
+     * @param useForPlace   The boolean value that the useForPlace property will be set to
+     */
+    void setUseForPlace(boolean useForPlace);
+
+    /**
+     * Generic getter for the useForPlace property
+     * @return  The useForPlace to be used by this bean
+     */
+    boolean getUseForPlace();
 }

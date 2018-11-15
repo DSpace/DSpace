@@ -156,6 +156,7 @@
         <property name="separator">
             <value>, </value>
         </property>
+        <property name="useForPlace" value="true"/>
     </bean>
 
     <util:map id="isOrgUnitOfPublicationMap">
