@@ -1179,122 +1179,148 @@
       out.write(sb.toString());
     }
     
-    
-
     void doQualdropValue(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, DCInputSet inputs, boolean repeatable, boolean required,
-      boolean readonly, int fieldCountIncr, List qualMap, String label, PageContext pageContext,List<DCInput> children,boolean hasParent)
+      boolean readonly, int fieldCountIncr, List qualMap, String label, PageContext pageContext, int collectionID, List<DCInput> children,boolean hasParent)
       throws java.io.IOException
     {
-      Metadatum[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
-      // filter out both unqualified and qualified values occurring elsewhere in inputs
-      List<Metadatum> filtered = new ArrayList<Metadatum>();
-      for (int i = 0; i < unfiltered.length; i++)
-      {
-          String unfilteredFieldName = unfiltered[i].element;
-          if(unfiltered[i].qualifier != null && unfiltered[i].qualifier.length()>0)
-              unfilteredFieldName += "." + unfiltered[i].qualifier;
-              
-              if ( ! inputs.isFieldPresent(unfilteredFieldName) )
-              {
-                      filtered.add( unfiltered[i] );
-              }
-      }
-      Metadatum[] defaults = filtered.toArray(new Metadatum[0]);
+    	Metadatum[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
+    	// filter out both unqualified and qualified values occurring elsewhere in inputs
+    	List<Metadatum> filtered = new ArrayList<Metadatum>();
+    	for (int i = 0; i < unfiltered.length; i++)
+    	{
+    		String unfilteredFieldName = unfiltered[i].element;
+    		if(unfiltered[i].qualifier != null && unfiltered[i].qualifier.length()>0)
+    			unfilteredFieldName += "." + unfiltered[i].qualifier;
+    		if ( ! inputs.isFieldPresent(unfilteredFieldName) )
+    		{
+    			filtered.add( unfiltered[i] );
+   			}
+      	}
+      	Metadatum[] defaults = filtered.toArray(new Metadatum[0]);
 
-      int fieldCount = defaults.length + fieldCountIncr;
-      StringBuffer sb = new StringBuffer();
-      String   q, v, currentQual, currentVal;
+      	int fieldCount = defaults.length + fieldCountIncr;
+      	StringBuffer sb = new StringBuffer();
+      	String defaultCurrentQual = (String)qualMap.get(1);
+	    String q, v, currentQual, currentVal, currentAuth;
+      	int currentConf;
 
-      if (fieldCount == 0)
-         fieldCount = 1;
+      	if (fieldCount == 0)
+         	fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
-      	.append(label)
-      	.append("</label>");
-      sb.append("<div class=\"col-md-10\">");
-      for (int j = 0; j < fieldCount; j++)
-      {
-
-         if (j < defaults.length)
-         {
-            currentQual = defaults[j].qualifier;
-            if(currentQual==null) currentQual="";
-            currentVal = defaults[j].value;
-         }
-         else
-         {
-            currentQual = "";
-            currentVal = "";
-         }
-
-         // do the dropdown box
-         sb.append("<div class=\"row col-md-12\"><span class=\"input-group col-md-10\"><span class=\"input-group-addon\"><select name=\"")
-           .append(fieldName)
-           .append("_qualifier");
-         if (repeatable && j!= fieldCount-1)
-           sb.append("_").append(j+1);
-         if (readonly)
-         {
-             sb.append("\" disabled=\"disabled");
-         }
-         sb.append("\">");
-         for (int i = 0; i < qualMap.size(); i+=2)
-         {
-           q = (String)qualMap.get(i);
-           v = (String)qualMap.get(i+1);
-           sb.append("<option")
-             .append((v.equals(currentQual) ? " selected=\"selected\" ": "" ))
-             .append(" value=\"")
-             .append(v)
-             .append("\">")
-             .append(q)
-             .append("</option>");
-         }
+      	sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
+      	  .append(label)
+      	  .append("</label>");
       
-         // do the input box
-         sb.append("</select></span><input class=\"form-control\" type=\"text\" name=\"")
-           .append(fieldName)
-           .append("_value");
-         if (repeatable && j!= fieldCount-1)
-           sb.append("_").append(j+1);
-         if (readonly)
-         {
-             sb.append("\" disabled=\"disabled");
-         }
-         sb.append("\" size=\"34\" value=\"")
-           .append(currentVal.replaceAll("\"", "&quot;"))
-           .append("\"/></span>\n");
-
-         if (repeatable && !readonly && j < defaults.length)
-         {
-            // put a remove button next to filled in values
-            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+      	sb.append("<div class=\"col-md-10\">");
+      	for (int j = 0; j < fieldCount; j++)
+      	{
+      		if (j < defaults.length)
+	   	  	{
+      			currentQual = defaults[j].qualifier;
+              	if(currentQual==null) currentQual="";
+              	currentVal = defaults[j].value;
+             	currentAuth = defaults[j].authority;
+              	currentConf = defaults[j].confidence;
+          	}
+    	 	else
+    	  	{
+    		  	currentQual = "";
+	          	currentVal = "";
+	          	currentAuth = "";
+	          	currentConf = unknownConfidence;
+	 	  	}
+      		
+    	  	String completeFieldName = fieldName + '_' + defaultCurrentQual;
+          	String fieldNameValue = fieldName + "_value";
+          	
+          	String authorityType = getAuthorityType(pageContext, completeFieldName, collectionID);
+          	if (authorityType != null) {
+          		// use different layout when authority is active
+          		sb.append("<div class=\"row col-md-12\">")
+        	      .append("<div class=\"col col-md-10\">")
+        	      .append("<span class=\"input-group row col-md-10\">");
+          	}
+         	else {
+         		sb.append("<div class=\"row col-md-12\"><span class=\"input-group col-md-10\">");
+          	}
+          	
+          	// do the dropdown box
+          	sb.append("<span class=\"input-group-addon\"><select name=\"")
               .append(fieldName)
-              .append("_remove_")
-              .append(j)
-              .append("\" value=\"")
-              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
-         }
-         else if (repeatable && !readonly && j == fieldCount - 1)
-         {
-            // put a 'more' button next to the last space
-            sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
+              .append("_qualifier");
+          	if (repeatable && j!= fieldCount-1)
+          		sb.append("_").append(j+1);
+            if (readonly) {
+        	    sb.append("\" disabled=\"disabled");
+            }
+            sb.append("\">");
+            for (int i = 0; i < qualMap.size(); i+=2)
+            {
+        	    q = (String)qualMap.get(i);
+        	    v = (String)qualMap.get(i+1);
+        	    sb.append("<option")
+        	      .append((v.equals(currentQual) ? " selected=\"selected\" ": "" ))
+          	      .append(" value=\"")
+                  .append(v)
+                  .append("\">")
+                  .append(q)
+                  .append("</option>");
+            }
+            
+            // do the input box
+            sb.append("</select></span><input class=\"form-control\" type=\"text\" name=\"")
               .append(fieldName)
-//            .append("_add\" value=\"Add More\"/> </td></tr>");
-              .append("_add\" value=\"")
-              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
-         }
-
-         // put a blank if nothing else
-       	 sb.append("</div>");
-      }
-      sb.append("</div></div><br/>");
-      out.write(sb.toString());
+              .append("_value");
+            if (repeatable && j!= fieldCount-1)
+              sb.append("_").append(j+1);
+            if (readonly)
+            {
+                sb.append("\" disabled=\"disabled");
+            }
+            sb.append("\" size=\"34\" value=\"")
+              .append(currentVal.replaceAll("\"", "&quot;"))
+              .append("\"/></span>\n");
+            
+            if (authorityType != null)
+            {
+            	// do authority
+        	    sb.append("<div class=\"col-md-2\">")
+        	      .append(doAuthority(pageContext, completeFieldName, j, fieldCount, fieldNameValue,
+        	    		  currentAuth, currentConf, false, repeatable,
+        		 	      defaults, null, collectionID))
+	              .append("</div></div>");
+            }
+            
+            if (repeatable && !readonly && j < defaults.length)
+            {
+        	    // put a remove button next to filled in values
+                sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+                  .append(fieldName)
+                  .append("_remove_")
+                  .append(j)
+                  .append("\" value=\"")
+                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+                  .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
+            }
+            else if (repeatable && !readonly && j == fieldCount - 1)
+            {
+                // put a 'more' button next to the last space
+                sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
+                  .append(fieldName)
+                  //.append("_add\" value=\"Add More\"/> </td></tr>");
+                  .append("_add\" value=\"")
+                  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+                  .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
+            }
+            
+            // put a blank if nothing else
+       	    sb.append("</div>");
+          }
+          sb.append("</div></div><br/>");
+          out.write(sb.toString());
     }
-
+    
     void doDropDown(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
       boolean required, boolean readonly, List valueList, String label,List<DCInput> children,boolean hasParent)
@@ -1749,7 +1775,7 @@
        else if (inputType.equals("qualdrop_value"))
        {
            doQualdropValue(out, item, fieldName, dcSchema, dcElement, inputSet, repeatable, required,
-                                   readonly, fieldCountIncr, inputs[z].getPairs(), label, pageContext,parent2child.get(fieldName),hasParent);
+                                   readonly, fieldCountIncr, inputs[z].getPairs(), label, pageContext, collectionID, parent2child.get(fieldName),hasParent);
        }
        else if (inputType.equals("textarea"))
        {

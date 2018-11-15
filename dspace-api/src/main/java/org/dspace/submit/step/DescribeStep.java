@@ -314,6 +314,23 @@ public class DescribeStep extends AbstractProcessingStep
                         + element, schema + "_" + element + "_qualifier");
                 List<String> vals = getRepeatedParameter(request, schema + "_"
                         + element, schema + "_" + element + "_value");
+
+                List<String> auths = null;
+                List<String> confs = null;
+                if (quals.size() > 0) {
+                	List<String> pairs = inputs[j].getPairs();
+                	String firstQual = pairs.get(1);
+                	
+                	String qFirstFieldKey = MetadataAuthorityManager.makeFieldKey(schema, element, firstQual);
+                    boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(qFirstFieldKey);
+                    
+                    if (isAuthorityControlled)
+                    {
+                        auths = getRepeatedParameter(request, qFirstFieldKey, qFirstFieldKey+"_authority");
+                        confs = getRepeatedParameter(request, qFirstFieldKey, qFirstFieldKey+"_confidence");
+                    }
+                }
+                
                 for (int z = 0; z < vals.size(); z++)
                 {
                     String thisQual = quals.get(z);
@@ -321,15 +338,24 @@ public class DescribeStep extends AbstractProcessingStep
                     {
                         thisQual = null;
                     }
+                     
                     String thisVal = vals.get(z);
                     if (!buttonPressed.equals("submit_" + schema + "_"
                             + element + "_remove_" + z)
                             && !thisVal.equals(""))
                     {
-                        item.addMetadata(schema, element, thisQual, null,
-                                thisVal);
-                        validateField(request, inputs[j], fieldKey, thisVal);
-                    }
+                    	if (auths != null)
+                        {
+                    		item.addMetadata(schema, element, thisQual, null, thisVal,
+                                    auths.get(z), (confs != null && confs.size() > 0) ?
+                                            Choices.getConfidenceValue(confs.get(z)) : Choices.CF_ACCEPTED);
+                        }
+                    	else {
+	                        item.addMetadata(schema, element, thisQual, null,
+	                                thisVal);
+                    	}
+                    	validateField(request, inputs[j], fieldKey, thisVal);
+                	}
                 }
             }
             else if (inputType.equals("number") || (inputType.equals("onebox"))
