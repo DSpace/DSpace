@@ -21,11 +21,11 @@ public class RootConverter {
     @Autowired
     private ConfigurationService configurationService;
 
-    public RootRest convert(String restUrl) {
+    public RootRest convert() {
         RootRest rootRest = new RootRest();
         rootRest.setDspaceName(configurationService.getProperty("dspace.name"));
         rootRest.setDspaceURL(configurationService.getProperty("dspace.url"));
-        rootRest.setDspaceRest(restUrl);
+        rootRest.setDspaceRest(configurationService.getProperty("dspace.restUrl"));
         return rootRest;
     }
 }
