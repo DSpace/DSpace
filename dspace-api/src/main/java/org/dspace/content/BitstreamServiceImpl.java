@@ -103,6 +103,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         clonedBitstream.setSizeBytes(bitstream.getSizeBytes());
         clonedBitstream.setChecksum(bitstream.getChecksum());
         clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+        clonedBitstream.setFormat(bitstream.getBitstreamFormat());
+
         try {
             //Update our bitstream but turn off the authorization system since permissions
             //haven't been set at this point in time.
