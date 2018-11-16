@@ -337,6 +337,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 }
                 Item item = addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
                 c.uncacheEntity(item);
+                c.commit();
                 System.out.println(i + " " + dircontents[i]);
             }
         }
