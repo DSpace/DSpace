@@ -239,7 +239,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         for (int i = 0; i < values.size(); i++) {
 
             if (authorities != null && authorities.size() >= i) {
-                if (StringUtils.equals(authorities.get(i), "virtual")) {
+                if (StringUtils.startsWith(authorities.get(i), "virtual::")) {
                     continue;
                 }
             }
@@ -549,7 +549,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             List<MetadataValue> metadataValues = dso.getMetadata();
             for (MetadataValue metadataValue : metadataValues) {
                 //Retrieve & store the place for each metadata value
-                if (!StringUtils.equals(metadataValue.getAuthority(), "virtual")) {
+                if (!StringUtils.startsWith(metadataValue.getAuthority(), "virtual::")) {
                     int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
                     metadataValue.setPlace(mvPlace);
                 }
