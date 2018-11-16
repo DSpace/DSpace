@@ -14,12 +14,15 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 /**
  * This class provide extra configuration for our Spring Boot Application
- *
+ * <p>
+ * NOTE: @ComponentScan on "org.dspace.app.configuration" provides a way for other modules or plugins
+ * to "inject" their own configurations / subpaths into our Spring Boot webapp.
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Configuration
 @EnableSpringDataWebSupport
-@ComponentScan( {"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils"})
+@ComponentScan( {"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils",
+                 "org.dspace.app.configuration"})
 public class ApplicationConfig {
     @Value("${dspace.dir}")
     private String dspaceHome;
