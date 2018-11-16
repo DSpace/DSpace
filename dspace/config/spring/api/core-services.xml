@@ -280,6 +280,7 @@
 
     <util:map id="isJournalIssueOfPublicationMap">
         <entry key="journal.identifier.issn"  value-ref="issueVolumeJournal_issn_related"/>
+        <entry key="relation.isJournalOfPublication" value-ref="issueVolumeJournal_uuid_related"/>
     </util:map>
 
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_issn_related">
@@ -287,5 +288,18 @@
         <property name="place" value="1"/>
         <property name="virtualBean" ref="volumeJournal_issn_related"/>
     </bean>
+
+    <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_uuid_related">
+        <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="volumeJournal_uuid_related"/>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.Related" id="volumeJournal_uuid_related">
+        <property name="relationshipTypeString" value="isJournalOfVolume"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="volumeJournal_uuid"/>
+    </bean>
+    <bean class="org.dspace.content.virtual.UUIDValue" id="volumeJournal_uuid"/>
 </beans>
 
