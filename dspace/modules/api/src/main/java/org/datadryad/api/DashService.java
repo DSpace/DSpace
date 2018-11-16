@@ -329,7 +329,7 @@ public class DashService {
             if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
                 log.debug("package submission successful");
             } else {
-                log.fatal("Unable to send curation activity to DASH, response: " + responseCode +
+                log.fatal("Unable to update submission status of item in DASH, response: " + responseCode +
                         connection.getResponseMessage());
             }
 
