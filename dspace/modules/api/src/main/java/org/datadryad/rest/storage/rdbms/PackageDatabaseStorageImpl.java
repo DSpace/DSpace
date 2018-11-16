@@ -3,6 +3,8 @@
 package org.datadryad.rest.storage.rdbms;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DashService;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Package;
 import org.datadryad.rest.models.ResultSet;
@@ -23,6 +25,16 @@ import java.util.*;
 public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
     private static Logger log = Logger.getLogger(PackageDatabaseStorageImpl.class);
 
+    private static boolean useDryadClassic = true;
+    private static DashService dashService = null;
+
+    static {
+        String dryadSystem = ConfigurationManager.getProperty("dryad.system");
+        if (dryadSystem != null && dryadSystem.toLowerCase().equals("dash")) {
+            useDryadClassic = false;
+            dashService = new DashService();
+        }
+    }
     public PackageDatabaseStorageImpl(String configFileName) {
         setConfigFile(configFileName);
     }
@@ -97,7 +109,13 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
 
     @Override
     protected void createObject(StoragePath path, Package pkg) throws StorageException {
-        throw new StorageException("can't create a package");
+        if (useDryadClassic) {
+            throw new StorageException("can't create a package");
+        } else {
+            dashService.putDataset(pkg);
+            dashService.setPublicationISSN(pkg, pkg.getJournalConcept().getISSN());
+            dashService.setManuscriptNumber(pkg, pkg.getManuscriptNumber());
+        }
     }
 
     @Override
