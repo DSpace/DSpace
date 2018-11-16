@@ -327,7 +327,7 @@ public class DashService {
             responseCode = connection.getResponseCode();
 
             if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
-                log.debug("curation activity added");
+                log.debug("package submission successful");
             } else {
                 log.fatal("Unable to send curation activity to DASH, response: " + responseCode +
                         connection.getResponseMessage());
