@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-sword</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>DSpace SWORD</name>
     <description>
         DSpace SWORD Deposit Service Provider Web Application
@@ -94,6 +94,13 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
+        </dependency>
+
+        <!-- TODO: Spring boot version should be shared at Parent POM level -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>1.4.4.RELEASE</version>
         </dependency>
 
         <dependency>

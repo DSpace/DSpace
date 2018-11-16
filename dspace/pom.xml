@@ -227,7 +227,6 @@
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-sword</artifactId>
-                    <classifier>classes</classifier>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
