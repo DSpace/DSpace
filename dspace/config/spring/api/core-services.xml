@@ -219,6 +219,7 @@
     <util:map id="isJournalVolumeOfIssueMap">
         <entry key="journalvolume.identifier.volume" value-ref="issueVolume_volume"/>
         <entry key="journal.identifier.issn" value-ref="volumeJournal_issn_related"/>
+        <entry key="journal.title" value-ref="volumeJournal_title_related"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Concatenate" id="issueVolume_volume">
         <property name="fields">
@@ -234,6 +235,12 @@
         <property name="relationshipTypeString" value="isJournalOfVolume"/>
         <property name="place" value="1"/>
         <property name="virtualBean" ref="volumeJournal_issn"/>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.Related" id="volumeJournal_title_related">
+        <property name="relationshipTypeString" value="isJournalOfVolume"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="volumeJournal_title"/>
     </bean>
 
     <util:map id="isJournalOfVolumeMap">
@@ -280,13 +287,36 @@
 
     <util:map id="isJournalIssueOfPublicationMap">
         <entry key="journal.identifier.issn"  value-ref="issueVolumeJournal_issn_related"/>
+        <entry key="journal.title"  value-ref="issueVolumeJournal_title_related"/>
+        <entry key="volume.title" value-ref="issueVolume_title_related"/>
         <entry key="relation.isJournalOfPublication" value-ref="issueVolumeJournal_uuid_related"/>
     </util:map>
-
+    <bean class="org.dspace.content.virtual.Concatenate" id="issueVolume_title">
+        <property name="fields">
+            <util:list>
+                <value>journalvolume.identifier.name</value>
+            </util:list>
+        </property>
+        <property name="separator">
+            <value>, </value>
+        </property>
+    </bean>
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_issn_related">
         <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
         <property name="place" value="1"/>
         <property name="virtualBean" ref="volumeJournal_issn_related"/>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_title_related">
+        <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="volumeJournal_title_related"/>
+    </bean>
+
+    <bean class="org.dspace.content.virtual.Related" id="issueVolume_title_related">
+        <property name="relationshipTypeString" value="isJournalVolumeOfIssue"/>
+        <property name="place" value="1"/>
+        <property name="virtualBean" ref="issueVolume_title"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="issueVolumeJournal_uuid_related">
