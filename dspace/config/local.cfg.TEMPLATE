@@ -125,6 +125,7 @@ drum.environment.bannerText = Local Environment
 # Required
 wufoo.feedback.formHash = r12gwaic1xvrtzs
 # Optional
+wufoo.feedback.field.email = Field1
 wufoo.feedback.field.page = Field7
 wufoo.feedback.field.eperson = Field10
 wufoo.feedback.field.agent = Field8

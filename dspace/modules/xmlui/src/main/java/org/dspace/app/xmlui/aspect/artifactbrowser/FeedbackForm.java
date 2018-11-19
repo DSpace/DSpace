@@ -76,6 +76,8 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
     // Customization for LIBDRUM-563
     private static final String FORM_HASH = "wufoo.feedback.formHash";
 
+    private static final String EMAIL_FIELD = "wufoo.feedback.field.email";
+
     private static final String PAGE_FIELD = "wufoo.feedback.field.page";
 
     private static final String AGENT_FIELD = "wufoo.feedback.field.agent";
@@ -129,6 +131,13 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
         if (wufooFormHash != null && !wufooFormHash.isEmpty()) {
             pageMeta.addMetadata("wufoo","formHash").addContent(wufooFormHash);
             Request request = ObjectModelHelper.getRequest(objectModel);
+            Context context = ContextUtil.obtainContext(objectModel);
+            EPerson loggedin = context.getCurrentUser();
+            String eperson = null;
+            if (loggedin != null)
+            {
+                eperson = loggedin.getEmail();
+            }
             String defaultValues = "";
             String joiner = "";
             if (configurationService.getProperty(PAGE_FIELD) != null) {
@@ -143,14 +152,11 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
                         request.getHeader("User-Agent");
                 joiner = "&";
             }
+            if (configurationService.getProperty(EMAIL_FIELD) != null && eperson != null) {
+                defaultValues += joiner + configurationService.getProperty(EMAIL_FIELD) + "=" + eperson;
+                joiner = "&";
+            }
             if (configurationService.getProperty(EPERSON_FIELD) != null) {
-                Context context = ContextUtil.obtainContext(objectModel);
-                EPerson loggedin = context.getCurrentUser();
-                String eperson = null;
-                if (loggedin != null)
-                {
-                    eperson = loggedin.getEmail();
-                }
                 defaultValues += joiner + configurationService.getProperty(EPERSON_FIELD) + "=" + eperson;
                 joiner = "&";
             }
