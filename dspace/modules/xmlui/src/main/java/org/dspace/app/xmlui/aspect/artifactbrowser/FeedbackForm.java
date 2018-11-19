@@ -17,6 +17,7 @@ import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -128,7 +129,7 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
         // Customization for LIBDRUM-563
         // Add metadata needed for Wufoo feedback form
         String wufooFormHash = configurationService.getProperty(FORM_HASH);
-        if (wufooFormHash != null && !wufooFormHash.isEmpty()) {
+        if (StringUtils.isNotEmpty(wufooFormHash)) {
             pageMeta.addMetadata("wufoo","formHash").addContent(wufooFormHash);
             Request request = ObjectModelHelper.getRequest(objectModel);
             Context context = ContextUtil.obtainContext(objectModel);
@@ -140,36 +141,36 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
             }
             String defaultValues = "";
             String joiner = "";
-            if (configurationService.getProperty(PAGE_FIELD) != null) {
+            if (StringUtils.isNotEmpty(configurationService.getProperty(PAGE_FIELD))) {
                 String page = request.getHeader("Referer");
                 // Remove scheme (Wufoo does not allow '//' in default values)
                 page = page.substring(page.startsWith("https") ? 8 : 7);
                 defaultValues += configurationService.getProperty(PAGE_FIELD) + "=" + page;
                 joiner = "&";
             }
-            if (configurationService.getProperty(AGENT_FIELD) != null) {
+            if (StringUtils.isNotEmpty(configurationService.getProperty(AGENT_FIELD))) {
                 defaultValues += joiner + configurationService.getProperty(AGENT_FIELD) + "=" +
                         request.getHeader("User-Agent");
                 joiner = "&";
             }
-            if (configurationService.getProperty(EMAIL_FIELD) != null && eperson != null) {
+            if (StringUtils.isNotEmpty(configurationService.getProperty(EMAIL_FIELD)) && eperson != null) {
                 defaultValues += joiner + configurationService.getProperty(EMAIL_FIELD) + "=" + eperson;
                 joiner = "&";
             }
-            if (configurationService.getProperty(EPERSON_FIELD) != null) {
+            if (StringUtils.isNotEmpty(configurationService.getProperty(EPERSON_FIELD))) {
                 defaultValues += joiner + configurationService.getProperty(EPERSON_FIELD) + "=" + eperson;
                 joiner = "&";
             }
-            if (configurationService.getProperty(SESSION_FIELD) != null) {
+            if (StringUtils.isNotEmpty(configurationService.getProperty(SESSION_FIELD))) {
                 defaultValues += joiner + configurationService.getProperty(SESSION_FIELD) + "=" +
                         request.getSession().getId();
                 joiner = "&";
             }
-            if (configurationService.getProperty(DATE_FIELD) != null) {
+            if (StringUtils.isNotEmpty(configurationService.getProperty(DATE_FIELD))) {
                 defaultValues += joiner + configurationService.getProperty(DATE_FIELD) + "=" + new Date();
                 joiner = "&";
             }
-            if (configurationService.getProperty(HOST_FIELD) != null) {
+            if (StringUtils.isNotEmpty(configurationService.getProperty(HOST_FIELD))) {
                 defaultValues += joiner + configurationService.getProperty(HOST_FIELD) + "=" +
                         configurationService.getProperty("dspace.hostname");
             }
@@ -185,7 +186,7 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
         // Customization for LIBDRUM-563
         // No body needed for Wufoo feedback form
         String wufooFormHash = configurationService.getProperty(FORM_HASH);
-        if (wufooFormHash != null && !wufooFormHash.isEmpty()) {
+        if (StringUtils.isNotEmpty(wufooFormHash)) {
             return;
         }
         // End Customization for LIBDRUM-563
