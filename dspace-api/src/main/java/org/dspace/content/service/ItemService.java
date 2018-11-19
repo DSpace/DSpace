@@ -24,6 +24,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipMetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
@@ -648,6 +649,6 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @param item  The Item that will be processed through it's Relationships
      * @return      The list of MetadataValue objects constructed through the Relationships
      */
-    public List<MetadataValue> getRelationshipMetadata(Item item, boolean extra);
+    public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean extra);
 
 }
