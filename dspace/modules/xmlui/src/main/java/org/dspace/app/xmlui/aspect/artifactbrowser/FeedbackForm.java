@@ -10,12 +10,16 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -26,6 +30,10 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -63,6 +71,25 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
     private static final Message T_submit =
         message("xmlui.ArtifactBrowser.FeedbackForm.submit");
     
+    // Begin UMD Customization
+    // Customization for LIBDRUM-563
+    private static final String FORM_HASH = "wufoo.feedback.formHash";
+
+    private static final String PAGE_FIELD = "wufoo.feedback.field.page";
+
+    private static final String AGENT_FIELD = "wufoo.feedback.field.agent";
+
+    private static final String EPERSON_FIELD = "wufoo.feedback.field.eperson";
+
+    private static final String DATE_FIELD = "wufoo.feedback.field.date";
+
+    private static final String SESSION_FIELD = "wufoo.feedback.field.session";
+
+    private static final String HOST_FIELD = "wufoo.feedback.field.host";
+
+    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    // End Customization for LIBDRUM-563
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -93,12 +120,66 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
  
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         pageMeta.addTrail().addContent(T_trail);
+
+        // Begin UMD Customization
+        // Customization for LIBDRUM-563
+        // Add metadata needed for Wufoo feedback form
+        String wufooFormHash = configurationService.getProperty(FORM_HASH);
+        if (wufooFormHash != null && !wufooFormHash.isEmpty()) {
+            pageMeta.addMetadata("wufoo","formHash").addContent(wufooFormHash);
+            Request request = ObjectModelHelper.getRequest(objectModel);
+            String defaultValues = "";
+            String joiner = "";
+            if (configurationService.getProperty(PAGE_FIELD) != null) {
+                defaultValues += configurationService.getProperty(PAGE_FIELD) + "=" +
+                        request.getHeader("Referer");
+                joiner = "&";
+            }
+            if (configurationService.getProperty(AGENT_FIELD) != null) {
+                defaultValues += joiner + configurationService.getProperty(AGENT_FIELD) + "=" +
+                        request.getHeader("User-Agent");
+                joiner = "&";
+            }
+            if (configurationService.getProperty(EPERSON_FIELD) != null) {
+                Context context = ContextUtil.obtainContext(objectModel);
+                EPerson loggedin = context.getCurrentUser();
+                String eperson = null;
+                if (loggedin != null)
+                {
+                    eperson = loggedin.getEmail();
+                }
+                defaultValues += joiner + configurationService.getProperty(EPERSON_FIELD) + "=" + eperson;
+                joiner = "&";
+            }
+            if (configurationService.getProperty(SESSION_FIELD) != null) {
+                defaultValues += joiner + configurationService.getProperty(SESSION_FIELD) + "=" +
+                        request.getSession().getId();
+                joiner = "&";
+            }
+            if (configurationService.getProperty(DATE_FIELD) != null) {
+                defaultValues += joiner + configurationService.getProperty(DATE_FIELD) + "=" + new Date();
+                joiner = "&";
+            }
+            if (configurationService.getProperty(HOST_FIELD) != null) {
+                defaultValues += joiner + configurationService.getProperty(HOST_FIELD) + "=" +
+                        configurationService.getProperty("dspace.hostname");
+            }
+            pageMeta.addMetadata("wufoo","defaultValues").addContent(defaultValues);
+        }
+        // End Customization for LIBDRUM-563
     }
 
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-
+        // Begin UMD Customization
+        // Customization for LIBDRUM-563
+        // No body needed for Wufoo feedback form
+        String wufooFormHash = configurationService.getProperty(FORM_HASH);
+        if (wufooFormHash != null && !wufooFormHash.isEmpty()) {
+            return;
+        }
+        // End Customization for LIBDRUM-563
         // Build the item viewer division.
         Division feedback = body.addInteractiveDivision("feedback-form",
                 contextPath+"/feedback",Division.METHOD_POST,"primary");
