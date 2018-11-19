@@ -1294,7 +1294,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang) {
         if (StringUtils.equals(schema, "relation") && !StringUtils.equals(element, "type")) {
 
-            List<MetadataValue> relationMetadata = getRelationshipMetadata(item, false);
+            List<RelationshipMetadataValue> relationMetadata = getRelationshipMetadata(item, false);
             List<MetadataValue> listToReturn = new LinkedList<>();
             for (MetadataValue metadataValue : relationMetadata) {
                 if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {
@@ -1310,7 +1310,8 @@ prevent the generation of resource policy entry values with null dspace_object a
                 StringUtils.equals(qualifier, "*") && StringUtils.equals(lang, "*"))) {
                 return dbMetadataValues;
             }
-            List<MetadataValue> fullMetadataValueList = getRelationshipMetadata(item, true);
+            List<MetadataValue> fullMetadataValueList = new LinkedList<>();
+            fullMetadataValueList.addAll(getRelationshipMetadata(item, true));
             fullMetadataValueList.addAll(dbMetadataValues);
 
             return fullMetadataValueList;
@@ -1319,9 +1320,9 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public List<MetadataValue> getRelationshipMetadata(Item item, boolean extra) {
+    public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean extra) {
         Context context = new Context();
-        List<MetadataValue> fullMetadataValueList = new LinkedList<>();
+        List<RelationshipMetadataValue> fullMetadataValueList = new LinkedList<>();
         try {
             List<MetadataValue> list = item.getMetadata();
             String entityType = getEntityTypeStringFromMetadata(list);
@@ -1339,9 +1340,10 @@ prevent the generation of resource policy entry values with null dspace_object a
         return fullMetadataValueList;
     }
 
-    private List<MetadataValue> handleItemRelationship(Context context, Item item, String entityType,
-                                                       Relationship relationship, boolean extra) throws SQLException {
-        List<MetadataValue> resultingMetadataValueList = new LinkedList<>();
+    private List<RelationshipMetadataValue> handleItemRelationship(Context context, Item item, String entityType,
+                                                                   Relationship relationship, boolean extra)
+        throws SQLException {
+        List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
         HashMap<String, VirtualBean> hashMaps = new HashMap<>();
         String relationName = "";
@@ -1367,19 +1369,21 @@ prevent the generation of resource policy entry values with null dspace_object a
         return resultingMetadataValueList;
     }
 
-    private List<MetadataValue> handleRelationshipTypeMetadataMappping(Context context, Item item,
-                                                                       HashMap<String, VirtualBean> hashMaps,
-                                                                       Item otherItem,
-                                                                       String relationName, Integer relationshipId)
+    private List<RelationshipMetadataValue> handleRelationshipTypeMetadataMappping(Context context, Item item,
+                                                                                   HashMap<String, VirtualBean> hashMaps,
+                                                                                   Item otherItem,
+                                                                                   String relationName,
+                                                                                   Integer relationshipId)
         throws SQLException {
-        List<MetadataValue> resultingMetadataValueList = new LinkedList<>();
+        List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         for (Map.Entry<String, VirtualBean> entry : hashMaps.entrySet()) {
             String key = entry.getKey();
             VirtualBean virtualBean = entry.getValue();
 
-            MetadataValue metadataValue = constructMetadataValue(key);
+            RelationshipMetadataValue metadataValue = constructMetadataValue(key);
             metadataValue = constructResultingMetadataValue(context, item, otherItem, virtualBean, metadataValue,
                                                             relationshipId);
+            metadataValue.setUseForPlace(virtualBean.getUseForPlace());
             if (StringUtils.isNotBlank(metadataValue.getValue())) {
                 resultingMetadataValueList.add(metadataValue);
             }
@@ -1387,9 +1391,9 @@ prevent the generation of resource policy entry values with null dspace_object a
         return resultingMetadataValueList;
     }
 
-    private MetadataValue getRelationMetadataFromOtherItem(Item otherItem, String relationName,
-                                                           Integer relationshipId) {
-        MetadataValue metadataValue = constructMetadataValue("relation." + relationName);
+    private RelationshipMetadataValue getRelationMetadataFromOtherItem(Item otherItem, String relationName,
+                                                                       Integer relationshipId) {
+        RelationshipMetadataValue metadataValue = constructMetadataValue("relation." + relationName);
         metadataValue.setAuthority("virtual::" + relationshipId);
         metadataValue.setValue(otherItem.getID().toString());
         return metadataValue;
@@ -1409,9 +1413,10 @@ prevent the generation of resource policy entry values with null dspace_object a
         return entityType;
     }
 
-    private MetadataValue constructResultingMetadataValue(Context context, Item item, Item otherItem,
-                                                          VirtualBean virtualBean,
-                                                          MetadataValue metadataValue, Integer relationshipId)
+    private RelationshipMetadataValue constructResultingMetadataValue(Context context, Item item, Item otherItem,
+                                                                      VirtualBean virtualBean,
+                                                                      RelationshipMetadataValue metadataValue,
+                                                                      Integer relationshipId)
         throws SQLException {
         metadataValue.setValue(virtualBean.getValue(context, otherItem));
         metadataValue.setAuthority("virtual::" + relationshipId);
@@ -1420,9 +1425,9 @@ prevent the generation of resource policy entry values with null dspace_object a
         return metadataValue;
     }
 
-    private MetadataValue constructMetadataValue(String key) {
+    private RelationshipMetadataValue constructMetadataValue(String key) {
         String[] splittedKey = key.split("\\.");
-        MetadataValue metadataValue = new MetadataValue();
+        RelationshipMetadataValue metadataValue = new RelationshipMetadataValue();
         MetadataField metadataField = new MetadataField();
         MetadataSchema metadataSchema = new MetadataSchema();
         metadataSchema.setName(splittedKey.length > 0 ? splittedKey[0] : null);
