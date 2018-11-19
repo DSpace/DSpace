@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -131,8 +132,10 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
             String defaultValues = "";
             String joiner = "";
             if (configurationService.getProperty(PAGE_FIELD) != null) {
-                defaultValues += configurationService.getProperty(PAGE_FIELD) + "=" +
-                        request.getHeader("Referer");
+                String page = request.getHeader("Referer");
+                // Remove scheme (Wufoo does not allow '//' in default values)
+                page = page.substring(page.startsWith("https") ? 8 : 7);
+                defaultValues += configurationService.getProperty(PAGE_FIELD) + "=" + page;
                 joiner = "&";
             }
             if (configurationService.getProperty(AGENT_FIELD) != null) {
@@ -164,7 +167,7 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
                 defaultValues += joiner + configurationService.getProperty(HOST_FIELD) + "=" +
                         configurationService.getProperty("dspace.hostname");
             }
-            pageMeta.addMetadata("wufoo","defaultValues").addContent(defaultValues);
+            pageMeta.addMetadata("wufoo","defaultValues").addContent(URLEncoder.encode(defaultValues, "UTF-8"));
         }
         // End Customization for LIBDRUM-563
     }
