@@ -33,11 +33,18 @@ The Feedback Aspect is responsible for managing the feedback form.
         </map:actions>
         
         <map:selectors/>
+
+        <map:pipes default="caching">
+            <map:pipe name="noncaching" src="org.apache.cocoon.components.pipeline.impl.NonCachingProcessingPipeline">
+            </map:pipe>
+            <map:pipe name="caching" src="org.apache.cocoon.components.pipeline.impl.CachingProcessingPipeline">
+            </map:pipe>
+        </map:pipes>
     
     </map:components>
 
     <map:pipelines>
-        <map:pipeline>
+        <map:pipeline type="noncaching">
 
             <map:generate/>
             
