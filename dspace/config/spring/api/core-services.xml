@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+    default-lazy-init="true">
 
 
     <!-- ******************** -->
@@ -49,6 +50,10 @@
     <bean class="org.dspace.content.SiteServiceImpl"/>
     <bean class="org.dspace.content.SupervisedItemServiceImpl"/>
     <bean class="org.dspace.content.WorkspaceItemServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipServiceImpl"/>
+    <bean class="org.dspace.content.EntityTypeServiceImpl"/>
+    <bean class="org.dspace.content.EntityServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
 
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
@@ -111,5 +116,96 @@
     <bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>-->
+    <bean class="org.dspace.content.virtual.VirtualMetadataPopulator">
+        <property name="map">
+            <map>
+                <entry key="isAuthorOfPublication" value-ref="isAuthorOfPublicationMap"/>
+                <entry key="isOrgUnitOfPublication" value-ref="isOrgUnitOfPublicationMap"/>
+                <entry key="isPersonOfProject" value-ref="isPersonOfProjectMap"/>
+                <entry key="isOrgUnitOfProject" value-ref="isOrgUnitOfProjectMap"/>
+                <entry key="isOrgUnitOfPerson" value-ref="isOrgUnitOfPersonMap"/>
+                <entry key="isJournalVolumeOfIssue" value-ref="isJournalVolumeOfIssueMap"/>
+                <entry key="isJournalOfVolume" value-ref="isJournalOfVolumeMap"/>
+		<entry key="isVolumeOfJournal" value-ref="isVolumeOfJournalMap"/>
+                <entry key="isIssueOfJournalVolume" value-ref="isIssueOfJournalVolumeMap"/>
+            </map>
+        </property>
+    </bean>
 
+    <bean class="org.dspace.content.virtual.EntityTypeToFilterQueryService">
+        <property name="map">
+            <map>
+                <entry key="Publication" value="f.entityType=Publication,equals"/>
+                <entry key="Person" value="f.entityType=Person,equals"/>
+                <entry key="Journal" value="f.entityType=Journal,equals"/>
+            </map>
+        </property>
+    </bean>
+
+    <util:map id="isAuthorOfPublicationMap">
+        <entry key="dc_contributor_author" value-ref="publicationAuthor_author"/>
+    </util:map>
+    <util:list id="publicationAuthor_author">
+        <value>orgunit.identifier.name</value>
+        <value>person.identifier.lastname</value>
+        <value>person.identifier.firstname</value>
+    </util:list>
+
+    <util:map id="isOrgUnitOfPublicationMap">
+        <entry key="dc_contributor_other" value-ref="publicationOrgUnit_name"/>
+    </util:map>
+    <util:list id="publicationOrgUnit_name">
+        <value>orgunit.identifier.name</value>
+    </util:list>
+
+    <util:map id="isPersonOfProjectMap">
+        <entry key="project_contributor_author" value-ref="projectPerson_author"/>
+    </util:map>
+    <util:list id="projectPerson_author">
+        <value>person.identifier.lastname</value>
+        <value>person.identifier.firstname</value>
+    </util:list>
+
+    <util:map id="isOrgUnitOfProjectMap">
+        <entry key="project_contributor_other" value-ref="projectOrgUnit_other"/>
+    </util:map>
+    <util:list id="projectOrgUnit_other">
+        <value>orgunit.identifier.name</value>
+    </util:list>
+
+    <util:map id="isOrgUnitOfPersonMap">
+        <entry key="person_contributor_other" value-ref="personProject_other"/>
+    </util:map>
+    <util:list id="personProject_other">
+        <value>orgunit.identifier.name</value>
+    </util:list>
+
+    <util:map id="isJournalVolumeOfIssueMap">
+        <entry key="journalvolume_identifier_volume" value-ref="issueVolume_volume"/>
+    </util:map>
+    <util:list id="issueVolume_volume">
+        <value>journalvolume.identifier.volume</value>
+    </util:list>
+
+    <util:map id="isJournalOfVolumeMap">
+        <entry key="journal_identifier_issn" value-ref="volumeJournal_issn"/>
+        <entry key="journal_title" value-ref="volumeJournal_title"/>
+    </util:map>
+    <util:list id="volumeJournal_issn">
+        <value>journal.identifier.issn</value>
+    </util:list>
+    <util:list id="volumeJournal_title">
+        <value>journal.identifier.name</value>
+    </util:list>
+	
+    <util:map id="isVolumeOfJournalMap">
+    </util:map>
+	
+    <util:map id="isIssueOfJournalVolumeMap">
+        <entry key="journalissue_identifier_number" value-ref="journalIssue_number"/>
+    </util:map>
+    <util:list id="journalIssue_number">
+        <value>journalissue.identifier.number</value>
+    </util:list>
 </beans>
+

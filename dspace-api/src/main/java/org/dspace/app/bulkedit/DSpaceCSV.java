@@ -27,6 +27,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -198,20 +199,24 @@ public class DSpaceCSV implements Serializable {
                     }
 
                     // Check that the scheme exists
-                    MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
-                    if (foundSchema == null) {
-                        throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.SCHEMA,
-                                                                        columnCounter);
-                    }
+                    if (!StringUtils.equals(metadataSchema, "relation")) {
+                        MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
+                        if (foundSchema == null) {
+                            throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                            MetadataImportInvalidHeadingException
+                                                                                .SCHEMA,
+                                                                            columnCounter);
+                        }
 
-                    // Check that the metadata element exists in the schema
-                    MetadataField foundField = metadataFieldService
-                        .findByElement(c, foundSchema, metadataElement, metadataQualifier);
-                    if (foundField == null) {
-                        throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.ELEMENT,
-                                                                        columnCounter);
+                        // Check that the metadata element exists in the schema
+                        MetadataField foundField = metadataFieldService
+                            .findByElement(c, foundSchema, metadataElement, metadataQualifier);
+                        if (foundField == null) {
+                            throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                            MetadataImportInvalidHeadingException
+                                                                                .ELEMENT,
+                                                                            columnCounter);
+                        }
                     }
 
                     // Store the heading
