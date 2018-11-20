@@ -1365,7 +1365,8 @@ prevent the generation of resource policy entry values with null dspace_object a
                                                                                      otherItem, relationName,
                                                                                      relationship.getID()));
         }
-        resultingMetadataValueList.add(getRelationMetadataFromOtherItem(otherItem, relationName, relationship.getID()));
+        resultingMetadataValueList
+            .add(getRelationMetadataFromOtherItem(context, otherItem, relationName, relationship.getID()));
         return resultingMetadataValueList;
     }
 
@@ -1380,7 +1381,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             String key = entry.getKey();
             VirtualBean virtualBean = entry.getValue();
 
-            RelationshipMetadataValue metadataValue = constructMetadataValue(key);
+            RelationshipMetadataValue metadataValue = constructMetadataValue(context, key);
             metadataValue = constructResultingMetadataValue(context, item, otherItem, virtualBean, metadataValue,
                                                             relationshipId);
             metadataValue.setUseForPlace(virtualBean.getUseForPlace());
@@ -1391,9 +1392,10 @@ prevent the generation of resource policy entry values with null dspace_object a
         return resultingMetadataValueList;
     }
 
-    private RelationshipMetadataValue getRelationMetadataFromOtherItem(Item otherItem, String relationName,
+    private RelationshipMetadataValue getRelationMetadataFromOtherItem(Context context, Item otherItem,
+                                                                       String relationName,
                                                                        Integer relationshipId) {
-        RelationshipMetadataValue metadataValue = constructMetadataValue("relation." + relationName);
+        RelationshipMetadataValue metadataValue = constructMetadataValue(context, "relation." + relationName);
         metadataValue.setAuthority("virtual::" + relationshipId);
         metadataValue.setValue(otherItem.getID().toString());
         return metadataValue;
@@ -1425,17 +1427,27 @@ prevent the generation of resource policy entry values with null dspace_object a
         return metadataValue;
     }
 
-    private RelationshipMetadataValue constructMetadataValue(String key) {
-        String[] splittedKey = key.split("\\.");
-        RelationshipMetadataValue metadataValue = new RelationshipMetadataValue();
-        MetadataField metadataField = new MetadataField();
-        MetadataSchema metadataSchema = new MetadataSchema();
-        metadataSchema.setName(splittedKey.length > 0 ? splittedKey[0] : null);
-        metadataField.setMetadataSchema(metadataSchema);
-        metadataField.setElement(splittedKey.length > 1 ? splittedKey[1] : null);
-        metadataField.setQualifier(splittedKey.length > 2 ? splittedKey[2] : null);
-        metadataValue.setMetadataField(metadataField);
-        metadataValue.setLanguage(Item.ANY);
-        return metadataValue;
+    private RelationshipMetadataValue constructMetadataValue(Context context, String key) {
+        try {
+            String[] splittedKey = key.split("\\.");
+            RelationshipMetadataValue metadataValue = new RelationshipMetadataValue();
+            String metadataSchema = splittedKey.length > 0 ? splittedKey[0] : null;
+            String metadataElement = splittedKey.length > 1 ? splittedKey[1] : null;
+            String metadataQualifier = splittedKey.length > 2 ? splittedKey[2] : null;
+            MetadataField metadataField = metadataFieldService
+                .findByElement(context, metadataSchema, metadataElement, metadataQualifier);
+            if (metadataField == null) {
+                log.error(
+                    "A MetadataValue was attempted to construct with MetadataField for paremeters: metadataschema: "
+                        + metadataSchema + ", metadataelement:" + metadataElement + ", metadataqualifier: " + metadataQualifier);
+                return null;
+            }
+            metadataValue.setMetadataField(metadataField);
+            metadataValue.setLanguage(Item.ANY);
+            return metadataValue;
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
     }
 }
