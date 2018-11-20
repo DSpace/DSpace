@@ -58,4 +58,18 @@
         <qualifier>description</qualifier>
         <scope_note></scope_note>
     </dc-type>
+
+    <dc-type>
+        <schema>project</schema>
+        <element>contributor</element>
+        <qualifier>other</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>project</schema>
+        <element>contributor</element>
+        <qualifier>author</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 </dspace-dc-types>

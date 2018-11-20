@@ -58,4 +58,11 @@
         <qualifier>jobtitle</qualifier>
         <scope_note></scope_note>
     </dc-type>
+
+    <dc-type>
+        <schema>person</schema>
+        <element>contributor</element>
+        <qualifier>other</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 </dspace-dc-types>
