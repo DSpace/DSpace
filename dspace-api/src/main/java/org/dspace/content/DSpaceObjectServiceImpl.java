@@ -234,11 +234,15 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                             List<String> authorities, List<Integer> confidences) throws SQLException {
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
-
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         for (int i = 0; i < values.size(); i++) {
 
+            if (authorities != null && authorities.size() >= i) {
+                if (StringUtils.equals(authorities.get(i), "virtual")) {
+                    continue;
+                }
+            }
             MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
             metadataValue.setLanguage(lang == null ? null : lang.trim());
 
@@ -545,8 +549,10 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             List<MetadataValue> metadataValues = dso.getMetadata();
             for (MetadataValue metadataValue : metadataValues) {
                 //Retrieve & store the place for each metadata value
-                int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
-                metadataValue.setPlace(mvPlace);
+                if (!StringUtils.equals(metadataValue.getAuthority(), "virtual")) {
+                    int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
+                    metadataValue.setPlace(mvPlace);
+                }
             }
         }
     }
