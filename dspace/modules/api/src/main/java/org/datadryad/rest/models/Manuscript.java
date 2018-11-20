@@ -245,7 +245,7 @@ public class Manuscript {
     }
 
     public Manuscript(DryadDataPackage dryadDataPackage) {
-        journalConcept = JournalUtils.getJournalConceptByJournalName(dryadDataPackage.getPublicationName());
+        journalConcept = dryadDataPackage.getJournalConcept();
         setManuscriptId(dryadDataPackage.getManuscriptNumber());
         setPublicationDOI(dryadDataPackage.getPublicationDOI());
         String title = dryadDataPackage.getTitle().replaceAll("Data from: ", "");

@@ -743,21 +743,29 @@ public class DryadDataPackage extends DryadObject {
         if (useDryadClassic) {
             try {
                 // find all with same Dryad DOI
-                ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", null, manuscript.getDryadDataDOI(), false);
-                while (itemIterator.hasNext()) {
-                    dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+                if (!"".equals(manuscript.getDryadDataDOI())) {
+                    ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", null, manuscript.getDryadDataDOI(), false);
+                    while (itemIterator.hasNext()) {
+                        dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+                    }
                 }
+
                 // find all with same publication DOI
-                itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", manuscript.getPublicationDOI(), false);
-                while (itemIterator.hasNext()) {
-                    dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+                if (!"".equals(manuscript.getPublicationDOI())) {
+                    ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", manuscript.getPublicationDOI(), false);
+                    while (itemIterator.hasNext()) {
+                        dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+                    }
                 }
+
                 // find all with same manuscript ID (in the same journal)
-                itemIterator = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscript.getManuscriptId(), false);
-                while (itemIterator.hasNext()) {
-                    DryadDataPackage dataPackage = new DryadDataPackage(itemIterator.next());
-                    if (dataPackage.getPublicationName().equals(manuscript.getJournalName()))
-                        dataPackageList.add(dataPackage);
+                if (!"".equals(manuscript.getManuscriptId())) {
+                    ItemIterator itemIterator = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscript.getManuscriptId(), false);
+                    while (itemIterator.hasNext()) {
+                        DryadDataPackage dataPackage = new DryadDataPackage(itemIterator.next());
+                        if (dataPackage.getPublicationName().equals(manuscript.getJournalName()))
+                            dataPackageList.add(dataPackage);
+                    }
                 }
             } catch (Exception ex) {
                 log.error("Exception getting data package from publication DOI", ex);
