@@ -112,10 +112,10 @@ public class CurationCli {
         if (line.hasOption('p')) { // parameter
             for (String parameter : line.getOptionValues('p')) {
                 String[] parts = parameter.split("=", 2);
-                String name = parts[0];
+                String name = parts[0].trim();
                 String value;
                 if (parts.length > 1) {
-                    value = parts[1];
+                    value = parts[1].trim();
                 } else {
                     value = "true";
                 }
