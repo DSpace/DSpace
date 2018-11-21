@@ -64,7 +64,13 @@ public class CommunityConverter
             }
         }
         com.setSubCommunities(communityRest);
-
+        List<Community> parentCommunities = obj.getParentCommunities();
+        if (parentCommunities.size() > 0) {
+            Community parentCommunity = parentCommunities.get(0);
+            if (parentCommunity != null) {
+                com.setOwningCommunity(parentCommunity.getID().toString());
+            }
+        }
         return com;
     }
 

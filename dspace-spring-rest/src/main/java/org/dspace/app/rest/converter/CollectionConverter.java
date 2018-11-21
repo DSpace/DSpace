@@ -66,6 +66,11 @@ public class CollectionConverter
 
         col.setDefaultAccessConditions(getDefaultBitstreamPoliciesForCollection(obj.getID()));
 
+        try {
+            col.setOwningCommunity(obj.getCommunities().get(0).getID().toString());
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
         return col;
     }
 
