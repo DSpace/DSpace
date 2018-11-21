@@ -67,7 +67,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     @Override
     public String getName(T dso) {
-        String value = getMetadataFirstValue(dso, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        String value = getMetadataFirstValue(dso, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 
@@ -578,23 +578,23 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected String[] getMDValueByLegacyField(String field) {
         switch (field) {
             case "introductory_text":
-                return new String[] {MetadataSchema.DC_SCHEMA, "description", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "description", null};
             case "short_description":
-                return new String[] {MetadataSchema.DC_SCHEMA, "description", "abstract"};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "description", "abstract"};
             case "side_bar_text":
-                return new String[] {MetadataSchema.DC_SCHEMA, "description", "tableofcontents"};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "description", "tableofcontents"};
             case "copyright_text":
-                return new String[] {MetadataSchema.DC_SCHEMA, "rights", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "rights", null};
             case "name":
-                return new String[] {MetadataSchema.DC_SCHEMA, "title", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "title", null};
             case "provenance_description":
-                return new String[] {MetadataSchema.DC_SCHEMA, "provenance", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "provenance", null};
             case "license":
-                return new String[] {MetadataSchema.DC_SCHEMA, "rights", "license"};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "rights", "license"};
             case "user_format_description":
-                return new String[] {MetadataSchema.DC_SCHEMA, "format", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "format", null};
             case "source":
-                return new String[] {MetadataSchema.DC_SCHEMA, "source", null};
+                return new String[] {MetadataSchemaEnum.DC.getName(), "source", null};
             case "firstname":
                 return new String[] {"eperson", "firstname", null};
             case "lastname":
