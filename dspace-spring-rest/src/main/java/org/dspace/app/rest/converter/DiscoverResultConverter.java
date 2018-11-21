@@ -22,7 +22,6 @@ import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
@@ -45,9 +44,6 @@ public class DiscoverResultConverter {
 
     @Autowired
     private List<DSpaceObjectConverter> converters;
-
-    @Autowired
-    private ItemService itemService;
 
     @Autowired
     private SearchService searchService;

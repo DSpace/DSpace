@@ -26,7 +26,7 @@ public class EntityTypeConverter extends DSpaceConverter<org.dspace.content.Enti
      */
     public EntityTypeRest fromModel(EntityType obj) {
         EntityTypeRest entityTypeRest = new EntityTypeRest();
-        entityTypeRest.setId(obj.getId());
+        entityTypeRest.setId(obj.getID());
         entityTypeRest.setLabel(obj.getLabel());
         return entityTypeRest;
     }

@@ -85,14 +85,6 @@ public class Relationship implements ReloadableEntity<Integer> {
     }
 
     /**
-     * Standard setter for the ID field
-     * @param id    The ID to be set
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    /**
      * Standard getter for the leftItem field
      * @return  The leftItem Item object in this relationship
      */
