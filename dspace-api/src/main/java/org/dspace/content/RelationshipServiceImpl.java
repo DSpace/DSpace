@@ -127,7 +127,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     private void logRelationshipTypeDetails(RelationshipType relationshipType) {
-        log.warn("The relationshipType's ID is: " + relationshipType.getId());
+        log.warn("The relationshipType's ID is: " + relationshipType.getID());
         log.warn("The relationshipType's left label is: " + relationshipType.getLeftLabel());
         log.warn("The relationshipType's right label is: " + relationshipType.getRightLabel());
         log.warn("The relationshipType's left entityType label is: " + relationshipType.getLeftType().getLabel());
