@@ -40,7 +40,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.content.virtual.Concatenate;
 import org.dspace.content.virtual.VirtualBean;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
@@ -1328,7 +1327,8 @@ prevent the generation of resource policy entry values with null dspace_object a
             if (StringUtils.isNotBlank(entityType)) {
                 List<Relationship> relationships = relationshipService.findByItem(context, item);
                 for (Relationship relationship : relationships) {
-                    fullMetadataValueList.addAll(handleItemRelationship(context, item, entityType, relationship, extra));
+                    fullMetadataValueList.addAll(handleItemRelationship(context, item,
+                                                                        entityType, relationship, extra));
                 }
 
             }
@@ -1406,7 +1406,8 @@ prevent the generation of resource policy entry values with null dspace_object a
         return entityType;
     }
 
-    private MetadataValue constructResultingMetadataValue(Context context, Item item, Item otherItem, VirtualBean virtualBean,
+    private MetadataValue constructResultingMetadataValue(Context context, Item item,
+                                                          Item otherItem, VirtualBean virtualBean,
                                                           MetadataValue metadataValue) throws SQLException {
         metadataValue.setValue(virtualBean.getValue(context, otherItem));
         metadataValue.setAuthority("virtual");
