@@ -367,7 +367,13 @@ public class DryadDataPackage extends DryadObject {
         try {
             // get the current duplicate packages
             resultList.addAll(getDuplicatePackages(context));
-            resultList.addAll(findAllByManuscript(context, new Manuscript(this)));
+            List<DryadDataPackage> matchingPackages = findAllByManuscript(context, new Manuscript(this));
+            for (DryadDataPackage dryadDataPackage : matchingPackages) {
+                if (!dryadDataPackage.getIdentifier().equals(this.getIdentifier())) {
+                    resultList.add(dryadDataPackage);
+                    log.error("adding package " + dryadDataPackage.getIdentifier());
+                }
+            }
             // look for items that have the same journal + title + authors?
 
         } catch (Exception e) {
