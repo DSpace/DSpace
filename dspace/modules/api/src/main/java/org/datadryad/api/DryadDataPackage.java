@@ -113,7 +113,7 @@ public class DryadDataPackage extends DryadObject {
         super(item);
         String pubName = getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
         if (pubName != null && !pubName.equals("")) {
-            journalConcept = JournalUtils.getJournalConceptByJournalName(getPublicationName());
+            journalConcept = JournalUtils.getJournalConceptByJournalName(pubName);
         }
     }
 
