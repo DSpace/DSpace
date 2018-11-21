@@ -344,10 +344,6 @@
             <artifactId>mets</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.dspace.dependencies</groupId>
-            <artifactId>dspace-tm-extractors</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
