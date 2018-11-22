@@ -17,6 +17,11 @@ public class RelationshipRestWrapper implements RestAddressableModel {
     @JsonIgnore
     private List<RelationshipRest> relationshipRestList;
 
+    private String label;
+    private String dsoId;
+
+
+
     public List<RelationshipRest> getRelationshipRestList() {
         return relationshipRestList;
     }
@@ -35,5 +40,21 @@ public class RelationshipRestWrapper implements RestAddressableModel {
 
     public String getType() {
         return "relationship";
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getDsoId() {
+        return dsoId;
+    }
+
+    public void setDsoId(String dsoId) {
+        this.dsoId = dsoId;
     }
 }
