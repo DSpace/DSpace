@@ -501,7 +501,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     }
 
     @Test
-    public void testBrowseByStartsWith() throws Exception {
+    public void testBrowseByEntriesStartsWith() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -638,6 +638,72 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //Verify that the startsWith paramater is included in the links
                     .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=C")));
 
+    };
+    
+    @Test
+    public void testBrowseByItemsStartsWith() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. 7 public items that are readable by Anonymous
+        Item item1 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Alan Turing")
+                                .withAuthor("Turing, Alan Mathison")
+                                .withIssueDate("1912-06-23")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Blade Runner")
+                                .withAuthor("Scott, Ridley")
+                                .withIssueDate("1982-06-25")
+                                .withSubject("Science Fiction")
+                                .build();
+
+        Item item3 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Python")
+                                .withAuthor("Van Rossum, Guido")
+                                .withIssueDate("1990")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item4 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Java")
+                                .withAuthor("Gosling, James")
+                                .withIssueDate("1995-05-23")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item5 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Zeta Reticuli")
+                                .withAuthor("Universe")
+                                .withIssueDate("2018-01-01")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item6 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Moon")
+                                .withAuthor("Universe")
+                                .withIssueDate("2018-01-02")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item7 = ItemBuilder.createItem(context, col2)
+                                .withTitle("T-800")
+                                .withAuthor("Cameron, James")
+                                .withIssueDate("2029")
+                                .withSubject("Science Fiction")
+                                .build();
         // ---- BROWSES BY ITEM ----
 
         //** WHEN **
@@ -719,6 +785,197 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                                                             "1982-06-25"),
                                                ItemMatcher.matchItemWithTitleAndDateIssued(item3,
                                                                                             "Python", "1990")
+                                       )));
+    }
+    
+    @Test
+    public void testBrowseByStartsWithAndPage() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. 7 public items that are readable by Anonymous
+        Item item1 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Alan Turing")
+                                .withAuthor("Turing, Alan Mathison")
+                                .withIssueDate("1912-06-23")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Blade Runner")
+                                .withAuthor("Scott, Ridley")
+                                .withIssueDate("1982-06-25")
+                                .withSubject("Science Fiction")
+                                .build();
+
+        Item item3 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Java")
+                                .withAuthor("Gosling, James")
+                                .withIssueDate("1995-05-23")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item4 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Moon")
+                                .withAuthor("Universe")
+                                .withIssueDate("2018-01-02")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item5 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Python")
+                                .withAuthor("Van Rossum, Guido")
+                                .withIssueDate("1990")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item6 = ItemBuilder.createItem(context, col2)
+                                .withTitle("T-800")
+                                .withAuthor("Cameron, James")
+                                .withIssueDate("2029")
+                                .withSubject("Science Fiction")
+                                .build();
+
+        Item item7 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Zeta Reticuli")
+                                .withAuthor("Universe")
+                                .withIssueDate("2018-01-01")
+                                .withSubject("Astronomy")
+                                .build();
+        
+        // ---- BROWSES BY ITEM ----
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by date issued endpoint
+        //with startsWith set to 1990 and Page to 3
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
+                                .param("size", "2").param("page", "2"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect the totalElements to be the 7 items present in the repository
+                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   //We expect to jump to page 1 of the index
+                   .andExpect(jsonPath("$.page.number", is(2)))
+                   .andExpect(jsonPath("$.page.size", is(2)))
+                   .andExpect(jsonPath("$._links.first.href", containsString("startsWith=1990")))
+
+                   //Verify that the index jumps to the "Zeta Reticuli" item.
+                   .andExpect(jsonPath("$._embedded.items",
+                                       contains(ItemMatcher.matchItemWithTitleAndDateIssued(item7,
+                                                                                            "Zeta Reticuli", "2018-01-01"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item4,
+                                                                                            "Moon", "2018-01-02")
+                                       )));
+    }
+
+    @Test
+    public void testBrowseByStartsWithAndPageGreaterThanTotalPages() throws Exception {
+        // This test an scenario where a nonexisting page is requested (The page number is greater than
+        // the total number of pages )
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. 7 public items that are readable by Anonymous
+        Item item1 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Alan Turing")
+                                .withAuthor("Turing, Alan Mathison")
+                                .withIssueDate("1912-06-23")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Blade Runner")
+                                .withAuthor("Scott, Ridley")
+                                .withIssueDate("1982-06-25")
+                                .withSubject("Science Fiction")
+                                .build();
+
+        Item item3 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Python")
+                                .withAuthor("Van Rossum, Guido")
+                                .withIssueDate("1990")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item4 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Java")
+                                .withAuthor("Gosling, James")
+                                .withIssueDate("1995-05-23")
+                                .withSubject("Computing")
+                                .build();
+
+        Item item5 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Zeta Reticuli")
+                                .withAuthor("Universe")
+                                .withIssueDate("2018-01-01")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item6 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Moon")
+                                .withAuthor("Universe")
+                                .withIssueDate("2018-01-02")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item7 = ItemBuilder.createItem(context, col2)
+                                .withTitle("T-800")
+                                .withAuthor("Cameron, James")
+                                .withIssueDate("2029")
+                                .withSubject("Science Fiction")
+                                .build();
+        // ---- BROWSES BY ITEM ----
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by date issued endpoint
+        //with startsWith set to 1990 and Page to 300
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
+                                .param("size", "2").param("page", "300"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect the totalElements to be the 7 items present in the repository
+                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   //We expect to jump to the LAST page of the index
+                   .andExpect(jsonPath("$.page.number", is(3)))
+                   .andExpect(jsonPath("$.page.size", is(2)))
+                   .andExpect(jsonPath("$._links.first.href", containsString("startsWith=1990")))
+
+                   //Verify that the index jumps to the "Python" item.
+                   .andExpect(jsonPath("$._embedded.items",
+                                       contains(ItemMatcher.matchItemWithTitleAndDateIssued(item3,
+                                                                                            "Python", "1990"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item4,
+                                                                                            "Java", "1995-05-23")
                                        )));
     }
 }
