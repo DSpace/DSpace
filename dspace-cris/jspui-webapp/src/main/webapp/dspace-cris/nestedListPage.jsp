@@ -7,13 +7,16 @@
     https://github.com/CILEA/dspace-cris/wiki/License
 
 --%>
+<%@page import="java.util.Locale"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
 <%@ taglib uri="jdynatags" prefix="dyna"%>
+<%@ taglib uri="researchertags" prefix="researcher"%>
 <%@page import="it.cilea.osd.jdyna.model.AccessLevelConstants"%>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <% 
 	Integer offset = (Integer)request.getAttribute("offset");
@@ -21,9 +24,15 @@
 	Integer totalHit = (Integer)request.getAttribute("totalHit");
 	Integer hitPageSize = (Integer)request.getAttribute("hitPageSize");
 	Integer pageCurrent = (Integer)request.getAttribute("pageCurrent");
+    Locale sessionLocale = UIUtil.getSessionLocale(request);
+	String currLocale = null;
+	if (sessionLocale != null) {
+		currLocale = sessionLocale.toString();
+	}
 %>
-
+<c:set var="currLocale"><%= currLocale %></c:set>
 <c:set var="HIGH_ACCESS" value="<%=  AccessLevelConstants.HIGH_ACCESS %>"></c:set>
+<c:set var="decoratorPropertyDefinition" value="${researcher:getPropertyDefinitionI18N(decoratorPropertyDefinition,currLocale)}" />
 <div id="nestedDetailDiv_${decoratorPropertyDefinition.real.id}" class="dynaField">
 			<span class="spandatabind nestedinfo">${decoratorPropertyDefinition.real.id}</span>
 			<span id="nested_${decoratorPropertyDefinition.real.id}_totalHit" class="spandatabind">${totalHit}</span>

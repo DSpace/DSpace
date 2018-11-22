@@ -57,36 +57,7 @@ public class ScopusResponse {
 			DocumentBuilder db = factory.newDocumentBuilder();
 			Document inDoc = db.parse(xmlData);
 
-			Element xmlRoot = inDoc.getDocumentElement();
-			Element dataRoot = XMLUtils.getSingleElement(xmlRoot, "entry");
-			String eid = XMLUtils.getElementValue(dataRoot, "eid");
-			String numCitations = XMLUtils.getElementValue(dataRoot, "citedby-count");
-			List<Element> citedByLinkElements = XMLUtils.getElementList(dataRoot, "link");
-			
-			for(Element element : citedByLinkElements) {
-				if(element.hasAttribute("ref")) {
-					if("scopus-citedby".equals(element.getAttribute("ref"))) {
-						scopusCitation.getTmpRemark().put("link", element.getAttribute("href"));
-						break;
-					}
-				}
-			}
-			
-			if (StringUtils.isNotBlank(eid)) {
-				scopusCitation.getTmpRemark().put("identifier", eid);
-			}
-			try {
-			    scopusCitation.setMetricCount(Double.parseDouble(numCitations));
-			}
-			catch(NullPointerException ex) {
-			    log.error("try to parse numCitations:" + numCitations);
-			    throw new Exception(ex);
-			}
-			scopusCitation.setEndDate(new Date());
-			scopusCitation.setMetricType(ConstantMetrics.STATS_INDICATOR_TYPE_SCOPUS);
-            scopusCitation.setRemark(scopusCitation.buildMetricsRemark());
-			
-            if (log.isDebugEnabled())
+			if (log.isDebugEnabled())
             {
                 DOMSource domSource = new DOMSource(inDoc);
                 StringWriter writer = new StringWriter();
@@ -96,6 +67,49 @@ public class ScopusResponse {
                 transformer.transform(domSource, result);
                 log.debug(writer.toString());
             }
+			
+			Element xmlRoot = inDoc.getDocumentElement();
+			Element dataRoot = XMLUtils.getSingleElement(xmlRoot, "entry");
+			Element errorScopusResp = XMLUtils.getSingleElement(dataRoot, "error");
+			if (dataRoot != null && errorScopusResp == null) {
+				String eid = XMLUtils.getElementValue(dataRoot, "eid");
+				String numCitations = XMLUtils.getElementValue(dataRoot, "citedby-count");
+				List<Element> citedByLinkElements = XMLUtils.getElementList(dataRoot, "link");
+				
+				for(Element element : citedByLinkElements) {
+					if(element.hasAttribute("ref")) {
+						if("scopus-citedby".equals(element.getAttribute("ref"))) {
+							scopusCitation.getTmpRemark().put("link", element.getAttribute("href"));
+							break;
+						}
+					}
+				}
+				
+				if (StringUtils.isNotBlank(eid)) {
+					scopusCitation.getTmpRemark().put("identifier", eid);
+				}
+				try {
+				    scopusCitation.setMetricCount(Double.parseDouble(numCitations));
+				}
+				catch(NullPointerException ex) {
+				    log.error("try to parse numCitations:" + numCitations);
+				    throw new Exception(ex);
+				}
+				scopusCitation.setEndDate(new Date());
+				scopusCitation.setMetricType(ConstantMetrics.STATS_INDICATOR_TYPE_SCOPUS);
+	            scopusCitation.setRemark(scopusCitation.buildMetricsRemark());
+				
+	            
+			}
+			else {
+				error = true;
+				if (dataRoot == null) {
+					log.debug("No citation entry found in Scopus");
+				}
+				else {
+					log.debug("Error citation entry found in Scopus: " + errorScopusResp.getTextContent());
+				}
+			}
 		} catch (Exception e) {
 		    log.error(e.getMessage(), e);
 			error = true;

@@ -202,7 +202,7 @@ public class DisplayItemMetadataUtils {
 			}
 
 			// FIXME: Still need to fix for metadata language?
-			Metadatum[] values = item.getMetadata(schema, element, qualifier, Item.ANY);
+			Metadatum[] values = item.getMetadataWithoutPlaceholder(schema, element, qualifier, Item.ANY);
 
 			if (values.length > 0) {
 

@@ -447,8 +447,9 @@ return decorator.generateDisplayValue(alternativeName, rp);
 		    discoverQuery.setDSpaceObjectFilter(CrisConstants.RP_TYPE_ID);
 		    String surnameQuery = "{!lucene q.op=AND df=rpsurnames}("
     			    + luceneQuery
-    			    + ") OR (\""
-    			    + luceneQuery.substring(0,luceneQuery.length() - 1) + "\")";
+    			    + ") OR ("
+    			    // no need for a phrase search, the default operator is now AND and we want to match surnames in any order
+    			    + luceneQuery.substring(0,luceneQuery.length() - 1) + ")";
 		    
 		    discoverQuery.setQuery(surnameQuery);
 		    discoverQuery.setMaxResults(MAX_RESULTS);
@@ -700,4 +701,36 @@ return decorator.generateDisplayValue(alternativeName, rp);
             ro.removeProprieta(remove);
         }
     }
+
+	public static void copyNestedObject(ACrisObject targetCrisObject, ACrisNestedObject no) {
+		ACrisNestedObject copy = null;
+		try {
+			copy = (ACrisNestedObject) targetCrisObject.getClassNested().newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+		}
+		copy.setParent(targetCrisObject);
+		copy.setTypo(no.getTypo());
+		copy.setPositionDef(no.getPositionDef());
+		copy.setPreferred(no.getPreferred());
+		copy.setScopeDef(no.getScopeDef());
+		copy.setSourceReference(no.getSourceReference());
+		copy.setAvailabilityInfo(no.getAvailabilityInfo());
+		
+		for (Property p : (List<Property>) no.getAnagrafica()) {
+			AValue avalue = p.getTypo().getRendering().getInstanceValore();
+	        avalue.setOggetto(p.getObject());
+	        Property pc = copy.createProprieta(p.getTypo());
+	        pc.setValue(avalue);
+	        pc.setVisibility(p.getVisibility());
+		}
+		applicationService.saveOrUpdate(targetCrisObject.getClassNested(), copy);
+	}
+
+	public static void cleanNestedObjectByShortname(ACrisObject targetCrisObject, String propName) {
+		List<? extends ACrisNestedObject> nestedObjects = applicationService.getNestedObjectsByParentIDAndShortname(
+				targetCrisObject.getId(), propName, targetCrisObject.getClassNested());
+		for (ACrisNestedObject acno : nestedObjects) {
+			applicationService.delete(targetCrisObject.getClassNested(), acno.getId());
+		}
+	}
 }
