@@ -52,4 +52,15 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @throws SQLException If something goes wrong
      */
     List<RelationshipType> findAll(Context context) throws SQLException;
+
+    /**
+     * Retrieves all RelationshipType objects that have a left or right label that is
+     * equal to the given String
+     * @param context   The relevant DSpace context
+     * @param label     The label that has to match
+     * @return          The list of all RelationshipType objects that have a left or right label
+     *                  that is equal to the given label param
+     * @throws SQLException If something goes wrong
+     */
+    List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException;
 }
