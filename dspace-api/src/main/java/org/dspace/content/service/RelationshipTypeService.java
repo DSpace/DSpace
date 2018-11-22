@@ -63,4 +63,6 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @throws SQLException If something goes wrong
      */
     List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException;
+
+    List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException;
 }

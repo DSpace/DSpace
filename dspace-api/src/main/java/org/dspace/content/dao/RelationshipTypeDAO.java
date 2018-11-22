@@ -39,4 +39,5 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
                                                 throws SQLException;
 
     List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException;
+    List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException;
 }
