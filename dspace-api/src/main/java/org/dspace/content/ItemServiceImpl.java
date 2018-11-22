@@ -1334,8 +1334,6 @@ prevent the generation of resource policy entry values with null dspace_object a
             }
         } catch (SQLException e) {
             log.error(e, e);
-        } finally {
-            context.close();
         }
         return fullMetadataValueList;
     }
