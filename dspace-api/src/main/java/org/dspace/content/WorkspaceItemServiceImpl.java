@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
-    private static final Logger log = Logger.getLogger(WorkspaceItemServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemServiceImpl.class);
 
     @Autowired(required = true)
     protected WorkspaceItemDAO workspaceItemDAO;
@@ -148,6 +148,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
+    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
+        throws SQLException {
+        return workspaceItemDAO.findByEPerson(context, ep, limit, offset);
+    }
+
+    @Override
     public List<WorkspaceItem> findByCollection(Context context, Collection collection) throws SQLException {
         return workspaceItemDAO.findByCollection(context, collection);
     }
@@ -229,6 +235,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public int countTotal(Context context) throws SQLException {
         return workspaceItemDAO.countRows(context);
+    }
+
+    @Override
+    public int countByEPerson(Context context, EPerson ep) throws SQLException {
+        return workspaceItemDAO.countRows(context, ep);
     }
 
     @Override

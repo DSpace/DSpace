@@ -11,7 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
@@ -29,7 +29,7 @@ import org.flywaydb.core.api.callback.FlywayCallback;
  * @author Tim Donohue
  */
 public class PostgreSQLCryptoChecker implements FlywayCallback {
-    private Logger log = Logger.getLogger(PostgreSQLCryptoChecker.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(PostgreSQLCryptoChecker.class);
 
     /**
      * Check for pgcrypto (if needed). Throws an exception if pgcrypto is

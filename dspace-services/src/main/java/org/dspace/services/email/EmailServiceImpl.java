@@ -12,7 +12,9 @@ import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.naming.InitialContext;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+import javax.naming.NoInitialContextException;
 
 import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.services.ConfigurationService;
@@ -33,7 +35,7 @@ import org.springframework.beans.factory.annotation.Required;
 public class EmailServiceImpl
     extends Authenticator
     implements EmailService, InitializedService {
-    private static final Logger logger = (Logger) LoggerFactory.getLogger(EmailServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     private Session session = null;
 
@@ -53,7 +55,7 @@ public class EmailServiceImpl
     /**
      * Provide a reference to the JavaMail session.
      *
-     * @return the managed Session, or null if none could be created.
+     * @return the managed Session, or {@code null} if none could be created.
      */
     @Override
     public Session getSession() {
@@ -67,12 +69,16 @@ public class EmailServiceImpl
         if (null == sessionName) {
             sessionName = "Session";
         }
+        String sessionUri = "java:comp/env/mail/" + sessionName;
+        logger.debug("Looking up Session as {}", sessionUri);
         try {
             InitialContext ctx = new InitialContext(null);
-            session = (Session) ctx.lookup("java:comp/env/mail/" + sessionName);
+            session = (Session) ctx.lookup(sessionUri);
+        } catch (NameNotFoundException | NoInitialContextException ex) {
+            // Not a problem -- build a new Session from configuration.
         } catch (NamingException ex) {
-            logger.warn("Couldn't get an email session from environment:  {}",
-                        ex.getMessage());
+            logger.warn("Couldn't get an email session from environment:  {}:  {}",
+                        ex.getClass().getName(), ex.getMessage());
         }
 
         if (null != session) {
@@ -106,8 +112,6 @@ public class EmailServiceImpl
                 props.put("mail.smtp.auth", "true");
                 session = Session.getInstance(props, this);
             }
-
-
         }
     }
 

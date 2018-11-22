@@ -17,7 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -36,7 +36,7 @@ public class XMLUtils {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(XMLUtils.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(XMLUtils.class);
 
     /**
      * Default constructor

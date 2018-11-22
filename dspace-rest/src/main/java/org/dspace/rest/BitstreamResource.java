@@ -32,7 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -69,7 +69,7 @@ public class BitstreamResource extends Resource {
                                                                                    .getResourcePolicyService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
-    private static Logger log = Logger.getLogger(BitstreamResource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamResource.class);
 
     /**
      * Return bitstream properties without file data. It can throw

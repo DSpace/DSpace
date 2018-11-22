@@ -23,6 +23,7 @@ import com.nimbusds.jwt.SignedJWT;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.service.ClientInfoService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,6 +63,9 @@ public class JWTTokenHandlerTest {
     @Mock
     private EPersonClaimProvider ePersonClaimProvider;
 
+    @Mock
+    private ClientInfoService clientInfoService;
+
     @Spy
     private List<JWTClaimProvider> jwtClaimProviders = new ArrayList<>();
 
@@ -71,6 +75,7 @@ public class JWTTokenHandlerTest {
         when(ePerson.getSessionSalt()).thenReturn("01234567890123456789012345678901");
         when(ePerson.getLastActive()).thenReturn(new Date());
         when(context.getCurrentUser()).thenReturn(ePerson);
+        when(clientInfoService.getClientIp(any())).thenReturn("123.123.123.123");
         when(ePersonClaimProvider.getKey()).thenReturn("eid");
         when(ePersonClaimProvider.getValue(any(), Mockito.any(HttpServletRequest.class))).thenReturn("epersonID");
         jwtClaimProviders.add(ePersonClaimProvider);

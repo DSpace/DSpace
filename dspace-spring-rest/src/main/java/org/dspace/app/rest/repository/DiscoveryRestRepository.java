@@ -9,7 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import javax.ws.rs.BadRequestException;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.DiscoverConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverFacetConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverFacetResultsConverter;
@@ -46,7 +48,7 @@ import org.springframework.stereotype.Component;
 @Component(SearchResultsRest.CATEGORY + "." + SearchResultsRest.NAME)
 public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
-    private static final Logger log = Logger.getLogger(ScopeResolver.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopeResolver.class);
 
     @Autowired
     private DiscoveryConfigurationService searchConfigurationService;
@@ -91,7 +93,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     public SearchResultsRest getSearchObjects(final String query, final String dsoType, final String dsoScope,
                                               final String configurationName,
                                               final List<SearchFilter> searchFilters, final Pageable page)
-            throws InvalidRequestException {
+            throws InvalidRequestException, BadRequestException {
         Context context = obtainContext();
 
         DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
@@ -108,6 +110,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
         } catch (SearchServiceException e) {
             log.error("Error while searching with Discovery", e);
+            throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
         }
 
         return discoverResultConverter

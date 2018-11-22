@@ -32,7 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -72,7 +72,7 @@ public class ItemsResource extends Resource {
                                                                                    .getResourcePolicyService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
-    private static final Logger log = Logger.getLogger(ItemsResource.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemsResource.class);
 
     /**
      * Return item properties without metadata and bitstreams. You can add

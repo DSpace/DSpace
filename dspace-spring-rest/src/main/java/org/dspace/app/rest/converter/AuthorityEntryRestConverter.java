@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.Choice;
@@ -36,6 +36,6 @@ public class AuthorityEntryRestConverter extends DSpaceConverter<Choice, Authori
 
     @Override
     public Choice toModel(AuthorityEntryRest obj) {
-        throw new NotImplementedException();
+        throw new NotImplementedException("Method not implemented");
     }
 }
