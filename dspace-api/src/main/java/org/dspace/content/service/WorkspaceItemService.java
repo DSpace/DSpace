@@ -73,6 +73,21 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
         throws SQLException;
 
     /**
+     * Get a page of workspace items for a particular e-person. These are ordered by
+     * workspace item ID, since this should likely keep them in the order in
+     * which they were created.
+     *
+     * @param context the context object
+     * @param ep      the eperson
+     * @param limit   the max number of workspaceitems to return
+     * @param offset  the offset
+     * @return the corresponding workspace items
+     * @throws SQLException if database error
+     */
+    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
+        throws SQLException;
+
+    /**
      * Get all workspace items for a particular collection.
      *
      * @param context    the context object
@@ -146,4 +161,8 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * @throws SQLException if database error
      */
     List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException;
+
+
+    public int countByEPerson(Context context, EPerson ep) throws SQLException;
+
 }

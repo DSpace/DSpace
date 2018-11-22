@@ -19,7 +19,7 @@ import javax.servlet.Filter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Application;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.security.MethodSecurityConfig;
@@ -70,6 +70,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     protected static final String AUTHORIZATION_TYPE = "Bearer ";
 
     public static final String REST_SERVER_URL = "http://localhost/api/";
+    public static final String BASE_REST_SERVER_URL = "http://localhost";
 
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
                                                     MediaTypes.HAL_JSON.getSubtype(), Charsets.UTF_8);

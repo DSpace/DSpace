@@ -13,17 +13,19 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
 import org.dspace.app.rest.converter.ResourcePolicyConverter;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -31,12 +33,14 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.init.UncategorizedScriptException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,7 +51,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmissionService {
 
-    private static final Logger log = Logger.getLogger(SubmissionService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionService.class);
 
     @Autowired
     protected ConfigurationService configurationService;
@@ -64,23 +68,35 @@ public class SubmissionService {
 
     public WorkspaceItem createWorkspaceItem(Context context, Request request) {
         WorkspaceItem wsi = null;
+        Collection collection = null;
         String collectionUUID = request.getHttpServletRequest().getParameter("collection");
+
         if (StringUtils.isBlank(collectionUUID)) {
-            String uuid = configurationService.getProperty("submission.default.collection");
-            Collection collection = null;
-            try {
-                if (StringUtils.isNotBlank(uuid)) {
-                    collection = collectionService.find(context, UUID.fromString(uuid));
+            collectionUUID = configurationService.getProperty("submission.default.collection");
+        }
+
+        try {
+            if (StringUtils.isNotBlank(collectionUUID)) {
+                collection = collectionService.find(context, UUID.fromString(collectionUUID));
+            } else {
+                final List<Collection> findAuthorizedOptimized = collectionService.findAuthorizedOptimized(context,
+                        Constants.ADD);
+                if (findAuthorizedOptimized != null && findAuthorizedOptimized.size() > 0) {
+                    collection = findAuthorizedOptimized.get(0);
                 } else {
-                    collection = collectionService.findAll(context, 1, 0).get(0);
+                    throw new RESTAuthorizationException("No collection suitable for submission for the current user");
                 }
-                wsi = workspaceItemService.create(context, collection, true);
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
             }
-        } else {
-            //TODO manage setup of default collection in the case WSI it is not null
-            //TODO manage setup of collection discovered into request
+
+            if (collection == null) {
+                throw new RESTAuthorizationException("collectionUUID=" + collectionUUID + " not found");
+            }
+            wsi = workspaceItemService.create(context, collection, true);
+        } catch (SQLException e) {
+            // wrap in a runtime exception as we cannot change the method signature
+            throw new UncategorizedScriptException(e.getMessage(), e);
+        } catch (AuthorizeException ae) {
+            throw new RESTAuthorizationException(ae);
         }
         return wsi;
     }

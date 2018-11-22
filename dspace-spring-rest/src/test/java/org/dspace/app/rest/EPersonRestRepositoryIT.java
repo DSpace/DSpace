@@ -11,15 +11,20 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
@@ -30,6 +35,8 @@ import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.EPersonMetadataMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -37,7 +44,6 @@ import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
-
 
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
@@ -512,6 +518,527 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         // Verify the eperson is still here
         getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void patchByForbiddenUser() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // should be forbidden.
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                   .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.netid", Matchers.is(nullValue())));
+
+    }
+
+    @Test
+    public void patchByAnonymousUser() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // should be unauthorized.
+        getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isUnauthorized());
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.netid", Matchers.is(nullValue())));
+
+    }
+
+    @Test
+    public void patchNetId() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withNetId("testId")
+                                        .build();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // update net id
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.netid", Matchers.is("newNetId")))
+                        .andExpect(jsonPath("$.email", Matchers.is("johndoe@fake-email.com")))
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(false)));
+
+    }
+
+    @Test
+    public void patchUsingStringForBoolean() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withNetId("testId")
+                                        .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+
+        // String should be converted to boolean.
+        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", "true");
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // updatecan login
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.netid", Matchers.is("testId")))
+                        .andExpect(jsonPath("$.email", Matchers.is("johndoe@fake-email.com")))
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(true)));
+
+        // String should be converted to boolean.
+        replaceOperation = new ReplaceOperation("/canLogin", "false");
+        ops.set(0, replaceOperation);
+        patchBody = getPatchContent(ops);
+
+        // update can login
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.netid", Matchers.is("testId")))
+                        .andExpect(jsonPath("$.email", Matchers.is("johndoe@fake-email.com")))
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(false)));
+
+    }
+
+    @Test
+    public void replaceOnNonExistentValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // update of netId should fail.
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.email", Matchers.is("johndoe@fake-email.com")))
+                        .andExpect(jsonPath("$.netid", Matchers.nullValue()));
+
+    }
+
+    @Test
+    public void patchNetIdMissingValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withNetId("testId")
+                                        .build();
+
+        String newId = "newId";
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/netid", newId);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // initialize to true
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.netid", Matchers.is(newId)));
+
+
+        List<Operation> ops2 = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/netid", null);
+        ops2.add(replaceOperation2);
+        patchBody = getPatchContent(ops2);
+
+        // should return bad request
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        // value should be unchanged.
+        getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.netid", Matchers.is(newId)))
+                        .andExpect(jsonPath("$.email", Matchers.is("johndoe@fake-email.com")))
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(false)));
+
+
+    }
+
+    @Test
+    public void patchCanLogin() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // updates canLogIn to true
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(true)))
+                        .andExpect(jsonPath("$.email", Matchers.is("johndoe@fake-email.com")))
+                        .andExpect(jsonPath("$.netid", Matchers.nullValue()));
+
+
+    }
+
+    @Test
+    public void patchCanLoginMissingValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // initialize to true
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(true)));;
+
+
+        List<Operation> ops2 = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/canLogin", null);
+        ops2.add(replaceOperation2);
+        patchBody = getPatchContent(ops2);
+
+        // should return bad request
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        // value should still be true.
+        getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(true)))
+                        .andExpect(jsonPath("$.email", Matchers.is("johndoe@fake-email.com")))
+                        .andExpect(jsonPath("$.requireCertificate", Matchers.is(false)));
+
+    }
+
+    @Test
+    public void patchRequireCertificate() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        // Boolean operations should accept either string or boolean as value. Try boolean.
+        ReplaceOperation replaceOperation = new ReplaceOperation("/certificate", false);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // updates requireCertificate to false
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.requireCertificate", Matchers.is(false)))
+                        .andExpect(jsonPath("$.email", Matchers.is("johndoe@fake-email.com")))
+                        .andExpect(jsonPath("$.netid", Matchers.nullValue()));
+
+    }
+
+    @Test
+    public void patchRequireCertificateMissingValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/certificate", true);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // initialize to true
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.requireCertificate", Matchers.is(true)));;
+
+        List<Operation> ops2 = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/certificate",null);
+        ops2.add(replaceOperation2);
+        patchBody = getPatchContent(ops2);
+
+        // should return bad request
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        // value should still be true.
+        getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.requireCertificate", Matchers.is(true)))
+                        .andExpect(jsonPath("$.email", Matchers.is("johndoe@fake-email.com")))
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(false)));
+
+
+    }
+
+    @Test
+    public void patchPassword() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword("7Testpass")
+                                        .build();
+
+        String newPassword = "newpassword";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // updates password
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        // login with new password
+        token = getAuthToken(ePerson.getEmail(), newPassword);
+        getClient(token).perform(get("/api/"))
+                        .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void patchPasswordMissingValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword("testpass79bC")
+                                        .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        String newPassword = "newpass";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        // initialize passwd
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+
+        List<Operation> ops2 = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/password", null);
+        ops2.add(replaceOperation2);
+        patchBody = getPatchContent(ops2);
+
+        // should return bad request
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        // login with original password
+        token = getAuthToken(ePerson.getEmail(), newPassword);
+        getClient(token).perform(get("/api/"))
+                        .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void patchMultipleOperationsWithSuccess() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withNetId("testId")
+                                        .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+
+        ReplaceOperation replaceOperation1 = new ReplaceOperation("/canLogin", true);
+        ops.add(replaceOperation1);
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/netid", "multitestId");
+        ops.add(replaceOperation2);
+        ReplaceOperation replaceOperation3 = new ReplaceOperation("/certificate", true);
+        ops.add(replaceOperation3);
+        String patchBody = getPatchContent(ops);
+
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(true)))
+                        .andExpect(jsonPath("$.netid", Matchers.is("multitestId")))
+                        .andExpect(jsonPath("$.requireCertificate", Matchers.is(true)));
+
+    }
+
+    @Test
+    public void patchMultipleOperationsWithFailure() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation0 = new ReplaceOperation("/canLogin", true);
+        ops.add(replaceOperation0);
+        String patchBody = getPatchContent(ops);
+
+        // Initialized canLogIn value is true.
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(true)));
+
+        // The first operation in the series sets canLogIn to be false.
+        ReplaceOperation replaceOperation1 = new ReplaceOperation("/canLogin", false);
+        ops.add(replaceOperation1);
+        ReplaceOperation replaceOperation2 = new ReplaceOperation("/certificate", true);
+        ops.add(replaceOperation2);
+        // This will fail. The path does not exist.
+        ReplaceOperation replaceOperation3 = new ReplaceOperation("/nonexistentPath", "somevalue");
+        ops.add(replaceOperation3);
+        ReplaceOperation replaceOperation4 = new ReplaceOperation("/certificate", false);
+        ops.add(replaceOperation4);
+        patchBody = getPatchContent(ops);
+
+        // The 3rd operation should result in bad request
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        // The value of canLogIn should equal the previously initialized value.
+        getClient(token).perform(get("/api/eperson/epersons/" + ePerson.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.canLogIn", Matchers.is(true)));
+
     }
 
 }

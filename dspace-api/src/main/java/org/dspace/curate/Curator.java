@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -78,7 +78,7 @@ public class Curator {
 
     ;
 
-    private static final Logger log = Logger.getLogger(Curator.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Curator.class);
 
     protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<>();
 

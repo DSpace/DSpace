@@ -52,14 +52,26 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     }
 
     @Override
+    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
+        throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
+        Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
+        criteriaQuery.select(workspaceItemRoot);
+        criteriaQuery.where(criteriaBuilder.equal(workspaceItemRoot.get(WorkspaceItem_.item).get("submitter"), ep));
+        criteriaQuery.orderBy(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
+        return list(context, criteriaQuery, false, WorkspaceItem.class, limit, offset);
+    }
+
+    @Override
     public List<WorkspaceItem> findByCollection(Context context, Collection c) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
         criteriaQuery.select(workspaceItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(workspaceItemRoot.get(WorkspaceItem_.collection), c));
+        criteriaQuery.orderBy(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
         return list(context, criteriaQuery, false, WorkspaceItem.class, -1, -1);
-
     }
 
     @Override
@@ -74,14 +86,13 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
 
     @Override
     public List<WorkspaceItem> findAll(Context context) throws SQLException {
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
         criteriaQuery.select(workspaceItemRoot);
 
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.item)));
+        orderList.add(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
         criteriaQuery.orderBy(orderList);
 
 
@@ -96,7 +107,7 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
         criteriaQuery.select(workspaceItemRoot);
 
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.item)));
+        orderList.add(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
         criteriaQuery.orderBy(orderList);
 
 
@@ -105,8 +116,6 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
 
     @Override
     public List<WorkspaceItem> findWithSupervisedGroup(Context context) throws SQLException {
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
@@ -116,16 +125,11 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
         criteriaQuery.orderBy(orderList);
-
-
         return list(context, criteriaQuery, false, WorkspaceItem.class, -1, -1);
-
-
     }
 
     @Override
     public List<WorkspaceItem> findBySupervisedGroupMember(Context context, EPerson ePerson) throws SQLException {
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
@@ -133,12 +137,21 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
         Join<Group, EPerson> secondJoin = join.join("epeople");
         criteriaQuery.select(workspaceItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(secondJoin.get(EPerson_.id), ePerson.getID()));
+        criteriaQuery.orderBy(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
         return list(context, criteriaQuery, false, WorkspaceItem.class, -1, -1);
     }
 
     @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) from WorkspaceItem"));
+    }
+
+    @Override
+    public int countRows(Context context, EPerson ep) throws SQLException {
+        Query query = createQuery(context,
+                                  "SELECT count(*) from WorkspaceItem ws where ws.item.submitter = :submitter");
+        query.setParameter("submitter", ep);
+        return count(query);
     }
 
     @Override

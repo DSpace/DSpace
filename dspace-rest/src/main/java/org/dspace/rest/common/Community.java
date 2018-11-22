@@ -16,7 +16,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -37,7 +37,7 @@ public class Community extends DSpaceObject {
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    private static Logger log = Logger.getLogger(Community.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Community.class);
 
     //Exandable relationships
     private Bitstream logo;

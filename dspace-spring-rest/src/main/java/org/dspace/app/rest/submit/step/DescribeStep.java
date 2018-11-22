@@ -10,7 +10,7 @@ package org.dspace.app.rest.submit.step;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataDescribe;
@@ -23,6 +23,7 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
@@ -30,13 +31,15 @@ import org.dspace.core.Utils;
 import org.dspace.services.model.Request;
 
 /**
- * Describe step for DSpace Spring Rest. Handle the exposition of metadata own by the in progress submission.
+ * Describe step for DSpace Spring Rest. Expose and allow patching of the in progress submission metadata. It is
+ * configured via the config/submission-forms.xml file
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class DescribeStep extends org.dspace.submit.step.DescribeStep implements AbstractRestProcessingStep {
 
-    private static final Logger log = Logger.getLogger(DescribeStep.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DescribeStep.class);
 
     private DCInputsReader inputReader;
 
@@ -49,7 +52,17 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
         DataDescribe data = new DataDescribe();
         try {
             DCInputSet inputConfig = inputReader.getInputsByFormName(config.getId());
-            for (DCInput input : inputConfig.getFields()) {
+            readField(obj, config, data, inputConfig);
+        } catch (DCInputsReaderException e) {
+            log.error(e.getMessage(), e);
+        }
+        return data;
+    }
+
+    private void readField(InProgressSubmission obj, SubmissionStepConfig config, DataDescribe data,
+                           DCInputSet inputConfig) throws DCInputsReaderException {
+        for (DCInput[] row : inputConfig.getFields()) {
+            for (DCInput input : row) {
 
                 List<String> fieldsName = new ArrayList<String>();
                 if (input.isQualdropValue()) {
@@ -93,10 +106,7 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
                     }
                 }
             }
-        } catch (DCInputsReaderException e) {
-            log.error(e.getMessage(), e);
         }
-        return data;
     }
 
     @Override

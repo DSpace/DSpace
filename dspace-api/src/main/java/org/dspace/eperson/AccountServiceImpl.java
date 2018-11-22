@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.Locale;
 import javax.mail.MessagingException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -42,7 +42,7 @@ public class AccountServiceImpl implements AccountService {
     /**
      * log4j log
      */
-    private static Logger log = Logger.getLogger(AccountServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AccountServiceImpl.class);
     @Autowired(required = true)
     protected EPersonService ePersonService;
     @Autowired(required = true)
