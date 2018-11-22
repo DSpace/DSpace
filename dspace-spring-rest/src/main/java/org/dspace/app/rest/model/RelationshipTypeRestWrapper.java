@@ -17,6 +17,11 @@ public class RelationshipTypeRestWrapper implements RestAddressableModel {
     @JsonIgnore
     private List<RelationshipTypeRest> relationshipTypeRestList;
 
+    private String entityTypeLabel;
+    private Integer entityTypeId;
+
+
+
     public List<RelationshipTypeRest> getRelationshipTypeRestList() {
         return relationshipTypeRestList;
     }
@@ -36,5 +41,21 @@ public class RelationshipTypeRestWrapper implements RestAddressableModel {
 
     public String getType() {
         return "relationshiptype";
+    }
+
+    public String getEntityTypeLabel() {
+        return entityTypeLabel;
+    }
+
+    public void setEntityTypeLabel(String label) {
+        this.entityTypeLabel = label;
+    }
+
+    public Integer getEntityTypeId() {
+        return entityTypeId;
+    }
+
+    public void setEntityTypeId(Integer entityTypeId) {
+        this.entityTypeId = entityTypeId;
     }
 }
