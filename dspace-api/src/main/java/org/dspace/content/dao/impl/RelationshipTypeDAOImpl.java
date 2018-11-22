@@ -52,4 +52,19 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
         return list(context, criteriaQuery, true, RelationshipType.class, -1, -1);
     }
 
+    public List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
+        Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
+        criteriaQuery.select(relationshipTypeRoot);
+        criteriaQuery.where(
+            criteriaBuilder.or(criteriaBuilder.
+                                    equal(relationshipTypeRoot.get(RelationshipType_.leftType), entityType),
+                               criteriaBuilder
+                                   .equal(relationshipTypeRoot.get(RelationshipType_.rightType), entityType)
+            )
+        );
+        return list(context, criteriaQuery, false, RelationshipType.class, -1, -1);
+    }
+
 }
