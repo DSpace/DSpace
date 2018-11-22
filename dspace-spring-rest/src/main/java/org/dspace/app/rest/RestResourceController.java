@@ -681,7 +681,7 @@ public class RestResourceController implements InitializingBean {
 
                         Link link = null;
                         String querystring = request.getQueryString();
-                        if (querystring != null) {
+                        if (querystring != null && querystring.length() > 0) {
                             link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
                                 .slash(subpath + '?' + querystring).withSelfRel();
                         } else {
