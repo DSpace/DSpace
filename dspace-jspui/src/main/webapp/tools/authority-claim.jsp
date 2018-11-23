@@ -23,7 +23,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
 	
-	double checksimilarity = 0.5;
+	double checksimilarity = Double.parseDouble((String)request.getAttribute("checksimilarity"));
     Map<String, List<String[]>> result = (Map<String, List<String[]>>) request.getAttribute("result");
 	String handle = (String)request.getAttribute("handle");
 	Item item = (Item)request.getAttribute("item");
@@ -258,7 +258,7 @@ for (String key : result.keySet())
     </div>
   </div>
 		<%      
-		if(countSimilar==1) {
+		if(countSimilar==0 || countSimilar==1) {
 		%>
 				<script type="text/javascript">
 						jQuery("#<%= key %>").toggle();

@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.search.spell.JaroWinklerDistance;
 import org.dspace.app.cris.integration.BindItemToRP;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.Researcher;
@@ -47,6 +48,7 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
+import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryViewAndHighlightConfiguration;
@@ -59,7 +61,9 @@ import it.cilea.osd.common.constants.Constants;
 
 public class AuthorityClaimServlet extends DSpaceServlet
 {
-
+    
+    private Logger log = Logger.getLogger(AuthorityClaimServlet.class);
+    
     private static final String[] METADATA_MESSAGE = new String[] { "local",
             "message", "claim" };
 
@@ -72,14 +76,21 @@ public class AuthorityClaimServlet extends DSpaceServlet
     private static final SimpleDateFormat sdf = new SimpleDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-    private Logger log = Logger.getLogger(AuthorityClaimServlet.class);
-
     private DSpace dspace = new DSpace();
+
+    private static final boolean forceCommit = ConfigurationManager
+            .getBooleanProperty(CrisConstants.CFG_MODULE, "publication.claim.list.solr.force.commit", false);
+
+    private static final String checksimilarityString = ConfigurationManager
+            .getProperty(CrisConstants.CFG_MODULE, "publication.claim.list.checksimilarity");
     
     private ApplicationService applicationService = dspace.getServiceManager()
-            .getServiceByName("applicationService",
-                    ApplicationService.class);
-    
+            .getServiceByName("applicationService", ApplicationService.class);
+
+    private IndexingService indexer = dspace.getServiceManager()
+            .getServiceByName(IndexingService.class.getName(),
+                    IndexingService.class);
+
     @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -128,7 +139,8 @@ public class AuthorityClaimServlet extends DSpaceServlet
         Map<String, Map<String, List<String[]>>> mapResult = new HashMap<String, Map<String, List<String[]>>>();
         Map<String, Map<String, Boolean>> haveSimilarResult = new HashMap<String, Map<String, Boolean>>();
         Map<String, DSpaceObject> mapItem = new HashMap<String, DSpaceObject>();
-        ResearcherPage rp = applicationService.getEntityByCrisId(crisID, ResearcherPage.class);
+        ResearcherPage rp = applicationService.getEntityByCrisId(crisID,
+                ResearcherPage.class);
         for (Item ii : publications)
         {
             Map<String, List<String[]>> result = new HashMap<String, List<String[]>>();
@@ -146,6 +158,7 @@ public class AuthorityClaimServlet extends DSpaceServlet
         request.setAttribute("result", mapResult);
         request.setAttribute("haveSimilar", haveSimilarResult);
         request.setAttribute("crisID", crisID);
+        request.setAttribute("checksimilarity", checksimilarityString);
 
         JSPManager.showJSP(request, response,
                 "/tools/authority-claim-list.jsp");
@@ -159,8 +172,9 @@ public class AuthorityClaimServlet extends DSpaceServlet
             throws SQLException, ServletException, IOException
     {
 
-        ResearcherPage rp = applicationService.getEntityByCrisId(crisID, ResearcherPage.class);
-        
+        ResearcherPage rp = applicationService.getEntityByCrisId(crisID,
+                ResearcherPage.class);
+
         internalDoResult(context, handle, crisID, result, haveSimilar, rp);
 
         request.setAttribute("item",
@@ -169,7 +183,8 @@ public class AuthorityClaimServlet extends DSpaceServlet
         request.setAttribute("handle", handle);
         request.setAttribute("haveSimilar", haveSimilar);
         request.setAttribute("crisID", crisID);
-
+        request.setAttribute("checksimilarity", checksimilarityString);
+        
         log.info(LogManager.getHeader(context, "show_authority_claim",
                 "#keys: " + result.size()));
 
@@ -178,11 +193,12 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
     private void internalDoResult(Context context, String handle, String crisID,
             Map<String, List<String[]>> result,
-            Map<String, Boolean> haveSimilar, ResearcherPage rp) throws SQLException
+            Map<String, Boolean> haveSimilar, ResearcherPage rp)
+            throws SQLException
     {
-        
+
         JaroWinklerDistance jaroWinklerDistance = new JaroWinklerDistance();
-        double checksimilarity = 0.9;
+        double checksimilarity = Double.parseDouble(checksimilarityString);
         
         if (StringUtils.isNotBlank(handle))
         {
@@ -225,10 +241,15 @@ public class AuthorityClaimServlet extends DSpaceServlet
                     {
                         if (choices.total > 0)
                         {
-                            choice : for (Choice choice : choices.values)
+                            choice: for (Choice choice : choices.values)
                             {
-                                for(String allname : rp.getAllNames()) {
-                                    if (crisID.equals(choice.authority) || allname.equals(choice.value) || jaroWinklerDistance.getDistance(allname,choice.value)>checksimilarity)
+                                for (String allname : rp.getAllNames())
+                                {
+                                    if (crisID.equals(choice.authority)
+                                            || allname.equals(choice.value)
+                                            || jaroWinklerDistance.getDistance(
+                                                    allname,
+                                                    choice.value) > checksimilarity || allname.startsWith(choice.value) || choice.value.startsWith(allname))
                                     {
                                         similar = meta.value;
                                         haveSimilar.put(field, true);
@@ -237,7 +258,21 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                 }
                             }
                         }
+                        else {
+                            choice: for (String allname : rp.getAllNames())
+                            {
+                                if (jaroWinklerDistance.getDistance(
+                                                allname,
+                                                meta.value) > checksimilarity || allname.startsWith(meta.value) || meta.value.startsWith(allname))
+                                {
+                                    similar = meta.value;
+                                    haveSimilar.put(field, true);
+                                    break choice;
+                                }
+                            }
+                        }
                     }
+
 
                     List<String[]> options = null;
                     if (result.containsKey(field))
@@ -330,7 +365,9 @@ public class AuthorityClaimServlet extends DSpaceServlet
                         if ("submit_approve".equalsIgnoreCase(submitButton))
                         {
                             successes++;
-                        } else {
+                        }
+                        else
+                        {
                             discarded++;
                         }
                     }
@@ -349,7 +386,9 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                 "jsp.dspace.authority-listclaim.failure.success",
                                 new Object[] { successes, failures },
                                 context.getCurrentLocale(), false);
-                    } else {
+                    }
+                    else
+                    {
                         message = I18nUtil.getMessage(
                                 "jsp.dspace.authority-listclaim.failure.reject",
                                 new Object[] { discarded, failures },
@@ -378,6 +417,9 @@ public class AuthorityClaimServlet extends DSpaceServlet
                     request.getSession().setAttribute(Constants.MESSAGES_KEY,
                             Arrays.asList(message));
                 }
+                if(forceCommit) {
+                    indexer.commit();
+                }
                 subcontext.complete();
             }
             catch (Exception ex)
@@ -403,7 +445,6 @@ public class AuthorityClaimServlet extends DSpaceServlet
             response.sendRedirect(
                     request.getContextPath() + "/handle/" + handle);
         }
-
         context.restoreAuthSystemState();
     }
 

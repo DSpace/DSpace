@@ -23,7 +23,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
-	double checksimilarity = 0.9;	
+	double checksimilarity = Double.parseDouble((String)request.getAttribute("checksimilarity"));
 	Map<String, Map<String, List<String[]>>> result = (Map<String, Map<String, List<String[]>>>) request.getAttribute("result");
 	Map<String, Map<String, Boolean>> haveSimilar = (Map<String, Map<String, Boolean>>)request.getAttribute("haveSimilar");
 	Map<String, DSpaceObject> mapItem = (Map<String, DSpaceObject>)request.getAttribute("items");
@@ -113,7 +113,7 @@
 		      <div class="col-md-12">
 		<%	
 			boolean hiddenSelectCheckbox = false;
-			boolean toggleTab = false;
+
 			Metadatum[] requestPendings = item.getMetadataByMetadataString("local.message.claim");
 			for(Metadatum requestPending : requestPendings) {
 			    String vvv = requestPending.value;
@@ -124,28 +124,33 @@
 				    }
 				}
 			}
-			if(!hiddenSelectCheckbox) {
+			
+				int countSS = 0;
 				for(String[] record : subresult.get(key)) { 
 			        String value = record[0];
 			        String authority = record[1];
 			        String confidence = record[2];
 			        String language = record[3];
 			        String similar = record[4];
-			        if(crisID.equals(authority) && !confidence.equals("600")) {
-			            toggleTab = true;
-			            break;
-			        }
-				}
-			}
-			if(hiddenSelectCheckbox) {
+				 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
+						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
+						        countSS++;
+						    }
+				 	   }
+			    }
+			if(countSS==0) {
+		%>
+				<script type="text/javascript">
+					jQuery("#<%= keyID %>").toggle();
+					jQuery("#li_<%= keyID %>").toggle();
+				</script>		
+		<% }
+			else if(hiddenSelectCheckbox) {
 		%>
 				<script type="text/javascript">
 					jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
-					<% if(toggleTab) { %>
-						jQuery("#<%= keyID %>").toggle();
-						jQuery("#li_<%= keyID %>").toggle();
-					<% }
-					%>
+					jQuery("#<%= keyID %>").toggle();
+					jQuery("#li_<%= keyID %>").toggle();
 				</script>	
 				<div class="well text-center text-info"><fmt:message key="jsp.authority-claim.found.local.message"/></div>
 		<% } else { %>			      
@@ -196,7 +201,7 @@
 				    	}
 				 	} else {
 				 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
-						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity) {
+						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
 						        countSimilar++;
 								if(StringUtils.isNotBlank(authority)) {
 						    		showFoundDifferentAuthority = true;
@@ -247,7 +252,7 @@
 				 %>
 		          <option value="<%= option %>"
 		          <%if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
-							    if(value.equals(similar) || jaroWinklerDistance.getDistance(similar,value)>checksimilarity) {
+							    if(value.equals(similar) || jaroWinklerDistance.getDistance(similar,value)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
 							        %>
 							        <%= "selected" %>
 							        <%    		
@@ -271,29 +276,29 @@
 		    </div>
 		  </div>
 		<%      
-		if(countSimilar==1) {
+				if(countSimilar==1) {
 		%>
 				<script type="text/javascript">
 						jQuery("#<%= keyID %>").toggle();
 						jQuery("#li_<%= keyID %>").toggle();
 				</script>		
 		<% 
-		}
+				}
 		%>
 		<% 
 			i++;
-		} 
-		%>
-		
-			</div>
-		
-		    <input type="hidden" name="handle_<%= item.getID() %>" value="<%= handlekey %>"/>
-		</td>    
-		</tr>		
-		<%
-		}
+			} 
 		}
 		%>
+		
+		</div>
+		
+		<input type="hidden" name="handle_<%= item.getID() %>" value="<%= handlekey %>"/>
+	</td>    
+	</tr>		
+	<%
+	}
+	%>
 </tbody>
 <tfoot>
 </tfoot>
