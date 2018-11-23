@@ -70,8 +70,8 @@ public class V5_7_2018_11_20__Remove_Old_Workflow_Steps_From_Collections
 
             // Determine path of this migration class (as the SQL scripts
             // we will run are based on this path under /src/main/resources)
-            String packagePath = V5_7_2018_11_20__Remove_Old_Workflow_Steps_From_Collections.class.getPackage().getName()
-                                                                                    .replace(".", "/");
+            String packagePath = V5_7_2018_11_20__Remove_Old_Workflow_Steps_From_Collections.class
+                    .getPackage().getName().replace(".", "/");
 
             // Get the contents of our DB Schema migration script, based on path & DB type
             // (e.g. /src/main/resources/[path-to-this-class]/postgres/xml_workflow_migration.sql)
