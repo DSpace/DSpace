@@ -30,6 +30,7 @@ import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -111,6 +112,8 @@ public class DryadDataPackage extends DryadObject {
 
     public DryadDataPackage(Item item) {
         super(item);
+        log.error("making a package from item " + item.getID());
+        log.error("its identifier is " + DOIIdentifierProvider.getDoiValue(item));
         String pubName = getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
         if (pubName != null && !pubName.equals("")) {
             journalConcept = JournalUtils.getJournalConceptByJournalName(pubName);
@@ -367,6 +370,8 @@ public class DryadDataPackage extends DryadObject {
         try {
             // get the current duplicate packages
             resultList.addAll(getDuplicatePackages(context));
+            log.error("this package is item " + this.getItem().getID());
+            log.error("this package is identifier " + this.getIdentifier());
             List<DryadDataPackage> matchingPackages = findAllByManuscript(context, new Manuscript(this));
             for (DryadDataPackage dryadDataPackage : matchingPackages) {
                 if (!dryadDataPackage.getIdentifier().equals(this.getIdentifier())) {
