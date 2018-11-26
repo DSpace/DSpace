@@ -291,26 +291,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
 
     /**
-     * Get the bundles matching a bundle name (name corresponds roughly to type)
-     *
-     * @param name
-     *            name of bundle (ORIGINAL/TEXT/THUMBNAIL)
-     *
-     * @return the bundles in an unordered array
-     */
-    public List<Bundle> getBundles(String name) {
-        List<Bundle> matchingBundles = new ArrayList<>();
-         // now only keep bundles with matching names
-        List<Bundle> bunds = getBundles();
-        for (Bundle bundle : bunds) {
-            if (name.equals(bundle.getName())) {
-                matchingBundles.add(bundle);
-            }
-        }
-        return matchingBundles;
-    }
-
-    /**
      * Add a bundle to the item, should not be made public since we don't want to skip business logic
      *
      * @param bundle the bundle to be added
