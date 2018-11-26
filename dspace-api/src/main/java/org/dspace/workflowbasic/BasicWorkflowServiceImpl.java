@@ -31,7 +31,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
@@ -910,8 +910,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
             + rejection_message + " on " + now + " (GMT) ";
 
         // Add to item as a DC field
-        itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        itemService.addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                         "description", "provenance", "en", provDescription);
         itemService.update(context, myitem);
 
         // convert into personal workspace
@@ -1135,8 +1135,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
         provDescription += installItemService.getBitstreamProvenanceMessage(context, item);
 
         // Add to item as a DC field
-        itemService
-            .addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provDescription);
         itemService.update(context, item);
     }
 
@@ -1163,8 +1163,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
         provmessage += installItemService.getBitstreamProvenanceMessage(context, myitem);
 
         // Add message to the DC
-        itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
+        itemService.addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provmessage);
         itemService.update(context, myitem);
     }
 

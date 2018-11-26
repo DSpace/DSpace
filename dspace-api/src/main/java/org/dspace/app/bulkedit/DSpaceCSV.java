@@ -35,6 +35,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -199,7 +200,7 @@ public class DSpaceCSV implements Serializable {
                     }
 
                     // Check that the scheme exists
-                    if (!StringUtils.equals(metadataSchema, "relation")) {
+                    if (!StringUtils.equals(metadataSchema, MetadataSchemaEnum.RELATION.getName())) {
                         MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
                         if (foundSchema == null) {
                             throw new MetadataImportInvalidHeadingException(clean[0],

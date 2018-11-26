@@ -37,6 +37,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Entity;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
@@ -356,7 +357,7 @@ public class MetadataImport {
                         // Add the metadata to the item
                         List<BulkEditMetadataValue> relationships = new LinkedList<>();
                         for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                            if (StringUtils.equals(dcv.getSchema(), "relation")) {
+                            if (StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
 
                                 if (!StringUtils.equals(dcv.getElement(), "type")) {
                                     relationships.add(dcv);
@@ -637,7 +638,7 @@ public class MetadataImport {
             }
 
 
-            if (StringUtils.equals(schema, "relation")) {
+            if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
                 handleRelationMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
             } else {
                 itemService.clearMetadata(c, item, schema, element, qualifier, language);
