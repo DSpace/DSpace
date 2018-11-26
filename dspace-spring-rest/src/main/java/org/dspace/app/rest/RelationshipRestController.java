@@ -82,8 +82,10 @@ public class RelationshipRestController {
                 relationships.addAll(relationshipService.findByItemAndRelationshipType(context, item, relationshipType));
             }
         } else {
-            //TODO Find by label
-            relationships = relationshipService.findAll(context);
+            for (RelationshipType relationshipType : relationshipTypeList) {
+                relationships.addAll(relationshipService.findByRelationshipType(context, relationshipType));
+            }
+//            relationships = relationshipService.findAll(context);
         }
 
         List<RelationshipRest> relationshipRests = new LinkedList<>();

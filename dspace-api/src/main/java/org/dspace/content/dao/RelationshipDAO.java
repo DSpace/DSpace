@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
@@ -56,4 +57,6 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      * @throws SQLException If something goes wrong
      */
     int findRightPlaceByRightItem(Context context,Item item) throws SQLException;
+
+    List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException;
 }

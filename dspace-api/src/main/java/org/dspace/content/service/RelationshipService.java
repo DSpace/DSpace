@@ -76,4 +76,6 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
                                                             RelationshipType relationshipType)
         throws SQLException;
+
+    List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException;
 }

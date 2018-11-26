@@ -300,4 +300,9 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
         return listToReturn;
     }
+
+    public List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType)
+        throws SQLException {
+        return relationshipDAO.findByRelationshipType(context, relationshipType);
+    }
 }
