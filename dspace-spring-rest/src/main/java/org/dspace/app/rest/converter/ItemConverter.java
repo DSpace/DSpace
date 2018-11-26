@@ -46,6 +46,7 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
             Collection c = obj.getOwningCollection();
             if (c != null) {
                 item.setOwningCollection(collectionConverter.fromModel(c));
+                item.setOwningCollectionUuid(c.getID().toString());
             }
         } catch (Exception e) {
             log.error("Error setting owning collection for item" + item.getHandle(), e);

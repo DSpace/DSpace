@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The Item REST Resource
@@ -24,6 +25,7 @@ public class ItemRest extends DSpaceObjectRest {
     private boolean discoverable = false;
     private boolean withdrawn = false;
     private Date lastModified = new Date();
+    private String owningCollectionUuid;
     @JsonIgnore
     private CollectionRest owningCollection;
     @JsonIgnore
@@ -38,6 +40,7 @@ public class ItemRest extends DSpaceObjectRest {
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
@@ -100,4 +103,11 @@ public class ItemRest extends DSpaceObjectRest {
         this.bitstreams = bitstreams;
     }
 
+    public String getOwningCollectionUuid() {
+        return owningCollectionUuid;
+    }
+
+    public void setOwningCollectionUuid(String owningCollectionUuid) {
+        this.owningCollectionUuid = owningCollectionUuid;
+    }
 }
