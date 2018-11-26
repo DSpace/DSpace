@@ -1147,11 +1147,7 @@
                 <artifactId>mets</artifactId>
                 <version>1.5.2</version>
             </dependency>
-            <dependency>
-                <groupId>org.dspace.dependencies</groupId>
-                <artifactId>dspace-tm-extractors</artifactId>
-                <version>1.0.1</version>
-            </dependency>
+
             <!-- Required by Commons Configuration -->
             <dependency>
                 <groupId>commons-beanutils</groupId>
