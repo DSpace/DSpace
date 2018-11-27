@@ -328,12 +328,14 @@
 		<property name="resourceTypeID" value="1001" />
 		<property name="metadataInputConfiguration">
 			<map>
+			    <!-- the list of BTE fields (keys) to use for the CRIS lookup -->
 				<entry key="jissn" value="crisjournal.journalissn" />
 				<entry key="jeissn" value="crisjournal.journaleissn" />
 			</map>
 		</property>
 		<property name="mappingOutputConfiguration">
 			<map>
+				<!-- the list of CRIS properties (keys) to expose as BTE fields (values) -->
 				<entry key="journalname" value="journal" />
 				<entry key="journalissn" value="jissn" />
 				<entry key="journaleissn" value="jeissn" />
@@ -341,9 +343,10 @@
 			</map>
 		</property>
 		<property name="mappingAuthorityConfiguration">
-			<map>
-				<entry key="journalname" value="journal" />
-			</map>
+			<!-- the list of BTE field that should contains the authority -->
+			<list>
+				<value>journal</value>
+			</list>
 		</property>
 		<property name="clazzCrisObject" value="org.dspace.app.cris.model.ResearchObject" />
 	</bean>
@@ -354,18 +357,21 @@
 		<property name="resourceTypeID" value="9" />
 		<property name="metadataInputConfiguration">
 			<map>
+			    <!-- the list of BTE fields (keys) to use for the CRIS lookup -->
 				<entry key="authors" value="crisauthoritylookup" />
 			</map>
 		</property>
 		<property name="mappingOutputConfiguration">
 			<map>
+			    <!-- the list of CRIS properties (keys) to expose as BTE fields (values) -->
 				<entry key="fullName" value="authors" />
 			</map>
 		</property>
 		<property name="mappingAuthorityConfiguration">
-			<map>
-				<entry key="fullName" value="authors" />
-			</map>
+			<!-- the list of BTE field that should contains the authority -->
+			<list>
+				<value>authors</value>
+			</list>
 		</property>
 		<property name="clazzCrisObject" value="org.dspace.app.cris.model.ResearcherPage" />
 	</bean>

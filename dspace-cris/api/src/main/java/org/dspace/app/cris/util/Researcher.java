@@ -38,7 +38,7 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 public class Researcher implements EPersonCRISIntegration
 {
     
-    public static final String FILTER_MYDSPACE_MATCHES = "mydspace_authority_metadata";
+    public static final String FILTER_MYDSPACE_MATCHES = "mydspace_possible_matches";
 
     DSpace dspace = new DSpace();
     

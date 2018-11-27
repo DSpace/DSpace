@@ -85,7 +85,7 @@ public class ReBindItemToRPController extends ParameterizableViewController
                     && OPERATION_LIST.equals(operation))
             {
 
-                Map<NameResearcherPage, Item[]> result = BindItemToRP.list(r,
+                Map<NameResearcherPage, Item[]> result = BindItemToRP.listExcludeAuthority(r,
                         relationPreferenceService);
 
                 List<Item> resultMatch = new ArrayList<Item>();

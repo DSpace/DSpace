@@ -127,17 +127,27 @@ public class CrisRetrievePotentialMatchPlugin implements
     public Map<NameResearcherPage, Item[]> retrieveGroupByName(Context context,
             Map<String, Set<Integer>> mapInvalids, List<ResearcherPage> rps, boolean partialMatch)
     {
-      
+        return retrieveGroupByNameExceptAuthority(context, mapInvalids, rps,
+                partialMatch, false);
+    }
+
+
+
+    @Override
+    public Map<NameResearcherPage, Item[]> retrieveGroupByNameExceptAuthority(
+            Context context, Map<String, Set<Integer>> mapInvalids,
+            List<ResearcherPage> rps, boolean partialMatch, boolean excludeMatchForAuthority)
+    {
+        
         Map<NameResearcherPage, Item[]> result = new HashMap<NameResearcherPage, Item[]>();
 
         for (ResearcherPage researcher : rps)
         {
             String authority = researcher.getCrisID();
-            Integer id = researcher.getId();
             BrowseIndex bi;
             try
             {
-            	String researcherPotentialMatchLookupBrowserIndex = ConfigurationManager
+                String researcherPotentialMatchLookupBrowserIndex = ConfigurationManager
                         .getProperty(CrisConstants.CFG_MODULE, "researcherpage.browseindex");
                 bi = BrowseIndex
                         .getBrowseIndex(researcherPotentialMatchLookupBrowserIndex);
@@ -166,6 +176,9 @@ public class CrisRetrievePotentialMatchPlugin implements
                     scope.setUserLocale(context.getCurrentLocale().getLanguage());
                     scope.setBrowseIndex(bi);
                     // scope.setOrder(order);
+                    if(excludeMatchForAuthority) {
+                        scope.setAuthorityValue(authority);
+                    }
                     scope.setFilterValue(tempName.getName());
                     scope.setFilterValuePartial(partialMatch);
                     

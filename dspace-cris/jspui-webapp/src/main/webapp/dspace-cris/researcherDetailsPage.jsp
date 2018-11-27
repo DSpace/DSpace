@@ -413,7 +413,7 @@
 	<c:if test="${not empty messages}">
 	<div class="message" id="successMessages">
 		<c:forEach var="msg" items="${messages}">
-				<div id="authority-message">${msg}</div>
+				<div id="authority-message" class="alert alert-info">${msg}</div>
 		</c:forEach>
 	</div>
 	<c:remove var="messages" scope="session" />

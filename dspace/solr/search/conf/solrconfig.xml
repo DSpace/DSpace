@@ -1040,11 +1040,13 @@
   <requestHandler name="/update/json" class="solr.JsonUpdateRequestHandler">
         <lst name="defaults">
          <str name="stream.contentType">application/json</str>
+         <str name="update.chain">clones_except_private</str>
        </lst>
   </requestHandler>
   <requestHandler name="/update/csv" class="solr.CSVRequestHandler">
         <lst name="defaults">
          <str name="stream.contentType">application/csv</str>
+         <str name="update.chain">clones_except_private</str>
        </lst>
   </requestHandler>
 
@@ -1064,6 +1066,7 @@
       <str name="captureAttr">false</str>
       <!--<str name="fmap.a">links</str>-->
       <!--<str name="fmap.div">ignored_</str>-->
+      <str name="update.chain">clones_except_private</str>
     </lst>
   </requestHandler>
 

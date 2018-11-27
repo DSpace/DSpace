@@ -23,7 +23,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
-	double checksimilarity = 0.5;	
+	double checksimilarity = Double.parseDouble((String)request.getAttribute("checksimilarity"));
 	Map<String, Map<String, List<String[]>>> result = (Map<String, Map<String, List<String[]>>>) request.getAttribute("result");
 	Map<String, Map<String, Boolean>> haveSimilar = (Map<String, Map<String, Boolean>>)request.getAttribute("haveSimilar");
 	Map<String, DSpaceObject> mapItem = (Map<String, DSpaceObject>)request.getAttribute("items");
@@ -33,7 +33,7 @@
 	JaroWinklerDistance jaroWinklerDistance = new JaroWinklerDistance();	
 %>
 
-<dspace:layout titlekey="jsp.dspace.authority-claim.title">
+<dspace:layout titlekey="jsp.dspace.authority-listclaim.title">
 <style>
 .list-group-item {
 	border: none;
@@ -43,15 +43,9 @@
 	float: right !important;
 }
 </style>
-<h3><fmt:message key="jsp.dspace.authority-claim.info-heading" /></h3>
+<h3><fmt:message key="jsp.dspace.authority-listclaim.info-heading" /></h3>
 
-<fmt:message key="jsp.dspace.authority-claim.info" />
-<ul>
-<fmt:message key="jsp.dspace.authority-listclaim.info.case1" />
-<fmt:message key="jsp.dspace.authority-listclaim.info.case2" />
-<fmt:message key="jsp.dspace.authority-listclaim.info.case3" />
-</ul>
-
+<fmt:message key="jsp.dspace.authority-listclaim.info" />
 
 <form method="post">
 
@@ -79,10 +73,10 @@
 	<td id="checkbox_<%= item.getID() %>"><div class="data" data-id="<%= item.getID() %>">&nbsp;</div></td>
 	<td>
 		<p style="display:none" id="foundyourauthority_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.your.authority"/></p>
-		<p style="display:none" id="foundlowlevelauthority_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.your.authority.low.level.confidence"/></p>
 		<p style="display:none" id="founddifferentauthority_<%= item.getID() %>" class="text-danger"><fmt:message key="jsp.authority-claim.found.different.authority"/></p>
+		<p style="display:none" id="foundrequestforclaim_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.local.message"/></p>
 		<dspace:discovery-artifact style="global" artifact="<%= item %>" view="<%= mapViewMetadata.get(\"publications\") %>" selectorCssView="<%=selectorViewMetadata %>"/>
-		<ul class="nav nav-tabs" role="tablist">
+		<ul class="nav nav-tabs" role="tablist" id="ul<%= item.getID() %>">
 		<%
 		    // Keep a count of the number of values of each element+qualifier
 		    // key is "element" or "element_qualifier" (String)
@@ -90,14 +84,34 @@
 		    Map<String, Integer> dcCounter = new HashMap<String, Integer>();
 		    
 		    int i = 0;
+		    String alreadyactive = null;
 		    for (String key : subresult.keySet())
 		    {
-		        
+		        String labelTab = "jsp.dspace.authority-claim-" + key;
 		        String keyID = item.getID() + "_" + key;
+		        boolean active = false;
+				//check if there are similarity before to build content 
+				int preCountSimilarity = 0;
+				for(String[] record : subresult.get(key)) { 
+			        String value = record[0];
+			        String authority = record[1];
+			        String confidence = record[2];
+			        String language = record[3];
+			        String similar = record[4];
+				 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
+						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
+						        preCountSimilarity++;
+						    }
+				 	   }
+			    }
+		        if(preCountSimilarity>0) {
+			        active = true;
+			        alreadyactive = keyID; 
+		        }
 		%>
 		
-				  <li id="li_<%= keyID %>" class="nav-item  <%= i==0?"active":""%>" >
-				    <a class="nav-link" id="<%= keyID %>-tab" data-toggle="tab" href="#<%= keyID %>" role="tab" aria-controls="<%= keyID %>" <%= i==0?"aria-selected=\"true\"":""%>><fmt:message key="<%= key %>" /></a>
+				  <li id="li_<%= keyID %>" class="nav-item  <%= active?"active":""%>" >
+				    <a class="nav-link" id="<%= keyID %>-tab" data-toggle="tab" href="#<%= keyID %>" role="tab" aria-controls="<%= keyID %>" <%= active?"aria-selected=\"true\"":""%>><fmt:message key="<%= labelTab %>" /></a>
 				  </li>
 		  
 		<%
@@ -105,22 +119,28 @@
 		    } %>
 		</ul>
 			
-		<div class="tab-content" id="myTabContent" >
+		<div class="tab-content" id="myTabContent<%= item.getID() %>" >
 		  
 		<%    
 		i = 0;
-		
 		for (String key : subresult.keySet())
 		{
-		    String keyID = item.getID() + "_" + key; 
+		    boolean active = false;
+		    String keyID = item.getID() + "_" + key;
+		    if(alreadyactive!=null) {
+		        if(alreadyactive.equals(keyID)) {
+		            active = true;
+		        }
+		    }
 		%>
 		
-		  <div class="tab-pane <%= i==0?"active":""%>" id="<%= keyID %>" role="tabpanel" aria-labelledby="<%= keyID %>-tab">
+		  <div class="tab-pane <%= active?"active":""%>" id="<%= keyID %>" role="tabpanel" aria-labelledby="<%= keyID %>-tab">
 		    <div class="row">
 		      <div class="col-md-12">
 		<%	
 			boolean hiddenSelectCheckbox = false;
-			boolean toggleTab = false;
+
+			//check if the local.message.claim exist... if exist show only a warning and remove checkbox selection
 			Metadatum[] requestPendings = item.getMetadataByMetadataString("local.message.claim");
 			for(Metadatum requestPending : requestPendings) {
 			    String vvv = requestPending.value;
@@ -131,34 +151,40 @@
 				    }
 				}
 			}
-			if(!hiddenSelectCheckbox) {
-				for(String[] record : subresult.get(key)) { 
-			        String value = record[0];
-			        String authority = record[1];
-			        String confidence = record[2];
-			        String language = record[3];
-			        String similar = record[4];
-			        if(crisID.equals(authority) && !confidence.equals("600")) {
-			            toggleTab = true;
-			            break;
-			        }
-				}
-			}
-			if(hiddenSelectCheckbox) {
+			
+			//check if there are similarity before to build content 
+			int preCountSimilarity = 0;
+			for(String[] record : subresult.get(key)) { 
+		        String value = record[0];
+		        String authority = record[1];
+		        String confidence = record[2];
+		        String language = record[3];
+		        String similar = record[4];
+			 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
+					    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
+					        preCountSimilarity++;
+					    }
+			 	   }
+		    }
+			if(preCountSimilarity==0) {
+		%>
+				 <script type="text/javascript">
+					jQuery("#<%= keyID %>").hide();
+					jQuery("#li_<%= keyID %>").hide();					
+				</script>
+		<%  }
+			else if(hiddenSelectCheckbox) {
 		%>
 				<script type="text/javascript">
 					jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
-					<% if(toggleTab) { %>
-						jQuery("#<%= keyID %>").toggle();
-						jQuery("#li_<%= keyID %>").toggle();
-					<% }
-					%>
-				</script>	
-				<div class="well text-center text-info"><fmt:message key="jsp.authority-claim.found.local.message"/></div>
-		<% } else { %>			      
+					jQuery("#<%= keyID %>").toggle();
+					jQuery("#li_<%= keyID %>").toggle();
+					jQuery("#foundrequestforclaim_<%= item.getID() %>").toggle();
+				</script>
+		<%  } else { %>			      
 		      	<div class="col-md-5">
-		<%      int countSimilar = 0;
-			    boolean showFoundYourAuthorityLowConfidence = false;
+		<%      
+				int countSimilar = 0;
 				boolean showFoundYourAuthority = false;
 				boolean showFoundDifferentAuthority = false;
 				for(String[] record : subresult.get(key)) { 
@@ -196,16 +222,14 @@
 				 %>
 				<% 	if(crisID.equals(authority)) {
 				    	countSimilar++;
-				    	if(!confidence.equals("600")) {
-				    	    showFoundYourAuthorityLowConfidence = true;
-				    	} else {
+				    	if(confidence.equals("600")) {
 			    			showFoundYourAuthority = true;
 				    	}
 				 	} else {
 				 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
-						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity) {
-						        countSimilar++;
-								if(StringUtils.isNotBlank(authority)) {
+						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
+						        countSimilar++;						        
+								if(StringUtils.isNotBlank(authority) && confidence.equals("600")) {
 						    		showFoundDifferentAuthority = true;
 							    }
 						    }
@@ -222,18 +246,16 @@
 				<% if(showFoundYourAuthority) { %>
 					<script type="text/javascript">
 						jQuery("#foundyourauthority_<%= item.getID() %>").toggle();
+						jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
+						jQuery("#myTabContent<%= item.getID() %>").toggle();
+						jQuery("#ul<%= item.getID() %>").toggle();
 					</script>					
-				<% } else if(showFoundDifferentAuthority && (!showFoundYourAuthority && !showFoundYourAuthorityLowConfidence)) { %>
+				<% } else if(showFoundDifferentAuthority && !showFoundYourAuthority && countSimilar==1) { %>
 					<script type="text/javascript">
 						jQuery("#founddifferentauthority_<%= item.getID() %>").toggle();
 					</script>						    
 				<%						    
-				   } else if (showFoundYourAuthorityLowConfidence) { %>
-					<script type="text/javascript">
-					jQuery("#foundlowlevelauthority_<%= item.getID() %>").toggle();
-					</script>						    
-				<%		
-				   }
+				   } 
 				%>
 							
 			<label for="userchoice_<%= keyID %>"> <fmt:message key="jsp.authority-claim.choice.fromdropdown"/></label>
@@ -256,7 +278,7 @@
 				 %>
 		          <option value="<%= option %>"
 		          <%if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
-							    if(value.equals(similar) || jaroWinklerDistance.getDistance(similar,value)>checksimilarity) {
+							    if(value.equals(similar) || jaroWinklerDistance.getDistance(similar,value)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
 							        %>
 							        <%= "selected" %>
 							        <%    		
@@ -265,7 +287,9 @@
 		          %>>
 		            <%= value %>
 		          </option>
-			<% } %>
+			<% 
+					subCount++;
+				} %>
 			</select>
 				</div>
 				<div class="col-md-7">
@@ -274,46 +298,46 @@
 					    <textarea class="form-control" name="requestNote_<%= keyID %>" id="requestNote_<%= keyID %>" rows="3" cols="100"></textarea>
 					  </div>
 				</div>
-		      </div>
-		    </div>
-		  </div>
+
 		<%      
-		if(countSimilar==1) {
+				if(countSimilar==1) {
 		%>
-				<script type="text/javascript">
-						jQuery("#<%= keyID %>").toggle();
-						jQuery("#li_<%= keyID %>").toggle();
-				</script>		
+					<script type="text/javascript">
+						jQuery("#<%= keyID %>").hide();
+						jQuery("#li_<%= keyID %>").hide();
+					</script>	
 		<% 
-		}
+				}
 		%>
 		<% 
 			i++;
-		} 
-		%>
+			}
+			
+		%>	
+				</div>
+		    </div>
+		  </div>
 		
-			</div>
-		
-		    <input type="hidden" name="handle_<%= item.getID() %>" value="<%= handlekey %>"/>
-		</td>    
-		</tr>		
-		<%
-		}
+		<%	
 		}
 		%>
+		</div>
+
+		<input type="hidden" name="handle_<%= item.getID() %>" value="<%= handlekey %>"/>
+	</td>    
+	</tr>		
+	<%
+	}
+	%>
 </tbody>
 <tfoot>
-	<tr>
-		<th>&nbsp;</th>
-		<th>
-        <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit_approve" value="<fmt:message key="jsp.tools.general.approve"/>" />
-        <input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_reject" value="<fmt:message key="jsp.tools.general.reject"/>" />
-		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
-		</th>
-	</tr>	
 </tfoot>
 </table>
-
+	<div class="row col-md-12 pull-right">
+        <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit_approve" value="<fmt:message key="jsp.authority.listclaim.approve"/>" />
+        <input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_reject" value="<fmt:message key="jsp.authority.listclaim.reject"/>" />
+		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.authority.listclaim.cancel"/>" />
+	</div>	
 <script type="text/javascript">
 j(document).ready(function() {
 	

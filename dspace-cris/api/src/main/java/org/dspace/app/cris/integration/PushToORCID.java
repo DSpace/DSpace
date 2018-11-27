@@ -2079,7 +2079,7 @@ public class PushToORCID
                 }
 
                 List<String> listOrgunitcountry = employment
-                        .get("affiliationorgunit.iso-3166-country");
+                        .get("affiliationorgunit.iso-country");
                 if (listOrgunitcountry != null && !listOrgunitcountry.isEmpty())
                 {
                     Iso3166Country isoCountry = Iso3166Country
@@ -2292,7 +2292,7 @@ public class PushToORCID
                 }
 
                 List<String> listOrgunitcountry = education
-                        .get("educationorgunit.iso-3166-country");
+                        .get("educationorgunit.iso-country");
                 if (listOrgunitcountry != null && !listOrgunitcountry.isEmpty())
                 {
                     Iso3166Country isoCountry = Iso3166Country
@@ -3136,7 +3136,7 @@ public class PushToORCID
             listMetadataParentOrgunitCity.add(pp.toString());
         }
         List<OUProperty> countryorgunits = ou.getAnagrafica4view()
-                .get("iso-3166-country");
+                .get("iso-country");
         for (OUProperty pp : countryorgunits)
         {
             listMetadataParentOrgunitCountry.add(pp.toString());
@@ -3434,7 +3434,7 @@ public class PushToORCID
                 if (!listMetadataParentOrgunitCountry.isEmpty())
                 {
                     mapMetadata.put(
-                            metadataNestedShortname + ".iso-3166-country",
+                            metadataNestedShortname + ".iso-country",
                             listMetadataParentOrgunitCountry);
                 }
                 if (!listMetadataParentOrgunitCity.isEmpty())

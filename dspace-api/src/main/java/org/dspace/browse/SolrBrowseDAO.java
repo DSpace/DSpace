@@ -171,7 +171,7 @@ public class SolrBrowseDAO implements BrowseDAO
                 }
 
                 // caution check first authority, value is always present!
-                if (authority != null)
+                if (authority != null && !valuePartial)
                 {
                     query.addFilterQueries("{!field f="+facetField + "_authority_filter}"
                             + authority);
@@ -182,6 +182,10 @@ public class SolrBrowseDAO implements BrowseDAO
                 }
                 else if (valuePartial)
                 {
+                    if(authority != null) {
+                        query.addFilterQueries("-{!field f="+facetField + "_authority_filter}"
+                                + authority);
+                    }
                     query.addFilterQueries("{!field f="+facetField + "_partial}" + value);
                 }
                 // filter on item to be sure to don't include any other object

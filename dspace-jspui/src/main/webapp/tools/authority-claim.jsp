@@ -23,7 +23,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
 	
-	double checksimilarity = 0.5;
+	double checksimilarity = Double.parseDouble((String)request.getAttribute("checksimilarity"));
     Map<String, List<String[]>> result = (Map<String, List<String[]>>) request.getAttribute("result");
 	String handle = (String)request.getAttribute("handle");
 	Item item = (Item)request.getAttribute("item");
@@ -49,8 +49,8 @@
 <form method="post">
 
 <p style="display:none" id="foundyourauthority_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.your.authority"/></p>
-<p style="display:none" id="foundlowlevelauthority_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.your.authority.low.level.confidence"/></p>
 <p style="display:none" id="founddifferentauthority_<%= item.getID() %>" class="text-danger"><fmt:message key="jsp.authority-claim.found.different.authority"/></p>
+<p style="display:none" id="foundrequestforclaim_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.local.message"/></p>
 <dspace:discovery-artifact style="global" artifact="<%= item %>" view="<%= mapViewMetadata.get(\"publications\") %>" selectorCssView="<%=selectorViewMetadata %>"/>
 <ul class="nav nav-tabs" id="myTab" role="tablist">
 <%
@@ -62,12 +62,12 @@
     int i = 0;
     for (String key : result.keySet())
     {
-
+        String labelTab = "jsp.dspace.authority-claim-" + key;
 %>
         
 
   <li id="li_<%= key %>" class="nav-item  <%= i==0?"active":""%>">
-    <a class="nav-link" id="<%= key %>-tab" data-toggle="tab" href="#<%= key %>" role="tab" aria-controls="<%= key %>" <%= i==0?"aria-selected=\"true\"":""%>><fmt:message key="<%= key %>" /></a>
+    <a class="nav-link" id="<%= key %>-tab" data-toggle="tab" href="#<%= key %>" role="tab" aria-controls="<%= key %>" <%= i==0?"aria-selected=\"true\"":""%>><fmt:message key="<%= labelTab %>" /></a>
   </li>
   
 <%
@@ -115,17 +115,35 @@ for (String key : result.keySet())
 			        }
 				}
 			}
-			if(hiddenSelectCheckbox) {
-		%>
+			
+			int countSS = 0;
+			for(String[] record : result.get(key)) { 
+		        String value = record[0];
+		        String authority = record[1];
+		        String confidence = record[2];
+		        String language = record[3];
+		        String similar = record[4];
+			 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
+					    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
+					        countSS++;
+					    }
+			 	   }
+		    }
+		if(countSS==0) {
+	%>
+			<script type="text/javascript">
+				jQuery("#<%= key %>").toggle();
+				jQuery("#li_<%= key %>").toggle();
+			</script>		
+	<% }
+		else if(hiddenSelectCheckbox) {
+	%>
 				<script type="text/javascript">
 					jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
-					<% if(toggleTab) { %>
-						jQuery("#<%= key %>").toggle();
-						jQuery("#li_<%= key %>").toggle();
-					<% }
-					%>
+					jQuery("#<%= key %>").toggle();
+					jQuery("#li_<%= key %>").toggle();
+					jQuery("#foundrequestforclaim_<%= item.getID() %>").toggle();
 				</script>	
-				<div class="well text-center text-info"><fmt:message key="jsp.authority-claim.found.local.message"/></div>
 		<% } else { %>			      
 		      	<div class="col-md-5">
 		<%
@@ -196,18 +214,16 @@ for (String key : result.keySet())
 				<% if(showFoundYourAuthority) { %>
 					<script type="text/javascript">
 						jQuery("#foundyourauthority_<%= item.getID() %>").toggle();
+						jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
+						jQuery("#myTabContent<%= item.getID() %>").toggle();
+						jQuery("#ul<%= item.getID() %>").toggle();
 					</script>					
-				<% } else if(showFoundDifferentAuthority && (!showFoundYourAuthority && !showFoundYourAuthorityLowConfidence)) { %>
+				<% } else if(showFoundDifferentAuthority && !showFoundYourAuthority && countSimilar==1) { %>
 					<script type="text/javascript">
 						jQuery("#founddifferentauthority_<%= item.getID() %>").toggle();
 					</script>						    
 				<%						    
-				   } else if (showFoundYourAuthorityLowConfidence) { %>
-					<script type="text/javascript">
-					jQuery("#foundlowlevelauthority_<%= item.getID() %>").toggle();
-					</script>						    
-				<%		
-				   }
+				   } 
 				%>
 				
 				
@@ -241,7 +257,9 @@ for (String key : result.keySet())
 		          %>>
 		            <%= value %>
 		          </option>
-		          <% } %>
+		          <% 
+		          	subCount++;
+					} %>
 			</select>
 			
         

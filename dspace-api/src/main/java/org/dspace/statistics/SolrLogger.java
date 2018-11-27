@@ -201,6 +201,18 @@ public class SolrLogger
     }
 
     
+    public SolrDocumentList getRawData(int type, String queryString) throws SolrServerException
+    {
+        SolrQuery query = new SolrQuery();
+        query.setQuery(queryString);
+        query.setFilterQueries("type:" + type);
+        query.setRows(Integer.MAX_VALUE);
+        query.setFields("ip", "id", "type", "time", "dns", "epersonid",
+                "isBot", "userAgent");
+        QueryResponse resp = getSolr().query(query);
+        return resp.getResults();
+    }
+    
     public SolrDocumentList getRawData(int type, int year) throws SolrServerException
     {
         SolrQuery query = new SolrQuery();
@@ -1681,6 +1693,12 @@ public class SolrLogger
         String start = year+"-01-01T00:00:00.000Z";
         String end = (year+1)+"-01-01T00:00:00.000Z";
         String query = "type:" + type + " AND " + "time:["+start+" TO "+end+"]";
+        getSolr().deleteByQuery(query);
+    }
+    
+    public void deleteByTypeAndQuery(int type, String queryString) throws SolrServerException, IOException
+    {
+        String query = "type:" + type + " AND " + queryString;
         getSolr().deleteByQuery(query);
     }
 }
