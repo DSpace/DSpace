@@ -226,50 +226,18 @@ public class AuthorityClaimServlet extends DSpaceServlet
                 for (Metadatum meta : metadatum)
                 {
                     String similar = null;
-                    Choices choices = null;
-                    try
+                    choice: for (String allname : rp.getAllNames())
                     {
-                        choices = ResearcherPageUtils.doGetMatches(
-                                Researcher.FILTER_MYDSPACE_MATCHES, meta.value);
-                    }
-                    catch (SearchServiceException e)
-                    {
-                        log.error(e.getMessage());
-                    }
-
-                    if (choices != null)
-                    {
-                        if (choices.total > 0)
+                        if (crisID.equals(meta.authority)
+                                || allname.equals(meta.value)
+                                || jaroWinklerDistance.getDistance(allname,
+                                        meta.value) > checksimilarity
+                                || allname.startsWith(meta.value)
+                                || meta.value.startsWith(allname))
                         {
-                            choice: for (Choice choice : choices.values)
-                            {
-                                for (String allname : rp.getAllNames())
-                                {
-                                    if (crisID.equals(choice.authority)
-                                            || allname.equals(choice.value)
-                                            || jaroWinklerDistance.getDistance(
-                                                    allname,
-                                                    choice.value) > checksimilarity || allname.startsWith(choice.value) || choice.value.startsWith(allname))
-                                    {
-                                        similar = meta.value;
-                                        haveSimilar.put(field, true);
-                                        break choice;
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            choice: for (String allname : rp.getAllNames())
-                            {
-                                if (jaroWinklerDistance.getDistance(
-                                                allname,
-                                                meta.value) > checksimilarity || allname.startsWith(meta.value) || meta.value.startsWith(allname))
-                                {
-                                    similar = meta.value;
-                                    haveSimilar.put(field, true);
-                                    break choice;
-                                }
-                            }
+                            similar = meta.value;
+                            haveSimilar.put(field, true);
+                            break choice;
                         }
                     }
 

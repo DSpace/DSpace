@@ -90,13 +90,24 @@
 		        String labelTab = "jsp.dspace.authority-claim-" + key;
 		        String keyID = item.getID() + "_" + key;
 		        boolean active = false;
-			    List<String[]> rrr = subresult.get(key);
-			    if(rrr.size()>0) {
-			        if(alreadyactive==null) {
-				        active = true;
-				        alreadyactive = keyID; 
-			        }
+				//check if there are similarity before to build content 
+				int preCountSimilarity = 0;
+				for(String[] record : subresult.get(key)) { 
+			        String value = record[0];
+			        String authority = record[1];
+			        String confidence = record[2];
+			        String language = record[3];
+			        String similar = record[4];
+				 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
+						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
+						        preCountSimilarity++;
+						    }
+				 	   }
 			    }
+		        if(preCountSimilarity>0) {
+			        active = true;
+			        alreadyactive = keyID; 
+		        }
 		%>
 		
 				  <li id="li_<%= keyID %>" class="nav-item  <%= active?"active":""%>" >
