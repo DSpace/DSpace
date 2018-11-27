@@ -31,6 +31,7 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,8 +64,9 @@ public class RelationshipRestController {
     @RequestMapping(method = RequestMethod.GET, value = "/{label}")
     public RelationshipResourceWrapper retrieveByLabel(HttpServletResponse response,
                                                        HttpServletRequest request, @PathVariable String label,
-                                                       @RequestParam(name = "dso", required = false) String dsoId)
-        throws SQLException {
+                                                       @RequestParam(name = "dso", required = false) String dsoId,
+                                                       Pageable pageable)
+        throws Exception {
 
         Context context = ContextUtil.obtainContext(request);
 
@@ -99,9 +101,9 @@ public class RelationshipRestController {
         relationshipRestWrapper.setRelationshipRestList(relationshipRests);
 
         RelationshipResourceWrapper relationshipResourceWrapper = new RelationshipResourceWrapper(
-            relationshipRestWrapper, utils);
+            relationshipRestWrapper, utils, relationshipRests.size(), pageable);
 
-        halLinkService.addLinks(relationshipResourceWrapper);
+        halLinkService.addLinks(relationshipResourceWrapper, pageable);
         return relationshipResourceWrapper;
     }
 
