@@ -74,6 +74,7 @@
 	<td>
 		<p style="display:none" id="foundyourauthority_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.your.authority"/></p>
 		<p style="display:none" id="founddifferentauthority_<%= item.getID() %>" class="text-danger"><fmt:message key="jsp.authority-claim.found.different.authority"/></p>
+		<p style="display:none" id="foundrequestforclaim_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.local.message"/></p>
 		<dspace:discovery-artifact style="global" artifact="<%= item %>" view="<%= mapViewMetadata.get(\"publications\") %>" selectorCssView="<%=selectorViewMetadata %>"/>
 		<ul class="nav nav-tabs" role="tablist" id="ul<%= item.getID() %>">
 		<%
@@ -83,14 +84,23 @@
 		    Map<String, Integer> dcCounter = new HashMap<String, Integer>();
 		    
 		    int i = 0;
+		    String alreadyactive = null;
 		    for (String key : subresult.keySet())
 		    {
 		        String labelTab = "jsp.dspace.authority-claim-" + key;
 		        String keyID = item.getID() + "_" + key;
+		        boolean active = false;
+			    List<String[]> rrr = subresult.get(key);
+			    if(rrr.size()>0) {
+			        if(alreadyactive==null) {
+				        active = true;
+				        alreadyactive = keyID; 
+			        }
+			    }
 		%>
 		
-				  <li id="li_<%= keyID %>" class="nav-item  <%= i==0?"active":""%>" >
-				    <a class="nav-link" id="<%= keyID %>-tab" data-toggle="tab" href="#<%= keyID %>" role="tab" aria-controls="<%= keyID %>" <%= i==0?"aria-selected=\"true\"":""%>><fmt:message key="<%= labelTab %>" /></a>
+				  <li id="li_<%= keyID %>" class="nav-item  <%= active?"active":""%>" >
+				    <a class="nav-link" id="<%= keyID %>-tab" data-toggle="tab" href="#<%= keyID %>" role="tab" aria-controls="<%= keyID %>" <%= active?"aria-selected=\"true\"":""%>><fmt:message key="<%= labelTab %>" /></a>
 				  </li>
 		  
 		<%
@@ -102,18 +112,24 @@
 		  
 		<%    
 		i = 0;
-		
 		for (String key : subresult.keySet())
 		{
-		    String keyID = item.getID() + "_" + key; 
+		    boolean active = false;
+		    String keyID = item.getID() + "_" + key;
+		    if(alreadyactive!=null) {
+		        if(alreadyactive.equals(keyID)) {
+		            active = true;
+		        }
+		    }
 		%>
 		
-		  <div class="tab-pane <%= i==0?"active":""%>" id="<%= keyID %>" role="tabpanel" aria-labelledby="<%= keyID %>-tab">
+		  <div class="tab-pane <%= active?"active":""%>" id="<%= keyID %>" role="tabpanel" aria-labelledby="<%= keyID %>-tab">
 		    <div class="row">
 		      <div class="col-md-12">
 		<%	
 			boolean hiddenSelectCheckbox = false;
 
+			//check if the local.message.claim exist... if exist show only a warning and remove checkbox selection
 			Metadatum[] requestPendings = item.getMetadataByMetadataString("local.message.claim");
 			for(Metadatum requestPending : requestPendings) {
 			    String vvv = requestPending.value;
@@ -125,38 +141,39 @@
 				}
 			}
 			
-				int countSS = 0;
-				for(String[] record : subresult.get(key)) { 
-			        String value = record[0];
-			        String authority = record[1];
-			        String confidence = record[2];
-			        String language = record[3];
-			        String similar = record[4];
-				 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
-						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
-						        countSS++;
-						    }
-				 	   }
-			    }
-			if(countSS==0) {
+			//check if there are similarity before to build content 
+			int preCountSimilarity = 0;
+			for(String[] record : subresult.get(key)) { 
+		        String value = record[0];
+		        String authority = record[1];
+		        String confidence = record[2];
+		        String language = record[3];
+		        String similar = record[4];
+			 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
+					    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
+					        preCountSimilarity++;
+					    }
+			 	   }
+		    }
+			if(preCountSimilarity==0) {
 		%>
-				<script type="text/javascript">
-					jQuery("#<%= keyID %>").toggle();
-					jQuery("#li_<%= keyID %>").toggle();
-				</script>		
-		<% }
+				 <script type="text/javascript">
+					jQuery("#<%= keyID %>").hide();
+					jQuery("#li_<%= keyID %>").hide();					
+				</script>
+		<%  }
 			else if(hiddenSelectCheckbox) {
 		%>
 				<script type="text/javascript">
 					jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
 					jQuery("#<%= keyID %>").toggle();
 					jQuery("#li_<%= keyID %>").toggle();
-				</script>	
-				<div class="well text-center text-info"><fmt:message key="jsp.authority-claim.found.local.message"/></div>
-		<% } else { %>			      
+					jQuery("#foundrequestforclaim_<%= item.getID() %>").toggle();
+				</script>
+		<%  } else { %>			      
 		      	<div class="col-md-5">
-		<%      int countSimilar = 0;
-			    boolean showFoundYourAuthorityLowConfidence = false;
+		<%      
+				int countSimilar = 0;
 				boolean showFoundYourAuthority = false;
 				boolean showFoundDifferentAuthority = false;
 				for(String[] record : subresult.get(key)) { 
@@ -194,16 +211,14 @@
 				 %>
 				<% 	if(crisID.equals(authority)) {
 				    	countSimilar++;
-				    	if(!confidence.equals("600")) {
-				    	    showFoundYourAuthorityLowConfidence = true;
-				    	} else {
+				    	if(confidence.equals("600")) {
 			    			showFoundYourAuthority = true;
 				    	}
 				 	} else {
 				 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
 						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
-						        countSimilar++;
-								if(StringUtils.isNotBlank(authority)) {
+						        countSimilar++;						        
+								if(StringUtils.isNotBlank(authority) && confidence.equals("600")) {
 						    		showFoundDifferentAuthority = true;
 							    }
 						    }
@@ -224,7 +239,7 @@
 						jQuery("#myTabContent<%= item.getID() %>").toggle();
 						jQuery("#ul<%= item.getID() %>").toggle();
 					</script>					
-				<% } else if(showFoundDifferentAuthority && !showFoundYourAuthority) { %>
+				<% } else if(showFoundDifferentAuthority && !showFoundYourAuthority && countSimilar==1) { %>
 					<script type="text/javascript">
 						jQuery("#founddifferentauthority_<%= item.getID() %>").toggle();
 					</script>						    
@@ -272,27 +287,31 @@
 					    <textarea class="form-control" name="requestNote_<%= keyID %>" id="requestNote_<%= keyID %>" rows="3" cols="100"></textarea>
 					  </div>
 				</div>
-		      </div>
-		    </div>
-		  </div>
+
 		<%      
 				if(countSimilar==1) {
 		%>
-				<script type="text/javascript">
-						jQuery("#<%= keyID %>").toggle();
-						jQuery("#li_<%= keyID %>").toggle();
-				</script>		
+					<script type="text/javascript">
+						jQuery("#<%= keyID %>").hide();
+						jQuery("#li_<%= keyID %>").hide();
+					</script>	
 		<% 
 				}
 		%>
 		<% 
 			i++;
-			} 
+			}
+			
+		%>	
+				</div>
+		    </div>
+		  </div>
+		
+		<%	
 		}
 		%>
-		
 		</div>
-		
+
 		<input type="hidden" name="handle_<%= item.getID() %>" value="<%= handlekey %>"/>
 	</td>    
 	</tr>		

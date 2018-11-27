@@ -524,7 +524,13 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
                 // Sort the list
                 Collections.sort(sortedParamNames);
-
+                
+                if ("submit_reject"
+                        .equalsIgnoreCase(submitMode))
+                {
+                    itemRejectedIDs.add(item.getID());
+                }
+                
                 for (String p : sortedParamNames)
                 {
                     // e.g. value_3_dc_contributor_author_00
@@ -668,8 +674,6 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                                         element, qualifier,
                                                         language, value, null,
                                                         Choices.CF_REJECTED);
-                                                itemRejectedIDs
-                                                        .add(item.getID());
                                             }
                                             else
                                             {
