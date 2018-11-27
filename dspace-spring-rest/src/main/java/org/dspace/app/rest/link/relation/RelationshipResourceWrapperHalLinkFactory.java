@@ -1,12 +1,19 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.link.relation;
 
 import java.util.LinkedList;
 
 import org.dspace.app.rest.RelationshipRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
+import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.app.rest.model.RelationshipRestWrapper;
-import org.dspace.app.rest.model.hateoas.EmbeddedPageHeader;
-import org.dspace.app.rest.model.hateoas.RelationshipResource;
+import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.RelationshipResourceWrapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +27,11 @@ public class RelationshipResourceWrapperHalLinkFactory
     protected void addLinks(RelationshipResourceWrapper halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
 
-        PageImpl<RelationshipResource> page = new PageImpl<>(halResource.getFullList(), pageable,
-                                                             halResource.getTotalElements());
-        halResource.setPageHeader(new EmbeddedPageHeader(getSelfLink(halResource.getContent(), pageable),
-                                                         page, true));
+        PageImpl<RelationshipRest> page = new PageImpl<>(halResource.getContent().getRelationshipRestList(), pageable,
+                                                         halResource.getContent().getRelationshipRestList().size());
+
+        halResource.setPageHeader(new EmbeddedPage(getSelfLink(halResource.getContent(), pageable),
+                                                   page, halResource.getContent().getRelationshipRestList(), true, "relationships"));
     }
 
     public String getSelfLink(RelationshipRestWrapper content, Pageable pageable) throws Exception {

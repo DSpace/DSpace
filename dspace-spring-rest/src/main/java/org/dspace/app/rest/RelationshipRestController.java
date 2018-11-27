@@ -87,7 +87,6 @@ public class RelationshipRestController {
             for (RelationshipType relationshipType : relationshipTypeList) {
                 relationships.addAll(relationshipService.findByRelationshipType(context, relationshipType));
             }
-//            relationships = relationshipService.findAll(context);
         }
 
         List<RelationshipRest> relationshipRests = new LinkedList<>();
