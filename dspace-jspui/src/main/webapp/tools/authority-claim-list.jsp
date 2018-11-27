@@ -74,7 +74,7 @@
 	<td>
 		<p style="display:none" id="foundyourauthority_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.your.authority"/></p>
 		<p style="display:none" id="founddifferentauthority_<%= item.getID() %>" class="text-danger"><fmt:message key="jsp.authority-claim.found.different.authority"/></p>
-		<p style="display:none" id="foundrequestforclaim_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.local.message"/></p>
+		<p style="display:none" id="foundrequestforclaim_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim-list.found.local.message"/></p>
 		<dspace:discovery-artifact style="global" artifact="<%= item %>" view="<%= mapViewMetadata.get(\"publications\") %>" selectorCssView="<%=selectorViewMetadata %>"/>
 		<ul class="nav nav-tabs" role="tablist" id="ul<%= item.getID() %>">
 		<%
@@ -104,7 +104,7 @@
 						    }
 				 	   }
 			    }
-		        if(preCountSimilarity>0) {
+		        if(preCountSimilarity>1) {
 			        active = true;
 			        alreadyactive = keyID; 
 		        }
