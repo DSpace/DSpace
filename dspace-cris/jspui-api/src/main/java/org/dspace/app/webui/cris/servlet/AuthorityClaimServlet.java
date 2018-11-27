@@ -585,7 +585,11 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                         // Get the value
                                         String value = request.getParameter(p)
                                                 .trim();
-
+                                        templateEmailParam0 = key;
+                                        templateEmailParam1 = value;
+                                        templateEmailParam2 = authority;
+                                        templateEmailParam3 = ""
+                                                + confidence;
                                         if (StringUtils.isBlank(authority))
                                         {
                                             if (sequenceNumber
@@ -600,11 +604,6 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                                 {
                                                     confidence = Choices.CF_UNCERTAIN;
                                                     templateEmail = PUBLICATION_CLAIMED_UNCERTAIN;
-                                                    templateEmailParam0 = key;
-                                                    templateEmailParam1 = value;
-                                                    templateEmailParam2 = authority;
-                                                    templateEmailParam3 = ""
-                                                            + confidence;
                                                 }
                                             }
                                             else
@@ -623,11 +622,6 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                                     .equals(sequenceChoice))
                                             {
                                                 templateEmail = PUBLICATION_REQUEST_FOR_CLAIM;
-                                                templateEmailParam0 = key;
-                                                templateEmailParam1 = value;
-                                                templateEmailParam2 = authority;
-                                                templateEmailParam3 = ""
-                                                        + confidence;
                                             }
                                         }
 
