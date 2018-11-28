@@ -19,5 +19,6 @@ import org.dspace.app.rest.utils.Utils;
 public class RelationshipResource extends DSpaceResource<RelationshipRest> {
     public RelationshipResource(RelationshipRest data, Utils utils, String... rels) {
         super(data, utils, rels);
+
     }
 }
