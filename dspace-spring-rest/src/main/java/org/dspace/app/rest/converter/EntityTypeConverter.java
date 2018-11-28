@@ -8,7 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.EntityTypeRest;
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * representation of an EntityType and vice versa
  */
 @Component
-public class EntityTypeConverter extends DSpaceConverter<org.dspace.content.EntityType, EntityTypeRest> {
+public class EntityTypeConverter extends DSpaceConverter<ItemRelationshipsType, EntityTypeRest> {
 
     /**
      * This method converts the EntityType model object that is passed along in the params to the
@@ -24,7 +24,7 @@ public class EntityTypeConverter extends DSpaceConverter<org.dspace.content.Enti
      * @param obj   The EntityType model object to be converted
      * @return      The EntityType REST object that is made from the model object
      */
-    public EntityTypeRest fromModel(EntityType obj) {
+    public EntityTypeRest fromModel(ItemRelationshipsType obj) {
         EntityTypeRest entityTypeRest = new EntityTypeRest();
         entityTypeRest.setId(obj.getID());
         entityTypeRest.setLabel(obj.getLabel());
@@ -37,10 +37,10 @@ public class EntityTypeConverter extends DSpaceConverter<org.dspace.content.Enti
      * @param obj   The EntityType REST object to be converted
      * @return      The EntityType model object that is made from the REST object
      */
-    public EntityType toModel(EntityTypeRest obj) {
-        EntityType entityType = new EntityType();
-        entityType.setId(obj.getId());
-        entityType.setLabel(obj.getLabel());
-        return entityType;
+    public ItemRelationshipsType toModel(EntityTypeRest obj) {
+        ItemRelationshipsType itemRelationshipsType = new ItemRelationshipsType();
+        itemRelationshipsType.setId(obj.getId());
+        itemRelationshipsType.setLabel(obj.getLabel());
+        return itemRelationshipsType;
     }
 }

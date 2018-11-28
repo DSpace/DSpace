@@ -13,7 +13,7 @@ import java.util.List;
  * This class represents an Entity object. An Entity object has an Item that it describes with a list
  * of relationships that it includes as well.
  */
-public class Entity {
+public class ItemRelationshipsUtil {
 
     /**
      * The Item that is being described by this Entity
@@ -29,7 +29,7 @@ public class Entity {
      * @param item              The Item to be included in this Entity object as a property
      * @param relationshipList  The list of relationships
      */
-    public Entity(Item item,List<Relationship> relationshipList) {
+    public ItemRelationshipsUtil(Item item, List<Relationship> relationshipList) {
         setItem(item);
         setRelationships(relationshipList);
     }

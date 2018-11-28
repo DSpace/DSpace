@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
 import org.dspace.content.RelationshipType;
 import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
@@ -41,8 +41,9 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @return
      * @throws SQLException If something goes wrong
      */
-    RelationshipType findbyTypesAndLabels(Context context,EntityType leftType,EntityType rightType,
-                                          String leftLabel,String rightLabel)
+    RelationshipType findbyTypesAndLabels(Context context, ItemRelationshipsType leftType,
+                                          ItemRelationshipsType rightType,
+                                          String leftLabel, String rightLabel)
                                             throws SQLException;
 
     /**

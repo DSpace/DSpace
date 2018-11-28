@@ -14,8 +14,8 @@ import org.dspace.app.rest.converter.EntityTypeConverter;
 import org.dspace.app.rest.model.EntityTypeRest;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EntityTypeResource;
-import org.dspace.content.EntityType;
-import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.ItemRelationshipsType;
+import org.dspace.content.service.ItemRelationshipTypeService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,27 +29,27 @@ import org.springframework.stereotype.Component;
 public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRest, Integer> {
 
     @Autowired
-    private EntityTypeService entityTypeService;
+    private ItemRelationshipTypeService itemRelationshipTypeService;
 
     @Autowired
     private EntityTypeConverter entityTypeConverter;
 
     public EntityTypeRest findOne(Context context, Integer integer) {
         try {
-            return entityTypeConverter.fromModel(entityTypeService.find(context, integer));
+            return entityTypeConverter.fromModel(itemRelationshipTypeService.find(context, integer));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public Page<EntityTypeRest> findAll(Context context, Pageable pageable) {
-        List<EntityType> entityTypeList = null;
+        List<ItemRelationshipsType> itemRelationshipsTypeList = null;
         try {
-            entityTypeList = entityTypeService.findAll(context);
+            itemRelationshipsTypeList = itemRelationshipTypeService.findAll(context);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<EntityTypeRest> page = utils.getPage(entityTypeList, pageable).map(entityTypeConverter);
+        Page<EntityTypeRest> page = utils.getPage(itemRelationshipsTypeList, pageable).map(entityTypeConverter);
         return page;
     }
 

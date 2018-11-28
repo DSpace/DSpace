@@ -49,7 +49,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      */
     @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "left_type", nullable = false)
-    private EntityType leftType;
+    private ItemRelationshipsType leftType;
 
     /**
      * The rightType EntityType field for the relationshipType
@@ -57,7 +57,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      */
     @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "right_type", nullable = false)
-    private EntityType rightType;
+    private ItemRelationshipsType rightType;
 
     /**
      * The leftLabel String field for the relationshipType
@@ -113,7 +113,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      * Standard getter for The leftType EntityType for this RelationshipType
      * @return  The leftType EntityType of this RelationshipType
      */
-    public EntityType getLeftType() {
+    public ItemRelationshipsType getLeftType() {
         return leftType;
     }
 
@@ -121,7 +121,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      * Standard setter for the leftType EntityType for this RelationshipType
      * @param leftType  The leftType EntityType that this RelationshipType should receive
      */
-    public void setLeftType(EntityType leftType) {
+    public void setLeftType(ItemRelationshipsType leftType) {
         this.leftType = leftType;
     }
 
@@ -129,7 +129,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      * Standard getter for The rightType EntityType for this RelationshipType
      * @return  The rightType EntityType of this RelationshipType
      */
-    public EntityType getRightType() {
+    public ItemRelationshipsType getRightType() {
         return rightType;
     }
 
@@ -137,7 +137,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      * Standard setter for the rightType EntityType for this RelationshipType
      * @param rightType  The rightType EntityType that this RelationshipType should receive
      */
-    public void setRightType(EntityType rightType) {
+    public void setRightType(ItemRelationshipsType rightType) {
         this.rightType = rightType;
     }
 

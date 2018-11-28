@@ -34,9 +34,9 @@ import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Entity;
-import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.ItemRelationshipsType;
+import org.dspace.content.ItemRelationshipsUtil;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
@@ -44,9 +44,9 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.EntityService;
-import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemRelationshipTypeService;
+import org.dspace.content.service.ItemRelationshipsService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
@@ -113,8 +113,8 @@ public class MetadataImport {
     protected final WorkspaceItemService workspaceItemService;
     protected final RelationshipTypeService relationshipTypeService;
     protected final RelationshipService relationshipService;
-    protected final EntityTypeService entityTypeService;
-    protected final EntityService entityService;
+    protected final ItemRelationshipTypeService itemRelationshipTypeService;
+    protected final ItemRelationshipsService itemRelationshipsService;
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -136,8 +136,8 @@ public class MetadataImport {
         workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
         relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
-        entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
-        entityService = ContentServiceFactory.getInstance().getEntityService();
+        itemRelationshipTypeService = ContentServiceFactory.getInstance().getItemRelationshipTypeService();
+        itemRelationshipsService = ContentServiceFactory.getInstance().getItemRelationshipsService();
     }
 
     /**
@@ -688,7 +688,7 @@ public class MetadataImport {
      */
     private void handleRelationOtherMetadata(Context c, Item item, String element, List<String> values)
         throws SQLException, AuthorizeException {
-        Entity entity = entityService.findByItemId(c, item.getID());
+        ItemRelationshipsUtil itemRelationshipsUtil = itemRelationshipsService.findByItemId(c, item.getID());
         boolean left = false;
         List<RelationshipType> acceptableRelationshipTypes = new LinkedList<>();
         String url = handleService.resolveToURL(c, values.get(0));
@@ -697,20 +697,25 @@ public class MetadataImport {
             return;
         }
 
-        Entity relationEntity = entityService.findByItemId(c, uuid);
+        ItemRelationshipsUtil relationItemRelationshipsUtil = itemRelationshipsService.findByItemId(c, uuid);
 
 
-        List<RelationshipType> leftRelationshipTypesForEntity = entityService.getLeftRelationshipTypes(c, entity);
-        List<RelationshipType> rightRelationshipTypesForEntity = entityService.getRightRelationshipTypes(c, entity);
+        List<RelationshipType> leftRelationshipTypesForEntity =
+            itemRelationshipsService.getLeftRelationshipTypes(c, itemRelationshipsUtil);
+        List<RelationshipType> rightRelationshipTypesForEntity =
+            itemRelationshipsService.getRightRelationshipTypes(c, itemRelationshipsUtil);
 
-        for (RelationshipType relationshipType : entityService.getAllRelationshipTypes(c, entity)) {
+        for (RelationshipType relationshipType : itemRelationshipsService
+            .getAllRelationshipTypes(c, itemRelationshipsUtil)) {
             if (StringUtils.equalsIgnoreCase(relationshipType.getLeftLabel(), element)) {
-                left = handleLeftLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
+                left = handleLeftLabelEqualityRelationshipTypeElement(c, itemRelationshipsUtil,
+                                                                      relationItemRelationshipsUtil, left,
                                                                       acceptableRelationshipTypes,
                                                                       leftRelationshipTypesForEntity,
                                                                       relationshipType);
             } else if (StringUtils.equalsIgnoreCase(relationshipType.getRightLabel(), element)) {
-                left = handleRightLabelEqualityRelationshipTypeElement(c, entity, relationEntity, left,
+                left = handleRightLabelEqualityRelationshipTypeElement(c, itemRelationshipsUtil,
+                                                                       relationItemRelationshipsUtil, left,
                                                                        acceptableRelationshipTypes,
                                                                        rightRelationshipTypesForEntity,
                                                                        relationshipType);
@@ -765,28 +770,31 @@ public class MetadataImport {
      * if applicable and valid RelationshipType objects are found. It will also return a boolean indicating
      * whether we're dealing with a left Relationship or not
      * @param c                                 The relevant DSpace context
-     * @param entity                            The Entity for which the RelationshipType has to be checked
-     * @param relationEntity                    The other Entity of the Relationship
+     * @param itemRelationshipsUtil                            The Entity for which the RelationshipType has to be
+     *                                                         checked
+     * @param relationItemRelationshipsUtil                    The other Entity of the Relationship
      * @param left                              Boolean indicating whether the Relationship is left or not
      * @param acceptableRelationshipTypes       The list of RelationshipType objects that will be added to
      * @param rightRelationshipTypesForEntity   The list of RelationshipType objects that are possible
      *                                          for the right entity
      * @param relationshipType                  The RelationshipType object that we want to check whether it's
      *                                          valid to be added or not
-     * @return                                  A boolean indicating whether the relationship is left or right, will
+     * @return A boolean indicating whether the relationship is left or right, will
      *                                          be false in this case
      * @throws SQLException                     If something goes wrong
      */
-    private boolean handleRightLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
+    private boolean handleRightLabelEqualityRelationshipTypeElement(Context c,
+                                                                    ItemRelationshipsUtil itemRelationshipsUtil,
+                                                                    ItemRelationshipsUtil relationItemRelationshipsUtil,
                                                                     boolean left,
                                                                     List<RelationshipType> acceptableRelationshipTypes,
                                                                     List<RelationshipType>
                                                                         rightRelationshipTypesForEntity,
                                                                     RelationshipType relationshipType)
         throws SQLException {
-        if (StringUtils.equalsIgnoreCase(entityService.getType(c, entity).getLabel(),
+        if (StringUtils.equalsIgnoreCase(itemRelationshipsService.getType(c, itemRelationshipsUtil).getLabel(),
                                          relationshipType.getRightType().getLabel()) &&
-            StringUtils.equalsIgnoreCase(entityService.getType(c, relationEntity).getLabel(),
+            StringUtils.equalsIgnoreCase(itemRelationshipsService.getType(c, relationItemRelationshipsUtil).getLabel(),
                                          relationshipType.getLeftType().getLabel())) {
 
             for (RelationshipType rightRelationshipType : rightRelationshipTypesForEntity) {
@@ -807,28 +815,31 @@ public class MetadataImport {
      * if applicable and valid RelationshipType objects are found. It will also return a boolean indicating
      * whether we're dealing with a left Relationship or not
      * @param c                                 The relevant DSpace context
-     * @param entity                            The Entity for which the RelationshipType has to be checked
-     * @param relationEntity                    The other Entity of the Relationship
+     * @param itemRelationshipsUtil                            The Entity for which the RelationshipType has to be
+     *                                                         checked
+     * @param relationItemRelationshipsUtil                    The other Entity of the Relationship
      * @param left                              Boolean indicating whether the Relationship is left or not
      * @param acceptableRelationshipTypes       The list of RelationshipType objects that will be added to
      * @param leftRelationshipTypesForEntity    The list of RelationshipType objects that are possible
      *                                          for the left entity
      * @param relationshipType                  The RelationshipType object that we want to check whether it's
      *                                          valid to be added or not
-     * @return                                  A boolean indicating whether the relationship is left or right, will
+     * @return A boolean indicating whether the relationship is left or right, will
      *                                          be true in this case
      * @throws SQLException                     If something goes wrong
      */
-    private boolean handleLeftLabelEqualityRelationshipTypeElement(Context c, Entity entity, Entity relationEntity,
+    private boolean handleLeftLabelEqualityRelationshipTypeElement(Context c,
+                                                                   ItemRelationshipsUtil itemRelationshipsUtil,
+                                                                   ItemRelationshipsUtil relationItemRelationshipsUtil,
                                                                    boolean left,
                                                                    List<RelationshipType> acceptableRelationshipTypes,
                                                                    List<RelationshipType>
                                                                        leftRelationshipTypesForEntity,
                                                                    RelationshipType relationshipType)
         throws SQLException {
-        if (StringUtils.equalsIgnoreCase(entityService.getType(c, entity).getLabel(),
+        if (StringUtils.equalsIgnoreCase(itemRelationshipsService.getType(c, itemRelationshipsUtil).getLabel(),
                                          relationshipType.getLeftType().getLabel()) &&
-            StringUtils.equalsIgnoreCase(entityService.getType(c, relationEntity).getLabel(),
+            StringUtils.equalsIgnoreCase(itemRelationshipsService.getType(c, relationItemRelationshipsUtil).getLabel(),
                                          relationshipType.getRightType().getLabel())) {
             for (RelationshipType leftRelationshipType : leftRelationshipTypesForEntity) {
                 if (StringUtils.equalsIgnoreCase(leftRelationshipType.getRightType().getLabel(),
@@ -864,9 +875,9 @@ public class MetadataImport {
                                             String language, List<String> values, List<String> authorities,
                                             List<Integer> confidences)
         throws SQLException, AuthorizeException {
-        EntityType entityType = entityTypeService.findByEntityType(c, values.get(0));
-        if (entityType != null) {
-            authorities.add(String.valueOf(entityType.getID()));
+        ItemRelationshipsType itemRelationshipsType = itemRelationshipTypeService.findByEntityType(c, values.get(0));
+        if (itemRelationshipsType != null) {
+            authorities.add(String.valueOf(itemRelationshipsType.getID()));
             itemService.clearMetadata(c, item, schema, element, qualifier, language);
             itemService.addMetadata(c, item, schema, element, qualifier, language,
                                     values, authorities, confidences);

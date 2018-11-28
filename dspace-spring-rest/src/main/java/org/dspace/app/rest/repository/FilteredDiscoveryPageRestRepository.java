@@ -15,8 +15,8 @@ import org.dspace.app.rest.converter.FilteredDiscoveryPageConverter;
 import org.dspace.app.rest.model.FilteredDiscoveryPageRest;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.FilteredDiscoveryPageResource;
-import org.dspace.content.EntityType;
-import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.ItemRelationshipsType;
+import org.dspace.content.service.ItemRelationshipTypeService;
 import org.dspace.content.virtual.EntityTypeToFilterQueryService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 public class FilteredDiscoveryPageRestRepository extends DSpaceRestRepository<FilteredDiscoveryPageRest, String> {
 
     @Autowired
-    private EntityTypeService entityTypeService;
+    private ItemRelationshipTypeService itemRelationshipTypeService;
 
     @Autowired
     private FilteredDiscoveryPageConverter filteredDiscoveryPageConverter;
@@ -41,28 +41,30 @@ public class FilteredDiscoveryPageRestRepository extends DSpaceRestRepository<Fi
 
     public FilteredDiscoveryPageRest findOne(Context context, String string) {
         try {
-            return filteredDiscoveryPageConverter.fromModel(entityTypeService.findByEntityType(context, string));
+            return filteredDiscoveryPageConverter
+                .fromModel(itemRelationshipTypeService.findByEntityType(context, string));
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public Page<FilteredDiscoveryPageRest> findAll(Context context, Pageable pageable) {
-        List<EntityType> entityTypeList = null;
+        List<ItemRelationshipsType> itemRelationshipsTypeList = null;
         try {
-            entityTypeList = entityTypeService.findAll(context);
+            itemRelationshipsTypeList = itemRelationshipTypeService.findAll(context);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        List<EntityType> resultingList = new LinkedList<>();
-        for (EntityType entityType : entityTypeList) {
-            if (entityTypeToFilterQueryService.hasKey(entityType.getLabel())) {
-                resultingList.add(entityType);
+        List<ItemRelationshipsType> resultingList = new LinkedList<>();
+        for (ItemRelationshipsType itemRelationshipsType : itemRelationshipsTypeList) {
+            if (entityTypeToFilterQueryService.hasKey(itemRelationshipsType.getLabel())) {
+                resultingList.add(itemRelationshipsType);
             }
         }
         Page<FilteredDiscoveryPageRest> page = utils.getPage(resultingList, pageable)
                                                     .map(filteredDiscoveryPageConverter);
-        return page;    }
+        return page;
+    }
 
     public Class<FilteredDiscoveryPageRest> getDomainClass() {
         return FilteredDiscoveryPageRest.class;

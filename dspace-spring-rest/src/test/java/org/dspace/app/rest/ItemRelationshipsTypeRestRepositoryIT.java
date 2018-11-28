@@ -23,10 +23,10 @@ import java.util.List;
 
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
-import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.ItemRelationshipTypeService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.services.ConfigurationService;
@@ -35,13 +35,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class EntityTypeRestRepositoryIT extends AbstractControllerIntegrationTest {
+public class ItemRelationshipsTypeRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private RelationshipTypeService relationshipTypeService;
 
     @Autowired
-    private EntityTypeService entityTypeService;
+    private ItemRelationshipTypeService itemRelationshipTypeService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -63,7 +63,7 @@ public class EntityTypeRestRepositoryIT extends AbstractControllerIntegrationTes
         //Clean up the database for the next test
         context.turnOffAuthorisationSystem();
         List<RelationshipType> relationshipTypeList = relationshipTypeService.findAll(context);
-        List<EntityType> entityTypeList = entityTypeService.findAll(context);
+        List<ItemRelationshipsType> itemRelationshipsTypeList = itemRelationshipTypeService.findAll(context);
         List<Relationship> relationships = relationshipService.findAll(context);
 
         Iterator<Relationship> relationshipIterator = relationships.iterator();
@@ -80,11 +80,11 @@ public class EntityTypeRestRepositoryIT extends AbstractControllerIntegrationTes
             relationshipTypeService.delete(context, relationshipType);
         }
 
-        Iterator<EntityType> entityTypeIterator = entityTypeList.iterator();
+        Iterator<ItemRelationshipsType> entityTypeIterator = itemRelationshipsTypeList.iterator();
         while (entityTypeIterator.hasNext()) {
-            EntityType entityType = entityTypeIterator.next();
+            ItemRelationshipsType itemRelationshipsType = entityTypeIterator.next();
             entityTypeIterator.remove();
-            entityTypeService.delete(context, entityType);
+            itemRelationshipTypeService.delete(context, itemRelationshipsType);
         }
 
         super.destroy();
@@ -92,7 +92,7 @@ public class EntityTypeRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findAllEntityTypesSizeTest() throws SQLException {
-        assertEquals(7, entityTypeService.findAll(context).size());
+        assertEquals(7, itemRelationshipTypeService.findAll(context).size());
     }
 
     @Test
@@ -138,9 +138,9 @@ public class EntityTypeRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     private void checkEntityType(String type) throws SQLException {
-        EntityType entityType = entityTypeService.findByEntityType(context, type);
-        assertNotNull(entityType);
-        assertEquals(type, entityType.getLabel());
+        ItemRelationshipsType itemRelationshipsType = itemRelationshipTypeService.findByEntityType(context, type);
+        assertNotNull(itemRelationshipsType);
+        assertEquals(type, itemRelationshipsType.getLabel());
     }
 
     @Test
@@ -157,15 +157,20 @@ public class EntityTypeRestRepositoryIT extends AbstractControllerIntegrationTes
                    //We have 4 facets in the default configuration, they need to all be present in the embedded section
                    .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
                        EntityTypeMatcher
-                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Publication")),
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Person")),
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Project")),
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "OrgUnit")),
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal")),
+                           .matchEntityTypeEntry(itemRelationshipTypeService.findByEntityType(context, "Publication")),
+                       EntityTypeMatcher.matchEntityTypeEntry(
+                           itemRelationshipTypeService.findByEntityType(context, "Person")),
+                       EntityTypeMatcher.matchEntityTypeEntry(
+                           itemRelationshipTypeService.findByEntityType(context, "Project")),
+                       EntityTypeMatcher.matchEntityTypeEntry(
+                           itemRelationshipTypeService.findByEntityType(context, "OrgUnit")),
+                       EntityTypeMatcher.matchEntityTypeEntry(
+                           itemRelationshipTypeService.findByEntityType(context, "Journal")),
                        EntityTypeMatcher
-                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalVolume")),
+                           .matchEntityTypeEntry(itemRelationshipTypeService.findByEntityType(context, "JournalVolume"
+                           )),
                        EntityTypeMatcher
-                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalIssue"))
+                           .matchEntityTypeEntry(itemRelationshipTypeService.findByEntityType(context, "JournalIssue"))
                    )));
     }
 }

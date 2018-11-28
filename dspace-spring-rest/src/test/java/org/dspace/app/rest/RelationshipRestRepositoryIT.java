@@ -26,11 +26,11 @@ import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.ItemRelationshipsType;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
-import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.ItemRelationshipTypeService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.services.ConfigurationService;
@@ -45,7 +45,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
     private RelationshipTypeService relationshipTypeService;
 
     @Autowired
-    private EntityTypeService entityTypeService;
+    private ItemRelationshipTypeService itemRelationshipTypeService;
 
     @Autowired
     private RelationshipService relationshipService;
@@ -69,7 +69,7 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
         //Clean up the database for the next test
         context.turnOffAuthorisationSystem();
         List<RelationshipType> relationshipTypeList = relationshipTypeService.findAll(context);
-        List<EntityType> entityTypeList = entityTypeService.findAll(context);
+        List<ItemRelationshipsType> itemRelationshipsTypeList = itemRelationshipTypeService.findAll(context);
         List<Relationship> relationships = relationshipService.findAll(context);
 
         Iterator<Relationship> relationshipIterator = relationships.iterator();
@@ -86,11 +86,11 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
             relationshipTypeService.delete(context, relationshipType);
         }
 
-        Iterator<EntityType> entityTypeIterator = entityTypeList.iterator();
+        Iterator<ItemRelationshipsType> entityTypeIterator = itemRelationshipsTypeList.iterator();
         while (entityTypeIterator.hasNext()) {
-            EntityType entityType = entityTypeIterator.next();
+            ItemRelationshipsType itemRelationshipsType = entityTypeIterator.next();
             entityTypeIterator.remove();
-            entityTypeService.delete(context, entityType);
+            itemRelationshipTypeService.delete(context, itemRelationshipsType);
         }
 
         super.destroy();
@@ -155,16 +155,16 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Person"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
+            .findbyTypesAndLabels(context, itemRelationshipTypeService.findByEntityType(context, "Person"),
+                                  itemRelationshipTypeService.findByEntityType(context, "OrgUnit"),
                                   "isOrgUnitOfPerson", "isPersonOfOrgUnit");
         RelationshipType isOrgUnitOfProjectRelationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Project"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
+            .findbyTypesAndLabels(context, itemRelationshipTypeService.findByEntityType(context, "Project"),
+                                  itemRelationshipTypeService.findByEntityType(context, "OrgUnit"),
                                   "isOrgUnitOfProject", "isProjectOfOrgUnit");
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
+            .findbyTypesAndLabels(context, itemRelationshipTypeService.findByEntityType(context, "Publication"),
+                                  itemRelationshipTypeService.findByEntityType(context, "Person"),
                                   "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Relationship relationship1 = RelationshipBuilder

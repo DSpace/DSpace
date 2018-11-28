@@ -24,10 +24,10 @@ import java.util.List;
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
-import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.ItemRelationshipTypeService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.services.ConfigurationService;
@@ -43,7 +43,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
     private RelationshipTypeService relationshipTypeService;
 
     @Autowired
-    private EntityTypeService entityTypeService;
+    private ItemRelationshipTypeService itemRelationshipTypeService;
 
     @Autowired
     private RelationshipService relationshipService;
@@ -65,7 +65,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
         //Clean up the database for the next test
         context.turnOffAuthorisationSystem();
         List<RelationshipType> relationshipTypeList = relationshipTypeService.findAll(context);
-        List<EntityType> entityTypeList = entityTypeService.findAll(context);
+        List<ItemRelationshipsType> itemRelationshipsTypeList = itemRelationshipTypeService.findAll(context);
         List<Relationship> relationships = relationshipService.findAll(context);
 
         Iterator<Relationship> relationshipIterator = relationships.iterator();
@@ -82,11 +82,11 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
             relationshipTypeService.delete(context, relationshipType);
         }
 
-        Iterator<EntityType> entityTypeIterator = entityTypeList.iterator();
+        Iterator<ItemRelationshipsType> entityTypeIterator = itemRelationshipsTypeList.iterator();
         while (entityTypeIterator.hasNext()) {
-            EntityType entityType = entityTypeIterator.next();
+            ItemRelationshipsType itemRelationshipsType = entityTypeIterator.next();
             entityTypeIterator.remove();
-            entityTypeService.delete(context, entityType);
+            itemRelationshipTypeService.delete(context, itemRelationshipsType);
         }
 
         super.destroy();
@@ -172,13 +172,13 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
     private void checkRelationshipType(String leftType, String rightType, String leftLabel, String rightLabel)
         throws SQLException {
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, leftType),
-                                  entityTypeService.findByEntityType(context, rightType),
+            .findbyTypesAndLabels(context, itemRelationshipTypeService.findByEntityType(context, leftType),
+                                  itemRelationshipTypeService.findByEntityType(context, rightType),
                                   leftLabel, rightLabel);
         assertNotNull(relationshipType);
-        assertEquals(entityTypeService.findByEntityType(context, leftType),
+        assertEquals(itemRelationshipTypeService.findByEntityType(context, leftType),
                      relationshipType.getLeftType());
-        assertEquals(entityTypeService.findByEntityType(context, rightType),
+        assertEquals(itemRelationshipTypeService.findByEntityType(context, rightType),
                      relationshipType.getRightType());
         assertEquals(leftLabel, relationshipType.getLeftLabel());
         assertEquals(rightLabel, relationshipType.getRightLabel());
@@ -240,8 +240,9 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
     @Test
     public void cardinalityOnAuthorPublicationRelationshipTypesTest() throws Exception {
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"), "isAuthorOfPublication",
+            .findbyTypesAndLabels(context, itemRelationshipTypeService.findByEntityType(context, "Publication"),
+                                  itemRelationshipTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
         assertEquals(0, relationshipType.getLeftMinCardinality());
         assertEquals(0, relationshipType.getRightMinCardinality());
@@ -285,8 +286,9 @@ public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrat
     @Test
     public void cardinalityOnIssueJournalJournalVolumeRelationshipTypesTest() throws Exception {
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "JournalVolume"),
-                                  entityTypeService.findByEntityType(context, "JournalIssue"), "isIssueOfJournalVolume",
+            .findbyTypesAndLabels(context, itemRelationshipTypeService.findByEntityType(context, "JournalVolume"),
+                                  itemRelationshipTypeService.findByEntityType(context, "JournalIssue"),
+                                  "isIssueOfJournalVolume",
                                   "isJournalVolumeOfIssue");
         assertEquals(0, relationshipType.getLeftMinCardinality());
         assertEquals(1, relationshipType.getRightMinCardinality());

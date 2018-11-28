@@ -9,7 +9,7 @@ package org.dspace.content.dao;
 
 import java.sql.SQLException;
 
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
 import org.dspace.content.RelationshipType;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
@@ -30,11 +30,12 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
      * @param rightType     The rightType EntityType object to be matched in the query
      * @param leftLabel     The leftLabel String to be matched in the query
      * @param rightLabel    The rightLabel String to be matched in the query
-     * @return              The RelationshipType object that matches all the given parameters
+     * @return The RelationshipType object that matches all the given parameters
      * @throws SQLException If something goes wrong
      */
     RelationshipType findbyTypesAndLabels(Context context,
-                                          EntityType leftType,EntityType rightType,String leftLabel,String rightLabel)
-                                                throws SQLException;
+                                          ItemRelationshipsType leftType, ItemRelationshipsType rightType,
+                                          String leftLabel, String rightLabel)
+        throws SQLException;
 
 }

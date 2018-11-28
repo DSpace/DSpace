@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -20,8 +20,8 @@ public class EntityTypeMatcher {
 
     private EntityTypeMatcher() {}
 
-    public static Matcher<? super Object> matchEntityTypeEntry(EntityType entityType) {
-        return matchEntityTypeExplicitValuesEntry(entityType.getID(), entityType.getLabel());
+    public static Matcher<? super Object> matchEntityTypeEntry(ItemRelationshipsType itemRelationshipsType) {
+        return matchEntityTypeExplicitValuesEntry(itemRelationshipsType.getID(), itemRelationshipsType.getLabel());
     }
 
     public static Matcher<? super Object> matchEntityTypeEntryForLabel(String label) {

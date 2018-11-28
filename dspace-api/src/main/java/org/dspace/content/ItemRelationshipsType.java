@@ -23,8 +23,8 @@ import org.dspace.core.ReloadableEntity;
  * This also has a label that will be used to identify what kind of EntityType this object is
  */
 @Entity
-@Table(name = "entity_type")
-public class EntityType implements ReloadableEntity<Integer> {
+@Table(name = "item_relationships_type")
+public class ItemRelationshipsType implements ReloadableEntity<Integer> {
 
     /**
      * The Integer ID used as a primary key for this database object.

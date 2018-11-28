@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.content.Entity;
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
+import org.dspace.content.ItemRelationshipsUtil;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.core.Context;
@@ -23,7 +23,7 @@ import org.dspace.core.Context;
  * to return the wanted objects to then check for properties on either the list of relationships or the item included
  * in the Entity.
  */
-public interface EntityService {
+public interface ItemRelationshipsService {
 
     /**
      * This will construct an Entity object that will be returned with the Item that matches the ItemID that was
@@ -34,44 +34,44 @@ public interface EntityService {
      * @return The constructed Entity object with the Item and the list of relationships
      * @throws SQLException If something goes wrong
      */
-    Entity findByItemId(Context context, UUID itemId) throws SQLException;
+    ItemRelationshipsUtil findByItemId(Context context, UUID itemId) throws SQLException;
 
     /**
      * Returns the EntityType for the Item that is attached to the Entity that is passed along to this method.
      * The EntityType String logic is in the Metadata for that Item and will be searched on in the EntityTypeService
      * to retrieve the actual EntityType object
      * @param context   The relevant DSpace context
-     * @param entity    The Entity object which contains the Item
+     * @param itemRelationshipsUtil    The Entity object which contains the Item
      * @return The EntityType that belongs to this Item
      * @throws SQLException If something goes wrong
      */
-    EntityType getType(Context context, Entity entity) throws SQLException;
+    ItemRelationshipsType getType(Context context, ItemRelationshipsUtil itemRelationshipsUtil) throws SQLException;
 
     /**
      * Returns the list of relations for the given Entity object
      * @param context   The relevant DSpace context
-     * @param entity    The Entity object for which the list of relationships will be returned
+     * @param itemRelationshipsUtil    The Entity object for which the list of relationships will be returned
      * @return The list of relationships for the given Entity object
      */
-    List<Relationship> getAllRelations(Context context, Entity entity);
+    List<Relationship> getAllRelations(Context context, ItemRelationshipsUtil itemRelationshipsUtil);
 
     /**
      * Retrieves the list of relationships, which are attached to the Entity object that is passed along, where the
      * left item object of each relationship is equal to the Item object of the Entity object that is passed along
      * @param context   The relevant DSpace context
-     * @param entity    The Entity object to be returned
+     * @param itemRelationshipsUtil    The Entity object to be returned
      * @return The list of relationships that have the Item in the Entity object as their left item
      */
-    List<Relationship> getLeftRelations(Context context, Entity entity);
+    List<Relationship> getLeftRelations(Context context, ItemRelationshipsUtil itemRelationshipsUtil);
 
     /**
      * Retrieves the list of relationships, which are attached to the Entity object that is passed along, where the
      * right item object of each relationship is equal to the Item object of the Entity object that is passed along
      * @param context   The relevant DSpace context
-     * @param entity    The Entity object to be returned
+     * @param itemRelationshipsUtil    The Entity object to be returned
      * @return The list of relationships that have the Item in the Entity object as their right item
      */
-    List<Relationship> getRightRelations(Context context, Entity entity);
+    List<Relationship> getRightRelations(Context context, ItemRelationshipsUtil itemRelationshipsUtil);
 
     /**
      * Retrieves the list of relationships for which their relationshiptype has a left or right label that is
@@ -89,37 +89,40 @@ public interface EntityService {
      * Entity
      * in either the leftEntityType or the rightEntityType variables
      * @param context   The relevant DSpace context
-     * @param entity    The Entity for which the EntityType should be checked for relationships
+     * @param itemRelationshipsUtil    The Entity for which the EntityType should be checked for relationships
      * @return The list of relationships that each contain a relationshiptype in which there is a right or left
      * entity type that
      *                  is equal to the entity type for the given entity
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> getAllRelationshipTypes(Context context, Entity entity) throws SQLException;
+    List<RelationshipType> getAllRelationshipTypes(Context context, ItemRelationshipsUtil itemRelationshipsUtil)
+        throws SQLException;
 
     /**
      * Retrieves the list of relationships that have a relationshiptype that contains the EntityType for the given
      * Entity
      * in the leftEntityType
      * @param context   The relevant DSpace context
-     * @param entity    The Entity for which the EntityType should be checked for relationships
+     * @param itemRelationshipsUtil    The Entity for which the EntityType should be checked for relationships
      * @return The list of relationships that each contain a relationshiptype in which there is a left entity type that
      *                  is equal to the entity type for the given entity
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> getLeftRelationshipTypes(Context context, Entity entity) throws SQLException;
+    List<RelationshipType> getLeftRelationshipTypes(Context context, ItemRelationshipsUtil itemRelationshipsUtil)
+        throws SQLException;
 
     /**
      * Retrieves the list of relationships that have a relationshiptype that contains the EntityType for the given
      * Entity
      * in the rightEntityType
      * @param context   The relevant DSpace context
-     * @param entity    The Entity for which the EntityType should be checked for relationships
+     * @param itemRelationshipsUtil    The Entity for which the EntityType should be checked for relationships
      * @return The list of relationships that each contain a relationshiptype in which there is a right entity type that
      *                  is equal to the entity type for the given entity
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> getRightRelationshipTypes(Context context, Entity entity) throws SQLException;
+    List<RelationshipType> getRightRelationshipTypes(Context context, ItemRelationshipsUtil itemRelationshipsUtil)
+        throws SQLException;
 
     /**
      * Retrieves a list of RelationshipType objects for which either their left or right label is equal to the

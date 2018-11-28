@@ -12,14 +12,15 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
 import org.dspace.content.RelationshipType;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 public class RelationshipTypeMatcher {
 
-    private RelationshipTypeMatcher() {}
+    private RelationshipTypeMatcher() {
+    }
 
     public static Matcher<? super Object> matchRelationshipTypeEntry(RelationshipType relationshipType) {
         return matchRelationshipTypeExplicitEntityTypes(relationshipType, relationshipType.getLeftType(),
@@ -27,8 +28,8 @@ public class RelationshipTypeMatcher {
     }
 
     private static Matcher<? super Object> matchRelationshipTypeExplicitEntityTypes(RelationshipType relationshipType,
-                                                                                    EntityType leftType,
-                                                                                    EntityType rightType) {
+                                                                                    ItemRelationshipsType leftType,
+                                                                                    ItemRelationshipsType rightType) {
         return matchRelationshipTypeExplicitEntityTypeValues(relationshipType, leftType.getID(), leftType.getLabel(),
                                                              rightType.getID(), rightType.getLabel());
     }
@@ -48,23 +49,29 @@ public class RelationshipTypeMatcher {
                                                                               rightEntityTypeId, rightEntityTypeLabel);
     }
 
-    private static Matcher<? super Object> matchExplicitRelationshipTypeValuesAndExplicitEntityType(int id,
-        String leftLabel, String rightLabel, int leftMinCardinality, int leftMaxCardinality,
-        int rightMinCardinality, int rightMaxCardinality, EntityType leftEntityType, EntityType rightEntityType) {
+    private static Matcher<? super Object>
+    matchExplicitRelationshipTypeValuesAndExplicitEntityType(int id, String leftLabel, String rightLabel,
+                                                             int leftMinCardinality, int leftMaxCardinality,
+                                                             int rightMinCardinality, int rightMaxCardinality,
+                                                             ItemRelationshipsType leftItemRelationshipsType,
+                                                             ItemRelationshipsType rightItemRelationshipsType) {
         return matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(id, leftLabel, rightLabel,
                                                                               leftMinCardinality, leftMaxCardinality,
                                                                               rightMinCardinality,
                                                                               rightMaxCardinality,
-                                                                              leftEntityType.getID(),
-                                                                              leftEntityType.getLabel(),
-                                                                              rightEntityType.getID(),
-                                                                              rightEntityType.getLabel());
+                                                                              leftItemRelationshipsType.getID(),
+                                                                              leftItemRelationshipsType.getLabel(),
+                                                                              rightItemRelationshipsType.getID(),
+                                                                              rightItemRelationshipsType.getLabel());
     }
 
-    private static Matcher<? super Object> matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(int id,
-        String leftLabel, String rightLabel, int leftMinCardinality, int leftMaxCardinality,
-        int rightMinCardinality, int rightMaxCardinality, int leftEntityTypeId, String leftEntityTypeLabel,
-        int rightEntityTypeId, String rightEntityTypeLabel) {
+    private static Matcher<? super Object>
+        matchExplicitRelationshipTypeValuesAndExplicitEntityTypeValues(int id, String leftLabel, String rightLabel,
+                                                                       int leftMinCardinality, int leftMaxCardinality,
+                                                                       int rightMinCardinality, int rightMaxCardinality,
+                                                                       int leftEntityTypeId, String leftEntityTypeLabel,
+                                                                       int rightEntityTypeId,
+                                                                       String rightEntityTypeLabel) {
         return allOf(
             hasJsonPath("$.id", is(id)),
             hasJsonPath("$.leftLabel", is(leftLabel)),

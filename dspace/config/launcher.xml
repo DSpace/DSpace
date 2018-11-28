@@ -370,7 +370,7 @@
         <name>initialize-entities</name>
         <description>Initialize the entities with a provided xml</description>
         <step>
-            <class>org.dspace.app.util.InitializeEntities</class>
+            <class>org.dspace.app.util.InitializeRelations</class>
         </step>
     </command>
 </commands>

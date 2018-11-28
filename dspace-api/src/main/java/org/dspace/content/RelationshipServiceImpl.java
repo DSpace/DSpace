@@ -148,13 +148,13 @@ public class RelationshipServiceImpl implements RelationshipService {
         return true;
     }
 
-    private boolean verifyEntityTypes(Item itemToProcess, EntityType entityTypeToProcess) {
+    private boolean verifyEntityTypes(Item itemToProcess, ItemRelationshipsType itemRelationshipsTypeToProcess) {
         List<MetadataValue> list = itemService.getMetadata(itemToProcess, "relationship", "type", null, Item.ANY);
         if (list.isEmpty()) {
             return false;
         }
         String leftEntityType = list.get(0).getValue();
-        if (!StringUtils.equals(leftEntityType, entityTypeToProcess.getLabel())) {
+        if (!StringUtils.equals(leftEntityType, itemRelationshipsTypeToProcess.getLabel())) {
             return false;
         }
         return true;

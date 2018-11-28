@@ -17,11 +17,11 @@
 -------------------------------------------------------------
 -- This will create the setup for the dspace 7 entities usage
 -------------------------------------------------------------
-CREATE SEQUENCE entity_type_id_seq;
+CREATE SEQUENCE item_relationships_type_id_seq;
 CREATE SEQUENCE relationship_type_id_seq;
 CREATE SEQUENCE relationship_id_seq;
 
-CREATE TABLE entity_type
+CREATE TABLE item_relationships_type
 (
     id                      INTEGER NOT NULL PRIMARY KEY,
     label                   varchar(32) UNIQUE NOT NULL
@@ -38,8 +38,8 @@ CREATE TABLE relationship_type
     left_max_cardinality    INTEGER,
     right_min_cardinality   INTEGER,
     right_max_cardinality   INTEGER,
-    FOREIGN KEY (left_type)   REFERENCES entity_type(id),
-    FOREIGN KEY (right_type)  REFERENCES entity_type(id)
+    FOREIGN KEY (left_type)   REFERENCES item_relationships_type(id),
+    FOREIGN KEY (right_type)  REFERENCES item_relationships_type(id)
 );
 
 CREATE TABLE relationship
@@ -54,7 +54,7 @@ CREATE TABLE relationship
 
 );
 
-CREATE INDEX entity_type_label_idx ON entity_type(label);
+CREATE INDEX item_relationships_type_label_idx ON item_relationships_type(label);
 CREATE INDEX relationship_type_by_types_and_labels_idx ON relationship_type(left_type, right_type, left_label, right_label);
 CREATE INDEX relationship_type_by_left_type_idx ON relationship_type(left_type);
 CREATE INDEX relationship_type_by_right_type_idx ON relationship_type(right_type);

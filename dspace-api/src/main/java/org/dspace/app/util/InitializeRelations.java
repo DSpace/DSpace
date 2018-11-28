@@ -25,10 +25,10 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.ItemRelationshipTypeService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
@@ -43,18 +43,18 @@ import org.xml.sax.SAXException;
  * in an xml file that is given to this script.
  * This XML file needs to have a proper XML structure and needs to define the variables of the RelationshipType object
  */
-public class InitializeEntities {
+public class InitializeRelations {
 
-    private final static Logger log = Logger.getLogger(InitializeEntities.class);
+    private final static Logger log = Logger.getLogger(InitializeRelations.class);
 
     private RelationshipTypeService relationshipTypeService;
     private RelationshipService relationshipService;
-    private EntityTypeService entityTypeService;
+    private ItemRelationshipTypeService itemRelationshipTypeService;
 
-    private InitializeEntities() {
+    private InitializeRelations() {
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
         relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
-        entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
+        itemRelationshipTypeService = ContentServiceFactory.getInstance().getItemRelationshipTypeService();
 
     }
 
@@ -67,14 +67,15 @@ public class InitializeEntities {
      * @throws ParseException       If something goes wrong with the parsing
      */
     public static void main(String[] argv) throws SQLException, AuthorizeException, ParseException {
-        InitializeEntities initializeEntities = new InitializeEntities();
+        InitializeRelations initializeRelations = new InitializeRelations();
         CommandLineParser parser = new PosixParser();
         Options options = createCommandLineOptions();
-        CommandLine line = parser.parse(options,argv);
+        CommandLine line = parser.parse(options, argv);
         String fileLocation = getFileLocationFromCommandLine(line);
         checkHelpEntered(options, line);
-        initializeEntities.run(fileLocation);
+        initializeRelations.run(fileLocation);
     }
+
     private static void checkHelpEntered(Options options, CommandLine line) {
         if (line.hasOption("h")) {
             HelpFormatter formatter = new HelpFormatter();
@@ -82,6 +83,7 @@ public class InitializeEntities {
             System.exit(0);
         }
     }
+
     private static String getFileLocationFromCommandLine(CommandLine line) {
         String query = line.getOptionValue("f");
         if (StringUtils.isEmpty(query)) {
@@ -108,11 +110,11 @@ public class InitializeEntities {
 
     private void saveRelations(Context context, List<RelationshipType> list) throws SQLException, AuthorizeException {
         for (RelationshipType relationshipType : list) {
-            RelationshipType relationshipTypeFromDb = relationshipTypeService.findbyTypesAndLabels(context,
-                                                                               relationshipType.getLeftType(),
-                                                                               relationshipType.getRightType(),
-                                                                               relationshipType.getLeftLabel(),
-                                                                               relationshipType.getRightLabel());
+            RelationshipType relationshipTypeFromDb =
+                relationshipTypeService.findbyTypesAndLabels(context, relationshipType.getLeftType(),
+                                                             relationshipType.getRightType(),
+                                                             relationshipType.getLeftLabel(),
+                                                             relationshipType.getRightLabel());
             if (relationshipTypeFromDb == null) {
                 relationshipTypeService.create(context, relationshipType);
             } else {
@@ -146,7 +148,7 @@ public class InitializeEntities {
 
                     Element eElement = (Element) nNode;
 
-                    String leftType =  eElement.getElementsByTagName("leftType").item(0).getTextContent();
+                    String leftType = eElement.getElementsByTagName("leftType").item(0).getTextContent();
                     String rightType = eElement.getElementsByTagName("rightType").item(0).getTextContent();
                     String leftLabel = eElement.getElementsByTagName("leftLabel").item(0).getTextContent();
                     String rightLabel = eElement.getElementsByTagName("rightLabel").item(0).getTextContent();
@@ -163,19 +165,20 @@ public class InitializeEntities {
 
                     for (int j = 0; j < leftCardinalityList.getLength(); j++) {
                         Node node = leftCardinalityList.item(j);
-                        leftCardinalityMin = getString(leftCardinalityMin,(Element) node, "min");
-                        leftCardinalityMax = getString(leftCardinalityMax,(Element) node, "max");
+                        leftCardinalityMin = getString(leftCardinalityMin, (Element) node, "min");
+                        leftCardinalityMax = getString(leftCardinalityMax, (Element) node, "max");
 
                     }
 
                     for (int j = 0; j < rightCardinalityList.getLength(); j++) {
                         Node node = rightCardinalityList.item(j);
-                        rightCardinalityMin = getString(rightCardinalityMin,(Element) node, "min");
-                        rightCardinalityMax = getString(rightCardinalityMax,(Element) node, "max");
+                        rightCardinalityMin = getString(rightCardinalityMin, (Element) node, "min");
+                        rightCardinalityMax = getString(rightCardinalityMax, (Element) node, "max");
 
                     }
-                    RelationshipType relationshipType = populateRelationshipType(context,leftType,rightType,leftLabel,
-                                                                                 rightLabel,leftCardinalityMin,
+                    RelationshipType relationshipType = populateRelationshipType(context, leftType, rightType,
+                                                                                 leftLabel,
+                                                                                 rightLabel, leftCardinalityMin,
                                                                                  leftCardinalityMax,
                                                                                  rightCardinalityMin,
                                                                                  rightCardinalityMax);
@@ -191,30 +194,33 @@ public class InitializeEntities {
         return null;
     }
 
-    private String getString(String leftCardinalityMin,Element node, String minOrMax) {
+    private String getString(String leftCardinalityMin, Element node, String minOrMax) {
         if (node.getElementsByTagName(minOrMax).getLength() > 0) {
             leftCardinalityMin = node.getElementsByTagName(minOrMax).item(0).getTextContent();
         }
         return leftCardinalityMin;
     }
 
-    private RelationshipType populateRelationshipType(Context context,String leftType,String rightType,String leftLabel,
-                                                      String rightLabel,String leftCardinalityMin,
-                                                      String leftCardinalityMax,String rightCardinalityMin,
+    private RelationshipType populateRelationshipType(Context context, String leftType, String rightType,
+                                                      String leftLabel,
+                                                      String rightLabel, String leftCardinalityMin,
+                                                      String leftCardinalityMax, String rightCardinalityMin,
                                                       String rightCardinalityMax)
         throws SQLException, AuthorizeException {
         RelationshipType relationshipType = new RelationshipType();
 
-        EntityType leftEntityType = entityTypeService.findByEntityType(context,leftType);
-        if (leftEntityType == null) {
-            leftEntityType = entityTypeService.create(context, leftType);
+        ItemRelationshipsType leftItemRelationshipsType = itemRelationshipTypeService
+            .findByEntityType(context, leftType);
+        if (leftItemRelationshipsType == null) {
+            leftItemRelationshipsType = itemRelationshipTypeService.create(context, leftType);
         }
-        EntityType rightEntityType = entityTypeService.findByEntityType(context, rightType);
-        if (rightEntityType == null) {
-            rightEntityType = entityTypeService.create(context, rightType);
+        ItemRelationshipsType rightItemRelationshipsType = itemRelationshipTypeService
+            .findByEntityType(context, rightType);
+        if (rightItemRelationshipsType == null) {
+            rightItemRelationshipsType = itemRelationshipTypeService.create(context, rightType);
         }
-        relationshipType.setLeftType(leftEntityType);
-        relationshipType.setRightType(rightEntityType);
+        relationshipType.setLeftType(leftItemRelationshipsType);
+        relationshipType.setRightType(rightItemRelationshipsType);
         relationshipType.setLeftLabel(leftLabel);
         relationshipType.setRightLabel(rightLabel);
         if (StringUtils.isNotBlank(leftCardinalityMin)) {

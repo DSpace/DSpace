@@ -9,7 +9,7 @@ package org.dspace.content.dao;
 
 import java.sql.SQLException;
 
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
@@ -19,7 +19,7 @@ import org.dspace.core.GenericDAO;
  * spring
  * This class should only be accessed from a single service and should never be exposed outside of the API
  */
-public interface EntityTypeDAO extends GenericDAO<EntityType> {
+public interface ItemRelationshipTypeDAO extends GenericDAO<ItemRelationshipsType> {
 
     /**
      * This method returns the EntityType object that has the given entityType String
@@ -30,6 +30,6 @@ public interface EntityTypeDAO extends GenericDAO<EntityType> {
      * @return              The EntityType object that has the entityType String as label
      * @throws SQLException If something goes wrong
      */
-    public EntityType findByEntityType(Context context, String entityType) throws SQLException;
+    public ItemRelationshipsType findByEntityType(Context context, String entityType) throws SQLException;
 
 }

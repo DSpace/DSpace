@@ -12,7 +12,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.dspace.content.EntityType;
+import org.dspace.content.ItemRelationshipsType;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.RelationshipType_;
 import org.dspace.content.dao.RelationshipTypeDAO;
@@ -21,7 +21,8 @@ import org.dspace.core.Context;
 
 public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipType> implements RelationshipTypeDAO {
 
-    public RelationshipType findbyTypesAndLabels(Context context, EntityType leftType, EntityType rightType,
+    public RelationshipType findbyTypesAndLabels(Context context, ItemRelationshipsType leftType,
+                                                 ItemRelationshipsType rightType,
                                                  String leftLabel, String rightLabel)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);

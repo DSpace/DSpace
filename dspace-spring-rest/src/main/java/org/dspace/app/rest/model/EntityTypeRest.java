@@ -8,11 +8,12 @@
 package org.dspace.app.rest.model;
 
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.content.ItemRelationshipsType;
 
 /**
  * This class is the REST representation of the EntityType model object and acts as a data object
  * for the EntityTypeResource class.
- * Refer to {@link org.dspace.content.EntityType} for explanation of the properties
+ * Refer to {@link ItemRelationshipsType} for explanation of the properties
  */
 public class EntityTypeRest extends BaseObjectRest<Integer> {
 

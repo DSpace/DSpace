@@ -19,10 +19,10 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.content.service.EntityService;
-import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InProgressSubmissionService;
 import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemRelationshipTypeService;
+import org.dspace.content.service.ItemRelationshipsService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
@@ -78,9 +78,9 @@ public abstract class ContentServiceFactory {
 
     public abstract RelationshipService getRelationshipService();
 
-    public abstract EntityTypeService getEntityTypeService();
+    public abstract ItemRelationshipTypeService getItemRelationshipTypeService();
 
-    public abstract EntityService getEntityService();
+    public abstract ItemRelationshipsService getItemRelationshipsService();
 
     public InProgressSubmissionService getInProgressSubmissionService(InProgressSubmission inProgressSubmission) {
         if (inProgressSubmission instanceof WorkspaceItem) {
