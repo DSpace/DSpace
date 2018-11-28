@@ -3,8 +3,10 @@
 package org.datadryad.rest.resources.v1;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Journal;
+import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Package;
 import org.datadryad.rest.models.ResultSet;
 import org.datadryad.rest.responses.ErrorsResponse;
@@ -13,6 +15,7 @@ import org.datadryad.rest.storage.AbstractOrganizationConceptStorage;
 import org.datadryad.rest.storage.AbstractPackageStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
+import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 
 import javax.inject.Inject;
@@ -145,6 +148,45 @@ public class PackageResource {
         } catch (Exception ex) {
             log.error("Exception getting packages", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list packages", uriInfo, Status.BAD_REQUEST.getStatusCode());
+            return error.toResponse().build();
+        }
+    }
+    @Path("/{journalRef}/packages")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createPackage(@PathParam(StoragePath.JOURNAL_PATH) String journalRef, Package pkg) {
+        String msID = pkg.getManuscriptNumber();
+        StoragePath journalPath = StoragePath.createJournalPath(journalRef);
+        journalPath.setManuscriptId(msID);
+        DryadJournalConcept dryadJournalConcept = JournalUtils.getJournalConceptByISSN(journalRef);
+        if (dryadJournalConcept == null) {
+            dryadJournalConcept = JournalUtils.getJournalConceptByJournalID(journalRef);
+        }
+        if (dryadJournalConcept == null) {
+            ErrorsResponse error = ResponseFactory.makeError("Invalid journal reference: should be either a Dryad journal code or ISSN", "Invalid journal reference", uriInfo, Status.BAD_REQUEST.getStatusCode());
+            return error.toResponse().build();
+        }
+        Manuscript manuscript = JournalUtils.getManuscriptFromManuscriptStorage(msID, dryadJournalConcept);
+        if (manuscript == null) {
+            ErrorsResponse error = ResponseFactory.makeError("Invalid manuscript number: Dryad does not have metadata for this manuscript", "Invalid manuscript number", uriInfo, Status.BAD_REQUEST.getStatusCode());
+            return error.toResponse().build();
+        }
+        if (manuscript.isValid()) {
+            try {
+                DryadDataPackage dryadDataPackage = new DryadDataPackage(manuscript);
+                dryadDataPackage.setIdentifier(pkg.getDryadDOI());
+                packageStorage.create(journalPath, new Package(dryadDataPackage));
+            } catch (Exception ex) {
+                log.error("Exception creating manuscript", ex);
+                ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to create manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+                return error.toResponse().build();
+            }
+            UriBuilder ub = uriInfo.getAbsolutePathBuilder();
+            URI uri = ub.path(manuscript.getManuscriptId()).build();
+            return Response.created(uri).entity(manuscript).build();
+        } else {
+            ErrorsResponse error = ResponseFactory.makeError("Please check the structure of your object", "Invalid manuscript object", uriInfo, Status.BAD_REQUEST.getStatusCode());
             return error.toResponse().build();
         }
     }

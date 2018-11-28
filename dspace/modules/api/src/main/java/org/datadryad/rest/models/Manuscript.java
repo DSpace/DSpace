@@ -5,7 +5,6 @@ package org.datadryad.rest.models;
 import java.lang.Exception;
 import java.lang.Override;
 import java.lang.String;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -124,7 +123,7 @@ public class Manuscript {
     private String manuscript_abstract = "";
     private AuthorsList authors = new AuthorsList();
     private CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
-    private String dryadDataDOI;
+    private String dryadDataDOI = "";
     private String manuscriptId = "";
     private String status = "";
     private String title = "";
@@ -359,6 +358,14 @@ public class Manuscript {
 
     public Date getPublicationDate() {
         return publicationDate;
+    }
+
+    public String getPublicationDateAsString() {
+        if (getPublicationDate() != null) {
+            SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
+            return dateIso.format(getPublicationDate());
+        }
+        return "";
     }
 
     public void setPublicationDate(Date date) {
