@@ -32,7 +32,7 @@ public class RelationshipConverter extends DSpaceConverter<Relationship, Relatio
      */
     public RelationshipRest fromModel(Relationship obj) {
         RelationshipRest relationshipRest = new RelationshipRest();
-        relationshipRest.setId(obj.getId());
+        relationshipRest.setId(obj.getID());
         relationshipRest.setLeftId(obj.getLeftItem().getID());
         relationshipRest.setRelationshipType(relationshipTypeConverter.fromModel(obj.getRelationshipType()));
         relationshipRest.setRightId(obj.getRightItem().getID());

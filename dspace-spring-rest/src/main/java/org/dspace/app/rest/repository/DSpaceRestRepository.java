@@ -14,6 +14,7 @@ import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
@@ -405,6 +406,23 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
             MultipartFile uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
+    }
+
+    public T put(HttpServletRequest request, String apiCategory, String model, ID id, JsonNode jsonNode) {
+        Context context = obtainContext();
+        try {
+            thisRepository.put(context, request, apiCategory, model, id, jsonNode);
+            context.commit();
+        } catch (SQLException | AuthorizeException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return findOne(id);
+    }
+
+    protected T put(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
+                    JsonNode jsonNode)
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+        throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 
 }

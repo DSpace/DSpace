@@ -62,7 +62,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
     }
 
-    private void updatePlaceInRelationship(Context context, Relationship relationship) throws SQLException {
+    public void updatePlaceInRelationship(Context context, Relationship relationship) throws SQLException {
         List<Relationship> leftRelationships = findByItemAndRelationshipType(context,
                                                                              relationship.getLeftItem(),
                                                                              relationship.getRelationshipType(), true);
@@ -209,7 +209,9 @@ public class RelationshipServiceImpl implements RelationshipService {
             }
 
             for (Relationship relationship : relationships) {
-                relationshipDAO.save(context, relationship);
+                if (isRelationshipValidToCreate(context, relationship)) {
+                    relationshipDAO.save(context, relationship);
+                }
             }
         }
     }
@@ -233,12 +235,12 @@ public class RelationshipServiceImpl implements RelationshipService {
             log.warn("The relationship has been deemed invalid since the relation was null");
             return false;
         }
-        if (relationship.getId() == null) {
+        if (relationship.getID() == null) {
             log.warn("The relationship has been deemed invalid since the ID" +
                          " off the given relationship was null");
             return false;
         }
-        if (this.find(context, relationship.getId()) == null) {
+        if (this.find(context, relationship.getID()) == null) {
             log.warn("The relationship has been deemed invalid since the relationship" +
                          " is not present in the DB with the current ID");
             logRelationshipTypeDetails(relationship.getRelationshipType());
