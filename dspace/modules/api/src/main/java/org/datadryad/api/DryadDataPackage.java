@@ -491,6 +491,8 @@ public class DryadDataPackage extends DryadObject {
             getItem().clearMetadata("dryad.duplicateItem");
             for (DryadDataPackage dryadDataPackage : resultList) {
                 getItem().addMetadata("dryad.duplicateItem", null, String.valueOf(dryadDataPackage.getItem().getID()), null, Choices.CF_NOVALUE);
+                // this is a temporary log to see when this is happening
+                log.error("adding duplicate " + dryadDataPackage.getItem().getID() + " to package " + getItem().getID());
             }
         } else {
             duplicateItems.addAll(resultList);
