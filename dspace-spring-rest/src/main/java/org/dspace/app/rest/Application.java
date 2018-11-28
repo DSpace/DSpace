@@ -14,6 +14,7 @@ import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
+import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.dspace.app.util.DSpaceContextListener;
 import org.dspace.utils.servlet.DSpaceWebappServletFilter;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
@@ -62,7 +62,6 @@ public class Application extends SpringBootServletInitializer {
      * This is necessary to allow us to build a deployable WAR, rather than
      * always relying on embedded Tomcat.
      * <p>
-     * <p>
      * See: http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file
      *
      * @param application
@@ -70,13 +69,10 @@ public class Application extends SpringBootServletInitializer {
      */
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        // Pass this Application class, and our initializers for DSpace Kernel and Configuration
+        // NOTE: Kernel must be initialized before Configuration
         return application.sources(Application.class)
-                          .initializers(new DSpaceKernelInitializer());
-    }
-
-    @Bean
-    public ServletContextInitializer contextInitializer() {
-        return servletContext -> servletContext.setInitParameter("dspace.dir", configuration.getDspaceHome());
+                          .initializers(new DSpaceKernelInitializer(), new DSpaceConfigurationInitializer());
     }
 
     /**
@@ -89,7 +85,6 @@ public class Application extends SpringBootServletInitializer {
     @Order(2)
     protected DSpaceContextListener dspaceContextListener() {
         // This listener initializes the DSpace Context object
-        // (and loads all DSpace configs)
         return new DSpaceContextListener();
     }
 
