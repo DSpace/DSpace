@@ -489,11 +489,11 @@ public class DryadDataPackage extends DryadObject {
         // update the data package's metadata:
         if (useDryadClassic) {
             getItem().clearMetadata("dryad.duplicateItem");
-            for (DryadDataPackage dryadDataPackage : resultSet) {
+            for (DryadDataPackage dryadDataPackage : resultList) {
                 getItem().addMetadata("dryad.duplicateItem", null, String.valueOf(dryadDataPackage.getItem().getID()), null, Choices.CF_NOVALUE);
             }
         } else {
-            duplicateItems.addAll(resultSet);
+            duplicateItems.addAll(resultList);
         }
     }
 
