@@ -305,6 +305,9 @@ public class Manuscript {
     }
 
     public String getAbstract() {
+        if (manuscript_abstract == null) {
+            manuscript_abstract = "";
+        }
         return manuscript_abstract;
     }
 

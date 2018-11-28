@@ -285,12 +285,17 @@ public class DryadDataPackage extends DryadObject {
         if (getItem() != null) {
             String theAbstract = getSingleMetadataValue("dc", "description", null);
             String extraAbstract = getSingleMetadataValue("dc", "description", "abstract");
-
+            if (theAbstract == null) {
+                theAbstract = "";
+            }
             if (extraAbstract != null && extraAbstract.length() > 0) {
                 theAbstract = theAbstract + "\n" + extraAbstract;
             }
             return theAbstract;
         } else {
+            if (abstractString == null) {
+                abstractString = "";
+            }
             return abstractString;
         }
     }
