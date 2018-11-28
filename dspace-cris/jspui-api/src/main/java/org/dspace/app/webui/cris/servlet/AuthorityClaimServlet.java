@@ -625,32 +625,9 @@ public class AuthorityClaimServlet extends DSpaceServlet
                                             }
                                         }
 
-                                        if ("submit_reject"
-                                                .equalsIgnoreCase(submitMode))
-                                        {
-                                            if (StringUtils
-                                                    .isNotBlank(authority)
-                                                    && crisID.equals(authority))
-                                            {
-                                                item.addMetadata(schema,
-                                                        element, qualifier,
-                                                        language, value, null,
-                                                        Choices.CF_REJECTED);
-                                            }
-                                            else
-                                            {
-                                                item.addMetadata(schema,
-                                                        element, qualifier,
-                                                        language, value,
-                                                        authority, confidence);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            item.addMetadata(schema, element,
-                                                    qualifier, language, value,
-                                                    authority, confidence);
-                                        }
+                                        item.addMetadata(schema, element,
+                                                qualifier, language, value,
+                                                authority, confidence);
 
                                     }
                                 }
