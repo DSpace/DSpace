@@ -242,9 +242,6 @@ for (String key : result.keySet())
     </div>
   </div>
 
-<%
-}
-%>
         <input type="hidden" name="handle_<%= item.getID() %>" value="<%= handle %>"/>
         <input type="hidden" name="selectedId" value="<%= item.getID() %>"/>
         <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit_approve" value="<fmt:message key="jsp.tools.general.approve"/>" />
