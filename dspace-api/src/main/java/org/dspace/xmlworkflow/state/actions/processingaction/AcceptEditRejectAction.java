@@ -69,7 +69,11 @@ public class AcceptEditRejectAction extends ProcessingAction {
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
         } else if (request.getParameter("submit_reject") != null) {
             // Make sure we indicate which page we want to process
-            request.setAttribute("page", REJECT_PAGE);
+            if (wfi.getSubmitter() == null) {
+                request.setAttribute("page", SUBMITTER_IS_DELETED_PAGE);
+            } else {
+                request.setAttribute("page", REJECT_PAGE);
+            }
             // We have pressed reject item, so take the user to a page where he can reject
             return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
         } else {
