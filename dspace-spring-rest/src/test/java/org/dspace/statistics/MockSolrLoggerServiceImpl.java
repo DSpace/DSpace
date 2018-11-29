@@ -28,6 +28,12 @@ import org.springframework.stereotype.Service;
 
 /**
  * Mock service that uses an embedded SOLR server for the statistics core.
+ *
+ * <p>
+ * <strong>NOTE:</strong>  this class overrides one <em>of the same name</em>
+ * defined in dspace-api and declared as a bean there.
+ * See {@code config/spring/api/Z-mock-services.xml}.  Some kind of classpath
+ * magic makes this work.
  */
 @Service
 public class MockSolrLoggerServiceImpl
