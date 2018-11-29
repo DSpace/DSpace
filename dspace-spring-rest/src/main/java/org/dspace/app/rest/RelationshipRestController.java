@@ -43,6 +43,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/core/relationships")
 public class RelationshipRestController {
 
+    /**
+     * Regular expression in the request mapping to accept a string as identifier but not the other kind of
+     * identifier (digits or uuid)
+     */
+    private static final String REGEX_REQUESTMAPPING_LABEL = "/{label:^(?!^\\d+$)" +
+        "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$+}";
+
     @Autowired
     private RelationshipTypeService relationshipTypeService;
 
@@ -61,7 +68,7 @@ public class RelationshipRestController {
     @Autowired
     private HalLinkService halLinkService;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{label}")
+    @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_LABEL)
     public RelationshipResourceWrapper retrieveByLabel(HttpServletResponse response,
                                                        HttpServletRequest request, @PathVariable String label,
                                                        @RequestParam(name = "dso", required = false) String dsoId,
