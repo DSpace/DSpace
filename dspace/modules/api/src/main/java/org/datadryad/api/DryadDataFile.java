@@ -240,11 +240,6 @@ public class DryadDataFile extends DryadObject {
         List<Bitstream> bitstreamList = new ArrayList<Bitstream>();
         Item item = getItem();
                 
-        Bitstream readme = getREADME();
-        if(readme != null) {
-            bitstreamList.add(readme);
-        }
-
         Bitstream aBitstream = null;
         try {
             Bundle[] bundles = item.getBundles("ORIGINAL"); // anything not ORIGINAL is not a "real" bitstream
@@ -256,8 +251,17 @@ public class DryadDataFile extends DryadObject {
 
             for(int b = 0; b < bundles.length; b++) {
                 Bitstream[] bitstreams = bundles[b].getBitstreams();
+                Bitstream readmeBitstream = null;
                 for(int i = 0; i < bitstreams.length; i++) {
-                    bitstreamList.add(bitstreams[i]);
+                    if(bitstreams[i].getName().toLowerCase().startsWith("readme")) {
+                        readmeBitstream = bitstreams[i];
+                    } else {
+                        bitstreamList.add(bitstreams[i]);
+                    }
+                }
+                // always add the readme at the end of the list of bitstreams
+                if(readmeBitstream != null) {
+                    bitstreamList.add(readmeBitstream);
                 }
             }
         } catch (Exception e) {

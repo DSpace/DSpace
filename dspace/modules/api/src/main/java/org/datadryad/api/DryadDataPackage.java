@@ -94,7 +94,7 @@ public class DryadDataPackage extends DryadObject {
     private final static String PROVENANCE = "dc.description.provenance";
 
     // title and identifier are declared in DryadObject
-    private Set<DryadDataFile> dataFiles;
+    private List<DryadDataFile> dataFiles;
     private String curationStatus = "";
     private String curationStatusReason = "";
     private String abstractString = "";
@@ -777,9 +777,9 @@ public class DryadDataPackage extends DryadObject {
         return packageSet;
     }
 
-    static Set<DryadDataFile> getFilesInPackage(Context context, DryadDataPackage dataPackage) throws SQLException {
+    static List<DryadDataFile> getFilesInPackage(Context context, DryadDataPackage dataPackage) throws SQLException {
         // files and packages are linked by DOI
-        Set<DryadDataFile> fileSet = new HashSet<DryadDataFile>();
+        List<DryadDataFile> fileList = new ArrayList<DryadDataFile>();
         String packageIdentifier = dataPackage.getIdentifier();
         if(packageIdentifier == null || packageIdentifier.length() == 0) {
             throw new IllegalArgumentException("Data package must have an identifier");
@@ -787,17 +787,17 @@ public class DryadDataPackage extends DryadObject {
         try {
             ItemIterator dataFiles = Item.findByMetadataField(context, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, packageIdentifier);
             while(dataFiles.hasNext()) {
-                fileSet.add(new DryadDataFile(dataFiles.next()));
+                fileList.add(new DryadDataFile(dataFiles.next()));
             }
         } catch (AuthorizeException ex) {
             log.error("Authorize exception getting files for data package", ex);
         } catch (IOException ex) {
             log.error("IO exception getting files for data package", ex);
         }
-        return fileSet;
+        return fileList;
     }
 
-    public Set<DryadDataFile> getDataFiles(Context context) throws SQLException {
+    public List<DryadDataFile> getDataFiles(Context context) throws SQLException {
         if(dataFiles == null) {
             // how are data files and packages linked? By DOI
             dataFiles = DryadDataPackage.getFilesInPackage(context, this);

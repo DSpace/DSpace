@@ -22,6 +22,7 @@ public class DryadBitstream {
     private static final Logger log = Logger.getLogger(DryadBitstream.class);
     private Bitstream bitstream;
     private String fileDescription = "<not initialized>";
+    private String readmeFilename = null;
     
     public DryadBitstream(Bitstream bitstream) {
         this.bitstream = bitstream;
@@ -37,6 +38,31 @@ public class DryadBitstream {
     
     public String getFileDescription() {
         return fileDescription;
+    }
+
+    public boolean isReadme() {
+        String filename = bitstream.getName();
+        if(filename.toLowerCase().startsWith("readme")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /*
+      Assuming this bitstream is a README, set a special filename for it. The special filename
+      will include "README_for_", the baseFilename passed in, and the file extension from the
+      original README file that is stored in the DSpace bitstream.
+    */
+    public void setReadmeFilename(String baseFilename) {
+        String origReadmeName = bitstream.getName();
+        String readmeExtension = origReadmeName.substring(origReadmeName.lastIndexOf('.'), origReadmeName.length());
+        baseFilename = baseFilename.substring(0, baseFilename.lastIndexOf('.'));
+        readmeFilename = "README_for_" + baseFilename + readmeExtension;
+    }
+
+    public String getReadmeFilename() {
+        return readmeFilename;
     }
     
     // Convenience method to access a properly serialized JSON string, formatted for use with DASH.
@@ -61,9 +87,14 @@ public class DryadBitstream {
             Bitstream dspaceBitstream = dryadBitstream.getDSpaceBitstream();
             try {
                 jGen.writeStartObject();
+
+                String filename = dspaceBitstream.getName();
+                if(dryadBitstream.isReadme() && (dryadBitstream.getReadmeFilename() != null)) {
+                    filename = dryadBitstream.getReadmeFilename();
+                }
                 
                 jGen.writeStringField("url", BitstreamStorageManager.getS3AccessURL(dspaceBitstream).toString());
-                jGen.writeStringField("path", dspaceBitstream.getName());
+                jGen.writeStringField("path", filename);
                 jGen.writeNumberField("size", dspaceBitstream.getSize());
                 jGen.writeStringField("description", dryadBitstream.getFileDescription());
                 jGen.writeStringField("mimeType", dspaceBitstream.getFormat().getMIMEType());
