@@ -2,6 +2,7 @@
  */
 package org.datadryad.api;
 
+import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.datadryad.test.ContextUnitTest;
@@ -141,7 +142,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
         DryadDataFile dataFile3 = DryadDataFile.create(context, dataPackage2);
         dataPackage1.addDataFile(context, dataFile1);
         dataPackage1.addDataFile(context, dataFile2);
-        Set result = DryadDataPackage.getFilesInPackage(context, dataPackage1);
+        List result = DryadDataPackage.getFilesInPackage(context, dataPackage1);
         assertTrue(result.contains(dataFile1));
         assertTrue(result.contains(dataFile2));
         assertFalse(result.contains(dataFile3));
