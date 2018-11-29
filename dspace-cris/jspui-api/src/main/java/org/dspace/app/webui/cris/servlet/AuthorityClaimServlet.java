@@ -306,99 +306,85 @@ public class AuthorityClaimServlet extends DSpaceServlet
 
         if (!"submit_cancel".equals(submitButton))
         {
-            Context subcontext = null;
-            try
+            int[] selectedIds = UIUtil.getIntParameters(request, "selectedId");
+
+            String message = null;
+            int failures = 0;
+            int successes = 0;
+            int discarded = 0;
+            for (int selectedId : selectedIds)
             {
-                subcontext = new Context();
-                subcontext.turnOffAuthorisationSystem();
-                subcontext.setDispatcher("onlyindex");
-                subcontext.setCurrentUser(context.getCurrentUser());
-                subcontext.setCurrentLocale(context.getCurrentLocale());
-                int[] selectedIds = UIUtil.getIntParameters(request,
-                        "selectedId");
-
-                String message = null;
-                int failures = 0;
-                int successes = 0;
-                int discarded = 0;
-                for (int selectedId : selectedIds)
+                try
                 {
-                    try
-                    {
-                        String selectedHandle = request
-                                .getParameter("handle_" + selectedId);
-                        workNow(subcontext, request, now, selectedHandle,
-                                crisID, notifyGroupSelfClaim, selfClaim,
-                                selectedId, submitButton);
-                        if ("submit_approve".equalsIgnoreCase(submitButton))
-                        {
-                            successes++;
-                        }
-                        else
-                        {
-                            discarded++;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        failures++;
-                        log.error(ex.getMessage(), ex);
-                    }
-                }
-
-                if (failures > 0)
-                {
+                    String selectedHandle = request
+                            .getParameter("handle_" + selectedId);
+                    workNow(context, request, now, selectedHandle, crisID,
+                            notifyGroupSelfClaim, selfClaim, selectedId,
+                            submitButton);
                     if ("submit_approve".equalsIgnoreCase(submitButton))
                     {
-                        message = I18nUtil.getMessage(
-                                "jsp.dspace.authority-listclaim.failure.success",
-                                new Object[] { successes, failures },
-                                context.getCurrentLocale(), false);
+                        successes++;
                     }
                     else
                     {
-                        message = I18nUtil.getMessage(
-                                "jsp.dspace.authority-listclaim.failure.reject",
-                                new Object[] { discarded, failures },
-                                context.getCurrentLocale(), false);
+                        discarded++;
                     }
+                }
+                catch (Exception ex)
+                {
+                    failures++;
+                    log.error(ex.getMessage(), ex);
+                }
+            }
+
+            if (failures > 0)
+            {
+                if ("submit_approve".equalsIgnoreCase(submitButton))
+                {
+                    message = I18nUtil.getMessage(
+                            "jsp.dspace.authority-listclaim.failure.success",
+                            new Object[] { successes, failures },
+                            context.getCurrentLocale(), false);
                 }
                 else
                 {
-                    if (successes > 0)
-                    {
-                        message = I18nUtil.getMessage(
-                                "jsp.dspace.authority-listclaim.success",
-                                new Object[] { successes },
-                                context.getCurrentLocale(), false);
-                    }
-                    else
-                    {
-                        message = I18nUtil.getMessage(
-                                "jsp.dspace.authority-listclaim.reject",
-                                new Object[] { selectedIds.length },
-                                context.getCurrentLocale(), false);
-                    }
+                    message = I18nUtil.getMessage(
+                            "jsp.dspace.authority-listclaim.failure.reject",
+                            new Object[] { discarded, failures },
+                            context.getCurrentLocale(), false);
                 }
-                if (StringUtils.isNotBlank(message))
+            }
+            else
+            {
+                if (successes > 0)
                 {
-                    request.getSession().setAttribute(Constants.MESSAGES_KEY,
-                            Arrays.asList(message));
+                    message = I18nUtil.getMessage(
+                            "jsp.dspace.authority-listclaim.success",
+                            new Object[] { successes },
+                            context.getCurrentLocale(), false);
                 }
-                if(forceCommit) {
+                else
+                {
+                    message = I18nUtil.getMessage(
+                            "jsp.dspace.authority-listclaim.reject",
+                            new Object[] { selectedIds.length },
+                            context.getCurrentLocale(), false);
+                }
+            }
+            if (StringUtils.isNotBlank(message))
+            {
+                request.getSession().setAttribute(Constants.MESSAGES_KEY,
+                        Arrays.asList(message));
+            }
+            if (forceCommit)
+            {
+                try
+                {
                     indexer.commit();
                 }
-                subcontext.complete();
-            }
-            catch (Exception ex)
-            {
-                log.error(ex.getMessage(), ex);
-            }
-            finally
-            {
-                if (subcontext != null && subcontext.isValid())
+                catch (SearchServiceException e)
                 {
-                    subcontext.abort();
+                    log.error(e.getMessage(), e);
                 }
             }
         }
