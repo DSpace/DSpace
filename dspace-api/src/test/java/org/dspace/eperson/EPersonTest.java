@@ -70,7 +70,7 @@ public class EPersonTest extends AbstractUnitTest {
     private Collection collection = null;
     private Item item = null;
 
-    private static final String EMAIL = "kevin@dspace.org";
+    private static final String EMAIL = "test@example.com";
     private static final String FIRSTNAME = "Kevin";
     private static final String LASTNAME = "Van de Velde";
     private static final String NETID = "1985";
@@ -116,7 +116,7 @@ public class EPersonTest extends AbstractUnitTest {
     public void destroy() {
         context.turnOffAuthorisationSystem();
         try {
-            EPerson testPerson = ePersonService.findByEmail(context, "kevin@dspace.org");
+            EPerson testPerson = ePersonService.findByEmail(context, EMAIL);
             if (testPerson != null) {
                 ePersonService.delete(context, testPerson);
             }
@@ -205,8 +205,8 @@ public class EPersonTest extends AbstractUnitTest {
         }
         context.restoreAuthSystemState();
         context.commit();
-        EPerson fundDeletedEperson = ePersonService.findByEmail(context, EMAIL);
-        assertNull("EPerson has not been deleted correctly!", fundDeletedEperson);
+        EPerson findDeletedEperson = ePersonService.findByEmail(context, EMAIL);
+        assertNull("EPerson has not been deleted correctly!", findDeletedEperson);
     }
 
     /**

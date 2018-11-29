@@ -566,8 +566,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         try {
             // Get submitter
             EPerson ep = item.getSubmitter();
-            // send the notification only if the person was not deleted in the
-            // meantime between submission and archiving.
+            // send the notification to the submitter unless the submitter eperson has been deleted
             if (null != ep) {
                 // Get the Locale
                 Locale supportedLocale = I18nUtil.getEPersonLocale(ep);

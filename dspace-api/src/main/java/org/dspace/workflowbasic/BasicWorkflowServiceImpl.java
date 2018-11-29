@@ -799,8 +799,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
             // Get submitter
             EPerson ep = item.getSubmitter();
 
-            // send the notification only if the person was not deleted in the
-            // meantime between submission and archiving.
+            // send the notification to the submitter unless the submitter eperson has been deleted
             if (ep != null) {
                 // Get the Locale
                 Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
@@ -884,10 +883,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
         workflowItemService.deleteWrapper(context, wi);
         // Now delete the item
         itemService.delete(context, myitem);
-        log.info(LogManager.getHeader(context, "delete_workflow", "workflow_item_id="
-                + workflowID + "item_id=" + itemID
-                + "collection_id=" + collID + "eperson_id="
-                + e.getID()));
+        log.info(LogManager.getHeader(context, "delete_workflow", String.format("workflow_item_id=%s " +
+                        "item_id=%s collection_id=%s eperson_id=%s", workflowID, itemID, collID, e.getID())));
     }
 
     @Override
