@@ -127,7 +127,7 @@ public class DryadDataPackage extends DryadObject {
         super(item);
         String pubName = getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
         if (pubName != null && !pubName.equals("")) {
-            journalConcept = JournalUtils.getJournalConceptByJournalName(getPublicationName());
+            journalConcept = JournalUtils.getJournalConceptByJournalName(pubName);
         }
     }
 
@@ -370,12 +370,17 @@ public class DryadDataPackage extends DryadObject {
         if (getItem() != null) {
             String theAbstract = getSingleMetadataValue("dc", "description", null);
             String extraAbstract = getSingleMetadataValue("dc", "description", "abstract");
-
+            if (theAbstract == null) {
+                theAbstract = "";
+            }
             if (extraAbstract != null && extraAbstract.length() > 0) {
                 theAbstract = theAbstract + "\n" + extraAbstract;
             }
             return theAbstract;
         } else {
+            if (abstractString == null) {
+                abstractString = "";
+            }
             return abstractString;
         }
     }
@@ -465,11 +470,16 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public void updateDuplicatePackages(Context context) {
-        HashSet<DryadDataPackage> resultSet = new HashSet<>();
+        ArrayList<DryadDataPackage> resultList = new ArrayList<>();
         try {
             // get the current duplicate packages
-            resultSet.addAll(getDuplicatePackages(context));
-            resultSet.addAll(findAllByManuscript(context, new Manuscript(this)));
+            resultList.addAll(getDuplicatePackages(context));
+            List<DryadDataPackage> matchingPackages = findAllByManuscript(context, new Manuscript(this));
+            for (DryadDataPackage dryadDataPackage : matchingPackages) {
+                if (!dryadDataPackage.getIdentifier().equals(this.getIdentifier())) {
+                    resultList.add(dryadDataPackage);
+                }
+            }
             // look for items that have the same journal + title + authors?
 
         } catch (Exception e) {
@@ -479,11 +489,13 @@ public class DryadDataPackage extends DryadObject {
         // update the data package's metadata:
         if (useDryadClassic) {
             getItem().clearMetadata("dryad.duplicateItem");
-            for (DryadDataPackage dryadDataPackage : resultSet) {
+            for (DryadDataPackage dryadDataPackage : resultList) {
                 getItem().addMetadata("dryad.duplicateItem", null, String.valueOf(dryadDataPackage.getItem().getID()), null, Choices.CF_NOVALUE);
+                // this is a temporary log to see when this is happening
+                log.error("adding duplicate " + dryadDataPackage.getItem().getID() + " to package " + getItem().getID());
             }
         } else {
-            duplicateItems.addAll(resultSet);
+            duplicateItems.addAll(resultList);
         }
     }
 
@@ -918,21 +930,29 @@ public class DryadDataPackage extends DryadObject {
         if (useDryadClassic) {
             try {
                 // find all with same Dryad DOI
-                ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", null, manuscript.getDryadDataDOI(), false);
-                while (itemIterator.hasNext()) {
-                    dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+                if (!"".equals(manuscript.getDryadDataDOI())) {
+                    ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", null, manuscript.getDryadDataDOI(), false);
+                    while (itemIterator.hasNext()) {
+                        dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+                    }
                 }
+
                 // find all with same publication DOI
-                itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", manuscript.getPublicationDOI(), false);
-                while (itemIterator.hasNext()) {
-                    dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+                if (!"".equals(manuscript.getPublicationDOI())) {
+                    ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", manuscript.getPublicationDOI(), false);
+                    while (itemIterator.hasNext()) {
+                        dataPackageList.add(new DryadDataPackage(itemIterator.next()));
+                    }
                 }
+
                 // find all with same manuscript ID (in the same journal)
-                itemIterator = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscript.getManuscriptId(), false);
-                while (itemIterator.hasNext()) {
-                    DryadDataPackage dataPackage = new DryadDataPackage(itemIterator.next());
-                    if (dataPackage.getPublicationName().equals(manuscript.getJournalName()))
-                        dataPackageList.add(dataPackage);
+                if (!"".equals(manuscript.getManuscriptId())) {
+                    ItemIterator itemIterator = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscript.getManuscriptId(), false);
+                    while (itemIterator.hasNext()) {
+                        DryadDataPackage dataPackage = new DryadDataPackage(itemIterator.next());
+                        if (dataPackage.getPublicationName().equals(manuscript.getJournalName()))
+                            dataPackageList.add(dataPackage);
+                    }
                 }
             } catch (Exception ex) {
                 log.error("Exception getting data package from publication DOI", ex);

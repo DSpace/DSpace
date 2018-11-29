@@ -170,7 +170,11 @@ public abstract class DryadObject {
 
     public String getIdentifier() {
         if (getItem() != null) {
-            return DOIIdentifierProvider.getDoiValue(getItem());
+            String id = DOIIdentifierProvider.getDoiValue(getItem());
+            if (id == null) {
+                id = Integer.valueOf(getItem().getID()).toString();
+            }
+            return id;
         }
         return identifier;
     }

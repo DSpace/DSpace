@@ -244,7 +244,7 @@ public class Manuscript {
     }
 
     public Manuscript(DryadDataPackage dryadDataPackage) {
-        journalConcept = JournalUtils.getJournalConceptByJournalName(dryadDataPackage.getPublicationName());
+        journalConcept = dryadDataPackage.getJournalConcept();
         setManuscriptId(dryadDataPackage.getManuscriptNumber());
         setPublicationDOI(dryadDataPackage.getPublicationDOI());
         String title = dryadDataPackage.getTitle().replaceAll("Data from: ", "");
@@ -304,6 +304,9 @@ public class Manuscript {
     }
 
     public String getAbstract() {
+        if (manuscript_abstract == null) {
+            manuscript_abstract = "";
+        }
         return manuscript_abstract;
     }
 
