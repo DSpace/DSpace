@@ -1523,7 +1523,11 @@ public class FlowUtils {
 			DCValue[] fileStatusMDVs = publication.getMetadata("workflow.review.fileStatus");
 			publication.clearMetadata("workflow.review.fileStatus");
 			for (DCValue fileStatusMDV : fileStatusMDVs) {
-				fileStatusMDV.confidence = filestatuses.get(fileStatusMDV.value);
+				int conf = Choices.CF_ACCEPTED;
+				if (filestatuses.containsKey(fileStatusMDV.value)) {
+					conf = filestatuses.get(fileStatusMDV.value);
+				}
+				fileStatusMDV.confidence = conf;
 				publication.addMetadata(fileStatusMDV);
 			}
 			publication.update();
