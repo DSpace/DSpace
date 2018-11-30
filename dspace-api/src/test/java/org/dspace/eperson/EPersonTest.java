@@ -19,8 +19,8 @@ import java.util.List;
 import javax.mail.MessagingException;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.apache.commons.lang.StringUtils;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -76,7 +76,7 @@ public class EPersonTest extends AbstractUnitTest {
     private static final String NETID = "1985";
     private static final String PASSWORD = "test";
 
-    private static final Logger log = Logger.getLogger(EPersonTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EPersonTest.class);
 
     public EPersonTest() {
     }
