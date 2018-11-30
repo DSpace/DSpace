@@ -9,7 +9,7 @@ package org.dspace.eperson;
 
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Exception indicating that an EPerson may not be deleted due to the presence
