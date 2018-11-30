@@ -123,6 +123,7 @@
 		  
 		<%    
 		i = 0;
+		int countPanelHide = 0;
 		for (String key : subresult.keySet())
 		{
 		    boolean active = false;
@@ -167,6 +168,7 @@
 			 	   }
 		    }
 			if(preCountSimilarity==0) {
+			    countPanelHide++;
 		%>
 				 <script type="text/javascript">
 					jQuery("#<%= keyID %>").hide();
@@ -185,6 +187,7 @@
 		      	<div class="col-md-5">
 		<%      
 				int countSimilar = 0;
+				int countSimilarWithAuthority = 0;
 				boolean showFoundYourAuthority = false;
 				boolean showFoundDifferentAuthority = false;
 				for(String[] record : subresult.get(key)) { 
@@ -231,6 +234,7 @@
 						        countSimilar++;						        
 								if(StringUtils.isNotBlank(authority) && confidence.equals("600")) {
 						    		showFoundDifferentAuthority = true;
+						    		countSimilarWithAuthority++;
 							    }
 						    }
 						}
@@ -300,7 +304,8 @@
 				</div>
 
 		<%      
-				if(countSimilar==1) {
+				if(countSimilar==1 || ((countSimilar-countSimilarWithAuthority)==1)) {
+				    countPanelHide++;
 		%>
 					<script type="text/javascript">
 						jQuery("#<%= keyID %>").hide();
@@ -310,7 +315,7 @@
 				}
 		%>
 		<% 
-			i++;
+			
 			}
 			
 		%>	
@@ -319,6 +324,7 @@
 		  </div>
 		
 		<%	
+			i++;
 		}
 		%>
 		</div>
@@ -327,6 +333,14 @@
 	</td>    
 	</tr>		
 	<%
+	
+	if(i==countPanelHide) {
+	%>
+		<script type="text/javascript">
+			jQuery("#myTabContent<%= item.getID() %>").toggle();
+		</script>	
+	<%   
+	}
 	}
 	%>
 </tbody>

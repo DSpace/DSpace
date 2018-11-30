@@ -245,7 +245,7 @@ for (String key : result.keySet())
         <input type="hidden" name="handle_<%= item.getID() %>" value="<%= handle %>"/>
         <input type="hidden" name="selectedId" value="<%= item.getID() %>"/>
         <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit_approve" value="<fmt:message key="jsp.tools.general.approve"/>" />
-        <input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_reject" value="<fmt:message key="jsp.tools.general.reject"/>" />
+        <input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_unclaim" value="<fmt:message key="jsp.tools.general.reject"/>" />
 		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
 	<%	
 				if(localMessageFound) {
