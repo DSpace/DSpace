@@ -1,0 +1,13 @@
+# Email sent to DSpace users when there is a Reject from Claim Publication
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Unclaim publication
+
+This email is to confirm that {9} ({10}) has successful unclaimed {8}
+
+Click here to view the item page {5}
+Click here to view Research Profile page {4}
+
+The DSpace Team
+

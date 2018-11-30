@@ -52,23 +52,25 @@
 <p style="display:none" id="founddifferentauthority_<%= item.getID() %>" class="text-danger"><fmt:message key="jsp.authority-claim.found.different.authority"/></p>
 <p style="display:none" id="foundrequestforclaim_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.local.message"/></p>
 <dspace:discovery-artifact style="global" artifact="<%= item %>" view="<%= mapViewMetadata.get(\"publications\") %>" selectorCssView="<%=selectorViewMetadata %>"/>
-<ul class="nav nav-tabs" id="myTab" role="tablist">
+<ul class="nav nav-tabs" role="tablist" id="ul<%= item.getID() %>">
 <%
     // Keep a count of the number of values of each element+qualifier
     // key is "element" or "element_qualifier" (String)
     // values are Integers - number of values that element/qualifier so far
     Map<String, Integer> dcCounter = new HashMap<String, Integer>();
     
-    int i = 0;
-    for (String key : result.keySet())
-    {
-        String labelTab = "jsp.dspace.authority-claim-" + key;
-%>
-        
 
-  <li id="li_<%= key %>" class="nav-item  <%= i==0?"active":""%>">
-    <a class="nav-link" id="<%= key %>-tab" data-toggle="tab" href="#<%= key %>" role="tab" aria-controls="<%= key %>" <%= i==0?"aria-selected=\"true\"":""%>><fmt:message key="<%= labelTab %>" /></a>
-  </li>
+	int i = 0;
+	for (String key : result.keySet())
+	{
+	    String labelTab = "jsp.dspace.authority-claim-" + key;
+	    String keyID = item.getID() + "_" + key;	
+	
+%>
+
+		  <li id="li_<%= keyID %>" class="nav-item  <%= i==0?"active":""%>" >
+		    <a class="nav-link" id="<%= keyID %>-tab" data-toggle="tab" href="#<%= keyID %>" role="tab" aria-controls="<%= keyID %>" <%= i==0?"aria-selected=\"true\"":""%>><fmt:message key="<%= labelTab %>" /></a>
+		  </li>
   
 <%
 	i++;
@@ -76,76 +78,43 @@
 </ul>
 
 
-<div class="tab-content" id="myTabContent">
+<div class="tab-content" id="myTabContent<%= item.getID() %>" >
 <% 
 
 i = 0;
+boolean localMessageFound = false;
+
 for (String key : result.keySet())
-{
-    String keyID = item.getID() + "_" + key; 
+{	
+    String keyID = item.getID() + "_" + key;
 %>
 
-  <div class="tab-pane <%= i==0?"active":""%>" id="<%= key %>" role="tabpanel" aria-labelledby="<%= key %>-tab">
+  <div class="tab-pane <%= i==0?"active":""%>" id="<%= keyID %>" role="tabpanel" aria-labelledby="<%= keyID %>-tab">
     <div class="row">
       <div class="col-md-12">
       
 		<%	
-			boolean hiddenSelectCheckbox = false;
-			boolean toggleTab = false;
-			Metadatum[] requestPendings = item.getMetadataByMetadataString("local.message.claim");
-			for(Metadatum requestPending : requestPendings) {
-			    String vvv = requestPending.value;
-				if(StringUtils.isNotBlank(vvv)) {
-				    if(vvv.contains(crisID) && vvv.contains(key)) { 
-				    	hiddenSelectCheckbox = true;
-				    	break;
-				    }
-				}
+
+		//check if the local.message.claim exist... if exist show only a warning
+		Metadatum[] requestPendings = item.getMetadataByMetadataString("local.message.claim");
+		for(Metadatum requestPending : requestPendings) {
+		    String vvv = requestPending.value;
+			if(StringUtils.isNotBlank(vvv)) {
+			    if(vvv.contains(crisID) && vvv.contains(key)) { 
+			        localMessageFound = true;
+			    	break;
+			    }
 			}
-			if(!hiddenSelectCheckbox) {
-				for(String[] record : result.get(key)) { 
-			        String value = record[0];
-			        String authority = record[1];
-			        String confidence = record[2];
-			        String language = record[3];
-			        String similar = record[4];
-			        if(crisID.equals(authority) && !confidence.equals("600")) {
-			            toggleTab = true;
-			            break;
-			        }
-				}
-			}
-			
-			int countSS = 0;
-			for(String[] record : result.get(key)) { 
-		        String value = record[0];
-		        String authority = record[1];
-		        String confidence = record[2];
-		        String language = record[3];
-		        String similar = record[4];
-			 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
-					    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
-					        countSS++;
-					    }
-			 	   }
-		    }
-		if(countSS==0) {
-	%>
-			<script type="text/javascript">
-				jQuery("#<%= key %>").toggle();
-				jQuery("#li_<%= key %>").toggle();
-			</script>		
-	<% }
-		else if(hiddenSelectCheckbox) {
+		}
+		
+		if(localMessageFound) {
 	%>
 				<script type="text/javascript">
-					jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
-					jQuery("#<%= key %>").toggle();
-					jQuery("#li_<%= key %>").toggle();
 					jQuery("#foundrequestforclaim_<%= item.getID() %>").toggle();
 				</script>	
-		<% } else { %>			      
-		      	<div class="col-md-5">
+		<% } %>			      
+		
+		<div class="col-md-5">
 		<%
 		int countSimilar = 0;
 	    boolean showFoundYourAuthorityLowConfidence = false;		
@@ -187,16 +156,14 @@ for (String key : result.keySet())
 		 %>
 				<% 	if(crisID.equals(authority)) {
 				    	countSimilar++;
-				    	if(!confidence.equals("600")) {
-				    	    showFoundYourAuthorityLowConfidence = true;
-				    	} else {
+				    	if(confidence.equals("600")) {
 			    			showFoundYourAuthority = true;
 				    	}
 				 	} else {
 				 	   if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
-						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity) {
-						        countSimilar++;
-								if(StringUtils.isNotBlank(authority)) {
+						    if(value.equals(similar) || jaroWinklerDistance.getDistance(value,similar)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
+						        countSimilar++;						        
+								if(StringUtils.isNotBlank(authority) && confidence.equals("600")) {
 						    		showFoundDifferentAuthority = true;
 							    }
 						    }
@@ -214,9 +181,6 @@ for (String key : result.keySet())
 				<% if(showFoundYourAuthority) { %>
 					<script type="text/javascript">
 						jQuery("#foundyourauthority_<%= item.getID() %>").toggle();
-						jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
-						jQuery("#myTabContent<%= item.getID() %>").toggle();
-						jQuery("#ul<%= item.getID() %>").toggle();
 					</script>					
 				<% } else if(showFoundDifferentAuthority && !showFoundYourAuthority && countSimilar==1) { %>
 					<script type="text/javascript">
@@ -248,7 +212,7 @@ for (String key : result.keySet())
 				 %>
 		          <option value="<%= option %>" 
 		          <%if(StringUtils.isNotBlank(value) && StringUtils.isNotBlank(similar)) {
-							    if(value.equals(similar) || jaroWinklerDistance.getDistance(similar,value)>checksimilarity) {
+							    if(value.equals(similar) || jaroWinklerDistance.getDistance(similar,value)>checksimilarity || value.startsWith(similar) || similar.startsWith(value)) {
 							        %>
 							        <%= "selected" %>
 							        <%    		
@@ -264,38 +228,35 @@ for (String key : result.keySet())
 			
         
 		</div>
-		<div class="col-md-5">
+		<div class="col-md-7">
 			  <div class="form-group">
 				    <label for="requestNote_<%= keyID %>"><fmt:message key="jsp.authority-claim.label.requestnote"/></label>
 				    <textarea class="form-control" name="requestNote_<%= keyID %>" id="requestNote_<%= keyID %>" rows="3" cols="100"></textarea>
 			  </div>
 		</div>
-      </div>
-    </div>
-  </div>
-		<%      
-		if(countSimilar==1) {
-		%>
-				<script type="text/javascript">
-						jQuery("#<%= key %>").toggle();
-						jQuery("#li_<%= key %>").toggle();
-				</script>		
-		<% 
-		}
-		%>
+
 <% 
 	i++;
 } %>
+      </div>
+    </div>
+  </div>
 
-
-<%
-}
-%>
         <input type="hidden" name="handle_<%= item.getID() %>" value="<%= handle %>"/>
         <input type="hidden" name="selectedId" value="<%= item.getID() %>"/>
         <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit_approve" value="<fmt:message key="jsp.tools.general.approve"/>" />
-        <input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_reject" value="<fmt:message key="jsp.tools.general.reject"/>" />        
+        <input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_unclaim" value="<fmt:message key="jsp.tools.general.reject"/>" />
 		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
+	<%	
+				if(localMessageFound) {
+	%>
+				<script type="text/javascript">
+					jQuery('input[name="submit_approve"]').toggle();
+					jQuery('input[name="submit_reject"]').toggle();
+				</script>
+	<%
+				}
+	%>				
 </div>	
 
 </form>

@@ -74,7 +74,7 @@
 	<td>
 		<p style="display:none" id="foundyourauthority_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.your.authority"/></p>
 		<p style="display:none" id="founddifferentauthority_<%= item.getID() %>" class="text-danger"><fmt:message key="jsp.authority-claim.found.different.authority"/></p>
-		<p style="display:none" id="foundrequestforclaim_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.local.message"/></p>
+		<p style="display:none" id="foundrequestforclaim_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim-list.found.local.message"/></p>
 		<dspace:discovery-artifact style="global" artifact="<%= item %>" view="<%= mapViewMetadata.get(\"publications\") %>" selectorCssView="<%=selectorViewMetadata %>"/>
 		<ul class="nav nav-tabs" role="tablist" id="ul<%= item.getID() %>">
 		<%
@@ -104,7 +104,7 @@
 						    }
 				 	   }
 			    }
-		        if(preCountSimilarity>0) {
+		        if(preCountSimilarity>1) {
 			        active = true;
 			        alreadyactive = keyID; 
 		        }
@@ -123,6 +123,7 @@
 		  
 		<%    
 		i = 0;
+		int countPanelHide = 0;
 		for (String key : subresult.keySet())
 		{
 		    boolean active = false;
@@ -167,6 +168,7 @@
 			 	   }
 		    }
 			if(preCountSimilarity==0) {
+			    countPanelHide++;
 		%>
 				 <script type="text/javascript">
 					jQuery("#<%= keyID %>").hide();
@@ -185,6 +187,7 @@
 		      	<div class="col-md-5">
 		<%      
 				int countSimilar = 0;
+				int countSimilarWithAuthority = 0;
 				boolean showFoundYourAuthority = false;
 				boolean showFoundDifferentAuthority = false;
 				for(String[] record : subresult.get(key)) { 
@@ -231,6 +234,7 @@
 						        countSimilar++;						        
 								if(StringUtils.isNotBlank(authority) && confidence.equals("600")) {
 						    		showFoundDifferentAuthority = true;
+						    		countSimilarWithAuthority++;
 							    }
 						    }
 						}
@@ -300,7 +304,8 @@
 				</div>
 
 		<%      
-				if(countSimilar==1) {
+				if(countSimilar==1 || ((countSimilar-countSimilarWithAuthority)==1)) {
+				    countPanelHide++;
 		%>
 					<script type="text/javascript">
 						jQuery("#<%= keyID %>").hide();
@@ -310,7 +315,7 @@
 				}
 		%>
 		<% 
-			i++;
+			
 			}
 			
 		%>	
@@ -319,6 +324,7 @@
 		  </div>
 		
 		<%	
+			i++;
 		}
 		%>
 		</div>
@@ -327,6 +333,14 @@
 	</td>    
 	</tr>		
 	<%
+	
+	if(i==countPanelHide) {
+	%>
+		<script type="text/javascript">
+			jQuery("#myTabContent<%= item.getID() %>").toggle();
+		</script>	
+	<%   
+	}
 	}
 	%>
 </tbody>
