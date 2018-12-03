@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Author;
@@ -521,43 +523,55 @@ public class DryadDataPackage extends DryadObject {
             curationStatusReason = reason;
         }
     }
-    // this method does not assume that the package is in review; only used by AutoReturnReviewItem.
-    public Date getEnteredReviewDate() {
-        if (useDryadClassic) {
+    private List<String> getProvenances() {
+        ArrayList<String> resultList = new ArrayList<>();
+        if (item != null) {
             DCValue[] provenanceValues = item.getMetadata("dc.description.provenance");
             if (provenanceValues != null && provenanceValues.length > 0) {
                 for (DCValue provenanceValue : provenanceValues) {
-                    //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
-                    String provenance = provenanceValue.value;
-                    Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
-                    Matcher matcher = pattern.matcher(provenance);
-                    if (matcher.find()) {
-                        String dateString = matcher.group(1);
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                        try {
-                            Date reviewDate = sdf.parse(dateString);
-                            log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
-                            return reviewDate;
-                        } catch (Exception e) {
-                            log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
-                            return null;
-                        }
+                    resultList.add(provenanceValue.value);
+                }
+            }
+        }
+        return resultList;
+    }
+
+    // this method does not assume that the package is in review; only used by AutoReturnReviewItem.
+    public Date getEnteredReviewDate() {
+        if (useDryadClassic) {
+            List<String> provenances = getProvenances();
+            for (String provenance : provenances) {
+                //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
+                Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
+                Matcher matcher = pattern.matcher(provenance);
+                if (matcher.find()) {
+                    String dateString = matcher.group(1);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    try {
+                        Date reviewDate = sdf.parse(dateString);
+                        log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
+                        return reviewDate;
+                    } catch (Exception e) {
+                        log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
+                        return null;
                     }
                 }
             }
         } else {
-            JsonNode resultNode = dashService.getCurationActivity(new Package(this));
-            // the curation activities are returned in descending order of recency
-            for (int i=0; i < resultNode.size(); i++) {
-                if (resultNode.get(i).get("status").textValue().equals("Private for Peer Review")) {
-                    String dateString = resultNode.get(i).get("created_at").textValue();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            JsonNode provenances = dashService.getCurationActivity(new Package(this));
+            if (provenances.isArray()) {
+                for (int i = 0; i < provenances.size(); i++) {
                     try {
-                        Date reviewDate = sdf.parse(dateString);
-                        log.info("package " + this.getIdentifier() + " entered review on " + reviewDate.toString());
-                        return reviewDate;
+                        JsonNode resultNode = provenances.get(i);
+                        if (resultNode.get("status").textValue().equals("Private for Peer Review")) {
+                            String dateString = resultNode.get("created_at").textValue();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                            Date reviewDate = sdf.parse(dateString);
+                            log.info("package " + this.getIdentifier() + " entered review on " + reviewDate.toString());
+                            return reviewDate;
+                        }
                     } catch (Exception e) {
-                        log.error("couldn't find review date for package " + this.getIdentifier() + ": " + dateString);
+                        log.error("couldn't find review date for package " + this.getIdentifier() + ": " + e.getMessage());
                         return null;
                     }
                 }
