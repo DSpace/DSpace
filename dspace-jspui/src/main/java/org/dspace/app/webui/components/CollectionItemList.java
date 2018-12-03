@@ -10,6 +10,7 @@ package org.dspace.app.webui.components;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseEngine;
@@ -25,6 +26,7 @@ import org.dspace.plugin.PluginException;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.dspace.utils.DSpace;
+import org.eclipse.jetty.util.log.Log;
 
 
 /**
@@ -96,9 +98,13 @@ public class CollectionItemList implements CollectionHomeProcessor
         {
             offset = 0;
         }
+        String sort =  request.getParameter("sort_by");
+        String order =   request.getParameter("order");
+        order = StringUtils.equals(order, SortOption.DESCENDING)? SortOption.DESCENDING :SortOption.ASCENDING ; 
         
         try
         {
+        	
             BrowseIndex bi = BrowseIndex.getBrowseIndex(name);
             if (bi == null || !"item".equals(bi.getDisplayType()))
             {
@@ -113,11 +119,43 @@ public class CollectionItemList implements CollectionHomeProcessor
             scope.setEtAl(etal);
             scope.setOffset(offset);
             scope.setResultsPerPage(perpage);
-            if (number != -1)
+            
+            
+            if (StringUtils.isNotBlank(sort)) {
+            	Integer sortID =-1;
+                try
+                {
+                	int num = Integer.parseInt(sort);
+                	for (SortOption option : SortOption.getSortOptions())
+                    {
+                        if (option.getNumber() == num)
+                        {
+                        	sortID= num;
+                        	break;
+                        }
+                    }
+                }
+                catch (SortException e)
+                {
+
+                }catch( NumberFormatException e){
+                	
+                }
+                
+                if(sortID != -1) {
+                	scope.setSortBy(sortID);
+                	scope.setOrder(order);
+                }else if(number!= -1) {
+                	scope.setSortBy(number);
+                    scope.setOrder(SortOption.DESCENDING);
+                }
+            }
+            else if(number != -1)
             {
                 scope.setSortBy(number);
                 scope.setOrder(SortOption.DESCENDING);
             }
+            
             boolean isMultilanguage = new DSpace()
             .getConfigurationService()
             .getPropertyAsType(
