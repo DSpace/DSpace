@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Package;
@@ -38,6 +39,7 @@ public class DashService {
     private static final Logger log = Logger.getLogger(DashService.class);
     private String dashServer = "";
     private String oauthToken = "";
+    private ObjectMapper mapper = null;
 
     public DashService() {
         // init oauth connection with DASH
@@ -46,6 +48,7 @@ public class DashService {
         String dashAppSecret = ConfigurationManager.getProperty("dash.application.secret");
 
         oauthToken = getOAUTHtoken(dashServer, dashAppID, dashAppSecret);
+        mapper = new ObjectMapper();
         fixHttpURLConnection();
     }
 
@@ -348,11 +351,17 @@ public class DashService {
     }
 
     public int addCurationActivity(DryadDataPackage dataPackage, String status, String reason) {
-        String dashJSON = "{\"status\": \"" + status + "\", \"note\": \"" + reason + "\"}";
+        ObjectNode node = mapper.createObjectNode();
+        node.put("status", status);
+        node.put("note", reason);
+        return addCurationActivity(dataPackage, node);
+    }
+
+    private int addCurationActivity(DryadDataPackage dataPackage, JsonNode node) {
         int responseCode = 0;
-        BufferedReader reader = null;
 
         try {
+            String dashJSON = mapper.writeValueAsString(node);
             String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -366,7 +375,7 @@ public class DashService {
             wr.write(dashJSON);
             wr.close();
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
