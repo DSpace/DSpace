@@ -291,6 +291,42 @@ public class DashService {
         return responseCode;
     }
 
+    public void migrateProvenances(Package pkg) {
+        log.debug("migrating provenances");
+        // get curationActivities from Dash package
+        JsonNode curationActivities = getCurationActivity(pkg);
+        // if the only curation activity is the default "Unsubmitted," delete it
+        if (curationActivities.size() == 1) {
+            if (curationActivities.get(0).get("status").textValue().equals("Unsubmitted")) {
+                int unsubmittedID = curationActivities.get(0).get("id").intValue();
+                try {
+                    URL url = new URL(dashServer + "/api/curation_activity/" + unsubmittedID);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    connection.setRequestProperty("Accept", "application/json");
+                    connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+                    connection.setRequestMethod("DELETE");
+
+                    InputStream inputStream = connection.getInputStream();
+                } catch (Exception e) {
+                    throw new RuntimeException("Unable to delete curation activity from Dash", e);
+                }
+            }
+        }
+        if (curationActivities.size() > 1) {
+            throw new RuntimeException("More than one curation activity for package " + pkg.getDataPackage().getIdentifier() + ": are you sure you want to migrate provenances?");
+        }
+
+        // add provenances as curation activities
+        JsonNode provenances = pkg.getDataPackage().getProvenancesAsCurationActivities();
+        log.debug("migrating provenances " + provenances.toString());
+        for (int i=0; i<provenances.size(); i++) {
+            int responseCode = addCurationActivity(pkg.getDataPackage(), provenances.get(i));
+            if (responseCode < 200 || responseCode > 202) {
+                log.fatal("Unable to send provenance to DASH, response: " + responseCode);
+            }
+        }
+    }
 
     /**
        Given the (unencoded) DOI of a Dryad Data Package that has

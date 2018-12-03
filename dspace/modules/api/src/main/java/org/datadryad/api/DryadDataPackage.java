@@ -523,6 +523,65 @@ public class DryadDataPackage extends DryadObject {
             curationStatusReason = reason;
         }
     }
+
+    public JsonNode getProvenancesAsCurationActivities() {
+        List<String> provenances = getProvenances();
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode resultNode = mapper.createArrayNode();
+
+        for (String provenance : provenances) {
+            provenance = provenance.replaceAll("[\\n|\\r]", " ");
+            Matcher authorActionRequired = Pattern.compile(".*Rejected by .+?, reason: .+ on (\\d+-\\d+-\\d+.*).*").matcher(provenance);
+            Matcher submitted1 = Pattern.compile("Approved by ApproveRejectReviewItem based on metadata for .+ on (\\d+-\\d+-\\d+).*\\(GMT\\) .*").matcher(provenance);
+            Matcher submitted2 = Pattern.compile("Enter dryadAcceptEditReject Moved by .+, reason: .+ on (\\d+-\\d+-\\d+).*").matcher(provenance);
+            Matcher submitted3 = Pattern.compile("Submitted by .+ on (\\d+-\\d+-\\d+)T.+?Z.*").matcher(provenance);
+            Matcher embargoed = Pattern.compile(".+Entered publication blackout by .+ on (\\d+-\\d+-\\d+).*\\(GMT\\).*").matcher(provenance);
+            Matcher peerReview1 = Pattern.compile("Enter reviewStep Moved by .+, reason: .+ on (\\d+-\\d+-\\d+).*\\(GMT\\).*").matcher(provenance);
+            Matcher peerReview2 = Pattern.compile("Data package moved to review on (\\d+-\\d+-\\d+).*").matcher(provenance);
+            Matcher published = Pattern.compile("Made available in DSpace on (\\d+-\\d+-\\d+).*").matcher(provenance);
+            Matcher withdrawn = Pattern.compile("Item withdrawn by .+ on (\\d+-\\d+-\\d+).*").matcher(provenance);
+
+            ObjectNode node = mapper.createObjectNode();
+            node.put("note", provenance);
+            node.put("user", (JsonNode) null);
+
+            if (authorActionRequired.matches()) {
+                node.put("status", "Author Action Required");
+                node.put("created_at", authorActionRequired.group(1));
+            } else if (submitted1.matches()) {
+                node.put("status", "Submitted");
+                node.put("created_at", submitted1.group(1));
+            } else if (submitted2.matches()) {
+                node.put("status", "Submitted");
+                node.put("created_at", submitted2.group(1));
+            } else if (submitted3.matches()) {
+                node.put("status", "Submitted");
+                node.put("created_at", submitted3.group(1));
+            } else if (embargoed.matches()) {
+                node.put("status", "Embargoed");
+                node.put("created_at", embargoed.group(1));
+            } else if (peerReview1.matches()) {
+                node.put("status", "Private for Peer Review");
+                node.put("created_at", peerReview1.group(1));
+            } else if (peerReview2.matches()) {
+                node.put("status", "Private for Peer Review");
+                node.put("created_at", peerReview2.group(1));
+            } else if (published.matches()) {
+                node.put("status", "Published");
+                node.put("created_at", published.group(1));
+            } else if (withdrawn.matches()) {
+                node.put("status", "Withdrawn");
+                node.put("created_at", withdrawn.group(1));
+            } else {
+                node.put("status", "Status Unchanged");
+                // it doesn't really matter what the date is for Status Unchanged, because it doesn't affect status, I guess.
+            }
+            resultNode.add(node);
+        }
+
+        return resultNode;
+    }
+
     private List<String> getProvenances() {
         ArrayList<String> resultList = new ArrayList<>();
         if (item != null) {
