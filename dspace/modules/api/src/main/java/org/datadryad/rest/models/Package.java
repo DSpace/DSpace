@@ -248,7 +248,7 @@ public class Package {
                     String fileListString = "";
                     for(DryadDataFile dryadFile : ddfs) {
                         String fileTitle = dryadFile.getTitle();
-                        fileListString = fileListString + "<h3>" + fileTitle + "</h3>";
+                        fileListString = fileListString + "<h4>" + fileTitle + "</h4>";
                         String fileDescription = dryadFile.getDescription();
                         if(fileDescription != null) {
                             fileListString = fileListString + "<p>" + fileDescription + "</p>";
