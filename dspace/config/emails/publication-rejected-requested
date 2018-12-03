@@ -2,12 +2,11 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: Unclaim publication
+Subject: Publication unclaimed
 
 This email is to confirm that {9} ({10}) has successful unclaimed {8}
 
-Click here to view the item page {5}
-Click here to view Research Profile page {4}
+Link to your Researcher Profile {4}
+Link to the publication {5}
 
 The DSpace Team
-
