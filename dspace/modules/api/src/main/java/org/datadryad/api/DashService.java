@@ -412,8 +412,7 @@ public class DashService {
             while ((line = reader.readLine()) != null) {
                 out.append(line);
             }
-            ObjectMapper m = new ObjectMapper();
-            JsonNode rootNode = m.readTree(out.toString());
+            JsonNode rootNode = mapper.readTree(out.toString());
             if (rootNode.isArray()) {
                 return rootNode;
             }
@@ -441,8 +440,7 @@ public class DashService {
             while ((line = reader.readLine()) != null) {
                 out.append(line);
             }
-            ObjectMapper m = new ObjectMapper();
-            JsonNode rootNode = m.readTree(out.toString());
+            JsonNode rootNode = mapper.readTree(out.toString());
             if (rootNode.isArray()) {
                 return rootNode;
             }
@@ -628,8 +626,7 @@ public class DashService {
                         connection.getResponseMessage());
             }
 
-            ObjectMapper m = new ObjectMapper();
-            JsonNode rootNode = m.readTree(out.toString());
+            JsonNode rootNode = mapper.readTree(out.toString());
             JsonNode packagesNode = rootNode.path("_embedded").path("stash:datasets");
             if (!packagesNode.isMissingNode() && packagesNode.isArray()) {
                 for (int i = 0; i < packagesNode.size(); i++) {
