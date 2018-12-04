@@ -9,10 +9,13 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadBitstream;
+import org.datadryad.api.DryadDataFile;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.dspace.JournalUtils;
 import org.dspace.content.Item;
+import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 import org.dspace.identifier.DOIIdentifierProvider;
 
@@ -215,6 +218,8 @@ public class Package {
     public static class DashSerializer extends JsonSerializer<Package> {
         @Override
         public void serialize(Package dataPackage, JsonGenerator jGen, SerializerProvider provider) throws IOException {
+            DryadDataPackage ddp = dataPackage.getDataPackage();
+            
             jGen.writeStartObject();
 
             jGen.writeStringField("identifier", dataPackage.getDryadDOI());
@@ -228,6 +233,46 @@ public class Package {
             
             //TODO: replace this with a real epersonID OR DASH user ID
             jGen.writeStringField("userID", "1");
+
+            // Data Files
+            // for each file, write the
+            // # <h3>File Title
+            // # File Description
+            // # Filenames:
+            // # - File name
+            // # - README filename
+            try {
+                Context context = new Context();
+                List<DryadDataFile> ddfs = ddp.getDataFiles(context);
+                if(ddfs.size() > 0) {
+                    String fileListString = "";
+                    for(DryadDataFile dryadFile : ddfs) {
+                        String fileTitle = dryadFile.getTitle();
+                        fileListString = fileListString + "<h4>" + fileTitle + "</h4>";
+                        String fileDescription = dryadFile.getDescription();
+                        if(fileDescription != null) {
+                            fileListString = fileListString + "<p>" + fileDescription + "</p>";
+                        }
+                        // bitstreams
+                        fileListString = fileListString + "<p>";
+                        String previousBitstreamFilename = "";
+                        for(Bitstream dspaceBitstream : dryadFile.getAllBitstreams()) {
+                            DryadBitstream dryadBitstream = new DryadBitstream(dspaceBitstream);                    
+                            if(dryadBitstream.isReadme()) {
+                                dryadBitstream.setReadmeFilename(previousBitstreamFilename);
+                                fileListString = fileListString + dryadBitstream.getReadmeFilename() + "</br>";
+                            } else {
+                                fileListString = fileListString + dspaceBitstream.getName() + "</br>";
+                                previousBitstreamFilename = dspaceBitstream.getName();
+                            }
+                        }
+                        fileListString = fileListString + "</p>";
+                    }
+                    jGen.writeStringField("usageNotes", fileListString);
+                }
+            } catch(Exception e) {
+                throw new IOException("Unable to serialize data files", e);
+            }
             
             // write citation for article:
             jGen.writeArrayFieldStart("relatedWorks");
