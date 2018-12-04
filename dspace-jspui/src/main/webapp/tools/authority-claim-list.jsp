@@ -22,6 +22,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%
 	double checksimilarity = Double.parseDouble((String)request.getAttribute("checksimilarity"));
 	Map<String, Map<String, List<String[]>>> result = (Map<String, Map<String, List<String[]>>>) request.getAttribute("result");
@@ -32,7 +33,8 @@
 	String selectorViewMetadata = (String)request.getAttribute("selectorViewMetadata");
 	JaroWinklerDistance jaroWinklerDistance = new JaroWinklerDistance();	
 %>
-
+<c:set var="selectallbutton"><fmt:message key="jsp.dspace.authority-list.selectallbutton" /></c:set>
+<c:set var="deselectallbutton"><fmt:message key="jsp.dspace.authority-list.deselectallbutton" /></c:set>
 <dspace:layout titlekey="jsp.dspace.authority-listclaim.title">
 <style>
 .list-group-item {
@@ -70,7 +72,7 @@
 %>  
 
 <tr>
-	<td id="checkbox_<%= item.getID() %>"><div class="data" data-id="<%= item.getID() %>">&nbsp;</div></td>
+	<td id="checkbox_data_<%= item.getID() %>"><div id="data_<%= item.getID() %>" class="data" data-identifier="<%= item.getID() %>">&nbsp;</div></td>
 	<td>
 		<p style="display:none" id="foundyourauthority_<%= item.getID() %>" class="text-warning"><fmt:message key="jsp.authority-claim.found.your.authority"/></p>
 		<p style="display:none" id="founddifferentauthority_<%= item.getID() %>" class="text-danger"><fmt:message key="jsp.authority-claim.found.different.authority"/></p>
@@ -178,7 +180,7 @@
 			else if(hiddenSelectCheckbox) {
 		%>
 				<script type="text/javascript">
-					jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
+					jQuery("#checkbox_data_<%= item.getID() %>").addClass("hidden-select-checkbox");
 					jQuery("#<%= keyID %>").toggle();
 					jQuery("#li_<%= keyID %>").toggle();
 					jQuery("#foundrequestforclaim_<%= item.getID() %>").toggle();
@@ -250,7 +252,7 @@
 				<% if(showFoundYourAuthority) { %>
 					<script type="text/javascript">
 						jQuery("#foundyourauthority_<%= item.getID() %>").toggle();
-						jQuery("#checkbox_<%= item.getID() %>").addClass("hidden-select-checkbox");
+						jQuery("#checkbox_data_<%= item.getID() %>").addClass("hidden-select-checkbox");
 						jQuery("#myTabContent<%= item.getID() %>").toggle();
 						jQuery("#ul<%= item.getID() %>").toggle();
 					</script>					
@@ -348,8 +350,8 @@
 </tfoot>
 </table>
 	<div class="row col-md-12 pull-right">
-        <input class="btn btn-primary pull-right col-md-3" type="submit" name="submit_approve" value="<fmt:message key="jsp.authority.listclaim.approve"/>" />
-        <input class="btn btn-warning pull-right col-md-3" type="submit" name="submit_reject" value="<fmt:message key="jsp.authority.listclaim.reject"/>" />
+        <input class="btn btn-primary pull-right col-md-3" type="submit" id="submit_approve" name="submit_approve" value="<fmt:message key="jsp.authority.listclaim.approve"/>" />
+        <input class="btn btn-warning pull-right col-md-3" type="submit" id="submit_reject" name="submit_reject" value="<fmt:message key="jsp.authority.listclaim.reject"/>" />
 		<input class="btn btn-default pull-right col-md-3" type="submit" name="submit_cancel" value="<fmt:message key="jsp.authority.listclaim.cancel"/>" />
 	</div>	
 <script type="text/javascript">
@@ -363,8 +365,8 @@ j(document).ready(function() {
         ],
         language: {
             buttons: {
-                selectAll: "Select all items",
-                selectNone: "Select none"
+                selectAll: "${selectallbutton}",
+                selectNone: "${deselectallbutton}"
             }
         },
         columnDefs: [ 
@@ -386,25 +388,50 @@ j(document).ready(function() {
 	j( "form input[type=submit]" ).click(function( event ) {
 		var buttonPressed = this.getAttribute("name");
 		if((buttonPressed=='submit_approve' || buttonPressed=='submit_reject')) {
+			
 			var successExit = false;			
 			table.rows('.selected').data().each( function ( i ) {
-					successExit = true;
-					var htmlid = j(i[0]).attr("data-id");
-					j('<input>').attr({
-					    type: 'hidden',
-					    id: 'selectedId' + htmlid,
-					    name: 'selectedId',
-					    value: htmlid
-					}).appendTo('form');
-					return false;
+					var parentCss = j("#checkbox_" + j(i[0]).attr('id')).attr('class');
+					if(parentCss.includes("select-checkbox")) { 
+						successExit = true;					
+						var htmlid = j(i[0]).attr("data-identifier");
+						j('<input>').attr({
+						    type: 'hidden',
+						    id: 'selectedId' + htmlid,
+						    name: 'selectedId',
+						    value: htmlid
+						}).appendTo('form');
+						return false;
+					}
             } );
 			if(!successExit) {
+				$('#authority-claim-no-selected').modal('show');
 				return false;
 			}
 		}
 
 	});
+	
 });
 </script>
 </form>
+
+	    <div class="modal fade" id="authority-claim-no-selected" tabindex="-1" role="dialog" aria-labelledby="<fmt:message key="jsp.authority.listclaim.no-selected"/>" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title"><fmt:message key="jsp.authority.listclaim.no-selected"/></h4>
+						</div>
+						<div class="modal-body with-padding">
+							<p><fmt:message key="jsp.authority.listclaim.no-selected-body"/></p>
+						</div>
+						<div class="modal-footer">							 
+							 <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.authority.listclaim.no-selected-body-dismissmodal"/></button>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+		</div>
 </dspace:layout>

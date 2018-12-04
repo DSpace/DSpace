@@ -2,15 +2,11 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: Authority Claimed
+Subject: Review Authority Claim
 
-The system have found the following action: CLAIM {0}
+The user {9} ({10}) requested claim for: {8}
 
-Metadata Field: {0}
-Current Value: {1}
-Current Authority: {2}
-Current Confidence: {3}
-
+Field: {0}
 USER NOTE: {7}
 
 Research Profile that claimed {4}
