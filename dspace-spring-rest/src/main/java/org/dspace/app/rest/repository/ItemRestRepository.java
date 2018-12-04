@@ -176,6 +176,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     protected void delete(Context context, UUID id) throws AuthorizeException {
         Item item = null;
         try {
