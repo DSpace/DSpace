@@ -44,7 +44,7 @@
 			<map:selector name="ConfigurationParameterSelector"
 				src="ar.edu.unlp.sedici.aspect.redirect.ConfigurationParameterSelector" />
 			<map:selector logger="sitemap.selector.exception" name="exceptionSedici" src="org.apache.cocoon.selection.ExceptionSelector">
-								<exception name="bad-request" class="ar.edu.unlp.sedici.xmlui.exception.BadRequestException"/>
+								<exception name="bad-request" class="org.dspace.app.xmlui.utils.BadRequestException"/>
                                 <exception name="not-found" class="org.apache.cocoon.ResourceNotFoundException"/>
                                 <exception name="authorize-exception" class="org.dspace.authorize.AuthorizeException"/>
                                 <exception name="file-not-found-exception" class="java.io.FileNotFoundException"/>
