@@ -1,0 +1,13 @@
+# Email sent to DSpace user that make claim request
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Publication claimed
+
+This email is to confirm that {9} ({10}) has successful claimed {8}
+
+Link to your Researcher Profile {4}
+Link to the publication {5}
+
+The DSpace Team
+
