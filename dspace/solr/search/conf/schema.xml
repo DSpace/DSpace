@@ -453,7 +453,7 @@
         <analyzer>
             <!--Treats the entire field as a single token, regardless of its content-->
             <tokenizer class="solr.KeywordTokenizerFactory"/>
-			<filter class="solr.ASCIIFoldingFilterFactory"/>
+
             <!--<filter class="solr.LowerCaseFilterFactory" />-->
             <filter class="solr.TrimFilterFactory" />
         </analyzer>
