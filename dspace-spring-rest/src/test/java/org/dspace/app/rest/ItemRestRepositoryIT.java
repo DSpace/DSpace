@@ -1509,4 +1509,191 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             )));
     }
 
+
+    @Test
+    public void testDeleteItem() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        ItemRest itemRest = new ItemRest();
+        itemRest.setName("Practices of research data curation in institutional repositories:" +
+                             " A qualitative view from repository staff");
+        itemRest.setOwningCollectionUuid(col1.getID().toString());
+        itemRest.setInArchive(true);
+        itemRest.setDiscoverable(true);
+        itemRest.setWithdrawn(false);
+
+        MetadataEntryRest description = new MetadataEntryRest();
+        description.setKey("dc.description");
+        description.setValue("<p>Some cool HTML code here</p>");
+
+        MetadataEntryRest abs = new MetadataEntryRest();
+        abs.setKey("dc.description.abstract");
+        abs.setValue("Sample item created via the REST API");
+
+        MetadataEntryRest contents = new MetadataEntryRest();
+        contents.setKey("dc.description.tableofcontents");
+        contents.setValue("<p>HTML News</p>");
+
+        MetadataEntryRest copyright = new MetadataEntryRest();
+        copyright.setKey("dc.rights");
+        copyright.setValue("Custom Copyright Text");
+
+        MetadataEntryRest title = new MetadataEntryRest();
+        title.setKey("dc.title");
+        title.setValue("Title Text");
+
+        itemRest.setMetadata(Arrays.asList(description,
+                                           abs,
+                                           contents,
+                                           copyright,
+                                           title));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items")
+                                                           .content(mapper.writeValueAsBytes(itemRest))
+                                                           .contentType(contentType))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String itemUuidString = String.valueOf(map.get("uuid"));
+        String itemHandleString = String.valueOf(map.get("handle"));
+
+        //TODO Refactor this to use the converter to Item instead of checking every property separately
+        getClient(token).perform(get("/api/core/items/" + itemUuidString))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.id", is(itemUuidString)),
+                            hasJsonPath("$.uuid", is(itemUuidString)),
+                            hasJsonPath("$.name", is("Title Text")),
+                            hasJsonPath("$.handle", is(itemHandleString)),
+                            hasJsonPath("$.type", is("item")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.title')].value",
+                                        contains("Title Text")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.rights')].value",
+                                        contains("Custom Copyright Text")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.description.tableofcontents')].value",
+                                        contains("<p>HTML News</p>")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.description.abstract')].value",
+                                        contains("Sample item created via the REST API")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.description')].value",
+                                        contains("<p>Some cool HTML code here</p>"))
+
+                        )));
+
+        getClient(token).perform(delete("/api/core/items/" + itemUuidString))
+                        .andExpect(status().isNoContent());
+
+        getClient(token).perform(get("/api/core/items/" + itemUuidString))
+                        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDeleteItemUnauthorized() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        ItemRest itemRest = new ItemRest();
+        itemRest.setName("Practices of research data curation in institutional repositories:" +
+                             " A qualitative view from repository staff");
+        itemRest.setOwningCollectionUuid(col1.getID().toString());
+        itemRest.setInArchive(true);
+        itemRest.setDiscoverable(true);
+        itemRest.setWithdrawn(false);
+
+        MetadataEntryRest description = new MetadataEntryRest();
+        description.setKey("dc.description");
+        description.setValue("<p>Some cool HTML code here</p>");
+
+        MetadataEntryRest abs = new MetadataEntryRest();
+        abs.setKey("dc.description.abstract");
+        abs.setValue("Sample item created via the REST API");
+
+        MetadataEntryRest contents = new MetadataEntryRest();
+        contents.setKey("dc.description.tableofcontents");
+        contents.setValue("<p>HTML News</p>");
+
+        MetadataEntryRest copyright = new MetadataEntryRest();
+        copyright.setKey("dc.rights");
+        copyright.setValue("Custom Copyright Text");
+
+        MetadataEntryRest title = new MetadataEntryRest();
+        title.setKey("dc.title");
+        title.setValue("Title Text");
+
+        itemRest.setMetadata(Arrays.asList(description,
+                                           abs,
+                                           contents,
+                                           copyright,
+                                           title));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items")
+                                                           .content(mapper.writeValueAsBytes(itemRest))
+                                                           .contentType(contentType))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String itemUuidString = String.valueOf(map.get("uuid"));
+        String itemHandleString = String.valueOf(map.get("handle"));
+
+        //TODO Refactor this to use the converter to Item instead of checking every property separately
+        getClient(token).perform(get("/api/core/items/" + itemUuidString))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.id", is(itemUuidString)),
+                            hasJsonPath("$.uuid", is(itemUuidString)),
+                            hasJsonPath("$.name", is("Title Text")),
+                            hasJsonPath("$.handle", is(itemHandleString)),
+                            hasJsonPath("$.type", is("item")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.title')].value",
+                                        contains("Title Text")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.rights')].value",
+                                        contains("Custom Copyright Text")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.description.tableofcontents')].value",
+                                        contains("<p>HTML News</p>")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.description.abstract')].value",
+                                        contains("Sample item created via the REST API")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.description')].value",
+                                        contains("<p>Some cool HTML code here</p>"))
+
+                        )));
+
+        getClient().perform(delete("/api/core/items/" + itemUuidString))
+                        .andExpect(status().isUnauthorized());
+
+        getClient(token).perform(get("/api/core/items/" + itemUuidString))
+                        .andExpect(status().isOk());
+    }
+
 }
