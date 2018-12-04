@@ -306,7 +306,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             }
             if (getCollection(context, item).equals(myDataPkgColl)) {
                 DryadDataPackage dryadDataPackage = new DryadDataPackage(item);
-                Set<DryadDataFile> dryadDataFiles = dryadDataPackage.getDataFiles(context);
+                List<DryadDataFile> dryadDataFiles = dryadDataPackage.getDataFiles(context);
                 for (DryadDataFile dryadDataFile : dryadDataFiles) {
                     mintDOIAtVersion(context, dryadDataFile.getDryadDOI(), dryadDataFile.getItem(), 1);
                 }

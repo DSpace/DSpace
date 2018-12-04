@@ -228,12 +228,18 @@ public class DashService {
         try {
             log.debug("number of files: " + dataPackage.getDataFiles(context).size());
             for(DryadDataFile dryadFile : dataPackage.getDataFiles(context)) {
-                String fileName = dryadFile.getTitle();
+                String fileTitle = dryadFile.getTitle();
                 String fileDescription = dryadFile.getDescription();
+                String previousBitstreamFilename = "";
                 for(Bitstream dspaceBitstream : dryadFile.getAllBitstreams()) {
                     log.debug("transferring bitstream " + dspaceBitstream.getName());
                     DryadBitstream dryadBitstream = new DryadBitstream(dspaceBitstream);
                     dryadBitstream.setFileDescription(fileDescription);
+                    if(dryadBitstream.isReadme()) {
+                        dryadBitstream.setReadmeFilename(previousBitstreamFilename);
+                    } else {
+                        previousBitstreamFilename = dspaceBitstream.getName();                        
+                    }
                     String dashJSON = dryadBitstream.getDashReferenceJSON();
                     log.debug("Got JSON object: " + dashJSON);
                     String encodedPackageDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
