@@ -95,6 +95,8 @@ public class UploadWithEmbargoStep extends UploadStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        updateFileRequiredByExcludedGroup(context);
+        
         // get button user pressed
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 

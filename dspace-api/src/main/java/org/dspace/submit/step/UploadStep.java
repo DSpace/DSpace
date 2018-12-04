@@ -129,15 +129,8 @@ public class UploadStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-    	// BEGIN SeDiCI: determina si el archivo es requerido dependiendo del Grupo del usuario
-    	fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
-    	if(fileRequired) {
-    		String excludedGroupName = ConfigurationManager.getProperty("webui.submit.upload.excluded_group");
-    		Group excludedGroup = Group.findByName(context, excludedGroupName);
-    		fileRequired = excludedGroup == null || !Group.isMember(context, excludedGroup.getID());
-    	}
-    	// END SeDiCI
-    	
+        updateFileRequiredByExcludedGroup(context);
+        
         // get button user pressed
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
@@ -742,6 +735,23 @@ public class UploadStep extends AbstractProcessingStep
         }
 
         return STATUS_COMPLETE;
+    }
+    
+    /**
+     *  <p>Actualiza el flag <b>fileRequired</b> si el usuario actual es miembro de un grupo excluido
+     *  (property <em>webui.submit.upload.excluded_group</em>).</p>
+     *  <p>Determina si el archivo es requerido dependiendo del Grupo del usuario 
+     *  Si la configuración dice que el upload es optativo, es optativo para todo el 
+     *  mundo, en cambio, si dice que es obligatorio, es obligatorio solo para los roles 
+     *  que NO se listan.</p>
+     * @throws SQLException 
+     */
+    protected void updateFileRequiredByExcludedGroup(Context context) throws SQLException {
+        if(fileRequired) {
+            String excludedGroupName = ConfigurationManager.getProperty("webui.submit.upload.excluded_group");
+            Group excludedGroup = Group.findByName(context, excludedGroupName);
+            fileRequired = excludedGroup == null || !Group.isMember(context, excludedGroup.getID());
+        }
     }
 
 }
