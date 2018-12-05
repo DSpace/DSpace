@@ -595,6 +595,17 @@ public class DryadDataPackage extends DryadObject {
         return resultList;
     }
 
+    public EPerson getSubmitter() {
+        if (item != null) {
+            try {
+                return item.getSubmitter();
+            } catch (SQLException e) {
+                log.error("couldn't get package's submitter: " + e.getMessage());
+            }
+        }
+        return null;
+    }
+
     // this method does not assume that the package is in review; only used by AutoReturnReviewItem.
     public Date getEnteredReviewDate() {
         if (useDryadClassic) {
