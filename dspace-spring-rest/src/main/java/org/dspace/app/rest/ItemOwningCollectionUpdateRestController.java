@@ -25,6 +25,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,7 +51,7 @@ public class ItemOwningCollectionUpdateRestController {
     @Autowired
     CollectionConverter converter;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{targetUuid}")
+    @RequestMapping(method = RequestMethod.PUT, value = "/{targetUuid}")
     @PreAuthorize("hasPermission(#itemUuid, 'ITEM','WRITE') && hasPermission(#targetUuid,'COLLECTION','ADD')")
     @PostAuthorize("returnObject != null")
     public CollectionRest move(@PathVariable UUID itemUuid, HttpServletResponse response,
@@ -80,6 +81,10 @@ public class ItemOwningCollectionUpdateRestController {
             throws SQLException, IOException, AuthorizeException {
 
         Item item = itemService.find(context, itemUuid);
+
+        if (item == null) {
+            throw new ResourceNotFoundException("Item with id: " + itemUuid + " not found");
+        }
 
         Collection currentCollection = item.getOwningCollection();
 
