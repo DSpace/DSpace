@@ -9,7 +9,7 @@ package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,7 +52,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
 
         //When we call this owningCollection/move endpoint
-        getClient().perform(post("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
+        getClient().perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
                                          + col2.getID()))
 
                    //We expect a 401 Unauthorized status when performed by anonymous
@@ -85,7 +85,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         //When we call this owningCollection/move endpoint
         getClient(token)
-                .perform(post("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
+                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
                                       + col2.getID()))
 
                 //We expect a 401 Unauthorized status when performed by anonymous
@@ -135,7 +135,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token)
-                .perform(post("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
+                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
                                       + col2.getID()))
 
                 //We expect a 401 Unauthorized status when performed by anonymous
@@ -178,7 +178,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(post("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
                                               + col2.getID()))
 
                         //We expect a 401 Unauthorized status when performed by anonymous
@@ -216,7 +216,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(post("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
                                               + col2.getID()))
 
                         //We expect a 401 Unauthorized status when performed by anonymous
@@ -254,7 +254,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(post("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/move/"
                                               + col2.getID()))
 
                         //We expect a 401 Unauthorized status when performed by anonymous
