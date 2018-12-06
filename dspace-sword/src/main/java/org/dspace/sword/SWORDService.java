@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
@@ -33,7 +33,7 @@ public class SWORDService {
     /**
      * Log4j logging instance
      */
-    public static final Logger log = Logger.getLogger(SWORDService.class);
+    public static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SWORDService.class);
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory
         .getInstance().getBitstreamFormatService();

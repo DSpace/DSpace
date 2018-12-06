@@ -12,7 +12,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -30,7 +30,7 @@ public class ResultsLogger implements ChecksumResultsCollector {
     /**
      * Usual Log4J logger.
      */
-    private static final Logger LOG = Logger.getLogger(ResultsLogger.class);
+    private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(ResultsLogger.class);
 
     /**
      * Utility date format.

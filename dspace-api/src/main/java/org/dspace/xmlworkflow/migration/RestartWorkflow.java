@@ -15,7 +15,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
@@ -41,7 +41,7 @@ public class RestartWorkflow {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(RestartWorkflow.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RestartWorkflow.class);
 
     public static boolean useWorkflowSendEmail = false;
 
