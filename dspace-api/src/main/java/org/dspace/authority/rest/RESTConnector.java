@@ -15,7 +15,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -28,7 +28,7 @@ public class RESTConnector {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(RESTConnector.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RESTConnector.class);
 
     private String url;
 

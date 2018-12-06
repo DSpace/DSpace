@@ -20,7 +20,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.analytics.Analytics;
 import com.google.api.services.analytics.AnalyticsScopes;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -47,7 +47,7 @@ public class GoogleAccount {
 
     private volatile static GoogleAccount uniqueInstance;
 
-    private static Logger log = Logger.getLogger(GoogleAccount.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(GoogleAccount.class);
 
 
     private GoogleAccount() {

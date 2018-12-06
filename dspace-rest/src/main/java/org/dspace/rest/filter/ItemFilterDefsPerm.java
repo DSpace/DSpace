@@ -9,7 +9,7 @@ package org.dspace.rest.filter;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -26,7 +26,7 @@ import org.dspace.rest.filter.ItemFilterUtil.BundleName;
 public class ItemFilterDefsPerm implements ItemFilterList {
     protected static AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     public static final String CAT_PERM = "Perimission Filters";
-    private static Logger log = Logger.getLogger(ItemFilterDefsPerm.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemFilterDefsPerm.class);
 
     public ItemFilterDefsPerm() {
     }

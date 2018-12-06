@@ -7,7 +7,7 @@
  */
 package org.dspace.submit.step;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
@@ -17,7 +17,7 @@ public class AccessStep extends AbstractProcessingStep {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(AccessStep.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AccessStep.class);
 
     @Override
     public void doPreProcessing(Context context, InProgressSubmission wsi) {

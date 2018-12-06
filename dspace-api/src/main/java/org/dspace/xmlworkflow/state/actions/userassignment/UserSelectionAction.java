@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.RoleMembers;
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class UserSelectionAction extends Action {
 
-    protected Logger log = Logger.getLogger(UserSelectionAction.class);
+    protected Logger log = org.apache.logging.log4j.LogManager.getLogger(UserSelectionAction.class);
 
     public abstract boolean isFinished(XmlWorkflowItem wfi);
 

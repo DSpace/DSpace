@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.Value;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
@@ -31,7 +31,7 @@ import org.dspace.core.Context;
  * @author Panagiotis Koutsourakis
  */
 public class SubmissionLookupUtils {
-    private static Logger log = Logger.getLogger(SubmissionLookupUtils.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionLookupUtils.class);
 
     /**
      * Default constructor

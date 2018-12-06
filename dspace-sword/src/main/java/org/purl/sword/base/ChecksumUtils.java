@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class that holds Checksum related methods.
@@ -25,7 +25,7 @@ public class ChecksumUtils {
     /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(ChecksumUtils.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ChecksumUtils.class);
 
     /**
      * Default constructor

@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -39,7 +39,7 @@ public class LicenseStreamIngestionCrosswalk
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(LicenseStreamIngestionCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(LicenseStreamIngestionCrosswalk.class);
 
     @Override
     public void ingest(Context context, DSpaceObject dso, InputStream in, String MIMEType)

@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -46,7 +46,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(VersionedHandleIdentifierProvider.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionedHandleIdentifierProvider.class);
 
     /**
      * Prefix registered to no one

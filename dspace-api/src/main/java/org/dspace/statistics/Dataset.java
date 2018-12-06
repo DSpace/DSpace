@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author kevinvandevelde at atmire.com
@@ -54,8 +54,8 @@ public class Dataset {
         initRowLabels(rows);
     }
 
-    public Dataset(float[][] matrix) {
-        this.matrix = (String[][]) ArrayUtils.clone(matrix);
+    public Dataset(String[][] matrix) {
+        this.matrix = ArrayUtils.clone(matrix);
         nbRows = matrix.length;
         if (0 < matrix.length && 0 < matrix[0].length) {
             nbCols = matrix[0].length;

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
@@ -48,7 +48,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(CollectionTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionTest.class);
 
     private LicenseService licenseService = CoreServiceFactory.getInstance().getLicenseService();
 
