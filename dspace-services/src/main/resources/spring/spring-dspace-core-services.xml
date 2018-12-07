@@ -16,18 +16,19 @@
     <!-- Place all DSpace core service bean definitions below here -->
 
     <!-- PROPERTY PLACEHOLDER SETUP -->
-    <!-- The following two beans are a cool trick. They let us use dynamic properties
-         like ${dspace.dir} within our Spring bean XML configuration files. These
-         property values are then dynamically loaded via our DSpaceConfigurationService. -->
-    <!-- First, configure a property placeholder. This lets us use properties like ${..} within Spring bean configs -->
-    <bean id="propertyPlaceholderConfigurer"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="properties" ref="dspaceConfigurationFactoryBean"/>
+    <!-- Configure a custom PropertySourcesPlaceholderConfigurer to use our DSpaceConfigurationService. This allows us
+         resolve ${...} placeholders in both Bean definitions property values (e.g. within Spring XML config files)
+         and in @Value annotations using our DSpaceConfigurationService. These are resolved at runtime. -->
+    <bean id="dspaceConfigurationFactoryBean" class="org.dspace.servicemanager.config.DSpaceConfigurationPlaceholderConfigurer">
+        <constructor-arg>
+          <ref bean="dspaceConfiguration" />
+        </constructor-arg>
     </bean>
-    <!-- Next, wire it up to use our DSpaceConfigurationFactoryBean. This bean will use our configured
-         DSpace ConfigurationService for all property substitution in Spring XML files -->
-    <bean id="dspaceConfigurationFactoryBean" class="org.dspace.servicemanager.config.DSpaceConfigurationFactoryBean">
-        <constructor-arg ref="org.dspace.services.ConfigurationService"/>
+    <!-- This wires up our ConfigurationService.getConfiguration() method to be called to provide its properties
+         to the above PropertySourcesPlaceholderConfigurer bean. -->
+    <bean id="dspaceConfiguration" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="org.dspace.services.ConfigurationService" />
+        <property name="targetMethod" value="getConfiguration" />
     </bean>
     <!-- end PROPERTY PLACEHOLDER SETUP-->
 

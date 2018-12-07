@@ -10,9 +10,9 @@ package org.dspace.core;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationConverter;
-import org.apache.log4j.Logger;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ConfigurationConverter;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -36,7 +36,7 @@ public class ConfigurationManager {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(ConfigurationManager.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ConfigurationManager.class);
 
     protected ConfigurationManager() {
 

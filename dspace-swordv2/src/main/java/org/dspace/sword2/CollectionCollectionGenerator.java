@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
@@ -26,7 +26,7 @@ import org.swordapp.server.SwordCollection;
  * DSpace Collections
  */
 public class CollectionCollectionGenerator implements AtomCollectionGenerator {
-    private static Logger log = Logger.getLogger(
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(
         CommunityCollectionGenerator.class);
 
     protected CollectionService collectionService =

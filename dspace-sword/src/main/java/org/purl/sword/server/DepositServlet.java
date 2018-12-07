@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.purl.sword.atom.Summary;
 import org.purl.sword.atom.Title;
 import org.purl.sword.base.ChecksumUtils;
@@ -73,7 +73,7 @@ public class DepositServlet extends HttpServlet {
     /**
      * Logger
      */
-    private static final Logger log = Logger.getLogger(DepositServlet.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DepositServlet.class);
 
     /**
      * Initialise the servlet.

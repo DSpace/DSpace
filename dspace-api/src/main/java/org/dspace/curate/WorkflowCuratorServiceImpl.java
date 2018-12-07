@@ -23,7 +23,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -58,7 +58,7 @@ public class WorkflowCuratorServiceImpl implements WorkflowCuratorService {
     /**
      * log4j logger
      */
-    private Logger log = Logger.getLogger(WorkflowCuratorServiceImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkflowCuratorServiceImpl.class);
 
     protected Map<String, TaskSet> tsMap = new HashMap<String, TaskSet>();
 

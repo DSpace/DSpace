@@ -7,7 +7,7 @@
  */
 package org.dspace.sort;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.text.filter.TextFilter;
 
 /**
@@ -40,7 +40,7 @@ import org.dspace.text.filter.TextFilter;
  * @author Graham Triggs
  */
 public abstract class AbstractTextFilterOFD implements OrderFormatDelegate {
-    private static final Logger log = Logger.getLogger(AbstractTextFilterOFD.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractTextFilterOFD.class);
 
     // Initialised in subclass in an object initializer
     protected TextFilter[] filters;

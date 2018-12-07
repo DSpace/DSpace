@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.abdera.i18n.iri.IRI;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -40,7 +40,7 @@ public class ReceiptGenerator {
     /**
      * logger
      */
-    private static Logger log = Logger.getLogger(ReceiptGenerator.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ReceiptGenerator.class);
 
     protected ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();

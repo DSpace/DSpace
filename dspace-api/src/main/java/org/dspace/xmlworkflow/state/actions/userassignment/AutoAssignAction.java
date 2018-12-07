@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AutoAssignAction extends UserSelectionAction {
 
-    private final Logger log = Logger.getLogger(AutoAssignAction.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(AutoAssignAction.class);
 
     @Autowired(required = true)
     protected GroupService groupService;

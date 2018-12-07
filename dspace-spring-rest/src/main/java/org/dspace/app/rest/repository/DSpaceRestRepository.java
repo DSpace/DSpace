@@ -14,7 +14,7 @@ import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -44,7 +44,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     extends AbstractDSpaceRestRepository
     implements PagingAndSortingRepository<T, ID> {
 
-    private static final Logger log = Logger.getLogger(DSpaceRestRepository.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceRestRepository.class);
 
     //Trick to make inner-calls to ourselves that are checked by Spring security
     //See:
