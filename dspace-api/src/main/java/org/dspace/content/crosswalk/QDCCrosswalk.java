@@ -19,13 +19,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -97,7 +98,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(QDCCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(QDCCrosswalk.class);
 
     // map of qdc to JDOM Element
     private Map<String, Element> qdc2element = new HashMap<String, Element>();
@@ -353,7 +354,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
             // only complain about missing elements in the DC schema:
             if (elt == null) {
-                if (metadataField.getMetadataSchema().getName().equals(MetadataSchema.DC_SCHEMA)) {
+                if (metadataField.getMetadataSchema().getName().equals(MetadataSchemaEnum.DC.getName())) {
                     log.warn("WARNING: " + myName + ": No QDC mapping for \"" + qdc + "\"");
                 }
             } else {

@@ -18,7 +18,7 @@ import java.util.Stack;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.EPerson;
@@ -50,7 +50,7 @@ import org.springframework.util.CollectionUtils;
  * @version $Revision$
  */
 public class Context implements AutoCloseable {
-    private static final Logger log = Logger.getLogger(Context.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Context.class);
     protected static final AtomicBoolean databaseUpdated = new AtomicBoolean(false);
 
     /**

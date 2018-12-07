@@ -22,7 +22,7 @@ import java.util.Map;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;

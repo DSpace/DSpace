@@ -7,7 +7,7 @@
  */
 package org.dspace.importer.external.metadatamapping.transform;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Removes the last point from an author name.

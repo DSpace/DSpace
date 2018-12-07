@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 
 /**
@@ -25,7 +25,7 @@ public class ContextUtil {
     /**
      * The log4j logger
      */
-    private static final Logger log = Logger.getLogger(ContextUtil.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContextUtil.class);
 
     /**
      * Where the context is stored on an HTTP Request object

@@ -85,8 +85,6 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for disseminator of
@@ -125,7 +123,8 @@ public abstract class AbstractMETSDisseminator
     /**
      * log4j category
      */
-    private static final Logger log = LoggerFactory.getLogger(AbstractMETSDisseminator.class);
+    private static org.apache.logging.log4j.Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(AbstractMETSDisseminator.class);
 
     // JDOM xml output writer - indented format for readability.
     protected static XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());

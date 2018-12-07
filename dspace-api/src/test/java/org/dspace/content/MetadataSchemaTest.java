@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -37,7 +37,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(MetadataSchemaTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataSchemaTest.class);
 
     /**
      * MetadataSchema instance for the tests
@@ -59,7 +59,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     public void init() {
         super.init();
         try {
-            this.ms = metadataSchemaService.find(context, MetadataSchema.DC_SCHEMA);
+            this.ms = metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName());
         } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -122,7 +122,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     @Test
     public void testGetSchemaID() throws SQLException {
         assertThat("testGetSchemaID 0", ms.getID(),
-                   equalTo(metadataSchemaService.find(context, MetadataSchema.DC_SCHEMA).getID()));
+                   equalTo(metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName()).getID()));
     }
 
     /**

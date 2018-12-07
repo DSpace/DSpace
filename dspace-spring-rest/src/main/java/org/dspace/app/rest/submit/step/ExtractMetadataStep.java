@@ -18,7 +18,7 @@ import gr.ekt.bte.core.Value;
 import gr.ekt.bte.dataloader.FileDataLoader;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
@@ -38,7 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
  * This submission step allows to extract metadata from an uploaded file to enrich or initialize a submission. The
  * processing is delegated to a list of extractor specialized by format (i.e. a Grobid extractor to get data from a PDF
  * file, an extractor to get data from bibliographic file such as BibTeX, etc)
- * 
+ *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class ExtractMetadataStep extends ExtractionStep implements UploadableStep {

@@ -19,7 +19,7 @@ import java.util.Set;
 import gr.ekt.bte.core.DataLoader;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.Value;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;

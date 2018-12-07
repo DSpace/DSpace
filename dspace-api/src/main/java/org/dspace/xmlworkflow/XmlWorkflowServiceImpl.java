@@ -22,7 +22,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -31,7 +31,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.InstallItemService;
@@ -84,7 +84,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     /* support for 'no notification' */
     protected Map<UUID, Boolean> noEMail = new HashMap<>();
 
-    private Logger log = Logger.getLogger(XmlWorkflowServiceImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowServiceImpl.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -573,7 +573,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
             // Get title
             List<MetadataValue> titles = itemService
-                .getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+                .getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
             String title = "";
             try {
                 title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
@@ -874,7 +874,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         // Add to item as a DC field
         itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+            .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                         "description", "provenance", "en", provDescription);
 
         //Clear any workflow schema related metadata
         itemService
@@ -1002,7 +1003,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         // Add message to the DC
         itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
+            .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                         "description", "provenance", "en", provmessage);
         itemService.update(context, myitem);
     }
 
