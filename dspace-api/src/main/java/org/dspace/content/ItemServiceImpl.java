@@ -1317,7 +1317,7 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     }
     @Override
-    public List<MetadataValue> getRelationshipMetadata(Item item, boolean extra) {
+    public List<MetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata) {
         Context context = new Context();
         List<MetadataValue> fullMetadataValueList = new LinkedList<>();
         try {
@@ -1326,7 +1326,8 @@ prevent the generation of resource policy entry values with null dspace_object a
             if (StringUtils.isNotBlank(entityType)) {
                 List<Relationship> relationships = relationshipService.findByItem(context, item);
                 for (Relationship relationship : relationships) {
-                    fullMetadataValueList.addAll(handleItemRelationship(item, entityType, relationship, extra));
+                    fullMetadataValueList.addAll(handleItemRelationship(item, entityType,
+                                                                        relationship, enableVirtualMetadata));
                 }
 
             }
@@ -1337,7 +1338,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private List<MetadataValue> handleItemRelationship(Item item, String entityType,
-                                                       Relationship relationship, boolean extra) {
+                                                       Relationship relationship, boolean enableVirtualMetadata) {
         List<MetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
         HashMap<String, List<String>> hashMaps = new HashMap<>();
@@ -1355,7 +1356,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             relationName = relationship.getRelationshipType().getRightLabel();
         }
 
-        if (hashMaps != null && extra) {
+        if (hashMaps != null && enableVirtualMetadata) {
             resultingMetadataValueList.addAll(handleRelationshipTypeMetadataMappping(item, hashMaps,
                                                                                      otherItem, relationName));
         }
