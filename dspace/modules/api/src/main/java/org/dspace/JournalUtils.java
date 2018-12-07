@@ -723,7 +723,7 @@ public class JournalUtils {
                     msDate.set(Calendar.DATE, dateParts.get(2).asInt());
                 }
                 if (msDate.after(today)) {
-                    throw new RESTModelException("CrossRef match has publication date in the future: " + msDate.get(Calendar.YEAR) + "-" + msDate.get(Calendar.MONTH) + "-" + msDate.get(Calendar.DATE));
+                    throw new RESTModelException("CrossRef match has publication date in the future: " + msDate.get(Calendar.YEAR) + "-" + msDate.get(Calendar.MONTH)+1 + "-" + msDate.get(Calendar.DATE));
                 }
                 manuscript.setPublicationDate(msDate.getTime());
             } catch (Exception e) {
