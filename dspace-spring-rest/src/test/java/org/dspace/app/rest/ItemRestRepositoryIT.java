@@ -1696,4 +1696,33 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk());
     }
 
+    @Test
+    public void deleteOneWrongUuidResourceNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder
+            .createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. One public item, one workspace item and one template item.
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item 1")
+                                     .withIssueDate("2017-10-17")
+                                     .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                     .withSubject("ExtraEntry")
+                                     .build();
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        //Delete public item
+        getClient(token).perform(delete("/api/core/items/" + parentCommunity.getID()))
+                        .andExpect(status().is(404));
+
+    }
+
 }
