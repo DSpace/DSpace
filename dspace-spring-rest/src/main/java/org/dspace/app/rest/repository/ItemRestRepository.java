@@ -181,6 +181,10 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         Item item = null;
         try {
             item = is.find(context, id);
+            if (item == null) {
+                throw new ResourceNotFoundException(ItemRest.CATEGORY + "." + ItemRest.NAME +
+                                                        " with id: " + id + " not found");
+            }
             if (is.isInProgressSubmission(context, item)) {
                 throw new UnprocessableEntityException("The item cannot be deleted. "
                         + "It's part of a in-progress submission.");
