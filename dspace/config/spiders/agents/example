@@ -1,6 +1,6 @@
-Mozilla/5\.0 \(compatible; PRTG Network Monitor \(www\.paessler\.com\); Windows\)
-Mozilla/5\.0 \(compatible; monitis \- premium monitoring service; http://www\.monitis\.com\)
-Pingdom\.com_bot_version_1\.4_\(http://www\.pingdom\.com/\)
+Mozilla\/5\.0 \(compatible; PRTG Network Monitor \(www\.paessler\.com\); Windows\)
+Mozilla\/5\.0 \(compatible; monitis \- premium monitoring service; http:\/\/www\.monitis\.com\)
+Pingdom\.com_bot_version_1\.4_\(http:\/\/www\.pingdom\.com\/\)
 Alexandria(\s|\+)prototype(\s|\+)project
 AllenTrack
 Arachmo
@@ -46,7 +46,7 @@ Webinator
 Webmetrics
 Wget
 Xenu(\s|\+)Link(\s|\+)Sleuth
-[+:,\.\;\/\\-]bot
+#[+:,\.\;\/\\-]bot
 [^a]fish
 ^voyager\/
 acme\.spider
@@ -71,7 +71,7 @@ blogpulse
 boitho\.com\-dc
 bookmark\-manager
 bot
-bot[+:,\.\;\/\\-]
+#bot[+:,\.\;\/\\-]
 bspider
 bwh3_user_agent
 celestial
