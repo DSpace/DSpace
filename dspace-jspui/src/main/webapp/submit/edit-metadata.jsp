@@ -1570,7 +1570,7 @@
 		
 %>
 
-  <form action="<%= request.getContextPath() %>/submit#<%= si.getJumpToField()%>" method="post" name="edit_metadata" id="edit_metadata" onkeydown="return disableEnterKey(event);">
+  <form action="<%= request.getContextPath() %>/submit#<%= si.getJumpToField()%>" method="post" name="edit_metadata" id="edit_metadata">
 
         <jsp:include page="/submit/progressbar.jsp"></jsp:include>
 
@@ -1837,7 +1837,20 @@ j(document).ready(
 		{			
 			<%@ include file="/deduplication/javascriptDeduplication.jsp" %>
 		}		
+
 );
+
+/*
+ * Don't discard 'Enter' input in general, since it
+ * prevents users from inserting a carriage return in
+ * textareas, which might contain several paragraphs
+ * (e.g. description, abstract).
+ */
+j("form").on("keypress", ":input:not(textarea)", function(event) {
+	if (event.keyCode == 13) {
+		event.preventDefault();
+	}
+})
 
 </script>
 <%@ include file="/deduplication/template.jsp" %>
