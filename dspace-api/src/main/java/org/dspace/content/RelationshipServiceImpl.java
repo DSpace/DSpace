@@ -288,6 +288,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         return listToReturn;
     }
 
+    @Override
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
                                                             RelationshipType relationshipType)
         throws SQLException {
