@@ -135,7 +135,7 @@
  %>
       <li>
         <a onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
-                  document.repost.submit();" href="<%= currentPage %>?locale=<%=supportedLocales[i].toString()%>">
+                 document.repost.submit();" href="javascript:updateURLParam('locale', '<%=supportedLocales[i].toString()%>');">
          <%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>
        </a>
       </li>
