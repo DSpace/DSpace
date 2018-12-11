@@ -93,4 +93,26 @@ jQuery(document).ready(function($){
 		controllerDiv.append(nextArrow);
 		$(this).find('.panel-heading > .panel-title').append(controllerDiv);
 	});
+    addConfirmationBeforeAnyDeleteAction();
 });
+
+/*
+ * Adds an event listener to any button/link that potentially deletes
+ * items, e.g. CRIS items, boxes, tabs, etc.
+ */
+function addConfirmationBeforeAnyDeleteAction() {
+  function addConfirmation() {
+    this.addEventListener('click', function(event) {
+      event.preventDefault();
+      var choice = confirm("Are you sure you want delete this item?");
+      if (choice) window.location.href = this.getAttribute('href');
+    });
+  }
+
+  // CRIS items, like RPs, OrgUnits, Projects, etc.
+  j('[id^=delete]').each(addConfirmation);
+
+  // JDynA items, like tabs, boxes, etc.
+  j('.jdynaremovebutton').each(addConfirmation);
+}
+
