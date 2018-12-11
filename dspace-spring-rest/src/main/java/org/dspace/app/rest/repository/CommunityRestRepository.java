@@ -19,18 +19,16 @@ import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
+import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
-import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
@@ -60,7 +58,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     CommunityConverter converter;
 
     @Autowired
-    DSpaceObjectUtils dspaceObjectUtils;
+    MetadataConverter metadataConverter;
 
     @Autowired
     CommunityRestEqualityUtils communityRestEqualityUtils;
@@ -104,13 +102,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
             }
             community = cs.create(parent, context);
             cs.update(context, community);
-            if (communityRest.getMetadata() != null) {
-                for (MetadataEntryRest mer : communityRest.getMetadata()) {
-                    String[] metadatakey = mer.getKey().split("\\.");
-                    cs.addMetadata(context, community, metadatakey[0], metadatakey[1],
-                            metadatakey.length == 3 ? metadatakey[2] : null, mer.getLanguage(), mer.getValue());
-                }
-            }
+            metadataConverter.setMetadata(context, community, communityRest.getMetadata());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -201,15 +193,19 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     protected CommunityRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
                        JsonNode jsonNode)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
-        CommunityRest communityRest = new Gson().fromJson(jsonNode.toString(), CommunityRest.class);
+        CommunityRest communityRest;
+        try {
+            communityRest = new ObjectMapper().readValue(jsonNode.toString(), CommunityRest.class);
+        } catch (IOException e) {
+            throw new UnprocessableEntityException("Error parsing community json: " + e.getMessage());
+        }
         Community community = cs.find(context, id);
         if (community == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
         CommunityRest originalCommunityRest = converter.fromModel(community);
         if (communityRestEqualityUtils.isCommunityRestEqualWithoutMetadata(originalCommunityRest, communityRest)) {
-            List<MetadataEntryRest> metadataEntryRestList = communityRest.getMetadata();
-            community = (Community) dspaceObjectUtils.replaceMetadataValues(context, community, metadataEntryRestList);
+            metadataConverter.setMetadata(context, community, communityRest.getMetadata());
         } else {
             throw new UnprocessableEntityException("The given JSON and the original Community differ more " +
                                                        "than just the metadata");

@@ -29,9 +29,9 @@ public class EPersonMatcher {
             hasJsonPath("$.type", is("eperson")),
             hasJsonPath("$.canLogIn", not(empty())),
             hasJsonPath("$._links.self.href", containsString("/api/eperson/epersons/" + ePerson.getID().toString())),
-            hasJsonPath("$.metadata", Matchers.hasItems(
-                EPersonMetadataMatcher.matchFirstName(ePerson.getFirstName()),
-                EPersonMetadataMatcher.matchLastName(ePerson.getLastName())
+            hasJsonPath("$.metadata", Matchers.allOf(
+                MetadataMatcher.matchMetadata("eperson.firstname", ePerson.getFirstName()),
+                MetadataMatcher.matchMetadata("eperson.lastname", ePerson.getLastName())
             ))
         );
     }

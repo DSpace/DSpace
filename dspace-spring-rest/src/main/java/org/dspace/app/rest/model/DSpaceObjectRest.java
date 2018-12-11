@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.List;
-
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -22,7 +20,7 @@ public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
     private String name;
     private String handle;
 
-    List<MetadataEntryRest> metadata;
+    MetadataRest metadata = new MetadataRest();
 
     @Override
     public String getId() {
@@ -53,11 +51,11 @@ public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
         this.handle = handle;
     }
 
-    public List<MetadataEntryRest> getMetadata() {
+    public MetadataRest getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(List<MetadataEntryRest> metadata) {
+    public void setMetadata(MetadataRest metadata) {
         this.metadata = metadata;
     }
 

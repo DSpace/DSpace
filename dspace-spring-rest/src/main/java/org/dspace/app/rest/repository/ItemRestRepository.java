@@ -22,16 +22,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ItemConverter;
+import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.ItemPatch;
-import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -68,6 +67,9 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     ItemConverter converter;
 
     @Autowired
+    MetadataConverter metadataConverter;
+
+    @Autowired
     ItemPatch itemPatch;
 
     @Autowired
@@ -78,9 +80,6 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
     @Autowired
     CollectionService collectionService;
-
-    @Autowired
-    DSpaceObjectUtils dspaceObjectUtils;
 
     @Autowired
     InstallItemService installItemService;
@@ -239,7 +238,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         item.setOwningCollection(collection);
         item.setDiscoverable(itemRest.getDiscoverable());
         item.setLastModified(itemRest.getLastModified());
-        dspaceObjectUtils.replaceMetadataValues(context, item, itemRest.getMetadata());
+        metadataConverter.setMetadata(context, item, itemRest.getMetadata());
 
         Item itemToReturn = installItemService.installItem(context, workspaceItem);
 
@@ -266,10 +265,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         }
 
         if (StringUtils.equals(uuid.toString(), itemRest.getId())) {
-            List<MetadataEntryRest> metadataEntryRestList = itemRest.getMetadata();
-            item = (Item) dspaceObjectUtils.replaceMetadataValues(context,
-                                                                              item,
-                                                                              metadataEntryRestList);
+            metadataConverter.setMetadata(context, item, itemRest.getMetadata());
         } else {
             throw new IllegalArgumentException("The UUID in the Json and the UUID in the url do not match: "
                                                    + uuid + ", "
