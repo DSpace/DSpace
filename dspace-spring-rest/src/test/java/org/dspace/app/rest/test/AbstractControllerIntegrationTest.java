@@ -33,7 +33,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -58,8 +57,6 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(classes = Application.class)
 // Load DSpaceKernelInitializer in Spring ApplicationContext (to initialize DSpace Kernel)
 @ContextConfiguration(initializers = DSpaceKernelInitializer.class)
-// Tell Spring to remove all cached Contexts and rebuild ApplicationContext *for each test class*
-@DirtiesContext
 // Tell Spring to make ApplicationContext an instance of WebApplicationContext (for web-based tests)
 @WebAppConfiguration
 public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
