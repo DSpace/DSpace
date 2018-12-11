@@ -22,6 +22,7 @@ import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Application;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -54,7 +56,8 @@ import org.springframework.web.context.WebApplicationContext;
 // NOTE: By default, Spring caches and reuses ApplicationContext for each integration test (to speed up tests)
 // See: https://docs.spring.io/spring/docs/current/spring-framework-reference/testing.html#integration-testing
 @SpringBootTest(classes = Application.class)
-//@ContextConfiguration(initializers = DSpaceKernelInitializer.class)
+// Load DSpaceKernelInitializer in Spring ApplicationContext (to initialize DSpace Kernel)
+@ContextConfiguration(initializers = DSpaceKernelInitializer.class)
 // Tell Spring to remove all cached Contexts and rebuild ApplicationContext *for each test class*
 @DirtiesContext
 // Tell Spring to make ApplicationContext an instance of WebApplicationContext (for web-based tests)
