@@ -8,8 +8,8 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -30,9 +30,9 @@ public class BitstreamMatcher {
             hasJsonPath("$.uuid", is(bitstream.getID().toString())),
             hasJsonPath("$.name", is(bitstream.getName())),
             hasJsonPath("$.bundleName", is("ORIGINAL")),
-            hasJsonPath("$.metadata", containsInAnyOrder(
-                BitstreamMetadataMatcher.matchTitle(bitstream.getName()),
-                BitstreamMetadataMatcher.matchDescription(bitstream.getDescription())
+            hasJsonPath("$.metadata", allOf(
+                    matchMetadata("dc.title", bitstream.getName()),
+                    matchMetadata("dc.description", bitstream.getDescription())
             )),
             hasJsonPath("$.sizeBytes", is((int) bitstream.getSizeBytes())),
             hasJsonPath("$.checkSum", matchChecksum()),

@@ -25,6 +25,7 @@ import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -53,6 +54,9 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     // https://docs.spring.io/spring/docs/4.3.18.RELEASE/spring-framework-reference/htmlsingle/#aop-understanding-aop-proxies
     @Autowired
     private DSpaceRestRepository<T, ID> thisRepository;
+
+    @Autowired
+    private MetadataFieldService metadataFieldService;
 
     @Override
     public <S extends T> S save(S entity) {

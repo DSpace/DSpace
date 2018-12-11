@@ -8,7 +8,6 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,7 +20,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -38,8 +36,10 @@ import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.ItemMatcher;
+import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
+import org.dspace.app.rest.model.MetadataRest;
+import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -1449,31 +1449,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         itemRest.setDiscoverable(true);
         itemRest.setWithdrawn(false);
 
-        MetadataEntryRest description = new MetadataEntryRest();
-        description.setKey("dc.description");
-        description.setValue("<p>Some cool HTML code here</p>");
-
-        MetadataEntryRest abs = new MetadataEntryRest();
-        abs.setKey("dc.description.abstract");
-        abs.setValue("Sample item created via the REST API");
-
-        MetadataEntryRest contents = new MetadataEntryRest();
-        contents.setKey("dc.description.tableofcontents");
-        contents.setValue("<p>HTML News</p>");
-
-        MetadataEntryRest copyright = new MetadataEntryRest();
-        copyright.setKey("dc.rights");
-        copyright.setValue("Custom Copyright Text");
-
-        MetadataEntryRest title = new MetadataEntryRest();
-        title.setKey("dc.title");
-        title.setValue("Title Text");
-
-        itemRest.setMetadata(Arrays.asList(description,
-                                                 abs,
-                                                 contents,
-                                                 copyright,
-                                                 title));
+        itemRest.setMetadata(new MetadataRest()
+                .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract", new MetadataValueRest("Sample item created via the REST API"))
+                .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
+                .put("dc.title", new MetadataValueRest("Title Text")));
 
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
@@ -1496,18 +1477,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.name", is("Title Text")),
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.title')].value",
-                                        contains("Title Text")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.rights')].value",
-                                        contains("Custom Copyright Text")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description.tableofcontents')].value",
-                                        contains("<p>HTML News</p>")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description.abstract')].value",
-                                        contains("Sample item created via the REST API")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description')].value",
-                                        contains("<p>Some cool HTML code here</p>"))
-
-                            )));
+                            hasJsonPath("$.metadata", Matchers.allOf(
+                                MetadataMatcher.matchMetadata("dc.description",
+                                    "<p>Some cool HTML code here</p>"),
+                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                    "Sample item created via the REST API"),
+                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                    "<p>HTML News</p>"),
+                                MetadataMatcher.matchMetadata("dc.rights",
+                                    "Custom Copyright Text"),
+                                MetadataMatcher.matchMetadata("dc.title",
+                                    "Title Text")
+                            )))));
     }
 
     @Test
@@ -1532,31 +1513,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         itemRest.setDiscoverable(true);
         itemRest.setWithdrawn(false);
 
-        MetadataEntryRest description = new MetadataEntryRest();
-        description.setKey("dc.description");
-        description.setValue("<p>Some cool HTML code here</p>");
-
-        MetadataEntryRest abs = new MetadataEntryRest();
-        abs.setKey("dc.description.abstract");
-        abs.setValue("Sample item created via the REST API");
-
-        MetadataEntryRest contents = new MetadataEntryRest();
-        contents.setKey("dc.description.tableofcontents");
-        contents.setValue("<p>HTML News</p>");
-
-        MetadataEntryRest copyright = new MetadataEntryRest();
-        copyright.setKey("dc.rights");
-        copyright.setValue("Custom Copyright Text");
-
-        MetadataEntryRest title = new MetadataEntryRest();
-        title.setKey("dc.title");
-        title.setValue("Title Text");
-
-        itemRest.setMetadata(Arrays.asList(description,
-                                           abs,
-                                           contents,
-                                           copyright,
-                                           title));
 
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
@@ -1571,18 +1527,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String itemUuidString = String.valueOf(map.get("uuid"));
         String itemHandleString = String.valueOf(map.get("handle"));
 
-
-        title.setValue("New title");
-        copyright.setValue("New Custom Copyright Text");
+        itemRest.setMetadata(new MetadataRest()
+                .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract", new MetadataValueRest("Sample item created via the REST API"))
+                .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights", new MetadataValueRest("New Custom Copyright Text"))
+                .put("dc.title", new MetadataValueRest("New title")));
 
         itemRest.setUuid(itemUuidString);
         itemRest.setHandle(itemHandleString);
-        itemRest.setMetadata(Arrays.asList(description,
-                                           abs,
-                                           contents,
-                                           copyright,
-                                           title));
-        itemRest.setName("New title");
 
         mvcResult = getClient(token).perform(put("/api/core/items/" + itemUuidString)
                                                            .content(mapper.writeValueAsBytes(itemRest))
@@ -1602,18 +1555,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.name", is("New title")),
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.title')].value",
-                                        contains("New title")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.rights')].value",
-                                        contains("New Custom Copyright Text")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description.tableofcontents')].value",
-                                        contains("<p>HTML News</p>")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description.abstract')].value",
-                                        contains("Sample item created via the REST API")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description')].value",
-                                        contains("<p>Some cool HTML code here</p>"))
-
-                            )));
+                            hasJsonPath("$.metadata", Matchers.allOf(
+                                MetadataMatcher.matchMetadata("dc.description",
+                                    "<p>Some cool HTML code here</p>"),
+                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                    "Sample item created via the REST API"),
+                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                    "<p>HTML News</p>"),
+                                MetadataMatcher.matchMetadata("dc.rights",
+                                    "New Custom Copyright Text"),
+                                MetadataMatcher.matchMetadata("dc.title",
+                                    "New title")
+                            )))));
     }
 
 
@@ -1642,31 +1595,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         itemRest.setDiscoverable(true);
         itemRest.setWithdrawn(false);
 
-        MetadataEntryRest description = new MetadataEntryRest();
-        description.setKey("dc.description");
-        description.setValue("<p>Some cool HTML code here</p>");
-
-        MetadataEntryRest abs = new MetadataEntryRest();
-        abs.setKey("dc.description.abstract");
-        abs.setValue("Sample item created via the REST API");
-
-        MetadataEntryRest contents = new MetadataEntryRest();
-        contents.setKey("dc.description.tableofcontents");
-        contents.setValue("<p>HTML News</p>");
-
-        MetadataEntryRest copyright = new MetadataEntryRest();
-        copyright.setKey("dc.rights");
-        copyright.setValue("Custom Copyright Text");
-
-        MetadataEntryRest title = new MetadataEntryRest();
-        title.setKey("dc.title");
-        title.setValue("Title Text");
-
-        itemRest.setMetadata(Arrays.asList(description,
-                                           abs,
-                                           contents,
-                                           copyright,
-                                           title));
+        itemRest.setMetadata(new MetadataRest()
+                .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract", new MetadataValueRest("Sample item created via the REST API"))
+                .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
+                .put("dc.title", new MetadataValueRest("Title Text")));
 
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
@@ -1690,18 +1624,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.name", is("Title Text")),
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.title')].value",
-                                        contains("Title Text")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.rights')].value",
-                                        contains("Custom Copyright Text")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description.tableofcontents')].value",
-                                        contains("<p>HTML News</p>")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description.abstract')].value",
-                                        contains("Sample item created via the REST API")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description')].value",
-                                        contains("<p>Some cool HTML code here</p>"))
-
-                        )));
+                            hasJsonPath("$.metadata", Matchers.allOf(
+                                MetadataMatcher.matchMetadata("dc.description",
+                                    "<p>Some cool HTML code here</p>"),
+                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                    "Sample item created via the REST API"),
+                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                    "<p>HTML News</p>"),
+                                MetadataMatcher.matchMetadata("dc.rights",
+                                    "Custom Copyright Text"),
+                                MetadataMatcher.matchMetadata("dc.title",
+                                    "Title Text")
+                            )))));
 
         getClient(token).perform(delete("/api/core/items/" + itemUuidString))
                         .andExpect(status().isNoContent());
@@ -1735,31 +1669,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         itemRest.setDiscoverable(true);
         itemRest.setWithdrawn(false);
 
-        MetadataEntryRest description = new MetadataEntryRest();
-        description.setKey("dc.description");
-        description.setValue("<p>Some cool HTML code here</p>");
-
-        MetadataEntryRest abs = new MetadataEntryRest();
-        abs.setKey("dc.description.abstract");
-        abs.setValue("Sample item created via the REST API");
-
-        MetadataEntryRest contents = new MetadataEntryRest();
-        contents.setKey("dc.description.tableofcontents");
-        contents.setValue("<p>HTML News</p>");
-
-        MetadataEntryRest copyright = new MetadataEntryRest();
-        copyright.setKey("dc.rights");
-        copyright.setValue("Custom Copyright Text");
-
-        MetadataEntryRest title = new MetadataEntryRest();
-        title.setKey("dc.title");
-        title.setValue("Title Text");
-
-        itemRest.setMetadata(Arrays.asList(description,
-                                           abs,
-                                           contents,
-                                           copyright,
-                                           title));
+        itemRest.setMetadata(new MetadataRest()
+                .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract", new MetadataValueRest("Sample item created via the REST API"))
+                .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
+                .put("dc.title", new MetadataValueRest("Title Text")));
 
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
@@ -1783,18 +1698,18 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.name", is("Title Text")),
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.title')].value",
-                                        contains("Title Text")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.rights')].value",
-                                        contains("Custom Copyright Text")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description.tableofcontents')].value",
-                                        contains("<p>HTML News</p>")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description.abstract')].value",
-                                        contains("Sample item created via the REST API")),
-                            hasJsonPath("$.metadata[?(@.key=='dc.description')].value",
-                                        contains("<p>Some cool HTML code here</p>"))
-
-                        )));
+                            hasJsonPath("$.metadata", Matchers.allOf(
+                                MetadataMatcher.matchMetadata("dc.description",
+                                    "<p>Some cool HTML code here</p>"),
+                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                    "Sample item created via the REST API"),
+                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                    "<p>HTML News</p>"),
+                                MetadataMatcher.matchMetadata("dc.rights",
+                                    "Custom Copyright Text"),
+                                MetadataMatcher.matchMetadata("dc.title",
+                                    "Title Text")
+                            )))));
 
         getClient().perform(delete("/api/core/items/" + itemUuidString))
                         .andExpect(status().isUnauthorized());
