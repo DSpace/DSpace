@@ -76,6 +76,10 @@ public class EPerson extends DSpaceObject
     // stub Eperson, just for Dash use:
     public EPerson() {}
 
+    public EPerson(int dashUserID) {
+        this.dashUserID = dashUserID;
+    }
+
     /**
      * Construct an EPerson
      * 

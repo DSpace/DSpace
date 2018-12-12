@@ -190,7 +190,7 @@ public class DashService {
 
             if (pkg.getDataPackage().getSubmitter() != null) {
                 // need to find the equivalent user in Dash and set the userId
-                int dashUserId = getDashUser(pkg.getDataPackage().getSubmitter());
+                int dashUserId = getDashUser(pkg.getDataPackage());
                 if (dashUserId != 0) {
                     ObjectNode jsonObj = (ObjectNode) mapper.readTree(dashJSON);
                     jsonObj.put("userId", dashUserId);
@@ -476,29 +476,35 @@ public class DashService {
         return null;
     }
 
-    private int getDashUser(EPerson eperson) {
-        try {
-            URI uri = UriBuilder.fromUri(dashServer + "/api/users/").queryParam("ePersonId", Integer.toString(eperson.getID())).build();
-            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
-            connection.setRequestMethod("GET");
+    private int getDashUser(DryadDataPackage dryadDataPackage) {
+        EPerson eperson = dryadDataPackage.getSubmitter();
+        if (dryadDataPackage.getItem() != null) {
+            try {
+                URI uri = UriBuilder.fromUri(dashServer + "/api/users/").queryParam("ePersonId", Integer.toString(eperson.getID())).build();
+                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+                connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+                connection.setRequestMethod("GET");
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line = null;
-            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
-            while ((line = reader.readLine()) != null) {
-                out.append(line);
-            }
-            JsonNode rootNode = mapper.readTree(out.toString());
-            JsonNode usersNode = rootNode.path("_embedded").path("stash:users");
-            if (!usersNode.isMissingNode() && usersNode.isArray()) {
-                return usersNode.get(0).path("id").intValue();
-            }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line = null;
+                StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+                while ((line = reader.readLine()) != null) {
+                    out.append(line);
+                }
+                JsonNode rootNode = mapper.readTree(out.toString());
+                JsonNode usersNode = rootNode.path("_embedded").path("stash:users");
+                if (!usersNode.isMissingNode() && usersNode.isArray()) {
+                    return usersNode.get(0).path("id").intValue();
+                }
 
-        } catch (Exception e) {
-            log.fatal("Unable to get user from Dash", e);
+            } catch (Exception e) {
+                log.fatal("Unable to get user from Dash", e);
+            }
+        } else {
+            // if it's not a Dspace item, the submitter is already a dash user
+            return eperson.getID();
         }
         return 0;
     }
