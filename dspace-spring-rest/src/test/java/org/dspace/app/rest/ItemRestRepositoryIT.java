@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -1499,6 +1500,112 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         contains("Title Text")),
                             hasJsonPath("$.metadata[?(@.key=='dc.rights')].value",
                                         contains("Custom Copyright Text")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.description.tableofcontents')].value",
+                                        contains("<p>HTML News</p>")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.description.abstract')].value",
+                                        contains("Sample item created via the REST API")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.description')].value",
+                                        contains("<p>Some cool HTML code here</p>"))
+
+                            )));
+    }
+
+    @Test
+    public void updateTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        ItemRest itemRest = new ItemRest();
+        itemRest.setName("Practices of research data curation in institutional repositories:" +
+                             " A qualitative view from repository staff");
+        itemRest.setOwningCollectionUuid(col1.getID().toString());
+        itemRest.setInArchive(true);
+        itemRest.setDiscoverable(true);
+        itemRest.setWithdrawn(false);
+
+        MetadataEntryRest description = new MetadataEntryRest();
+        description.setKey("dc.description");
+        description.setValue("<p>Some cool HTML code here</p>");
+
+        MetadataEntryRest abs = new MetadataEntryRest();
+        abs.setKey("dc.description.abstract");
+        abs.setValue("Sample item created via the REST API");
+
+        MetadataEntryRest contents = new MetadataEntryRest();
+        contents.setKey("dc.description.tableofcontents");
+        contents.setValue("<p>HTML News</p>");
+
+        MetadataEntryRest copyright = new MetadataEntryRest();
+        copyright.setKey("dc.rights");
+        copyright.setValue("Custom Copyright Text");
+
+        MetadataEntryRest title = new MetadataEntryRest();
+        title.setKey("dc.title");
+        title.setValue("Title Text");
+
+        itemRest.setMetadata(Arrays.asList(description,
+                                           abs,
+                                           contents,
+                                           copyright,
+                                           title));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items")
+                                                           .content(mapper.writeValueAsBytes(itemRest))
+                                                           .contentType(contentType))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String itemUuidString = String.valueOf(map.get("uuid"));
+        String itemHandleString = String.valueOf(map.get("handle"));
+
+
+        title.setValue("New title");
+        copyright.setValue("New Custom Copyright Text");
+
+        itemRest.setUuid(itemUuidString);
+        itemRest.setHandle(itemHandleString);
+        itemRest.setMetadata(Arrays.asList(description,
+                                           abs,
+                                           contents,
+                                           copyright,
+                                           title));
+        itemRest.setName("New title");
+
+        mvcResult = getClient(token).perform(put("/api/core/items/" + itemUuidString)
+                                                           .content(mapper.writeValueAsBytes(itemRest))
+                                                           .contentType(contentType))
+                                              .andExpect(status().isOk())
+                                              .andReturn();
+        map = mapper.readValue(content, Map.class);
+        itemUuidString = String.valueOf(map.get("uuid"));
+        itemHandleString = String.valueOf(map.get("handle"));
+
+        //TODO Refactor this to use the converter to Item instead of checking every property separately
+        getClient(token).perform(get("/api/core/items/" + itemUuidString))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.id", is(itemUuidString)),
+                            hasJsonPath("$.uuid", is(itemUuidString)),
+                            hasJsonPath("$.name", is("New title")),
+                            hasJsonPath("$.handle", is(itemHandleString)),
+                            hasJsonPath("$.type", is("item")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.title')].value",
+                                        contains("New title")),
+                            hasJsonPath("$.metadata[?(@.key=='dc.rights')].value",
+                                        contains("New Custom Copyright Text")),
                             hasJsonPath("$.metadata[?(@.key=='dc.description.tableofcontents')].value",
                                         contains("<p>HTML News</p>")),
                             hasJsonPath("$.metadata[?(@.key=='dc.description.abstract')].value",
