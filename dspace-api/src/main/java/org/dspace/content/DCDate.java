@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 // FIXME: Not very robust - assumes dates will always be valid
 
@@ -45,7 +45,7 @@ public class DCDate {
     /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(DCDate.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DCDate.class);
 
     // UTC timezone
     private static final TimeZone utcZone = TimeZone.getTimeZone("UTC");

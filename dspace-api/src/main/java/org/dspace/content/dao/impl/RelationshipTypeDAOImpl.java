@@ -38,6 +38,7 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
         return uniqueResult(context, criteriaQuery, false, RelationshipType.class, -1, -1);
     }
 
+    @Override
     public List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);

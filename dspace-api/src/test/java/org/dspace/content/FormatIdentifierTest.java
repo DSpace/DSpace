@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.io.FileInputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
@@ -33,7 +33,7 @@ public class FormatIdentifierTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(FormatIdentifierTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(FormatIdentifierTest.class);
 
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()

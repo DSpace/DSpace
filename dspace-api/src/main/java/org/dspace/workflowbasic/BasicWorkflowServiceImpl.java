@@ -21,8 +21,8 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -31,7 +31,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
@@ -104,7 +104,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
     /**
      * log4j logger
      */
-    private final Logger log = Logger.getLogger(BasicWorkflowServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicWorkflowServiceImpl.class);
 
     @Override
     public int getWorkflowID(String state) {
@@ -910,8 +910,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
             + rejection_message + " on " + now + " (GMT) ";
 
         // Add to item as a DC field
-        itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        itemService.addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                         "description", "provenance", "en", provDescription);
         itemService.update(context, myitem);
 
         // convert into personal workspace
@@ -1135,8 +1135,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
         provDescription += installItemService.getBitstreamProvenanceMessage(context, item);
 
         // Add to item as a DC field
-        itemService
-            .addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provDescription);
         itemService.update(context, item);
     }
 
@@ -1163,8 +1163,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
         provmessage += installItemService.getBitstreamProvenanceMessage(context, myitem);
 
         // Add message to the DC
-        itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
+        itemService.addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provmessage);
         itemService.update(context, myitem);
     }
 

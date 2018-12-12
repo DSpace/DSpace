@@ -7,8 +7,8 @@
  */
 package org.dspace.xoai.filter.results;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Lyncode Development Team (dspace at lyncode dot com)

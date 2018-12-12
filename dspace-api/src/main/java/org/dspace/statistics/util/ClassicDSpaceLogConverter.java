@@ -28,7 +28,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.statistics.LogAnalyser;
 import org.dspace.app.statistics.LogLine;
 import org.dspace.content.DSpaceObject;
@@ -44,7 +44,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
  * @see StatisticsImporter
  */
 public class ClassicDSpaceLogConverter {
-    private final Logger log = Logger.getLogger(ClassicDSpaceLogConverter.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ClassicDSpaceLogConverter.class);
 
     /**
      * A DSpace context

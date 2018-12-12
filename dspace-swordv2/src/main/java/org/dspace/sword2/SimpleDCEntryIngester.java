@@ -12,8 +12,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -36,7 +36,7 @@ import org.swordapp.server.SwordServerException;
 public class SimpleDCEntryIngester extends AbstractSimpleDC
     implements SwordEntryIngester {
     private static final Logger log =
-        Logger.getLogger(SimpleDCEntryIngester.class);
+        org.apache.logging.log4j.LogManager.getLogger(SimpleDCEntryIngester.class);
 
     protected WorkspaceItemService workspaceItemService =
         ContentServiceFactory.getInstance().getWorkspaceItemService();

@@ -26,8 +26,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -37,6 +37,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Entity;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
@@ -102,7 +103,7 @@ public class MetadataImport {
     /**
      * Logger
      */
-    protected static final Logger log = Logger.getLogger(MetadataImport.class);
+    protected static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataImport.class);
 
     protected final AuthorityValueService authorityValueService;
 
@@ -356,7 +357,7 @@ public class MetadataImport {
                         // Add the metadata to the item
                         List<BulkEditMetadataValue> relationships = new LinkedList<>();
                         for (BulkEditMetadataValue dcv : whatHasChanged.getAdds()) {
-                            if (StringUtils.equals(dcv.getSchema(), "relation")) {
+                            if (StringUtils.equals(dcv.getSchema(), MetadataSchemaEnum.RELATION.getName())) {
 
                                 if (!StringUtils.equals(dcv.getElement(), "type")) {
                                     relationships.add(dcv);
@@ -637,14 +638,12 @@ public class MetadataImport {
             }
 
 
-            if (StringUtils.equals(schema, "relation")) {
+            if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
                 List<RelationshipType> relationshipTypeList = relationshipTypeService
-                                                                .findByLeftOrRightLabel(c, element);
+                    .findByLeftOrRightLabel(c, element);
                 for (RelationshipType relationshipType : relationshipTypeList) {
                     for (Relationship relationship : relationshipService
-                                                        .findByItemAndRelationshipType(c,
-                                                                                       item,
-                                                                                       relationshipType)) {
+                        .findByItemAndRelationshipType(c, item, relationshipType)) {
                         relationshipService.delete(c, relationship);
                         relationshipService.update(c, relationship);
                     }
@@ -768,7 +767,7 @@ public class MetadataImport {
         }
         relationship.setRelationshipType(acceptedRelationshipType);
         relationship.setLeftPlace(relationshipService.findLeftPlaceByLeftItem(c, relationship.getLeftItem()) + 1);
-        relationship.setRightPlace(relationshipService.findRightPlaceByRightItem(c, relationship.getLeftItem()) + 1);
+        relationship.setRightPlace(relationshipService.findRightPlaceByRightItem(c, relationship.getRightItem()) + 1);
         Relationship persistedRelationship = relationshipService.create(c, relationship);
         relationshipService.update(c, persistedRelationship);
     }

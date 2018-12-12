@@ -10,7 +10,7 @@ package org.dspace.content;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.MetadataSchemaDAO;
@@ -31,7 +31,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(MetadataSchemaServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataSchemaServiceImpl.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;

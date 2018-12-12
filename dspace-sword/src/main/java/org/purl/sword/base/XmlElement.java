@@ -13,7 +13,7 @@ import java.util.Properties;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Parent class for all classes that represent an XML element. This provides
@@ -27,7 +27,7 @@ public abstract class XmlElement {
     /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(XmlElement.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlElement.class);
 
 
     /**

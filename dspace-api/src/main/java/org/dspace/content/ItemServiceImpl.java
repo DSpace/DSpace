@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -69,7 +69,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(Item.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
@@ -230,10 +230,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         throws SQLException {
 
         MetadataField metadataField = metadataFieldService
-            .findByElement(context, MetadataSchema.DC_SCHEMA, "date", "accessioned");
+            .findByElement(context, MetadataSchemaEnum.DC.getName(), "date", "accessioned");
         if (metadataField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".date.accessioned' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".date.accessioned' doesn't exist!");
         }
 
         return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
@@ -554,7 +554,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
-        addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", prov.toString());
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update(context, item);
@@ -609,7 +609,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // bitstream checksums
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
-        addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", prov.toString());
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update(context, item);
@@ -1292,7 +1292,7 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang) {
-        if (StringUtils.equals(schema, "relation") && !StringUtils.equals(element, "type")) {
+        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
 
             List<MetadataValue> relationMetadata = getRelationshipMetadata(item, false);
             List<MetadataValue> listToReturn = new LinkedList<>();
@@ -1318,7 +1318,7 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     }
     @Override
-    public List<MetadataValue> getRelationshipMetadata(Item item, boolean extra) {
+    public List<MetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata) {
         Context context = new Context();
         List<MetadataValue> fullMetadataValueList = new LinkedList<>();
         try {
@@ -1327,8 +1327,8 @@ prevent the generation of resource policy entry values with null dspace_object a
             if (StringUtils.isNotBlank(entityType)) {
                 List<Relationship> relationships = relationshipService.findByItem(context, item);
                 for (Relationship relationship : relationships) {
-                    fullMetadataValueList.addAll(handleItemRelationship(context, item,
-                                                                        entityType, relationship, extra));
+                    fullMetadataValueList.addAll(handleItemRelationship(context, item, entityType,
+                                                                        relationship, enableVirtualMetadata));
                 }
 
             }
@@ -1339,7 +1339,8 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private List<MetadataValue> handleItemRelationship(Context context, Item item, String entityType,
-                                                       Relationship relationship, boolean extra) throws SQLException {
+                                                       Relationship relationship, boolean enableVirtualMetadata)
+        throws SQLException {
         List<MetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
         HashMap<String, VirtualBean> hashMaps = new HashMap<>();
@@ -1357,7 +1358,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             relationName = relationship.getRelationshipType().getRightLabel();
         }
 
-        if (hashMaps != null && extra) {
+        if (hashMaps != null && enableVirtualMetadata) {
             resultingMetadataValueList.addAll(handleRelationshipTypeMetadataMappping(context, item, hashMaps,
                                                                                      otherItem, relationName));
         }
