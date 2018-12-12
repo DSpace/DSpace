@@ -29,11 +29,11 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
@@ -43,11 +43,14 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.disseminate.CitationDocumentServiceImpl;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
-import org.dspace.solr.MockSolrServer;
-import org.junit.After;
+import org.dspace.statistics.ObjectCount;
+import org.dspace.statistics.SolrLoggerServiceImpl;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
+import org.dspace.statistics.service.SolrLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +63,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BitstreamContentRestControllerIT extends AbstractControllerIntegrationTest {
 
-    private MockSolrServer mockSolrServer;
+    protected SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+
+    private static final Logger log = LogManager
+        .getLogger(BitstreamContentRestControllerIT.class);
 
     @Autowired
     private ConfigurationService configurationService;
@@ -71,16 +77,8 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
     @Before
     public void setup() throws Exception {
         super.setUp();
-        mockSolrServer = new MockSolrServer("statistics");
-        mockSolrServer.getSolrServer().deleteByQuery("*:*");
-        mockSolrServer.getSolrServer().commit();
-        configurationService.setProperty("citation-page.enable_globally", false);
-    }
 
-    @After
-    public void destroy() throws Exception {
-        super.destroy();
-        mockSolrServer.destroy();
+        configurationService.setProperty("citation-page.enable_globally", false);
     }
 
     @Test
@@ -314,15 +312,18 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
         }
     }
 
+    // Verify number of hits/views of Bitstream is as expected
     private void checkNumberOfStatsRecords(Bitstream bitstream, int expectedNumberOfStatsRecords)
         throws SolrServerException, IOException {
-        mockSolrServer.getSolrServer().commit();
+        // Use the SolrLoggerServiceImpl.ResultProcessor inner class to force a Solr commit to occur.
+        // This is required because statistics hits will not be committed to Solr until autoCommit next runs.
+        SolrLoggerServiceImpl.ResultProcessor rs = ((SolrLoggerServiceImpl) solrLoggerService).new ResultProcessor();
+        rs.commit();
 
-        SolrQuery query = new SolrQuery("id:\"" + bitstream.getID() + "\"")
-            .setRows(0)
-            .setStart(0);
-        QueryResponse queryResponse = mockSolrServer.getSolrServer().query(query);
-        assertEquals(expectedNumberOfStatsRecords, queryResponse.getResults().getNumFound());
+        // Find all hits/views of bitstream
+        ObjectCount objectCount = solrLoggerService.queryTotal("type:" + Constants.BITSTREAM +
+                                                               " AND id:" + bitstream.getID(), null);
+        assertEquals(expectedNumberOfStatsRecords, objectCount.getCount());
     }
 
     @Test
