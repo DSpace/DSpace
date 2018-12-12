@@ -987,6 +987,14 @@ public class RestResourceController implements InitializingBean {
     }
 
 
+    @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
+    public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
+                                                    @PathVariable String apiCategory, @PathVariable String model,
+                                                    @PathVariable Integer id,
+                                                    @RequestBody(required = true) JsonNode jsonNode) {
+        return putOneInternal(request, apiCategory, model, id, jsonNode);
+    }
+
     /**
      * Execute a PUT request for an entity with id of type UUID;
      *

@@ -29,11 +29,15 @@ public class MetadataschemaMatcher {
     }
 
     public static Matcher<? super Object> matchEntry(MetadataSchema metadataSchema) {
+        return matchEntry(metadataSchema.getName(), metadataSchema.getNamespace());
+    }
+
+    public static Matcher<? super Object> matchEntry(String name, String nameSpace) {
         return allOf(
-            hasJsonPath("$.prefix", is(metadataSchema.getName())),
-            hasJsonPath("$.namespace", is(metadataSchema.getNamespace())),
-            hasJsonPath("$.type", is("metadataschema")),
-            hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/metadataschemas"))
+                hasJsonPath("$.prefix", is(name)),
+                hasJsonPath("$.namespace", is(nameSpace)),
+                hasJsonPath("$.type", is("metadataschema")),
+                hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/metadataschemas"))
         );
     }
 }
