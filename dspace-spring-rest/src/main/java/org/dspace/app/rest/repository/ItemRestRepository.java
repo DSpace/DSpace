@@ -17,12 +17,16 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BadRequestException;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
@@ -68,6 +72,9 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 
     @Autowired
     WorkspaceItemService workspaceItemService;
+
+    @Autowired
+    ItemService itemService;
 
     @Autowired
     CollectionService collectionService;
@@ -238,4 +245,35 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         return converter.fromModel(itemToReturn);
     }
 
+    @Override
+    @PreAuthorize("hasPermission(#id, 'ITEM', 'WRITE')")
+    protected ItemRest put(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
+                           JsonNode jsonNode)
+            throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ObjectMapper mapper = new ObjectMapper();
+        ItemRest itemRest = null;
+        try {
+            itemRest = mapper.readValue(jsonNode.toString(), ItemRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
+        }
+
+        Item item = itemService.find(context, uuid);
+        if (item == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
+        }
+
+        if (StringUtils.equals(uuid.toString(), itemRest.getId())) {
+            List<MetadataEntryRest> metadataEntryRestList = itemRest.getMetadata();
+            item = (Item) dspaceObjectUtils.replaceMetadataValues(context,
+                                                                              item,
+                                                                              metadataEntryRestList);
+        } else {
+            throw new IllegalArgumentException("The UUID in the Json and the UUID in the url do not match: "
+                                                   + uuid + ", "
+                                                   + itemRest.getId());
+        }
+        return converter.fromModel(item);
+    }
 }
