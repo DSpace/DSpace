@@ -531,15 +531,15 @@ public class DryadDataPackage extends DryadObject {
 
         for (String provenance : provenances) {
             provenance = provenance.replaceAll("[\\n|\\r]", " ");
-            Matcher authorActionRequired = Pattern.compile(".*Rejected by .+?, reason: .+ on (\\d+-\\d+-\\d+.*).*").matcher(provenance);
-            Matcher submitted1 = Pattern.compile("Approved by ApproveRejectReviewItem based on metadata for .+ on (\\d+-\\d+-\\d+).*\\(GMT\\) .*").matcher(provenance);
-            Matcher submitted2 = Pattern.compile("Enter dryadAcceptEditReject Moved by .+, reason: .+ on (\\d+-\\d+-\\d+).*").matcher(provenance);
-            Matcher submitted3 = Pattern.compile("Submitted by .+ on (\\d+-\\d+-\\d+)T.+?Z.*").matcher(provenance);
-            Matcher embargoed = Pattern.compile(".+Entered publication blackout by .+ on (\\d+-\\d+-\\d+).*\\(GMT\\).*").matcher(provenance);
-            Matcher peerReview1 = Pattern.compile("Enter reviewStep Moved by .+, reason: .+ on (\\d+-\\d+-\\d+).*\\(GMT\\).*").matcher(provenance);
-            Matcher peerReview2 = Pattern.compile("Data package moved to review on (\\d+-\\d+-\\d+).*").matcher(provenance);
-            Matcher published = Pattern.compile("Made available in DSpace on (\\d+-\\d+-\\d+).*").matcher(provenance);
-            Matcher withdrawn = Pattern.compile("Item withdrawn by .+ on (\\d+-\\d+-\\d+).*").matcher(provenance);
+            Matcher authorActionRequired = Pattern.compile(".*Rejected by .+?, reason: .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher submitted1 = Pattern.compile("Approved by ApproveRejectReviewItem based on metadata for .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher submitted2 = Pattern.compile("Enter dryadAcceptEditReject Moved by .+, reason: .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher submitted3 = Pattern.compile("Submitted by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher embargoed = Pattern.compile(".+Entered publication blackout by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher peerReview1 = Pattern.compile("Enter reviewStep Moved by .+, reason: .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher peerReview2 = Pattern.compile("Data package moved to review on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher published = Pattern.compile("Made available in DSpace on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher withdrawn = Pattern.compile("Item withdrawn by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
 
             ObjectNode node = mapper.createObjectNode();
             node.put("note", provenance);
