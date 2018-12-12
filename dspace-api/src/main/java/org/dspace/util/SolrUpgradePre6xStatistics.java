@@ -67,6 +67,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * 
  * @author Terry Brady, Georgetown University Library
  */
+
+//GUCODE[[6.4: https://github.com/DSpace/DSpace/pull/2292]]
+//GUCODE[[6.4: https://github.com/DSpace/DSpace/pull/2260]]
+//GUCODE[[6.4: https://github.com/DSpace/DSpace/pull/2256]]
 public class SolrUpgradePre6xStatistics {
     //Command line parameter constants
     private static final String INDEX_NAME_OPTION = "i";
