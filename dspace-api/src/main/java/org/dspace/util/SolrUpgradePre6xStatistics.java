@@ -487,7 +487,7 @@ public class SolrUpgradePre6xStatistics {
         sQ.addSort("type", SolrQuery.ORDER.desc);
         sQ.addSort("scopeType", SolrQuery.ORDER.desc);
         sQ.addSort("ord(owningItem)", SolrQuery.ORDER.desc);
-        sQ.addSort("id", SolrQuery.ORDER.asc);
+        sQ.addSort("ord(id)", SolrQuery.ORDER.asc);
         sQ.addSort("scopeId", SolrQuery.ORDER.asc);
 
         QueryResponse sr = server.query(sQ);
