@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
@@ -45,7 +45,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(CommunityTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CommunityTest.class);
 
     /**
      * Community instance for the tests
@@ -673,14 +673,17 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         context.turnOffAuthorisationSystem();
         Collection collection = collectionService.create(context, c);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection B");
+        collectionService
+            .setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "collection B");
         collection = collectionService.create(context, c);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection C");
+        collectionService
+            .setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "collection C");
         collection = collectionService.create(context, c);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection A");
+        collectionService
+            .setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "collection A");
         //we need to commit the changes so we don't block the table for testing
         context.restoreAuthSystemState();
 
@@ -712,14 +715,17 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         context.turnOffAuthorisationSystem();
         Community community = communityService.create(c, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "subcommunity B");
+        communityService
+            .setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "subcommunity B");
         community = communityService.create(c, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "subcommunity A");
+        communityService
+            .setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "subcommunity A");
         community = communityService.create(c, context);
-        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                "subcommunity C");
+        communityService
+            .setMetadataSingleValue(context, community, MetadataSchemaEnum.DC.getName(),
+                                    "title", null, Item.ANY, "subcommunity C");
         //we need to commit the changes so we don't block the table for testing
         context.restoreAuthSystemState();
 

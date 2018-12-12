@@ -15,7 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 
@@ -59,7 +59,7 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
     }
 
     public CommunityBuilder withName(final String communityName) {
-        return setMetadataSingleValue(community, MetadataSchema.DC_SCHEMA, "title", null, communityName);
+        return setMetadataSingleValue(community, MetadataSchemaEnum.DC.getName(), "title", null, communityName);
     }
 
     public CommunityBuilder withLogo(String content) throws AuthorizeException, IOException, SQLException {

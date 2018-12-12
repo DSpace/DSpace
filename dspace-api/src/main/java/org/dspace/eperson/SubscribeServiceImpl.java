@@ -10,7 +10,7 @@ package org.dspace.eperson;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -32,7 +32,7 @@ public class SubscribeServiceImpl implements SubscribeService {
     /**
      * log4j logger
      */
-    private Logger log = Logger.getLogger(SubscribeServiceImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(SubscribeServiceImpl.class);
 
     @Autowired(required = true)
     protected SubscriptionDAO subscriptionDAO;

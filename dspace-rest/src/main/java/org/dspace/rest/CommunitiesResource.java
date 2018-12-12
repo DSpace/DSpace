@@ -28,7 +28,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -51,7 +51,7 @@ public class CommunitiesResource extends Resource {
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    private static Logger log = Logger.getLogger(CommunitiesResource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CommunitiesResource.class);
 
     /**
      * Returns community with basic properties. If you want more, use expand

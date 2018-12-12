@@ -9,7 +9,7 @@ package org.dspace.xoai.controller;
 
 import static java.util.Arrays.asList;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.apache.log4j.Logger.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,7 +28,7 @@ import com.lyncode.xoai.dataprovider.core.XOAIManager;
 import com.lyncode.xoai.dataprovider.exceptions.InvalidContextException;
 import com.lyncode.xoai.dataprovider.exceptions.OAIException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
