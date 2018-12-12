@@ -17,6 +17,7 @@ import org.dspace.JournalUtils;
 import org.dspace.content.Item;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.identifier.DOIIdentifierProvider;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -66,6 +67,16 @@ public class Package {
 
     public Integer getItemID() {
         return itemID;
+    }
+
+    public void setDashUserID(Integer userID) {
+        EPerson user = new EPerson();
+        user.setID(userID);
+        dataPackage.setSubmitter(user);
+    }
+
+    public Integer getDashUserID() {
+        return dataPackage.getSubmitter().getID();
     }
 
     public String getPublicationDOI() {
