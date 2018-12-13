@@ -132,22 +132,22 @@ public class FilteredItemsResource extends Resource {
             Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause, offset, limit);
              
             int count = itemFilterSet.processSaveItems(context, servletContext, childItems, true, expand);
-    	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
-    	    result.annotateQuery(query_field, query_op, query_val);
-    	    result.setUnfilteredItemCount(count);
-    	    context.complete();
+            writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
+            result.annotateQuery(query_field, query_op, query_val);
+            result.setUnfilteredItemCount(count);
+            context.complete();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             processException(e.getMessage(), context);
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
-        	processException(e.getMessage(), context);
+            processException(e.getMessage(), context);
         } catch (AuthorizeException e) {
             log.error(e.getMessage(), e);
-        	processException(e.getMessage(), context);
+            processException(e.getMessage(), context);
         } catch (ContextException e) {
             log.error(e.getMessage(), e);
-        	processException("Unauthorized filtered item query. " + e.getMessage(), context);
+            processException("Unauthorized filtered item query. " + e.getMessage(), context);
 		} finally {
 			processFinally(context);
         }
@@ -193,10 +193,13 @@ public class FilteredItemsResource extends Resource {
 	private List<UUID> getUuidsFromStrings(List<String> collSel) {
 		List<UUID> uuids = new ArrayList<UUID>();
 		for(String s: collSel) {
+		    if (s.isEmpty()) {
+		        continue;
+		    }
 			try {
 				uuids.add(UUID.fromString(s));
 			} catch (IllegalArgumentException e) {
-				log.warn("Invalid collection UUID: " + s);
+				log.warn(String.format("Invalid collection UUID: [%s]", s));
 			}
 		}
 		return uuids;
