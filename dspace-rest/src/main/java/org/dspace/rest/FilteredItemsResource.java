@@ -137,12 +137,16 @@ public class FilteredItemsResource extends Resource {
     	    result.setUnfilteredItemCount(count);
     	    context.complete();
         } catch (IOException e) {
+            log.error(e.getMessage(), e);
             processException(e.getMessage(), context);
         } catch (SQLException e) {
+            log.error(e.getMessage(), e);
         	processException(e.getMessage(), context);
         } catch (AuthorizeException e) {
+            log.error(e.getMessage(), e);
         	processException(e.getMessage(), context);
         } catch (ContextException e) {
+            log.error(e.getMessage(), e);
         	processException("Unauthorized filtered item query. " + e.getMessage(), context);
 		} finally {
 			processFinally(context);
