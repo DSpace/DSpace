@@ -248,7 +248,7 @@ public class AuthenticationUtil
             if (id != null)
             {
                 String address = (String)session.getAttribute(CURRENT_IP_ADDRESS);
-                if (address != null && address.equals(request.getRemoteAddr()))
+                if (address != null)
                 {
                     EPerson eperson = EPerson.find(context, id);
                     context.setCurrentUser(eperson);
