@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -24,7 +24,7 @@ import org.dspace.core.Context;
  */
 public class GoogleBitstreamComparator implements Comparator<Bitstream> {
 
-    private final static Logger log = Logger.getLogger(GoogleBitstreamComparator.class);
+    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(GoogleBitstreamComparator.class);
 
     HashMap<String, Integer> priorityMap = new HashMap<>();
 

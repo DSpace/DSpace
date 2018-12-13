@@ -129,7 +129,9 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
                                                                           page.map(resourceRepository::wrapResource),
                                                                           linkedRMList, name);
                                         } else {
-                                            wrapObject = null;
+                                            PageImpl<RestAddressableModel> page = new PageImpl(linkedRMList);
+                                            wrapObject = new EmbeddedPage(linkToSubResource.getHref(), page,
+                                                    linkedRMList, name);
                                         }
                                     }
                                 }

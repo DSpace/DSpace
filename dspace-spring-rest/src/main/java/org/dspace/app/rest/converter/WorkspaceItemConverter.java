@@ -10,8 +10,8 @@ package org.dspace.app.rest.converter;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
@@ -24,7 +24,6 @@ import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
-import org.dspace.submit.AbstractProcessingStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +37,7 @@ import org.springframework.stereotype.Component;
 public class WorkspaceItemConverter
     extends DSpaceConverter<org.dspace.content.WorkspaceItem, org.dspace.app.rest.model.WorkspaceItemRest> {
 
-    private static final Logger log = Logger.getLogger(WorkspaceItemConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemConverter.class);
 
     @Autowired
     private EPersonConverter epersonConverter;
@@ -86,6 +85,10 @@ public class WorkspaceItemConverter
         // info
 
         if (collection != null) {
+            // we set the status to true as we will discover validation error later in this block
+            // we could eventually leave the status to empty if we don't have collection information, this could be
+            // eventually the case when projection support will be included
+            witem.setStatus(true);
             SubmissionDefinitionRest def = submissionDefinitionConverter
                 .convert(submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle()));
             witem.setSubmissionDefinition(def);
@@ -103,22 +106,21 @@ public class WorkspaceItemConverter
 
                     Object stepInstance = stepClass.newInstance();
 
-                    if (stepInstance instanceof AbstractProcessingStep) {
+                    if (stepInstance instanceof AbstractRestProcessingStep) {
                         // load the interface for this step
-                        AbstractRestProcessingStep stepProcessing = (AbstractRestProcessingStep) stepClass
-                            .newInstance();
+                        AbstractRestProcessingStep stepProcessing =
+                            (AbstractRestProcessingStep) stepClass.newInstance();
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
                             addError(witem.getErrors(), error);
+                            witem.setStatus(false);
                         }
                         witem.getSections()
-                             .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
+                            .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
                     } else {
-                        throw new Exception("The submission step class specified by '"
-                                                + stepConfig.getProcessingClassName()
-                                                + "' does not extend the class org.dspace.app.rest.submit" +
-                                                ".AbstractRestProcessingStep!"
-                                                + " Therefore it cannot be used by the Configurable Submission as the" +
-                                                " <processing-class>!");
+                        log.warn("The submission step class specified by '" + stepConfig.getProcessingClassName() +
+                                 "' does not extend the class org.dspace.app.rest.submit.AbstractRestProcessingStep!" +
+                                 " Therefore it cannot be used by the Configurable Submission as the " +
+                                 "<processing-class>!");
                     }
 
                 } catch (Exception e) {

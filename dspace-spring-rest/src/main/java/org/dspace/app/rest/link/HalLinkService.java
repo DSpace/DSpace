@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @ComponentScan
 public class HalLinkService {
 
-    private static final Logger log = Logger.getLogger(HalLinkService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(HalLinkService.class);
 
     @Autowired
     private List<HalLinkFactory> halLinkFactories;

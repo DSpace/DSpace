@@ -9,7 +9,7 @@ package org.dspace.app.rest.builder;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -34,7 +34,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
     extends AbstractBuilder<T, DSpaceObjectService> {
 
     /* Log4j logger*/
-    private static final Logger log = Logger.getLogger(AbstractDSpaceObjectBuilder.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractDSpaceObjectBuilder.class);
 
     protected AbstractDSpaceObjectBuilder(Context context) {
         super(context);

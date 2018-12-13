@@ -21,8 +21,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -46,7 +46,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * which can then be loaded into DSpace using ItemImport.
  */
 public class PubMedToImport {
-    private static final Logger log = Logger.getLogger(PubMedToImport.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PubMedToImport.class);
 
     private static File outputDir = null;
 

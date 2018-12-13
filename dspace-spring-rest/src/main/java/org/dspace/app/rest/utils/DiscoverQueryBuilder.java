@@ -14,7 +14,7 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.query.SearchQueryConverter;
 import org.dspace.app.rest.exception.InvalidDSpaceObjectTypeException;
 import org.dspace.app.rest.exception.InvalidRequestException;
@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscoverQueryBuilder implements InitializingBean {
 
-    private static final Logger log = Logger.getLogger(DiscoverQueryBuilder.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DiscoverQueryBuilder.class);
 
     @Autowired
     private SearchService searchService;
@@ -181,9 +181,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
         //Set search query
         if (StringUtils.isNotBlank(query)) {
-            //Note that these quotes are needed incase we try to query OR for example.
-            //If the quotes aren't present, it'll crash.
-            queryArgs.setQuery("\"" + searchService.escapeQueryChars(query) + "\"");
+            queryArgs.setQuery(query);
         }
 
         //Limit results to DSO type
