@@ -18,6 +18,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
@@ -33,6 +34,9 @@ import org.datadryad.rest.models.Package;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Bitstream;
+import org.dspace.eperson.EPerson;
+
+import javax.ws.rs.core.UriBuilder;
 
 public class DashService {
 
@@ -183,6 +187,16 @@ public class DashService {
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setDoOutput(true);
             connection.setRequestMethod("PUT");
+
+            if (pkg.getDataPackage().getSubmitter() != null) {
+                // need to find the equivalent user in Dash and set the userId
+                int dashUserId = getDashUser(pkg.getDataPackage());
+                if (dashUserId != 0) {
+                    ObjectNode jsonObj = (ObjectNode) mapper.readTree(dashJSON);
+                    jsonObj.put("userId", dashUserId);
+                    dashJSON = jsonObj.toString();
+                }
+            }
 
             OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
             wr.write(dashJSON);
@@ -437,8 +451,6 @@ public class DashService {
     }
 
     public JsonNode getCurationActivity(Package pkg) {
-        BufferedReader reader = null;
-
         try {
             String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getIdentifier(), "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
@@ -448,7 +460,7 @@ public class DashService {
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setRequestMethod("GET");
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -462,6 +474,39 @@ public class DashService {
             log.fatal("Unable to get curation activity from Dash", e);
         }
         return null;
+    }
+
+    private int getDashUser(DryadDataPackage dryadDataPackage) {
+        EPerson eperson = dryadDataPackage.getSubmitter();
+        if (dryadDataPackage.getItem() != null) {
+            try {
+                URI uri = UriBuilder.fromUri(dashServer + "/api/users/").queryParam("ePersonId", Integer.toString(eperson.getID())).build();
+                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+                connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+                connection.setRequestMethod("GET");
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line = null;
+                StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+                while ((line = reader.readLine()) != null) {
+                    out.append(line);
+                }
+                JsonNode rootNode = mapper.readTree(out.toString());
+                JsonNode usersNode = rootNode.path("_embedded").path("stash:users");
+                if (!usersNode.isMissingNode() && usersNode.isArray()) {
+                    return usersNode.get(0).path("id").intValue();
+                }
+
+            } catch (Exception e) {
+                log.fatal("Unable to get user from Dash", e);
+            }
+        } else {
+            // if it's not a Dspace item, the submitter is already a dash user
+            return eperson.getID();
+        }
+        return 0;
     }
 
     private JsonNode getInternalData(Package pkg) {

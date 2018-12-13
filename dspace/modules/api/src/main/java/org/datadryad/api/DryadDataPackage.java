@@ -109,6 +109,7 @@ public class DryadDataPackage extends DryadObject {
     private ArrayList<String> formerManuscriptNumbers = new ArrayList<>();
     private ArrayList<String> mismatchedDOIs = new ArrayList<>();
     private ArrayList<DryadDataPackage> duplicateItems = new ArrayList<>();
+    private EPerson submitter = null;
 
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
@@ -593,6 +594,23 @@ public class DryadDataPackage extends DryadObject {
             }
         }
         return resultList;
+    }
+
+    public EPerson getSubmitter() {
+        if (item != null) {
+            try {
+                return item.getSubmitter();
+            } catch (SQLException e) {
+                log.error("couldn't get package's submitter: " + e.getMessage());
+            }
+        } else {
+            return submitter;
+        }
+        return null;
+    }
+
+    public void setSubmitter(EPerson submitter) {
+        this.submitter = submitter;
     }
 
     // this method does not assume that the package is in review; only used by AutoReturnReviewItem.
