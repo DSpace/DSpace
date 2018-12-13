@@ -97,6 +97,11 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
     }
 
     @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
     public String getContentType(String format) {
         return "html".equals(format) ? "text/html" :
             "application/" + format + "+xml; charset=UTF-8";
