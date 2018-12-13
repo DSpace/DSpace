@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -94,7 +94,6 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
             throws AuthorizeException, SQLException {
 
         // parse request body
-
         MetadataSchemaRest metadataSchemaRest;
         try {
             metadataSchemaRest = new ObjectMapper().readValue(
@@ -106,7 +105,6 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         }
 
         // validate fields
-
         if (isBlank(metadataSchemaRest.getPrefix())) {
             throw new UnprocessableEntityException("metadata schema name can be blank not");
         }
@@ -115,7 +113,6 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         }
 
         // create
-
         MetadataSchema metadataSchema;
         try {
             metadataSchema = metadataSchemaService.create(
@@ -128,7 +125,6 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         }
 
         // return
-
         return converter.convert(metadataSchema);
     }
 

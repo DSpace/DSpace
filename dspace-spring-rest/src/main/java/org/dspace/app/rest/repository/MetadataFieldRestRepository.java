@@ -8,7 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import static java.lang.Integer.parseInt;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -120,7 +120,6 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             throws AuthorizeException, SQLException {
 
         // parse request body
-
         MetadataFieldRest metadataFieldRest;
         try {
             metadataFieldRest = new ObjectMapper().readValue(
@@ -132,7 +131,6 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         }
 
         // validate fields
-
         String schemaId = getRequestService().getCurrentRequest().getHttpServletRequest().getParameter("schemaId");
         if (isBlank(schemaId)) {
             throw new UnprocessableEntityException("metadata schema ID can be blank not");
@@ -148,7 +146,6 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         }
 
         // create
-
         MetadataField metadataField;
         try {
             metadataField = metadataFieldService.create(context, schema,
@@ -166,7 +163,6 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         }
 
         // return
-
         return converter.convert(metadataField);
     }
 
