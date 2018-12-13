@@ -51,7 +51,7 @@ public class Related implements VirtualBean {
      */
     private Integer place;
     /**
-     * The next bean to call its getValue() method on
+     * The next bean to call its getValues() method on
      */
     private VirtualBean virtualBean;
 
@@ -113,7 +113,7 @@ public class Related implements VirtualBean {
      *                  Will return null if no relationships are found
      * @throws SQLException If something goes wrong
      */
-    public String getValue(Context context, Item item) throws SQLException {
+    public List<String> getValues(Context context, Item item) throws SQLException {
         Entity entity = entityService.findByItemId(context, item.getID());
         EntityType entityType = entityService.getType(context, entity);
 
@@ -135,12 +135,12 @@ public class Related implements VirtualBean {
             if (relationship.getRelationshipType().getLeftType() == entityType) {
                 if (relationship.getLeftPlace() == place) {
                     Item otherItem = relationship.getRightItem();
-                    return virtualBean.getValue(context, otherItem);
+                    return virtualBean.getValues(context, otherItem);
                 }
             } else if (relationship.getRelationshipType().getRightType() == entityType) {
                 if (relationship.getRightPlace() == place) {
                     Item otherItem = relationship.getLeftItem();
-                    return virtualBean.getValue(context, otherItem);
+                    return virtualBean.getValues(context, otherItem);
                 }
             }
         }

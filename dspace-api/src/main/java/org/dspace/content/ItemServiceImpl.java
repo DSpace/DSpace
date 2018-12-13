@@ -1375,10 +1375,12 @@ prevent the generation of resource policy entry values with null dspace_object a
             String key = entry.getKey();
             VirtualBean virtualBean = entry.getValue();
 
-            MetadataValue metadataValue = constructMetadataValue(key);
-            metadataValue = constructResultingMetadataValue(context, item, otherItem, virtualBean, metadataValue);
-            if (StringUtils.isNotBlank(metadataValue.getValue())) {
-                resultingMetadataValueList.add(metadataValue);
+            for (String value : virtualBean.getValues(context, otherItem)) {
+                MetadataValue metadataValue = constructMetadataValue(key);
+                metadataValue = constructResultingMetadataValue(item, value, metadataValue);
+                if (StringUtils.isNotBlank(metadataValue.getValue())) {
+                    resultingMetadataValueList.add(metadataValue);
+                }
             }
         }
         return resultingMetadataValueList;
@@ -1405,10 +1407,8 @@ prevent the generation of resource policy entry values with null dspace_object a
         return entityType;
     }
 
-    private MetadataValue constructResultingMetadataValue(Context context, Item item,
-                                                          Item otherItem, VirtualBean virtualBean,
-                                                          MetadataValue metadataValue) throws SQLException {
-        metadataValue.setValue(virtualBean.getValue(context, otherItem));
+    private MetadataValue constructResultingMetadataValue(Item item, String value, MetadataValue metadataValue) {
+        metadataValue.setValue(value);
         metadataValue.setAuthority("virtual");
         metadataValue.setConfidence(-1);
         metadataValue.setDSpaceObject(item);

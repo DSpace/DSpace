@@ -162,14 +162,11 @@
     <util:map id="isOrgUnitOfPublicationMap">
         <entry key="dc_contributor_other" value-ref="publicationOrgUnit_name"/>
     </util:map>
-    <bean class="org.dspace.content.virtual.Concatenate" id="publicationOrgUnit_name">
+    <bean class="org.dspace.content.virtual.Collected" id="publicationOrgUnit_name">
         <property name="fields">
             <util:list>
                 <value>orgunit.identifier.name</value>
             </util:list>
-        </property>
-        <property name="separator">
-            <value>, </value>
         </property>
     </bean>
 
@@ -191,28 +188,22 @@
     <util:map id="isOrgUnitOfProjectMap">
         <entry key="project_contributor_other" value-ref="projectOrgUnit_other"/>
     </util:map>
-    <bean class="org.dspace.content.virtual.Concatenate" id="projectOrgUnit_other">
+    <bean class="org.dspace.content.virtual.Collected" id="projectOrgUnit_other">
         <property name="fields">
             <util:list>
                 <value>orgunit.identifier.name</value>
             </util:list>
-        </property>
-        <property name="separator">
-            <value>, </value>
         </property>
     </bean>
 
     <util:map id="isOrgUnitOfPersonMap">
         <entry key="person_contributor_other" value-ref="personProject_other"/>
     </util:map>
-    <bean class="org.dspace.content.virtual.Concatenate" id="personProject_other">
+    <bean class="org.dspace.content.virtual.Collected" id="personProject_other">
         <property name="fields">
             <util:list>
                 <value>orgunit.identifier.name</value>
             </util:list>
-        </property>
-        <property name="separator">
-            <value>, </value>
         </property>
     </bean>
 
@@ -220,14 +211,11 @@
         <entry key="journalvolume.identifier.volume" value-ref="issueVolume_volume"/>
         <entry key="journal.identifier.issn" value-ref="volumeJournal_issn_related"/>
     </util:map>
-    <bean class="org.dspace.content.virtual.Concatenate" id="issueVolume_volume">
+    <bean class="org.dspace.content.virtual.Collected" id="issueVolume_volume">
         <property name="fields">
             <util:list>
                 <value>journalvolume.identifier.volume</value>
             </util:list>
-        </property>
-        <property name="separator">
-            <value>, </value>
         </property>
     </bean>
     <bean class="org.dspace.content.virtual.Related" id="volumeJournal_issn_related">
@@ -240,24 +228,18 @@
         <entry key="journal.identifier.issn" value-ref="volumeJournal_issn"/>
         <entry key="journal.title" value-ref="volumeJournal_title"/>
     </util:map>
-    <bean class="org.dspace.content.virtual.Concatenate" id="volumeJournal_issn">
+    <bean class="org.dspace.content.virtual.Collected" id="volumeJournal_issn">
         <property name="fields">
             <util:list>
                 <value>journal.identifier.issn</value>
             </util:list>
         </property>
-        <property name="separator">
-            <value>, </value>
-        </property>
     </bean>
-    <bean class="org.dspace.content.virtual.Concatenate" id="volumeJournal_title">
+    <bean class="org.dspace.content.virtual.Collected" id="volumeJournal_title">
         <property name="fields">
             <util:list>
                 <value>journal.identifier.name</value>
             </util:list>
-        </property>
-        <property name="separator">
-            <value>, </value>
         </property>
     </bean>
 
@@ -267,14 +249,11 @@
     <util:map id="isIssueOfJournalVolumeMap">
         <entry key="journalissue_identifier_number" value-ref="journalIssue_number"/>
     </util:map>
-    <bean class="org.dspace.content.virtual.Concatenate" id="journalIssue_number">
+    <bean class="org.dspace.content.virtual.Collected" id="journalIssue_number">
         <property name="fields">
             <util:list>
                 <value>journalissue.identifier.number</value>
             </util:list>
-        </property>
-        <property name="separator">
-            <value>, </value>
         </property>
     </bean>
 

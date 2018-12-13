@@ -17,10 +17,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * A bean implementing the {@link VirtualBean} interface to achieve the generation of Virtual metadata
- */
-public class Concatenate implements VirtualBean {
+public class Collected implements VirtualBean {
 
     @Autowired
     private ItemService itemService;
@@ -29,10 +26,6 @@ public class Concatenate implements VirtualBean {
      * The fields for which the metadata will be retrieved
      */
     private List<String> fields;
-    /**
-     * The seperator that will be used to concatenate the values retrieved from the above mentioned fields
-     */
-    private String separator;
 
     /**
      * Generic getter for the fields property
@@ -50,32 +43,8 @@ public class Concatenate implements VirtualBean {
         this.fields = fields;
     }
 
-    /**
-     * Generic getter for the seperator
-     * @return the seperator to be used by this bean
-     */
-    public String getSeparator() {
-        return separator;
-    }
 
-    /**
-     * Generic setter for the seperator property
-     * @param separator The String seperator value to which this seperator value will be set to
-     */
-    public void setSeparator(String separator) {
-        this.separator = separator;
-    }
-
-    /**
-     * this method will retrieve the metadata values from the given item for all the metadata fields listed
-     * in the fields property and it'll concatenate all those values together with the seperrator specified
-     * in this class
-     * @param context   The relevant DSpace context
-     * @param item      The item that will be used to either retrieve metadata values from
-     * @return The String value for all of the retrieved metadatavalues combined with the seperator
-     */
     public List<String> getValues(Context context, Item item) {
-
         List<String> resultValues = new LinkedList<>();
         List<String> value = this.getFields();
         for (String s : value) {
@@ -90,24 +59,13 @@ public class Concatenate implements VirtualBean {
                                                                          null,
                                                                      Item.ANY);
 
-            String resultString = "";
-            for (int i = 0; i < resultList.size(); i++) {
-                String metadataValueString = resultList.get(i).getValue();
-                if (StringUtils.isNotBlank(metadataValueString)) {
-                    if (StringUtils.isNotBlank(resultString)) {
-                        resultString += this.getSeparator();
-                    }
-                    resultString += metadataValueString;
+            for (MetadataValue metadataValue : resultList) {
+                if (StringUtils.isNotBlank(metadataValue.getValue())) {
+                    resultValues.add(metadataValue.getValue());
                 }
-            }
-            if (StringUtils.isNotBlank(resultString)) {
-                resultValues.add(resultString);
             }
         }
 
-        String result = StringUtils.join(resultValues, this.getSeparator());
-        List<String> listToReturn = new LinkedList<>();
-        listToReturn.add(result);
-        return listToReturn;
+        return resultValues;
     }
 }
