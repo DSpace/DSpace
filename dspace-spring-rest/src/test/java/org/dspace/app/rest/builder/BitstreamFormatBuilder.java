@@ -9,7 +9,7 @@ package org.dspace.app.rest.builder;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.core.Context;
@@ -22,7 +22,7 @@ import org.dspace.service.DSpaceCRUDService;
 public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat> {
 
     /* Log4j logger*/
-    private static final Logger log = Logger.getLogger(BitstreamFormatBuilder.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamFormatBuilder.class);
 
     private BitstreamFormat bitstreamFormat;
 

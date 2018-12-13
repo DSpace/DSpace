@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepConfig, SubmissionSectionRest> {
 
-    private static final Logger log = Logger.getLogger(SubmissionSectionConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionSectionConverter.class);
 
     private SubmissionConfigReader submissionConfigReader;
 

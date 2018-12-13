@@ -16,7 +16,7 @@ import java.util.Set;
 
 import gr.ekt.bte.core.Record;
 import org.apache.http.HttpException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -29,7 +29,7 @@ import org.dspace.core.LogManager;
 public class PubmedOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
     protected boolean searchProvider = true;
 
-    private static final Logger log = Logger.getLogger(PubmedOnlineDataLoader.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PubmedOnlineDataLoader.class);
 
     protected PubmedService pubmedService = new PubmedService();
 

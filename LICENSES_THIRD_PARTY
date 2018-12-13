@@ -366,7 +366,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * FindBugs-Annotations (com.google.code.findbugs:annotations:3.0.1u2 - http://findbugs.sourceforge.net/)
         * MaxMind GeoIP Legacy API (com.maxmind.geoip:geoip-api:1.3.0 - https://github.com/maxmind/geoip-api-java)
         * JHighlight (com.uwyn:jhighlight:1.0 - https://jhighlight.dev.java.net/)
-        * DSpace TM-Extractors Dependency (org.dspace.dependencies:dspace-tm-extractors:1.0.1 - http://projects.dspace.org/dspace-pom/dspace-tm-extractors)
         * A Hibernate O/RM Module (org.hibernate:hibernate-core:4.2.21.Final - http://hibernate.org)
         * A Hibernate O/RM Module (org.hibernate:hibernate-ehcache:4.2.21.Final - http://hibernate.org)
         * Hibernate Commons Annotations (org.hibernate.common:hibernate-commons-annotations:4.0.2.Final - http://hibernate.org)

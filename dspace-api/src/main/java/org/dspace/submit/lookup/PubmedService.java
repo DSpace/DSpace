@@ -19,7 +19,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import gr.ekt.bte.core.Record;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -29,7 +29,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
  */
 public class PubmedService {
 
-    private static final Logger log = Logger.getLogger(PubmedService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PubmedService.class);
 
     protected int timeout = 1000;
 

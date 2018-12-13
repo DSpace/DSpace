@@ -12,13 +12,19 @@ import java.util.Objects;
 
 /**
  * The SubmissionVisibility REST Resource. It is not addressable directly, only
- * used as inline object in the SubmissionPanel resource and InputFormPage
- * resource
+ * used as inline object in the SubmissionPanel resource and SubmissionForm's fields
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class SubmissionVisibilityRest {
+    /**
+     * The visibility to apply within the main scope
+     */
     private VisibilityEnum main;
+
+    /**
+     * The visibility to apply outside the main scope
+     */
     private VisibilityEnum other;
 
     public SubmissionVisibilityRest(VisibilityEnum main, VisibilityEnum other) {

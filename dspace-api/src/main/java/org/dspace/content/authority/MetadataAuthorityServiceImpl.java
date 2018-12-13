@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
@@ -57,7 +57,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see Choices
  */
 public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
-    private static Logger log = Logger.getLogger(MetadataAuthorityServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataAuthorityServiceImpl.class);
 
     @Autowired(required = true)
     protected MetadataFieldService metadataFieldService;
@@ -235,21 +235,23 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
         try {
             DCInputsReader dcInputsReader = new DCInputsReader();
             for (DCInputSet dcinputSet : dcInputsReader.getAllInputs(Integer.MAX_VALUE, 0)) {
-                DCInput[] dcinputs = dcinputSet.getFields();
-                for (DCInput dcinput : dcinputs) {
-                    if (StringUtils.isNotBlank(dcinput.getPairsType())
-                        || StringUtils.isNotBlank(dcinput.getVocabulary())) {
-                        String authorityName = dcinput.getPairsType();
-                        if (StringUtils.isBlank(authorityName)) {
-                            authorityName = dcinput.getVocabulary();
-                        }
-                        if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
-                            String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
-                                                           dcinput.getQualifier());
-                            boolean req = ConfigurationManager
-                                .getBooleanProperty("authority.required." + fieldKey, false);
-                            controlled.put(fieldKey, true);
-                            isAuthorityRequired.put(fieldKey, req);
+                DCInput[][] dcinputs = dcinputSet.getFields();
+                for (DCInput[] dcrows : dcinputs) {
+                    for (DCInput dcinput : dcrows) {
+                        if (StringUtils.isNotBlank(dcinput.getPairsType())
+                            || StringUtils.isNotBlank(dcinput.getVocabulary())) {
+                            String authorityName = dcinput.getPairsType();
+                            if (StringUtils.isBlank(authorityName)) {
+                                authorityName = dcinput.getVocabulary();
+                            }
+                            if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
+                                String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
+                                                               dcinput.getQualifier());
+                                boolean req = ConfigurationManager
+                                    .getBooleanProperty("authority.required." + fieldKey, false);
+                                controlled.put(fieldKey, true);
+                                isAuthorityRequired.put(fieldKey, req);
+                            }
                         }
                     }
                 }

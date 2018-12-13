@@ -23,8 +23,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
@@ -52,7 +52,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(Community.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Community.class);
 
     @Column(name = "community_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -107,7 +107,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         setModified();
     }
 
-    void removeSubCommunity(Community subCommunity) {
+    public void removeSubCommunity(Community subCommunity) {
         subCommunities.remove(subCommunity);
         setModified();
     }
