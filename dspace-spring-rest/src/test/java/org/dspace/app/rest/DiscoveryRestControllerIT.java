@@ -2721,8 +2721,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
         //Add a bitstream to an item
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            Bitstream bitstream = BitstreamBuilder.
-                                                      createBitstream(context, publicItem1, is)
+            Bitstream bitstream = BitstreamBuilder.createBitstream(context, publicItem1, is)
                                                   .withName("Bitstream")
                                                   .withMimeType("text/plain")
                                                   .build();
@@ -2733,7 +2732,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** WHEN **
         getClient().perform(get("/api/discover/search/objects")
-                                .param("query", "dc.date.issued:2010-02-13"))
+                                .param("query", "dc.date.issued:\"2010-02-13\""))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -2756,7 +2755,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** WHEN **
         getClient().perform(get("/api/discover/search/objects")
-                                .param("query", "dc.date.issued:2013-02-13"))
+                                .param("query", "dc.date.issued:\"2013-02-13\""))
 
                    //** THEN **
                    //The status has to be 200 OK
