@@ -71,6 +71,15 @@ public class EPerson extends DSpaceObject
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
 
+    private int dashUserID = 0;
+
+    // stub Eperson, just for Dash use:
+    public EPerson() {}
+
+    public EPerson(int dashUserID) {
+        this.dashUserID = dashUserID;
+    }
+
     /**
      * Construct an EPerson
      * 
@@ -644,7 +653,15 @@ public class EPerson extends DSpaceObject
      */
     public int getID()
     {
-        return myRow.getIntColumn("eperson_id");
+        if (myRow != null) {
+            return myRow.getIntColumn("eperson_id");
+        } else {
+            return dashUserID;
+        }
+    }
+
+    public void setID(int id) {
+        dashUserID = id;
     }
     
     /**

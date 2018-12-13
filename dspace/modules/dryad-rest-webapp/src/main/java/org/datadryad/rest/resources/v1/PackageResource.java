@@ -17,6 +17,7 @@ import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
+import org.dspace.eperson.EPerson;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -176,6 +177,7 @@ public class PackageResource {
             try {
                 DryadDataPackage dryadDataPackage = new DryadDataPackage(manuscript);
                 dryadDataPackage.setIdentifier(pkg.getDryadDOI());
+                dryadDataPackage.setSubmitter(new EPerson(pkg.getDashUserID()));
                 packageStorage.create(journalPath, new Package(dryadDataPackage));
             } catch (Exception ex) {
                 log.error("Exception creating manuscript", ex);
