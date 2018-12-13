@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Package;
@@ -38,6 +39,7 @@ public class DashService {
     private static final Logger log = Logger.getLogger(DashService.class);
     private String dashServer = "";
     private String oauthToken = "";
+    private ObjectMapper mapper = null;
 
     public DashService() {
         // init oauth connection with DASH
@@ -46,6 +48,7 @@ public class DashService {
         String dashAppSecret = ConfigurationManager.getProperty("dash.application.secret");
 
         oauthToken = getOAUTHtoken(dashServer, dashAppID, dashAppSecret);
+        mapper = new ObjectMapper();
         fixHttpURLConnection();
     }
 
@@ -288,6 +291,42 @@ public class DashService {
         return responseCode;
     }
 
+    public void migrateProvenances(Package pkg) {
+        log.debug("migrating provenances");
+        // get curationActivities from Dash package
+        JsonNode curationActivities = getCurationActivity(pkg);
+        // if the only curation activity is the default "Unsubmitted," delete it
+        if (curationActivities.size() == 1) {
+            if (curationActivities.get(0).get("status").textValue().equals("Unsubmitted")) {
+                int unsubmittedID = curationActivities.get(0).get("id").intValue();
+                try {
+                    URL url = new URL(dashServer + "/api/curation_activity/" + unsubmittedID);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    connection.setRequestProperty("Accept", "application/json");
+                    connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+                    connection.setRequestMethod("DELETE");
+
+                    InputStream inputStream = connection.getInputStream();
+                } catch (Exception e) {
+                    throw new RuntimeException("Unable to delete curation activity from Dash", e);
+                }
+            }
+        }
+        if (curationActivities.size() > 1) {
+            throw new RuntimeException("More than one curation activity for package " + pkg.getDataPackage().getIdentifier() + ": are you sure you want to migrate provenances?");
+        }
+
+        // add provenances as curation activities
+        JsonNode provenances = pkg.getDataPackage().getProvenancesAsCurationActivities();
+        log.debug("migrating provenances " + provenances.toString());
+        for (int i=0; i<provenances.size(); i++) {
+            int responseCode = addCurationActivity(pkg.getDataPackage(), provenances.get(i));
+            if (responseCode < 200 || responseCode > 202) {
+                log.fatal("Unable to send provenance to DASH, response: " + responseCode);
+            }
+        }
+    }
 
     /**
        Given the (unencoded) DOI of a Dryad Data Package that has
@@ -348,11 +387,17 @@ public class DashService {
     }
 
     public int addCurationActivity(DryadDataPackage dataPackage, String status, String reason) {
-        String dashJSON = "{\"status\": \"" + status + "\", \"note\": \"" + reason + "\"}";
+        ObjectNode node = mapper.createObjectNode();
+        node.put("status", status);
+        node.put("note", reason);
+        return addCurationActivity(dataPackage, node);
+    }
+
+    private int addCurationActivity(DryadDataPackage dataPackage, JsonNode node) {
         int responseCode = 0;
-        BufferedReader reader = null;
 
         try {
+            String dashJSON = mapper.writeValueAsString(node);
             String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -366,7 +411,7 @@ public class DashService {
             wr.write(dashJSON);
             wr.close();
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -409,8 +454,7 @@ public class DashService {
             while ((line = reader.readLine()) != null) {
                 out.append(line);
             }
-            ObjectMapper m = new ObjectMapper();
-            JsonNode rootNode = m.readTree(out.toString());
+            JsonNode rootNode = mapper.readTree(out.toString());
             if (rootNode.isArray()) {
                 return rootNode;
             }
@@ -438,8 +482,7 @@ public class DashService {
             while ((line = reader.readLine()) != null) {
                 out.append(line);
             }
-            ObjectMapper m = new ObjectMapper();
-            JsonNode rootNode = m.readTree(out.toString());
+            JsonNode rootNode = mapper.readTree(out.toString());
             if (rootNode.isArray()) {
                 return rootNode;
             }
@@ -625,8 +668,7 @@ public class DashService {
                         connection.getResponseMessage());
             }
 
-            ObjectMapper m = new ObjectMapper();
-            JsonNode rootNode = m.readTree(out.toString());
+            JsonNode rootNode = mapper.readTree(out.toString());
             JsonNode packagesNode = rootNode.path("_embedded").path("stash:datasets");
             if (!packagesNode.isMissingNode() && packagesNode.isArray()) {
                 for (int i = 0; i < packagesNode.size(); i++) {

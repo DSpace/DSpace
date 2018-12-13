@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Author;
@@ -521,43 +523,114 @@ public class DryadDataPackage extends DryadObject {
             curationStatusReason = reason;
         }
     }
-    // this method does not assume that the package is in review; only used by AutoReturnReviewItem.
-    public Date getEnteredReviewDate() {
-        if (useDryadClassic) {
+
+    public JsonNode getProvenancesAsCurationActivities() {
+        List<String> provenances = getProvenances();
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode resultNode = mapper.createArrayNode();
+
+        for (String provenance : provenances) {
+            provenance = provenance.replaceAll("[\\n|\\r]", " ");
+            Matcher authorActionRequired = Pattern.compile(".*Rejected by .+?, reason: .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher submitted1 = Pattern.compile("Approved by ApproveRejectReviewItem based on metadata for .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher submitted2 = Pattern.compile("Enter dryadAcceptEditReject Moved by .+, reason: .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher submitted3 = Pattern.compile("Submitted by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher embargoed = Pattern.compile(".+Entered publication blackout by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher peerReview1 = Pattern.compile("Enter reviewStep Moved by .+, reason: .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher peerReview2 = Pattern.compile("Data package moved to review on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher published = Pattern.compile("Made available in DSpace on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher withdrawn = Pattern.compile("Item withdrawn by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+
+            ObjectNode node = mapper.createObjectNode();
+            node.put("note", provenance);
+            node.put("user", (JsonNode) null);
+
+            if (authorActionRequired.matches()) {
+                node.put("status", "Author Action Required");
+                node.put("created_at", authorActionRequired.group(1));
+            } else if (submitted1.matches()) {
+                node.put("status", "Submitted");
+                node.put("created_at", submitted1.group(1));
+            } else if (submitted2.matches()) {
+                node.put("status", "Submitted");
+                node.put("created_at", submitted2.group(1));
+            } else if (submitted3.matches()) {
+                node.put("status", "Submitted");
+                node.put("created_at", submitted3.group(1));
+            } else if (embargoed.matches()) {
+                node.put("status", "Embargoed");
+                node.put("created_at", embargoed.group(1));
+            } else if (peerReview1.matches()) {
+                node.put("status", "Private for Peer Review");
+                node.put("created_at", peerReview1.group(1));
+            } else if (peerReview2.matches()) {
+                node.put("status", "Private for Peer Review");
+                node.put("created_at", peerReview2.group(1));
+            } else if (published.matches()) {
+                node.put("status", "Published");
+                node.put("created_at", published.group(1));
+            } else if (withdrawn.matches()) {
+                node.put("status", "Withdrawn");
+                node.put("created_at", withdrawn.group(1));
+            } else {
+                node.put("status", "Status Unchanged");
+                // it doesn't really matter what the date is for Status Unchanged, because it doesn't affect status, I guess.
+            }
+            resultNode.add(node);
+        }
+
+        return resultNode;
+    }
+
+    private List<String> getProvenances() {
+        ArrayList<String> resultList = new ArrayList<>();
+        if (item != null) {
             DCValue[] provenanceValues = item.getMetadata("dc.description.provenance");
             if (provenanceValues != null && provenanceValues.length > 0) {
                 for (DCValue provenanceValue : provenanceValues) {
-                    //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
-                    String provenance = provenanceValue.value;
-                    Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
-                    Matcher matcher = pattern.matcher(provenance);
-                    if (matcher.find()) {
-                        String dateString = matcher.group(1);
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                        try {
-                            Date reviewDate = sdf.parse(dateString);
-                            log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
-                            return reviewDate;
-                        } catch (Exception e) {
-                            log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
-                            return null;
-                        }
+                    resultList.add(provenanceValue.value);
+                }
+            }
+        }
+        return resultList;
+    }
+
+    // this method does not assume that the package is in review; only used by AutoReturnReviewItem.
+    public Date getEnteredReviewDate() {
+        if (useDryadClassic) {
+            List<String> provenances = getProvenances();
+            for (String provenance : provenances) {
+                //Submitted by Ricardo Rodríguez (ricardo_eyre@yahoo.es) on 2014-01-30T12:35:00Z workflow start=Step: requiresReviewStep - action:noUserSelectionAction\r
+                Pattern pattern = Pattern.compile(".* on (.+?)Z.+requiresReviewStep.*");
+                Matcher matcher = pattern.matcher(provenance);
+                if (matcher.find()) {
+                    String dateString = matcher.group(1);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    try {
+                        Date reviewDate = sdf.parse(dateString);
+                        log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
+                        return reviewDate;
+                    } catch (Exception e) {
+                        log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
+                        return null;
                     }
                 }
             }
         } else {
-            JsonNode resultNode = dashService.getCurationActivity(new Package(this));
-            // the curation activities are returned in descending order of recency
-            for (int i=0; i < resultNode.size(); i++) {
-                if (resultNode.get(i).get("status").textValue().equals("Private for Peer Review")) {
-                    String dateString = resultNode.get(i).get("created_at").textValue();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            JsonNode provenances = dashService.getCurationActivity(new Package(this));
+            if (provenances.isArray()) {
+                for (int i = 0; i < provenances.size(); i++) {
                     try {
-                        Date reviewDate = sdf.parse(dateString);
-                        log.info("package " + this.getIdentifier() + " entered review on " + reviewDate.toString());
-                        return reviewDate;
+                        JsonNode resultNode = provenances.get(i);
+                        if (resultNode.get("status").textValue().equals("Private for Peer Review")) {
+                            String dateString = resultNode.get("created_at").textValue();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                            Date reviewDate = sdf.parse(dateString);
+                            log.info("package " + this.getIdentifier() + " entered review on " + reviewDate.toString());
+                            return reviewDate;
+                        }
                     } catch (Exception e) {
-                        log.error("couldn't find review date for package " + this.getIdentifier() + ": " + dateString);
+                        log.error("couldn't find review date for package " + this.getIdentifier() + ": " + e.getMessage());
                         return null;
                     }
                 }
