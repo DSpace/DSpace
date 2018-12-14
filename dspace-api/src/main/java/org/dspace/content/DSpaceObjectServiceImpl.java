@@ -561,7 +561,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             }
             for (MetadataValue metadataValue : metadataValues) {
                 //Retrieve & store the place for each metadata value
-                if (StringUtils.startsWith(metadataValue.getAuthority(), "virtual::") && ((RelationshipMetadataValue) metadataValue).isUseForPlace()) {
+                if (StringUtils.startsWith(metadataValue.getAuthority(), "virtual::") &&
+                    ((RelationshipMetadataValue) metadataValue).isUseForPlace()) {
                     int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
                     metadataValue.setPlace(mvPlace);
                     String authority = metadataValue.getAuthority();
