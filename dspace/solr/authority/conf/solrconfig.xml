@@ -39,7 +39,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
     -->
-    <luceneMatchVersion>4.10</luceneMatchVersion>
+    <luceneMatchVersion>7.2.1</luceneMatchVersion>
 
   <!-- lib directives can be used to instruct Solr to load an Jars identified
        and use them to resolve any "plugins" specified in your solrconfig.xml or
@@ -93,8 +93,11 @@
        solr.RAMDirectoryFactory is memory based, not
        persistent, and doesn't work with replication.
     -->
-  <directoryFactory name="DirectoryFactory"
-                    class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
+    <directoryFactory name="DirectoryFactory"
+                      class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
+
+    <schemaFactory class="ClassicIndexSchemaFactory"/>
+
 
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -974,10 +977,7 @@
        The response format differs from solr1.1 formatting and returns a standard error code.
        To enable solr1.1 behavior, remove the /update handler or change its path
     -->
-  <requestHandler name="/update" class="solr.XmlUpdateRequestHandler" />
-
-
-  <requestHandler name="/update/javabin" class="solr.BinaryUpdateRequestHandler" />
+  <requestHandler name="/update" class="solr.UpdateRequestHandler" />
 
   <!--
    Analysis request handler.  Since Solr 1.3.  Use to return how a document is analyzed.  Useful
