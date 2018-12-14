@@ -38,6 +38,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +71,9 @@ public class JWTTokenHandler implements InitializingBean {
 
     @Autowired
     private EPersonService ePersonService;
+
+    @Autowired
+    private ClientInfoService clientInfoService;
 
     private String jwtKey;
     private long expirationTime;
@@ -276,11 +280,7 @@ public class JWTTokenHandler implements InitializingBean {
     }
 
     private String getIpAddress(HttpServletRequest request) {
-        String ipAddress = request.getHeader("X-FORWARDED-FOR");
-        if (ipAddress == null) {
-            ipAddress = request.getRemoteAddr();
-        }
-        return ipAddress;
+        return clientInfoService.getClientIp(request);
     }
 
     private EPerson updateSessionSalt(final Context context, final Date previousLoginDate) throws SQLException {

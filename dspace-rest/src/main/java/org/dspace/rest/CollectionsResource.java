@@ -29,7 +29,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -60,7 +60,7 @@ public class CollectionsResource extends Resource {
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
 
-    private static Logger log = Logger.getLogger(CollectionsResource.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionsResource.class);
 
     /**
      * Return instance of collection with passed id. You can add more properties
