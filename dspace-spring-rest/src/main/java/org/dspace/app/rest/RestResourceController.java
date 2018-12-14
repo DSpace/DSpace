@@ -990,7 +990,10 @@ public class RestResourceController implements InitializingBean {
         return putOneInternal(request, apiCategory, model, id, jsonNode);
     }
 
-    private <ID extends Serializable> DSpaceResource<RestAddressableModel> putOneInternal(HttpServletRequest request, String apiCategory, String model, ID id, JsonNode jsonNode) {
+    private <ID extends Serializable> DSpaceResource<RestAddressableModel> putOneInternal(HttpServletRequest request,
+                                                                                          String apiCategory,
+                                                                                          String model, ID id,
+                                                                                          JsonNode jsonNode) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;

@@ -1371,10 +1371,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private List<RelationshipMetadataValue> handleRelationshipTypeMetadataMappping(Context context, Item item,
-                                                                                   HashMap<String, VirtualBean> hashMaps,
-                                                                                   Item otherItem,
-                                                                                   String relationName,
-                                                                                   Integer relationshipId)
+                   HashMap<String, VirtualBean> hashMaps, Item otherItem, String relationName, Integer relationshipId)
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         for (Map.Entry<String, VirtualBean> entry : hashMaps.entrySet()) {
@@ -1439,7 +1436,8 @@ prevent the generation of resource policy entry values with null dspace_object a
             if (metadataField == null) {
                 log.error(
                     "A MetadataValue was attempted to construct with MetadataField for paremeters: metadataschema: "
-                        + metadataSchema + ", metadataelement:" + metadataElement + ", metadataqualifier: " + metadataQualifier);
+                        + metadataSchema + ", metadataelement:" + metadataElement +
+                        ", metadataqualifier: " + metadataQualifier);
                 return null;
             }
             metadataValue.setMetadataField(metadataField);

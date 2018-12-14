@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.RelationshipConverter;
 import org.dspace.app.rest.converter.RelationshipTypeConverter;
@@ -33,6 +32,7 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -107,10 +107,11 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
 
         Relationship relationship = new Relationship();
-        Item leftItem = itemService.find(context, relationshipRest.getLeftId());
-        Item rightItem = itemService.find(context, relationshipRest.getRightId());
+        Item leftItem = itemService.find(context, UUIDUtils.fromString(req.getParameter("leftItem")));
+        Item rightItem = itemService.find(context, UUIDUtils.fromString(req.getParameter("rightItem")));
         EPerson ePerson = context.getCurrentUser();
-        if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) && authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
+        if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) &&
+            authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
             relationship.setLeftItem(leftItem);
             relationship.setRightItem(rightItem);
             relationship
@@ -129,6 +130,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                                    JsonNode jsonNode)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
 
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         RelationshipRest relationshipRest = null;
         try {
@@ -140,14 +142,16 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         if (relationship == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        Item leftItem = itemService.find(context, relationshipRest.getLeftId());
-        Item rightItem = itemService.find(context, relationshipRest.getRightId());
-        if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) && authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
+        Item leftItem = itemService.find(context, UUIDUtils.fromString(req.getParameter("leftItem")));
+        Item rightItem = itemService.find(context, UUIDUtils.fromString(req.getParameter("rightItem")));
+        if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) &&
+            authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
             relationship.setId(relationshipRest.getId());
             relationship.setLeftItem(leftItem);
             relationship.setRightItem(rightItem);
 
-            relationship.setRelationshipType(relationshipTypeService.find(context, relationshipRest.getRelationshipTypeId()));
+            relationship.setRelationshipType(
+                relationshipTypeService.find(context, relationshipRest.getRelationshipTypeId()));
             if (relationshipRest.getLeftPlace() != -1) {
                 relationship.setLeftPlace(relationshipRest.getLeftPlace());
             }
@@ -166,12 +170,12 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
     @Override
     protected void delete(Context context, Integer id) throws AuthorizeException {
-        
         Relationship relationship = null;
         try {
             relationship = relationshipService.find(context, id);
             if (relationship != null) {
-                if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) && authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+                if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) &&
+                    authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
                     relationshipService.delete(context, relationship);
                 } else {
                     throw new AccessDeniedException("You do not have write rights on this relationship's items");
