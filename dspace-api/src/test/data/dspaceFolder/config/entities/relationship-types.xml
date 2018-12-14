@@ -109,4 +109,18 @@
             <min>0</min>
         </rightCardinality>
     </type>
+    <type>
+        <leftType>JournalIssue</leftType>
+        <rightType>Publication</rightType>
+        <leftLabel>isPublicationOfJournalIssue</leftLabel>
+        <rightLabel>isJournalIssueOfPublication</rightLabel>
+        <leftCardinality>
+            <min>0</min>
+            <max>2147483647</max>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+            <max>1</max>
+        </rightCardinality>
+    </type>
 </relationships>

@@ -30,7 +30,8 @@ public class RelationshipResourceWrapper extends HALResource<RelationshipRestWra
             list.add(new RelationshipResource(relationshipRest, utils));
         }
         int begin = pageable.getOffset();
-        int end = (pageable.getOffset() + pageable.getPageSize()) > list.size() ? list.size() : pageable.getOffset() + pageable.getPageSize();
+        int end = (pageable.getOffset() + pageable.getPageSize()) > list.size() ? list.size() :
+            pageable.getOffset() + pageable.getPageSize();
         list = list.subList(begin, end);
         embedResource("relationships", list);
     }

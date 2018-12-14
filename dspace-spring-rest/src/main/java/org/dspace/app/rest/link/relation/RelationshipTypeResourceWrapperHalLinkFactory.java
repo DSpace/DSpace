@@ -21,7 +21,8 @@ public class RelationshipTypeResourceWrapperHalLinkFactory
     extends HalLinkFactory<RelationshipTypeResourceWrapper, RelationshipTypeRestController> {
     protected void addLinks(RelationshipTypeResourceWrapper halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
-        list.add(buildLink(Link.REL_SELF, getMethodOn().retrieve(halResource.getContent().getEntityTypeId(), null, null)));
+        list.add(buildLink(Link.REL_SELF, getMethodOn()
+            .retrieve(halResource.getContent().getEntityTypeId(), null, null)));
     }
 
     protected Class<RelationshipTypeRestController> getControllerClass() {
