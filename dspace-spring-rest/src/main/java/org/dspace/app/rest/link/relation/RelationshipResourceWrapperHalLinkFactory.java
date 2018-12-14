@@ -31,13 +31,15 @@ public class RelationshipResourceWrapperHalLinkFactory
                                                          halResource.getContent().getRelationshipRestList().size());
 
         halResource.setPageHeader(new EmbeddedPage(getSelfLink(halResource.getContent(), pageable),
-                                                   page, halResource.getContent().getRelationshipRestList(), true, "relationships"));
+                                                   page, halResource.getContent().getRelationshipRestList(),
+                                                   true, "relationships"));
     }
 
     public String getSelfLink(RelationshipRestWrapper content, Pageable pageable) throws Exception {
         if (content != null) {
             UriComponentsBuilder uriBuilderSelfLink = uriBuilder(getMethodOn()
-                                                                     .retrieveByLabel(null, null, content.getLabel(),
+                                                                     .retrieveByLabel(null, null,
+                                                                                      content.getLabel(),
                                                                                       content.getDsoId(), pageable));
             return uriBuilderSelfLink.build().toString();
         }
