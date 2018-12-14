@@ -36,7 +36,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     }
 
     @Override
-    public RelationshipType ecreate(Context context, RelationshipType relationshipType)
+    public RelationshipType create(Context context, RelationshipType relationshipType)
         throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
