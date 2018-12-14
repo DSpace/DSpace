@@ -79,7 +79,7 @@ public class Author {
             String suffix = "";
             authorString = StringUtils.stripToEmpty(authorString);
             // Remove any leading title, like Dr.
-            authorString = authorString.replaceAll("^[D|M]+rs*\\.*\\s*","");
+            authorString = authorString.replaceAll("^[D|M]+rs*\\.*\\s+","");
             // is there a comma in the name?
             // it could either be lastname, firstname, or firstname lastname, title
             Matcher namepattern = Pattern.compile("^(.+),\\s*(.*)$").matcher(authorString);

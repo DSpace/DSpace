@@ -667,9 +667,9 @@ public class JournalUtils {
         result.append("package " + dryadDataPackage.getIdentifier() + " has " + authorList.size() + " authors while manuscript has " + manuscript.getAuthorList().size() + " authors\n");
         for (Author itemAuthor : authorList) {
             for (Author msAuthor : manuscript.getAuthorList()) {
-                double score = JournalUtils.getHamrScore(itemAuthor.getNormalizedFullName().toLowerCase(), msAuthor.getNormalizedFullName().toLowerCase());
+                double score = JournalUtils.getHamrScore(itemAuthor.getNormalizedFullName().toLowerCase().replaceAll("[^a-zA-Z ]", ""), msAuthor.getNormalizedFullName().toLowerCase().replaceAll("[^a-zA-Z ]", ""));
                 result.append("item author " + itemAuthor.getNormalizedFullName() + " matched ms author " + msAuthor.getUnicodeFullName() + " with a score of " + score + "\n");
-                if (itemAuthor.equals(msAuthor)) {
+                if (score > 0.8) {
                     result.append("  matched\n");
                     numMatched++;
                     break;
@@ -723,7 +723,7 @@ public class JournalUtils {
                     msDate.set(Calendar.DATE, dateParts.get(2).asInt());
                 }
                 if (msDate.after(today)) {
-                    throw new RESTModelException("CrossRef match has publication date in the future: " + msDate.get(Calendar.YEAR) + "-" + msDate.get(Calendar.MONTH) + "-" + msDate.get(Calendar.DATE));
+                    throw new RESTModelException("CrossRef match has publication date in the future: " + msDate.get(Calendar.YEAR) + "-" + msDate.get(Calendar.MONTH)+1 + "-" + msDate.get(Calendar.DATE));
                 }
                 manuscript.setPublicationDate(msDate.getTime());
             } catch (Exception e) {
