@@ -58,5 +58,15 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      */
     int findRightPlaceByRightItem(Context context,Item item) throws SQLException;
 
+    /**
+     * This method returns a list of Relationship objects for the given RelationshipType object.
+     * It will construct a list of all Relationship objects that have the given RelationshipType object
+     * as the relationshipType property
+     * @param context           The relevant DSpace context
+     * @param relationshipType  The RelationshipType object to be checked on
+     * @return  A list of Relationship objects that have the given RelationshipType object as the
+     *          relationshipType property
+     * @throws SQLException If something goes wrong
+     */
     List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException;
 }

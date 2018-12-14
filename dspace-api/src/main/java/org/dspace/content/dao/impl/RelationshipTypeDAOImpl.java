@@ -22,6 +22,7 @@ import org.dspace.core.Context;
 
 public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipType> implements RelationshipTypeDAO {
 
+    @Override
     public RelationshipType findbyTypesAndLabels(Context context, EntityType leftType, EntityType rightType,
                                                  String leftLabel, String rightLabel)
         throws SQLException {
@@ -38,6 +39,7 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
         return uniqueResult(context, criteriaQuery, false, RelationshipType.class, -1, -1);
     }
 
+    @Override
     public List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
@@ -52,6 +54,7 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
         return list(context, criteriaQuery, true, RelationshipType.class, -1, -1);
     }
 
+    @Override
     public List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);

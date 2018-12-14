@@ -35,7 +35,8 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
         return relationshipTypeDAO.create(context, new RelationshipType());
     }
 
-    public RelationshipType create(Context context, RelationshipType relationshipType)
+    @Override
+    public RelationshipType ecreate(Context context, RelationshipType relationshipType)
         throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
@@ -44,19 +45,23 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
         return relationshipTypeDAO.create(context, relationshipType);
     }
 
+    @Override
     public RelationshipType findbyTypesAndLabels(Context context,EntityType leftType,EntityType rightType,
                                                  String leftLabel,String rightLabel) throws SQLException {
         return relationshipTypeDAO.findbyTypesAndLabels(context, leftType, rightType, leftLabel, rightLabel);
     }
 
+    @Override
     public List<RelationshipType> findAll(Context context) throws SQLException {
         return relationshipTypeDAO.findAll(context, RelationshipType.class);
     }
 
+    @Override
     public List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException {
         return relationshipTypeDAO.findByLeftOrRightLabel(context, label);
     }
 
+    @Override
     public List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException {
         return relationshipTypeDAO.findByEntityType(context, entityType);
     }
