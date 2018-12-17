@@ -34,7 +34,7 @@ import org.junit.Test;
  *
  * @author Oliver Goldschmidt (o dot goldschmidt at tuhh dot de)
  */
-public class OpenSearchControllerTest extends AbstractControllerIntegrationTest {
+public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
 
     private ConfigurationService configurationService;
 
