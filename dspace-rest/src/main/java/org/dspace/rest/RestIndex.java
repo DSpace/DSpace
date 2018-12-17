@@ -23,7 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.ShibAuthentication;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
@@ -44,7 +44,7 @@ import org.dspace.utils.DSpace;
 @Path("/")
 public class RestIndex {
     protected EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private static Logger log = Logger.getLogger(RestIndex.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RestIndex.class);
 
     /**
      * Return html page with information about REST api. It contains methods all

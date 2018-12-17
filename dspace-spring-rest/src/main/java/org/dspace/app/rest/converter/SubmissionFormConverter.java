@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.app.rest.model.SubmissionFormInputTypeRest;
@@ -176,6 +176,6 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 
     @Override
     public DCInputSet toModel(SubmissionFormRest obj) {
-        throw new NotImplementedException();
+        throw new NotImplementedException("Method not implemented");
     }
 }

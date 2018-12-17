@@ -19,7 +19,7 @@ import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.Value;
 import gr.ekt.bte.exceptions.MalformedSourceException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.dspace.core.Context;
 

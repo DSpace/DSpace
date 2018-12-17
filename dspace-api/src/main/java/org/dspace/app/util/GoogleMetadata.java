@@ -26,7 +26,7 @@ import java.util.Properties;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -51,7 +51,7 @@ import org.jdom.Element;
 @SuppressWarnings("deprecation")
 public class GoogleMetadata {
 
-    private final static Logger log = Logger.getLogger(GoogleMetadata.class);
+    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(GoogleMetadata.class);
 
     protected static final String GOOGLE_PREFIX = "google.";
 

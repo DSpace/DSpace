@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.UUID;
 
 import mockit.NonStrictExpectations;
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -56,7 +56,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(ItemTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemTest.class);
 
     /**
      * Item instance for the tests
@@ -737,12 +737,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testGetCollections() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection collection = collectionService.create(context, owningCommunity);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection B");
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                                 "title", null, Item.ANY, "collection B");
         it.addCollection(collection);
         collection = collectionService.create(context, owningCommunity);
-        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY,
-                                                 "collection A");
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchemaEnum.DC.getName(),
+                                                 "title", null, Item.ANY, "collection A");
         it.addCollection(collection);
         context.restoreAuthSystemState();
         assertThat("testGetCollections 0", it.getCollections(), notNullValue());

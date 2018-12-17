@@ -14,8 +14,8 @@ import java.util.List;
 
 import com.lyncode.xoai.dataprovider.core.ItemMetadata;
 import com.lyncode.xoai.dataprovider.core.ReferenceSet;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 
 /**

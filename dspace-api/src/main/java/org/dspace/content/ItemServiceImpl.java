@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -68,7 +68,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(Item.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
@@ -229,10 +229,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         throws SQLException {
 
         MetadataField metadataField = metadataFieldService
-            .findByElement(context, MetadataSchema.DC_SCHEMA, "date", "accessioned");
+            .findByElement(context, MetadataSchemaEnum.DC.getName(), "date", "accessioned");
         if (metadataField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".date.accessioned' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".date.accessioned' doesn't exist!");
         }
 
         return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
@@ -553,7 +553,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
-        addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", prov.toString());
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update(context, item);
@@ -608,7 +608,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // bitstream checksums
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
-        addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", prov.toString());
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update(context, item);

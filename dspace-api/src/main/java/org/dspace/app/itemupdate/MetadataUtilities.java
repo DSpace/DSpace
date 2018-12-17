@@ -28,12 +28,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -189,7 +190,7 @@ public class MetadataUtilities {
         NodeList metadata = XPathAPI.selectNodeList(document, "/dublin_core");
         Node schemaAttr = metadata.item(0).getAttributes().getNamedItem("schema");
         if (schemaAttr == null) {
-            schema = MetadataSchema.DC_SCHEMA;
+            schema = MetadataSchemaEnum.DC.getName();
         } else {
             schema = schemaAttr.getNodeValue();
         }

@@ -10,7 +10,7 @@ package org.dspace.app.rest.converter;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;

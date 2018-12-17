@@ -9,7 +9,7 @@ package org.dspace.rest.filter;
 
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -24,7 +24,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class ItemFilterDefsMeta implements ItemFilterList {
     protected static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    static Logger log = Logger.getLogger(ItemFilterDefsMeta.class);
+    static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemFilterDefsMeta.class);
 
     public static final String CAT_META_GEN = "General Metadata Filters";
     public static final String CAT_META_SPEC = "Specific Metadata Filters";
