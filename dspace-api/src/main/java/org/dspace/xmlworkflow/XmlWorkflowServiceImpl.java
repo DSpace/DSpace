@@ -22,7 +22,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -84,7 +84,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     /* support for 'no notification' */
     protected Map<UUID, Boolean> noEMail = new HashMap<>();
 
-    private Logger log = Logger.getLogger(XmlWorkflowServiceImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowServiceImpl.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;

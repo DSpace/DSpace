@@ -23,7 +23,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -35,7 +35,7 @@ public class CiNiiService {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(CiNiiService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CiNiiService.class);
 
     protected int timeout = 1000;
 

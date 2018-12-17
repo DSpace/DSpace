@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -39,7 +39,7 @@ import org.swordapp.server.SwordServerException;
 
 public class ContainerManagerDSpace extends DSpaceSwordAPI
     implements ContainerManager {
-    private static Logger log = Logger.getLogger(ContainerManagerDSpace.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ContainerManagerDSpace.class);
 
     protected AuthorizeService authorizeService =
         AuthorizeServiceFactory.getInstance().getAuthorizeService();

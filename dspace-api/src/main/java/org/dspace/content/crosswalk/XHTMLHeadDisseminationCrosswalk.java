@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -65,8 +66,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
     /**
      * log4j logger
      */
-    private static Logger log = Logger
-        .getLogger(XHTMLHeadDisseminationCrosswalk.class);
+    private static Logger log = LogManager.getLogger(XHTMLHeadDisseminationCrosswalk.class);
 
     /**
      * Location of config file

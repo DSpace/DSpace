@@ -22,7 +22,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DCPersonName;
 import org.dspace.core.ConfigurationManager;
@@ -57,7 +57,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @version $Revision $
  */
 public class LCNameAuthority implements ChoiceAuthority {
-    private static final Logger log = Logger.getLogger(LCNameAuthority.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LCNameAuthority.class);
 
     // get these from configuration
     protected static String url = null;
