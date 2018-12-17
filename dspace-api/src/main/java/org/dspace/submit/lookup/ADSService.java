@@ -7,9 +7,7 @@
  */
 package org.dspace.submit.lookup;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -17,8 +15,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
@@ -36,17 +32,9 @@ import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrResponse;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.dspace.app.util.XMLUtils;
 import org.dspace.core.ConfigurationManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import gr.ekt.bte.core.Record;
@@ -141,6 +129,7 @@ public class ADSService
                 URIBuilder uriBuilder = new URIBuilder(
                         END_POINT);
                 uriBuilder.addParameter("q", query);
+                uriBuilder.addParameter("rows", "1000");
                 uriBuilder.addParameter("fl", RESULT_FIELD_LIST);
                 
 	                method = new HttpGet(uriBuilder.build());
@@ -216,31 +205,6 @@ public class ADSService
         return adsResults;
     }
 
-    public List<Record> getByPubmedEuropeResults(List<Element> results)
-            throws HttpException, IOException, ParserConfigurationException,
-            SAXException
-    {
-		List<Record> pubmedEuropeResult = new ArrayList<Record>();
-
-		for (Element xmlArticle : results)
-		{
-			Record pubmedItem = null;
-			try
-			{
-				pubmedItem = PubmedEuropeUtils
-						.convertPubmedEuropeDomToRecord(xmlArticle);
-				pubmedEuropeResult.add(pubmedItem);
-			}
-			catch (Exception e)
-			{
-				throw new RuntimeException(
-						"PubmedID is not valid or not exist: "
-								+ e.getMessage(), e);
-			}
-		}
-
-		return pubmedEuropeResult;
-    }
     
     public List<Record> getByADSBibcodes(List<String> bibcodes,String token) throws  URISyntaxException{
 

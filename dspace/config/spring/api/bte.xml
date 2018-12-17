@@ -1046,6 +1046,7 @@
 				<entry key="bibcode" value="adsbibcode" />
 				<entry key="doi" value="doi" />
 				<entry key="doctype" value="subtype" />
+				<entry key="adstype" value="providerType" />
 				<entry key="id" value="adsid" />
 				<entry key="issue" value="issue" />
 				<entry key="keyword" value="keywords" />
@@ -1177,6 +1178,7 @@
 		<property name="sourceIdMetadata" value="dc.identifier.adsbibcode" />
 		<property name="providerName" value="scopus" />		
 	</bean>
+
 	
 	<!--  ORCID FEED -->	
 	<bean name="orcidFeedTransformationEnginePhaseOne" class="gr.ekt.bte.core.TransformationEngine">

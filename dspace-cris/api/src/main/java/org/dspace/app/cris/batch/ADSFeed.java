@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -63,6 +64,8 @@ public class ADSFeed
     private static final String IMP_RECORD_ID = "imp_record_id";
 
     private static final String IMP_ITEM_ID = "imp_item_id";
+    
+    private static final String IMP_SOURCE_REF_ADS= "ads";
 
 	
     private static final Logger log = Logger.getLogger(ADSFeed.class);
@@ -106,6 +109,12 @@ public class ADSFeed
                         "UserQuery, default query setup in the adsfeed.cfg")
                 .create("q"));
 
+        options.addOption(OptionBuilder.withArgName("Query Generator").hasArg(true)
+                .withDescription(
+                        "Generate query using the plugin, default query setup in the adsfeed.cfg")
+                .create("g"));
+
+        
         options.addOption(
                 OptionBuilder.withArgName("query Start Date").hasArg(true)
                         .withDescription(
@@ -173,38 +182,42 @@ public class ADSFeed
         boolean forceCollectionId = line.hasOption("f");
 
         String startDate = "";
+        Date sDate = null;
         if (line.hasOption("s"))
         {
-            startDate = line.getOptionValue("s");
+            sDate = df.parse(line.getOptionValue("s"));
         }
         else
         {
             TableRow row = DatabaseManager.querySingle(context,
                     "SELECT max(impr.last_modified) as LAST_MODIFIED from IMP_RECORD_TO_ITEM imprti join IMP_RECORD impr on "
-                    + "imprti.imp_record_id = impr.imp_record_id and imprti."+IMP_SOURCE_REF+" like 'ads'");
-            Date date = row.getDateColumn("LAST_MODIFIED");
-            if (date == null)
+                    + "imprti.imp_record_id = impr.imp_record_id and imprti."+IMP_SOURCE_REF+" like '"+IMP_SOURCE_REF_ADS+"'");
+            sDate = row.getDateColumn("LAST_MODIFIED");
+            if (sDate == null)
             {
-                date = new Date();
+                sDate = new Date();
             }
-            startDate = df.format(date);
         }
-
-
-        startDate = startDate.substring(0, 10);
+        
+        startDate = df.format(sDate);
         String endDate = "*";
         if (line.hasOption("e"))
         {
             endDate = line.getOptionValue("e");
             Date date = df.parse(endDate);
-            endDate = Long.toString(date.getTime());
+            endDate = df.format(date);
         }
         
         String userQuery = ConfigurationManager.getProperty("adsfeed",
                 "query.param.default");
+        String queryGen = "";
         if (line.hasOption("q"))
         {
             userQuery = line.getOptionValue("q");
+        }
+        
+        if(line.hasOption("g")) {
+        	queryGen = line.getOptionValue("g");
         }
 
         if (line.hasOption("o"))
@@ -215,34 +228,70 @@ public class ADSFeed
         int total = 0;
         int deleted = 0;
 
+        HashMap<Integer,String> submitterID2query = new HashMap<Integer,String>();
+        
+        IFeedQueryGenerator queryGenerator = new DSpace().getServiceManager()
+                .getServiceByName(queryGen, IFeedQueryGenerator.class);
+
+        if(queryGenerator != null) {
+	         submitterID2query = queryGenerator.generate();
+        }else {
+        	submitterID2query.put(eperson.getID(), userQuery);
+        }
+         
         ImpRecordDAO dao = ImpRecordDAOFactory.getInstance(context);
         List<ImpRecordItem> adsItemList = new ArrayList<ImpRecordItem>();
 
-        adsItemList
-                .addAll(convertToImpRecordItem(userQuery, startDate, endDate));
-
-     
-        for (ImpRecordItem adsItem : adsItemList)
-        {
-            try
-            {
-
-                total++;
-                String action = "insert";
-                DTOImpRecord impRecord = writeImpRecord(context, dao,
-                		collection_id, adsItem, action, eperson.getID());
-
-                dao.write(impRecord, true);
-            }
-            catch (Exception ex)
-            {
-                deleted++;
-            }
+        Set<Integer> ids = submitterID2query.keySet();
+        
+        for(Integer id : ids) {
+        	
+	        adsItemList
+	                .addAll(convertToImpRecordItem(submitterID2query.get(id), startDate, endDate));
+	     
+	        for (ImpRecordItem adsItem : adsItemList)
+	        {
+	        	
+	            try
+	            {
+	            	int tmpCollectionID = collection_id;
+	            	if(!forceCollectionId) {
+	                    Set<ImpRecordMetadata> t = adsItem.getMetadata().get("dc.source.type");
+	                    if (t != null && !t.isEmpty())
+	                    {
+	                        String stringTmpCollectionID = "";
+	                        Iterator<ImpRecordMetadata> iterator = t.iterator();
+	                        while (iterator.hasNext())
+	                        {
+	                            String stringTrimTmpCollectionID = iterator.next().getValue();
+	                            stringTmpCollectionID += stringTrimTmpCollectionID
+	                                    .trim();
+	                        }
+	                        tmpCollectionID = ConfigurationManager
+	                                .getIntProperty("adsfeed",
+	                                        "ads.type." + stringTmpCollectionID
+	                                                + ".collectionid",
+	                                        collection_id);
+	                    }	
+	            	}
+	            	
+	            	total++;
+	                String action = "insert";
+	                DTOImpRecord impRecord = writeImpRecord(context, dao,
+	                		tmpCollectionID, adsItem, action, id);
+	
+	                dao.write(impRecord, true);
+	            }
+	            catch (Exception ex)
+	            {
+	                deleted++;
+	            }
+	        }
+	
+	        System.out.println("Imported " + (total - deleted) + " record; "
+	                + deleted + " marked as removed");
+	        adsItemList.clear();
         }
-
-        System.out.println("Imported " + (total - deleted) + " record; "
-                + deleted + " marked as removed");
-        adsItemList.clear();
 
         context.complete();
 
@@ -255,6 +304,7 @@ public class ADSFeed
         DTOImpRecord dto = new DTOImpRecord(dao);
 
         HashMap<String, Set<ImpRecordMetadata>> meta = pmeItem.getMetadata();
+        String imp_record_id="";
         for (String md : meta.keySet())
         {
             Set<ImpRecordMetadata> values = meta.get(md);
@@ -296,30 +346,28 @@ public class ADSFeed
         String query = userQuery;
         if (StringUtils.isNotBlank(start) && StringUtils.isNotBlank(end))
         {
-            query += "&fq=pubdate:[" + start +" TO " + end +"]";
+            query += " AND pubdate:[" + start +" TO " + end +"]";
         }else if(StringUtils.isNotBlank(start)){
-        	query += "&fq=pubdate:[* TO " + end +"]";
+        	query += " AND pubdate:[* TO " + end +"]";
         }else if(StringUtils.isNotBlank(end)){
-        	query += "&fq=pubdate:[" + start +" TO *]";
+        	query += " AND pubdate:[" + start +" TO *]";
         }
-        query+="&rows=1000";
         adsResult =adsOnlineDataLoader.search(query);
 
         List<ItemSubmissionLookupDTO> results = new ArrayList<ItemSubmissionLookupDTO>();
         if (adsResult != null && !adsResult.isEmpty())
         {
-
             TransformationEngine transformationEngine1 = getFeedTransformationEnginePhaseOne();
             if (transformationEngine1 != null)
             {
                 for (Record record : adsResult)
                 {
-                    if (record.getValues("bibcode").isEmpty())
+                    if (record.getValues("adsbibcode")== null || record.getValues("adsbibcode").isEmpty())
                         continue;
                     HashMap<String, Set<String>> map = new HashMap<String, Set<String>>();
                     HashSet<String> set = new HashSet<String>();
-                    set.add(record.getValues("bibcode").get(0).getAsString());
-                    map.put("bibcode", set);
+                    set.add(record.getValues("adsbibcode").get(0).getAsString());
+                    map.put("adsbibcode", set);
 
                     MultipleSubmissionLookupDataLoader mdataLoader = (MultipleSubmissionLookupDataLoader) transformationEngine1
                             .getDataLoader();
