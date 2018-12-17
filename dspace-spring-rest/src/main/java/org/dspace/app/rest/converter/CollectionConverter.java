@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 public class CollectionConverter
     extends DSpaceObjectConverter<org.dspace.content.Collection, org.dspace.app.rest.model.CollectionRest> {
 
-    private static final Logger log = Logger.getLogger(CollectionConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionConverter.class);
 
     @Autowired
     private BitstreamConverter bitstreamConverter;

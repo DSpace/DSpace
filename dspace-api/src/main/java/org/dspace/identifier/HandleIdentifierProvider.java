@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -38,7 +38,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(HandleIdentifierProvider.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleIdentifierProvider.class);
 
     /**
      * Prefix registered to no one

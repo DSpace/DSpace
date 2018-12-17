@@ -22,8 +22,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
@@ -45,7 +46,7 @@ import org.xml.sax.SAXException;
  */
 public class InitializeEntities {
 
-    private final static Logger log = Logger.getLogger(InitializeEntities.class);
+    private final static Logger log = LogManager.getLogger();
 
     private RelationshipTypeService relationshipTypeService;
     private RelationshipService relationshipService;

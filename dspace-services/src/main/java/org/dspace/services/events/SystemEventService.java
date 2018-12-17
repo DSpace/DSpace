@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.services.CachingService;
 import org.dspace.services.EventService;

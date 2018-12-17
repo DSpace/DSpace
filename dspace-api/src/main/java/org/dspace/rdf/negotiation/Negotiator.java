@@ -14,8 +14,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.rdf.RDFUtil;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -34,7 +34,7 @@ public class Negotiator {
 
     public static final String DEFAULT_LANG = "html";
 
-    private static final Logger log = Logger.getLogger(Negotiator.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Negotiator.class);
 
     /**
      * Default constructor

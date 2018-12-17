@@ -45,6 +45,4 @@
     <bean class="org.dspace.storage.rdbms.PostgreSQLCryptoChecker"/>
     <bean class="org.dspace.storage.rdbms.SiteServiceInitializer"/>
 
-    <!-- Initialize our LoggerService (i.e. log4j) -->
-    <bean class="org.dspace.core.LoggerServiceImpl"/>
 </beans>

@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
@@ -62,7 +62,7 @@ public class MediaRange {
     public static final String mediaRangeRegex = "(?:(" + token + ")/(" + token + "?)"
         + "(" + nonQualityParam + "*)" + qualityParam + "?(" + nonQualityParam + "*))";
 
-    private final static Logger log = Logger.getLogger(MediaRange.class);
+    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(MediaRange.class);
 
     protected final String type;
     protected final String subtype;

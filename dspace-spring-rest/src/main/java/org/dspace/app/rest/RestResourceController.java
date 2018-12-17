@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.exception.PaginationException;
@@ -111,7 +111,7 @@ public class RestResourceController implements InitializingBean {
      */
     private static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT = "/{id:\\d+}";
 
-    private static final Logger log = Logger.getLogger(RestResourceController.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RestResourceController.class);
 
     @Autowired
     DiscoverableEndpointsService discoverableEndpointsService;

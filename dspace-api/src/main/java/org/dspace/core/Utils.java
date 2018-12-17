@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import com.coverity.security.Escape;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Utility functions for DSpace.
@@ -42,7 +42,7 @@ public final class Utils {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(Utils.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Utils.class);
 
     private static final Pattern DURATION_PATTERN = Pattern
         .compile("(\\d+)([smhdwy])");
