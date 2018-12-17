@@ -1,0 +1,57 @@
+====
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+====
+
+#ResourceSync for Metadata Harvesting
+
+This repository supports the ResourceSync protocol and the profile of ResourceSync for metadata harvesting.
+
+##Documents Available
+
+You should begin interacting with the service via the Capability List (where you will find a link to this document).
+
+The Capability List will point you to a Resource List and a Change List Archive.
+
+The Change List Archive will list all of the Change Lists available.
+
+##Bitstream Records
+
+Bitstreams listed in the Resource List and Change List documents can have the following form:
+
+    <url>
+        <loc>http://example.com/bitstream1</loc>
+        <lastmod>2013-01-02T17:00:00Z</lastmod>
+        <rs:ln rel="describedby" href="http://example.com/metadata-resource"/>
+        <rs:ln rel="describedby" href="http://example.com/other-metadata"/>
+        <rs:ln rel="collection" href="http://example.com/collection1"/>
+    </url>
+
+* describedBy indicates the metadata resources which describe this bitstream
+* collection indicates the collections/sets this bitstream appears in
+
+You may choose to selectively synchronise content based on the collection it appears in and whether it is described by
+a metadata resource which is in a format you wish to consume.  You may also apply any other filtering rules at your
+discretion.
+
+##Metadata Records
+
+Metadata records listed in the Resource List and Change List documents can have the following form:
+
+    <url>
+        <loc>http://example.com/metadata-resource</loc>
+        <lastmod>2013-01-02T17:00:00Z</lastmod>
+        <rs:ln rel="describes" href="http://example.com/bitstream1"/>
+        <rs:ln rel="describedby" href="http://purl.org/dc/terms/"/>
+        <rs:ln rel="collection" href="http://example.com/collection1"/>
+    </url>
+
+* describes indicates the bitstreams which this metadata resource describes
+* describedby indicates the metadata format that this particular serialisation of the metadata resource conforms to
+* collection indicates the collections/sets this metadata resource appears in
+
+You may choose to selectively synchronise content based on the collection it appears in.  You may also apply any other
+filtering rules at your discretion.
