@@ -22,6 +22,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,6 +35,15 @@ import org.junit.Test;
  * @author Oliver Goldschmidt (o dot goldschmidt at tuhh dot de)
  */
 public class OpenSearchControllerTest extends AbstractControllerIntegrationTest {
+
+    private ConfigurationService configurationService;
+
+    @Before
+    public void init() throws Exception {
+        //enable OpenSearch by configuration
+        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        configurationService.setProperty("websvc.opensearch.enable", true);
+    }
 
     @Test
     public void searchAtomTest() throws Exception {
