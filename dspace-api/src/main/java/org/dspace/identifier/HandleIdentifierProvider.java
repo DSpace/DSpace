@@ -11,11 +11,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
@@ -38,7 +38,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(HandleIdentifierProvider.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleIdentifierProvider.class);
 
     /**
      * Prefix registered to no one
@@ -228,14 +228,15 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         // First check that identifier doesn't already exist.
         boolean identifierExists = false;
         List<MetadataValue> identifiers = itemService
-            .getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
+            .getMetadata(item, MetadataSchemaEnum.DC.getName(), "identifier", "uri", Item.ANY);
         for (MetadataValue identifier : identifiers) {
             if (handleref.equals(identifier.getValue())) {
                 identifierExists = true;
             }
         }
         if (!identifierExists) {
-            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                    "identifier", "uri", null, handleref);
         }
     }
 }

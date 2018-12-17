@@ -17,7 +17,7 @@ import com.lyncode.xoai.dataprovider.filter.conditions.CustomCondition;
 import com.lyncode.xoai.dataprovider.filter.conditions.NotCondition;
 import com.lyncode.xoai.dataprovider.filter.conditions.OrCondition;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.xoai.filter.AndFilter;
 import org.dspace.xoai.filter.DSpaceFilter;
 import org.dspace.xoai.filter.NotFilter;
@@ -30,7 +30,7 @@ import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseDSpaceFilterResolver implements DSpaceFilterResolver {
-    private static final Logger LOGGER = Logger.getLogger(BaseDSpaceFilterResolver.class);
+    private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(BaseDSpaceFilterResolver.class);
 
     @Autowired
     FieldResolver fieldResolver;

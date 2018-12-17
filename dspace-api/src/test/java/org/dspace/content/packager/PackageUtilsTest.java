@@ -15,12 +15,12 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -44,7 +44,7 @@ import org.junit.Test;
  * for the University of Waikato's Institutional Research Repositories
  */
 public class PackageUtilsTest extends AbstractUnitTest {
-    private static final Logger log = Logger.getLogger(PackageUtilsTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PackageUtilsTest.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -87,13 +87,14 @@ public class PackageUtilsTest extends AbstractUnitTest {
             //
             Community topCommunity = communityService.create(null, context);
             communityService
-                .addMetadata(context, topCommunity, MetadataSchema.DC_SCHEMA, "title", null, null, "Top Community");
+                .addMetadata(context, topCommunity, MetadataSchemaEnum.DC.getName(), "title", null, null,
+                             "Top Community");
             communityService.update(context, topCommunity);
             topCommunityHandle = topCommunity.getHandle();
 
             Community child = communityService.createSubcommunity(context, topCommunity);
             communityService
-                .addMetadata(context, child, MetadataSchema.DC_SCHEMA, "title", null, null, "Child Community");
+                .addMetadata(context, child, MetadataSchemaEnum.DC.getName(), "title", null, null, "Child Community");
             communityService.update(context, child);
 
             // Create our primary Test Collection

@@ -32,12 +32,14 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.ParseException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -103,7 +105,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author Robert Tansley
  * @author Jim Downing - added attachment handling code
  * @author Adan Roman Ruiz at arvo.es - added inputstream attachment handling code
- * @version $Revision: 5844 $
  */
 public class Email {
     /**
@@ -139,7 +140,7 @@ public class Email {
      */
     private String charset;
 
-    private static final Logger log = Logger.getLogger(Email.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Email.class);
 
     /**
      * Create a new email message.
@@ -207,7 +208,25 @@ public class Email {
         attachments.add(new FileAttachment(f, name));
     }
 
+    /** When given a bad MIME type for an attachment, use this instead. */
+    private static final String DEFAULT_ATTACHMENT_TYPE = "application/octet-stream";
+
     public void addAttachment(InputStream is, String name, String mimetype) {
+        if (null == mimetype) {
+            log.error("Null MIME type replaced with '" + DEFAULT_ATTACHMENT_TYPE
+                    + "' for attachment '" + name + "'");
+            mimetype = DEFAULT_ATTACHMENT_TYPE;
+        } else {
+            try {
+                new ContentType(mimetype); // Just try to parse it.
+            } catch (ParseException ex) {
+                log.error("Bad MIME type '" + mimetype
+                        + "' replaced with '" + DEFAULT_ATTACHMENT_TYPE
+                        + "' for attachment '" + name + "'", ex);
+                mimetype = DEFAULT_ATTACHMENT_TYPE;
+            }
+        }
+
         moreAttachments.add(new InputStreamAttachment(is, name, mimetype));
     }
 
