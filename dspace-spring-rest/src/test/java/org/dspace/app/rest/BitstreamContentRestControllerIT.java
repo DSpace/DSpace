@@ -52,6 +52,7 @@ import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -73,6 +74,13 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
 
     @Autowired
     private CitationDocumentServiceImpl citationDocumentService;
+
+    @BeforeClass
+    public static void clearStatistics() throws Exception {
+        // To ensure these tests start "fresh", clear out any existing statistics data.
+        // NOTE: this is committed immediately in removeIndex()
+        StatisticsServiceFactory.getInstance().getSolrLoggerService().removeIndex("*:*");
+    }
 
     @Before
     public void setup() throws Exception {
