@@ -29,8 +29,6 @@ public class CollectionRest extends DSpaceObjectRest {
     @JsonIgnore
     private BitstreamRest logo;
 
-    private String owningCommunity;
-
     @JsonIgnore
     private List<ResourcePolicyRest> defaultAccessConditions;
 
@@ -61,14 +59,6 @@ public class CollectionRest extends DSpaceObjectRest {
 
     public void setDefaultAccessConditions(List<ResourcePolicyRest> defaultAccessConditions) {
         this.defaultAccessConditions = defaultAccessConditions;
-    }
-
-    public String getOwningCommunity() {
-        return owningCommunity;
-    }
-
-    public void setOwningCommunity(String owningCommunity) {
-        this.owningCommunity = owningCommunity;
     }
 
 }
