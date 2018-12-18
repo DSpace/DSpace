@@ -116,6 +116,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 f2.deleteOnExit();
                 ConvertCmd cmd = new ConvertCmd();
                 IMOperation op = new IMOperation();
+                op.autoOrient();
                 op.addImage(f.getAbsolutePath());
                 op.thumbnail(width, height);
                 op.addImage(f2.getAbsolutePath());
@@ -139,7 +140,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 // PDFs using the CMYK color system can be handled specially if
                 // profiles are defined
                 if (cmyk_profile != null && srgb_profile != null) {
-                        Info imageInfo = new Info(f.getAbsolutePath(), true);
+                        Info imageInfo = new Info(f.getAbsolutePath() + s, true);
                         String imageClass = imageInfo.getImageClass();
                         if (imageClass.contains("CMYK")) {
                                 op.profile(cmyk_profile);

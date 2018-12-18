@@ -276,14 +276,15 @@ public class XOAI {
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XmlOutputContext context = XmlOutputContext.emptyContext(out, Second);
-        retrieveMetadata(this.context, item).write(context);
-        context.getWriter().flush();
-        context.getWriter().close();
+        XmlOutputContext xmlContext = XmlOutputContext.emptyContext(out, Second);
+        retrieveMetadata(context, item).write(xmlContext);
+        xmlContext.getWriter().flush();
+        xmlContext.getWriter().close();
         doc.addField("item.compile", out.toString());
 
         if (verbose) {
-            println("Item with handle " + handle + " indexed");
+            println(String.format("Item %d with handle %s indexed",
+                    item.getID(), handle));
         }
 
 

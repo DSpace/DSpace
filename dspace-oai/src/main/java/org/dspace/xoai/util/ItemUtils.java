@@ -12,6 +12,7 @@ import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import com.lyncode.xoai.util.Base64Utils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.MetadataExposure;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -78,6 +79,19 @@ public class ItemUtils
         Metadatum[] vals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (Metadatum val : vals)
         {
+            // Don't expose fields that are hidden by configuration
+            try {
+                if (MetadataExposure.isHidden(context,
+                        val.schema,
+                        val.element,
+                        val.qualifier))
+                {
+                    continue;
+                }
+            } catch(SQLException se) {
+                throw new RuntimeException(se);
+            }
+
             Element valueElem = null;
             Element schema = getElement(metadata.getElement(), val.schema);
             if (schema == null)
