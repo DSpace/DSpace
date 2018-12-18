@@ -18,8 +18,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class adds links to {@link org.dspace.app.rest.model.hateoas.RelationshipResource}s
+ * This builds a link to both items included in the relationship
+ */
 @Component
 public class RelationshipHalLinkFactory extends HalLinkFactory<RelationshipResource, RestResourceController> {
+    @Override
     protected void addLinks(RelationshipResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
 
@@ -30,10 +35,12 @@ public class RelationshipHalLinkFactory extends HalLinkFactory<RelationshipResou
             .findOne(ItemRest.CATEGORY, English.plural(ItemRest.NAME), halResource.getContent().getRightId(), null)));
     }
 
+    @Override
     protected Class<RestResourceController> getControllerClass() {
         return RestResourceController.class;
     }
 
+    @Override
     protected Class<RelationshipResource> getResourceClass() {
         return RelationshipResource.class;
     }
