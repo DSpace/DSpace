@@ -10,7 +10,6 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -86,7 +85,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                hasJsonPath("$.uuid", not(empty())),
                                hasJsonPath("$.name", is("Title Text")),
                                hasJsonPath("$.handle", not(empty())),
-                               hasJsonPath("$.owningCommunity", isEmptyOrNullString()),
                                hasJsonPath("$.type", is("community")),
                                hasJsonPath("$._links.collections.href", not(empty())),
                                hasJsonPath("$._links.logo.href", not(empty())),
@@ -160,7 +158,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                 hasJsonPath("$.uuid", not(empty())),
                                 hasJsonPath("$.name", is("Title Text")),
                                 hasJsonPath("$.handle", not(empty())),
-                                hasJsonPath("$.owningCommunity", is(parentCommunity.getID().toString())),
                                 hasJsonPath("$.type", is("community")),
                                 hasJsonPath("$._links.collections.href", not(empty())),
                                 hasJsonPath("$._links.logo.href", not(empty())),

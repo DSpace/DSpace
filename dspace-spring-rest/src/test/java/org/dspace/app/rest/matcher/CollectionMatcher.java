@@ -22,18 +22,16 @@ public class CollectionMatcher {
 
     private CollectionMatcher() { }
 
-    public static Matcher<? super Object> matchCollectionEntry(String name, UUID uuid, String handle, UUID parentUuid) {
-        return matchCollectionEntry(name, uuid, handle, null, parentUuid);
+    public static Matcher<? super Object> matchCollectionEntry(String name, UUID uuid, String handle) {
+        return matchCollectionEntry(name, uuid, handle, null);
     }
 
-    public static Matcher<? super Object> matchCollectionEntry(String name, UUID uuid, String handle,
-                                                               Bitstream logo, UUID parentUuid) {
+    public static Matcher<? super Object> matchCollectionEntry(String name, UUID uuid, String handle, Bitstream logo) {
         return allOf(
             hasJsonPath("$.uuid", is(uuid.toString())),
             hasJsonPath("$.name", is(name)),
             hasJsonPath("$.handle", is(handle)),
             hasJsonPath("$.type", is("collection")),
-            hasJsonPath("$.owningCommunity", is(parentUuid.toString())),
             hasJsonPath("$.metadata", Matchers.hasItem(
                 CollectionMetadataMatcher.matchTitle(name)
             )),

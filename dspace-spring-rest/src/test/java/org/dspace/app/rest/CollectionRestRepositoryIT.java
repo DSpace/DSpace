@@ -63,10 +63,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle(),
-                                                              col1.getCommunities().get(0).getID()),
-                       CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle(),
-                                                              col2.getCommunities().get(0).getID())
+                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()),
+                       CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                    )));
     }
 
@@ -95,13 +93,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle(),
-                                                              col1.getCommunities().get(0).getID())
+                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.not(
                        Matchers.contains(
-                           CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle(),
-                                                                  col1.getCommunities().get(0).getID())
+                           CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                        )
                    )));
 
@@ -111,13 +107,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                       CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle(),
-                                                              col2.getCommunities().get(0).getID())
+                       CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.not(
                        Matchers.contains(
-                           CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle(),
-                                                                  col1.getCommunities().get(0).getID())
+                           CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                        )
                    )));
     }
@@ -147,13 +141,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
-                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle(),
-                                                              col1.getCommunities().get(0).getID())
+                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        is(
-                           CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle(),
-                                                                  col1.getCommunities().get(0).getID())
+                           CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                        ))));
     }
 
@@ -181,13 +173,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
-                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle(),
-                                                              col1.getCommunities().get(0).getID())
+                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        is(
-                           CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle(),
-                                                                  col1.getCommunities().get(0).getID())
+                           CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                        )))
                    )
         ;
@@ -321,13 +311,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
-                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle(),
-                                                              col1.getCommunities().get(0).getID())
+                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        is(
-                           CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle(),
-                                                                  col1.getCommunities().get(0).getID())
+                           CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                        ))));
     }
 
@@ -350,8 +338,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle(),
-                                                              col1.getCommunities().get(0).getID())
+                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/collections")))
         ;
@@ -365,8 +352,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                     "dissertations (ETD)\",\"handle\": \"" + col1.getHandle() + "\",\"metadata\": " +
                     "[{\"key\": \"dc.description.abstract\",\"value\": \"\",\"language\": null}," +
                     "{\"key\": \"dc.title\",\"value\": \"Electronic theses and dissertations " +
-                    "(ETD)\",\"language\": null}], \"owningCommunity\": \"" +
-                    child1.getID() + "\",\"type\": \"collection\"}"
+                    "(ETD)\",\"language\": null}],\"type\": \"collection\"}"
             ))
                         .andExpect(status().isOk())
         ;
@@ -376,8 +362,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
                        CollectionMatcher.matchCollectionEntry("Electronic theses and dissertations (ETD)",
-                                                              col1.getID(), col1.getHandle(),
-                                                              col1.getCommunities().get(0).getID())
+                                                              col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href",
                                        Matchers.containsString("/api/core/collections")))
@@ -415,8 +400,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle(),
-                                                                   col1.getCommunities().get(0).getID())
+                            CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
                                             Matchers.containsString("/api/core/collections")))        ;
@@ -457,8 +441,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle(),
-                                                                   col1.getCommunities().get(0).getID())
+                            CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
                                             Matchers.containsString("/api/core/collections")))        ;
@@ -522,7 +505,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                 hasJsonPath("$.uuid", not(empty())),
                                 hasJsonPath("$.name", is("Title Text")),
                                 hasJsonPath("$.handle", not(empty())),
-                                hasJsonPath("$.owningCommunity", is(parentCommunity.getID().toString())),
                                 hasJsonPath("$.type", is("collection")),
                                 hasJsonPath("$.metadata", Matchers.containsInAnyOrder(
                                     CommunityMetadataMatcher.matchMetadata("dc.description",

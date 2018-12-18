@@ -24,16 +24,6 @@ public class CommunityRest extends DSpaceObjectRest {
     @JsonIgnore
     private BitstreamRest logo;
 
-    private String owningCommunity;
-
-    public String getOwningCommunity() {
-        return owningCommunity;
-    }
-
-    public void setOwningCommunity(String owningCommunity) {
-        this.owningCommunity = owningCommunity;
-    }
-
     private List<CollectionRest> collections;
 
     @LinkRest(linkClass = CollectionRest.class)
