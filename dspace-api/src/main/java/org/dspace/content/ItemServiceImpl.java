@@ -1291,6 +1291,8 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang) {
+        //Fields of the relationship schema are virtual metadata except for relationship.type which is the type of item in the model
+        //TODO: the "type" should be migrated to a constant
         if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
 
             List<MetadataValue> relationMetadata = getRelationshipMetadata(item, false);
