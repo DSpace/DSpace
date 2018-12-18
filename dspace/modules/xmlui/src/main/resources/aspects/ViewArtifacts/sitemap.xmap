@@ -30,8 +30,6 @@ collections / items / and bitstreams
 			<map:transformer name="ItemViewer" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemViewer" />
 			<map:transformer name="ItemRequestForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestForm" />
 			<map:transformer name="ItemRequestSent" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestSent" />
-			<map:transformer name="FeedbackForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.FeedbackForm" />
-			<map:transformer name="FeedbackSent" src="org.dspace.app.xmlui.aspect.artifactbrowser.FeedbackSent" />
 			<map:transformer name="Contact" src="org.dspace.app.xmlui.aspect.artifactbrowser.Contact" />
 			<map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem" />
 			<map:transformer name="ItemRequestResponseDecisionForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestResponseDecisionForm" />
@@ -66,7 +64,6 @@ collections / items / and bitstreams
 
 
 		<map:actions>
-			<map:action name="SendFeedbackAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SendFeedbackAction" />
 			<map:action name="SendItemRequestAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SendItemRequestAction" />
 			<map:action name="UsageLoggerAction" src="org.dspace.app.xmlui.cocoon.UsageLoggerAction" />
 			<map:action name="NotModifiedAction" src="org.dspace.app.xmlui.aspect.general.NotModifiedAction" />
@@ -287,23 +284,6 @@ collections / items / and bitstreams
 
 			</map:match> <!-- End match handle/*/** -->
 
-
-			<!-- A simple feedback utility that presents the user with a form to fill 
-				out, the results of which are emailed to the site administrator. -->
-			<map:match pattern="feedback">
-				<map:act type="SendFeedbackAction">
-					<map:transform type="FeedbackForm">
-						<map:parameter name="comments" value="{comments}" />
-						<map:parameter name="email" value="{email}" />
-						<map:parameter name="page" value="{page}" />
-					</map:transform>
-
-					<map:serialize type="xml" />
-				</map:act>
-				<map:transform type="FeedbackSent" />
-				<map:serialize type="xml" />
-			</map:match>
-			
 			<!-- A request item flow -->
 			<map:match pattern="itemRequestResponse/*/">
 				<map:act type="ItemRequestResponseAction">

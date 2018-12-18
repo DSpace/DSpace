@@ -790,6 +790,18 @@
                         </xsl:choose>        
                     </div>
                 </xsl:when>
+                <!-- Customization for LIBDRUM-563 -->
+                <xsl:when test="$request-uri='feedback'">
+                    <xsl:choose>
+                        <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='wufoo'][@qualifier='formHash']">
+                            <xsl:call-template name="addWufooFormEmbed" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
+                <!-- End Customization for LIBDRUM-563 -->
                 <!-- Otherwise use default handling of body -->
                 <xsl:otherwise>
                     <xsl:apply-templates />
@@ -905,6 +917,57 @@
             </xsl:text></script>
         </xsl:if>
     </xsl:template>
+
+    <!-- Customization for LIBDRUM-563 -->
+    <xsl:template name="addWufooFormEmbed">
+        <xsl:variable name="formHash">
+            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='wufoo'][@qualifier='formHash']"/>
+        </xsl:variable>
+        <xsl:variable name="defaultValues">
+            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='wufoo'][@qualifier='defaultValues']"/>
+        </xsl:variable>
+        <!-- Add wufoo feedback form embed -->
+        <div>
+            <div id="wufoo-{$formHash}">
+                DRUM <a href="https://libumd.wufoo.com/forms/{$formHash}">feedback form</a>.
+            </div>
+            <script type="text/javascript">
+            <xsl:text>
+                var _form;
+                (function(d, t) {
+                    var s = d.createElement(t),
+                    options = {
+                        userName: "libumd",
+                        formHash: "</xsl:text><xsl:value-of select="$formHash"/><xsl:text>",
+                        autoResize: true,
+                        height: "440",
+                        async: true,
+                        host: "wufoo.com",
+                        header: "show",
+                        ssl: true,
+                        defaultValues: "</xsl:text><xsl:value-of select="$defaultValues"/><xsl:text>"
+                    };
+                    s.src =
+                    ("https:" == d.location.protocol ? "https://" : "http://") +
+                    "www.wufoo.com/scripts/embed/form.js";
+                    s.onload = s.onreadystatechange = function() {
+                        var rs = this.readyState;
+                        if (rs) if (rs != "complete") if (rs != "loaded") return;
+                        try {
+                            _form = new WufooForm();
+                            _form.initialize(options);
+                            _form.display();
+                        } catch (e) {}
+                    };
+                    var scr = d.getElementsByTagName(t)[0],
+                    par = scr.parentNode;
+                    par.insertBefore(s, scr);
+                })(document, "script");
+            </xsl:text>
+            </script>
+        </div>
+    </xsl:template>
+    <!-- End Customization for LIBDRUM-563 -->
 
     <!--The Language Selection
         Uses a page metadata curRequestURI which was introduced by in /xmlui-mirage2/src/main/webapp/themes/Mirage2/sitemap.xmap-->
