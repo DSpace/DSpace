@@ -17,6 +17,12 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * A bean implementing the {@link VirtualBean} interface to achieve the generation of Virtual metadata
+ * The Collected bean will take all the values of each metadata field defined in the list and it'll
+ * create a list of virtual metadata fields defined by the map in which it's defined.
+ * All values from the metadata fields will returned as separate elements
+ */
 public class Collected implements VirtualBean {
 
     @Autowired
@@ -44,6 +50,13 @@ public class Collected implements VirtualBean {
     }
 
 
+    /**
+     * this method will retrieve the metadata values from the given item for all the metadata fields listed
+     * in the fields property and it'll return all those values as a list
+     * @param context   The relevant DSpace context
+     * @param item      The item that will be used to either retrieve metadata values from
+     * @return The String values for all of the retrieved metadatavalues
+     */
     public List<String> getValues(Context context, Item item) {
         List<String> resultValues = new LinkedList<>();
         List<String> value = this.getFields();
