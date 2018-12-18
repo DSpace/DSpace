@@ -27,6 +27,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * A bean implementing the {@link VirtualBean} interface to achieve the generation of Virtual metadata
  * by traversing the path of relation specified in the config for this bean
+ * The Related bean will find the relationshiptype defined in the relationshipTypeString property on
+ * the current item and it'll use the related item from that relationship to pass it along to the virtualBean
+ * property which in turn refers to another VirtualBean instance and it continues the chain until it reaches
+ * either a Concatenate or Collected bean to retrieve the values. It will then return that value through the chain
+ * again and it'll fill the values into the virtual metadata fields that are defined in the map for the first
+ * Related bean.
  */
 public class Related implements VirtualBean {
 

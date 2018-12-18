@@ -154,10 +154,7 @@
     <util:map id="isAuthorOfPublicationMap">
         <entry key="dc.contributor.author" value-ref="publicationAuthor_author"/>
     </util:map>
-    <!-- This Concatenate bean will take all the values of each metadata field configured in the list
-         and it will join all of these together with the separator defined in this bean. This means that whichever
-         entry this bean belongs to, that metadata field will have the value of the related item's metadata values
-         joined together with this separator.
+    <!--
          If the related item has:
             person.identifier.lastname = Smith
             person.identifier.firstname = John
@@ -192,10 +189,7 @@
     <util:map id="isPersonOfProjectMap">
         <entry key="project_contributor_author" value-ref="projectPerson_author"/>
     </util:map>
-    <!-- This Concatenate bean will take all the values of each metadata field configured in the list
-     and it will join all of these together with the separator defined in this bean. This means that whichever
-     entry this bean belongs to, that metadata field will have the value of the related item's metadata values
-     joined together with this separator.
+    <!--
      If the related item has:
         person.identifier.lastname = Smith
         person.identifier.firstname = John
@@ -216,9 +210,7 @@
     <util:map id="isOrgUnitOfProjectMap">
         <entry key="project_contributor_other" value-ref="projectOrgUnit_other"/>
     </util:map>
-    <!-- This Collected bean will take all the values of each metadata field defined in the list and it'll
-         create a list of virtual metadata fields defined by the map in which it's defined.
-         In this case it'll create a list of project.contributor.other virtual metadata fields that hold
+    <!-- This Collected bean wil create a list of project.contributor.other virtual metadata fields that hold
          the value of orgunit.identifier.name, each of them in a separate metadatavalue
          If the related item has:
             orgunit.identifier.name = Generic name
@@ -249,9 +241,7 @@
         <entry key="journalvolume.identifier.volume" value-ref="issueVolume_volume"/>
         <entry key="journal.identifier.issn" value-ref="volumeJournal_issn_related"/>
     </util:map>
-    <!-- This Collected bean will take all the values of each metadata field defined in the list and it'll
-     create a list of virtual metadata fields defined by the map in which it's defined.
-     In this case it'll create a list of journalvolume.identifier.volume virtual metadata fields that hold
+    <!-- This Collected bean will create a list of journalvolume.identifier.volume virtual metadata fields that hold
      the value of journalvolume.identifier.volume, each of them in a separate metadatavalue
      If the related item has:
         journalvolume.identifier.volume = Generic volume
@@ -268,14 +258,7 @@
             </util:list>
         </property>
     </bean>
-    <!-- This is a Related bean, which will find the relationshiptype defined in the relationshipTypeString property on
-         the current item and it'll use the related item from that relationship to pass it along to the virtualBean
-         property which in turn refers to another VirtualBean instance and it continues the chain until it reaches
-         either a Concatenate or Collected bean to retrieve the values. It will then return that value through the chain
-         again and it'll fill the values into the virtual metadata fields that are defined in the map for the first
-         Related bean.
-         Lets look at this example: we've defined a Related bean for a relationship type that will be used on a
-         journal issue.
+    <!--    This Related bean defines a relationship type that will be used on a journal issue.
             The journal issue will receive 2 metadata fields if we look at the map 'isJournalVolumeOfIssueMap' it'll
             receive the journalvolume.identifier.volume metadata field and the journal.identifier.issn metadata field.
          Since the journal.identifier.issn metadata field can't be filled in through the metadata of the journalvolume
@@ -327,13 +310,7 @@
         <entry key="journal.identifier.issn"  value-ref="issueVolumeJournal_issn_related"/>
     </util:map>
 
-    <!-- This is a Related bean, which will find the relationshiptype defined in the relationshipTypeString property on
-     the current item and it'll use the related item from that relationship to pass it along to the virtualBean
-     property which in turn refers to another VirtualBean instance and it continues the chain until it reaches
-     either a Concatenate or Collected bean to retrieve the values. It will then return that value through the chain
-     again and it'll fill the values into the virtual metadata fields that are defined in the map for the first
-     Related bean.
-     Lets look at this example: we've defined a Related bean for a relationship type that will be used on a publication.
+    <!-- This Related bean defines a relationship type that will be used on a publication.
         The publication will receive 1 virtual metadata value namely the journal.identifier.issn to which it belongs
      Since the journal.identifier.issn metadata field can't be filled in through the metadata of the journalIssue
      alone, we need to pass this call higher up the chain to the journalissue's relationships to find the journal.
