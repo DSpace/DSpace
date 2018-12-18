@@ -122,7 +122,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         CommunityRest comm = new CommunityRest();
         // We send a name but the created community should set this to the title
         comm.setName("Test Sub-Level Community");
-        comm.setOwningCommunity(parentCommunity.getID().toString());
         MetadataEntryRest description = new MetadataEntryRest();
         description.setKey("dc.description");
         description.setValue("<p>Some cool HTML code here</p>");
@@ -152,6 +151,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/core/communities")
                                          .content(mapper.writeValueAsBytes(comm))
+                                         .param("parentCommunity", parentCommunity.getID().toString())
                                          .contentType(contentType))
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))

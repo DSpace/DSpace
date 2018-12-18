@@ -70,7 +70,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     protected CommunityRest createAndReturn(Context context) throws AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
-        CommunityRest communityRest = null;
+        CommunityRest communityRest;
         try {
             ServletInputStream input = req.getInputStream();
             communityRest = mapper.readValue(input, CommunityRest.class);
@@ -78,22 +78,23 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
             throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
         }
 
-        Community community = null;
+        Community community;
 
 
         try {
             Community parent = null;
-            if (StringUtils.isNotBlank(communityRest.getOwningCommunity())) {
-                UUID owningCommunityUuid = UUIDUtils.fromString(communityRest.getOwningCommunity());
-                if (owningCommunityUuid != null) {
-                    parent = cs.find(context, owningCommunityUuid);
-                    if (parent == null) {
-                        throw new ResourceNotFoundException("Parent community for id: "
-                                                                + owningCommunityUuid + " not found");
-                    }
-                } else {
+            if (StringUtils.isNotBlank(req.getParameter("parentCommunity"))) {
+
+                UUID owningCommunityUuid = UUIDUtils.fromString(req.getParameter("parentCommunity"));
+                if (owningCommunityUuid == null) {
                     throw new BadRequestException("The given owningCommunityUuid was invalid: "
-                                                      + communityRest.getOwningCommunity());
+                            + req.getParameter("parentCommunity"));
+                }
+
+                parent = cs.find(context, owningCommunityUuid);
+                if (parent == null) {
+                    throw new ResourceNotFoundException("Parent community for id: "
+                            + owningCommunityUuid + " not found");
                 }
             }
             community = cs.create(parent, context);

@@ -483,7 +483,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
-        collectionRest.setOwningCommunity(parentCommunity.getID().toString());
         MetadataEntryRest description = new MetadataEntryRest();
         description.setKey("dc.description");
         description.setValue("<p>Some cool HTML code here</p>");
@@ -514,6 +513,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/core/collections")
                                          .content(mapper.writeValueAsBytes(collectionRest))
+                                         .param("parentCommunity", parentCommunity.getID().toString())
                                          .contentType(contentType))
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
@@ -522,7 +522,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                 hasJsonPath("$.uuid", not(empty())),
                                 hasJsonPath("$.name", is("Title Text")),
                                 hasJsonPath("$.handle", not(empty())),
-                                hasJsonPath("$.owningCommunity", is(collectionRest.getOwningCommunity())),
+                                hasJsonPath("$.owningCommunity", is(parentCommunity.getID().toString())),
                                 hasJsonPath("$.type", is("collection")),
                                 hasJsonPath("$.metadata", Matchers.containsInAnyOrder(
                                     CommunityMetadataMatcher.matchMetadata("dc.description",
