@@ -1387,7 +1387,8 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private MetadataValue getRelationMetadataFromOtherItem(Item otherItem, String relationName) {
-        MetadataValue metadataValue = constructMetadataValue(MetadataSchemaEnum.RELATION.getName() + "." + relationName);
+        MetadataValue metadataValue = constructMetadataValue(
+                MetadataSchemaEnum.RELATION.getName() + "." + relationName);
         metadataValue.setAuthority("virtual");
         metadataValue.setValue(otherItem.getID().toString());
         return metadataValue;
