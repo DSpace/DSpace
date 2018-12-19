@@ -29,6 +29,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="org.dspace.eperson.Group"   %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     Group group = (Group) request.getAttribute("group");
@@ -56,7 +57,7 @@
                     <select class="form-control" size="15" name="groups_id" multiple="multiple">
                         <%  for (int i = 0; i < groups.length; i++) { %>
                             <option value="<%= groups[i].getID()%>">
-                                <%= groups[i].getName()%>
+                                <%= Utils.addEntities(groups[i].getName())%>
                             </option>
                         <%  } %>
                 </select>
