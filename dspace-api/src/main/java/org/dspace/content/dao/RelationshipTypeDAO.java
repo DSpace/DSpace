@@ -8,6 +8,7 @@
 package org.dspace.content.dao;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
@@ -36,5 +37,15 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
     RelationshipType findbyTypesAndLabels(Context context,
                                           EntityType leftType,EntityType rightType,String leftLabel,String rightLabel)
                                                 throws SQLException;
+
+    /**
+     * This method will query the Database for a list of RelationshipType objects that have the given label
+     * either as a left or right label in its attributes
+     * @param context   The relevant DSpace context
+     * @param label     The label that the RelationshipType must have as a leftLabel or rightLabel attribute
+     * @return  The list of RelationshipType objects that fit the criteria
+     * @throws SQLException If something goes wrong
+     */
+    List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException;
 
 }

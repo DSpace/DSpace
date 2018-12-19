@@ -639,6 +639,15 @@ public class MetadataImport {
 
 
             if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
+                List<RelationshipType> relationshipTypeList = relationshipTypeService
+                    .findByLeftOrRightLabel(c, element);
+                for (RelationshipType relationshipType : relationshipTypeList) {
+                    for (Relationship relationship : relationshipService
+                        .findByItemAndRelationshipType(c, item, relationshipType)) {
+                        relationshipService.delete(c, relationship);
+                        relationshipService.update(c, relationship);
+                    }
+                }
                 handleRelationMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
             } else {
                 itemService.clearMetadata(c, item, schema, element, qualifier, language);
@@ -672,7 +681,9 @@ public class MetadataImport {
             handleRelationTypeMetadata(c, item, schema, element, qualifier, language, values, authorities, confidences);
 
         } else {
-            handleRelationOtherMetadata(c, item, element, values);
+            for (String value : values) {
+                handleRelationOtherMetadata(c, item, element, value);
+            }
         }
 
     }
@@ -683,17 +694,17 @@ public class MetadataImport {
      * @param c         The relevant DSpace context
      * @param item      The item that the relationships will be made for
      * @param element   The string determining which relationshiptype is to be used
-     * @param values    The value for the relationship
+     * @param value    The value for the relationship
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    private void handleRelationOtherMetadata(Context c, Item item, String element, List<String> values)
+    private void handleRelationOtherMetadata(Context c, Item item, String element, String value)
         throws SQLException, AuthorizeException {
         Entity entity = entityService.findByItemId(c, item.getID());
         boolean left = false;
         List<RelationshipType> acceptableRelationshipTypes = new LinkedList<>();
-        String url = handleService.resolveToURL(c, values.get(0));
-        UUID uuid = UUIDUtils.fromString(values.get(0));
+        String url = handleService.resolveToURL(c, value);
+        UUID uuid = UUIDUtils.fromString(value);
         if (uuid == null && StringUtils.isNotBlank(url)) {
             return;
         }
@@ -729,7 +740,7 @@ public class MetadataImport {
             return;
         }
 
-        buildRelationObject(c, item, values, left, acceptableRelationshipTypes);
+        buildRelationObject(c, item, value, left, acceptableRelationshipTypes);
     }
 
     /**
@@ -742,21 +753,21 @@ public class MetadataImport {
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    private void buildRelationObject(Context c, Item item, List<String> values, boolean left,
+    private void buildRelationObject(Context c, Item item, String value, boolean left,
                                      List<RelationshipType> acceptableRelationshipTypes)
         throws SQLException, AuthorizeException {
         Relationship relationship = new Relationship();
         RelationshipType acceptedRelationshipType = acceptableRelationshipTypes.get(0);
         if (left) {
             relationship.setLeftItem(item);
-            relationship.setRightItem(itemService.findByIdOrLegacyId(c, values.get(0)));
+            relationship.setRightItem(itemService.findByIdOrLegacyId(c, value));
         } else {
             relationship.setRightItem(item);
-            relationship.setLeftItem(itemService.findByIdOrLegacyId(c, values.get(0)));
+            relationship.setLeftItem(itemService.findByIdOrLegacyId(c, value));
         }
         relationship.setRelationshipType(acceptedRelationshipType);
         relationship.setLeftPlace(relationshipService.findLeftPlaceByLeftItem(c, relationship.getLeftItem()) + 1);
-        relationship.setRightPlace(relationshipService.findRightPlaceByRightItem(c, relationship.getLeftItem()) + 1);
+        relationship.setRightPlace(relationshipService.findRightPlaceByRightItem(c, relationship.getRightItem()) + 1);
         Relationship persistedRelationship = relationshipService.create(c, relationship);
         relationshipService.update(c, persistedRelationship);
     }
