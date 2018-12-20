@@ -1291,21 +1291,35 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang) {
-        List<MetadataValue> dbMetadataValues = super.getMetadata(item, schema, element, qualifier, lang);
+        //Fields of the relation schema are virtual metadata
+        //except for relation.type which is the type of item in the model
+        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
 
-        if (!(StringUtils.equals(schema, "*") && StringUtils.equals(element, "*") &&
-            StringUtils.equals(qualifier, "*") && StringUtils.equals(lang, "*"))) {
-            return dbMetadataValues;
+            List<MetadataValue> relationMetadata = getRelationshipMetadata(item, false);
+            List<MetadataValue> listToReturn = new LinkedList<>();
+            for (MetadataValue metadataValue : relationMetadata) {
+                if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {
+                    listToReturn.add(metadataValue);
+                }
+            }
+            return listToReturn;
+
+        } else {
+            List<MetadataValue> dbMetadataValues = super.getMetadata(item, schema, element, qualifier, lang);
+
+            if (!(StringUtils.equals(schema, "*") && StringUtils.equals(element, "*") &&
+                StringUtils.equals(qualifier, "*") && StringUtils.equals(lang, "*"))) {
+                return dbMetadataValues;
+            }
+            List<MetadataValue> fullMetadataValueList = getRelationshipMetadata(item, true);
+            fullMetadataValueList.addAll(dbMetadataValues);
+
+            return fullMetadataValueList;
         }
-        List<MetadataValue> fullMetadataValueList = getRelationshipMetadata(item);
-        fullMetadataValueList.addAll(dbMetadataValues);
-
-        return fullMetadataValueList;
 
     }
-
     @Override
-    public List<MetadataValue> getRelationshipMetadata(Item item) {
+    public List<MetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata) {
         Context context = new Context();
         List<MetadataValue> fullMetadataValueList = new LinkedList<>();
         try {
@@ -1314,7 +1328,8 @@ prevent the generation of resource policy entry values with null dspace_object a
             if (StringUtils.isNotBlank(entityType)) {
                 List<Relationship> relationships = relationshipService.findByItem(context, item);
                 for (Relationship relationship : relationships) {
-                    fullMetadataValueList.addAll(handleItemRelationship(item, entityType, relationship));
+                    fullMetadataValueList.addAll(handleItemRelationship(item, entityType,
+                                                                        relationship, enableVirtualMetadata));
                 }
 
             }
@@ -1325,7 +1340,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private List<MetadataValue> handleItemRelationship(Item item, String entityType,
-                                                       Relationship relationship) {
+                                                       Relationship relationship, boolean enableVirtualMetadata) {
         List<MetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
         HashMap<String, List<String>> hashMaps = new HashMap<>();
@@ -1343,7 +1358,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             relationName = relationship.getRelationshipType().getRightLabel();
         }
 
-        if (hashMaps != null) {
+        if (hashMaps != null && enableVirtualMetadata) {
             resultingMetadataValueList.addAll(handleRelationshipTypeMetadataMappping(item, hashMaps,
                                                                                      otherItem, relationName));
         }
