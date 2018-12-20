@@ -48,6 +48,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer.RemoteSolrException;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
@@ -718,8 +719,9 @@ public class SolrLogger
 
         public void execute(String query) throws SolrServerException, IOException {
             Map<String, String> params = new HashMap<String, String>();
+            int maxDocumetsPerProcess= ConfigurationManager.getIntProperty("solr-statistics", "spiderDetector.batchUpdateSize",10);
             params.put("q", query);
-            params.put("rows", "10");
+            params.put("rows", String.valueOf(maxDocumetsPerProcess));
             if(0 < statisticYearCores.size()){
                 params.put(ShardParams.SHARDS, StringUtils.join(statisticYearCores.iterator(), ','));
             }
@@ -732,13 +734,16 @@ public class SolrLogger
             process(response.getResults());
 
             // Run over the rest
-            for (int i = 10; i < numbFound; i += 10)
+            for (int i = maxDocumetsPerProcess; i < numbFound; i += maxDocumetsPerProcess)
             {
-                params.put("start", String.valueOf(i));
+                //force solr commit to avoid trigering autocommits inside solr
+                commit();
                 solrParams = new MapSolrParams(params);
                 response = solr.query(solrParams);
                 process(response.getResults());
             }
+            //Commit lastest changes
+            commit();
 
         }
 
@@ -755,7 +760,7 @@ public class SolrLogger
                 process(doc);
             }
         }
-
+        
         /**
          * Override to manage individual documents
          * @param doc
@@ -786,18 +791,109 @@ public class SolrLogger
 
                 /* query for ip, exclude results previously set as bots. */
                 processor.execute("ip:"+ip+ "* AND -isBot:true");
+                
+                //Disable external commit, because the ResultProcessor always makes a commit at each processing batch...
+                //solr.commit();
 
-                solr.commit();
-
-            } catch (Exception e) {
-                log.error(e.getMessage(),e);
+            } catch (SolrServerException | IOException e) {
+                log.error("ERROR when processing pattern for solr field \"ip\", "
+                        + "with pattern value: \"" + ip + "\".\n" + e.getMessage(), e);
+            } catch (RemoteSolrException e) {
+                log.error("ERROR when processing pattern for solr field \"ip\", "
+                        + "with pattern value: \"" + ip + "\".\n" + e.getMessage(), e);
+                //Stop execution re-throwing runtime exception...
+                throw e;
             }
 
 
         }
 
     }
-
+    
+    /**
+     * Iterate over all agents patterns expressed at agents files (all files under 
+     * {dspace.dir}/config/spiders/agents directory), and marks all registries whose 
+     * "userAgent" field match with those patterns.
+     */
+    public static void markRobotsByUserAgent(){
+        SolrLogger.markRobotsBy("userAgent", SpiderDetector.getSpiderAgents());
+    }
+    
+    /**
+     * Iterate over all domains patterns expressed at agents files (all files under 
+     * {dspace.dir}/config/spiders/domains directory), and marks all registries whose 
+     * "dns" field match with those patterns.
+     */
+    public static void markRobotsByDomain() {
+        SolrLogger.markRobotsBy("dns", SpiderDetector.getSpiderDomains());
+    }
+    
+    /**
+     * Iterate over a list of patterns and update the corresponding usage records not mark as robots
+     * that match with the specified patterns.
+     * @param solrFieldName is the name of the field in Solr corresponding with the patterns specified.
+     * @param listOfPatterns is the list of patterns to check.
+     */
+    private static void markRobotsBy(String solrFieldName, Set<String> listOfPatterns){
+        listOfPatterns = (listOfPatterns == null)? new HashSet<String>(): listOfPatterns;
+        int counter = 1;
+        if(solrFieldName == null || solrFieldName.isEmpty()) {
+            log.error("Invalid solr field name passed when marking bots: is null or empty.");
+            return;
+        }
+        
+        /* Result Process to alter record to be identified as a bot */
+        ResultProcessor processor = new ResultProcessor(){
+            @Override
+            public void process(SolrDocument doc) throws IOException, SolrServerException {
+                doc.removeFields("isBot");
+                doc.addField("isBot", true);
+                SolrInputDocument newInput = ClientUtils.toSolrInputDocument(doc);
+                solr.add(newInput);
+            }
+        };
+        
+        for(String pattern : listOfPatterns)
+        {
+            log.info("(" + counter + "/" + listOfPatterns.size() + ") Processing pattern for solr field \"" + solrFieldName + "\", pattern value: \"" + pattern + "\"");
+            try {
+                /* query for the specified spider pattern, exclude results previously set as bots. */
+                processor.execute(solrFieldName + ":/" + buildSolrRegex(pattern) + "/ AND -isBot:true");
+                
+                //Disable external commit, because the ResultProcessor always makes a commit at each processing batch.
+                //solr.commit();
+            } catch (SolrServerException | IOException e) {
+                log.error("ERROR when processing pattern for solr field \"" + solrFieldName + "\", "
+                        + "with pattern value: \"" + pattern + "\".\n" + e.getMessage(), e);
+            } catch (RemoteSolrException e) {
+                log.error("ERROR when processing pattern for solr field \"" + solrFieldName + "\", "
+                        + "with pattern value: \"" + pattern + "\".\n" + e.getMessage(), e);
+              //Stop execution re-throwing runtime exception...
+                throw e;
+            }
+            counter++;
+        }
+        
+    }
+    
+    /**
+     * <p>Mark usage registries as robots according to the following criterias:
+     * <ul>
+     * <li> by registry's IP</li>
+     * <li> by registry's userAgent</li>
+     * <li> by registry's domain (reverse DNS Lookup).</li>
+     * </ul>
+     * </p>
+     */
+    public static void markRobots() {
+        log.info("Marking robots by IP starting now...");
+        SolrLogger.markRobotsByIP();
+        log.info("Marking robots by User Agent starting now...");
+        SolrLogger.markRobotsByUserAgent();
+        log.info("Marking robots by Domain starting now...");
+        SolrLogger.markRobotsByDomain();
+    }
+    
     public static void markRobotByUserAgent(String agent){
         try {
 
@@ -837,12 +933,42 @@ public class SolrLogger
             log.error(e.getMessage(),e);
         }
     }
-
-
-    public static void deleteRobotsByIP()
+    
+    /**
+     * Delete Solr statistics records that matches the passed query.
+     * @param query
+     */
+    private static void deleteBy(String query)
     {
+        try {
+            solr.deleteByQuery(query);
+        } catch (SolrServerException | IOException e) {
+            log.error("ERROR when deleting records for delete query \"" + query + "\".\n" 
+                         + e.getMessage(), e);
+        } catch (RemoteSolrException e) {
+            log.error("ERROR when deleting records for delete query \"" + query + "\".\n" 
+                    + e.getMessage(), e);
+            //Stop execution re-throwing runtime exception...
+            throw e;
+        }
+    }
+    
+    /**
+     * Delete robots by multiple criteria: IP, User Agent, and Domain.
+     */
+    public static void deleteRobots()
+    {
+        log.info("Delete robots by IP starting now...");
         for(String ip : SpiderDetector.getSpiderIpAddresses()){
-            deleteIP(ip);
+            deleteBy("ip:" + ip + "*");
+        }
+        log.info("Delete robots by User Agent starting now...");
+        for(String agent : SpiderDetector.getSpiderAgents()) {
+            deleteBy("userAgent:/" + buildSolrRegex(agent) + "/");
+        }
+        log.info("Delete robots by Domain starting now...");
+        for(String domain : SpiderDetector.getSpiderDomains()) {
+            deleteBy("dns:/" + buildSolrRegex(domain) + "/");
         }
     }
 
@@ -1681,5 +1807,26 @@ public class SolrLogger
             solrQuery.add(ShardParams.SHARDS, StringUtils.join(statisticYearCores.iterator(), ","));
         }
 
+    }
+    
+    /**
+     * Process the pattern passed as parameter to remove leading and ending anchoring syntax (^ and $ symbols) if exists.
+     * By defaults add the ".*" expression at both sides of the regex.
+     * @param pattern
+     */
+    private static String buildSolrRegex(String pattern) {
+        if (pattern != null || pattern.length() > 0) {
+            if (pattern.startsWith("^")) {
+                pattern = StringUtils.right(pattern, pattern.length() - 1);
+            } else {
+                pattern = ".*" + pattern;
+            }
+            if (pattern.endsWith("$")) {
+                pattern = StringUtils.chop(pattern);
+            } else {
+                pattern = pattern + ".*";
+            }
+        }
+        return pattern;
     }
 }
