@@ -646,8 +646,11 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * This method retrieves a list of MetadataValue objects that get constructed from processing
      * the given Item's Relationships through the config given to the {@link VirtualMetadataPopulator}
      * @param item  The Item that will be processed through it's Relationships
+     * @param enableVirtualMetadata This parameter will determine whether the list of Relationship metadata
+     *                              should be populated with metadata that is being generated through the
+     *                              VirtualMetadataPopulator functionality or not
      * @return      The list of MetadataValue objects constructed through the Relationships
      */
-    public List<MetadataValue> getRelationshipMetadata(Item item);
+    public List<MetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata);
 
 }
