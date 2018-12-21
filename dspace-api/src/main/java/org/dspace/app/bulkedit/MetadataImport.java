@@ -747,7 +747,7 @@ public class MetadataImport {
      * This method creates the relationship for the item and stores it in the database
      * @param c         The relevant DSpace context
      * @param item      The item for which this relationship will be constructed
-     * @param values    The value for the relationship
+     * @param value    The value for the relationship
      * @param left      A boolean indicating whether the item is the leftItem or the rightItem
      * @param acceptableRelationshipTypes   The acceptable relationship types
      * @throws SQLException If something goes wrong
