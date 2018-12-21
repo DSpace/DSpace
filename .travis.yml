@@ -28,6 +28,8 @@ before_install:
   # Install Compass & print version info
   - gem install compass -v 1.0.1
   - compass version
+  # Fix rb-inotify compatibility
+  - gem install rb-inotify -v 0.9.10
 
 # Skip install stage, as we'll do it below
 install: "echo 'Skipping install stage, dependencies will be downloaded during build and test stages.'"
