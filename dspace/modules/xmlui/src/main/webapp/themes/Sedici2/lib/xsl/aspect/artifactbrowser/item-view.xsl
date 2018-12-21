@@ -1164,7 +1164,7 @@
 		<div class="file-wrapper clearfix">
 			<div class="thumbnail-wrapper">
 				<xsl:choose>
-             	<xsl:when test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
+             	<xsl:when test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'embargoDate')">
 						<span>
 							<xsl:choose>
 	                        <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
@@ -1232,7 +1232,7 @@
 
 			<div class="file-metadata">
 				<xsl:choose>
-					<xsl:when test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
+					<xsl:when test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'embargoDate')">
 						<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/>
 					</xsl:when>
 					<xsl:otherwise>
@@ -1293,7 +1293,7 @@
 					</xsl:call-template>
 				</span>
 			</div>
-			<xsl:if test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
+			<xsl:if test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'embargoDate')">
 	              <span class="file-embargo-message">
 	              	<i18n:text>sedici.comunidades.tesis.embargo</i18n:text>
 	              </span>
