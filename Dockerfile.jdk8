@@ -9,26 +9,30 @@
 # - default tag for branch: dspace/dspace: dspace/dspace:dspace-6_x-jdk8
 
 # Step 1 - Run Maven Build
-FROM maven as build
+FROM dspace/dspace-dependencies:dspace-6_x as build
+ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 
-# The Mirage2 build cannot run as root.  Setting the user to dspace.
-RUN useradd dspace \
-    && mkdir /home/dspace \
-    && chown -Rv dspace: /home/dspace
+# The dspace-install directory will be written to /install
+RUN mkdir /install \
+    && chown -Rv dspace: /install
+
 USER dspace
 
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
-RUN mvn package -Dmirage2.on=true
+# Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
+RUN mvn package -Dmirage2.on=true && \
+  mv /app/dspace/target/${TARGET_DIR}/* /install && \
+  mvn clean
 
 # Step 2 - Run Ant Deploy
 FROM tomcat:8-jre8 as ant_build
 ARG TARGET_DIR=dspace-installer
-COPY --from=build /app /dspace-src
-WORKDIR /dspace-src/dspace/target/${TARGET_DIR}
+COPY --from=build /install /dspace-src
+WORKDIR /dspace-src
 
 # Create the initial install deployment using ANT
 ENV ANT_VERSION 1.10.5
