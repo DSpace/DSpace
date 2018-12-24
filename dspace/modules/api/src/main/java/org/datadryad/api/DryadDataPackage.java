@@ -515,6 +515,10 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
+    public String getCurationStatusReason() {
+        return curationStatusReason;
+    }
+    
     public void setCurationStatus(String status, String reason) {
         if (getItem() != null) {
             item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + reason + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
@@ -666,49 +670,6 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
-    public void updateToDash() {
-        Package pkg = new Package(this);
-        // first, set the dataset itself:
-        dashService.putDataset(pkg);
-
-        // next, check to see if the curation status has been updated: if there's no reason, we haven't updated it
-        if (!"".equals(curationStatusReason)) {
-            log.info("updating curation status");
-            dashService.addCurationActivity(this, curationStatus, curationStatusReason);
-        }
-
-        // finally, update the internal data:
-        if (!"".equals(getManuscriptNumber())) {
-            dashService.setManuscriptNumber(pkg, getManuscriptNumber());
-        }
-        if (getJournalConcept() != null) {
-            dashService.setPublicationISSN(pkg, getJournalConcept().getISSN());
-        }
-        if (getFormerManuscriptNumbers().size() > 0) {
-            List<String> prevFormerMSIDs = dashService.getFormerManuscriptNumbers(pkg);
-            for (String msid : getFormerManuscriptNumbers()) {
-                if (!prevFormerMSIDs.contains(msid)) {
-                    dashService.addFormerManuscriptNumber(pkg, msid);
-                }
-            }
-        }
-        if (getMismatchedDOIs().size() > 0) {
-            List<String> prevMismatches = dashService.getMismatchedDOIs(pkg);
-            for (String doi : getMismatchedDOIs()) {
-                if (!prevMismatches.contains(doi)) {
-                    dashService.addMismatchedDOI(pkg, doi);
-                }
-            }
-        }
-        if (getDuplicatePackages(null).size() > 0) {
-            List<String> prevDuplicates = dashService.getDuplicateItems(pkg);
-            for (DryadDataPackage dup : getDuplicatePackages(null)) {
-                if (!prevDuplicates.contains(dup.getIdentifier())) {
-                    dashService.addFormerManuscriptNumber(pkg, dup.getIdentifier());
-                }
-            }
-        }
-    }
 
     // DSpace-specific methods (without Dash equivalents)
 
@@ -1281,8 +1242,9 @@ public class DryadDataPackage extends DryadObject {
 
         // Only required for Dash:
         if (!useDryadClassic) {
-            updateToDash();
+            // updateToDash();
         }
+
         if (fieldsChanged.size() > 0) {
             if (!"".equals(provenance.toString())) {
                 log.info("writing provenance for package " + getIdentifier() + ": " + provenance);

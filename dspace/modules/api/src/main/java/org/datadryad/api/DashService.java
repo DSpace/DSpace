@@ -229,9 +229,54 @@ public class DashService {
             log.fatal("Unable to send item to DASH", e);
         }
 
+        updateInternalMetadata(pkg);
+        
         return responseCode;
     }
 
+
+    /**
+       Update the internal metadata for a Dash dataset.
+    **/
+    private void updateInternalMetadata(Package pkg) {
+        DryadDataPackage ddp = pkg.getDataPackage();
+        
+        log.info("updating curation status");
+        addCurationActivity(ddp, ddp.getCurationStatus(), ddp.getCurationStatusReason(), "updateCurationStatus");
+        
+        if (!"".equals(ddp.getManuscriptNumber())) {
+            setManuscriptNumber(pkg, ddp.getManuscriptNumber());
+        }
+        if (ddp.getJournalConcept() != null) {
+            setPublicationISSN(pkg, ddp.getJournalConcept().getISSN());
+        }
+        if (ddp.getFormerManuscriptNumbers().size() > 0) {
+            List<String> prevFormerMSIDs = getFormerManuscriptNumbers(pkg);
+            for (String msid : ddp.getFormerManuscriptNumbers()) {
+                if (!prevFormerMSIDs.contains(msid)) {
+                    addFormerManuscriptNumber(pkg, msid);
+                }
+            }
+        }
+        if (ddp.getMismatchedDOIs().size() > 0) {
+            List<String> prevMismatches = getMismatchedDOIs(pkg);
+            for (String doi : ddp.getMismatchedDOIs()) {
+                if (!prevMismatches.contains(doi)) {
+                    addMismatchedDOI(pkg, doi);
+                }
+            }
+        }
+        if (ddp.getDuplicatePackages(null).size() > 0) {
+            List<String> prevDuplicates = getDuplicateItems(pkg);
+            for (DryadDataPackage dup : ddp.getDuplicatePackages(null)) {
+                if (!prevDuplicates.contains(dup.getIdentifier())) {
+                    addDuplicateItem(pkg, dup.getIdentifier());
+                }
+            }
+        }
+    }
+
+    
     /**
        POSTs references for all data files to Dash, attaching them to the DryadDataPackage.
        The DryadDataPackage must already have been PUT to Dash.
@@ -327,15 +372,12 @@ public class DashService {
                 }
             }
         }
-        if (curationActivities.size() > 1) {
-            throw new RuntimeException("More than one curation activity for package " + pkg.getDataPackage().getIdentifier() + ": are you sure you want to migrate provenances?");
-        }
 
         // add provenances as curation activities
         JsonNode provenances = pkg.getDataPackage().getProvenancesAsCurationActivities();
         log.debug("migrating provenances " + provenances.toString());
         for (int i=0; i<provenances.size(); i++) {
-            int responseCode = addCurationActivity(pkg.getDataPackage(), provenances.get(i));
+            int responseCode = addCurationActivity(pkg.getDataPackage(), provenances.get(i).toString(), null, "");
             if (responseCode < 200 || responseCode > 202) {
                 log.fatal("Unable to send provenance to DASH, response: " + responseCode);
             }
@@ -400,10 +442,13 @@ public class DashService {
         return responseCode;
     }
 
-    public int addCurationActivity(DryadDataPackage dataPackage, String status, String reason) {
+    public int addCurationActivity(DryadDataPackage dataPackage, String status, String reason, String processKeyword) {
         ObjectNode node = mapper.createObjectNode();
         node.put("status", status);
         node.put("note", reason);
+        if(processKeyword != null) {
+            node.put("keywords", processKeyword);
+        }
         return addCurationActivity(dataPackage, node);
     }
 
@@ -425,7 +470,11 @@ public class DashService {
             wr.write(dashJSON);
             wr.close();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -460,7 +509,11 @@ public class DashService {
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setRequestMethod("GET");
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -487,7 +540,11 @@ public class DashService {
                 connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
                 connection.setRequestMethod("GET");
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                InputStream stream = connection.getErrorStream();
+                if (stream == null) {
+                    stream = connection.getInputStream();
+                }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
                 String line = null;
                 StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
                 while ((line = reader.readLine()) != null) {
@@ -521,7 +578,11 @@ public class DashService {
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setRequestMethod("GET");
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -633,7 +694,11 @@ public class DashService {
             wr.write(dashJSON);
             wr.close();
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -696,8 +761,12 @@ public class DashService {
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setDoOutput(true);
             connection.setRequestMethod("GET");
-
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -728,6 +797,9 @@ public class DashService {
         return dryadDataPackages;
     }
 
+    /**
+       Command-line functionality for the DashService.
+     **/
     public static void main(String[] args) throws IOException {
         
         String usage = "\n\nUsage: \n" +

@@ -78,10 +78,12 @@ public class TransferToDash extends AbstractCurationTask {
             DryadDataPackage dataPackage = new DryadDataPackage((Item)dso);
             Package pkg = new Package(dataPackage);
             String packageDOI = dataPackage.getIdentifier();
-            pkg.getDataPackage().updateToDash();
+
+            dashService.putDataset(pkg);
+            dashService.migrateProvenances(pkg);
             dashService.postDataFileReferences(context, dataPackage);
             dashService.submitDashDataset(packageDOI);
-            
+                        
             // provide output for the console
             setResult("Last processed item = " + packageDOI);        
             report(packageDOI);
