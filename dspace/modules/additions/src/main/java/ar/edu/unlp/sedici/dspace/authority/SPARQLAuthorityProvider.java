@@ -92,6 +92,8 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 			int limit) {
 
 		parameterizedSparqlString.setParams(globalParameters);
+		normalizeTextForHttpQuery(parameterizedSparqlString);
+
 		Query query = QueryFactory.create(parameterizedSparqlString.toString(),
 				this.getSPARQLSyntax());
 		query.setOffset(offset);
@@ -118,6 +120,13 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 					+ "ms");
 		}
 		return choices;
+	}
+
+	private void normalizeTextForHttpQuery(ParameterizedSparqlString parameterizedSparqlString) {
+		String aux = parameterizedSparqlString.getCommandText();
+		if (aux.indexOf("\\(") >= 0) aux = aux.replace("\\(", "\\\\\\\\\\(");
+		if (aux.indexOf("\\)") >= 0) aux = aux.replace("\\)", "\\\\\\\\\\)");
+		parameterizedSparqlString.setCommandText(aux);
 	}
 
 

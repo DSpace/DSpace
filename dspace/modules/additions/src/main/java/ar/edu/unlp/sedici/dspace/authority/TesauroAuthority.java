@@ -53,6 +53,8 @@ public class TesauroAuthority extends SimpleSPARQLAuthorityProvider {
 			break;
 		}
 		
+		text = normalizeTextForParserSPARQL10(text);
+
 		pqs.setNsPrefix("skos", NS_SKOS);
 		pqs.setNsPrefix("sedici", NS_SEDICI);
 
@@ -67,6 +69,12 @@ public class TesauroAuthority extends SimpleSPARQLAuthorityProvider {
 		pqs.append("ORDER BY ASC(?label)\n");
 		
 		return pqs;
+	}
+
+	private String normalizeTextForParserSPARQL10(String text) {
+		if (text.indexOf("(") >= 0) text = text.replace("(", "\\\\(");
+		if (text.indexOf(")") >= 0) text = text.replace(")", "\\\\)");
+		return text;
 	}
 
 	@Override
