@@ -409,7 +409,7 @@ public class BrowseEngine
             // get the table name that we are going to be getting our data from
             // this is the distinct table constrained to either community or collection
             dao.setTable(browseIndex.getDistinctTableName());
-            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+            dao.setStartsWith(StringUtils.stripAccents(StringUtils.lowerCase(scope.getStartsWith())));
             // remind the DAO that this is a distinct value browse, so it knows what sort
             // of query to build
             dao.setDistinct(true);
