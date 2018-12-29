@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * Provides PATCH operations for item updates.
  */
 @Component
-public class ItemPatch extends AbstractResourcePatch<ItemRest> {
+public class ItemPatch extends DSpaceObjectPatch<ItemRest> {
 
     @Autowired
     ItemOperationFactory patchFactory;
