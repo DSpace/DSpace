@@ -21,6 +21,8 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.hateoas.GroupResource;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -39,12 +41,16 @@ import org.springframework.stereotype.Component;
  */
 
 @Component(GroupRest.CATEGORY + "." + GroupRest.NAME)
-public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
+public class GroupRestRepository extends DSpaceObjectRestRepository<Group, GroupRest> {
     @Autowired
     GroupService gs;
 
     @Autowired
-    GroupConverter converter;
+    GroupRestRepository(GroupService dsoService,
+                        GroupConverter dsoConverter) {
+        super(dsoService, dsoConverter, new DSpaceObjectPatch<GroupRest>() {});
+        this.gs = dsoService;
+    }
 
     @Autowired
     MetadataConverter metadataConverter;
@@ -73,7 +79,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
             throw new RuntimeException(excSQL.getMessage(), excSQL);
         }
 
-        return converter.convert(group);
+        return dsoConverter.convert(group);
     }
 
     @Override
@@ -88,7 +94,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
         if (group == null) {
             return null;
         }
-        return converter.fromModel(group);
+        return dsoConverter.fromModel(group);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -102,8 +108,15 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total).map(converter);
+        Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total).map(dsoConverter);
         return page;
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'GROUP', 'WRITE')")
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
+                         Patch patch) throws AuthorizeException, SQLException {
+        patchDSpaceObject(apiCategory, model, id, patch);
     }
 
     @Override
