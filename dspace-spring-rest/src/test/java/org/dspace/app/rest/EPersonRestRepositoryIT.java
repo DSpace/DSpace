@@ -38,6 +38,7 @@ import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
@@ -1030,6 +1031,24 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.canLogIn", Matchers.is(true)));
 
+    }
+
+    @Test
+    public void patchEPersonMetadataAuthorized() throws Exception {
+        runPatchMetadataTests(admin, 200);
+    }
+
+    @Test
+    public void patchEPersonMetadataUnauthorized() throws Exception {
+        runPatchMetadataTests(eperson, 403);
+    }
+
+    private void runPatchMetadataTests(EPerson asUser, int expectedStatus) throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context).withEmail("user@test.com").build();
+        String token = getAuthToken(asUser.getEmail(), password);
+
+        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/epersons/" + ePerson.getID(), expectedStatus);
     }
 
 }
