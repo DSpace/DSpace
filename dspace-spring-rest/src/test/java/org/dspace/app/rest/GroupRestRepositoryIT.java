@@ -22,6 +22,8 @@ import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -234,4 +236,22 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
     }
 
+    @Test
+    public void patchGroupMetadataAuthorized() throws Exception {
+        runPatchMetadataTests(admin, 200);
+    }
+
+    @Test
+    public void patchGroupMetadataUnauthorized() throws Exception {
+        runPatchMetadataTests(eperson, 403);
+    }
+
+    private void runPatchMetadataTests(EPerson asUser, int expectedStatus) throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context).withName("Group").build();
+        String token = getAuthToken(asUser.getEmail(), password);
+
+        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/"
+                + group.getID(), expectedStatus);
+    }
 }

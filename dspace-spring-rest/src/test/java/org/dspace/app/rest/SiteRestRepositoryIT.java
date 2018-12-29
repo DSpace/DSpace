@@ -17,7 +17,9 @@ import java.util.UUID;
 import org.dspace.app.rest.builder.SiteBuilder;
 import org.dspace.app.rest.matcher.SiteMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Site;
+import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -65,6 +67,25 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/core/sites/" + UUID.randomUUID()))
                    .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void patchSiteMetadataAuthorized() throws Exception {
+        runPatchMetadataTests(admin, 200);
+    }
+
+    @Test
+    public void patchSiteMetadataUnauthorized() throws Exception {
+        runPatchMetadataTests(eperson, 403);
+    }
+
+    private void runPatchMetadataTests(EPerson asUser, int expectedStatus) throws Exception {
+        context.turnOffAuthorisationSystem();
+        Site site = SiteBuilder.createSite(context).build();
+        String token = getAuthToken(asUser.getEmail(), password);
+
+        new MetadataPatchSuite().runWith(getClient(token), "/api/core/sites/" + site.getID(), expectedStatus);
 
     }
 }
