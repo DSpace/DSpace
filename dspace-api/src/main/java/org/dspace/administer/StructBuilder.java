@@ -240,12 +240,12 @@ public class StructBuilder {
      */
     private static void usage(Options options) {
         HelpFormatter helper = new HelpFormatter();
-        helper.printHelp("Usage: java StructBuilder -f <source XML file> -o <output file> -e <eperson email>",
+        helper.printHelp("java StructBuilder -f <source XML file> -o <output file> -e <eperson email>",
                 "Load community/collection structure from a file.",
                 options,
                 "Communities will be created from the top level,"
                         + " and a map of communities to handles will be returned"
-                        + " in the output file");
+                        + " in the output file.");
     }
 
     /**
@@ -260,12 +260,12 @@ public class StructBuilder {
         StringBuilder err = new StringBuilder();
         boolean trip = false;
 
-        err.append("The following errors were encountered parsing the source XML\n");
-        err.append("No changes have been made to the DSpace instance\n\n");
+        err.append("The following errors were encountered parsing the source XML.\n");
+        err.append("No changes have been made to the DSpace instance.\n\n");
 
         NodeList first = XPathAPI.selectNodeList(document, "/import_structure/community");
         if (first.getLength() == 0) {
-            err.append("-There are no top level communities in the source document");
+            err.append("-There are no top level communities in the source document.");
             System.out.println(err.toString());
             System.exit(0);
         }
@@ -305,7 +305,7 @@ public class StructBuilder {
                 String pos = Integer.toString(i + 1);
                 err.append("-The level ").append(level)
                         .append(" community in position ").append(pos)
-                        .append(" does not contain exactly one name field\n");
+                        .append(" does not contain exactly one name field.\n");
                 trip = true;
             }
 
@@ -354,7 +354,7 @@ public class StructBuilder {
                 String pos = Integer.toString(i + 1);
                 err.append("-The level ").append(level)
                         .append(" collection in position ").append(pos)
-                        .append(" does not contain exactly one name field\n");
+                        .append(" does not contain exactly one name field.\n");
                 trip = true;
             }
         }
