@@ -85,6 +85,7 @@
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.11.4.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/tmpl.min.js"></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/custom-functions.js'></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/dataTables.bootstrap.min.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/dataTables.buttons.min.js"></script>
