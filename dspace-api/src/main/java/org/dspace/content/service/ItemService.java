@@ -645,11 +645,6 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      */
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
 
-    List<Bundle> getBundles(Context context, Item item, String name) throws SQLException;
-
-    public List<Item> findBySubmitter(Context context, EPerson ep, Integer pageSize, Integer offset)
-        throws SQLException;
-
     public int countBySubmitter(Context context, EPerson ep) throws SQLException;
 
 }

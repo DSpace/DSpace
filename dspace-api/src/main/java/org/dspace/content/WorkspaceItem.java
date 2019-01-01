@@ -26,7 +26,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;

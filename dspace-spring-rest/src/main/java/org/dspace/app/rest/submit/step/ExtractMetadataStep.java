@@ -17,8 +17,8 @@ import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.Value;
 import gr.ekt.bte.dataloader.FileDataLoader;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
 import org.dspace.app.rest.submit.SubmissionService;
@@ -34,15 +34,19 @@ import org.dspace.submit.step.ExtractionStep;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * This submission step allows to extract metadata from an uploaded file to enrich or initialize a submission. The
+ * processing is delegated to a list of extractor specialized by format (i.e. a Grobid extractor to get data from a PDF
+ * file, an extractor to get data from bibliographic file such as BibTeX, etc)
+ *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class ExtractMetadataStep extends ExtractionStep implements UploadableStep {
 
-    private static final Logger log = Logger.getLogger(ExtractMetadataStep.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ExtractMetadataStep.class);
 
     @Override
     public ErrorRest upload(Context context, SubmissionService submissionService, SubmissionStepConfig stepConfig,
-                            InProgressSubmission wsi, MultipartFile multipartFile, String extraField)
+            InProgressSubmission wsi, MultipartFile multipartFile)
         throws IOException {
 
         Item item = wsi.getItem();
@@ -61,7 +65,7 @@ public class ExtractMetadataStep extends ExtractionStep implements UploadableSte
                     }
 
                     FileDataLoader fdl = (FileDataLoader) dataLoader;
-                    fdl.setFilename(file.getAbsolutePath());
+                    fdl.setFilename(Utils.getFileName(multipartFile));
 
 
                     recordSet = convertFields(dataLoader.getRecords(), bteBatchImportService.getOutputMap());
@@ -80,7 +84,7 @@ public class ExtractMetadataStep extends ExtractionStep implements UploadableSte
         return null;
     }
 
-    public RecordSet convertFields(RecordSet recordSet, Map<String, String> fieldMap) {
+    private RecordSet convertFields(RecordSet recordSet, Map<String, String> fieldMap) {
         RecordSet result = new RecordSet();
         for (Record publication : recordSet.getRecords()) {
             for (String fieldName : fieldMap.keySet()) {

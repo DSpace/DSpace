@@ -21,8 +21,9 @@ import gr.ekt.bte.core.OutputGenerator;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.Value;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
@@ -49,8 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
 
-    private static Logger log = Logger
-        .getLogger(DSpaceWorkspaceItemOutputGenerator.class);
+    private static Logger log = LogManager.getLogger(DSpaceWorkspaceItemOutputGenerator.class);
 
     protected Context context;
 
@@ -275,13 +275,15 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator {
                                  String qualifier) throws DCInputsReaderException {
         List<DCInputSet> dcinputsets = new DCInputsReader().getInputsBySubmissionName(formName);
         for (DCInputSet dcinputset : dcinputsets) {
-            for (DCInput dcinput : dcinputset.getFields()) {
-                if (dcinput.getSchema().equals(schema)
-                    && dcinput.getElement().equals(element)
-                    && ((dcinput.getQualifier() != null && dcinput
-                    .getQualifier().equals(qualifier))
-                    || (dcinput.getQualifier() == null && qualifier == null))) {
-                    return dcinput;
+            for (DCInput[] dcrow : dcinputset.getFields()) {
+                for (DCInput dcinput : dcrow) {
+                    if (dcinput.getSchema().equals(schema)
+                        && dcinput.getElement().equals(element)
+                        && ((dcinput.getQualifier() != null && dcinput
+                        .getQualifier().equals(qualifier))
+                        || (dcinput.getQualifier() == null && qualifier == null))) {
+                        return dcinput;
+                    }
                 }
             }
         }

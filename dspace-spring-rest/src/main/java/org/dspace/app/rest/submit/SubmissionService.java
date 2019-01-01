@@ -16,12 +16,13 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
 import org.dspace.app.rest.converter.ResourcePolicyConverter;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
@@ -51,6 +52,7 @@ import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.init.UncategorizedScriptException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -61,7 +63,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmissionService {
 
-    private static final Logger log = Logger.getLogger(SubmissionService.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionService.class);
 
     @Autowired
     protected ConfigurationService configurationService;
@@ -86,18 +88,36 @@ public class SubmissionService {
 
     public WorkspaceItem createWorkspaceItem(Context context, Request request) throws SQLException, AuthorizeException {
         WorkspaceItem wsi = null;
-        String uuid = request.getHttpServletRequest().getParameter("collection");
-        if (StringUtils.isBlank(uuid)) {
-            uuid = configurationService.getProperty("submission.default.collection");
+        Collection collection = null;
+        String collectionUUID = request.getHttpServletRequest().getParameter("collection");
+
+        if (StringUtils.isBlank(collectionUUID)) {
+            collectionUUID = configurationService.getProperty("submission.default.collection");
         }
 
-        Collection collection = null;
-        if (StringUtils.isNotBlank(uuid)) {
-            collection = collectionService.find(context, UUID.fromString(uuid));
-        } else {
-            collection = collectionService.findAll(context, 1, 0).get(0);
+        try {
+            if (StringUtils.isNotBlank(collectionUUID)) {
+                collection = collectionService.find(context, UUID.fromString(collectionUUID));
+            } else {
+                final List<Collection> findAuthorizedOptimized = collectionService.findAuthorizedOptimized(context,
+                        Constants.ADD);
+                if (findAuthorizedOptimized != null && findAuthorizedOptimized.size() > 0) {
+                    collection = findAuthorizedOptimized.get(0);
+                } else {
+                    throw new RESTAuthorizationException("No collection suitable for submission for the current user");
+                }
+            }
+
+            if (collection == null) {
+                throw new RESTAuthorizationException("collectionUUID=" + collectionUUID + " not found");
+            }
+            wsi = workspaceItemService.create(context, collection, true);
+        } catch (SQLException e) {
+            // wrap in a runtime exception as we cannot change the method signature
+            throw new UncategorizedScriptException(e.getMessage(), e);
+        } catch (AuthorizeException ae) {
+            throw new RESTAuthorizationException(ae);
         }
-        wsi = workspaceItemService.create(context, collection, true);
 
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, wsi.getItem().getID(), null,
             itemService.getIdentifiers(context, wsi.getItem())));

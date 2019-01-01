@@ -13,6 +13,8 @@ import static org.junit.Assert.assertTrue;
 import mockit.Mock;
 import mockit.MockUp;
 import org.dspace.AbstractDSpaceTest;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.SolrLoggerServiceImpl;
@@ -32,14 +34,15 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
 
     private ConfigurationService configurationService;
 
+    private ClientInfoService clientInfoService;
 
     private SpiderDetectorService spiderDetectorService;
 
     @Before
     public void init() {
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService);
-
+        clientInfoService = CoreServiceFactory.getInstance().getClientInfoService();
+        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService, clientInfoService);
     }
 
     @Test
@@ -60,7 +63,7 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
     @Test
     public void testCaseInsensitiveMatching() throws Exception {
         configurationService.setProperty("usage-statistics.bots.case-insensitive", true);
-        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService);
+        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService, clientInfoService);
 
         DummyHttpServletRequest req = new DummyHttpServletRequest();
         req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
@@ -265,7 +268,7 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
     public void testBothLowerAndUpperCaseGetMatched() {
 
         configurationService.setProperty("usage-statistics.bots.case-insensitive", true);
-        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService);
+        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService, clientInfoService);
 
         DummyHttpServletRequest req = new DummyHttpServletRequest();
         req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
@@ -297,7 +300,7 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
     @Test
     public void testNonBooleanConfig() {
         configurationService.setProperty("usage-statistics.bots.case-insensitive", "RandomNonBooleanString");
-        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService);
+        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService, clientInfoService);
 
         DummyHttpServletRequest req = new DummyHttpServletRequest();
         req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises

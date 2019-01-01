@@ -12,12 +12,26 @@ import java.util.Map;
 import gr.ekt.bte.core.DataLoader;
 import org.dspace.services.ConfigurationService;
 
+/**
+ * Configuration bean to map metadata to identifiers (i.e dc.identifier.doi -> doi, dc.identifier.isbn -> isbn) and
+ * alias to BTE Data Loader. See config/spring/api/step-processing.xml
+ * 
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class MetadataListener {
 
+    /**
+     * Metadata to identifier map
+     */
     private Map<String, String> metadata;
 
     private ConfigurationService configurationService;
 
+    /**
+     * Alias to data loader map
+     */
     private Map<String, DataLoader> dataloadersMap;
 
     public ConfigurationService getConfigurationService() {

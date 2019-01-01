@@ -13,10 +13,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.content.Bundle;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -26,9 +26,8 @@ import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -43,7 +42,7 @@ import org.hibernate.type.StandardBasicTypes;
  * @author kevinvandevelde at atmire.com
  */
 public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDAO {
-    private static final Logger log = Logger.getLogger(ItemDAOImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemDAOImpl.class);
 
     protected ItemDAOImpl() {
         super();
@@ -92,7 +91,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("withdrawn", withdrawn);
         query.setParameter("discoverable", discoverable);
         if (lastModified != null) {
-            query.setTimestamp("last_modified", lastModified);
+            query.setParameter("last_modified", lastModified, TemporalType.TIMESTAMP);
         }
         return iterate(query);
     }
@@ -142,14 +141,68 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         return iterate(query);
     }
 
-    enum OP { equals, not_equals, like, not_like, contains, doesnt_contain, exists, doesnt_exist, matches,
-        doesnt_match }
+    enum OP {
+        equals {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return Property.forName("mv.value").eq(val);
+            }
+        },
+        not_equals {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.equals.buildPredicate(val, regexClause);
+            }
+        },
+        like {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return Property.forName("mv.value").like(val);
+            }
+        },
+        not_like {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.like.buildPredicate(val, regexClause);
+            }
+        },
+        contains {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return Property.forName("mv.value").like("%" + val + "%");
+            }
+        },
+        doesnt_contain {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.contains.buildPredicate(val, regexClause);
+            }
+        },
+        exists {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return Property.forName("mv.value").isNotNull();
+            }
+        },
+        doesnt_exist {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.exists.buildPredicate(val, regexClause);
+            }
+        },
+        matches {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return Restrictions.sqlRestriction(regexClause, val, StandardBasicTypes.STRING);
+            }
+        },
+        doesnt_match {
+            public Criterion buildPredicate(String val, String regexClause) {
+                return OP.matches.buildPredicate(val, regexClause);
+            }
+
+        };
+        public abstract Criterion buildPredicate(String val, String regexClause);
+    }
 
     @Override
+    @Deprecated
     public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit) throws SQLException {
-        Criteria criteria = createCriteria(context, Item.class, "item");
+
+        Criteria criteria = getHibernateSession(context).createCriteria(Item.class, "item");
         criteria.setFirstResult(offset);
         criteria.setMaxResults(limit);
 
@@ -186,20 +239,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 subcriteria.add(Restrictions.in("metadataField", listFieldList.get(i)));
             }
 
-            sb.append(op.name() + " ");
-            if (op == OP.equals || op == OP.not_equals) {
-                subcriteria.add(Property.forName("mv.value").eq(query_val.get(i)));
-                sb.append(query_val.get(i));
-            } else if (op == OP.like || op == OP.not_like) {
-                subcriteria.add(Property.forName("mv.value").like(query_val.get(i)));
-                sb.append(query_val.get(i));
-            } else if (op == OP.contains || op == OP.doesnt_contain) {
-                subcriteria.add(Property.forName("mv.value").like("%" + query_val.get(i) + "%"));
-                sb.append(query_val.get(i));
-            } else if (op == OP.matches || op == OP.doesnt_match) {
-                subcriteria.add(Restrictions.sqlRestriction(regexClause, query_val.get(i), StandardBasicTypes.STRING));
-                sb.append(query_val.get(i));
-            }
+            subcriteria.add(op.buildPredicate(query_val.get(i), regexClause));
 
             if (op == OP.exists || op == OP.equals || op == OP.like || op == OP.contains || op == OP.matches) {
                 criteria.add(Subqueries.exists(subcriteria));
@@ -209,7 +249,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         }
         log.debug(String.format("Running custom query with %d filters", index));
 
-        return list(criteria).iterator();
+        return ((List<Item>) criteria.list()).iterator();
+
     }
 
     @Override
@@ -288,7 +329,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         Query query = createQuery(context, "select count(distinct i) from Item i " +
             "join i.collections collection " +
             "WHERE collection IN (:collections) AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
-        query.setParameterList("collections", collections);
+        query.setParameter("collections", collections);
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
 
@@ -299,7 +340,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     public Iterator<Item> findByLastModifiedSince(Context context, Date since)
         throws SQLException {
         Query query = createQuery(context, "SELECT i FROM item i WHERE last_modified > :last_modified");
-        query.setTimestamp("last_modified", since);
+        query.setParameter("last_modified", since, TemporalType.TIMESTAMP);
         return iterate(query);
     }
 
@@ -316,35 +357,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
         return count(query);
-    }
-
-    @Override
-    public List<Bundle> findBundlesByName(Context context, Item item, String name) throws SQLException {
-        String hqlQueryString = "SELECT bundles FROM Item as item join item.bundles bundles join bundles.metadata " +
-            "metadatavalue WHERE item = :item";
-        if (StringUtils.isNotBlank(name)) {
-            hqlQueryString += " AND STR(metadatavalue.value) = :text_value ";
-        }
-        Query query = createQuery(context, hqlQueryString);
-
-        query.setParameter("item", item);
-        if (StringUtils.isNotBlank(name)) {
-            query.setParameter("text_value", name);
-        }
-        return query.list();
-    }
-
-    @Override
-    public List<Item> findBySubmitter(Context context, EPerson eperson, Integer limit, Integer offset)
-        throws SQLException {
-        Criteria criteria = createCriteria(context, Item.class);
-        criteria.addOrder(Order.asc("lastModified"));
-        criteria.add(Restrictions.eq("inArchive", true));
-        criteria.add(Restrictions.eq("withdrawn", false));
-        criteria.add(Restrictions.eq("submitter.id", eperson.getID()));
-        criteria.setFirstResult(offset);
-        criteria.setMaxResults(limit);
-        return list(criteria);
     }
 
     @Override

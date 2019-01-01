@@ -34,8 +34,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
@@ -326,7 +326,7 @@ public class XOAI {
         List<Date> dates = new LinkedList<Date>();
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
-            if (policy.getGroup().getName().equals("Anonymous")) {
+            if ((policy.getGroup() != null) && (policy.getGroup().getName().equals("Anonymous"))) {
                 if (policy.getStartDate() != null) {
                     dates.add(policy.getStartDate());
                 }
@@ -450,8 +450,7 @@ public class XOAI {
     private boolean willChangeStatus(Item item) throws SQLException {
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
-            if (policy.getGroup().getName().equals("Anonymous")) {
-
+            if ((policy.getGroup() != null) && (policy.getGroup().getName().equals("Anonymous"))) {
                 if (policy.getStartDate() != null && policy.getStartDate().after(new Date())) {
                     return true;
                 }

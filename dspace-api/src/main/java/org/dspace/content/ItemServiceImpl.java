@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -65,7 +65,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(Item.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
@@ -217,12 +217,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public List<Item> findBySubmitter(Context context, EPerson eperson, Integer limit, Integer offset)
-        throws SQLException {
-        return itemDAO.findBySubmitter(context, eperson, limit, offset);
-    }
-
-    @Override
     public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit)
         throws SQLException {
 
@@ -306,11 +300,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             }
         }
         return matchingBundles;
-    }
-
-    @Override
-    public List<Bundle> getBundles(Context context, Item item, String name) throws SQLException {
-        return itemDAO.findBundlesByName(context, item, name);
     }
 
     @Override

@@ -20,7 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.rest.common.Report;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -34,7 +34,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 @Path("/reports")
 public class RestReports {
-    private static Logger log = Logger.getLogger(RestReports.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RestReports.class);
 
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     public static final String REST_RPT_URL = "rest.report-url.";

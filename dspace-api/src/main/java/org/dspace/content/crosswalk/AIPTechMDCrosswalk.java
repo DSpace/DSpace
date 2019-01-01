@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -72,7 +72,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
     /**
      * log4j category
      */
-    private static Logger log = Logger.getLogger(AIPTechMDCrosswalk.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AIPTechMDCrosswalk.class);
     protected final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
                                                                                          .getBitstreamFormatService();
     protected final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();

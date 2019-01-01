@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -132,11 +131,6 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @throws SQLException if database error
      */
     int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
-
-    public List<Bundle> findBundlesByName(Context context, Item item, String name) throws SQLException;
-
-    public List<Item> findBySubmitter(Context context, EPerson eperson, Integer limit, Integer offset)
-        throws SQLException;
 
     public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
         throws SQLException;

@@ -10,8 +10,8 @@ package org.dspace.app.rest.converter;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 public class WorkspaceItemConverter
     extends DSpaceConverter<org.dspace.content.WorkspaceItem, org.dspace.app.rest.model.WorkspaceItemRest> {
 
-    private static final Logger log = Logger.getLogger(WorkspaceItemConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemConverter.class);
 
     @Autowired
     private EPersonConverter epersonConverter;
@@ -85,6 +85,10 @@ public class WorkspaceItemConverter
         // info
 
         if (collection != null) {
+            // we set the status to true as we will discover validation error later in this block
+            // we could eventually leave the status to empty if we don't have collection information, this could be
+            // eventually the case when projection support will be included
+            witem.setStatus(true);
             SubmissionDefinitionRest def = submissionDefinitionConverter
                 .convert(submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle()));
             witem.setSubmissionDefinition(def);
@@ -108,6 +112,7 @@ public class WorkspaceItemConverter
                             (AbstractRestProcessingStep) stepClass.newInstance();
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
                             addError(witem.getErrors(), error);
+                            witem.setStatus(false);
                         }
                         witem.getSections()
                             .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
