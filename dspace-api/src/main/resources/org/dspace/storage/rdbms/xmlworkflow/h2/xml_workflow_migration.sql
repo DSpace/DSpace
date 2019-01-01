@@ -31,7 +31,7 @@ CREATE SEQUENCE cwf_pooltask_seq;
 CREATE TABLE cwf_workflowitem
 (
   workflowitem_id INTEGER PRIMARY KEY,
-  item_id        INTEGER REFERENCES item(item_id) UNIQUE,
+  item_id        INTEGER UNIQUE REFERENCES item(item_id),
   collection_id  INTEGER REFERENCES collection(collection_id),
   --
   -- Answers to questions on first page of submit UI
