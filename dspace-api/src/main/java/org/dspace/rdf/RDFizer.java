@@ -26,7 +26,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -54,7 +54,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class RDFizer {
 
-    private static final Logger log = Logger.getLogger(RDFizer.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RDFizer.class);
 
     protected boolean stdout;
     protected boolean verbose;

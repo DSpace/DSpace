@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -44,7 +44,7 @@ import org.junit.Test;
  * for the University of Waikato's Institutional Research Repositories
  */
 public class PackageUtilsTest extends AbstractUnitTest {
-    private static final Logger log = Logger.getLogger(PackageUtilsTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PackageUtilsTest.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();

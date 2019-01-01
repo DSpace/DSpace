@@ -205,7 +205,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Override
     public WorkflowItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                   String extraField, MultipartFile file) throws Exception {
+                                   MultipartFile file) throws Exception {
 
         Context context = obtainContext();
         WorkflowItemRest wsi = findOne(id);
@@ -230,7 +230,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                     UploadableStep uploadableStep = (UploadableStep) stepInstance;
                     uploadableStep.doPreProcessing(context, source);
                     ErrorRest err =
-                        uploadableStep.upload(context, submissionService, stepConfig, source, file, extraField);
+                        uploadableStep.upload(context, submissionService, stepConfig, source, file);
                     uploadableStep.doPostProcessing(context, source);
                     if (err != null) {
                         errors.add(err);

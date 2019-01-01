@@ -61,11 +61,13 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         String scope = null;
         String filterValue = null;
         String filterAuthority = null;
+        String startsWith = null;
 
         if (request != null) {
             scope = request.getParameter("scope");
             filterValue = request.getParameter("filterValue");
             filterAuthority = request.getParameter("filterAuthority");
+            startsWith = request.getParameter("startsWith");
         }
         Context context = obtainContext();
         BrowseEngine be = new BrowseEngine(context);
@@ -128,7 +130,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         // bs.setJumpToItem(focus);
         // bs.setJumpToValue(valueFocus);
         // bs.setJumpToValueLang(valueFocusLang);
-        // bs.setStartsWith(startsWith);
+        bs.setStartsWith(startsWith);
         if (pageable != null) {
             bs.setOffset(pageable.getOffset());
             bs.setResultsPerPage(pageable.getPageSize());

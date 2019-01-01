@@ -11,7 +11,7 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataUpload;
@@ -22,6 +22,7 @@ import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -40,9 +41,9 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class UploadStep extends org.dspace.submit.step.UploadStep
-    implements AbstractRestProcessingStep, UploadableStep {
+        implements AbstractRestProcessingStep, UploadableStep {
 
-    private static final Logger log = Logger.getLogger(UploadStep.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadStep.class);
 
     @Override
     public DataUpload getData(SubmissionService submissionService, InProgressSubmission obj,
@@ -90,10 +91,9 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
 
     }
 
-
     @Override
     public ErrorRest upload(Context context, SubmissionService submissionService, SubmissionStepConfig stepConfig,
-                            InProgressSubmission wsi, MultipartFile file, String extraField) {
+                            InProgressSubmission wsi, MultipartFile file) {
 
         Bitstream source = null;
         BitstreamFormat bf = null;
@@ -113,9 +113,8 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
                 source = bitstreamService.create(context, bundles.get(0), inputStream);
             }
 
-            source.setName(context, file.getOriginalFilename());
-            // TODO how retrieve this information?
-            source.setSource(context, extraField);
+            source.setName(context, Utils.getFileName(file));
+            source.setSource(context, file.getOriginalFilename());
 
             // Identify the format
             bf = bitstreamFormatService.guessFormat(context, source);

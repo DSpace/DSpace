@@ -165,6 +165,20 @@ public class Utils {
         return org.dspace.core.Utils.standardize(schema, element, qualifier, ".");
     }
 
+    /**
+     * Create a temporary file from a multipart file upload
+     * 
+     * @param multipartFile
+     *            the multipartFile representing the uploaded file. Please note that it is a complex object including
+     *            additional information other than the binary like the orginal file name and the mimetype
+     * @param prefixTempName
+     *            the prefix to use to generate the filename of the temporary file
+     * @param suffixTempName
+     *            the suffic to use to generate the filename of the temporary file
+     * @return the temporary file on the server
+     * @throws IOException
+     * @throws FileNotFoundException
+     */
     public static File getFile(MultipartFile multipartFile, String prefixTempName, String suffixTempName)
             throws IOException, FileNotFoundException {
         // TODO after change item-submission into
@@ -182,5 +196,27 @@ public class Utils {
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
         org.dspace.core.Utils.bufferedCopy(io, out);
         return file;
+    }
+
+    /**
+     * Return the filename part from a multipartFile upload that could eventually contains the fullpath on the client
+     * filesystem
+     * 
+     * @param multipartFile
+     *            the file uploaded
+     * @return the filename part of the file on the client filesystem
+     * @throws IOException
+     * @throws FileNotFoundException
+     */
+    public static String getFileName(MultipartFile multipartFile)
+            throws IOException, FileNotFoundException {
+        String originalFilename = multipartFile.getOriginalFilename();
+        if (originalFilename != null) {
+            // split by \ or / as we don't know the client OS (Win, Linux)
+            String[] parts = originalFilename.split("[\\/]");
+            return parts[parts.length - 1];
+        } else {
+            return multipartFile.getName();
+        }
     }
 }

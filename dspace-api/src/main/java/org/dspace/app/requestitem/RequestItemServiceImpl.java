@@ -10,7 +10,7 @@ package org.dspace.app.requestitem;
 import java.sql.SQLException;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.dao.RequestItemDAO;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.content.Bitstream;
@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class RequestItemServiceImpl implements RequestItemService {
 
-    private final Logger log = Logger.getLogger(RequestItemServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(RequestItemServiceImpl.class);
 
     @Autowired(required = true)
     protected RequestItemDAO requestItemDAO;

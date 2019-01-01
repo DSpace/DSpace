@@ -10,7 +10,7 @@ package org.dspace.sword;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -33,7 +33,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
     /**
      * logger
      */
-    private static Logger log = Logger.getLogger(BitstreamEntryGenerator.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamEntryGenerator.class);
 
     /**
      * Create a new ATOM Entry generator which can provide a SWORD Entry for

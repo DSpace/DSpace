@@ -10,14 +10,17 @@ package org.dspace.app.rest;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
+import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
@@ -28,6 +31,66 @@ import org.junit.Test;
  */
 
 public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Test
+    public void createTest()
+        throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String groupName = "testGroup1";
+
+        groupRest.setName(groupName);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/eperson/groups")
+                .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                .andExpect(status().isCreated());
+
+        getClient(authToken).perform(get("/api/eperson/groups"))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.groups", Matchers.containsInAnyOrder(
+                           GroupMatcher.matchGroupWithName(groupName),
+                           GroupMatcher.matchGroupWithName("Administrator"),
+                           GroupMatcher.matchGroupWithName("Anonymous"))));
+
+    }
+
+    @Test
+    public void createUnauthauthorizedTest()
+            throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String groupName = "testGroupUnauth1";
+
+        groupRest.setName(groupName);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient().perform(post("/api/eperson/groups")
+                .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    public void createForbiddenTest()
+            throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String groupName = "testGroupForbidden1";
+
+        groupRest.setName(groupName);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(post("/api/eperson/groups")
+                .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                .andExpect(status().isForbidden());
+    }
 
     @Test
     public void findAllTest() throws Exception {
