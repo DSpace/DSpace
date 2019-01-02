@@ -47,6 +47,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -57,6 +58,7 @@ import org.junit.Test;
  * @author Pascal-Nicolas Becker
  * @author Terry Brady
  */
+@Ignore
 public class BasicWorkflowAuthorizationIT
     extends AbstractIntegrationTest {
     /**
