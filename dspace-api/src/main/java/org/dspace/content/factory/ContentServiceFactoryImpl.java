@@ -37,9 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ContentServiceFactoryImpl extends ContentServiceFactory {
 
-//    @Autowired(required = true)
-//    private List<BrowsableObjectService<? extends BrowsableDSpaceObject<? extends Serializable>, Serializable>>
-//        browsableDSpaceObjectServices;
     @Autowired(required = true)
     private List<DSpaceObjectService<? extends DSpaceObject>> dSpaceObjectServices;
     @Autowired(required = true)

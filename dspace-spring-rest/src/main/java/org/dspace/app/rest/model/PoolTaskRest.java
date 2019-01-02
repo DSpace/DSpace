@@ -9,6 +9,7 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 
 /**
  * The PoolTask REST Resource
@@ -41,6 +42,10 @@ public class PoolTaskRest extends BaseObjectRest<Integer> {
         return RestResourceController.class;
     }
 
+    /**
+     * @see PoolTask#getStepID()
+     * @return
+     */
     public String getStep() {
         return step;
     }
@@ -49,6 +54,10 @@ public class PoolTaskRest extends BaseObjectRest<Integer> {
         this.step = step;
     }
 
+    /**
+     * @see PoolTask#getActionID()
+     * @return
+     */
     public String getAction() {
         return action;
     }
@@ -57,6 +66,10 @@ public class PoolTaskRest extends BaseObjectRest<Integer> {
         this.action = action;
     }
 
+    /**
+     * 
+     * @return the WorkflowItemRest that belong to this pool task
+     */
     public WorkflowItemRest getWorkflowitem() {
         return workflowitem;
     }

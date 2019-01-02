@@ -7,14 +7,10 @@
  */
 package org.dspace.xmlworkflow;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +28,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -892,10 +887,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         itemService.update(context, myitem);
 
-        //send an internal message to the submitter
-        createMessage(context, myitem, rejection_message,
-                      I18nUtil.getMessage("message.subject.xmlworkflow.rejected.item", context));
-
         // convert into personal workspace
         WorkspaceItem wsi = returnToWorkspace(context, wi);
 
@@ -1058,41 +1049,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     public String getMyDSpaceLink() {
         return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
     }
-
-    public void createMessage(Context context, Item item, String description, String subject)
-        throws SQLException, IOException, AuthorizeException {
-        Bundle message = null;
-        for (Bundle bnd : item.getBundles()) {
-            if ("MESSAGE".equals(bnd.getName())) {
-                message = bnd;
-                break;
-            }
-        }
-        if (message == null) {
-            message = bundleService.create(context, item, "MESSAGE");
-        }
-
-        BitstreamFormat bitstreamFormat = bitstreamFormatService.findByMIMEType(context, "text/plain");
-
-        InputStream is = new ByteArrayInputStream(description.getBytes(StandardCharsets.UTF_8));
-        Bitstream bitMessage = bitstreamService.create(context, message, is);
-        bitMessage.setFormat(context, bitstreamFormat);
-        bitstreamService.addMetadata(context, bitMessage, "dc", "title", null, null, subject);
-        bitstreamService.addMetadata(context, bitMessage, "dc", "creator", null, null,
-                                     context.getCurrentUser().getFullName() + " <" + context.getCurrentUser()
-                                                                                            .getEmail() + ">");
-        bitstreamService.addMetadata(context, bitMessage, "dc", "date", "issued", null,
-                                     new DCDate(new Date()).toString());
-        bitstreamService.addMetadata(context, bitMessage, "dc", "type", null, null, "outbound");
-        bitstreamService.update(context, bitMessage);
-        authorizeService.addPolicy(context, bitMessage, Constants.READ, context.getCurrentUser());
-
-        Group controllers = groupService.findByName(context, "Controllers");
-        if (controllers != null) {
-            authorizeService.addPolicy(context, bitMessage, Constants.READ, controllers);
-        }
-    }
-
 
     protected void revokeReviewerPolicies(Context context, Item item) throws SQLException, AuthorizeException {
         // get bundle "ORIGINAL"

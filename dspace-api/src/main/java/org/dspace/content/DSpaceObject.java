@@ -201,7 +201,4 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
         this.modified = true;
     }
 
-    public String getUniqueIndexID() {
-        return getType() + "-" + getID().toString();
-    }
 }

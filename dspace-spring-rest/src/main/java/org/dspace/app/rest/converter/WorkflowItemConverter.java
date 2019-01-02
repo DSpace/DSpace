@@ -136,7 +136,7 @@ public class WorkflowItemConverter
     }
 
 
-    public void addError(List<ErrorRest> errors, ErrorRest toAdd) {
+    private void addError(List<ErrorRest> errors, ErrorRest toAdd) {
 
         boolean found = false;
         String i18nKey = toAdd.getMessage();

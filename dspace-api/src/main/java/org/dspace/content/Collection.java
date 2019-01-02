@@ -350,7 +350,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         return legacyId;
     }
 
-    public CollectionService getCollectionService() {
+    private CollectionService getCollectionService() {
         if (collectionService == null) {
             collectionService = ContentServiceFactory.getInstance().getCollectionService();
         }

@@ -377,6 +377,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport, Bro
         return itemService;
     }
 
+    @Override
     public String getTypeText() {
         return getItemService().getTypeText(this);
     }

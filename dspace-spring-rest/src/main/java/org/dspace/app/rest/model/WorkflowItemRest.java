@@ -50,6 +50,10 @@ public class WorkflowItemRest extends BaseObjectRest<Integer> {
         return NAME;
     }
 
+    /**
+     * 
+     * @return the timestamp of the last modification done to the workflowitem
+     */
     public Date getLastModified() {
         return lastModified;
     }
@@ -58,6 +62,10 @@ public class WorkflowItemRest extends BaseObjectRest<Integer> {
         this.lastModified = lastModified;
     }
 
+    /**
+     * 
+     * @return the item wrapped by the workflowitem
+     */
     public ItemRest getItem() {
         return item;
     }
@@ -66,6 +74,10 @@ public class WorkflowItemRest extends BaseObjectRest<Integer> {
         this.item = item;
     }
 
+    /**
+     * 
+     * @return the SubmissionDefinition used by the workflowitem
+     */
     public SubmissionDefinitionRest getSubmissionDefinition() {
         return submissionDefinition;
     }
@@ -74,6 +86,10 @@ public class WorkflowItemRest extends BaseObjectRest<Integer> {
         this.submissionDefinition = submissionDefinition;
     }
 
+    /**
+     * 
+     * @return the submitter
+     */
     public EPersonRest getSubmitter() {
         return submitter;
     }
@@ -87,6 +103,10 @@ public class WorkflowItemRest extends BaseObjectRest<Integer> {
         return RestResourceController.class;
     }
 
+    /**
+     * 
+     * @return the data of the workflowitem organized according to the submission definition
+     */
     public Map<String, Serializable> getSections() {
         if (sections == null) {
             sections = new HashMap<String, Serializable>();
@@ -98,6 +118,10 @@ public class WorkflowItemRest extends BaseObjectRest<Integer> {
         this.sections = sections;
     }
 
+    /**
+     * 
+     * @return the collection where the workflow is in progress
+     */
     public CollectionRest getCollection() {
         return collection;
     }

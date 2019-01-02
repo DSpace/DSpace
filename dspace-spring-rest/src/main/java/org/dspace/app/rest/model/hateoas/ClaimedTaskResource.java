@@ -12,7 +12,7 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**
- * PooledTask Rest HAL Resource. The HAL Resource wraps the REST Resource
+ * ClaimedTask Rest HAL Resource. The HAL Resource wraps the REST Resource
  * adding support for the links and embedded resources
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)

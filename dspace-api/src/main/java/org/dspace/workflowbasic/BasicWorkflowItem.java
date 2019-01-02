@@ -203,17 +203,12 @@ public class BasicWorkflowItem implements WorkflowItem {
     }
 
     @Override
-    public String getTypeText() {
-        return "workflowitem";
-    }
-
-    @Override
     public int getType() {
         return Constants.WORKFLOWITEM;
     }
 
     @Override
     public String getHandle() {
-        return getType() + "-" + getID();
+        return null;
     }
 }
