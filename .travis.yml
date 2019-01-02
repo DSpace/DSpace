@@ -23,7 +23,7 @@ before_install:
   # Print ruby version info (should be installed)
   - ruby -v
   # Install Sass & print version info
-  - gem install sass -v 3.3.14
+  - gem install sass -v 3.4.25
   - sass -v
   # Install Compass & print version info
   - gem install compass -v 1.0.1
