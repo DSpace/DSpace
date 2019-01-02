@@ -1,7 +1,9 @@
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
- * tree
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.resourcesync;
 
@@ -17,8 +19,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.openarchives.resourcesync.ResourceSync;
 import org.openarchives.resourcesync.ResourceSyncDocument;
 import org.openarchives.resourcesync.ResourceSyncLn;
@@ -62,7 +64,9 @@ public class DSpaceResourceDocument
         List<Collection> clist = item.getCollections();
 
         // add all the relevant bitstreams
-        boolean isOnlyMetadata = ConfigurationManager.getBooleanProperty("resourcesync", "resourcedump.onlymetadata");
+        boolean isOnlyMetadata = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getBooleanProperty("resourcesync.resourcedump.onlymetadata");
+        
         if (!isOnlyMetadata)
         {
         	for (Bundle bundle : item.getBundles())
@@ -94,7 +98,7 @@ public class DSpaceResourceDocument
         bs.setLoc(this.getBitstreamUrl(bitstream));
         bs.setLastModified(item.getLastModified()); // last modified date is not available on a bitstream, so we use the item one
         bs.setType(bitstreamService.getFormat(context, bitstream).getMIMEType());
-        bs.setLength(bitstream.getSize());
+        bs.setLength(bitstream.getSizeBytes());
         bs.addHash(bitstream.getChecksumAlgorithm().toLowerCase(), bitstream.getChecksum());
 
         for (MetadataFormat format : this.mdFormats)
@@ -161,8 +165,10 @@ public class DSpaceResourceDocument
         List<MetadataFormat> formats = new ArrayList<MetadataFormat>();
 
         // load our config options
-        String formatCfg = ConfigurationManager.getProperty("resourcesync", "metadata.formats");
-        String typeCfg = ConfigurationManager.getProperty("resourcesync", "metadata.types");
+        String formatCfg = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.metadata.formats");
+        String typeCfg =  DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.metadata.types");
 
         // if there's no format config, there are no formats, irrespective of what
         // the type config says
@@ -225,7 +231,8 @@ public class DSpaceResourceDocument
 
     protected String getMetadataChangeFreq()
     {
-        String cf = ConfigurationManager.getProperty("resourcesync", "metadata.change-freq");
+        String cf =  DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.metadata.change-freq");
         if (cf == null || "".equals(cf))
         {
             return null;
@@ -235,7 +242,8 @@ public class DSpaceResourceDocument
 
     protected String getBitstreamChangeFreq()
     {
-        String cf = ConfigurationManager.getProperty("resourcesync", "bitstream.change-freq");
+        String cf =  DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.bitstream.change-freq");
         if (cf == null || "".equals(cf))
         {
             return null;
@@ -245,14 +253,16 @@ public class DSpaceResourceDocument
 
     protected String getMetadataUrl(Item item, MetadataFormat format)
     {
-        String baseUrl = ConfigurationManager.getProperty("resourcesync", "base-url");
+        String baseUrl =  DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.base-url");
         String handle = item.getHandle();
         String url = baseUrl + "/resource/" + handle + "/" + format.getPrefix();
         return url;
     }
 
 	protected String getBitstreamUrl(Bitstream bitstream) {
-		String bsLink = ConfigurationManager.getProperty("resourcesync", "base-url");
+		String bsLink =  DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.base-url");
 		bsLink += "/bitstreams/" + bitstream.getID();
 		return bsLink;
 	}
@@ -260,7 +270,8 @@ public class DSpaceResourceDocument
     protected String getCollectionUrl(Collection collection)
     {
         String handle = collection.getHandle();
-        String base = ConfigurationManager.getProperty("dspace.url");
+        String base =  DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("dspace.url");
         return base + "/handle/" + handle;
     }
 }

@@ -1,14 +1,17 @@
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
- * tree
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.resourcesync;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
-import org.dspace.core.ConfigurationManager;
+
 /**
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Andrea Petrucci (andrea.petrucci at 4science.it)
@@ -24,7 +27,8 @@ public class ResourceSyncConfiguration {
 		}
 		
 		exposeBundles = new ArrayList<String>();
-        String cfg = ConfigurationManager.getProperty("resourcesync", "expose-bundles");
+        String cfg = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.expose-bundles");
         if (cfg == null || "".equals(cfg))
         {
             return exposeBundles;

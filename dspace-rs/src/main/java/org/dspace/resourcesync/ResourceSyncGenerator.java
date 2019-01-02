@@ -1,7 +1,9 @@
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
- * tree
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.resourcesync;
 
@@ -20,9 +22,9 @@ import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -31,10 +33,10 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.openarchives.resourcesync.ResourceSync;
 import org.openarchives.resourcesync.ResourceSyncDescription;
 import org.openarchives.resourcesync.ResourceSyncDescriptionIndex;
@@ -54,7 +56,7 @@ public class ResourceSyncGenerator
 		options.addOption("i", "init", false, "Create a fresh ResourceSync description of this repository - this will remove any previous ResourceSync documents");
 		options.addOption("u", "update", false, "Update the Change List ResourceSync document with the changes since this script last ran");
 		options.addOption("r", "rebase", false, "Update the Resource List ResourceSync document to reflect the current state of the archive, and bring the Change List up to the same level");
-		CommandLineParser parser = new PosixParser();
+		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd = parser.parse( options, args);
 
 		Context context = new Context();
@@ -106,7 +108,8 @@ public class ResourceSyncGenerator
 		CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 		CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 		
-		String capabilityList = ConfigurationManager.getProperty("resourcesync", "capabilitylists");
+		String capabilityList = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.capabilitylists");
 		String handleSite = siteService.findSite(context).getHandle();
 		
 		List<String> handles = new ArrayList<String>();
@@ -146,7 +149,7 @@ public class ResourceSyncGenerator
 				DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, h);
 				if (dso == null) 
 				{
-					log.error("The handle isn't valid "+handle);
+					log.error("The handle isn't valid "+h);
 				}
 				else if (dso.getType() == Constants.ITEM) 
 				{
@@ -175,9 +178,11 @@ public class ResourceSyncGenerator
 			this.ums.put(h, new UrlManager(siteHandle, h));	
 		}
 		this.context = context;
-		this.resourceDump = ConfigurationManager.getBooleanProperty("resourcesync", "resourcedump.enable");
+		this.resourceDump = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getBooleanProperty("resourcesync.resourcedump.enable");
 
-		this.outdir = ConfigurationManager.getProperty("resourcesync", "resourcesync.dir");
+		this.outdir = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.dir");
 		if (this.outdir == null)
 		{
 			throw new IOException("No configuration for resourcesync.dir");
@@ -585,7 +590,8 @@ public class ResourceSyncGenerator
 		if (!handle.equals(siteHandle))
 		{
 			directoryName = handle.replace("/", "-");
-			path = ConfigurationManager.getProperty("resourcesync", "resourcesync.dir");
+			path = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.dir");
 			path = path.concat("/"+directoryName);		
 			File directory = new File(path);
 			directory.mkdir();

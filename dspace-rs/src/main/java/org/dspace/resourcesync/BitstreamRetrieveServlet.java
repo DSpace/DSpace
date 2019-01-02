@@ -1,7 +1,9 @@
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
- * tree
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.resourcesync;
 
@@ -25,10 +27,10 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
@@ -131,7 +133,8 @@ public class BitstreamRetrieveServlet extends HttpServlet {
 				log.info(LogManager.getHeader(context, "rs_bitstream", "bitstream_id=" + bitstream.getID()));
 
 				// aggiungi un if su parametro di conf rs usage-statistcs.track.download
-				boolean usageStatistics = ConfigurationManager.getBooleanProperty("resourcesync", "");
+				boolean usageStatistics = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getBooleanProperty("resourcesync.usage-statistics.track.download");
 				if (usageStatistics) {
 					new DSpace().getEventService()
 							.fireEvent(new UsageEvent(UsageEvent.Action.VIEW, request, context, bitstream));
@@ -147,9 +150,9 @@ public class BitstreamRetrieveServlet extends HttpServlet {
 				response.setContentType(bitstreamService.getFormat(context, bitstream).getMIMEType());
 
 				// Response length
-				response.setHeader("Content-Length", String.valueOf(bitstream.getSize()));
+				response.setHeader("Content-Length", String.valueOf(bitstream.getSizeBytes()));
 
-				if (threshold != -1 && bitstream.getSize() >= threshold) {
+				if (threshold != -1 && bitstream.getSizeBytes() >= threshold) {
 					setBitstreamDisposition(bitstream.getName(), request, response);
 				}
 

@@ -1,7 +1,9 @@
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
- * tree
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.resourcesync;
 
@@ -30,10 +32,10 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
 /**
  * @author Richard Jones
  * @author Andrea Bollini (andrea.bollini at 4science.it)
@@ -45,8 +47,10 @@ public class ResourceSyncServlet extends HttpServlet
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private boolean resourcedumpOnTheFly = ConfigurationManager.getBooleanProperty("resourcesync", "resourcedump.onthefly");
-	private boolean changedumpOnTheFly = ConfigurationManager.getBooleanProperty("resourcesync", "changedump.onthefly");
+	private boolean resourcedumpOnTheFly = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getBooleanProperty("resourcesync.resourcedump.onthefly");
+	private boolean changedumpOnTheFly = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getBooleanProperty("resourcesync.changedump.onthefly");
     private static Logger log = Logger.getLogger(ResourceSyncServlet.class);
 
     @Override
@@ -118,7 +122,13 @@ public class ResourceSyncServlet extends HttpServlet
 	    			resp.setContentType("application/zip");
 	        		resp.setHeader("Content-Disposition","attachment;filename=\"" +  "changedump.zip" + "\"");
 	        		OutputStream servletOutputStream = resp.getOutputStream();
-	        		String date = req.getParameter("from"); 
+	        		String date = req.getParameter("from");
+	        		
+	        		if(StringUtils.isBlank(date)) {
+	        			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+	                    return;
+	        		}
+	        		
 	        		regex = "^\\d{4}-\\d{2}-\\d{2}-\\d{6}$";
 	        		pattern = Pattern.compile(regex);
 	        		matcher = pattern.matcher(date);
@@ -232,7 +242,8 @@ public class ResourceSyncServlet extends HttpServlet
             throws IOException
     {
         // this is a standard resourcesync document serve
-        String dir = ConfigurationManager.getProperty("resourcesync", "resourcesync.dir");
+        String dir = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.resourcesync.dir");
         if (dir == null)
         {
             resp.sendError(404);

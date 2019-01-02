@@ -1,7 +1,9 @@
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
- * tree
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.resourcesync;
 
@@ -20,9 +22,9 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.resourcesync.ResourceSyncAuditService.ChangeType;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.openarchives.resourcesync.ChangeList;
 import org.openarchives.resourcesync.ResourceSync;
 import org.openarchives.resourcesync.ResourceSyncDocument;
@@ -41,8 +43,8 @@ public class DSpaceChangeList extends DSpaceResourceDocument {
 	
 	public DSpaceChangeList(Context context, Date from, Date to, UrlManager um) {
 		super(context);
-		this.includeRestricted = ConfigurationManager.getBooleanProperty("resourcesync",
-				"changelist.include-restricted");
+		this.includeRestricted = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getBooleanProperty("resourcesync.changelist.include-restricted");
 		this.from = from;
 		this.to = to;
 		this.um = um;
@@ -108,7 +110,8 @@ public class DSpaceChangeList extends DSpaceResourceDocument {
 	            throws SQLException
 	    {
 		 	URL bs = new URL();
-		 	String resourceSyncDir = ConfigurationManager.getProperty("resourcesync", "base-url");
+		 	String resourceSyncDir = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.base-url");
 		 	if (rse.getResource_type() == 0)
 		 	{
 		 		bs.setLoc(resourceSyncDir+"/bitstreams/" + rse.getResource_id());

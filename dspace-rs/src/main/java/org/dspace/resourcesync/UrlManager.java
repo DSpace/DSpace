@@ -1,12 +1,13 @@
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
- * tree
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.resourcesync;
 
-import org.dspace.content.Site;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * @author Richard Jones
@@ -21,7 +22,8 @@ public class UrlManager
     }
     public UrlManager(String siteHandle, String handle)
     {
-        this.base = ConfigurationManager.getProperty("resourcesync", "base-url");
+        this.base = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.base-url");
         if (!this.base.endsWith("/"))
         {
             this.base += "/";

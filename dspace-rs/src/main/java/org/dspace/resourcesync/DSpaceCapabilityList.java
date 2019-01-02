@@ -1,17 +1,19 @@
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
- * tree
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.resourcesync;
 
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.openarchives.resourcesync.CapabilityList;
 import org.openarchives.resourcesync.ResourceSync;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * @author Richard Jones
@@ -34,7 +36,8 @@ public class DSpaceCapabilityList
     		boolean changeDump,String latestChangeList,String latestChangeDump,UrlManager um)
     {
         this.context = context;
-        this.describedBy = ConfigurationManager.getProperty("resourcesync", "capabilitylist.described-by");
+        this.describedBy = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                   .getProperty("resourcesync.capabilitylist.described-by");
         if ("".equals(this.describedBy))
         {
             this.describedBy = null;
