@@ -140,11 +140,6 @@ public class PoolTask implements ReloadableEntity<Integer>, BrowsableDSpaceObjec
     }
 
     @Override
-    public String getTypeText() {
-        return "pooltask";
-    }
-
-    @Override
     public int getType() {
         return Constants.WORKFLOW_POOL;
     }

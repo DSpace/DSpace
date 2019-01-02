@@ -155,7 +155,8 @@ public class XmlWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>,
 
     @Override
     public int getState() {
-        // FIXME
+        // FIXME not used by the xml workflow, should be removed when the basic workflow is removed and the interfaces
+        // simplified
         return 0;
     }
 

@@ -125,11 +125,6 @@ public class ClaimedTask implements ReloadableEntity<Integer>, BrowsableDSpaceOb
     }
 
     @Override
-    public String getTypeText() {
-        return "claimedtask";
-    }
-
-    @Override
     public int getType() {
         return Constants.WORKFLOW_CLAIMED;
     }

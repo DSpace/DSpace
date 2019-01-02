@@ -23,7 +23,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
-import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
@@ -435,17 +434,4 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
             .setMetadataSingleValue(context, this, "dcterms", "accessRights", null, null, acceptanceDate.toString());
     }
 
-    public BrowsableDSpaceObject getParentObject() {
-        Context context = new Context();
-        try {
-            return (BrowsableDSpaceObject) (getBitstreamService().getParentObject(context, this));
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
-        return null;
-    }
-
-    public String getMetadata(String field) {
-        return getBitstreamService().getMetadata(this, field);
-    }
 }

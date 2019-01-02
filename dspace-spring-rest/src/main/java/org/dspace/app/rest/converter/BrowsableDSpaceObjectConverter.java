@@ -20,6 +20,12 @@ import org.dspace.browse.BrowsableDSpaceObject;
 public abstract class BrowsableDSpaceObjectConverter<M extends BrowsableDSpaceObject,
     R extends org.dspace.app.rest.model.RestAddressableModel> extends DSpaceConverter<M, R> {
 
+    /**
+     * 
+     * @param bdso
+     *            the browsableDSpaceObject to check
+     * @return true if the actual converter implementation is able to manage the supplied BrowsableDSpaceObject
+     */
     public abstract boolean supportsModel(BrowsableDSpaceObject bdso);
 
 }
