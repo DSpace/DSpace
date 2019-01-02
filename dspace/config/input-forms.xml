@@ -1426,6 +1426,10 @@
 				<displayed-value>Documento institucional</displayed-value>
 				<stored-value>Documento institucional</stored-value>
 			</pair>
+			<pair>
+				<displayed-value>Convenio</displayed-value>
+				<stored-value>Convenio</stored-value>
+			</pair>
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_imagen_fija" dc-term="type">

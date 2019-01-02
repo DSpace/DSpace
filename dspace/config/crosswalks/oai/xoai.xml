@@ -514,6 +514,7 @@
 					<string>Edicion de Revista</string>
 					<string>Boletin</string>
 					<string>Conjunto de datos</string>
+					<string>Convenio</string>
                 </list>
             </Configuration>
         </CustomCondition>

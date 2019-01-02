@@ -211,6 +211,9 @@
 			<xsl:when test="$subtype='Resolucion'">
 				info:eu-repo/semantics/annotation
 			</xsl:when>
+			<xsl:when test="$subtype='Convenio'">
+				info:eu-repo/semantics/annotation
+			</xsl:when>
 			<xsl:when test="$subtype='Imagen fija'">
 				info:eu-repo/semantics/other
 			</xsl:when> 
@@ -250,6 +253,9 @@
 				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Comunicacion'">
+				info:eu-repo/semantics/publishedVersion
+			</xsl:when>
+			<xsl:when test="$subtype='Convenio'">
 				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='Revision'">
