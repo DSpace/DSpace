@@ -47,6 +47,9 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
             me.setKey(mv.getMetadataField().toString('.'));
             me.setValue(mv.getValue());
             me.setLanguage(mv.getLanguage());
+            me.setPlace(mv.getPlace());
+            me.setAuthority(mv.getAuthority());
+            me.setConfidence(mv.getConfidence());
             metadata.add(me);
         }
         return metadata;
