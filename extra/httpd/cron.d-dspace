@@ -60,10 +60,10 @@ DSPACE=/var/dspace
 #10 6 3 * *     dspace  $DSPACE/bin/dspace stats-util -u > /dev/null
 
 #le agrego la marca isBot a los accesos de bots
-30 21 * * * dspace $DSPACE/bin/dspace stats-util -m  > /dev/null
+#30 21 * * * dspace $DSPACE/bin/dspace stats-util -m  > /dev/null
 
 # Cleanup & Re-Optimize Statistics Core
-30 3 * * * dspace $DSPACE/bin/dspace stats-util --delete-spiders-by-flag && $DSPACE/bin/dspace stats-util --optimize  > /dev/null
+#30 3 * * * dspace $DSPACE/bin/dspace stats-util --delete-spiders-by-flag && $DSPACE/bin/dspace stats-util --optimize  > /dev/null
 
 #Generate Sitemaps
 0 1,9,17 * * *  dspace  $DSPACE/bin/dspace generate-sitemaps > /dev/null
