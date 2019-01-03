@@ -247,9 +247,11 @@ public class DashService {
         if (!"".equals(ddp.getManuscriptNumber())) {
             setManuscriptNumber(pkg, ddp.getManuscriptNumber());
         }
+        
         if (ddp.getJournalConcept() != null) {
             setPublicationISSN(pkg, ddp.getJournalConcept().getISSN());
         }
+        
         if (ddp.getFormerManuscriptNumbers().size() > 0) {
             List<String> prevFormerMSIDs = getFormerManuscriptNumbers(pkg);
             for (String msid : ddp.getFormerManuscriptNumbers()) {
@@ -258,6 +260,7 @@ public class DashService {
                 }
             }
         }
+        
         if (ddp.getMismatchedDOIs().size() > 0) {
             List<String> prevMismatches = getMismatchedDOIs(pkg);
             for (String doi : ddp.getMismatchedDOIs()) {
@@ -266,6 +269,7 @@ public class DashService {
                 }
             }
         }
+        
         if (ddp.getDuplicatePackages(null).size() > 0) {
             List<String> prevDuplicates = getDuplicateItems(pkg);
             for (DryadDataPackage dup : ddp.getDuplicatePackages(null)) {
@@ -436,7 +440,7 @@ public class DashService {
 
             log.info("result object " + response);
         } catch (Exception e) {
-            log.fatal("Unable to send curation_activity to DASH", e);
+            log.fatal("Unable to set item to \"submitted\" in DASH", e);
         }
 
         return responseCode;
@@ -455,6 +459,7 @@ public class DashService {
     private int addCurationActivity(DryadDataPackage dataPackage, JsonNode node) {
         int responseCode = 0;
 
+        log.debug("starting addCurationActivity");
         try {
             String dashJSON = mapper.writeValueAsString(node);
             String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
@@ -492,6 +497,7 @@ public class DashService {
             }
 
             log.info("result object " + response);
+            log.debug("ending addCurationActivity");
         } catch (Exception e) {
             log.fatal("Unable to send curation_activity to DASH", e);
         }
@@ -608,8 +614,12 @@ public class DashService {
         return "";
     }
 
-    public int setPublicationISSN(Package pkg, String ISSN) {
-        return postInternalDatum(pkg, "set", "publicationISSN", ISSN);
+    public int setPublicationISSN(Package pkg, String issn) {
+        if(issn != null && issn.length() > 0) {
+           return postInternalDatum(pkg, "set", "publicationISSN", issn);
+        } else {
+            return -1;
+        }
     }
 
     public int setManuscriptNumber(Package pkg, String msid) {
