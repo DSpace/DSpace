@@ -57,6 +57,6 @@ script:
     cd dspace && 
     mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2 &&
     cd .. && 
-    docker build -t dspace/dspace:${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST_BRANCH:-branch} -f Dockerfile.jdk8-test . &&
+    docker build -t dspace/dspace:${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST_BRANCH:-branch} -f Dockerfile.jdk8-test -q . &&
     echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USER}" --password-stdin &&
     docker push dspace/dspace:${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST_BRANCH:-branch}
