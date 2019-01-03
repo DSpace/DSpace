@@ -72,6 +72,7 @@ Afterwards the command `grunt --version` should show the grunt-cli version numbe
 
 For the same reasons as with Node, we’d advise using ruby via [RVM](http://rvm.io/)  (Ruby Version Manager). Even on OSX, which comes with a version of ruby preinstalled, you can save yourself a lot of hassle by using RVM instead. (In most cases there is no need to uninstall the system ruby first). Note that **you need sudo rights to perform the RVM installation**. You won't need sudo again to use RVM, ruby or gem later on
 
+Ruby 2.2.x (or JRuby 9.1.x.x) or above when pre-installing dependencies locally.
 
 #### OSX Ruby Note ####
 On OSX, you need to have the XCode command line tools installed. To test if they're installed try to type `make` in your terminal, if it says "command not found" follow [these instructions](http://www.computersnyou.com/2025/2013/06/install-command-line-tools-in-osx-10-9-mavericks-how-to/) to install them  
@@ -136,6 +137,8 @@ Afterwards the command `grunt --version` should show the grunt-cli version numbe
 ### Ruby on Windows ###
 
 Download and install: [Ruby Installer](http://rubyinstaller.org/)
+
+Ruby 2.2.x (or JRuby 9.1.x.x) or above when pre-installing dependencies locally.
 
 Make sure its environment variables are set in system variables
 

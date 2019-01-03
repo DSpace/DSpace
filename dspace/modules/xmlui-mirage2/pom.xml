@@ -23,10 +23,13 @@
         <grunt.color.scheme>classic_mirage_color_scheme</grunt.color.scheme>
         <mirage2.deps.included>true</mirage2.deps.included>
         <!-- Versions of build dependencies to be auto-installed when "mirage2.deps.included=true" -->
-        <sass.version>3.3.14</sass.version>
+        <!-- These versions should be kept in sync with ./.travis.yml -->
+        <sass.version>3.4.25</sass.version>
         <compass.version>1.0.1</compass.version>
         <node.version>0.10.31</node.version>
         <npm.version>1.4.23</npm.version>
+        <!-- Override version of JRuby that gem-maven-plugin installs when "mirage2.deps.included=true" -->
+        <jruby.version>9.1.17.0</jruby.version>
     </properties>
 
     <build>
