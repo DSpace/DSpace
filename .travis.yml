@@ -8,6 +8,7 @@ env:
 # Install prerequisites for building Mirage2 more rapidly
 before_install:
   # Remove outdated settings.xml from Travis builds. Workaround for https://github.com/travis-ci/travis-ci/issues/4629
+  # These versions should be kept in sync with ./dspace/modules/xml-mirage2/pom.xml 
   - rm ~/.m2/settings.xml
   # Install Node.js 6.5.0 & print version info
   - nvm install 6.5.0
