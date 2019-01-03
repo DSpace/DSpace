@@ -5,6 +5,9 @@ env:
   # Give Maven 1GB of memory to work with
   - MAVEN_OPTS=-Xmx1024M
 
+services:
+  docker
+
 # Install prerequisites for building Mirage2 more rapidly
 # These versions should be kept in sync with ./dspace/modules/xml-mirage2/pom.xml
 before_install:
@@ -50,4 +53,10 @@ script:
   #        -Dmirage2.on=true => Build Mirage2
   #        -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)
   #        -P !assembly => SKIP the actual building of [src]/dspace/dspace-installer (as it can be memory intensive)
-  - "cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2"
+  - > 
+    cd dspace && 
+    mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2 &&
+    cd .. && 
+    docker build -t dspace/dspace:${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST_BRANCH:-branch} -f Dockerfile.jdk8-test . &&
+    echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USER}" --password-stdin &&
+    docker push dspace/dspace:${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST_BRANCH:-branch}
