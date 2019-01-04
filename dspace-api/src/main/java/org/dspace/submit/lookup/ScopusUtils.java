@@ -149,10 +149,16 @@ public class ScopusUtils
         LinkedList<Value> authOrcid = new LinkedList<Value>();
         //TODO: Manage Author Affiliation
         for(Element author: authors){
-            String name = XMLUtils.getElementValue(author,
+            String givenname = XMLUtils.getElementValue(author,
+                    "given-name");
+            String surname = XMLUtils.getElementValue(author,
+                    "surname");
+            String authname = XMLUtils.getElementValue(author,
                     "authname");
-            if (name != null){
-                authNames.add(new StringValue(name));
+            if (givenname != null && surname != null) {
+                authNames.add(new StringValue(surname+", "+givenname));
+            } else if (authname != null){
+                authNames.add(new StringValue(authname));
             }
 
             String auUrl = XMLUtils.getElementValue(author,
