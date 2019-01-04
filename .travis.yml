@@ -58,7 +58,7 @@ script:
     mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2 &&
     cd .. &&
     echo "Building docker image dspace/dspace:${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST_BRANCH:-branch}" &&
-    docker build -t dspace/dspace:${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST_BRANCH:-branch} -f Dockerfile.jdk8-test . | egrep "^\[(INFO|WARNING|ERROR)\]" &&
+    docker build -t dspace/dspace:${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST_BRANCH:-branch} -f Dockerfile.jdk8-test . | egrep "^Step|^\[(ERROR|WARNING)|\]$" &&
     echo "Pushing docker image dspace/dspace:${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST_BRANCH:-branch}" &&
     echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USER}" --password-stdin &&
     docker push dspace/dspace:${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST_BRANCH:-branch}
