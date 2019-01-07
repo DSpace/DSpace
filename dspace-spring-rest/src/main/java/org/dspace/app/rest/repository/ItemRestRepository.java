@@ -214,6 +214,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
     @PreAuthorize("hasAuthority('ADMIN')")
     protected ItemRest createAndReturn(Context context) throws AuthorizeException, SQLException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        String owningCollectionUuidString = req.getParameter("owningCollection");
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = null;
         try {
@@ -226,11 +227,11 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         if (itemRest.getInArchive() == false) {
             throw new BadRequestException("InArchive attribute should not be set to false for the create");
         }
-        Collection collection = collectionService.find(context,
-                                                       UUIDUtils.fromString(itemRest.getOwningCollectionUuid()));
+        UUID owningCollectionUuid = UUIDUtils.fromString(owningCollectionUuidString);
+        Collection collection = collectionService.find(context, owningCollectionUuid);
         if (collection == null) {
-            throw new BadRequestException("The given collection in the body is invalid: "
-                                              + itemRest.getOwningCollectionUuid());
+            throw new BadRequestException("The given owningCollection parameter is invalid: "
+                                              + owningCollectionUuid);
         }
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item item = workspaceItem.getItem();
