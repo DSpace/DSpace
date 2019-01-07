@@ -433,14 +433,18 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Method to support updating a DSpace instance.
+     * Implement this method in the subclass to support updating a DSpace instance.
      *
-     * @param request     the http request
+     * @param context     the dspace context
      * @param apiCategory the API category e.g. "api"
      * @param model       the DSpace model e.g. "metadatafield"
-     * @param id        the ID of the target REST object
+     * @param id          the ID of the target REST object
      * @param jsonNode    the part of the request body representing the updated rest object
      * @return the updated REST object
+     * @throws AuthorizeException if the context user is not authorized to perform this operation
+     * @throws SQLException when the database returns an error
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
      */
     protected T put(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
                          JsonNode jsonNode)

@@ -25,13 +25,10 @@ public class ItemRest extends DSpaceObjectRest {
     private boolean discoverable = false;
     private boolean withdrawn = false;
     private Date lastModified = new Date();
-    private String owningCollectionUuid;
     @JsonIgnore
     private CollectionRest owningCollection;
     @JsonIgnore
     private CollectionRest templateItemOf;
-    //private EPerson submitter;
-
     List<BitstreamRest> bitstreams;
 
     @Override
@@ -101,13 +98,5 @@ public class ItemRest extends DSpaceObjectRest {
 
     public void setBitstreams(List<BitstreamRest> bitstreams) {
         this.bitstreams = bitstreams;
-    }
-
-    public String getOwningCollectionUuid() {
-        return owningCollectionUuid;
-    }
-
-    public void setOwningCollectionUuid(String owningCollectionUuid) {
-        this.owningCollectionUuid = owningCollectionUuid;
     }
 }

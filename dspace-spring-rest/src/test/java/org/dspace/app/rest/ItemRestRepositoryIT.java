@@ -1445,7 +1445,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
-        itemRest.setOwningCollectionUuid(col1.getID().toString());
         itemRest.setInArchive(true);
         itemRest.setDiscoverable(true);
         itemRest.setWithdrawn(false);
@@ -1477,7 +1476,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                  title));
 
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(post("/api/core/items")
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
+                                                                col1.getID().toString())
                                    .content(mapper.writeValueAsBytes(itemRest)).contentType(contentType))
                                               .andExpect(status().isCreated())
                                               .andReturn();
@@ -1528,7 +1528,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
-        itemRest.setOwningCollectionUuid(col1.getID().toString());
         itemRest.setInArchive(true);
         itemRest.setDiscoverable(true);
         itemRest.setWithdrawn(false);
@@ -1560,7 +1559,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            title));
 
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(post("/api/core/items")
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
+                                                                col1.getID().toString())
                                                            .content(mapper.writeValueAsBytes(itemRest))
                                                            .contentType(contentType))
                                               .andExpect(status().isCreated())
@@ -1638,7 +1638,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
-        itemRest.setOwningCollectionUuid(col1.getID().toString());
         itemRest.setInArchive(true);
         itemRest.setDiscoverable(true);
         itemRest.setWithdrawn(false);
@@ -1670,7 +1669,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            title));
 
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(post("/api/core/items")
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
+                                                                col1.getID().toString())
                                                            .content(mapper.writeValueAsBytes(itemRest))
                                                            .contentType(contentType))
                                               .andExpect(status().isCreated())
@@ -1731,7 +1731,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
-        itemRest.setOwningCollectionUuid(col1.getID().toString());
         itemRest.setInArchive(true);
         itemRest.setDiscoverable(true);
         itemRest.setWithdrawn(false);
@@ -1763,7 +1762,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            title));
 
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(post("/api/core/items")
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
+                                                                col1.getID().toString())
                                                            .content(mapper.writeValueAsBytes(itemRest))
                                                            .contentType(contentType))
                                               .andExpect(status().isCreated())
