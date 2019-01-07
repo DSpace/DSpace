@@ -26,6 +26,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
@@ -109,13 +110,15 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         Relationship relationship = new Relationship();
         Item leftItem = itemService.find(context, UUIDUtils.fromString(req.getParameter("leftItem")));
         Item rightItem = itemService.find(context, UUIDUtils.fromString(req.getParameter("rightItem")));
+        RelationshipType relationshipType = relationshipTypeService
+            .find(context, Integer.parseInt(req.getParameter("relationshipType")));
+
         EPerson ePerson = context.getCurrentUser();
         if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) &&
             authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
             relationship.setLeftItem(leftItem);
             relationship.setRightItem(rightItem);
-            relationship
-                .setRelationshipType(relationshipTypeService.find(context, relationshipRest.getRelationshipTypeId()));
+            relationship.setRelationshipType(relationshipType);
             relationship = relationshipService.create(context, relationship);
             return relationshipConverter.fromModel(relationship);
         } else {
@@ -144,14 +147,16 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
         Item leftItem = itemService.find(context, UUIDUtils.fromString(req.getParameter("leftItem")));
         Item rightItem = itemService.find(context, UUIDUtils.fromString(req.getParameter("rightItem")));
+        RelationshipType relationshipType = relationshipTypeService
+            .find(context, Integer.parseInt(req.getParameter("relationshipType")));
+
         if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) &&
             authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
             relationship.setId(relationshipRest.getId());
             relationship.setLeftItem(leftItem);
             relationship.setRightItem(rightItem);
 
-            relationship.setRelationshipType(
-                relationshipTypeService.find(context, relationshipRest.getRelationshipTypeId()));
+            relationship.setRelationshipType(relationshipType);
             if (relationshipRest.getLeftPlace() != -1) {
                 relationship.setLeftPlace(relationshipRest.getLeftPlace());
             }
