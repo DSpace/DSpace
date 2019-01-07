@@ -552,7 +552,8 @@ public class ShibAuthentication implements AuthenticationMethod
 			returnURL += host;
 			if (!(port == 443 || port == 80))
 				returnURL += ":" + port;
-			returnURL += "/" + contextPath + "/shibboleth-login";
+			// For servlets in the default (root) context, this method returns "". 
+			returnURL += contextPath + "/shibboleth-login";
 
 			try {
 				shibURL += "?target="+URLEncoder.encode(returnURL, "UTF-8");
