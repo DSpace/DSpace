@@ -273,13 +273,14 @@ public class XOAI {
         try {
             int i = 0;
             SolrServer server = solrServerResolver.getServer();
+            ArrayList<SolrInputDocument> list = new ArrayList<>();
             while (iterator.hasNext()) {
                 try {
                     Item item = iterator.next();
                     if (item.getHandle() == null) {
                         log.warn("Skipped item without handle: " + item.getID());
                     } else {
-                        server.add(this.index(item));
+                        list.add(this.index(item));
                     }
                     context.uncacheEntity(item);
 
@@ -288,11 +289,20 @@ public class XOAI {
                     log.error(ex.getMessage(), ex);
                 }
                 i++;
-                if (i % 100 == 0)
+                if (i % 1000 == 0) {
+                    System.out.println(i + " items prepared so far...");
+                }
+                if (i % 10000 == 0) {
                     System.out.println(i + " items imported so far...");
+                    server.add(list);
+                    server.commit(true, true);
+                    list.clear();
+                }
             }
             System.out.println("Total: " + i + " items");
-            server.commit();
+            server.add(list);
+            server.commit(true, true);
+            list.clear();
             return i;
         } catch (SolrServerException | IOException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
@@ -322,6 +332,7 @@ public class XOAI {
                     dates.add(policy.getEndDate());
                 }
             }
+            context.uncacheEntity(policy);
         }
         dates.add(item.getLastModified());
         Collections.sort(dates);
@@ -449,6 +460,7 @@ public class XOAI {
                     return true;
                 }
             }
+            context.uncacheEntity(policy);
         }
         
         return false;
