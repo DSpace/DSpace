@@ -477,12 +477,13 @@ implements DOIConnector
             {
                 return;
             }
-            // 400 -> invalid XML
+            // 400, 422 -> invalid XML syntax or unallowed content
             case (400) :
+            case (422) :
             {
                 log.warn("DataCite was unable to understand the XML we send.");
                 log.warn("DataCite Metadata API returned a http status code "
-                        +"400: " + resp.getContent());
+                        + resp.getStatusCode() +": " + resp.getContent());
                 Format format = Format.getCompactFormat();
                 format.setEncoding("UTF-8");
                 XMLOutputter xout = new XMLOutputter(format);
