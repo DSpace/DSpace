@@ -14,7 +14,7 @@
 	
 	<!-- Find the DOI information. -->
 	<xsl:template name="get_identifier">
-		<xsl:value-of select="dspace:field[@element ='identifier'][@mdschema='dc']"/>
+	  <xsl:value-of select="dspace:field[@element='identifier' and not(@qualifier)]" />
 	</xsl:template>
 
 	<!-- Main match for the root node: set up the root element, <resource> -->
