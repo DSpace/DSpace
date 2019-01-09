@@ -87,9 +87,23 @@ public class DryadWorkflowUtils {
                 isInReview = true;
             }
         } catch (SQLException e) {
-            log.error("SQL exception looking up whether item " + wfi.getItem().getID() + " is in review: " + e.getMessage());
+            log.error("SQL exception looking up whether item " + wfi.getItem().getID() + " is in review: ", e);
         }
         return isInReview;
+    }
+
+    public static boolean isItemClaimed(Context context, WorkflowItem wfi) {
+        boolean isClaimed = false;
+        if (wfi == null) return false;
+        try {
+            List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
+            if (claimedTasks != null && claimedTasks.size() > 0 && !claimedTasks.get(0).getActionID().equals("reviewAction")) {
+                isClaimed = true;
+            }
+        } catch (SQLException e) {
+            log.error("SQL exception looking up whether item " + wfi.getItem().getID() + " is claimed: ", e);
+        }
+        return isClaimed;
     }
 
     public static Item[] getDataFiles(Context context, Item dataPackage) throws SQLException {

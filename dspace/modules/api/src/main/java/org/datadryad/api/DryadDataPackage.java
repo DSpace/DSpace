@@ -534,6 +534,13 @@ public class DryadDataPackage extends DryadObject {
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode resultNode = mapper.createArrayNode();
 
+        Context c = null;
+        try {
+            c = new Context();
+        } catch (Exception e) {
+            log.fatal("Can't create a context! Something is very wrong!", e);
+        }
+
         for (String provenance : provenances) {
             provenance = provenance.replaceAll("[\\n|\\r]", " ");
             Matcher authorActionRequired = Pattern.compile(".*Rejected by .+?, reason: .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
@@ -554,13 +561,25 @@ public class DryadDataPackage extends DryadObject {
                 node.put("status", "Author Action Required");
                 node.put("created_at", authorActionRequired.group(1));
             } else if (submitted1.matches()) {
-                node.put("status", "Submitted");
+                if(isPackageClaimed(c)) {
+                    node.put("status", "Curation");
+                } else {
+                    node.put("status", "Submitted");
+                }
                 node.put("created_at", submitted1.group(1));
             } else if (submitted2.matches()) {
-                node.put("status", "Submitted");
+                if(isPackageClaimed(c)) {
+                    node.put("status", "Curation");
+                } else {
+                    node.put("status", "Submitted");
+                }
                 node.put("created_at", submitted2.group(1));
             } else if (submitted3.matches()) {
-                node.put("status", "Submitted");
+                if(isPackageClaimed(c)) {
+                    node.put("status", "Curation");
+                } else {
+                    node.put("status", "Submitted");
+                }
                 node.put("created_at", submitted3.group(1));
             } else if (embargoed.matches()) {
                 node.put("status", "Embargoed");
@@ -670,6 +689,13 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
+    public boolean isPackageClaimed(Context c) {
+        if (useDryadClassic) {
+            return DryadWorkflowUtils.isItemClaimed(c, getWorkflowItem(c));
+        } else {
+            return curationStatus.equals("Curation");
+        }
+    }
 
     // DSpace-specific methods (without Dash equivalents)
 
