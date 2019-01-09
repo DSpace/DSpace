@@ -461,54 +461,47 @@ public class DashService {
 
         log.debug("starting addCurationActivity");
         try {
-            String fullJSON = mapper.writeValueAsString(node);
-            log.debug("full curation json is " + fullJSON);
-            if (node.isArray()) {
-                for (JsonNode curationActivityNode : node) {
-                    String dashJSON = mapper.writeValueAsString(curationActivityNode);
-                    log.debug("transferring curation activity node " + dashJSON);
-                    String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
-                    URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    connection.setRequestProperty("Accept", "application/json");
-                    connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
-                    connection.setDoOutput(true);
-                    connection.setRequestMethod("POST");
-                    
-                    OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
-                    wr.write(dashJSON);
-                    wr.close();
-                    
-                    InputStream stream = connection.getErrorStream();
-                    if (stream == null) {
-                        stream = connection.getInputStream();
-                    }
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                    String line = null;
-                    StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
-                    while ((line = reader.readLine()) != null) {
-                        out.append(line);
-                    }
-                    String response = out.toString();
-
-                    responseCode = connection.getResponseCode();
-                    
-                    if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
-                        log.debug("curation activity added");
-                    } else {
-                        log.fatal("Unable to send curation activity to DASH, response: " + responseCode +
-                                  connection.getResponseMessage());
-                    }
-
-                    log.info("result object " + response);
-                }
+            String dashJSON = mapper.writeValueAsString(node);
+            log.debug("curation activity json is " + dashJSON);
+            String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            
+            OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+            wr.write(dashJSON);
+            wr.close();
+            
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
             }
-            log.debug("ending addCurationActivity");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            String line = null;
+            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+            String response = out.toString();
+
+            responseCode = connection.getResponseCode();
+            
+            if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
+                log.debug("curation activity added");
+            } else {
+                log.fatal("Unable to send curation activity to DASH, response: " + responseCode +
+                          connection.getResponseMessage());
+            }
+            
+            log.info("result object " + response);
         } catch (Exception e) {
             log.fatal("Unable to send curation_activity to DASH", e);
         }
-
+        
         return responseCode;
     }
 
