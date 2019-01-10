@@ -127,7 +127,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
                     MetadataFieldRest.class
             );
         } catch (IOException excIO) {
-            throw new PatchBadRequestException("error parsing the body ..." + excIO.getMessage());
+            throw new PatchBadRequestException("error parsing request body", excIO);
         }
 
         // validate fields
@@ -179,7 +179,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
             metadataFieldService.delete(context, metadataField);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("error while trying to delete " + MetadataFieldRest.NAME + " with id: " + id, e);
         }
     }
 

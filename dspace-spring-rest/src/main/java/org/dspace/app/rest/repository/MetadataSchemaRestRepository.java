@@ -101,7 +101,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
                     MetadataSchemaRest.class
             );
         } catch (IOException excIO) {
-            throw new PatchBadRequestException("error parsing the body ..." + excIO.getMessage());
+            throw new PatchBadRequestException("error parsing request body", excIO);
         }
 
         // validate fields
@@ -141,7 +141,9 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
 
             metadataSchemaService.delete(context, metadataSchema);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException(
+                    "error while trying to delete " + MetadataSchemaRest.NAME + " with id: " + id, e
+            );
         }
     }
 
