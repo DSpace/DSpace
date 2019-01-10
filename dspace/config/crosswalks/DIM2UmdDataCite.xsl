@@ -475,7 +475,7 @@
         <xsl:element name="resourceType">
             <xsl:attribute name="resourceTypeGeneral">
                 <xsl:choose>
-                    <xsl:when test="string(text())='Animation'">Image</xsl:when>
+                    <xsl:when test="string(text())='Animation'">Audiovisual</xsl:when>
                     <xsl:when test="string(text())='Article'">Text</xsl:when>
                     <xsl:when test="string(text())='Book'">Text</xsl:when>
                     <xsl:when test="string(text())='Book chapter'">Text</xsl:when>
@@ -483,18 +483,18 @@
                     <xsl:when test="string(text())='Learning Object'">InteractiveResource</xsl:when>
                     <xsl:when test="string(text())='Image'">Image</xsl:when>
                     <xsl:when test="string(text())='Image, 3-D'">Image</xsl:when>
-                    <xsl:when test="string(text())='Map'">Image</xsl:when>
-                    <xsl:when test="string(text())='Musical Score'">Sound</xsl:when>
-                    <xsl:when test="string(text())='Plan or blueprint'">Image</xsl:when>
+                    <xsl:when test="string(text())='Map'">Model</xsl:when>
+                    <xsl:when test="string(text())='Musical Score'">Other</xsl:when>
+                    <xsl:when test="string(text())='Plan or blueprint'">Model</xsl:when>
                     <xsl:when test="string(text())='Preprint'">Text</xsl:when>
-                    <xsl:when test="string(text())='Presentation'">Image</xsl:when>
+                    <xsl:when test="string(text())='Presentation'">Text</xsl:when>
                     <xsl:when test="string(text())='Recording, acoustical'">Sound</xsl:when>
                     <xsl:when test="string(text())='Recording, musical'">Sound</xsl:when>
                     <xsl:when test="string(text())='Recording, oral'">Sound</xsl:when>
                     <xsl:when test="string(text())='Software'">Software</xsl:when>
                     <xsl:when test="string(text())='Technical Report'">Text</xsl:when>
                     <xsl:when test="string(text())='Thesis'">Text</xsl:when>
-                    <xsl:when test="string(text())='Video'">Film</xsl:when>
+                    <xsl:when test="string(text())='Video'">Audiovisual</xsl:when>
                     <xsl:when test="string(text())='Working Paper'">Text</xsl:when>
                     <xsl:when test="string(text())='Other'">Other</xsl:when>
                     <xsl:otherwise>Collection</xsl:otherwise>
