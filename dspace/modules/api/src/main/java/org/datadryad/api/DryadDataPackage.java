@@ -515,6 +515,10 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
+    public String getCurationStatusReason() {
+        return curationStatusReason;
+    }
+    
     public void setCurationStatus(String status, String reason) {
         if (getItem() != null) {
             item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + reason + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
@@ -530,6 +534,13 @@ public class DryadDataPackage extends DryadObject {
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode resultNode = mapper.createArrayNode();
 
+        Context c = null;
+        try {
+            c = new Context();
+        } catch (Exception e) {
+            log.fatal("Can't create a context! Something is very wrong!", e);
+        }
+
         for (String provenance : provenances) {
             provenance = provenance.replaceAll("[\\n|\\r]", " ");
             Matcher authorActionRequired = Pattern.compile(".*Rejected by .+?, reason: .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
@@ -541,6 +552,8 @@ public class DryadDataPackage extends DryadObject {
             Matcher peerReview2 = Pattern.compile("Data package moved to review on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
             Matcher published = Pattern.compile("Made available in DSpace on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
             Matcher withdrawn = Pattern.compile("Item withdrawn by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher approved = Pattern.compile("Step: dryadAcceptEditReject - action:dryadAcceptEditRejectAction " +
+                                               "Approved for entry into archive by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
 
             ObjectNode node = mapper.createObjectNode();
             node.put("note", provenance);
@@ -550,13 +563,25 @@ public class DryadDataPackage extends DryadObject {
                 node.put("status", "Author Action Required");
                 node.put("created_at", authorActionRequired.group(1));
             } else if (submitted1.matches()) {
-                node.put("status", "Submitted");
+                if(isPackageClaimed(c)) {
+                    node.put("status", "Curation");
+                } else {
+                    node.put("status", "Submitted");
+                }
                 node.put("created_at", submitted1.group(1));
             } else if (submitted2.matches()) {
-                node.put("status", "Submitted");
+                if(isPackageClaimed(c)) {
+                    node.put("status", "Curation");
+                } else {
+                    node.put("status", "Submitted");
+                }
                 node.put("created_at", submitted2.group(1));
             } else if (submitted3.matches()) {
-                node.put("status", "Submitted");
+                if(isPackageClaimed(c)) {
+                    node.put("status", "Curation");
+                } else {
+                    node.put("status", "Submitted");
+                }
                 node.put("created_at", submitted3.group(1));
             } else if (embargoed.matches()) {
                 node.put("status", "Embargoed");
@@ -570,6 +595,11 @@ public class DryadDataPackage extends DryadObject {
             } else if (published.matches()) {
                 node.put("status", "Published");
                 node.put("created_at", published.group(1));
+            } else if (approved.matches()) {
+                // There are times when something is approved in Dryad classic but not published (e.g., Reauthorize Payment)
+                // These items will get Published status in the new system
+                node.put("status", "Published");
+                node.put("created_at", approved.group(1));
             } else if (withdrawn.matches()) {
                 node.put("status", "Withdrawn");
                 node.put("created_at", withdrawn.group(1));
@@ -666,47 +696,11 @@ public class DryadDataPackage extends DryadObject {
         }
     }
 
-    public void updateToDash() {
-        Package pkg = new Package(this);
-        // first, set the dataset itself:
-        dashService.putDataset(pkg);
-
-        // next, check to see if the curation status has been updated: if there's no reason, we haven't updated it
-        if (!"".equals(curationStatusReason)) {
-            log.info("updating curation status");
-            dashService.addCurationActivity(this, curationStatus, curationStatusReason);
-        }
-
-        // finally, update the internal data:
-        if (!"".equals(getManuscriptNumber())) {
-            dashService.setManuscriptNumber(pkg, getManuscriptNumber());
-        }
-        if (getJournalConcept() != null) {
-            dashService.setPublicationISSN(pkg, getJournalConcept().getISSN());
-        }
-        if (getFormerManuscriptNumbers().size() > 0) {
-            List<String> prevFormerMSIDs = dashService.getFormerManuscriptNumbers(pkg);
-            for (String msid : getFormerManuscriptNumbers()) {
-                if (!prevFormerMSIDs.contains(msid)) {
-                    dashService.addFormerManuscriptNumber(pkg, msid);
-                }
-            }
-        }
-        if (getMismatchedDOIs().size() > 0) {
-            List<String> prevMismatches = dashService.getMismatchedDOIs(pkg);
-            for (String doi : getMismatchedDOIs()) {
-                if (!prevMismatches.contains(doi)) {
-                    dashService.addMismatchedDOI(pkg, doi);
-                }
-            }
-        }
-        if (getDuplicatePackages(null).size() > 0) {
-            List<String> prevDuplicates = dashService.getDuplicateItems(pkg);
-            for (DryadDataPackage dup : getDuplicatePackages(null)) {
-                if (!prevDuplicates.contains(dup.getIdentifier())) {
-                    dashService.addFormerManuscriptNumber(pkg, dup.getIdentifier());
-                }
-            }
+    public boolean isPackageClaimed(Context c) {
+        if (useDryadClassic) {
+            return DryadWorkflowUtils.isItemClaimed(c, getWorkflowItem(c));
+        } else {
+            return curationStatus.equals("Curation");
         }
     }
 
@@ -1281,8 +1275,9 @@ public class DryadDataPackage extends DryadObject {
 
         // Only required for Dash:
         if (!useDryadClassic) {
-            updateToDash();
+            // updateToDash();
         }
+
         if (fieldsChanged.size() > 0) {
             if (!"".equals(provenance.toString())) {
                 log.info("writing provenance for package " + getIdentifier() + ": " + provenance);

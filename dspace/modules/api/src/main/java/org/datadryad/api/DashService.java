@@ -229,9 +229,55 @@ public class DashService {
             log.fatal("Unable to send item to DASH", e);
         }
 
+        updateInternalMetadata(pkg);
+        
         return responseCode;
     }
 
+
+    /**
+       Update the internal metadata for a Dash dataset.
+    **/
+    private void updateInternalMetadata(Package pkg) {
+        DryadDataPackage ddp = pkg.getDataPackage();
+        
+        if (!"".equals(ddp.getManuscriptNumber())) {
+            setManuscriptNumber(pkg, ddp.getManuscriptNumber());
+        }
+        
+        if (ddp.getJournalConcept() != null) {
+            setPublicationISSN(pkg, ddp.getJournalConcept().getISSN());
+        }
+        
+        if (ddp.getFormerManuscriptNumbers().size() > 0) {
+            List<String> prevFormerMSIDs = getFormerManuscriptNumbers(pkg);
+            for (String msid : ddp.getFormerManuscriptNumbers()) {
+                if (!prevFormerMSIDs.contains(msid)) {
+                    addFormerManuscriptNumber(pkg, msid);
+                }
+            }
+        }
+        
+        if (ddp.getMismatchedDOIs().size() > 0) {
+            List<String> prevMismatches = getMismatchedDOIs(pkg);
+            for (String doi : ddp.getMismatchedDOIs()) {
+                if (!prevMismatches.contains(doi)) {
+                    addMismatchedDOI(pkg, doi);
+                }
+            }
+        }
+        
+        if (ddp.getDuplicatePackages(null).size() > 0) {
+            List<String> prevDuplicates = getDuplicateItems(pkg);
+            for (DryadDataPackage dup : ddp.getDuplicatePackages(null)) {
+                if (!prevDuplicates.contains(dup.getIdentifier())) {
+                    addDuplicateItem(pkg, dup.getIdentifier());
+                }
+            }
+        }
+    }
+
+    
     /**
        POSTs references for all data files to Dash, attaching them to the DryadDataPackage.
        The DryadDataPackage must already have been PUT to Dash.
@@ -327,9 +373,6 @@ public class DashService {
                 }
             }
         }
-        if (curationActivities.size() > 1) {
-            throw new RuntimeException("More than one curation activity for package " + pkg.getDataPackage().getIdentifier() + ": are you sure you want to migrate provenances?");
-        }
 
         // add provenances as curation activities
         JsonNode provenances = pkg.getDataPackage().getProvenancesAsCurationActivities();
@@ -394,24 +437,29 @@ public class DashService {
 
             log.info("result object " + response);
         } catch (Exception e) {
-            log.fatal("Unable to send curation_activity to DASH", e);
+            log.fatal("Unable to set item to \"submitted\" in DASH", e);
         }
 
         return responseCode;
     }
 
-    public int addCurationActivity(DryadDataPackage dataPackage, String status, String reason) {
+    public int addCurationActivity(DryadDataPackage dataPackage, String status, String reason, String processKeyword) {
         ObjectNode node = mapper.createObjectNode();
         node.put("status", status);
         node.put("note", reason);
+        if(processKeyword != null) {
+            node.put("keywords", processKeyword);
+        }
         return addCurationActivity(dataPackage, node);
     }
 
     private int addCurationActivity(DryadDataPackage dataPackage, JsonNode node) {
         int responseCode = 0;
 
+        log.debug("starting addCurationActivity");
         try {
             String dashJSON = mapper.writeValueAsString(node);
+            log.debug("curation activity json is " + dashJSON);
             String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -420,12 +468,16 @@ public class DashService {
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
-
+            
             OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
             wr.write(dashJSON);
             wr.close();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -434,19 +486,19 @@ public class DashService {
             String response = out.toString();
 
             responseCode = connection.getResponseCode();
-
+            
             if(responseCode == 200 || responseCode == 201 || responseCode == 202) {
                 log.debug("curation activity added");
             } else {
                 log.fatal("Unable to send curation activity to DASH, response: " + responseCode +
-                        connection.getResponseMessage());
+                          connection.getResponseMessage());
             }
-
+            
             log.info("result object " + response);
         } catch (Exception e) {
             log.fatal("Unable to send curation_activity to DASH", e);
         }
-
+        
         return responseCode;
     }
 
@@ -460,7 +512,11 @@ public class DashService {
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setRequestMethod("GET");
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -487,7 +543,11 @@ public class DashService {
                 connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
                 connection.setRequestMethod("GET");
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                InputStream stream = connection.getErrorStream();
+                if (stream == null) {
+                    stream = connection.getInputStream();
+                }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
                 String line = null;
                 StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
                 while ((line = reader.readLine()) != null) {
@@ -521,7 +581,11 @@ public class DashService {
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setRequestMethod("GET");
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -547,8 +611,12 @@ public class DashService {
         return "";
     }
 
-    public int setPublicationISSN(Package pkg, String ISSN) {
-        return postInternalDatum(pkg, "set", "publicationISSN", ISSN);
+    public int setPublicationISSN(Package pkg, String issn) {
+        if(issn != null && issn.length() > 0) {
+           return postInternalDatum(pkg, "set", "publicationISSN", issn);
+        } else {
+            return -1;
+        }
     }
 
     public int setManuscriptNumber(Package pkg, String msid) {
@@ -633,7 +701,11 @@ public class DashService {
             wr.write(dashJSON);
             wr.close();
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -696,8 +768,12 @@ public class DashService {
             connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
             connection.setDoOutput(true);
             connection.setRequestMethod("GET");
-
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
             while ((line = reader.readLine()) != null) {
@@ -728,6 +804,9 @@ public class DashService {
         return dryadDataPackages;
     }
 
+    /**
+       Command-line functionality for the DashService.
+     **/
     public static void main(String[] args) throws IOException {
         
         String usage = "\n\nUsage: \n" +
