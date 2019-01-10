@@ -241,9 +241,6 @@ public class DashService {
     private void updateInternalMetadata(Package pkg) {
         DryadDataPackage ddp = pkg.getDataPackage();
         
-        log.info("updating curation status");
-        addCurationActivity(ddp, ddp.getCurationStatus(), ddp.getCurationStatusReason(), "updateCurationStatus");
-        
         if (!"".equals(ddp.getManuscriptNumber())) {
             setManuscriptNumber(pkg, ddp.getManuscriptNumber());
         }

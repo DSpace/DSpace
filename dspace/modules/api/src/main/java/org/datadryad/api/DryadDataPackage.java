@@ -552,6 +552,8 @@ public class DryadDataPackage extends DryadObject {
             Matcher peerReview2 = Pattern.compile("Data package moved to review on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
             Matcher published = Pattern.compile("Made available in DSpace on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
             Matcher withdrawn = Pattern.compile("Item withdrawn by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
+            Matcher approved = Pattern.compile("Step: dryadAcceptEditReject - action:dryadAcceptEditRejectAction " +
+                                               "Approved for entry into archive by .+ on (\\d+-\\d+-\\d+T\\d+:\\d+:\\d+Z).*").matcher(provenance);
 
             ObjectNode node = mapper.createObjectNode();
             node.put("note", provenance);
@@ -593,6 +595,11 @@ public class DryadDataPackage extends DryadObject {
             } else if (published.matches()) {
                 node.put("status", "Published");
                 node.put("created_at", published.group(1));
+            } else if (approved.matches()) {
+                // There are times when something is approved in Dryad classic but not published (e.g., Reauthorize Payment)
+                // These items will get Published status in the new system
+                node.put("status", "Published");
+                node.put("created_at", approved.group(1));
             } else if (withdrawn.matches()) {
                 node.put("status", "Withdrawn");
                 node.put("created_at", withdrawn.group(1));
