@@ -20,7 +20,6 @@ import javax.ws.rs.BadRequestException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CollectionConverter;
@@ -56,8 +55,6 @@ import org.springframework.stereotype.Component;
 
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
 public class CollectionRestRepository extends DSpaceRestRepository<CollectionRest, UUID> {
-
-    private static final Logger log = Logger.getLogger(CollectionRestRepository.class);
 
     @Autowired
     CommunityService communityService;
@@ -256,8 +253,10 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
         }
         try {
             cs.delete(context, collection);
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to delete collection because the logo couldn't be deleted", e);
         }
     }
 
