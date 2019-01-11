@@ -4,12 +4,12 @@
 # This version is JDK8 compatible
 # - tomcat:8-jre8
 # - ANT 1.10.5
-# - maven:latest
+# - maven:3-jdk-8
 # - note: 
 # - default tag for branch: dspace/dspace: dspace/dspace:dspace-6_x-jdk8
 
 # Step 1 - Run Maven Build
-FROM maven as build
+FROM maven:3-jdk-8 as build
 WORKDIR /app
 
 # The Mirage2 build cannot run as root.  Setting the user to dspace.
