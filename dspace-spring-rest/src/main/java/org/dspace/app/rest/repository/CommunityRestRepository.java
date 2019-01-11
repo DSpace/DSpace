@@ -231,8 +231,10 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
         }
         try {
             cs.delete(context, community);
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to delete community because the logo couldn't be deleted", e);
         }
     }
 

@@ -407,13 +407,27 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
+
+    /**
+     * Method to support updating a DSpace instance.
+     *
+     * @param request     the http request
+     * @param apiCategory the API category e.g. "api"
+     * @param model       the DSpace model e.g. "metadatafield"
+     * @param uuid        the ID of the target REST object
+     * @param jsonNode    the part of the request body representing the updated rest object
+     * @return the updated REST object
+     */
     public T put(HttpServletRequest request, String apiCategory, String model, ID uuid, JsonNode jsonNode) {
         Context context = obtainContext();
         try {
             thisRepository.put(context, request, apiCategory, model, uuid, jsonNode);
             context.commit();
-        } catch (SQLException | AuthorizeException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
+        } catch (AuthorizeException e) {
+            throw new RuntimeException("Unable to perform PUT request as the " +
+                                           "current user does not have sufficient rights", e);
         }
         return findOne(uuid);
     }
