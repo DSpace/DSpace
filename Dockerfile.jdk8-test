@@ -4,7 +4,7 @@
 # This version is JDK8 compatible
 # - tomcat:8-jre8
 # - ANT 1.10.5
-# - maven:latest
+# - maven:3-jdk-8
 # - note: expose /solr to any host; provide /rest over http
 # - default tag for branch: dspace/dspace: dspace/dspace:dspace-6_x-jdk8
 
