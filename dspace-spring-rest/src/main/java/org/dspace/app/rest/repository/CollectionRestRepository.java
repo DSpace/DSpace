@@ -30,6 +30,7 @@ import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.hateoas.CollectionResource;
+import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -69,6 +70,9 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 
     @Autowired
     DSpaceObjectUtils dspaceObjectUtils;
+
+    @Autowired
+    CollectionRestEqualityUtils collectionRestEqualityUtils;
 
 
     public CollectionRestRepository() {
@@ -177,18 +181,19 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 
         try {
             Community parent = null;
-            if (StringUtils.isNotBlank(req.getParameter("parentCommunity"))) {
+            String parentCommunityString = req.getParameter("parent");
+            if (StringUtils.isNotBlank(parentCommunityString)) {
 
-                UUID owningCommunityUuid = UUIDUtils.fromString(req.getParameter("parentCommunity"));
-                if (owningCommunityUuid == null) {
-                    throw new BadRequestException("The given owningCommunityUuid was invalid: "
-                            + req.getParameter("parentCommunity"));
+                UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
+                if (parentCommunityUuid == null) {
+                    throw new BadRequestException("The given parent was invalid: "
+                            + parentCommunityString);
                 }
 
-                parent = communityService.find(context, owningCommunityUuid);
+                parent = communityService.find(context, parentCommunityUuid);
                 if (parent == null) {
-                    throw new ResourceNotFoundException("Parent community for id: "
-                            + owningCommunityUuid + " not found");
+                    throw new UnprocessableEntityException("Parent community for id: "
+                            + parentCommunityUuid + " not found");
                 }
             }
             collection = cs.create(context, parent);
@@ -217,13 +222,14 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
         try {
             collectionRest = new ObjectMapper().readValue(jsonNode.toString(), CollectionRest.class);
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            throw new UnprocessableEntityException("error parsing the body ..." + e.getMessage());
         }
         Collection collection = cs.find(context, id);
         if (collection == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        if (StringUtils.equals(id.toString(), collectionRest.getId())) {
+        CollectionRest originalCollectionRest = converter.fromModel(collection);
+        if (collectionRestEqualityUtils.isCollectionRestEqualWithoutMetadata(originalCollectionRest, collectionRest)) {
             List<MetadataEntryRest> metadataEntryRestList = collectionRest.getMetadata();
             collection = (Collection) dspaceObjectUtils.replaceMetadataValues(context,
                                                                               collection,

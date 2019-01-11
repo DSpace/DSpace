@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.CommunityMetadataMatcher;
 import org.dspace.app.rest.model.CommunityRest;
@@ -35,9 +36,13 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    CommunityConverter communityConverter;
 
     @Test
     public void createTest() throws Exception {
@@ -149,7 +154,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/core/communities")
                                          .content(mapper.writeValueAsBytes(comm))
-                                         .param("parentCommunity", parentCommunity.getID().toString())
+                                         .param("parent", parentCommunity.getID().toString())
                                          .contentType(contentType))
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
@@ -624,15 +629,20 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        ObjectMapper mapper = new ObjectMapper();
+
+        CommunityRest communityRest = communityConverter.fromModel(parentCommunity);
+
+        MetadataEntryRest metadataEntryRest = new MetadataEntryRest();
+        metadataEntryRest.setKey("dc.title");
+        metadataEntryRest.setValue("Electronic theses and dissertations");
+
+        communityRest.setMetadata(Arrays.asList(metadataEntryRest));
+
+
         getClient(token).perform(put("/api/core/communities/" + parentCommunity.getID().toString())
-                                .contentType(MediaType.APPLICATION_JSON).content(
-                                    "{\"id\": \"" + parentCommunity.getID() + "\",\"uuid\": " +
-                                        "\"" + parentCommunity.getID() + "\",\"name\": \"Electronic theses and " +
-                                        "dissertations (ETD)\",\"handle\": \"123456789/5286\",\"metadata\": " +
-                                        "[{\"key\": \"dc.description.abstract\",\"value\": \"\",\"language\": null}," +
-                                        "{\"key\": \"dc.title\",\"value\": \"Electronic theses and dissertations " +
-                                        "(ETD)\",\"language\": null}],\"type\": \"community\"}"
-            ))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsBytes(communityRest)))
                    .andExpect(status().isOk())
         ;
 
@@ -640,7 +650,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntry("Electronic theses and dissertations (ETD)",
+                       CommunityMatcher.matchCommunityEntry("Electronic theses and dissertations",
                                                             parentCommunity.getID(),
                                                             parentCommunity.getHandle())
                    )))

@@ -25,6 +25,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.CommunityMetadataMatcher;
 import org.dspace.app.rest.model.CollectionRest;
@@ -34,10 +35,13 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    CollectionConverter collectionConverter;
 
     @Test
     public void findAllTest() throws Exception {
@@ -289,7 +293,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void findCollectionWithOwningCommunity() throws Exception {
+    public void findCollectionWithParentCommunity() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
@@ -345,15 +349,19 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        ObjectMapper mapper = new ObjectMapper();
+
+        CollectionRest collectionRest = collectionConverter.fromModel(col1);
+
+        MetadataEntryRest metadataEntryRest = new MetadataEntryRest();
+        metadataEntryRest.setKey("dc.title");
+        metadataEntryRest.setValue("Electronic theses and dissertations");
+
+        collectionRest.setMetadata(Arrays.asList(metadataEntryRest));
+
         getClient(token).perform(put("/api/core/collections/" + col1.getID().toString())
-                                     .contentType(MediaType.APPLICATION_JSON).content(
-                "{\"id\": \"" + col1.getID() + "\",\"uuid\": " +
-                    "\"" + col1.getID() + "\",\"name\": \"Electronic theses and " +
-                    "dissertations (ETD)\",\"handle\": \"" + col1.getHandle() + "\",\"metadata\": " +
-                    "[{\"key\": \"dc.description.abstract\",\"value\": \"\",\"language\": null}," +
-                    "{\"key\": \"dc.title\",\"value\": \"Electronic theses and dissertations " +
-                    "(ETD)\",\"language\": null}],\"type\": \"collection\"}"
-            ))
+                                     .contentType(MediaType.APPLICATION_JSON)
+                                     .content(mapper.writeValueAsBytes(collectionRest)))
                         .andExpect(status().isOk())
         ;
 
@@ -361,7 +369,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CollectionMatcher.matchCollectionEntry("Electronic theses and dissertations (ETD)",
+                       CollectionMatcher.matchCollectionEntry("Electronic theses and dissertations",
                                                               col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href",
@@ -496,7 +504,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/core/collections")
                                          .content(mapper.writeValueAsBytes(collectionRest))
-                                         .param("parentCommunity", parentCommunity.getID().toString())
+                                         .param("parent", parentCommunity.getID().toString())
                                          .contentType(contentType))
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
