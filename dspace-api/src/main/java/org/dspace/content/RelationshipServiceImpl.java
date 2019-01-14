@@ -62,7 +62,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
     }
 
-    public void updatePlaceInRelationship(Context context, Relationship relationship) throws SQLException {
+    public void updatePlaceInRelationship(Context context, Relationship relationship)
+        throws SQLException, AuthorizeException {
         List<Relationship> leftRelationships = findByItemAndRelationshipType(context,
                                                                              relationship.getLeftItem(),
                                                                              relationship.getRelationshipType(), true);
@@ -90,6 +91,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         } else {
             relationship.setRightPlace(1);
         }
+        itemService.update(context, relationship.getLeftItem());
+        itemService.update(context, relationship.getRightItem());
     }
 
     public int findLeftPlaceByLeftItem(Context context, Item item) throws SQLException {
