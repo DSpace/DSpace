@@ -2,7 +2,7 @@
 # The purpose of this image is to make the build for dspace/dspace run faster 
 
 # Step 1 - Run Maven Build
-FROM maven as build
+FROM maven:3-jdk-8 as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 
