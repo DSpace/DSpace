@@ -4,12 +4,12 @@
 # This version is JDK7 compatible
 # - tomcat:7-jre7
 # - ANT 1.9.13
-# - maven:latest
+# - maven:3-jdk-7
 # - note: 
 # - default tag for branch: dspace/dspace: dspace/dspace:dspace-4_x-jdk7
 
 # Step 1 - Run Maven Build
-FROM maven as build
+FROM maven:3-jdk-7 as build
 WORKDIR /app
 
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
