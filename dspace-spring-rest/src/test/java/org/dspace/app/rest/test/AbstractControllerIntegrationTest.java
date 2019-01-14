@@ -56,7 +56,7 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {Application.class, ApplicationConfig.class, WebSecurityConfiguration.class,
-        MethodSecurityConfig.class})
+    MethodSecurityConfig.class})
 @TestExecutionListeners( {DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
     TransactionalTestExecutionListener.class})
 @DirtiesContext
@@ -70,6 +70,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     protected static final String AUTHORIZATION_TYPE = "Bearer ";
 
     public static final String REST_SERVER_URL = "http://localhost/api/";
+    public static final String BASE_REST_SERVER_URL = "http://localhost";
 
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
                                                     MediaTypes.HAL_JSON.getSubtype(), Charsets.UTF_8);
@@ -111,7 +112,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
         if (StringUtils.isNotBlank(authToken)) {
             mockMvcBuilder.defaultRequest(
-                    get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
+                get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
         }
 
         return mockMvcBuilder
@@ -127,8 +128,8 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     public String getAuthToken(String user, String password) throws Exception {
         return StringUtils.substringAfter(
-                getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER),
-                AUTHORIZATION_TYPE);
+            getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER),
+            AUTHORIZATION_TYPE);
     }
 
     public String getPatchContent(List<Operation> ops) {
@@ -148,4 +149,3 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
         };
     }
 }
-

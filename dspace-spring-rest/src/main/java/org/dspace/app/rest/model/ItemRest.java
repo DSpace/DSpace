@@ -32,6 +32,8 @@ public class ItemRest extends DSpaceObjectRest {
 
     List<BitstreamRest> bitstreams;
 
+    List<RelationshipRest> relationships;
+
     @Override
     public String getCategory() {
         return CATEGORY;
@@ -100,4 +102,13 @@ public class ItemRest extends DSpaceObjectRest {
         this.bitstreams = bitstreams;
     }
 
+    @LinkRest(linkClass = RelationshipRest.class)
+    @JsonIgnore
+    public List<RelationshipRest> getRelationships() {
+        return relationships;
+    }
+
+    public void setRelationships(List<RelationshipRest> relationships) {
+        this.relationships = relationships;
+    }
 }

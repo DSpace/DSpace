@@ -23,8 +23,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -639,4 +641,16 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
+
+    /**
+     * This method retrieves a list of MetadataValue objects that get constructed from processing
+     * the given Item's Relationships through the config given to the {@link VirtualMetadataPopulator}
+     * @param item  The Item that will be processed through it's Relationships
+     * @param enableVirtualMetadata This parameter will determine whether the list of Relationship metadata
+     *                              should be populated with metadata that is being generated through the
+     *                              VirtualMetadataPopulator functionality or not
+     * @return      The list of MetadataValue objects constructed through the Relationships
+     */
+    public List<MetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata);
+
 }

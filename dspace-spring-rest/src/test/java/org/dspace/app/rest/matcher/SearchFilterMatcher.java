@@ -102,4 +102,13 @@ public class SearchFilterMatcher {
                         ))
         );
     }
+    public static Matcher<? super Object> entityTypeFilter() {
+        return allOf(
+            hasJsonPath("$.filter", is("entityType")),
+            hasJsonPath("$.hasFacets", is(true)),
+            hasJsonPath("$.type", is("text")),
+            hasJsonPath("$.openByDefault", is(false)),
+            checkOperators()
+        );
+    }
 }
