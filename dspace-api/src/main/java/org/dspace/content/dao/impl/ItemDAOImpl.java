@@ -136,9 +136,9 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     enum OP {equals,not_equals,like,not_like,contains,doesnt_contain,exists,doesnt_exist,matches,doesnt_match;}
     
     @Override
-    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause, int offset, int limit) throws SQLException {
+    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause, boolean inArchive, int offset, int limit) throws SQLException {
     	Criteria criteria = createCriteria(context, Item.class, "item");
-        criteria.add(Property.forName("inArchive").eq(Boolean.TRUE));
+        criteria.add(Property.forName("inArchive").eq(inArchive));
     	criteria.setFirstResult(offset);
     	criteria.setMaxResults(limit);
     	
