@@ -1348,22 +1348,25 @@ prevent the generation of resource policy entry values with null dspace_object a
         HashMap<String, VirtualBean> hashMaps = new HashMap<>();
         String relationName = "";
         Item otherItem = null;
+        int place = 0;
         if (StringUtils.equals(relationshipType.getLeftType().getLabel(), entityType)) {
             hashMaps = (HashMap<String, VirtualBean>) virtualMetadataPopulator
                 .getMap().get(relationshipType.getLeftLabel());
             otherItem = relationship.getRightItem();
             relationName = relationship.getRelationshipType().getLeftLabel();
+            place = relationship.getLeftPlace();
         } else if (StringUtils.equals(relationshipType.getRightType().getLabel(), entityType)) {
             hashMaps = (HashMap<String, VirtualBean>) virtualMetadataPopulator
                 .getMap().get(relationshipType.getRightLabel());
             otherItem = relationship.getLeftItem();
             relationName = relationship.getRelationshipType().getRightLabel();
+            place = relationship.getRightPlace();
         }
 
         if (hashMaps != null && extra) {
             resultingMetadataValueList.addAll(handleRelationshipTypeMetadataMappping(context, item, hashMaps,
                                                                                      otherItem, relationName,
-                                                                                     relationship.getID()));
+                                                                                     relationship.getID(), place));
         }
         resultingMetadataValueList
             .add(getRelationMetadataFromOtherItem(context, otherItem, relationName, relationship.getID()));
@@ -1371,7 +1374,9 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private List<RelationshipMetadataValue> handleRelationshipTypeMetadataMappping(Context context, Item item,
-                   HashMap<String, VirtualBean> hashMaps, Item otherItem, String relationName, Integer relationshipId)
+                                                                                   HashMap<String, VirtualBean> hashMaps,
+                                                                                   Item otherItem, String relationName,
+                                                                                   Integer relationshipId, int place)
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         for (Map.Entry<String, VirtualBean> entry : hashMaps.entrySet()) {
@@ -1382,6 +1387,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             metadataValue = constructResultingMetadataValue(context, item, otherItem, virtualBean, metadataValue,
                                                             relationshipId);
             metadataValue.setUseForPlace(virtualBean.getUseForPlace());
+            metadataValue.setPlace(place);
             if (StringUtils.isNotBlank(metadataValue.getValue())) {
                 resultingMetadataValueList.add(metadataValue);
             }
