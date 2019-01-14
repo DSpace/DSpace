@@ -424,7 +424,7 @@
         </profile>
 
         <!-- Allow for passing extra memory to Unit/Integration tests.
-             By default this gives unit tests 512MB of memory (when tests are enabled),
+             By default this gives unit tests 1GB of memory max (when tests are enabled),
              unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since
              m-surefire-p and m-failsafe-p both fork a new JVM for testing, they ignores MAVEN_OPTS. -->
         <profile>
@@ -435,7 +435,7 @@
                 </property>
             </activation>
             <properties>
-                <test.argLine>-Xmx512m</test.argLine>
+                <test.argLine>-Xmx1024m</test.argLine>
             </properties>
         </profile>
 
@@ -1147,11 +1147,7 @@
                 <artifactId>mets</artifactId>
                 <version>1.5.2</version>
             </dependency>
-            <dependency>
-                <groupId>org.dspace.dependencies</groupId>
-                <artifactId>dspace-tm-extractors</artifactId>
-                <version>1.0.1</version>
-            </dependency>
+
             <!-- Required by Commons Configuration -->
             <dependency>
                 <groupId>commons-beanutils</groupId>

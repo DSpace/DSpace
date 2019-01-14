@@ -27,6 +27,7 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
@@ -72,6 +73,7 @@ public abstract class AbstractBuilder<T, S> {
     static MetadataFieldService metadataFieldService;
     static MetadataSchemaService metadataSchemaService;
     static SiteService siteService;
+    static RelationshipService relationshipService;
 
     protected Context context;
 
@@ -107,6 +109,7 @@ public abstract class AbstractBuilder<T, S> {
         metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
         metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
         siteService = ContentServiceFactory.getInstance().getSiteService();
+        relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
         // Temporarily disabled
         // TODO find a way to be able to test the XML and "default" workflow at the same time

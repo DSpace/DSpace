@@ -12,8 +12,11 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -35,7 +38,10 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.virtual.VirtualBean;
+import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -100,6 +106,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired(required = true)
     protected WorkflowItemService workflowItemService;
 
+    @Autowired(required = true)
+    protected RelationshipService relationshipService;
+
+    @Autowired(required = true)
+    protected VirtualMetadataPopulator virtualMetadataPopulator;
 
     protected ItemServiceImpl() {
         super();
@@ -219,10 +230,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         throws SQLException {
 
         MetadataField metadataField = metadataFieldService
-            .findByElement(context, MetadataSchema.DC_SCHEMA, "date", "accessioned");
+            .findByElement(context, MetadataSchemaEnum.DC.getName(), "date", "accessioned");
         if (metadataField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".date.accessioned' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".date.accessioned' doesn't exist!");
         }
 
         return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
@@ -543,7 +554,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
-        addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", prov.toString());
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update(context, item);
@@ -598,7 +609,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // bitstream checksums
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
-        addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", prov.toString());
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update(context, item);
@@ -1256,5 +1267,168 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
 
         return false;
+    }
+
+    /**
+     * This method will return a list of MetadataValue objects that contains all the regular
+     * metadata of the item passed along in the parameters as well as all the virtual metadata
+     * which will be generated and processed together with the {@link VirtualMetadataPopulator}
+     * by processing the item's relationships
+     * @param item         the Item to be processed
+     * @param schema       the schema for the metadata field. <em>Must</em> match
+     *                     the <code>name</code> of an existing metadata schema.
+     * @param element      the element name. <code>DSpaceObject.ANY</code> matches any
+     *                     element. <code>null</code> doesn't really make sense as all
+     *                     metadata must have an element.
+     * @param qualifier    the qualifier. <code>null</code> means unqualified, and
+     *                     <code>DSpaceObject.ANY</code> means any qualifier (including
+     *                     unqualified.)
+     * @param lang         the ISO639 language code, optionally followed by an underscore
+     *                     and the ISO3166 country code. <code>null</code> means only
+     *                     values with no language are returned, and
+     *                     <code>DSpaceObject.ANY</code> means values with any country code or
+     *                     no country code are returned.
+     * @return
+     */
+    @Override
+    public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang) {
+        //Fields of the relation schema are virtual metadata
+        //except for relation.type which is the type of item in the model
+        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
+
+            List<MetadataValue> relationMetadata = getRelationshipMetadata(item, false);
+            List<MetadataValue> listToReturn = new LinkedList<>();
+            for (MetadataValue metadataValue : relationMetadata) {
+                if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {
+                    listToReturn.add(metadataValue);
+                }
+            }
+            return listToReturn;
+
+        } else {
+            List<MetadataValue> dbMetadataValues = super.getMetadata(item, schema, element, qualifier, lang);
+
+            if (!(StringUtils.equals(schema, "*") && StringUtils.equals(element, "*") &&
+                StringUtils.equals(qualifier, "*") && StringUtils.equals(lang, "*"))) {
+                return dbMetadataValues;
+            }
+            List<MetadataValue> fullMetadataValueList = getRelationshipMetadata(item, true);
+            fullMetadataValueList.addAll(dbMetadataValues);
+
+            return fullMetadataValueList;
+        }
+
+    }
+    @Override
+    public List<MetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata) {
+        Context context = new Context();
+        List<MetadataValue> fullMetadataValueList = new LinkedList<>();
+        try {
+            List<MetadataValue> list = item.getMetadata();
+            String entityType = getEntityTypeStringFromMetadata(list);
+            if (StringUtils.isNotBlank(entityType)) {
+                List<Relationship> relationships = relationshipService.findByItem(context, item);
+                for (Relationship relationship : relationships) {
+                    fullMetadataValueList.addAll(handleItemRelationship(context, item, entityType,
+                                                                        relationship, enableVirtualMetadata));
+                }
+
+            }
+        } catch (SQLException e) {
+            log.error(e, e);
+        }
+        return fullMetadataValueList;
+    }
+
+    private List<MetadataValue> handleItemRelationship(Context context, Item item, String entityType,
+                                                       Relationship relationship, boolean enableVirtualMetadata)
+        throws SQLException {
+        List<MetadataValue> resultingMetadataValueList = new LinkedList<>();
+        RelationshipType relationshipType = relationship.getRelationshipType();
+        HashMap<String, VirtualBean> hashMaps = new HashMap<>();
+        String relationName = "";
+        Item otherItem = null;
+        if (StringUtils.equals(relationshipType.getLeftType().getLabel(), entityType)) {
+            hashMaps = (HashMap<String, VirtualBean>) virtualMetadataPopulator
+                .getMap().get(relationshipType.getLeftLabel());
+            otherItem = relationship.getRightItem();
+            relationName = relationship.getRelationshipType().getLeftLabel();
+        } else if (StringUtils.equals(relationshipType.getRightType().getLabel(), entityType)) {
+            hashMaps = (HashMap<String, VirtualBean>) virtualMetadataPopulator
+                .getMap().get(relationshipType.getRightLabel());
+            otherItem = relationship.getLeftItem();
+            relationName = relationship.getRelationshipType().getRightLabel();
+        }
+
+        if (hashMaps != null && enableVirtualMetadata) {
+            resultingMetadataValueList.addAll(handleRelationshipTypeMetadataMappping(context, item, hashMaps,
+                                                                                     otherItem, relationName));
+        }
+        resultingMetadataValueList.add(getRelationMetadataFromOtherItem(otherItem, relationName));
+        return resultingMetadataValueList;
+    }
+
+    private List<MetadataValue> handleRelationshipTypeMetadataMappping(Context context, Item item,
+                                                                       HashMap<String, VirtualBean> hashMaps,
+                                                                       Item otherItem,
+                                                                       String relationName) throws SQLException {
+        List<MetadataValue> resultingMetadataValueList = new LinkedList<>();
+        for (Map.Entry<String, VirtualBean> entry : hashMaps.entrySet()) {
+            String key = entry.getKey();
+            VirtualBean virtualBean = entry.getValue();
+
+            for (String value : virtualBean.getValues(context, otherItem)) {
+                MetadataValue metadataValue = constructMetadataValue(key);
+                metadataValue = constructResultingMetadataValue(item, value, metadataValue);
+                if (StringUtils.isNotBlank(metadataValue.getValue())) {
+                    resultingMetadataValueList.add(metadataValue);
+                }
+            }
+        }
+        return resultingMetadataValueList;
+    }
+
+    private MetadataValue getRelationMetadataFromOtherItem(Item otherItem, String relationName) {
+        MetadataValue metadataValue = constructMetadataValue(
+                MetadataSchemaEnum.RELATION.getName() + "." + relationName);
+        metadataValue.setAuthority("virtual");
+        metadataValue.setValue(otherItem.getID().toString());
+        return metadataValue;
+    }
+
+    private String getEntityTypeStringFromMetadata(List<MetadataValue> list) {
+        String entityType = null;
+        for (MetadataValue mdv : list) {
+            if (StringUtils.equals(mdv.getMetadataField().getMetadataSchema().getName(),
+                                   "relationship")
+                && StringUtils.equals(mdv.getMetadataField().getElement(),
+                                      "type")) {
+
+                entityType = mdv.getValue();
+            }
+        }
+        return entityType;
+    }
+
+    private MetadataValue constructResultingMetadataValue(Item item, String value, MetadataValue metadataValue) {
+        metadataValue.setValue(value);
+        metadataValue.setAuthority("virtual");
+        metadataValue.setConfidence(-1);
+        metadataValue.setDSpaceObject(item);
+        return metadataValue;
+    }
+
+    private MetadataValue constructMetadataValue(String key) {
+        String[] splittedKey = key.split("\\.");
+        MetadataValue metadataValue = new MetadataValue();
+        MetadataField metadataField = new MetadataField();
+        MetadataSchema metadataSchema = new MetadataSchema();
+        metadataSchema.setName(splittedKey.length > 0 ? splittedKey[0] : null);
+        metadataField.setMetadataSchema(metadataSchema);
+        metadataField.setElement(splittedKey.length > 1 ? splittedKey[1] : null);
+        metadataField.setQualifier(splittedKey.length > 2 ? splittedKey[2] : null);
+        metadataValue.setMetadataField(metadataField);
+        metadataValue.setLanguage(Item.ANY);
+        return metadataValue;
     }
 }

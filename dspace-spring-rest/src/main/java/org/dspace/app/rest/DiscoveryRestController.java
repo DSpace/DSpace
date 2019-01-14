@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.FacetConfigurationRest;
@@ -27,7 +28,6 @@ import org.dspace.app.rest.model.hateoas.SearchResultsResource;
 import org.dspace.app.rest.model.hateoas.SearchSupportResource;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.repository.DiscoveryRestRepository;
-import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/" + SearchResultsRest.CATEGORY)
 public class DiscoveryRestController implements InitializingBean {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ScopeResolver.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     protected Utils utils;
@@ -109,7 +109,7 @@ public class DiscoveryRestController implements InitializingBean {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
                           + ", configuration name: " + StringUtils.trimToEmpty(configurationName)
                           + ", dsoType: " + StringUtils.trimToEmpty(dsoType)
-                          + ", query: " + StringUtils.trimToEmpty(dsoType)
+                          + ", query: " + StringUtils.trimToEmpty(query)
                           + ", filters: " + Objects.toString(searchFilters));
         }
 
@@ -136,7 +136,7 @@ public class DiscoveryRestController implements InitializingBean {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
                           + ", configuration name: " + StringUtils.trimToEmpty(configurationName)
                           + ", dsoType: " + StringUtils.trimToEmpty(dsoType)
-                          + ", query: " + StringUtils.trimToEmpty(dsoType)
+                          + ", query: " + StringUtils.trimToEmpty(query)
                           + ", filters: " + Objects.toString(searchFilters)
                           + ", page: " + Objects.toString(page));
         }
@@ -182,7 +182,7 @@ public class DiscoveryRestController implements InitializingBean {
             log.trace("Facetting on facet " + facetName + " with scope: " + StringUtils.trimToEmpty(dsoScope)
                           + ", dsoType: " + StringUtils.trimToEmpty(dsoType)
                           + ", prefix: " + StringUtils.trimToEmpty(prefix)
-                          + ", query: " + StringUtils.trimToEmpty(dsoType)
+                          + ", query: " + StringUtils.trimToEmpty(query)
                           + ", filters: " + Objects.toString(searchFilters)
                           + ", page: " + Objects.toString(page));
         }
