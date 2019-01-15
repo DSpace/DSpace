@@ -21,9 +21,17 @@ import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+/**
+ * This class' purpose is to add the links to the RelationshipResourceWrapper. This function and class will be called
+ * and used
+ * when the HalLinkService addLinks methods is called as it'll iterate over all the different factories and check
+ * whether
+ * these are allowed to create links for said resource or not.
+ */
 @Component
 public class RelationshipResourceWrapperHalLinkFactory
     extends HalLinkFactory<RelationshipResourceWrapper, RelationshipRestController> {
+    @Override
     protected void addLinks(RelationshipResourceWrapper halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
 
@@ -35,6 +43,15 @@ public class RelationshipResourceWrapperHalLinkFactory
                                                    true, "relationships"));
     }
 
+    /**
+     * This method will construct a self link to the RelationshipRestController.retrieveByLabel method.
+     * This will be constructed so that the RelationshipResourceWrapper resource can contain this selflink
+     * and immediately point to the correct endpoint with it.
+     * @param content   The RelationshipRestWrapper from which we'll retrieve variables to construct the link
+     * @param pageable  The page object
+     * @return  The String determining the link to the correct endpoint
+     * @throws Exception    If something goes wrong
+     */
     public String getSelfLink(RelationshipRestWrapper content, Pageable pageable) throws Exception {
         if (content != null) {
             UriComponentsBuilder uriBuilderSelfLink = uriBuilder(getMethodOn()
@@ -46,10 +63,12 @@ public class RelationshipResourceWrapperHalLinkFactory
         return null;
     }
 
+    @Override
     protected Class<RelationshipRestController> getControllerClass() {
         return RelationshipRestController.class;
     }
 
+    @Override
     protected Class<RelationshipResourceWrapper> getResourceClass() {
         return RelationshipResourceWrapper.class;
     }

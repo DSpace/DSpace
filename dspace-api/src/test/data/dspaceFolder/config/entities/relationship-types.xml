@@ -116,7 +116,6 @@
         <rightLabel>isJournalIssueOfPublication</rightLabel>
         <leftCardinality>
             <min>0</min>
-            <max>2147483647</max>
         </leftCardinality>
         <rightCardinality>
             <min>0</min>

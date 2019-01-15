@@ -14,8 +14,18 @@ import org.dspace.app.rest.model.RelationshipTypeRest;
 import org.dspace.app.rest.model.RelationshipTypeRestWrapper;
 import org.dspace.app.rest.utils.Utils;
 
+/**
+ * This is the RelationshipTypeResourceWrapper class which will take the
+ * RelationshipTypeRestWrapper's data and transform this into a resource with the data, embeds and links.
+ */
 public class RelationshipTypeResourceWrapper extends HALResource<RelationshipTypeRestWrapper> {
 
+    /**
+     * The constructor for the RelationshipTypeResourceWrapper
+     * This will call the HALResource constructor and additionally add embeds to the resource
+     * @param content           The RelationshipTypeRestWrapper object that contains the data
+     * @param utils             The Util object
+     */
     public RelationshipTypeResourceWrapper(RelationshipTypeRestWrapper content, Utils utils) {
         super(content);
         addEmbeds(content, utils);
