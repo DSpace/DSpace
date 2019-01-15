@@ -29,17 +29,15 @@ import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
-import org.dspace.handle.Handle;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.cache.XOAIItemCacheService;
 import org.dspace.xoai.services.api.cache.XOAILastCompilationCacheService;
-import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
@@ -83,6 +81,7 @@ public class XOAI {
 
     private final AuthorizeService authorizeService;
     private final ItemService itemService;
+    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private List<String> getFileFormats(Item item) {
         List<String> formats = new ArrayList<>();
@@ -272,6 +271,7 @@ public class XOAI {
     private int index(Iterator<Item> iterator) throws DSpaceSolrIndexerException {
         try {
             int i = 0;
+            int batchSize = configurationService.getIntProperty("oai.import.batch.size", 1000);
             SolrServer server = solrServerResolver.getServer();
             ArrayList<SolrInputDocument> list = new ArrayList<>();
             while (iterator.hasNext()) {
@@ -292,10 +292,10 @@ public class XOAI {
                 if (i % 1000 == 0) {
                     System.out.println(i + " items prepared so far...");
                 }
-                if (i % 10000 == 0) {
+                if (i % batchSize == 0) {
                     System.out.println(i + " items imported so far...");
                     server.add(list);
-                    server.commit(true, true);
+                    server.commit();
                     list.clear();
                 }
             }
@@ -480,7 +480,7 @@ public class XOAI {
     private static boolean getKnownExplanation(Throwable t) {
         if (t instanceof ConnectException) {
             System.err.println(
-                    "Solr server (" + ConfigurationManager.getProperty("oai", "solr.url") + ") is down, turn it on.");
+                    "Solr server (" + configurationService.getProperty("oai.solr.uri", "") + ") is down, turn it on.");
             return true;
         }
 
@@ -521,7 +521,6 @@ public class XOAI {
 
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(new Class[] { BasicConfiguration.class });
 
-        ConfigurationService configurationService = applicationContext.getBean(ConfigurationService.class);
         XOAICacheService cacheService = applicationContext.getBean(XOAICacheService.class);
         XOAIItemCacheService itemCacheService = applicationContext.getBean(XOAIItemCacheService.class);
 
@@ -542,7 +541,7 @@ public class XOAI {
                     COMMAND_ERASE_COMPILED_ITEMS };
 
             boolean solr = true; // Assuming solr by default
-            solr = !("database").equals(configurationService.getProperty("oai", "storage"));
+            solr = !("database").equals(configurationService.getProperty("oai.storage", "solr"));
 
             boolean run = false;
             if (line.getArgs().length > 0) {
@@ -645,7 +644,7 @@ public class XOAI {
 
     private static void usage() {
         boolean solr = true; // Assuming solr by default
-        solr = !("database").equals(ConfigurationManager.getProperty("oai", "storage"));
+        solr = !("database").equals(configurationService.getProperty("oai.storage", "solr"));
 
         if (solr) {
             System.out.println("OAI Manager Script");
