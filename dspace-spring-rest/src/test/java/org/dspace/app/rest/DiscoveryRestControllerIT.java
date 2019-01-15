@@ -831,7 +831,12 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                        SearchFilterMatcher.hasContentInOriginalBundleFilter(),
                        SearchFilterMatcher.hasFileNameInOriginalBundleFilter(),
                        SearchFilterMatcher.hasFileDescriptionInOriginalBundleFilter(),
-                       SearchFilterMatcher.entityTypeFilter()
+                       SearchFilterMatcher.entityTypeFilter(),
+                       SearchFilterMatcher.isAuthorOfPublicationRelation(),
+                       SearchFilterMatcher.isProjectOfPublicationRelation(),
+                       SearchFilterMatcher.isOrgUnitOfPublicationRelation(),
+                       SearchFilterMatcher.isPublicationOfJournalIssueRelation(),
+                       SearchFilterMatcher.isJournalOfPublicationRelation()
                    )))
                    //These sortOptions need to be present as it's the default in the configuration
                    .andExpect(jsonPath("$.sortOptions", containsInAnyOrder(

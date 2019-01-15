@@ -111,4 +111,49 @@ public class SearchFilterMatcher {
             checkOperators()
         );
     }
+    public static Matcher<? super Object> isAuthorOfPublicationRelation() {
+        return allOf(
+            hasJsonPath("$.filter", is("isAuthorOfPublication")),
+            hasJsonPath("$.hasFacets", is(false)),
+            hasJsonPath("$.type", is("text")),
+            hasJsonPath("$.openByDefault", is(false)),
+            checkOperators()
+        );
+    }
+    public static Matcher<? super Object> isProjectOfPublicationRelation() {
+        return allOf(
+            hasJsonPath("$.filter", is("isProjectOfPublication")),
+            hasJsonPath("$.hasFacets", is(false)),
+            hasJsonPath("$.type", is("text")),
+            hasJsonPath("$.openByDefault", is(false)),
+            checkOperators()
+        );
+    }
+    public static Matcher<? super Object> isOrgUnitOfPublicationRelation() {
+        return allOf(
+            hasJsonPath("$.filter", is("isOrgUnitOfPublication")),
+            hasJsonPath("$.hasFacets", is(false)),
+            hasJsonPath("$.type", is("text")),
+            hasJsonPath("$.openByDefault", is(false)),
+            checkOperators()
+        );
+    }
+    public static Matcher<? super Object> isPublicationOfJournalIssueRelation() {
+        return allOf(
+            hasJsonPath("$.filter", is("isPublicationOfJournalIssue")),
+            hasJsonPath("$.hasFacets", is(false)),
+            hasJsonPath("$.type", is("text")),
+            hasJsonPath("$.openByDefault", is(false)),
+            checkOperators()
+        );
+    }
+    public static Matcher<? super Object> isJournalOfPublicationRelation() {
+        return allOf(
+            hasJsonPath("$.filter", is("isJournalOfPublication")),
+            hasJsonPath("$.hasFacets", is(false)),
+            hasJsonPath("$.type", is("text")),
+            hasJsonPath("$.openByDefault", is(false)),
+            checkOperators()
+        );
+    }
 }
