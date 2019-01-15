@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -559,6 +560,19 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             } else {
                 metadataValues = dso.getMetadata();
             }
+            metadataValues.sort(new Comparator<MetadataValue>() {
+                public int compare(MetadataValue o1, MetadataValue o2) {
+                    int compare = o1.getPlace() - o2.getPlace();
+                    if (compare == 0) {
+                        if (o1 instanceof RelationshipMetadataValue) {
+                            return 1;
+                        } else if (o2 instanceof  RelationshipMetadataValue) {
+                            return -1;
+                        }
+                    }
+                    return compare;
+                }
+            });
             for (MetadataValue metadataValue : metadataValues) {
                 //Retrieve & store the place for each metadata value
                 if (StringUtils.startsWith(metadataValue.getAuthority(), "virtual::") &&

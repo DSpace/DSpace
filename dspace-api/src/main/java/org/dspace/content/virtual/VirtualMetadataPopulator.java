@@ -7,7 +7,10 @@
  */
 package org.dspace.content.virtual;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import org.dspace.content.RelationshipType;
 
 /**
  * This class is responsible for holding the representation of how a certain relationshipType label has to be
@@ -35,5 +38,26 @@ public class VirtualMetadataPopulator {
      */
     public Map getMap() {
         return map;
+    }
+
+    public boolean isUseForPlaceTrueForRelationshipType(RelationshipType relationshipType, boolean isLeft) {
+        HashMap<String, VirtualBean> hashMaps = new HashMap<>();
+        if (isLeft) {
+            hashMaps = (HashMap<String, VirtualBean>) this
+                .getMap().get(relationshipType.getLeftLabel());
+        } else {
+            hashMaps = (HashMap<String, VirtualBean>) this
+                .getMap().get(relationshipType.getRightLabel());
+        }
+        if (hashMaps != null) {
+            for (Map.Entry<String, VirtualBean> entry : hashMaps.entrySet()) {
+                VirtualBean virtualBean = entry.getValue();
+                boolean useForPlace = virtualBean.getUseForPlace();
+                if (useForPlace) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

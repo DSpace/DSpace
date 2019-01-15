@@ -120,6 +120,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             relationship.setRightItem(rightItem);
             relationship.setRelationshipType(relationshipType);
             relationship = relationshipService.create(context, relationship);
+            relationshipService.updateItems(context, relationship);
             return relationshipConverter.fromModel(relationship);
         } else {
             throw new AccessDeniedException("You do not have write rights on this relationship's items");
@@ -164,7 +165,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 relationship.setRightPlace(relationshipRest.getRightPlace());
             }
 
-            relationshipService.updatePlaceInRelationship(context, relationship);
+            relationshipService.updatePlaceInRelationship(context, relationship, false);
             relationshipService.update(context, relationship);
 
             return relationshipConverter.fromModel(relationship);
