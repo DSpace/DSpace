@@ -31,6 +31,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This controller will handle all the incoming calls on the api/core/entitytypes/{id}/relationshiptypes endpoint
+ * where the id parameter can be filled in to match a specific entityType and then get all the relationshipTypes
+ * for the given EntityType
+ */
 @RestController
 @RequestMapping("/api/core/entitytypes/{id}/relationshiptypes")
 public class RelationshipTypeRestController {
@@ -51,6 +56,16 @@ public class RelationshipTypeRestController {
     @Autowired
     private HalLinkService halLinkService;
 
+    /**
+     * This method will retrieve all the RelationshipTypes that conform to the given EntityType by the given ID and
+     * it will return this in a wrapped resource.
+     *
+     * @param id        The ID of the EntityType objects that we'll use to retrieve the RelationshipTypes
+     * @param response  The response object
+     * @param request   The request object
+     * @return          The wrapped resource containing the list of RelationshipType objects as defined above
+     * @throws SQLException If something goes wrong
+     */
     @RequestMapping(method = RequestMethod.GET)
     public RelationshipTypeResourceWrapper retrieve(@PathVariable Integer id, HttpServletResponse response,
                                                     HttpServletRequest request) throws SQLException {

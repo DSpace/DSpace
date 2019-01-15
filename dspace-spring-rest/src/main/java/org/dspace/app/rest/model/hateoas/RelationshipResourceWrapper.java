@@ -15,8 +15,20 @@ import org.dspace.app.rest.model.RelationshipRestWrapper;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Pageable;
 
+/**
+ * This is the RelationshipResourceWrapper class which will take the RelationshipRestWrapper's data and transform
+ * this into a resource with the data, embeds and links.
+ */
 public class RelationshipResourceWrapper extends HALResource<RelationshipRestWrapper> {
 
+    /**
+     * The constructor for the RelationshipResourceWrapper
+     * This will call the HALResource constructor and additionally add embeds to the resource
+     * @param content           The RelationshipRestWrapper object that contains the data
+     * @param utils             The Util object
+     * @param totalElements     The total amount of elements to be included in the list
+     * @param pageable          The pageable object
+     */
     public RelationshipResourceWrapper(RelationshipRestWrapper content, Utils utils, Integer totalElements,
                                        Pageable pageable) {
         super(content);

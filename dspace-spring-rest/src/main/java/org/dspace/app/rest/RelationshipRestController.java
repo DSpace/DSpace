@@ -38,6 +38,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This will be the entry point for the api/core/relationships endpoint with additional paths to it
+ */
 @RestController
 @RequestMapping("/api/core/relationships")
 public class RelationshipRestController {
@@ -67,6 +70,20 @@ public class RelationshipRestController {
     @Autowired
     private HalLinkService halLinkService;
 
+    /**
+     * This method will retrieve all the Relationships that have a RelationshipType which has a left or right label
+     * equal to the one passed along in the pathvariable.
+     * This is further filtered by an optional dso parameter to filter on only the relationships for the given dso
+     * if this is applicable
+     *
+     * @param response  The response object
+     * @param request   The request object
+     * @param label     The label on which the Relationship's RelationshipType will be matched
+     * @param dsoId     The ID of the dso on which we'll search for relationships if applicable
+     * @param pageable  The page object
+     * @return          A Resource containing all the relationships that meet the criteria
+     * @throws Exception    If something goes wrong
+     */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_LABEL)
     public RelationshipResourceWrapper retrieveByLabel(HttpServletResponse response,
                                                        HttpServletRequest request, @PathVariable String label,

@@ -12,6 +12,11 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RelationshipRestController;
 
+/**
+ * This is the RestWrapper object for the RelationshipRestResource class. This will contain all the data that is
+ * used in that resource and more specifically, the label, dsoid and list of RelationshipRest objects
+ * The other methods are generic getters and setters
+ */
 public class RelationshipRestWrapper implements RestAddressableModel {
 
     @JsonIgnore
