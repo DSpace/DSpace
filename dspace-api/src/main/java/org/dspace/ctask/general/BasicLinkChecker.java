@@ -138,15 +138,13 @@ public class BasicLinkChecker extends AbstractCurationTask {
             if (statusCode != HttpURLConnection.HTTP_OK &&
                     (statusCode == HttpURLConnection.HTTP_MOVED_TEMP ||
                             statusCode == HttpURLConnection.HTTP_MOVED_PERM ||
-                            statusCode == HttpURLConnection.HTTP_SEE_OTHER))
-            {
+                            statusCode == HttpURLConnection.HTTP_SEE_OTHER)) {
                 String newUrl = connection.getHeaderField("Location");
-                if(newUrl != null)
-                {
+                if (newUrl != null) {
                     return getResponseStatus(newUrl);
                 }
 
-           	}
+            }
             return statusCode;
 
         } catch (IOException ioe) {
