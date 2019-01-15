@@ -77,12 +77,21 @@ public class TransferToDash extends AbstractCurationTask {
         } else if (dso.getType() == Constants.ITEM) {
             DryadDataPackage dataPackage = new DryadDataPackage((Item)dso);
             Package pkg = new Package(dataPackage);
+            String versionlessPackageDOI = dataPackage.getVersionlessIdentifier();
             String packageDOI = dataPackage.getIdentifier();
 
             dashService.putDataset(pkg);
             dashService.migrateProvenances(pkg);
+            if(!packageDOI.equals(versionlessPackageDOI)) {
+                // when we're dealing with a versioned item, delete any existing data
+                // files and replace them with the set of data files in the new item
+                // (although some will be duplicates and technically wouldn't need to be
+                // deleted and re-transferred, this process is simpler and cleaner than
+                // comparing each file individually)
+                dashService.deleteDataFiles(pkg);
+            }
             dashService.postDataFileReferences(context, dataPackage);
-            dashService.submitDashDataset(packageDOI);
+            dashService.submitDashDataset(versionlessPackageDOI);
                         
             // provide output for the console
             setResult("Last processed item = " + packageDOI);        
