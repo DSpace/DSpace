@@ -191,12 +191,14 @@ public class Package {
     public static class SchemaDotOrgSerializer extends JsonSerializer<Package> {
         @Override
         public void serialize(Package dataPackage, JsonGenerator jGen, SerializerProvider provider) throws IOException {
+            String packageDOI = dataPackage.getDryadDOI();
+            
             jGen.writeStartObject();
             jGen.writeStringField("@context", "http://schema.org/");
             jGen.writeStringField("@type", "Dataset");
-            jGen.writeStringField("@id", DOIIdentifierProvider.getFullDOIURL(dataPackage.getDryadDOI()));
-            jGen.writeStringField("url", DOIIdentifierProvider.getFullDOIURL(dataPackage.getDryadDOI()));
-            jGen.writeStringField("identifier", dataPackage.getDryadDOI());
+            jGen.writeStringField("@id", DOIIdentifierProvider.getFullDOIURL(packageDOI));
+            jGen.writeStringField("url", DOIIdentifierProvider.getFullDOIURL(packageDOI));
+            jGen.writeStringField("identifier", packageDOI);
             jGen.writeStringField("name", dataPackage.getTitle());
             jGen.writeObjectField("author", dataPackage.getAuthorList());
             jGen.writeStringField("datePublished", dataPackage.getPublicationDate());
@@ -233,7 +235,7 @@ public class Package {
             
             jGen.writeStartObject();
 
-            jGen.writeStringField("identifier", dataPackage.getDryadDOI());
+            jGen.writeStringField("identifier", ddp.getVersionlessIdentifier());
             jGen.writeStringField("title", dataPackage.getTitle());
             jGen.writeStringField("abstract", dataPackage.getAbstract());
             jGen.writeObjectField("authors", dataPackage.getAuthorList());

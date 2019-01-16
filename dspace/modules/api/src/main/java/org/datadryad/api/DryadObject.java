@@ -179,6 +179,26 @@ public abstract class DryadObject {
         return identifier;
     }
 
+    /**
+       Return the identifier of this item. If the identifier is a DOI, detect
+       and remove any version string. For example, for the identifier
+       doi:10.5061/dryad.abc123.4, return the string doi:10.5061/dryad.abc123
+    **/
+    public String getVersionlessIdentifier() {
+        String fullID = getIdentifier();
+
+        if(fullID.contains("dryad.")) {
+            String dryadPart = fullID.substring(fullID.indexOf("dryad."));
+            String afterDot = dryadPart.substring(dryadPart.indexOf(".") + 1);
+            
+            if(afterDot.contains(".")) {
+                fullID = fullID.substring(0, fullID.lastIndexOf("."));
+            }
+        }
+        
+        return fullID;
+    }
+
     public void setIdentifier(String newIdentifier) {
         identifier = newIdentifier;
     }

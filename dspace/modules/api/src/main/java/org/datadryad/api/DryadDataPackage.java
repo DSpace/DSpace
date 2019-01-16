@@ -96,7 +96,7 @@ public class DryadDataPackage extends DryadObject {
     private final static String PROVENANCE = "dc.description.provenance";
 
     // title and identifier are declared in DryadObject
-    private List<DryadDataFile> dataFiles;
+    private List<DryadDataFile> cachedDataFiles;
     private String curationStatus = "";
     private String curationStatusReason = "";
     private String abstractString = "";
@@ -876,16 +876,20 @@ public class DryadDataPackage extends DryadObject {
 
     static List<DryadDataFile> getFilesInPackage(Context context, DryadDataPackage dataPackage) throws SQLException {
         // files and packages are linked by DOI
+        log.debug("getting data files");
         List<DryadDataFile> fileList = new ArrayList<DryadDataFile>();
         String packageIdentifier = dataPackage.getIdentifier();
+        log.debug(" -- package ID " + packageIdentifier);
         if(packageIdentifier == null || packageIdentifier.length() == 0) {
             throw new IllegalArgumentException("Data package must have an identifier");
         }
         try {
-            ItemIterator dataFiles = Item.findByMetadataField(context, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, packageIdentifier);
+            ItemIterator dataFiles = Item.findByMetadataField(context, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, packageIdentifier, false);
             while(dataFiles.hasNext()) {
+                log.debug(" -- adding file ");
                 fileList.add(new DryadDataFile(dataFiles.next()));
             }
+            log.debug(" -- found " + fileList.size() + " data files ");
         } catch (AuthorizeException ex) {
             log.error("Authorize exception getting files for data package", ex);
         } catch (IOException ex) {
@@ -895,11 +899,13 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public List<DryadDataFile> getDataFiles(Context context) throws SQLException {
-        if(dataFiles == null) {
+        log.debug("getDataFiles");
+        if(cachedDataFiles == null) {
             // how are data files and packages linked? By DOI
-            dataFiles = DryadDataPackage.getFilesInPackage(context, this);
+            cachedDataFiles = DryadDataPackage.getFilesInPackage(context, this);
+            log.debug(" found " + cachedDataFiles.size() + " files");
         }
-        return dataFiles;
+        return cachedDataFiles;
     }
 
     void setHasPart(DryadDataFile dataFile) throws SQLException {
@@ -915,7 +921,7 @@ public class DryadDataPackage extends DryadObject {
     }
 
     void clearDataFilesCache() {
-        this.dataFiles = null;
+        cachedDataFiles = null;
     }
 
     /**

@@ -179,7 +179,8 @@ public class DashService {
         BufferedReader reader = null;
 
         try {
-            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getIdentifier(), "UTF-8");
+            String versionlessDOI = pkg.getDataPackage().getVersionlessIdentifier();
+            String encodedDOI = URLEncoder.encode(versionlessDOI, "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -270,8 +271,8 @@ public class DashService {
         if (ddp.getDuplicatePackages(null).size() > 0) {
             List<String> prevDuplicates = getDuplicateItems(pkg);
             for (DryadDataPackage dup : ddp.getDuplicatePackages(null)) {
-                if (!prevDuplicates.contains(dup.getIdentifier())) {
-                    addDuplicateItem(pkg, dup.getIdentifier());
+                if (!prevDuplicates.contains(dup.getVersionlessIdentifier())) {
+                    addDuplicateItem(pkg, dup.getVersionlessIdentifier());
                 }
             }
         }
@@ -305,7 +306,7 @@ public class DashService {
                     }
                     String dashJSON = dryadBitstream.getDashReferenceJSON();
                     log.debug("Got JSON object: " + dashJSON);
-                    String encodedPackageDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
+                    String encodedPackageDOI = URLEncoder.encode(dataPackage.getVersionlessIdentifier(), "UTF-8");
                     URL url = new URL(dashServer + "/api/datasets/" + encodedPackageDOI + "/urls");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -351,6 +352,45 @@ public class DashService {
         return responseCode;
     }
 
+    /**
+       Delete the data files in a dataset. Assumes that the dataset is in_progress.
+    **/
+    public void deleteDataFiles(Package pkg) {
+
+        // get file list
+        JsonNode fileJson = getFiles(pkg);
+        
+        
+        // for each file, call a delete
+        for(int i = 0; i < fileJson.size(); i++) {
+            try {
+                String fileID = fileJson.get(i).get("_links").get("self").get("href").textValue();
+                URL url = new URL(dashServer + fileID);
+                log.info("deleting " + url);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+                connection.setRequestMethod("DELETE");
+                
+                InputStream stream = connection.getErrorStream();
+                if (stream == null) {
+                    stream = connection.getInputStream();
+                }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                String line = null;
+                StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+                while ((line = reader.readLine()) != null) {
+                    out.append(line);
+                }
+                String response = out.toString();
+                log.info("result object " + response);
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to delete file from Dash", e);
+            }
+        }
+    }
+    
     public void migrateProvenances(Package pkg) {
         log.debug("migrating provenances");
         // get curationActivities from Dash package
@@ -460,7 +500,7 @@ public class DashService {
         try {
             String dashJSON = mapper.writeValueAsString(node);
             log.debug("curation activity json is " + dashJSON);
-            String encodedDOI = URLEncoder.encode(dataPackage.getIdentifier(), "UTF-8");
+            String encodedDOI = URLEncoder.encode(dataPackage.getVersionlessIdentifier(), "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -502,9 +542,72 @@ public class DashService {
         return responseCode;
     }
 
+    public String getLatestVersionID(Package pkg) {
+        String result = null;
+        
+        try {
+            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getVersionlessIdentifier(), "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/versions");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            String line = null;
+            StringWriter responseContent = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                responseContent.append(line);
+            }
+            String response = responseContent.toString();
+            log.debug("got response content: " + response);
+            JsonNode rootNode = mapper.readTree(response);
+            JsonNode theVersions = rootNode.get("_embedded").get("stash:versions");
+            result = theVersions.get(theVersions.size() - 1).get("_links").get("self").get("href").textValue();
+        } catch (Exception e) {
+            log.fatal("Unable to retrieve versionID for package", e);
+        }
+
+        return result;
+    }
+    
+    public JsonNode getFiles(Package pkg) {
+        String dashVersionID = getLatestVersionID(pkg);
+        log.debug("getting files for version " + dashVersionID);
+        try {
+            URL url = new URL(dashServer + dashVersionID + "/files");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+            connection.setRequestMethod("GET");
+
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            String line = null;
+            StringWriter out = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+            JsonNode rootNode = mapper.readTree(out.toString());
+            return rootNode.get("_embedded").get("stash:files");
+        } catch (Exception e) {
+            log.fatal("Unable to get file list from Dash", e);
+        }
+        return null;
+    }
+
     public JsonNode getCurationActivity(Package pkg) {
         try {
-            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getIdentifier(), "UTF-8");
+            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getVersionlessIdentifier(), "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/curation_activity");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -573,7 +676,7 @@ public class DashService {
         BufferedReader reader = null;
 
         try {
-            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getIdentifier(), "UTF-8");
+            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getVersionlessIdentifier(), "UTF-8");
             URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/internal_data");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
