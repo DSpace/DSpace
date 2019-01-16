@@ -311,7 +311,8 @@ public class XOAI {
         List<Date> dates = new LinkedList<Date>();
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
-            if (policy.getGroup().getName().equals("Anonymous")) {
+            if (policy.getGroup() != null && policy.getGroup().getName() != null
+                    && policy.getGroup().getName().equals("Anonymous")) {
                 if (policy.getStartDate() != null) {
                     dates.add(policy.getStartDate());
                 }
@@ -435,7 +436,8 @@ public class XOAI {
 
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
-            if (policy.getGroup().getName().equals("Anonymous")) {
+            if (policy.getGroup() != null && policy.getGroup().getName() != null
+                    && policy.getGroup().getName().equals("Anonymous")) {
                 
                 if (policy.getStartDate() != null && policy.getStartDate().after(new Date())) {
                     
