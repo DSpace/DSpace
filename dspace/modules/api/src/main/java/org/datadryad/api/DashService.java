@@ -360,6 +360,7 @@ public class DashService {
         // get file list
         JsonNode fileJson = getFiles(pkg);
         
+        
         // for each file, call a delete
         for(int i = 0; i < fileJson.size(); i++) {
             try {
@@ -541,14 +542,33 @@ public class DashService {
         return responseCode;
     }
 
-    public String getVersionID(Package pkg) {
+    public String getLatestVersionID(Package pkg) {
         String result = null;
         
         try {
-            String packageDOI = pkg.getDataPackage().getVersionlessIdentifier();
-            String jsonString = getDashJSON(packageDOI);
-            JsonNode rootNode = mapper.readTree(jsonString);
-            result = rootNode.get("_links").get("stash:version").get("href").textValue();
+            String encodedDOI = URLEncoder.encode(pkg.getDataPackage().getVersionlessIdentifier(), "UTF-8");
+            URL url = new URL(dashServer + "/api/datasets/" + encodedDOI + "/versions");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + oauthToken);
+
+            InputStream stream = connection.getErrorStream();
+            if (stream == null) {
+                stream = connection.getInputStream();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            String line = null;
+            StringWriter responseContent = new StringWriter(connection.getContentLength() > 0 ? connection.getContentLength() : 2048);
+            while ((line = reader.readLine()) != null) {
+                responseContent.append(line);
+            }
+            String response = responseContent.toString();
+            log.debug("got response content: " + response);
+            JsonNode rootNode = mapper.readTree(response);
+            JsonNode theVersions = rootNode.get("_embedded").get("stash:versions");
+            result = theVersions.get(theVersions.size() - 1).get("_links").get("self").get("href").textValue();
         } catch (Exception e) {
             log.fatal("Unable to retrieve versionID for package", e);
         }
@@ -557,7 +577,7 @@ public class DashService {
     }
     
     public JsonNode getFiles(Package pkg) {
-        String dashVersionID = getVersionID(pkg);
+        String dashVersionID = getLatestVersionID(pkg);
         log.debug("getting files for version " + dashVersionID);
         try {
             URL url = new URL(dashServer + dashVersionID + "/files");
