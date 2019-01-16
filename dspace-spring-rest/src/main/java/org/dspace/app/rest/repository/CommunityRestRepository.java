@@ -227,12 +227,12 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + id + " not found");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Unable to find Community with id = " + id, e);
         }
         try {
             cs.delete(context, community);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Unable to delete Community with id = " + id, e);
         } catch (IOException e) {
             throw new RuntimeException("Unable to delete community because the logo couldn't be deleted", e);
         }
