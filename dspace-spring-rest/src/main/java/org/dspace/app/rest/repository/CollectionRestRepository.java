@@ -176,9 +176,9 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
         Collection collection;
 
 
+        String parentCommunityString = req.getParameter("parent");
         try {
             Community parent = null;
-            String parentCommunityString = req.getParameter("parent");
             if (StringUtils.isNotBlank(parentCommunityString)) {
 
                 UUID parentCommunityUuid = UUIDUtils.fromString(parentCommunityString);
@@ -192,6 +192,9 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
                     throw new UnprocessableEntityException("Parent community for id: "
                             + parentCommunityUuid + " not found");
                 }
+            } else {
+                throw new BadRequestException("The parent parameter cannot be left empty," +
+                                                  "collections require a parent community.");
             }
             collection = cs.create(context, parent);
             cs.update(context, collection);
@@ -203,9 +206,9 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Unable to create new Collection under parent Community " +
+                                           parentCommunityString, e);
         }
-
         return converter.convert(collection);
     }
 
@@ -249,12 +252,12 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
                     CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: " + id + " not found");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Unable to find Collection with id = " + id, e);
         }
         try {
             cs.delete(context, collection);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Unable to delete Collection with id = " + id, e);
         } catch (IOException e) {
             throw new RuntimeException("Unable to delete collection because the logo couldn't be deleted", e);
         }
