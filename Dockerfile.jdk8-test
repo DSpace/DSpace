@@ -23,10 +23,6 @@ USER dspace
 ADD --chown=dspace . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
-# Provide web.xml overrides to make webapps easier to test
-COPY dspace/src/main/docker/test/solr_web.xml /app/dspace-solr/src/main/webapp/WEB-INF/web.xml
-COPY dspace/src/main/docker/test/rest_web.xml /app/dspace-rest/src/main/webapp/WEB-INF/web.xml
-
 # Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
 RUN mvn package -Dmirage2.on=true && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
@@ -65,3 +61,9 @@ RUN ln -s $DSPACE_INSTALL/webapps/solr    /usr/local/tomcat/webapps/solr    && \
     ln -s $DSPACE_INSTALL/webapps/rdf     /usr/local/tomcat/webapps/rdf     && \
     ln -s $DSPACE_INSTALL/webapps/sword   /usr/local/tomcat/webapps/sword   && \
     ln -s $DSPACE_INSTALL/webapps/swordv2 /usr/local/tomcat/webapps/swordv2
+
+COPY dspace/src/main/docker/test/solr_web.xml $DSPACE_INSTALL/webapps/solr/WEB-INF/web.xml
+COPY dspace/src/main/docker/test/rest_web.xml $DSPACE_INSTALL/webapps/rest/WEB-INF/web.xml
+
+RUN sed -i -e "s|\${dspace.dir}|$DSPACE_INSTALL|" $DSPACE_INSTALL/webapps/solr/WEB-INF/web.xml && \
+    sed -i -e "s|\${dspace.dir}|$DSPACE_INSTALL|" $DSPACE_INSTALL/webapps/rest/WEB-INF/web.xml
