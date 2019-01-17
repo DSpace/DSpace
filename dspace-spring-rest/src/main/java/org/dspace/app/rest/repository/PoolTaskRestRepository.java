@@ -15,6 +15,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.PoolTaskConverter;
 import org.dspace.app.rest.model.PoolTaskRest;
@@ -39,7 +40,6 @@ import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
 /**
@@ -86,7 +86,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
     }
 
     @SearchRestMethod(name = "findByUser")
-    public Page<PoolTaskRest> findByUser(@Param(value = "uuid") UUID userID, Pageable pageable) {
+    public Page<PoolTaskRest> findByUser(@Parameter(value = "uuid") UUID userID, Pageable pageable) {
         List<PoolTask> tasks = null;
         try {
             Context context = obtainContext();
