@@ -221,7 +221,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
             ServletInputStream input = req.getInputStream();
             itemRest = mapper.readValue(input, ItemRest.class);
         } catch (IOException e1) {
-            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
+            throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
         if (itemRest.getInArchive() == false) {
@@ -257,7 +257,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
         try {
             itemRest = mapper.readValue(jsonNode.toString(), ItemRest.class);
         } catch (IOException e1) {
-            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
+            throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
         Item item = itemService.find(context, uuid);
