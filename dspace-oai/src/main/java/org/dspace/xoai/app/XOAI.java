@@ -54,16 +54,15 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService; //added
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.cache.XOAIItemCacheService;
 import org.dspace.xoai.services.api.cache.XOAILastCompilationCacheService;
-import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
@@ -95,6 +94,8 @@ public class XOAI {
     private final AuthorizeService authorizeService;
     private final ItemService itemService;
 
+    private final static ConfigurationService configurationService = DSpaceServicesFactory
+            .getInstance().getConfigurationService();
 
     private List<String> getFileFormats(Item item) {
         List<String> formats = new ArrayList<>();
@@ -286,13 +287,14 @@ public class XOAI {
             int i = 0;
             int batchSize = configurationService.getIntProperty("oai.import.batch.size", 1000);
             SolrServer server = solrServerResolver.getServer();
+            ArrayList<SolrInputDocument> list = new ArrayList<>();
             while (iterator.hasNext()) {
                 try {
                     Item item = iterator.next();
                     if (item.getHandle() == null) {
                         log.warn("Skipped item without handle: " + item.getID());
                     } else {
-                        server.add(this.index(item));
+                        list.add(this.index(item));
                     }
                     //Uncache the item to keep memory consumption low
                     context.uncacheEntity(item);
@@ -302,12 +304,20 @@ public class XOAI {
                     log.error(ex.getMessage(), ex);
                 }
                 i++;
-                if (i % 100 == 0) {
+                if (i % 1000 == 0) {
                     System.out.println(i + " items imported so far...");
+                }
+                if (i % batchSize == 0) {
+                    System.out.println(i + " items imported so far...");
+                    server.add(list);
+                    server.commit();
+                    list.clear();
                 }
             }
             System.out.println("Total: " + i + " items");
-            server.commit();
+            server.add(list);
+            server.commit(true, true);
+            list.clear();
             return i;
         } catch (SolrServerException | IOException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
@@ -336,6 +346,7 @@ public class XOAI {
                     dates.add(policy.getEndDate());
                 }
             }
+            context.uncacheEntity(policy);
         }
         dates.add(item.getLastModified());
         Collections.sort(dates);
@@ -460,6 +471,7 @@ public class XOAI {
                     return true;
                 }
             }
+            context.uncacheEntity(policy);
         }
         return false;
     }
@@ -479,8 +491,8 @@ public class XOAI {
     private static boolean getKnownExplanation(Throwable t) {
         if (t instanceof ConnectException) {
             System.err.println("Solr server ("
-                                   + ConfigurationManager.getProperty("oai", "solr.url")
-                                   + ") is down, turn it on.");
+                    + configurationService.getProperty("oai.solr.url", "")
+                    + ") is down, turn it on.");
             return true;
         }
 
@@ -527,7 +539,7 @@ public class XOAI {
             BasicConfiguration.class
         });
 
-        ConfigurationService configurationService = applicationContext.getBean(ConfigurationService.class);
+        //ConfigurationService configurationService = applicationContext.getBean(ConfigurationService.class);
         XOAICacheService cacheService = applicationContext.getBean(XOAICacheService.class);
         XOAIItemCacheService itemCacheService = applicationContext.getBean(XOAIItemCacheService.class);
 
@@ -549,7 +561,7 @@ public class XOAI {
 
 
             boolean solr = true; // Assuming solr by default
-            solr = !("database").equals(configurationService.getProperty("oai", "storage"));
+            solr = !("database").equals(configurationService.getProperty("oai.storage", "solr"));
 
 
             boolean run = false;
@@ -654,7 +666,7 @@ public class XOAI {
 
     private static void usage() {
         boolean solr = true; // Assuming solr by default
-        solr = !("database").equals(ConfigurationManager.getProperty("oai", "storage"));
+        solr = !("database").equals(configurationService.getProperty("oai.storage","solr"));
 
         if (solr) {
             System.out.println("OAI Manager Script");
