@@ -539,7 +539,6 @@ public class XOAI {
             BasicConfiguration.class
         });
 
-        //ConfigurationService configurationService = applicationContext.getBean(ConfigurationService.class);
         XOAICacheService cacheService = applicationContext.getBean(XOAICacheService.class);
         XOAIItemCacheService itemCacheService = applicationContext.getBean(XOAIItemCacheService.class);
 
