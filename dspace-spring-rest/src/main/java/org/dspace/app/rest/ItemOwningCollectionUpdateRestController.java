@@ -31,12 +31,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/core/items/" +
         "{itemUuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12" +
-        "}}/owningCollection/move")
+        "}}/owningCollection")
 public class ItemOwningCollectionUpdateRestController {
 
     @Autowired
@@ -51,11 +52,11 @@ public class ItemOwningCollectionUpdateRestController {
     @Autowired
     CollectionConverter converter;
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{targetUuid}")
+    @RequestMapping(method = RequestMethod.PUT)
     @PreAuthorize("hasPermission(#itemUuid, 'ITEM','WRITE') && hasPermission(#targetUuid,'COLLECTION','ADD')")
     @PostAuthorize("returnObject != null")
     public CollectionRest move(@PathVariable UUID itemUuid, HttpServletResponse response,
-                               HttpServletRequest request, @PathVariable UUID targetUuid)
+                               HttpServletRequest request, @RequestParam(name = "collection") UUID targetUuid)
             throws SQLException, IOException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
 
