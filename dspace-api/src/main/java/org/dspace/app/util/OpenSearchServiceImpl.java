@@ -33,7 +33,6 @@ import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.output.DOMOutputter;
 import org.jdom.output.XMLOutputter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 
@@ -53,20 +52,14 @@ import org.w3c.dom.Document;
  *
  * @author Richard Rodgers
  */
-public class OpenSearchServiceImpl implements OpenSearchService, InitializingBean {
+public class OpenSearchServiceImpl implements OpenSearchService {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenSearchServiceImpl.class);
 
-    // are open search queries enabled?
-    protected boolean enabled = false;
-    // supported results formats
-    protected List<String> formats = null;
     // Namespaces used
     protected final String osNs = "http://a9.com/-/spec/opensearch/1.1/";
 
-    // base search UI URL
-    protected String uiUrl = null;
-    // base search service URL
-    protected String svcUrl = null;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     @Autowired(required = true)
     protected HandleService handleService;
@@ -75,25 +68,35 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
-        enabled = config.getBooleanProperty("websvc.opensearch.enable");
-        svcUrl = config.getProperty("dspace.url") + "/" +
-            config.getProperty("websvc.opensearch.svccontext");
-        uiUrl = config.getProperty("dspace.url") + "/" +
-            config.getProperty("websvc.opensearch.uicontext");
-
-        // read rest of config info if enabled
-        formats = new ArrayList<String>();
-        if (enabled) {
-            String[] fmts = config.getArrayProperty("websvc.opensearch.formats");
+    public List<String> getFormats() {
+        List<String> formats = new ArrayList<>();
+        // read formats only if enabled
+        if (isEnabled()) {
+            String[] fmts = configurationService.getArrayProperty("websvc.opensearch.formats");
             formats = Arrays.asList(fmts);
         }
+        return formats;
     }
 
     @Override
-    public List<String> getFormats() {
-        return formats;
+    public boolean isEnabled() {
+        return configurationService.getBooleanProperty("websvc.opensearch.enable");
+    }
+
+    /**
+     * Get base search service URL (websvc.opensearch.svccontext)
+     */
+    protected String getBaseSearchServiceURL() {
+        return configurationService.getProperty("dspace.url") + "/" +
+            configurationService.getProperty("websvc.opensearch.svccontext");
+    }
+
+    /**
+     * Get base search UI URL (websvc.opensearch.uicontext)
+     */
+    protected String getBaseSearchUIURL() {
+        return configurationService.getProperty("dspace.url") + "/" +
+            configurationService.getProperty("websvc.opensearch.uicontext");
     }
 
     @Override
@@ -221,13 +224,13 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
             root.addContent(fav);
         }
         // service URLs
-        for (String format : formats) {
+        for (String format : getFormats()) {
             Element url = new Element("Url", ns).setAttribute("type", getContentType(format));
             StringBuilder template = new StringBuilder();
             if ("html".equals(format)) {
-                template.append(uiUrl);
+                template.append(getBaseSearchUIURL());
             } else {
-                template.append(svcUrl);
+                template.append(getBaseSearchServiceURL());
             }
             template.append("?query={searchTerms}");
             if (!"html".equals(format)) {
