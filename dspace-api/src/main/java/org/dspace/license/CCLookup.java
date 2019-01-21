@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.license.factory.LicenseServiceFactory;
 import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.ConfigurationService;
@@ -45,7 +45,7 @@ public class CCLookup {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(CCLookup.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CCLookup.class);
 
     private String cc_root;
     private String jurisdiction;

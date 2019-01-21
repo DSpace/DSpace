@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeServiceImpl;
@@ -45,7 +45,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private final static Logger log = Logger.getLogger(BitstreamFormatTest.class);
+    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamFormatTest.class);
 
     /**
      * Object to use in the tests

@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Represents a text construct in the ATOM elements. This is a superclass of
@@ -36,7 +36,7 @@ public class SwordAcceptPackaging extends XmlElement
     /**
      * The log.
      */
-    private static Logger log = Logger.getLogger(SwordAcceptPackaging.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SwordAcceptPackaging.class);
 
     /** */
     public static final String ELEMENT_NAME = "acceptPackaging";
