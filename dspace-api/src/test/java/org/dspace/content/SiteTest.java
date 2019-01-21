@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
@@ -35,7 +35,7 @@ public class SiteTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(SiteTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SiteTest.class);
 
     /**
      * Site instance for the tests

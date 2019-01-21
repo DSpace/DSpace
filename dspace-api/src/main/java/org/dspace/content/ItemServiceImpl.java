@@ -21,7 +21,7 @@ import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -69,7 +69,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(Item.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
@@ -230,10 +230,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         throws SQLException {
 
         MetadataField metadataField = metadataFieldService
-            .findByElement(context, MetadataSchema.DC_SCHEMA, "date", "accessioned");
+            .findByElement(context, MetadataSchemaEnum.DC.getName(), "date", "accessioned");
         if (metadataField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".date.accessioned' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".date.accessioned' doesn't exist!");
         }
 
         return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
@@ -554,7 +554,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
-        addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", prov.toString());
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update(context, item);
@@ -609,7 +609,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // bitstream checksums
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
-        addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", prov.toString());
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update(context, item);
@@ -1292,7 +1292,9 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang) {
-        if (StringUtils.equals(schema, "relation") && !StringUtils.equals(element, "type")) {
+        //Fields of the relation schema are virtual metadata
+        //except for relation.type which is the type of item in the model
+        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
 
             List<RelationshipMetadataValue> relationMetadata = getRelationshipMetadata(item, false);
             List<MetadataValue> listToReturn = new LinkedList<>();
@@ -1341,7 +1343,8 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private List<RelationshipMetadataValue> handleItemRelationship(Context context, Item item, String entityType,
-                                                                   Relationship relationship, boolean extra)
+                                                                   Relationship relationship,
+                                                                   boolean enableVirtualMetadata)
         throws SQLException {
         List<RelationshipMetadataValue> resultingMetadataValueList = new LinkedList<>();
         RelationshipType relationshipType = relationship.getRelationshipType();
@@ -1363,7 +1366,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             place = relationship.getRightPlace();
         }
 
-        if (hashMaps != null && extra) {
+        if (hashMaps != null && enableVirtualMetadata) {
             resultingMetadataValueList.addAll(handleRelationshipTypeMetadataMappping(context, item, hashMaps,
                                                                                      otherItem, relationName,
                                                                                      relationship.getID(), place));
@@ -1374,7 +1377,8 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private List<RelationshipMetadataValue> handleRelationshipTypeMetadataMappping(Context context, Item item,
-                                                                                   HashMap<String, VirtualBean> hashMaps,
+                                                                                   HashMap<String, VirtualBean>
+                                                                                       hashMaps,
                                                                                    Item otherItem, String relationName,
                                                                                    Integer relationshipId, int place)
         throws SQLException {
@@ -1383,13 +1387,14 @@ prevent the generation of resource policy entry values with null dspace_object a
             String key = entry.getKey();
             VirtualBean virtualBean = entry.getValue();
 
-            RelationshipMetadataValue metadataValue = constructMetadataValue(context, key);
-            metadataValue = constructResultingMetadataValue(context, item, otherItem, virtualBean, metadataValue,
-                                                            relationshipId);
-            metadataValue.setUseForPlace(virtualBean.getUseForPlace());
-            metadataValue.setPlace(place);
-            if (StringUtils.isNotBlank(metadataValue.getValue())) {
-                resultingMetadataValueList.add(metadataValue);
+            for (String value : virtualBean.getValues(context, otherItem)) {
+                RelationshipMetadataValue metadataValue = constructMetadataValue(context, key);
+                metadataValue = constructResultingMetadataValue(item, value, metadataValue, relationshipId);
+                metadataValue.setUseForPlace(virtualBean.getUseForPlace());
+                metadataValue.setPlace(place);
+                if (StringUtils.isNotBlank(metadataValue.getValue())) {
+                    resultingMetadataValueList.add(metadataValue);
+                }
             }
         }
         return resultingMetadataValueList;
@@ -1398,7 +1403,9 @@ prevent the generation of resource policy entry values with null dspace_object a
     private RelationshipMetadataValue getRelationMetadataFromOtherItem(Context context, Item otherItem,
                                                                        String relationName,
                                                                        Integer relationshipId) {
-        RelationshipMetadataValue metadataValue = constructMetadataValue(context, "relation." + relationName);
+        RelationshipMetadataValue metadataValue = constructMetadataValue(context,
+                                                                         MetadataSchemaEnum.RELATION
+                                                                             .getName() + "." + relationName);
         metadataValue.setAuthority("virtual::" + relationshipId);
         metadataValue.setValue(otherItem.getID().toString());
         return metadataValue;
@@ -1418,12 +1425,10 @@ prevent the generation of resource policy entry values with null dspace_object a
         return entityType;
     }
 
-    private RelationshipMetadataValue constructResultingMetadataValue(Context context, Item item, Item otherItem,
-                                                                      VirtualBean virtualBean,
+    private RelationshipMetadataValue constructResultingMetadataValue(Item item, String value,
                                                                       RelationshipMetadataValue metadataValue,
-                                                                      Integer relationshipId)
-        throws SQLException {
-        metadataValue.setValue(virtualBean.getValue(context, otherItem));
+                                                                      Integer relationshipId) {
+        metadataValue.setValue(value);
         metadataValue.setAuthority("virtual::" + relationshipId);
         metadataValue.setConfidence(-1);
         metadataValue.setDSpaceObject(item);

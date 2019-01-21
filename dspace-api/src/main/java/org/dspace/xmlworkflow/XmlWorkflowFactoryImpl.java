@@ -18,7 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.content.Collection;
 import org.dspace.services.ConfigurationService;
@@ -45,7 +45,7 @@ import org.w3c.dom.NodeList;
  */
 public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
-    private Logger log = Logger.getLogger(XmlWorkflowFactoryImpl.class);
+    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowFactoryImpl.class);
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;

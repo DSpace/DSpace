@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
@@ -38,7 +38,7 @@ public class SWORDMETSIngester implements SWORDIngester {
     /**
      * Log4j logger
      */
-    public static final Logger log = Logger.getLogger(SWORDMETSIngester.class);
+    public static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SWORDMETSIngester.class);
 
     /* (non-Javadoc)
      * @see org.dspace.sword.SWORDIngester#ingest(org.dspace.core.Context, org.purl.sword.base.Deposit)

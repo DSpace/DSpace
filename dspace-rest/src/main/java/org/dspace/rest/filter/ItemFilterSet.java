@@ -14,7 +14,7 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -28,7 +28,7 @@ import org.dspace.rest.common.ItemFilter;
  */
 public class ItemFilterSet {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    static Logger log = Logger.getLogger(ItemFilterSet.class);
+    static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemFilterSet.class);
 
     private List<ItemFilter> itemFilters;
     private ItemFilter allFiltersFilter;

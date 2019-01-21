@@ -12,9 +12,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.RelationshipDAO;
@@ -27,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class RelationshipServiceImpl implements RelationshipService {
 
-    private static final Logger log = Logger.getLogger(RelationshipServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired(required = true)
     protected RelationshipDAO relationshipDAO;
@@ -120,12 +121,12 @@ public class RelationshipServiceImpl implements RelationshipService {
         List<Relationship> leftRelationships;
         List<Relationship> rightRelationships;
         leftRelationships = findByItemAndRelationshipType(context,
-                                                      relationship.getLeftItem(),
-                                                      relationship.getRelationshipType(), true);
+                                                          relationship.getLeftItem(),
+                                                          relationship.getRelationshipType(), true);
         rightRelationships = findByItemAndRelationshipType(context,
-                                                                              relationship.getRightItem(),
-                                                                              relationship.getRelationshipType(),
-                                                                              false);
+                                                           relationship.getRightItem(),
+                                                           relationship.getRelationshipType(),
+                                                           false);
         leftRelationships.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
         rightRelationships.sort((o1, o2) -> o2.getRightPlace() - o1.getRightPlace());
 
@@ -268,13 +269,13 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public void delete(Context context, Relationship relationship) throws SQLException, AuthorizeException {
 //        if (isRelationshipValidToDelete(context, relationship)) {
-            if (!authorizeService.isAdmin(context)) {
-                throw new AuthorizeException(
-                    "Only administrators can delete relationship");
-            }
-            relationshipDAO.delete(context, relationship);
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "Only administrators can delete relationship");
+        }
+        relationshipDAO.delete(context, relationship);
 
-            updatePlaceInRelationship(context, relationship, false);
+        updatePlaceInRelationship(context, relationship, false);
 //        } else {
 //            throw new IllegalArgumentException("The relationship given was not valid");
 //        }
@@ -347,6 +348,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         return listToReturn;
     }
 
+    @Override
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
                                                             RelationshipType relationshipType)
         throws SQLException {

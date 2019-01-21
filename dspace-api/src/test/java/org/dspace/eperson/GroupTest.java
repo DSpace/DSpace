@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -38,7 +38,7 @@ import org.junit.Test;
  */
 public class GroupTest extends AbstractUnitTest {
 
-    private static final Logger log = Logger.getLogger(GroupTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(GroupTest.class);
 
     //TODO: test duplicate names ?
 

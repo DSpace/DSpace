@@ -16,7 +16,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import mockit.integration.junit4.JMockit;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.MockUtil;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
@@ -50,7 +50,7 @@ public class AbstractDSpaceTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(AbstractDSpaceTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractDSpaceTest.class);
 
     /**
      * Test properties. These configure our general test environment
