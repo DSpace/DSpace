@@ -10,7 +10,7 @@ package org.dspace.content.virtual;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -19,6 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A bean implementing the {@link VirtualBean} interface to achieve the generation of Virtual metadata
+ * The Concatenate bean will take all the values of each metadata field configured in the list
+ * and it will join all of these together with the separator defined in this bean. This means that whichever
+ * entry this bean belongs to, that metadata field will have the value of the related item's metadata values
+ * joined together with this separator. Only one value will be returned
  */
 public class Concatenate implements VirtualBean {
 
@@ -30,7 +34,7 @@ public class Concatenate implements VirtualBean {
      */
     private List<String> fields;
     /**
-     * The seperator that will be used to concatenate the values retrieved from the above mentioned fields
+     * The separator that will be used to concatenate the values retrieved from the above mentioned fields
      */
     private String separator;
 
@@ -89,13 +93,13 @@ public class Concatenate implements VirtualBean {
 
     /**
      * this method will retrieve the metadata values from the given item for all the metadata fields listed
-     * in the fields property and it'll concatenate all those values together with the seperrator specified
+     * in the fields property and it'll concatenate all those values together with the separator specified
      * in this class
      * @param context   The relevant DSpace context
      * @param item      The item that will be used to either retrieve metadata values from
-     * @return The String value for all of the retrieved metadatavalues combined with the seperator
+     * @return The String value for all of the retrieved metadatavalues combined with the separator
      */
-    public String getValue(Context context, Item item) {
+    public List<String> getValues(Context context, Item item) {
 
         List<String> resultValues = new LinkedList<>();
         List<String> value = this.getFields();
@@ -127,8 +131,9 @@ public class Concatenate implements VirtualBean {
         }
 
         String result = StringUtils.join(resultValues, this.getSeparator());
-
-        return result;
+        List<String> listToReturn = new LinkedList<>();
+        listToReturn.add(result);
+        return listToReturn;
     }
 
 }

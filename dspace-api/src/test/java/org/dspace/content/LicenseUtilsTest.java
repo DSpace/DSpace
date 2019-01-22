@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -49,7 +49,7 @@ public class LicenseUtilsTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(LicenseUtilsTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LicenseUtilsTest.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();

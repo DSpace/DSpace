@@ -8,6 +8,7 @@
 package org.dspace.content.virtual;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -20,18 +21,15 @@ import org.dspace.core.Context;
 public interface VirtualBean {
 
     /**
-     * This method will return the String value for the metadata field that is configured in the
-     * {@link Concatenate} bean in the config and it will traverse all the {@link Related} beans
-     * in the config that are chained together until it finds a {@link Concatenate} bean for which
-     * the value can be retrieved.
+     * This method will return a list filled with String values which will be determine by the bean that's responsible
+     * of handling the metadata fields when fully traversed through all the {@link Related} beans
      * @param context   The relevant DSpace context
      * @param item      The item that will be used to either retrieve metadata values from or to find
      *                  the related item through its relationships
-     * @return The String value of all the metadata values of all fields defined in {@link Concatenate}
-     *                  bean which will be concatenated with a seperator that's defined in the same bean
+     * @return The list of String values of all the metadata values as constructed by the responsible bean
      * @throws SQLException If something goes wrong
      */
-    String getValue(Context context, Item item) throws SQLException;
+    List<String> getValues(Context context, Item item) throws SQLException;
 
     /**
      * Generic setter for the useForPlace property

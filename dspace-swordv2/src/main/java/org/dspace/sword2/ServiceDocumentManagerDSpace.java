@@ -9,7 +9,7 @@ package org.dspace.sword2;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -32,7 +32,7 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager {
     /**
      * logger
      */
-    private static Logger log = Logger
+    private static Logger log = org.apache.logging.log4j.LogManager
         .getLogger(ServiceDocumentManagerDSpace.class);
 
     protected CommunityService communityService = ContentServiceFactory

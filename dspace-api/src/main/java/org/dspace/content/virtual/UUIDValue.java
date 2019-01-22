@@ -8,6 +8,8 @@
 package org.dspace.content.virtual;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -24,7 +26,9 @@ public class UUIDValue implements VirtualBean {
         return useForPlace;
     }
 
-    public String getValue(Context context, Item item) throws SQLException {
-        return String.valueOf(item.getID());
+    public List<String> getValues(Context context, Item item) throws SQLException {
+        List<String> list = new LinkedList<>();
+        list.add(String.valueOf(item.getID()));
+        return list;
     }
 }

@@ -16,7 +16,7 @@ import org.apache.commons.lang3.CharEncoding;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 
@@ -50,7 +50,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     }
 
     public CollectionBuilder withName(final String name) {
-        return setMetadataSingleValue(collection, MetadataSchema.DC_SCHEMA, "title", null, name);
+        return setMetadataSingleValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, name);
     }
 
     public CollectionBuilder withLogo(final String content) throws AuthorizeException, IOException, SQLException {

@@ -21,7 +21,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.SimpleReporterService;
 import org.dspace.core.ConfigurationManager;
@@ -43,7 +43,7 @@ public class DailyReportEmailer {
     /**
      * log4j logger.
      */
-    private static Logger log = Logger.getLogger(DailyReportEmailer.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DailyReportEmailer.class);
 
     /**
      * Default constructor.

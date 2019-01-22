@@ -10,7 +10,7 @@ package org.dspace.sword2;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -30,7 +30,7 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI
     /**
      * logger
      */
-    private static Logger log = Logger
+    private static Logger log = org.apache.logging.log4j.LogManager
         .getLogger(CollectionDepositManagerDSpace.class);
 
     protected CollectionService collectionService = ContentServiceFactory

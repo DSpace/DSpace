@@ -19,7 +19,7 @@ import gr.ekt.bte.core.MutableRecord;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.core.Value;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.submit.util.SubmissionLookupPublication;
 import org.w3c.dom.Element;

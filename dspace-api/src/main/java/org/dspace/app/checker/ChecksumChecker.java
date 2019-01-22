@@ -23,7 +23,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.checker.BitstreamDispatcher;
 import org.dspace.checker.CheckerCommand;
 import org.dspace.checker.HandleDispatcher;
@@ -48,7 +49,7 @@ import org.dspace.core.Utils;
  * @author Nathan Sarr
  */
 public final class ChecksumChecker {
-    private static final Logger LOG = Logger.getLogger(ChecksumChecker.class);
+    private static final Logger LOG = LogManager.getLogger(ChecksumChecker.class);
 
     private static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
