@@ -73,6 +73,17 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      */
     int findRightPlaceByRightItem(Context context, Item item) throws SQLException;
 
+    /**
+     * This method will retrieve a list of Relationship objects by retrieving the list of Relationship objects
+     * for the given item and then filtering the Relationship objects on the RelationshipType object that is
+     * passed along to this method.
+     * @param context           The relevant DSpace context
+     * @param item              The Item for which the list of Relationship objects will be retrieved
+     * @param relationshipType  The RelationshipType object on which the list of Relationship objects for the given
+     *                          Item will be filtered
+     * @return  The list of Relationship objects for the given Item filtered on the RelationshipType object
+     * @throws SQLException If something goes wrong
+     */
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
                                                             RelationshipType relationshipType)
         throws SQLException;

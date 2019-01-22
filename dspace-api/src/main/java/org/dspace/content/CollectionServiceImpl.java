@@ -20,8 +20,8 @@ import java.util.MissingResourceException;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -61,7 +61,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(CollectionServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionServiceImpl.class);
 
     @Autowired(required = true)
     protected CollectionDAO collectionDAO;
@@ -143,10 +143,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findAll(Context context) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return collectionDAO.findAll(context, nameField);
@@ -154,10 +155,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+                                                                     "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
-                "Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+                "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
         return collectionDAO.findAll(context, nameField, limit, offset);

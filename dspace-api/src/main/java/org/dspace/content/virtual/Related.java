@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Entity;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
@@ -27,6 +27,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * A bean implementing the {@link VirtualBean} interface to achieve the generation of Virtual metadata
  * by traversing the path of relation specified in the config for this bean
+ * The Related bean will find the relationshiptype defined in the relationshipTypeString property on
+ * the current item and it'll use the related item from that relationship to pass it along to the virtualBean
+ * property which in turn refers to another VirtualBean instance and it continues the chain until it reaches
+ * either a Concatenate or Collected bean to retrieve the values. It will then return that value through the chain
+ * again and it'll fill the values into the virtual metadata fields that are defined in the map for the first
+ * Related bean.
  */
 public class Related implements VirtualBean {
 
@@ -51,7 +57,7 @@ public class Related implements VirtualBean {
      */
     private Integer place;
     /**
-     * The next bean to call its getValue() method on
+     * The next bean to call its getValues() method on
      */
     private VirtualBean virtualBean;
 
@@ -134,7 +140,7 @@ public class Related implements VirtualBean {
      *                  Will return null if no relationships are found
      * @throws SQLException If something goes wrong
      */
-    public String getValue(Context context, Item item) throws SQLException {
+    public List<String> getValues(Context context, Item item) throws SQLException {
         Entity entity = entityService.findByItemId(context, item.getID());
         EntityType entityType = entityService.getType(context, entity);
 
@@ -156,12 +162,12 @@ public class Related implements VirtualBean {
             if (relationship.getRelationshipType().getLeftType() == entityType) {
                 if (relationship.getLeftPlace() == place) {
                     Item otherItem = relationship.getRightItem();
-                    return virtualBean.getValue(context, otherItem);
+                    return virtualBean.getValues(context, otherItem);
                 }
             } else if (relationship.getRelationshipType().getRightType() == entityType) {
                 if (relationship.getRightPlace() == place) {
                     Item otherItem = relationship.getLeftItem();
-                    return virtualBean.getValue(context, otherItem);
+                    return virtualBean.getValues(context, otherItem);
                 }
             }
         }

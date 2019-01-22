@@ -18,7 +18,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class DSpaceCSVTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(DSpaceCSVTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceCSVTest.class);
 
     /**
      * Test the reading and parsing of CSV files

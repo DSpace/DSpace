@@ -12,9 +12,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.RelationshipDAO;
@@ -26,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class RelationshipServiceImpl implements RelationshipService {
 
-    private static final Logger log = Logger.getLogger(RelationshipServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired(required = true)
     protected RelationshipDAO relationshipDAO;
@@ -297,6 +298,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         return listToReturn;
     }
 
+    @Override
     public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
                                                             RelationshipType relationshipType)
         throws SQLException {

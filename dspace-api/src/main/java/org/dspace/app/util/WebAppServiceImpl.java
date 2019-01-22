@@ -18,7 +18,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.dao.WebAppDAO;
 import org.dspace.app.util.service.WebAppService;
 import org.dspace.core.Context;
@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class WebAppServiceImpl implements WebAppService {
 
-    private final Logger log = Logger.getLogger(WebAppServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(WebAppServiceImpl.class);
 
     @Autowired(required = true)
     protected WebAppDAO webAppDAO;

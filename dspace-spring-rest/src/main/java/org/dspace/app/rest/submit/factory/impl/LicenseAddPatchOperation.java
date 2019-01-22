@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.content.Item;
 import org.dspace.content.LicenseUtils;
 import org.dspace.content.WorkspaceItem;

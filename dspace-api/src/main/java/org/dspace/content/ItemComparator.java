@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.sort.OrderFormat;
@@ -174,7 +174,7 @@ public class ItemComparator implements Comparator, Serializable {
     protected String getValue(Item item) {
         // The overall array and each element are guaranteed non-null
         List<MetadataValue> dcvalues = itemService
-            .getMetadata(item, MetadataSchema.DC_SCHEMA, element, qualifier, language);
+            .getMetadata(item, MetadataSchemaEnum.DC.getName(), element, qualifier, language);
 
         if (dcvalues.isEmpty()) {
             return null;

@@ -8,7 +8,7 @@
 package org.dspace.xoai.tests.helpers.stubs;
 
 import static java.lang.Math.min;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 
 import java.util.ArrayList;
 import java.util.List;

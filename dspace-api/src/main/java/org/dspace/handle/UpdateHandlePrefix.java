@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataValueService;
@@ -33,7 +33,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class UpdateHandlePrefix {
 
-    private static final Logger log = Logger.getLogger(UpdateHandlePrefix.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UpdateHandlePrefix.class);
     private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
                                                                                           .getConfigurationService();
 
