@@ -91,7 +91,6 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     public void updatePlaceInRelationship(Context context, Relationship relationship, boolean isCreation)
         throws SQLException, AuthorizeException;
 
-    public void updateItems(Context context, Relationship relationship) throws SQLException, AuthorizeException;
-
+    public void updateItem(Context context, Item leftItem) throws SQLException, AuthorizeException;
 
 }
