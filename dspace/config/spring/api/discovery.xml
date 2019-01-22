@@ -263,7 +263,7 @@
                 <ref bean="searchFilterIsProjectOfPublicationRelation"/>
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
-		        <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+		<ref bean="searchFilterIsJournalOfPublicationRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search (same as defaultConfiguration above)-->
