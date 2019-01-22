@@ -612,7 +612,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         if (fieldToLastPlace.containsKey(metadataField)) {
             fieldToLastPlace.put(metadataField, fieldToLastPlace.get(metadataField) + 1);
         } else {
-            // The metadata value place starts at 0q
+            // The metadata value place starts at 0
             fieldToLastPlace.put(metadataField, 0);
         }
         return fieldToLastPlace.get(metadataField);
