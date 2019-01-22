@@ -149,13 +149,13 @@ public class CsvImportIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(0)))
                    .andExpect(jsonPath("$.rightId", is(itemC.getID().toString())))
-                   .andExpect(jsonPath("$.rightPlace", is(2)))
+                   .andExpect(jsonPath("$.rightPlace", is(1)))
                    .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
         getClient().perform(get("/api/core/relationships/" + relationships.get(1).getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.leftPlace", is(1)))
                    .andExpect(jsonPath("$.rightId", is(itemB.getID().toString())))
-                   .andExpect(jsonPath("$.rightPlace", is(2)))
+                   .andExpect(jsonPath("$.rightPlace", is(1)))
                    .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(1)))));
 
         Item itemF = validateSpecificItemRelationCreationCsvImport(col1, itemE, "TestItemF", "Person",

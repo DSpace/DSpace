@@ -69,11 +69,13 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public void updatePlaceInRelationship(Context context, Relationship relationship, boolean isCreation)
         throws SQLException, AuthorizeException {
+        Item leftItem = relationship.getLeftItem();
         List<Relationship> leftRelationships = findByItemAndRelationshipType(context,
-                                                                             relationship.getLeftItem(),
+                                                                             leftItem,
                                                                              relationship.getRelationshipType(), true);
+        Item rightItem = relationship.getRightItem();
         List<Relationship> rightRelationships = findByItemAndRelationshipType(context,
-                                                                              relationship.getRightItem(),
+                                                                              rightItem,
                                                                               relationship.getRelationshipType(),
                                                                               false);
 
@@ -81,27 +83,32 @@ public class RelationshipServiceImpl implements RelationshipService {
             if (!leftRelationships.isEmpty()) {
                 leftRelationships.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
                 for (int i = 0; i < leftRelationships.size(); i++) {
-                    leftRelationships.get(leftRelationships.size() - 1 - i).setLeftPlace(i + 1);
+                    leftRelationships.get(leftRelationships.size() - 1 - i).setLeftPlace(i);
                 }
                 relationship.setLeftPlace(leftRelationships.get(0).getLeftPlace() + 1);
             } else {
                 relationship.setLeftPlace(0);
             }
+        } else {
+            updateItem(context, leftItem);
+
         }
 
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), false)) {
             if (!rightRelationships.isEmpty()) {
                 rightRelationships.sort((o1, o2) -> o2.getRightPlace() - o1.getRightPlace());
                 for (int i = 0; i < rightRelationships.size(); i++) {
-                    rightRelationships.get(rightRelationships.size() - 1 - i).setRightPlace(i + 1);
+                    rightRelationships.get(rightRelationships.size() - 1 - i).setRightPlace(i);
                 }
                 relationship.setRightPlace(rightRelationships.get(0).getRightPlace() + 1);
             } else {
                 relationship.setRightPlace(0);
             }
 
+        } else {
+            updateItem(context, rightItem);
+
         }
-        updateItems(context, relationship);
 
         if (isCreation) {
             handleCreationPlaces(context, relationship);
@@ -109,13 +116,12 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     }
 
-    public void updateItems(Context context, Relationship relationship)
+    public void updateItem(Context context, Item leftItem)
         throws SQLException, AuthorizeException {
-        relationship.getLeftItem().setMetadataModified();
-        relationship.getRightItem().setMetadataModified();
-        itemService.update(context, relationship.getLeftItem());
-        itemService.update(context, relationship.getRightItem());
+        leftItem.setMetadataModified();
+        itemService.update(context, leftItem);
     }
+
 
     private void handleCreationPlaces(Context context, Relationship relationship) throws SQLException {
         List<Relationship> leftRelationships;

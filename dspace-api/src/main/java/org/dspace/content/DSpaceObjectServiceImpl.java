@@ -252,6 +252,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 }
             }
             MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
+            // TODO Set place to list length
+            metadataValue.setPlace(this.getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY).size());
+
             metadataValue.setLanguage(lang == null ? null : lang.trim());
 
             // Logic to set Authority and Confidence:
