@@ -61,8 +61,11 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
         // FIXME this should be bind automatically and available as method
         // argument
         String scope = null;
+        String startsWith = null;
+
         if (request != null) {
             scope = request.getParameter("scope");
+            startsWith = request.getParameter("startsWith");
         }
 
 
@@ -103,7 +106,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
         // bs.setJumpToItem(focus);
         // bs.setJumpToValue(valueFocus);
         // bs.setJumpToValueLang(valueFocusLang);
-        // bs.setStartsWith(startsWith);
+        bs.setStartsWith(startsWith);
         if (pageable != null) {
             bs.setOffset(pageable.getOffset());
             bs.setResultsPerPage(pageable.getPageSize());
