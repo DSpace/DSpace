@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.webui.cris.web.tag;
 
 import java.util.ArrayList;
@@ -31,13 +38,13 @@ public final class PropertyDefintionI18NWrapper implements MethodInterceptor {
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		if (locale != null) {
 			String name = invocation.getMethod().getName();
-			if (name.equals("getLabel")) {
+			if ("getLabel".equals(name)) {
 				return getLabel(invocation);
-			} else if (name.equals("getReal")) {
+			} else if ("getReal".equals(name)) {
 				return getWrapper((IPropertiesDefinition) invocation.proceed(), localeString);
-			} else if (name.equals("getMask")) {
+			} else if ("getMask".equals(name)) {
 				return getMask(invocation);
-			} else if (name.equals("getPriority")) {
+			} else if ("getPriority".equals(name)) {
                 return priority;
             }
 			
