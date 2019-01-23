@@ -106,10 +106,10 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
 
         // validate fields
         if (isBlank(metadataSchemaRest.getPrefix())) {
-            throw new UnprocessableEntityException("metadata schema name can be blank not");
+            throw new UnprocessableEntityException("metadata schema name cannot be blank");
         }
         if (isBlank(metadataSchemaRest.getNamespace())) {
-            throw new UnprocessableEntityException("metadata schema namespace can be blank not");
+            throw new UnprocessableEntityException("metadata schema namespace cannot be blank");
         }
 
         // create
@@ -155,14 +155,14 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         MetadataSchemaRest metadataSchemaRest = new Gson().fromJson(jsonNode.toString(), MetadataSchemaRest.class);
 
         if (isBlank(metadataSchemaRest.getPrefix())) {
-            throw new UnprocessableEntityException("metadata schema name can be blank not");
+            throw new UnprocessableEntityException("metadata schema name cannot be blank");
         }
         if (isBlank(metadataSchemaRest.getNamespace())) {
-            throw new UnprocessableEntityException("metadata schema namespace can be blank not");
+            throw new UnprocessableEntityException("metadata schema namespace cannot be blank");
         }
 
         if (!Objects.equals(id, metadataSchemaRest.getId())) {
-            throw new UnprocessableEntityException("body id matches path id... not");
+            throw new UnprocessableEntityException("ID in request doesn't match path ID");
         }
 
         MetadataSchema metadataSchema = metadataSchemaService.find(context, id);
