@@ -133,16 +133,16 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         // validate fields
         String schemaId = getRequestService().getCurrentRequest().getHttpServletRequest().getParameter("schemaId");
         if (isBlank(schemaId)) {
-            throw new UnprocessableEntityException("metadata schema ID can be blank not");
+            throw new UnprocessableEntityException("metadata schema ID cannot be blank");
         }
 
         MetadataSchema schema = metadataSchemaService.find(context, parseInt(schemaId));
         if (schema == null) {
-            throw new UnprocessableEntityException("metadata schema is found not");
+            throw new UnprocessableEntityException("metadata schema with ID " + schemaId + " not found");
         }
 
         if (isBlank(metadataFieldRest.getElement())) {
-            throw new UnprocessableEntityException("metadata element can be blank not");
+            throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
         }
 
         // create
