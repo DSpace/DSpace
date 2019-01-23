@@ -725,8 +725,16 @@ public class RestResourceController implements InitializingBean {
                     if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
                         Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
                                 .invoke(linkRepository, request, uuid, page, projection);
-                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
-                                .withSelfRel();
+
+                        Link link = null;
+                        String querystring = request.getQueryString();
+                        if (querystring != null && querystring.length() > 0) {
+                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
+                                .slash(subpath + '?' + querystring).withSelfRel();
+                        } else {
+                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid).withSelfRel();
+                        }
+
                         Page<HALResource> halResources = pageResult.map(linkRepository::wrapResource);
                         halResources.forEach(linkService::addLinks);
 
@@ -924,11 +932,7 @@ public class RestResourceController implements InitializingBean {
             result = assembler.toResource(resources, link);
         } else {
             if (searchResult == null) {
-                try {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                } catch (IOException e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 return null;
             }
             DSpaceResource<T> dsResource = repository.wrapResource((T) searchResult);
