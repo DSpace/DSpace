@@ -1296,7 +1296,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean extra) {
+    public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata) {
         Context context = new Context();
         List<RelationshipMetadataValue> fullMetadataValueList = new LinkedList<>();
         try {
@@ -1306,7 +1306,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                 List<Relationship> relationships = relationshipService.findByItem(context, item);
                 for (Relationship relationship : relationships) {
                     fullMetadataValueList
-                        .addAll(handleItemRelationship(context, item, entityType, relationship, extra));
+                        .addAll(handleItemRelationship(context, item, entityType, relationship, enableVirtualMetadata));
                 }
 
             }
