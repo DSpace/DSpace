@@ -89,7 +89,7 @@ public class Collected implements VirtualBean {
                                                                          null,
                                                                      splittedString.length > 2 ? splittedString[2] :
                                                                          null,
-                                                                     Item.ANY);
+                                                                     Item.ANY, false);
 
             for (MetadataValue metadataValue : resultList) {
                 if (StringUtils.isNotBlank(metadataValue.getValue())) {
