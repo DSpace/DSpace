@@ -18,18 +18,20 @@ public class UUIDValue implements VirtualBean {
 
     private boolean useForPlace;
 
+    @Override
     public List<String> getValues(Context context, Item item) throws SQLException {
         List<String> list = new LinkedList<>();
         list.add(String.valueOf(item.getID()));
         return list;
     }
 
+    @Override
     public void setUseForPlace(boolean useForPlace) {
         this.useForPlace = useForPlace;
     }
 
+    @Override
     public boolean getUseForPlace() {
         return useForPlace;
     }
-
 }

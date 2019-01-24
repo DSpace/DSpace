@@ -29,14 +29,13 @@ public class Collected implements VirtualBean {
     private ItemService itemService;
 
     /**
-     * The fields for which the metadata will be retrieved
-     */
-    private List<String> fields;
-
-    /**
      * The boolean value indicating whether this field should be used for place or not
      */
     private boolean useForPlace;
+    /**
+     * The fields for which the metadata will be retrieved
+     */
+    private List<String> fields;
 
     /**
      * Generic getter for the fields property
@@ -53,7 +52,6 @@ public class Collected implements VirtualBean {
     public void setFields(List<String> fields) {
         this.fields = fields;
     }
-
     /**
      * Generic setter for the useForPlace property
      * @param useForPlace   The boolean value that the useForPlace property will be set to
@@ -69,6 +67,7 @@ public class Collected implements VirtualBean {
     public boolean getUseForPlace() {
         return useForPlace;
     }
+
     /**
      * this method will retrieve the metadata values from the given item for all the metadata fields listed
      * in the fields property and it'll return all those values as a list
