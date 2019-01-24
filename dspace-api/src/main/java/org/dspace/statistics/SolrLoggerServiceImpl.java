@@ -160,7 +160,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             try {
                 server = new HttpSolrServer(configurationService.getProperty("solr-statistics.server"));
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                log.error("Error accessing Solr server configured in 'solr-statistics.server'", e);
             }
         }
         solr = server;
@@ -231,7 +231,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         } catch (RuntimeException re) {
             throw re;
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Error saving VIEW event to Solr for DSpaceObject {} by EPerson {}",
+                      dspaceObject.getID(), currentUser.getEmail(), e);
         }
     }
 
@@ -266,7 +267,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         } catch (RuntimeException re) {
             throw re;
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Error saving VIEW event to Solr for DSpaceObject {} by EPerson {}",
+                      dspaceObject.getID(), currentUser.getEmail(), e);
         }
     }
 
@@ -338,7 +340,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                         doc1.addField("longitude", longitude);
                     }
                 } catch (IOException | GeoIp2Exception e) {
-                    log.error("Unable to get location of request:  {}", e.getMessage());
+                    log.error("Unable to get location of request: {}", e.getMessage());
                 }
             }
         }
@@ -473,7 +475,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         } catch (RuntimeException re) {
             throw re;
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Error saving SEARCH event to Solr by EPerson {}",
+                      currentUser.getEmail(), e);
         }
     }
 
@@ -520,7 +523,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             solr.add(solrDoc);
         } catch (Exception e) {
             //Log the exception, no need to send it through, the workflow shouldn't crash because of this !
-            log.error(e.getMessage(), e);
+            log.error("Error saving WORKFLOW event to Solr", e);
         }
 
     }
@@ -1033,7 +1036,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             // solr.set
             response = solr.query(solrQuery);
         } catch (SolrServerException e) {
-            System.err.println("Error using query " + query);
+            log.error("Error searching Solr usage events using query {}", query, e);
             throw e;
         }
         return response;
