@@ -114,7 +114,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             .find(context, Integer.parseInt(req.getParameter("relationshipType")));
 
         EPerson ePerson = context.getCurrentUser();
-        if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) &&
+        if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
             authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
             relationship.setLeftItem(leftItem);
             relationship.setRightItem(rightItem);
@@ -154,7 +154,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         RelationshipType relationshipType = relationshipTypeService
             .find(context, Integer.parseInt(req.getParameter("relationshipType")));
 
-        if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) &&
+        if (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
             authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) {
             relationship.setId(relationshipRest.getId());
             relationship.setLeftItem(leftItem);
@@ -183,7 +183,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         try {
             relationship = relationshipService.find(context, id);
             if (relationship != null) {
-                if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) &&
+                if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
                     authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
                     relationshipService.delete(context, relationship);
                 } else {
