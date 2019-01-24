@@ -1292,33 +1292,7 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang) {
-        //Fields of the relation schema are virtual metadata
-        //except for relation.type which is the type of item in the model
-        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
-
-            List<RelationshipMetadataValue> relationMetadata = getRelationshipMetadata(item, false);
-            List<MetadataValue> listToReturn = new LinkedList<>();
-            for (MetadataValue metadataValue : relationMetadata) {
-                if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {
-                    listToReturn.add(metadataValue);
-                }
-            }
-            return listToReturn;
-
-        } else {
-            List<MetadataValue> dbMetadataValues = super.getMetadata(item, schema, element, qualifier, lang);
-
-            if (!(StringUtils.equals(schema, "*") && StringUtils.equals(element, "*") &&
-                StringUtils.equals(qualifier, "*") && StringUtils.equals(lang, "*"))) {
-                return dbMetadataValues;
-            }
-            List<MetadataValue> fullMetadataValueList = new LinkedList<>();
-            fullMetadataValueList.addAll(getRelationshipMetadata(item, true));
-            fullMetadataValueList.addAll(dbMetadataValues);
-
-            return fullMetadataValueList;
-        }
-
+        return this.getMetadata(item, schema, element, qualifier, lang, true);
     }
 
     @Override
@@ -1340,6 +1314,40 @@ prevent the generation of resource policy entry values with null dspace_object a
             log.error(e, e);
         }
         return fullMetadataValueList;
+    }
+
+    public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang,
+                                           boolean enableVirtualMetadata) {
+        //Fields of the relation schema are virtual metadata
+        //except for relation.type which is the type of item in the model
+        if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
+
+            List<RelationshipMetadataValue> relationMetadata = getRelationshipMetadata(item, false);
+            List<MetadataValue> listToReturn = new LinkedList<>();
+            for (MetadataValue metadataValue : relationMetadata) {
+                if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {
+                    listToReturn.add(metadataValue);
+                }
+            }
+            return listToReturn;
+
+        } else {
+            List<MetadataValue> dbMetadataValues = super.getMetadata(item, schema, element, qualifier, lang);
+
+            List<MetadataValue> fullMetadataValueList = new LinkedList<>();
+            if (enableVirtualMetadata) {
+                fullMetadataValueList.addAll(getRelationshipMetadata(item, true));
+            }
+            fullMetadataValueList.addAll(dbMetadataValues);
+
+            List<MetadataValue> finalList = new LinkedList<>();
+            for (MetadataValue metadataValue : fullMetadataValueList) {
+                if (match(schema, element, qualifier, lang, metadataValue)) {
+                    finalList.add(metadataValue);
+                }
+            }
+            return finalList;
+        }
     }
 
     private List<RelationshipMetadataValue> handleItemRelationship(Context context, Item item, String entityType,

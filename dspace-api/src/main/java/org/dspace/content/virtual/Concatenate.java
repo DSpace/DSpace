@@ -113,7 +113,7 @@ public class Concatenate implements VirtualBean {
                                                                          null,
                                                                      splittedString.length > 2 ? splittedString[2] :
                                                                          null,
-                                                                     Item.ANY);
+                                                                     Item.ANY, false);
 
             String resultString = "";
             for (int i = 0; i < resultList.size(); i++) {
