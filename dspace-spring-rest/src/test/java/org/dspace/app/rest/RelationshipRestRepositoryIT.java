@@ -45,11 +45,13 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.services.ConfigurationService;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
+@Ignore
 public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired

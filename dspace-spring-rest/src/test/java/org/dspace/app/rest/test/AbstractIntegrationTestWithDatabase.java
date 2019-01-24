@@ -170,21 +170,11 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         // Cleanup our global context object
         try {
             AbstractBuilder.cleanupObjects();
-            if (context == null || !context.isValid()) {
-                context = new Context();
-            }
-            eperson = context.reloadEntity(eperson);
-            admin = context.reloadEntity(admin);
-
-            context.turnOffAuthorisationSystem();
-            if (eperson != null) {
-                EPersonServiceFactory.getInstance().getEPersonService().delete(context, eperson);
-            }
-            if (admin != null) {
-                EPersonServiceFactory.getInstance().getEPersonService().delete(context, admin);
-            }
             parentCommunity = null;
             cleanupContext();
+
+            // NOTE: we explicitly do NOT destroy our default eperson & admin as they
+            // are cached and reused for all tests. This speeds up all tests.
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
