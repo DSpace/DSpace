@@ -31,6 +31,7 @@ import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
@@ -42,6 +43,10 @@ import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.Constants;
+import org.dspace.core.I18nUtil;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.junit.After;
 import org.junit.Before;
@@ -65,6 +70,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private EPersonService ePersonService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     @Autowired
     private ItemService itemService;
@@ -203,6 +214,203 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                        RelationshipMatcher.matchRelationship(relationship3)
                    )))
         ;
+    }
+
+    @Test
+    public void createRelationshipWriteAccessLeftItem() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Author1")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, Donald")
+                                 .withRelationshipType("Person")
+                                 .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+
+
+        EPerson user = ePersonService.create(context);
+        user.setFirstName(context, "first");
+        user.setLastName(context, "last");
+        user.setEmail("testaze@email.com");
+        user.setCanLogIn(true);
+        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+        ePersonService.setPassword(user, password);
+        // actually save the eperson to unit testing DB
+        ePersonService.update(context, user);
+        context.setCurrentUser(user);
+
+        authorizeService.addPolicy(context, publication, Constants.WRITE, user);
+
+        String token = getAuthToken(user.getEmail(), password);
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+                                                           .param("leftItem", publication.getID().toString())
+                                                           .param("rightItem", author1.getID().toString())
+                                                           .param("relationshipType",
+                                                                       isAuthorOfPublicationRelationshipType.getID()
+                                                                                                            .toString())
+                                                           .contentType(MediaType.APPLICATION_JSON).content(
+                "{\"id\":530,\"leftId\":\"77877343-3f75-4c33-9492" +
+                    "-6ed7c98ed84e\",\"relationshipTypeId\":0,\"rightId\":\"423d0eda-b808-4b87-97ae-b85fe9d59418\"," +
+                    "\"leftPlace\":1,\"rightPlace\":1}"))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+    }
+
+    @Test
+    public void createRelationshipWriteAccessRightItem() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+
+
+        EPerson user = ePersonService.create(context);
+        user.setFirstName(context, "first");
+        user.setLastName(context, "last");
+        user.setEmail("testazhfhdfhe@email.com");
+        user.setCanLogIn(true);
+        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+        ePersonService.setPassword(user, password);
+        // actually save the eperson to unit testing DB
+        ePersonService.update(context, user);
+        context.setCurrentUser(user);
+
+        authorizeService.addPolicy(context, author1, Constants.WRITE, user);
+
+        String token = getAuthToken(user.getEmail(), password);
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+                                                           .param("leftItem", publication.getID().toString())
+                                                           .param("rightItem", author1.getID().toString())
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.APPLICATION_JSON).content(
+                "{\"id\":530,\"leftId\":\"77877343-3f75-4c33-9492" +
+                    "-6ed7c98ed84e\",\"relationshipTypeId\":0,\"rightId\":\"423d0eda-b808-4b87-97ae-b85fe9d59418\"," +
+                    "\"leftPlace\":1,\"rightPlace\":1}"))
+                                              .andExpect(status().isCreated())
+                                              .andReturn();
+
+    }
+
+
+    @Test
+    public void createRelationshipNoWriteAccess() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item author1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
+
+        Item publication = ItemBuilder.createItem(context, col3)
+                                      .withTitle("Publication1")
+                                      .withAuthor("Testy, TEst")
+                                      .withIssueDate("2015-01-01")
+                                      .withRelationshipType("Publication")
+                                      .build();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndLabels(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+
+
+        EPerson user = ePersonService.create(context);
+        user.setFirstName(context, "first");
+        user.setLastName(context, "last");
+        user.setEmail("testazeazeazezae@email.com");
+        user.setCanLogIn(true);
+        user.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+        ePersonService.setPassword(user, password);
+        // actually save the eperson to unit testing DB
+        ePersonService.update(context, user);
+        context.setCurrentUser(user);
+
+        String token = getAuthToken(user.getEmail(), password);
+
+        MvcResult mvcResult = getClient(token).perform(post("/api/core/relationships")
+                                                           .param("leftItem", publication.getID().toString())
+                                                           .param("rightItem", author1.getID().toString())
+                                                           .param("relationshipType",
+                                                                  isAuthorOfPublicationRelationshipType.getID()
+                                                                                                       .toString())
+                                                           .contentType(MediaType.APPLICATION_JSON).content(
+                "{\"id\":530,\"leftId\":\"77877343-3f75-4c33-9492" +
+                    "-6ed7c98ed84e\",\"relationshipTypeId\":0,\"rightId\":\"423d0eda-b808-4b87-97ae-b85fe9d59418\"," +
+                    "\"leftPlace\":1,\"rightPlace\":1}"))
+                                              .andExpect(status().isForbidden())
+                                              .andReturn();
+
     }
 
     @Test
