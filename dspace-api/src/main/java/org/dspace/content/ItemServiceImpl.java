@@ -1348,6 +1348,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             }
             return finalList;
         }
+
     }
 
     private List<RelationshipMetadataValue> handleItemRelationship(Context context, Item item, String entityType,

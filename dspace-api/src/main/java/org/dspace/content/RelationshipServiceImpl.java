@@ -23,6 +23,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,13 +56,15 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public Relationship create(Context context, Relationship relationship) throws SQLException, AuthorizeException {
         if (isRelationshipValidToCreate(context, relationship)) {
-            if (!authorizeService.isAdmin(context)) {
+            if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+                authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+                updatePlaceInRelationship(context, relationship, true);
+                return relationshipDAO.create(context, relationship);
+            } else {
                 throw new AuthorizeException(
-                    "Only administrators can modify relationship");
+                    "You do not have write rights on this relationship's items");
             }
-            updatePlaceInRelationship(context, relationship, true);
 
-            return relationshipDAO.create(context, relationship);
         } else {
             throw new IllegalArgumentException("The relationship given was not valid");
         }
@@ -276,17 +279,19 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     public void delete(Context context, Relationship relationship) throws SQLException, AuthorizeException {
-//        if (isRelationshipValidToDelete(context, relationship)) {
-        if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException(
-                "Only administrators can delete relationship");
-        }
-        relationshipDAO.delete(context, relationship);
+        if (isRelationshipValidToDelete(context, relationship)) {
+            if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
+                authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
+                relationshipDAO.delete(context, relationship);
+                updatePlaceInRelationship(context, relationship, false);
+            } else {
+                throw new AuthorizeException(
+                    "You do not have write rights on this relationship's items");
+            }
 
-        updatePlaceInRelationship(context, relationship, false);
-//        } else {
-//            throw new IllegalArgumentException("The relationship given was not valid");
-//        }
+        } else {
+            throw new IllegalArgumentException("The relationship given was not valid");
+        }
     }
 
     private boolean isRelationshipValidToDelete(Context context, Relationship relationship) throws SQLException {
