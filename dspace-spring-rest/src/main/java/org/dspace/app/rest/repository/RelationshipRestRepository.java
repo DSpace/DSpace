@@ -187,7 +187,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 }
             }
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error("Error deleting Relationship specified by ID:" + id, e);
         }
     }
 }

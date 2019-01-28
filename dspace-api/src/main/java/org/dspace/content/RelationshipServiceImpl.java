@@ -66,6 +66,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
     }
 
+    @Override
     public void updatePlaceInRelationship(Context context, Relationship relationship) throws SQLException {
         List<Relationship> leftRelationships = findByItemAndRelationshipType(context,
                                                                              relationship.getLeftItem(),
