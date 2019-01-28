@@ -18,9 +18,11 @@ public class MetadataValueComparator
     implements Comparator<MetadataValue>, Serializable {
     @Override
     public int compare(MetadataValue mv1, MetadataValue mv2) {
-        int compare = mv1.getMetadataField().getMetadataSchema().getID().compareTo(mv2.getMetadataField().getMetadataSchema().getID());
-        if (compare != 0)
+        int compare = mv1.getMetadataField().getMetadataSchema().getID()
+                         .compareTo(mv2.getMetadataField().getMetadataSchema().getID());
+        if (compare != 0) {
             return compare;
+        }
         compare = mv1.getMetadataField().getElement().compareTo(mv2.getMetadataField().getElement());
         //TODO: continue comparison
         return compare;
