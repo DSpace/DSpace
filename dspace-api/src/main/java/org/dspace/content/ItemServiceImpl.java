@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,6 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1329,6 +1332,8 @@ prevent the generation of resource policy entry values with null dspace_object a
                     listToReturn.add(metadataValue);
                 }
             }
+            listToReturn = sortMetadataValueList(listToReturn);
+
             return listToReturn;
 
         } else {
@@ -1346,9 +1351,25 @@ prevent the generation of resource policy entry values with null dspace_object a
                     finalList.add(metadataValue);
                 }
             }
+            finalList = sortMetadataValueList(finalList);
             return finalList;
         }
 
+    }
+
+    private List<MetadataValue> sortMetadataValueList(List<MetadataValue> listToReturn) {
+        Comparator<MetadataValue> comparator = Comparator.comparing(
+            metadataValue -> metadataValue.getMetadataField().getMetadataSchema().getName());
+        comparator = comparator.thenComparing(Comparator.comparing(
+            metadataValue -> metadataValue.getMetadataField().getElement()));
+        comparator = comparator.thenComparing(Comparator.comparing(
+            metadataValue -> metadataValue.getMetadataField().getQualifier()));
+        comparator = comparator.thenComparing(Comparator.comparing(
+            metadataValue -> metadataValue.getPlace()));
+
+        Stream<MetadataValue> metadataValueStream = listToReturn.stream().sorted(comparator);
+        listToReturn = metadataValueStream.collect(Collectors.toList());
+        return listToReturn;
     }
 
     private List<RelationshipMetadataValue> handleItemRelationship(Context context, Item item, String entityType,
