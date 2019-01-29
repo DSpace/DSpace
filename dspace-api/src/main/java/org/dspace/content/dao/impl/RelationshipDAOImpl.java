@@ -15,6 +15,7 @@ import javax.persistence.criteria.Root;
 
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.Relationship_;
 import org.dspace.content.dao.RelationshipDAO;
 import org.dspace.core.AbstractHibernateDAO;
@@ -22,6 +23,7 @@ import org.dspace.core.Context;
 
 public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> implements RelationshipDAO {
 
+    @Override
     public List<Relationship> findByItem(Context context, Item item) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
@@ -33,6 +35,7 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         return list(context, criteriaQuery, false, Relationship.class, -1, -1);
     }
 
+    @Override
     public int findLeftPlaceByLeftItem(Context context, Item item) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
@@ -48,6 +51,7 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         }
     }
 
+    @Override
     public int findRightPlaceByRightItem(Context context, Item item) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
@@ -62,4 +66,18 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             return 1;
         }
     }
+
+    @Override
+    public List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType)
+        throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.select(relationshipRoot);
+        criteriaQuery
+            .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType));
+        return list(context, criteriaQuery, true, Relationship.class, -1, -1);
+    }
+
+
 }
