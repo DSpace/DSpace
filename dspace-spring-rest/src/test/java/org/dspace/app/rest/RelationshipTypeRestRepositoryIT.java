@@ -34,9 +34,11 @@ import org.dspace.services.ConfigurationService;
 import org.h2.util.StringUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Ignore
 public class RelationshipTypeRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
