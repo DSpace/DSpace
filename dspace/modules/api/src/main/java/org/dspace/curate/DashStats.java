@@ -30,6 +30,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.datadryad.api.DryadDataFile;
+import org.datadryad.api.DryadJournalConcept;
+
 import org.dspace.handle.HandleManager;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
@@ -50,7 +53,7 @@ import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.utils.DSpace;
 
 import org.apache.log4j.Logger;
-import org.datadryad.api.DryadJournalConcept;
+
 
 /**
  * DashStats retrieves detailed statistics about a data package,
@@ -71,6 +74,7 @@ import org.datadryad.api.DryadJournalConcept;
 public class DashStats extends AbstractCurationTask {
 
     private static Logger log = Logger.getLogger(DashStats.class);
+    private static boolean headersReported = false;
     private IdentifierService identifierService = null;
     DocumentBuilderFactory dbf = null;
     DocumentBuilder docb = null;
@@ -104,22 +108,18 @@ public class DashStats extends AbstractCurationTask {
 	
 	String handle = "\"[no handle found]\"";
 	String packageDOI = "\"[no package DOI found]\"";
+        String packageTitle = "\"[no package title found]\"";
+        String packageAuthors = "";
 	String articleDOI = "\"[no article DOI found]\"";
 	String journal = "[no journal found]"; // don't add quotes here, because journal is always quoted when output below
-	boolean journalAllowsEmbargo = false;
-	boolean journalAllowsReview = false;
-	String numKeywords = "\"[no numKeywords found]\"";
-	String numKeywordsJournal = "\"[unknown]\"";
 	String numberOfFiles = "\"[no numberOfFiles found]\"";
 	long packageSize = 0;
 	String embargoType = "none";
 	String embargoDate = "";
-	int maxDownloads = 0;
 	String numberOfDownloads = "\"[unknown]\"";
 	String manuscriptNum = null;
-	int numReadmes = 0;
-	boolean wentThroughReview = false;
 	String dateAccessioned = "\"[unknown]\"";
+        String publicationYear = "\"[unknown]\"";
 
 	
 	try {
@@ -130,8 +130,7 @@ public class DashStats extends AbstractCurationTask {
 	}
 	
 	if (dso.getType() == Constants.COLLECTION) {
-	    // output headers for the CSV file that will be created by processing all items in this collection
-	    report("time, ip, DOI, filename, filesize, useragent, title, authors, pubdate, version, pubyear");
+            // do nothing
 	} else if (dso.getType() == Constants.ITEM) {
             Item item = (Item)dso;
 
@@ -160,6 +159,33 @@ public class DashStats extends AbstractCurationTask {
 		}
 		log.debug("packageDOI = " + packageDOI);
 
+		// package title
+		vals = item.getMetadata("dc.title");
+		if (vals.length == 0) {
+		    log.debug("Object has no dc.title" + handle);
+		} else {
+		    packageTitle = vals[0].value;
+		}
+		log.debug("packageTitle = " + packageTitle);
+
+                // package authors
+		vals = item.getMetadata("dc.contributor.author");
+                packageAuthors = "";
+                log.debug("found " + vals.length + " authors");
+		if (vals.length == 0) {
+		    log.debug("Object has no dc.contributor.author" + handle);
+		} else {
+                    for(int i = 0; i < vals.length; i++) {
+                        log.debug(" -- adding " + vals[i].value);
+                        packageAuthors = packageAuthors + vals[i].value;
+                        if(vals.length > i + 1) {
+                            packageAuthors = packageAuthors + "|";
+                        }
+                    } 
+                    log.debug("authors are " + packageAuthors);
+		}
+		log.debug("packageTitle = " + packageTitle);
+                
 		// article DOI
 		vals = item.getMetadata("dc.relation.isreferencedby");
 		if (vals.length == 0) {
@@ -181,24 +207,6 @@ public class DashStats extends AbstractCurationTask {
 		    journal = vals[0].value;
 		}
 		log.debug("journal = " + journal);
-
-		// journalAllowsEmbargo
-		// embargoes are allowed for all non-integrated journals
-		// embargoes are also allowed for integrated journals that have set the embargoesAllowed option
-                //use new journal utils to read the configuration from database instead of from the file
-                Scheme journalScheme = Scheme.findByIdentifier(context,"Journal");
-		DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
-                
-		if (journalConcept != null) {
-                    if (journalConcept.getIntegrated() || journalConcept.getAllowEmbargo()) {
-		        journalAllowsEmbargo = true;
-                    }
-                    
-                    // journalAllowsReview
-                    if (journalConcept.getAllowReviewWorkflow()) {
-                        journalAllowsReview = true;
-                    }
-		}
                 
 		// accession date
 		vals = item.getMetadata("dc.date.accessioned");
@@ -212,29 +220,9 @@ public class DashStats extends AbstractCurationTask {
 		}
 		log.debug("dateAccessioned = " + dateAccessioned);
 
-		// wentThroughReview
-		vals = item.getMetadata("dc.description.provenance");
-		if (vals.length == 0) {
-		    log.warn("That's strange -- Object has no provenance data available " + handle);
-		} else {
-		    for(DCValue aVal : vals) {
-			if(aVal.value != null && aVal.value.contains("requiresReviewStep")) {
-			    wentThroughReview = true;
-			}
-		    }
-		}
-		log.debug("wentThroughReview = " + wentThroughReview);
-
-		
-		// number of keywords
-		int intNumKeywords = item.getMetadata("dc.subject").length +
-		    item.getMetadata("dwc.ScientificName").length +
-		    item.getMetadata("dc.coverage.temporal").length +
-		    item.getMetadata("dc.coverage.spatial").length;
-
-		numKeywords = "" + intNumKeywords; //convert integer to string by appending
-		log.debug("numKeywords = " + numKeywords);
-
+                // publication year
+                publicationYear = dateAccessioned.substring(0,4);
+                
 		// manuscript number
 		DCValue[] manuvals = item.getMetadata("dc.identifier.manuscriptNumber");
 		manuscriptNum = null;
@@ -246,13 +234,65 @@ public class DashStats extends AbstractCurationTask {
 
 		}
 
-                // OUTPUT basic package stats
-                // TODO: move this into the loop for outputting real stats
-                report(packageDOI + ", " + numberOfFiles + ", " + packageSize + ", " +
-                       numberOfDownloads + ", " + dateAccessioned);
-
-                // TODO: get package view stats and loop through them,  outputting each
+                // ensure the headers are output exactly once per run of the stats process
+                if(!headersReported) {
+                    report("#Fields: event_time" + "\t" +
+                           "client_ip" + "\t" +
+                           "session_cookie_id" + "\t" +
+                           "user_cookie_id" + "\t" +
+                           "user_id" + "\t" +
+                           "request_url" + "\t" +
+                           "identifier" + "\t" +
+                           "filename" + "\t" +
+                           "size" + "\t" +
+                           "user-agent" + "\t" +
+                           "title" + "\t" +
+                           "publisher" + "\t" +
+                           "publisher_id" + "\t" +
+                           "authors" + "\t" +
+                           "publication_date" + "\t" +
+                           "version" + "\t" +
+                           "other_id" + "\t" +
+                           "target_url" + "\t" +
+                           "publication_year"
+                           );
+                    headersReported = true;
+                }
                 
+                URL pageviewsURL = new URL("http://datadryad.org/solr/statistics/select/?rows=10000000&q=id:" + item.getID());
+                log.debug("fetching pageviews " + pageviewsURL);
+                Document viewsdoc = docb.parse(pageviewsURL.openStream());
+                NodeList nl = viewsdoc.getElementsByTagName("result");
+                String viewsAtt = nl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
+                int currViews = Integer.parseInt(viewsAtt);
+                log.debug("number of pageviews " + currViews);
+                NodeList viewNodes = nl.item(0).getChildNodes();
+                log.debug("number of nodes returned " + viewNodes.getLength());
+                for(int i = 0; i < viewNodes.getLength(); i++) {
+                    Node aView = viewNodes.item(i);
+                    String eventTime = getNamedChildText(aView, "time");
+                    String clientIP = getNamedChildText(aView, "ip");
+                    String userAgent = getNamedChildText(aView, "userAgent");
+                    report(eventTime + "\t" +
+                           clientIP + "\t" +
+                           "- \t" +  //session_cookie_id
+                           "- \t" +  //user_cookie_id
+                           "- \t" +  //user__id
+                           "https://datadryad.org/resource/" + packageDOI + "\t" +
+                           packageDOI + "\t" +
+                           "- \t" +  //filename
+                           "- \t" +  //size
+                           userAgent + "\t" +
+                           packageTitle + "\t" +
+                           "Dryad Digital Repository \t" + //publisher
+                           packageAuthors + "\t" +
+                           dateAccessioned + "\t" +
+                           "1 \t" +  //version
+                           "- \t" +  //other_id
+                           "https://datadryad.org/resource/" + packageDOI + "\t" +
+                           publicationYear
+                           );
+                }
                 
                 // ================= START DATA FILES ================
                 
@@ -269,7 +309,6 @@ public class DashStats extends AbstractCurationTask {
 		    packageSize = 0;
 		    
 		    // for each data file in the package
-
 		    for(int i = 0; i < dataFiles.length; i++) {
 			String fileID = dataFiles[i].value;
 			log.debug(" ======= processing fileID = " + fileID);
@@ -283,74 +322,53 @@ public class DashStats extends AbstractCurationTask {
 			}
 			log.debug("file internalID = " + fileItem.getID());
 			
-			// total package size
-			// add total size of the bitstreams in this data file 
-			// to the cumulative total for the package
-			// (includes metadata, readme, and textual conversions for indexing)
-			for (Bundle bn : fileItem.getBundles()) {
-			    for (Bitstream bs : bn.getBitstreams()) {
-				packageSize = packageSize + bs.getSize();
-			    }
-			}
-			log.debug("total package size (as of file " + fileID + ") = " + packageSize);
-
-			// Readmes
-			// Check for at least one readme bitstream. There may be more, due to indexing and cases
-			// where the file itself is named readme. We only count one readme per datafile.
-			boolean readmeFound = false;
-			for (Bundle bn : fileItem.getBundles()) {
-			    for (Bitstream bs : bn.getBitstreams()) {
-				String name = bs.getName().trim().toLowerCase();
-				if(name.startsWith("readme")) {
-				    readmeFound = true;
-				}
-			    }
-			}
-			if(readmeFound) {
-			    numReadmes++;
-			}
-			log.debug("total readmes (as of file " + fileID + ") = " + numReadmes);
-
-			
-			// embargo setting (of last file processed)
-			vals = fileItem.getMetadata("dc.type.embargo");
-			if (vals.length > 0) {
-			    embargoType = vals[0].value;
-			    log.debug("EMBARGO vals " + vals.length + " type " + embargoType);
-			}
-			vals = fileItem.getMetadata("dc.date.embargoedUntil");
-			if (vals.length > 0) {
-			    embargoDate = vals[0].value;
-			}
-			if((embargoType == null || embargoType.equals("") || embargoType.equals("none")) &&
-			   (embargoDate != null && !embargoDate.equals(""))) {
-			    // correctly encode embago type to "oneyear" if there is a date set, but the type is blank or none
-			    embargoType = "oneyear";
-			}
-			log.debug("embargoType = " + embargoType);
-			log.debug("embargoDate = " + embargoDate);
-			
-		       			    			
-			// number of downlaods for most downloaded file
+                        // basic file metadata
+                        DryadDataFile ddf = new DryadDataFile(fileItem);
+                        Bitstream bitstream = ddf.getFirstBitstream();
+                        String filename = bitstream.getName();
+                        Long fileSize = bitstream.getSize();
+                        String fileDOI = ddf.getIdentifier();
+                                              
 			// must use the DSpace item ID, since the solr stats system is based on this ID
 			// The SOLR address is hardcoded to the production system here, because even when we run on test servers,
 			// it's easiest to use the real stats --the test servers typically don't have useful stats available
-			URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?indent=on&q=owningItem:" + fileItem.getID());
+			URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?rows=1000000&q=owningItem:" + fileItem.getID());
 			log.debug("fetching " + downloadStatURL);
-			Document statsdoc = docb.parse(downloadStatURL.openStream());
-			NodeList nl = statsdoc.getElementsByTagName("result");
-			String downloadsAtt = nl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
+			Document downloadsdoc = docb.parse(downloadStatURL.openStream());
+			NodeList dnl = downloadsdoc.getElementsByTagName("result");
+			String downloadsAtt = dnl.item(0).getAttributes().getNamedItem("numFound").getTextContent();
 			int currDownloads = Integer.parseInt(downloadsAtt);
-			if(currDownloads > maxDownloads) {
-			    maxDownloads = currDownloads;
-			    // rather than converting maxDownloads back to a string, just use the string we parsed above
-			    numberOfDownloads = downloadsAtt;
-			}
-			log.debug("max downloads (as of file " + fileID + ") = " + numberOfDownloads);
-			
-		    }
+                        log.debug("number of downloads " + currDownloads);
+                        NodeList dlNodes = dnl.item(0).getChildNodes();
+                        log.debug("number of nodes returned " + dlNodes.getLength());
 
-		}
+                        for(int j = 0; j < dlNodes.getLength(); j++) {
+                            Node aDownload = dlNodes.item(j);
+                            String eventTime = getNamedChildText(aDownload, "time");
+                            String clientIP = getNamedChildText(aDownload, "ip");
+                            String userAgent = getNamedChildText(aDownload, "userAgent");
+                            report(eventTime + "\t" +
+                                   clientIP + "\t" +
+                                   "- \t" +  //session_cookie_id
+                                   "- \t" +  //user_cookie_id
+                                   "- \t" +  //user__id
+                                   "https://datadryad.org/resource/" + fileDOI + "\t" +
+                                   packageDOI + "\t" +
+                                   filename + "\t" +
+                                   fileSize + "\t" +
+                                   userAgent + "\t" +
+                                   filename + "\t" +
+                                   "Dryad Digital Repository \t" + //publisher
+                                   packageAuthors + "\t" +
+                                   dateAccessioned + "\t" +
+                                   "1 \t" +  //version
+                                   "- \t" +  //other_id
+                                   "https://datadryad.org/resource/" + fileDOI + "\t" +
+                                   publicationYear
+                                   );
+                        }
+                    }
+                }
 		log.info(handle + " done.");
 	    } catch (Exception e) {
 		log.fatal("Skipping -- Exception in processing " + handle, e);
@@ -376,7 +394,7 @@ public class DashStats extends AbstractCurationTask {
 	    // ignore it
 	}
 
-	log.debug("DataPackageStats complete");
+	log.debug("DashStats complete");
 
 	try { 
 	    context.complete();
@@ -393,6 +411,30 @@ public class DashStats extends AbstractCurationTask {
 	return aNode.getChildNodes().item(0).getNodeValue();
     }
 
+    /**
+       Returns the text of a "named" child node. For example, if called on the structure
+       below with the name of "color", this method would return "blue".
+
+       <rootNode>
+         <child name="size">4</child>
+         <child name="color">blue</child>
+         <child name="shape">square</child>
+       </rootNode>
+    **/
+    private String getNamedChildText(Node aNode, String fieldName) {
+        String result = null;
+        NodeList childNodes = aNode.getChildNodes();
+        for(int i = 0; i < childNodes.getLength(); i++) {
+            Node aChild = childNodes.item(i);
+            String name = aChild.getAttributes().getNamedItem("name").getTextContent();
+            if(name.equals(fieldName)) {
+                result = aChild.getFirstChild().getTextContent();
+                break;
+            }
+        }
+        return result;
+    }
+    
     private Item getDSpaceItem(String itemID) {
 	Item dspaceItem = null;
 	try {
