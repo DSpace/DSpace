@@ -91,6 +91,17 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     public void updatePlaceInRelationship(Context context, Relationship relationship, boolean isCreation)
         throws SQLException, AuthorizeException;
 
-    public void updateItem(Context context, Item leftItem) throws SQLException, AuthorizeException;
+    /**
+     * This method will update the given item's metadata order.
+     * If the relationships for the item have been modified and will calculate the place based on a
+     * metadata field, this function will ensure the place is calculated.
+     * @param context           The relevant DSpace context
+     * @param relatedItem       The Item for which the list of Relationship location is calculated
+     *                          based on a metadata field
+     * @throws SQLException     If something goes wrong
+     * @throws AuthorizeException
+     *                          If the user is not authorized to update the item
+     */
+    public void updateItem(Context context, Item relatedItem) throws SQLException, AuthorizeException;
 
 }
