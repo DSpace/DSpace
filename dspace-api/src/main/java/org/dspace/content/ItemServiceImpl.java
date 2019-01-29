@@ -1415,7 +1415,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         RelationshipMetadataValue metadataValue = constructMetadataValue(context,
                                                                          MetadataSchemaEnum.RELATION
                                                                              .getName() + "." + relationName);
-        metadataValue.setAuthority("virtual::" + relationshipId);
+        metadataValue.setAuthority(Constants.VIRTUAL_AUTHORITY_PREFIX + relationshipId);
         metadataValue.setValue(otherItem.getID().toString());
         return metadataValue;
     }
@@ -1438,7 +1438,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                                                                       RelationshipMetadataValue metadataValue,
                                                                       Integer relationshipId) {
         metadataValue.setValue(value);
-        metadataValue.setAuthority("virtual::" + relationshipId);
+        metadataValue.setAuthority(Constants.VIRTUAL_AUTHORITY_PREFIX + relationshipId);
         metadataValue.setConfidence(-1);
         metadataValue.setDSpaceObject(item);
         return metadataValue;
@@ -1454,10 +1454,9 @@ prevent the generation of resource policy entry values with null dspace_object a
             MetadataField metadataField = metadataFieldService
                 .findByElement(context, metadataSchema, metadataElement, metadataQualifier);
             if (metadataField == null) {
-                log.error(
-                    "A MetadataValue was attempted to construct with MetadataField for paremeters: metadataschema: "
-                        + metadataSchema + ", metadataelement:" + metadataElement +
-                        ", metadataqualifier: " + metadataQualifier);
+                log.error("A MetadataValue was attempted to construct with MetadataField for parameters: " +
+                              "metadataschema: {}, metadataelement: {}, metadataqualifier: {}",
+                          metadataSchema, metadataElement, metadataQualifier);
                 return null;
             }
             metadataValue.setMetadataField(metadataField);

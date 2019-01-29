@@ -986,6 +986,25 @@ public class RestResourceController implements InitializingBean {
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * Execute a PUT request for an entity with id of type Integer;
+     *
+     * curl -X PUT http://<dspace.url>/dspace-spring-rest/api/{apiCategory}/{model}/{id}
+     *
+     * Example:
+     * <pre>
+     * {@code
+     *      curl -X PUT http://<dspace.url>/dspace-spring-rest/api/core/metadatafield/1
+     * }
+     * </pre>
+     *
+     * @param request     the http request
+     * @param apiCategory the API category e.g. "api"
+     * @param model       the DSpace model e.g. "collection"
+     * @param id        the ID of the target REST object
+     * @param jsonNode    the part of the request body representing the updated rest object
+     * @return the relevant REST resource
+     */
     @RequestMapping(method = RequestMethod.PUT, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
     public DSpaceResource<RestAddressableModel> put(HttpServletRequest request,
                                                     @PathVariable String apiCategory, @PathVariable String model,

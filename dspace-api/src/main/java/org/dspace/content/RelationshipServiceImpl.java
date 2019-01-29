@@ -70,6 +70,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
     }
 
+    @Override
     public void updatePlaceInRelationship(Context context, Relationship relationship, boolean isCreation)
         throws SQLException, AuthorizeException {
         Item leftItem = relationship.getLeftItem();
