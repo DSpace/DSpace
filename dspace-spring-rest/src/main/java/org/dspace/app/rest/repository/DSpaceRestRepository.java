@@ -407,7 +407,16 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
-
+    /**
+     * Apply an update to the REST object via JSON PUT
+     *
+     * @param request       the http request
+     * @param apiCategory
+     * @param model
+     * @param id            the ID of the target REST object
+     * @param jsonNode
+     * @return              the full new state of the REST object after patching
+     */
     public T put(HttpServletRequest request, String apiCategory, String model, ID id, JsonNode jsonNode) {
         Context context = obtainContext();
         try {
