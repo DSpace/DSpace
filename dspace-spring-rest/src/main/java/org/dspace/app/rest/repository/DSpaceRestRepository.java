@@ -430,7 +430,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Implement this method in the subclass to support updating a DSpace instance.
+     * Implement this method in the subclass to support updating a REST object.
      *
      * @param context     the dspace context
      * @param apiCategory the API category e.g. "api"
