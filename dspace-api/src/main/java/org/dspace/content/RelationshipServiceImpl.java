@@ -122,10 +122,11 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     }
 
-    public void updateItem(Context context, Item leftItem)
+    @Override
+    public void updateItem(Context context, Item relatedItem)
         throws SQLException, AuthorizeException {
-        leftItem.setMetadataModified();
-        itemService.update(context, leftItem);
+        relatedItem.setMetadataModified();
+        itemService.update(context, relatedItem);
     }
 
 
