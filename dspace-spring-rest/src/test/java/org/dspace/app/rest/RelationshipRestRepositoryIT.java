@@ -532,12 +532,12 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(2)));
 
-//        author0MD = list.get(0);
-//        assertEquals("Smith, Donald", author0MD.getValue());
-//        author1MD = list.get(1);
-//        assertEquals("plain text", author1MD.getValue());
-//        MetadataValue author2MD = list.get(2);
-//        assertEquals("Smith, Maria", author2MD.getValue());
+        author0MD = list.get(0);
+        assertEquals("Smith, Donald", author0MD.getValue());
+        author1MD = list.get(1);
+        assertEquals("plain text", author1MD.getValue());
+        MetadataValue author2MD = list.get(2);
+        assertEquals("Smith, Maria", author2MD.getValue());
 
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text two");
@@ -555,14 +555,14 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
             }
         }
 
-//        author0MD = list.get(0);
-//        assertEquals("Smith, Donald", author0MD.getValue());
-//        author1MD = list.get(1);
-//        assertEquals("plain text", author1MD.getValue());
-//        author2MD = list.get(2);
-//        assertEquals("Smith, Maria", author2MD.getValue());
-//        MetadataValue author3MD = list.get(3);
-//        assertEquals("plain text two", author3MD.getValue());
+        author0MD = list.get(0);
+        assertEquals("Smith, Donald", author0MD.getValue());
+        author1MD = list.get(1);
+        assertEquals("plain text", author1MD.getValue());
+        author2MD = list.get(2);
+        assertEquals("Smith, Maria", author2MD.getValue());
+        MetadataValue author3MD = list.get(3);
+        assertEquals("plain text two", author3MD.getValue());
 
 
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
@@ -588,16 +588,16 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("leftPlace", is(4)));
 
-//        author0MD = list.get(0);
-//        assertEquals("Smith, Donald", author0MD.getValue());
-//        author1MD = list.get(1);
-//        assertEquals("plain text", author1MD.getValue());
-//        author2MD = list.get(2);
-//        assertEquals("Smith, Maria", author2MD.getValue());
-//        author3MD = list.get(3);
-//        assertEquals("plain text two", author3MD.getValue());
-//        MetadataValue author4MD = list.get(4);
-//        assertEquals("Maybe, Maybe", author4MD.getValue());
+        author0MD = list.get(0);
+        assertEquals("Smith, Donald", author0MD.getValue());
+        author1MD = list.get(1);
+        assertEquals("plain text", author1MD.getValue());
+        author2MD = list.get(2);
+        assertEquals("Smith, Maria", author2MD.getValue());
+        author3MD = list.get(3);
+        assertEquals("plain text two", author3MD.getValue());
+        MetadataValue author4MD = list.get(4);
+        assertEquals("Maybe, Maybe", author4MD.getValue());
 
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text three");
@@ -612,18 +612,18 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
             }
         }
 
-//        author0MD = list.get(0);
-//        assertEquals("Smith, Donald", author0MD.getValue());
-//        author1MD = list.get(1);
-//        assertEquals("plain text", author1MD.getValue());
-//        author2MD = list.get(2);
-//        assertEquals("Smith, Maria", author2MD.getValue());
-//        author3MD = list.get(3);
-//        assertEquals("plain text two", author3MD.getValue());
-//        author4MD = list.get(4);
-//        assertEquals("Maybe, Maybe", author4MD.getValue());
-//        MetadataValue author5MD = list.get(5);
-//        assertEquals("plain text three", author5MD.getValue());
+        author0MD = list.get(0);
+        assertEquals("Smith, Donald", author0MD.getValue());
+        author1MD = list.get(1);
+        assertEquals("plain text", author1MD.getValue());
+        author2MD = list.get(2);
+        assertEquals("Smith, Maria", author2MD.getValue());
+        author3MD = list.get(3);
+        assertEquals("plain text two", author3MD.getValue());
+        author4MD = list.get(4);
+        assertEquals("Maybe, Maybe", author4MD.getValue());
+        MetadataValue author5MD = list.get(5);
+        assertEquals("plain text three", author5MD.getValue());
 
         publication = itemService.find(context, publication.getID());
         itemService.addMetadata(context, publication, "dc", "contributor", "author", Item.ANY, "plain text four");
@@ -649,6 +649,28 @@ public class RelationshipRestRepositoryIT extends AbstractControllerIntegrationT
                 assertEquals(9, mdv.getPlace());
             }
         }
+
+
+        author0MD = list.get(0);
+        assertEquals("Smith, Donald", author0MD.getValue());
+        author1MD = list.get(1);
+        assertEquals("plain text", author1MD.getValue());
+        author2MD = list.get(2);
+        assertEquals("Smith, Maria", author2MD.getValue());
+        author3MD = list.get(3);
+        assertEquals("plain text two", author3MD.getValue());
+        author4MD = list.get(4);
+        assertEquals("Maybe, Maybe", author4MD.getValue());
+        author5MD = list.get(5);
+        assertEquals("plain text three", author5MD.getValue());
+        MetadataValue author6MD = list.get(6);
+        assertEquals("plain text four", author6MD.getValue());
+        MetadataValue author7MD = list.get(7);
+        assertEquals("plain text five", author7MD.getValue());
+        MetadataValue author8MD = list.get(8);
+        assertEquals("plain text six", author8MD.getValue());
+        MetadataValue author9MD = list.get(9);
+        assertEquals("plain text seven", author9MD.getValue());
 
         list = itemService.getMetadata(publication, "dc", "contributor", Item.ANY, Item.ANY);
         assertEquals(10, list.size()); //same size as authors
