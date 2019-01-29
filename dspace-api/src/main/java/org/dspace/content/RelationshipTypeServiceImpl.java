@@ -35,6 +35,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
         return relationshipTypeDAO.create(context, new RelationshipType());
     }
 
+    @Override
     public RelationshipType create(Context context, RelationshipType relationshipType)
         throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
@@ -44,13 +45,25 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
         return relationshipTypeDAO.create(context, relationshipType);
     }
 
+    @Override
     public RelationshipType findbyTypesAndLabels(Context context,EntityType leftType,EntityType rightType,
                                                  String leftLabel,String rightLabel) throws SQLException {
         return relationshipTypeDAO.findbyTypesAndLabels(context, leftType, rightType, leftLabel, rightLabel);
     }
 
+    @Override
     public List<RelationshipType> findAll(Context context) throws SQLException {
         return relationshipTypeDAO.findAll(context, RelationshipType.class);
+    }
+
+    @Override
+    public List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException {
+        return relationshipTypeDAO.findByLeftOrRightLabel(context, label);
+    }
+
+    @Override
+    public List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException {
+        return relationshipTypeDAO.findByEntityType(context, entityType);
     }
 
     public RelationshipType find(Context context,int id) throws SQLException {
@@ -83,10 +96,5 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
                 "Only administrators can delete entityType");
         }
         relationshipTypeDAO.delete(context, relationshipType);
-    }
-
-    @Override
-    public List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException {
-        return relationshipTypeDAO.findByLeftOrRightLabel(context, label);
     }
 }

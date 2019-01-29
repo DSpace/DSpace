@@ -39,13 +39,23 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
                                                 throws SQLException;
 
     /**
-     * This method will query the Database for a list of RelationshipType objects that have the given label
-     * either as a left or right label in its attributes
+     * This method will return a list of RelationshipType objects for which the given label is equal to
+     * either the leftLabel or rightLabel.
      * @param context   The relevant DSpace context
-     * @param label     The label that the RelationshipType must have as a leftLabel or rightLabel attribute
-     * @return  The list of RelationshipType objects that fit the criteria
+     * @param label     The label that will be used to check on
+     * @return A list of RelationshipType objects that have the given label as either the leftLabel or rightLabel
      * @throws SQLException If something goes wrong
      */
     List<RelationshipType> findByLeftOrRightLabel(Context context, String label) throws SQLException;
 
+    /**
+     * This method will return a list of RelationshipType objects for which the given EntityType object is equal
+     * to the leftType or rightType
+     * @param context       The relevant DSpace context
+     * @param entityType    The EntityType object that will be used to check on
+     * @return  The list of RelationshipType objects that have the given EntityType object
+     *          as either a leftType or rightType
+     * @throws SQLException If something goes wrong
+     */
+    List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException;
 }
