@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -86,11 +87,11 @@ public class RelationshipServiceImpl implements RelationshipService {
         context.turnOffAuthorisationSystem();
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), true)) {
             if (!leftRelationships.isEmpty()) {
-                leftRelationships.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
+                leftRelationships.sort(Comparator.comparingInt(Relationship::getLeftPlace));
                 for (int i = 0; i < leftRelationships.size(); i++) {
-                    leftRelationships.get(leftRelationships.size() - 1 - i).setLeftPlace(i);
+                    leftRelationships.get(i).setLeftPlace(i);
                 }
-                relationship.setLeftPlace(leftRelationships.get(0).getLeftPlace() + 1);
+                relationship.setLeftPlace(leftRelationships.size());
             } else {
                 relationship.setLeftPlace(0);
             }
@@ -101,11 +102,11 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         if (!virtualMetadataPopulator.isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), false)) {
             if (!rightRelationships.isEmpty()) {
-                rightRelationships.sort((o1, o2) -> o2.getRightPlace() - o1.getRightPlace());
+                rightRelationships.sort(Comparator.comparingInt(Relationship::getRightPlace));
                 for (int i = 0; i < rightRelationships.size(); i++) {
-                    rightRelationships.get(rightRelationships.size() - 1 - i).setRightPlace(i);
+                    rightRelationships.get(i).setRightPlace(i);
                 }
-                relationship.setRightPlace(rightRelationships.get(0).getRightPlace() + 1);
+                relationship.setRightPlace(rightRelationships.size());
             } else {
                 relationship.setRightPlace(0);
             }
