@@ -27,7 +27,6 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
@@ -64,8 +63,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected MetadataFieldService metadataFieldService;
     @Autowired(required = true)
     protected MetadataAuthorityService metadataAuthorityService;
-    @Autowired(required = true)
-    protected ItemService itemService;
     @Autowired(required = true)
     protected RelationshipService relationshipService;
 
@@ -559,7 +556,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             Map<MetadataField, Integer> fieldToLastPlace = new HashMap<>();
             List<MetadataValue> metadataValues = new LinkedList<>();
             if (dso.getType() == Constants.ITEM) {
-                metadataValues = itemService.getMetadata((Item) dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+                metadataValues = getMetadata(dso, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             } else {
                 metadataValues = dso.getMetadata();
             }
