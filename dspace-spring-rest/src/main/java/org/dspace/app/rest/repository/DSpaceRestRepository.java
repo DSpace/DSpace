@@ -409,7 +409,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     }
 
     /**
-     * Method to support updating a DSpace instance.
+     * Apply an update to the REST object via JSON PUT
      *
      * @param request     the http request
      * @param apiCategory the API category e.g. "api"
